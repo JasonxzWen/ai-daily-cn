@@ -9,6 +9,25 @@ const DEFAULT_KNOWLEDGE_DIR = path.join(DEFAULT_ROOT, "knowledge", "official-blo
 const SCHEMA_PATH = path.join(DEFAULT_ROOT, "schemas", "official-blog.schema.json");
 const SUPPORTED_COMPANIES = new Set(["openai", "anthropic"]);
 const MAX_DIGEST_LENGTH = 1200;
+const REPORT_ITEM_SECTIONS = [
+  "main_items",
+  "hot_blogs",
+  "official_org_updates",
+  "model_releases",
+  "projects",
+  "github_trending",
+  "builder_observations",
+  "community_leads",
+  "daily_tracking",
+  "chinese_media_dynamics"
+];
+const REPORT_ITEM_URL_FIELDS = [
+  "url",
+  "source_url",
+  "canonical_url",
+  "primary_url",
+  "article_url"
+];
 
 const TRACKING_PARAMS = new Set([
   "fbclid",
@@ -59,7 +78,10 @@ export async function loadOfficialBlogKnowledge(options = {}) {
 }
 
 export function toPublicOfficialBlogKnowledge(index = {}, options = {}) {
-  const records = Array.isArray(index.records) ? index.records.map(publicOfficialBlogRecord) : [];
+  const reportDatesByUrl = buildRelatedReportDateLookup(options.reports);
+  const records = Array.isArray(index.records)
+    ? index.records.map((record) => publicOfficialBlogRecord(record, { reportDatesByUrl }))
+    : [];
   const companies = uniqueSorted(records.map((record) => record.company));
   const topics = uniqueSorted(records.flatMap((record) => record.topics || []));
   const byCompany = { anthropic: 0, openai: 0 };
@@ -82,6 +104,26 @@ export function toPublicOfficialBlogKnowledge(index = {}, options = {}) {
     },
     records
   };
+}
+
+export function buildRelatedReportDateLookup(reports = []) {
+  const byUrl = new Map();
+  for (const report of Array.isArray(reports) ? reports : []) {
+    const reportDate = String(report?.report_date || "").trim();
+    if (!reportDate) {
+      continue;
+    }
+    for (const url of officialBlogCandidateUrlsFromReport(report)) {
+      const normalized = safeNormalizeOfficialBlogUrl(url);
+      if (!normalized) {
+        continue;
+      }
+      const dates = byUrl.get(normalized) || new Set();
+      dates.add(reportDate);
+      byUrl.set(normalized, dates);
+    }
+  }
+  return new Map([...byUrl.entries()].map(([url, dates]) => [url, uniqueSorted([...dates])]));
 }
 
 export function normalizeOfficialBlogUrl(value) {
@@ -213,13 +255,15 @@ export async function validateOfficialBlogKnowledge(index) {
   };
 }
 
-function publicOfficialBlogRecord(record = {}) {
+function publicOfficialBlogRecord(record = {}, options = {}) {
+  const normalizedUrl = String(record.normalized_url || normalizeOfficialBlogUrl(record.canonical_url || ""));
+  const inferredDates = options.reportDatesByUrl?.get(normalizedUrl) || [];
   return {
     id: String(record.id || ""),
     company: String(record.company || ""),
     company_label: record.company === "anthropic" ? "Anthropic" : record.company === "openai" ? "OpenAI" : String(record.company || ""),
     canonical_url: String(record.canonical_url || ""),
-    normalized_url: String(record.normalized_url || normalizeOfficialBlogUrl(record.canonical_url || "")),
+    normalized_url: normalizedUrl,
     published_at: String(record.published_at || ""),
     title_original: String(record.title_original || ""),
     title_zh: String(record.title_zh || ""),
@@ -230,8 +274,37 @@ function publicOfficialBlogRecord(record = {}) {
     key_ideas: stringArray(record.key_ideas),
     practice_checklist: stringArray(record.practice_checklist),
     related_blog_ids: uniqueSorted(record.related_blog_ids || []),
-    related_report_dates: uniqueSorted(record.related_report_dates || [])
+    related_report_dates: uniqueSorted([
+      ...(Array.isArray(record.related_report_dates) ? record.related_report_dates : []),
+      ...inferredDates
+    ])
   };
+}
+
+function officialBlogCandidateUrlsFromReport(report = {}) {
+  const urls = [];
+  for (const section of REPORT_ITEM_SECTIONS) {
+    const items = Array.isArray(report[section]) ? report[section] : [];
+    for (const item of items) {
+      if (!item || typeof item !== "object") {
+        continue;
+      }
+      for (const field of REPORT_ITEM_URL_FIELDS) {
+        if (typeof item[field] === "string" && item[field].trim()) {
+          urls.push(item[field]);
+        }
+      }
+    }
+  }
+  return urls;
+}
+
+function safeNormalizeOfficialBlogUrl(value) {
+  try {
+    return normalizeOfficialBlogUrl(value);
+  } catch {
+    return "";
+  }
 }
 
 function normalizeOfficialBlogRecord(record, context = {}) {

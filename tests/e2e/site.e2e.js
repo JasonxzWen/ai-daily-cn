@@ -146,6 +146,15 @@ structuredReport.hot_blogs.push({
   topic: "layout regression",
   summary: "这篇博客用于验证没有证据图时的卡片布局，重点是普通读者能否顺畅扫读。它应让标题、正文和要点占满可读宽度，而不是留下空媒体栏。读者看到的是清楚的中文正文层级、要点分组和链接状态，不会被英文测试文案干扰。"
 });
+structuredReport.hot_blogs.push({
+  title: "OpenAI Agent Tools Related Report Fixture",
+  url: "https://openai.com/index/new-tools-for-building-agents/?utm_source=e2e#tools",
+  publisher: "OpenAI",
+  author: "OpenAI",
+  event_date: "2026-05-15",
+  topic: "agent workflow",
+  summary: "这篇博客说明 OpenAI 的 agent 构建工具如何把模型调用、工具接入和工作流编排连接起来。摘要用于测试日报中的官方博客链接可以反向关联到知识页，读者能看到对应日期，并核对工程落地流程、权限边界和集成风险。"
+});
 structuredReport.chinese_media_dynamics = [
   {
     candidate_id: "intermediary-qbitai-e2e",
@@ -501,6 +510,7 @@ try {
   assert.equal(await page.locator('[data-official-blog-company="anthropic"]').count() >= 1, true);
   assert.equal(await page.locator("[data-related-report-links]").count() >= 6, true);
   assert.equal(await page.locator("[data-related-blog-link]").count() >= 4, true);
+  assert.equal(await page.locator('[data-related-report-link="2026-05-15"][href="../reports/2026/05/2026-05-15.html"]').count(), 1);
   assert.equal(await page.locator('a[href="../index.html"]').count() >= 1, true);
   assert.equal(await page.locator('a[href="../data/official-blogs.json"]').count() >= 1, true);
   assert.equal(await page.locator('a[href^="https://openai.com"][target="_blank"][rel*="noopener"]').count() >= 1, true);
@@ -605,7 +615,7 @@ try {
   assert.doesNotMatch(reportBody, /项目 highlight|项目 highlights|技不止术|热门技术博客|来源\s*第三方报道|第三方报道|这条动态主要围绕|完整列表|优先核对 README|进入 GitHub Trending Top 10|序号\s*1/);
   assert.equal(await allImagesLoaded(page), true);
   assert.equal(await page.locator(".blog-card .card-media-grid img").count(), 1);
-  assert.equal(await page.locator(".interactive-card.blog-card:not(.chinese-media-card)").count(), 2);
+  assert.equal(await page.locator(".interactive-card.blog-card:not(.chinese-media-card)").count(), 3);
   assert.equal(await page.locator(".builder-card").count(), 2);
   assert.equal(await page.locator(".builder-card .card-title-icon").count(), 2);
   assert.equal(await page.locator(".card-media-grid img[src^='http']").count(), 0);

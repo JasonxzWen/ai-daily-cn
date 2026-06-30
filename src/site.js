@@ -232,7 +232,8 @@ export async function buildSite(options = {}) {
     knowledgeDir: options.officialBlogKnowledgeDir
   });
   const officialBlogKnowledge = toPublicOfficialBlogKnowledge(officialBlogKnowledgeRaw, {
-    generatedAt: feedValidation.value.updated_at
+    generatedAt: feedValidation.value.updated_at,
+    reports
   });
   const dateIndex = buildDateIndex(feedValidation.value, reports, trendValidation.value);
   const reportNavigationByDate = buildReportNavigation(feedValidation.value.reports, dateIndex.items);
