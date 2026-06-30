@@ -21,15 +21,6 @@
       "why_watch": "模型权重更新需要关注许可证、推理成本、适配脚本和与现有评测基线的差异。",
       "category": "china_open_source_community",
       "source_item_ref": "https://huggingface.co/deepseek-ai/dspark_qwen3_14b_block7"
-    },
-    {
-      "title": "终端斗地主项目接入 DouZero AI",
-      "url": "https://github.com/palemoky/fight-the-landlord",
-      "reason": "工程价值集中在代码、权重、示例和生态复用条件",
-      "what_happened": "fight-the-landlord 是 Go 编写的终端斗地主项目，支持联网对战、房间匹配、断线重连和记牌器，并集成 DouZero AI 作为机器人。",
-      "why_watch": "它是小型游戏项目接入 AI 对战能力的案例，适合观察规则游戏、机器人补位和终端交互的实现方式。",
-      "category": "china_open_source_community",
-      "source_item_ref": "https://github.com/palemoky/fight-the-landlord"
     }
   ],
   "source_effectiveness": [
@@ -269,52 +260,6 @@
       "candidate_count": 8,
       "included_count": 0,
       "notes": "10 report entries parsed; latest_report_url=https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/years/2026.md#top-ai-papers-of-the-week-june-14---june-21---2026; report_title=Top_AI_Papers_of_the_Week_(June_14_-_June_21); 10 within 14d source window; source-specific github_report_markdown health; markdown_links=3; recent_48h_hints=1"
-    },
-    {
-      "id": "hellogithub",
-      "name": "HelloGitHub",
-      "role": "open_source_aggregator",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": true,
-      "public_included": true,
-      "not_included_reason": "",
-      "source_ids": [
-        "content-hellogithub"
-      ],
-      "source_kinds": [
-        "github_report_markdown"
-      ],
-      "statuses": [
-        "checked"
-      ],
-      "candidate_count": 12,
-      "included_count": 4,
-      "notes": "30 report entries parsed; latest_report_url=https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/content/HelloGitHub123.md; report_title=第_123_期; 30 within 45d source window; source-specific github_report_markdown health; markdown_links=5; recent_48h_hints=1"
-    },
-    {
-      "id": "ruanyf-weekly",
-      "name": "RuanYF Weekly",
-      "role": "open_source_aggregator",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": true,
-      "public_included": false,
-      "not_included_reason": "candidate_not_selected_for_public_page",
-      "source_ids": [
-        "content-ruanyf-weekly"
-      ],
-      "source_kinds": [
-        "github_report_markdown"
-      ],
-      "statuses": [
-        "checked"
-      ],
-      "candidate_count": 8,
-      "included_count": 0,
-      "notes": "30 report entries parsed; latest_report_url=https://raw.githubusercontent.com/ruanyf/weekly/master/docs/issue-401.md; report_title=如何赚到10亿美元; 30 within 14d source window; source-specific github_report_markdown health; markdown_links=2; recent_48h_hints=1"
     },
     {
       "id": "techcrunch-ai",
@@ -666,86 +611,6 @@
           "type": "official"
         }
       ]
-    },
-    {
-      "story_id": "story-content-hellogithub-fight-the-landlord",
-      "title": "终端斗地主项目接入 DouZero AI",
-      "importance": "general",
-      "trend": "open source AI",
-      "event_date": "2026-06-29",
-      "primary_entity": "palemoky/fight-the-landlord",
-      "event_type": "launch",
-      "object": "fight-the-landlord",
-      "what_happened": "fight-the-landlord 是 Go 编写的终端斗地主项目，支持联网对战、房间匹配、断线重连和记牌器，并集成 DouZero AI 作为机器人。",
-      "why_it_matters": "它展示了传统规则游戏如何接入 AI 对战和机器人补位，适合观察小型项目中的 AI 工程集成方式。",
-      "evidence_level": "primary",
-      "sources": [
-        {
-          "label": "HelloGitHub",
-          "url": "https://github.com/palemoky/fight-the-landlord",
-          "type": "github"
-        }
-      ]
-    },
-    {
-      "story_id": "story-content-hellogithub-chinese-poetry-api",
-      "title": "中国古诗词 API 服务支持搜索和容器部署",
-      "importance": "general",
-      "trend": "open source AI",
-      "event_date": "2026-06-29",
-      "primary_entity": "palemoky/chinese-poetry-api",
-      "event_type": "update",
-      "object": "palemoky/chinese-poetry-api披露 agent 与开发者工具能力",
-      "what_happened": "chinese-poetry-api 用 Go 提供中国古诗词 API，收录近 40 万首作品，支持 REST API、GraphQL、全文搜索、限流和 Docker 部署。",
-      "why_it_matters": "对内容产品和教育工具来说，这类项目能降低诗词数据服务原型成本，但要确认数据来源、许可证和检索质量。",
-      "evidence_level": "primary",
-      "sources": [
-        {
-          "label": "HelloGitHub",
-          "url": "https://github.com/palemoky/chinese-poetry-api",
-          "type": "github"
-        }
-      ]
-    },
-    {
-      "story_id": "story-content-hellogithub-papertodo",
-      "title": "Windows 桌面便签工具 PaperTodo",
-      "importance": "general",
-      "trend": "open source AI",
-      "event_date": "2026-06-29",
-      "primary_entity": "snownico0722/PaperTodo",
-      "event_type": "update",
-      "object": "PaperTodo",
-      "what_happened": "PaperTodo 是 Windows 桌面便签工具，采用独立无边框浮动窗口，内容自动保存，支持待办纸、轻量 Markdown 笔记纸和置顶小胶囊。",
-      "why_it_matters": "它提供了低复杂度桌面效率工具的样本：少账号、少分类、强调快速记录和本地窗口体验。",
-      "evidence_level": "primary",
-      "sources": [
-        {
-          "label": "HelloGitHub",
-          "url": "https://github.com/snownico0722/PaperTodo",
-          "type": "github"
-        }
-      ]
-    },
-    {
-      "story_id": "story-content-hellogithub-speedynote",
-      "title": "低成本设备手写笔记工具 SpeedyNote",
-      "importance": "general",
-      "trend": "open source AI",
-      "event_date": "2026-06-29",
-      "primary_entity": "alpha-liu-01/SpeedyNote",
-      "event_type": "update",
-      "object": "SpeedyNote",
-      "what_happened": "SpeedyNote 面向低成本设备优化手写笔记体验，支持压感书写、多图层、PDF 批注和手写 OCR，并覆盖多个桌面和移动平台。",
-      "why_it_matters": "它的价值在于把旧平板和低成本设备纳入手写工作流，验证重点是延迟、PDF 兼容、OCR 质量和跨平台输入体验。",
-      "evidence_level": "primary",
-      "sources": [
-        {
-          "label": "HelloGitHub",
-          "url": "https://github.com/alpha-liu-01/SpeedyNote",
-          "type": "github"
-        }
-      ]
     }
   ],
   "main_items": [
@@ -821,82 +686,6 @@
         "该条目与 4B、14B Block7 版本同时出现，说明 DeepSeek 正在维护一组不同规模的模型仓库。",
         "评估时应比较显存需求、吞吐、延迟和目标任务准确率，而不是只看参数规模。",
         "**Qwen3 8B Block7 更新**：公开页提供仓库更新信号，能力变化仍需后续模型卡和测试确认。"
-      ],
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "终端斗地主项目接入 DouZero AI",
-      "editorial_category": "open_source",
-      "event_date": "2026-06-29",
-      "url": "https://github.com/palemoky/fight-the-landlord",
-      "source": "HelloGitHub",
-      "tier": "T2",
-      "entities": [
-        "palemoky/fight-the-landlord"
-      ],
-      "summary": "fight-the-landlord 是 Go 编写的终端斗地主项目，支持联网对战、房间匹配、断线重连、记牌器和音乐开关，并集成 DouZero AI 作为机器人补位或对战。",
-      "bullets": [
-        "**终端斗地主项目**：项目把 Go 终端游戏、联网对战和 DouZero AI 机器人组合在一起，可观察规则游戏里的 AI 对战接入方式。",
-        "公开信息覆盖随机发牌、房间匹配、断线重连、记牌器和机器人补位能力。",
-        "适合关注小游戏、终端交互和 AI 机器人对战的开发者先看玩法完整性和部署成本。"
-      ],
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "中国古诗词 API 服务支持搜索和容器部署",
-      "editorial_category": "open_source",
-      "event_date": "2026-06-29",
-      "url": "https://github.com/palemoky/chinese-poetry-api",
-      "source": "HelloGitHub",
-      "tier": "T2",
-      "entities": [
-        "palemoky/chinese-poetry-api"
-      ],
-      "summary": "chinese-poetry-api 是 Go 编写的中国古诗词 API 服务，收录近 40 万首唐诗、宋词、元曲等作品，提供 REST API 和 GraphQL 接口，并支持全文搜索、限流、随机取诗和 Docker 部署。",
-      "bullets": [
-        "**中国古诗词 API 服务**：该项目把近 40 万首诗词数据封装成 REST API 和 GraphQL 接口，适合内容产品或教学工具做数据服务原型。",
-        "已披露能力包括全文搜索、IP 限流、按朝代/作者/诗型随机取诗和 Docker 一键部署。",
-        "采用前应检查数据来源、许可证、接口性能和中文全文检索质量。"
-      ],
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "Windows 桌面便签工具 PaperTodo",
-      "editorial_category": "open_source",
-      "event_date": "2026-06-29",
-      "url": "https://github.com/snownico0722/PaperTodo",
-      "source": "HelloGitHub",
-      "tier": "T2",
-      "entities": [
-        "snownico0722/PaperTodo"
-      ],
-      "summary": "PaperTodo 是极简 Windows 桌面便签工具，每张便签都是独立无边框浮动窗口，内容自动保存，支持待办纸和轻量 Markdown 笔记纸，并可折叠成置顶小胶囊。",
-      "bullets": [
-        "**桌面便签工具**：PaperTodo 不设主窗口、账号或分类系统，重点是快速记录、自动保存和屏幕边缘吸附。",
-        "它支持待办纸和轻量 Markdown 笔记纸两种形态，可折叠为置顶小胶囊。",
-        "适合观察低复杂度桌面工具如何减少账号、同步和信息架构成本。"
-      ],
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "低成本设备手写笔记工具 SpeedyNote",
-      "editorial_category": "open_source",
-      "event_date": "2026-06-29",
-      "url": "https://github.com/alpha-liu-01/SpeedyNote",
-      "source": "HelloGitHub",
-      "tier": "T2",
-      "entities": [
-        "alpha-liu-01/SpeedyNote"
-      ],
-      "summary": "SpeedyNote 是面向低成本设备优化的跨平台手写笔记应用，支持压感书写、多图层、PDF 批注和手写 OCR，可运行在 Windows、macOS、Linux、Android 和 iPadOS。",
-      "bullets": [
-        "**低成本设备手写笔记**：SpeedyNote 目标是在老旧平板上提供接近 iPad 的书写体验。",
-        "已披露能力包括压感书写、多图层、PDF 批注、手写 OCR 和多平台运行。",
-        "这类项目的关键验证点是笔迹延迟、旧设备性能、文件兼容和跨平台输入体验。"
       ],
       "importance": "general",
       "image_urls": []
@@ -3579,58 +3368,6 @@
     }
   ],
   "official_org_updates": [],
-  "community_leads": [
-    {
-      "title": "派早报：微软改口称 8GB 足够运行 Windows 11",
-      "content": "微软改口称 8GB 足够运行 Windows 11 OpenAI 发布 GPT 5.6，称需美国政府批准提供对象 Notion Mail 宣布关闭 央视报道网络测评乱象 苹果、奥迪前员工推出豪华电瓶车 俄罗斯主流应用被苹果下架，克宫呼吁改用 Android 看看就行的简讯 少数派的近期动态 你可能错过的好文章 查看全文。",
-      "url": "https://sspai.com/post/111639",
-      "event_date": "2026-06-28",
-      "source": "SSPAI",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "独家|美团王兴正面回应股价破发，复盘五年战略节奏得失",
-      "content": "6月26日美团举行了股东周年大会上，美团CEO王兴、CFO陈少晖回应了股价、竞争和业务相关的多个问题，并释放回购信号。与此同时，王兴还复盘了过去五年战略节奏得失和对AI的看法。 雷峰网从美团投资方获悉了此次会议详细内容，并有不少独家补充信息。从会议的发言来看美团管理层从承认问题，到正面回答股东问题，态度表现良好，中途还提出一些可行的举措...",
-      "url": "https://www.leiphone.com/category/industrynews/RC8Dz2VUQ4F9i90R.html",
-      "event_date": "2026-06-27",
-      "source": "Leiphone",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "不设KPI，MiniMax发6亿港元股票，员工满年限即可全拿；曝苹果游说特朗普采购中国长鑫存储芯片；DeepSeek 与北大联合开源 DSpark | AI周报",
-      "content": "不设KPI，MiniMax发6亿港元股票，员工满年限即可全拿；曝苹果游说特朗普采购中国长鑫存储芯片；DeepSeek 与北大联合开源 DSpark | AI周报。",
-      "url": "https://www.infoq.cn/article/6FP1sl5CrwdggVrXrwIN?utm_source=rss&utm_medium=article",
-      "event_date": "2026-06-29",
-      "source": "InfoQ CN",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "港大教授李弘扬创业做通用全身具身大脑，获真格高榕IDG五源等数亿种子轮融资｜硬氪独家",
-      "content": "s」近日完成数亿元种子轮融资，本轮投资方包括真格基金、高榕创投、IDG资本、五源资本等头部美元基金，以及戈壁创投与香港大学联名基金、奇绩创投、上海创智学院等。光源资本担任独家财务顾问。 本轮资金将主要用于全身人形基础模型研发、多模态全身动作数据采集、人才团队扩充，以及多地研发中心与产业合作生态搭建，加速在今年内实现开源人形基座模型落地。...",
-      "url": "https://36kr.com/p/3868055841641476?f=rss",
-      "event_date": "2026-06-29",
-      "source": "36Kr",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
-    },
-    {
-      "title": "vivo“再造”折叠屏",
-      "content": "手机行业从来不缺挑战。 自从2023年中国科技产业开启了所谓的“大模型狂飙时代”后，从互联网巨头到传统制造业，从手机厂商到汽车新势力，中国科技行业迅速陷入了一场前所未有的焦虑当中。在行业落地方向尚未明确时，各行各业均选择了“先上车后补票”的方式乘上这趟“快车”。 手机作为最接近消费者的入口，同样也成为了各行各业眼中的“必争之地”。手机厂...",
-      "url": "https://www.leiphone.com/category/weiwu/xwKJa2OJ5xsHkTRs.html",
-      "event_date": "2026-06-27",
-      "source": "Leiphone",
-      "editorial_category": "community_signal",
-      "importance": "general",
-      "image_urls": []
-    }
-  ],
   "wechat_items": [],
   "zhihu_items": [],
   "reddit_items": [

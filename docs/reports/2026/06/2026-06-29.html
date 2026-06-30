@@ -1191,6 +1191,7 @@ body.lightbox-open {
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
     "tracking-component tracking-component"
+    "tracking-trend tracking-trend"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1209,6 +1210,7 @@ body.lightbox-open {
 .tracking-card > *,
 .tracking-card .card-stat-grid,
 .tracking-card .card-bars,
+.tracking-card .card-trend-curve,
 .tracking-card .card-table,
 .tracking-card .card-table-scroll {
   min-width: 0;
@@ -1222,9 +1224,80 @@ body.lightbox-open {
   grid-area: tracking-bars;
 }
 
+.tracking-card .card-trend-curve {
+  grid-area: tracking-trend;
+}
+
 .tracking-card .card-table {
   grid-area: tracking-table;
   max-width: 100%;
+}
+
+.card-trend-curve {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 10px 12px 8px;
+}
+
+.card-trend-curve .card-visual-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-trend-metric {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.card-trend-svg {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.card-trend-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-point {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.card-trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .tracking-card > p {
@@ -1853,6 +1926,7 @@ body.lightbox-open {
       "tracking-tags"
       "tracking-component"
       "tracking-stats"
+      "tracking-trend"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
@@ -3106,8 +3180,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <div class="hero-brief hero-brief-single">
         <p class="hero-summary-text">今天主线集中在三类变化：惠普扩大与 OpenAI 的 Frontier 合作，DeepSeek 在 Hugging Face 更新多档 Qwen3 Block7 模型，以及多个开源工具进入候选观察池。</p>
         <div class="hero-stat-grid" aria-label="报告摘要指标">
-    <div class="hero-stat"><span>主体</span><strong>8</strong><small>重点条目</small></div>
-<div class="hero-stat"><span>AIGC</span><strong>1</strong><small>产品/内容</small></div>
+    <div class="hero-stat"><span>主体</span><strong>4</strong><small>重点条目</small></div>
 <div class="hero-stat"><span>追踪</span><strong>3</strong><small>榜单变化</small></div>
 <div class="hero-stat"><span>精选博客</span><strong>1</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>20</strong><small>Top 10</small></div>
@@ -3129,19 +3202,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-story-2" title="深度求索更新 Qwen3 14B Block7 模型" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>深度求索更新 Qwen3 14B Block7 模型</span></a>
 <a href="#section-story-3" title="深度求索更新 Qwen3 4B Block7 模型" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>深度求索更新 Qwen3 4B Block7 模型</span></a>
 <a href="#section-story-4" title="深度求索更新 Qwen3 8B Block7 模型" data-nav-link data-nav-index="6" data-nav-group-name="main" data-nav-status="info"><span>深度求索更新 Qwen3 8B Block7 模型</span></a>
-<a href="#section-story-5" title="终端斗地主项目接入 DouZero AI" data-nav-link data-nav-index="7" data-nav-group-name="main" data-nav-status="info"><span>终端斗地主项目接入 DouZero AI</span></a>
-<a href="#section-story-6" title="中国古诗词 API 服务支持搜索和容器部署" data-nav-link data-nav-index="8" data-nav-group-name="main" data-nav-status="info"><span>中国古诗词 API 服务支持搜索和容器部署</span></a>
-<a href="#section-story-7" title="Windows 桌面便签工具 PaperTodo" data-nav-link data-nav-index="9" data-nav-group-name="main" data-nav-status="info"><span>Windows 桌面便签工具 PaperTodo</span></a>
-<a href="#section-story-8" title="低成本设备手写笔记工具 SpeedyNote" data-nav-link data-nav-index="10" data-nav-group-name="main" data-nav-status="info"><span>低成本设备手写笔记工具 SpeedyNote</span></a>
-<a href="#section-github-trending-top-8-11" title="GitHub Trending · Top 8" data-nav-link data-nav-index="11" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
-<a href="#section-hugging-face-trending-top-10-12" title="Hugging Face Trending · Top 10" data-nav-link data-nav-index="12" data-nav-group-name="projects" data-nav-status="info"><span>Hugging Face Trending · Top 10</span></a>
-<a href="#section-trend-tracking" title="趋势追踪" data-nav-link data-nav-index="13" data-nav-group-name="signals" data-nav-status="info"><span>趋势追踪</span></a>
-<a href="#section-subscribed-rss" title="订阅 RSS" data-nav-link data-nav-index="14" data-nav-group-name="main" data-nav-status="info"><span>订阅 RSS</span></a>
-<a href="#section-chinese-media-rss" title="中文媒体 RSS" data-nav-link data-nav-index="15" data-nav-group-name="main" data-nav-status="info"><span>中文媒体 RSS</span></a>
-<a href="#section-x-twitter-16" title="X/Twitter 讨论" data-nav-link data-nav-index="16" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
-<a href="#section-other-sources" title="其他信源" data-nav-link data-nav-index="17" data-nav-group-name="signals" data-nav-status="info"><span>其他信源</span></a>
-<a href="#section-reddit-18" title="Reddit 线索" data-nav-link data-nav-index="18" data-nav-group-name="signals" data-nav-status="info"><span>Reddit 线索</span></a>
-<a href="#section-html-work-report-19" title="信源覆盖与缺口" data-nav-link data-nav-index="19" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
+<a href="#section-github-trending-top-8-7" title="GitHub Trending · Top 8" data-nav-link data-nav-index="7" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
+<a href="#section-hugging-face-trending-top-10-8" title="Hugging Face Trending · Top 10" data-nav-link data-nav-index="8" data-nav-group-name="projects" data-nav-status="info"><span>Hugging Face Trending · Top 10</span></a>
+<a href="#section-trend-tracking" title="趋势追踪" data-nav-link data-nav-index="9" data-nav-group-name="signals" data-nav-status="info"><span>趋势追踪</span></a>
+<a href="#section-subscribed-rss" title="订阅 RSS" data-nav-link data-nav-index="10" data-nav-group-name="main" data-nav-status="info"><span>订阅 RSS</span></a>
+<a href="#section-chinese-media-rss" title="中文媒体 RSS" data-nav-link data-nav-index="11" data-nav-group-name="main" data-nav-status="info"><span>中文媒体 RSS</span></a>
+<a href="#section-x-twitter-12" title="X/Twitter 讨论" data-nav-link data-nav-index="12" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
+<a href="#section-reddit-13" title="Reddit 线索" data-nav-link data-nav-index="13" data-nav-group-name="signals" data-nav-status="info"><span>Reddit 线索</span></a>
+<a href="#section-html-work-report-14" title="信源覆盖与缺口" data-nav-link data-nav-index="14" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3186,8 +3254,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </div>
 
 
-    <div class="rendered-markdown"><p>值得关注的开源模型与项目动态。（本日 7 条）</p></div>
-    <template data-rich-source data-source-fallback>值得关注的开源模型与项目动态。（本日 7 条）</template>
+    <div class="rendered-markdown"><p>值得关注的开源模型与项目动态。（本日 3 条）</p></div>
+    <template data-rich-source data-source-fallback>值得关注的开源模型与项目动态。（本日 3 条）</template>
   </section>
 <details class="panel rich-section collapsible-panel" id="section-story-2" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
     <summary class="collapsible-summary">
@@ -3243,79 +3311,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - 为什么值得看：中等规模模型通常处在成本和能力的折中区间，后续应重点比较延迟、吞吐和目标任务准确率。
 - 来源：[![DeepSeek Hugging Face Organization](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAeFBMVEVHcEz09PT8/f3u7u7+/v7////6+vqIiIghISH////6+vrX19fk5OT/0h7/1R7/nAH/////mgH/lwD/rAr/vhUxND3/ow/8xxv/thH/2Rz/kwP/zRz/0KcfLD7+LT0EFD//4Mf/vHr/q03/8ebEpCpYTjqJdTSmNTzTbJ3eAAAADXRSTlMAR4o0o+peAQXDdRUjQZpc5AAABYdJREFUWIW1V4l2ozgQxCfYCQIJkLgcfM///+FWtcAG7Eyy+95qXt4kkrrorj4VBP/bCsfrv0j/sPGz9GK/3m1SrM1uvf38FxhybbtLZ2u9+h0E73ysKXFpT2erjbHnU3sUTba/gMB5RPHjyRj9XKY+C8a2V/Bvn9/iXpsYnUDOZlwWvyVQpcXJ7uNvCDyC7UdtcN/mTg2ryTNgeIjt9wi0HrSfIa7LRqn4ufBHngDCXsDmd0Rgd4XPU/lyIj1gEKKGErv3Onj5tk50Fr+Ke4jSJOb0DQL1F3mTvxcXCAczzu8RsLOR77vv5YHQJKLD8gUBf+/S40/yXEAAD4sZgvj/Agt/lI9jMImgCucAIfyn9V/sfyyH73hnThRYp63R2S/kY1VqDRo+pwDwAOLnF+JEsEl9mXgCBizTdmxA5Vw1kalc/NxwRp8nKoRRQAWSQV65W9fdmqd8de267v5AUBlVGLFAF4CBhwJVcSiKw60ayRdF0V0fCjphIYjCUQzABf5cxeoKeQg8Ae+yIYiqZ8FILIwsqBPvgrx0AnA4dOXDpPtBECoe0zKVa3OkDYMFKyZhLi5CAWnirjhc78VDY3UtrrfD4V71x3HcGN2mm4GEMNinJ208PVi5unbXqhq5QeGv4qb8seNGQj9EngSJorP2PsjlE+pNQqvqoaD4ASSsvAagYJfqPgpVnjcvsiOU/hjRCEdugwFgk9a6/E0YP4G0uaT7B0D6CjCHm/0tbuirAgEucwB1bSYkuusUwXmA6FsAh9B1lRrE7133FmDQ4JUDh1Do7lf6T11v3aHoJsk1N2GTzmtBxdBDNN5ulB7i+GnTQGI4uNFqi17wbAd9+BfF8N/9GZe8BzciGR5xsEQk6sYakzWKN5hQ3SDuM8vJPk9LNM7SJhYVIRoAFignaDtY6Ao5tMlVdTsUhz9ff+QHCsAC9Ef0HMub+OfzOfQdZceKjJaU4SDTHqc5QPbriz9fByQiJSHIY3w/QTKl69ADfHCYoFilcuAIhmmUE1lZfyR4E2uppCWF0AC1XfLRdyTKo6LwGipTrtlfVd3L18wj3FCKCB4MA4BOfUlAR6kTmSEQCqw1zFYpkKoSPhhPxMxJvmE282sm8ZU1QC7DBa4BKvtSo00jpd8XNM+8QGr5dCYfAWwslXUfcCY5sR6qBqMMhpLcUBE9bRJE5LagZILuY2kZUIPWVwO0fyJYjekENI1D00nRVxm8A/mk4fc0a8pWNGhhj+UmyjXYN7CTao6yA47lHsM1M/5j4NGyz2OsIIdGi+YNETJjFZvwEyGR35saJJVyz8Fc44OJPQU2xbk1CXmzmVIkOqaKzhMAbeSrrlFNzUuZMaWLsY26iIrckjyQkphsVHmUG5od+LCjVIKhhmOUL6wLP1gkzpOYzJjPewUmpaC2ziekdHmOVpxDLcfKJnPjq32pNpNio8qcsVGSg5YcLNiVSgcXlvF0PETwUHU3G1zIYVZjkPXNBSawrRHTmMn3GU3UoDHzgpuJvhW8ShNWbKwSWnE5BXASfcSxU4BSbmfCQRQEfjwVDqYKgLy8wcrmw5/nAAnIkZOBIOmM/JgM2H3O4tnAItCMT8CB9iNruoqCCMmQXk61uAJGDBM+q4p/cxADDp2M/pr9PUUyAiBCLBFC7sE5NkMPZtUzx+OxxTriLOlfH3gD8Vb/gFmwNYVA+JQn1vGkaykssurz5fniakWZZHj+tHK0jiJOCCEQACHvLP/Qot3+zn67Xy7326Wgn2W/f4AhDz8CyktVFYjXl97mk3U7lLI/fwMuqHnUD8weARjhYrkb34kea4S+2e3xgoy8+GNQHDCwEX2uFovVh78TPU5QOLj/GQVBGM3EJxDjFfaN4/Xo7XvcP9Pf3nk5GEn/A/yV0CV1sqntAAAAAElFTkSuQmCC) DeepSeek Hugging Face Organization](https://huggingface.co/deepseek-ai/dspark_qwen3_8b_block7)</template></div>
   </details>
-<details class="panel rich-section collapsible-panel" id="section-story-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
-    <summary class="collapsible-summary">
-      <span class="collapsible-summary-main">
-        <span class="meta">正文</span>
-        <span class="collapsible-title">终端斗地主项目接入 DouZero AI</span>
-        <span class="collapsible-subtitle">它展示了传统规则游戏如何接入 AI 对战和机器人补位，适合观察小型项目中的 AI 工程集成方式。</span>
-      </span>
-      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
-    </summary>
-    <div class="collapsible-content">
-
-    <div class="rendered-markdown"><p><strong><a href="https://github.com/palemoky/fight-the-landlord" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="HelloGitHub" decoding="async"> 终端斗地主项目接入 DouZero AI</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：fight-the-landlord 是 Go 编写的终端斗地主项目，支持联网对战、房间匹配、断线重连和记牌器，并集成 DouZero AI 作为机器人。</li><li>为什么值得看：它展示了传统规则游戏如何接入 AI 对战和机器人补位，适合观察小型项目中的 AI 工程集成方式。</li><li>来源：<a href="https://github.com/palemoky/fight-the-landlord" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="HelloGitHub" decoding="async"> HelloGitHub</a></li></ul></div>
-    <template data-rich-source data-source-fallback>**[![HelloGitHub](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) 终端斗地主项目接入 DouZero AI](https://github.com/palemoky/fight-the-landlord)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：fight-the-landlord 是 Go 编写的终端斗地主项目，支持联网对战、房间匹配、断线重连和记牌器，并集成 DouZero AI 作为机器人。
-- 为什么值得看：它展示了传统规则游戏如何接入 AI 对战和机器人补位，适合观察小型项目中的 AI 工程集成方式。
-- 来源：[![HelloGitHub](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) HelloGitHub](https://github.com/palemoky/fight-the-landlord)</template></div>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-6" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
-    <summary class="collapsible-summary">
-      <span class="collapsible-summary-main">
-        <span class="meta">正文</span>
-        <span class="collapsible-title">中国古诗词 API 服务支持搜索和容器部署</span>
-        <span class="collapsible-subtitle">对内容产品和教育工具来说，这类项目能降低诗词数据服务原型成本，但要确认数据来源、许可证和检索质量。</span>
-      </span>
-      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
-    </summary>
-    <div class="collapsible-content">
-
-    <div class="rendered-markdown"><p><strong><a href="https://github.com/palemoky/chinese-poetry-api" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="HelloGitHub" decoding="async"> 中国古诗词 API 服务支持搜索和容器部署</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：chinese-poetry-api 用 Go 提供中国古诗词 API，收录近 40 万首作品，支持 REST API、GraphQL、全文搜索、限流和 Docker 部署。</li><li>为什么值得看：对内容产品和教育工具来说，这类项目能降低诗词数据服务原型成本，但要确认数据来源、许可证和检索质量。</li><li>来源：<a href="https://github.com/palemoky/chinese-poetry-api" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="HelloGitHub" decoding="async"> HelloGitHub</a></li></ul></div>
-    <template data-rich-source data-source-fallback>**[![HelloGitHub](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) 中国古诗词 API 服务支持搜索和容器部署](https://github.com/palemoky/chinese-poetry-api)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：chinese-poetry-api 用 Go 提供中国古诗词 API，收录近 40 万首作品，支持 REST API、GraphQL、全文搜索、限流和 Docker 部署。
-- 为什么值得看：对内容产品和教育工具来说，这类项目能降低诗词数据服务原型成本，但要确认数据来源、许可证和检索质量。
-- 来源：[![HelloGitHub](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) HelloGitHub](https://github.com/palemoky/chinese-poetry-api)</template></div>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-7" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
-    <summary class="collapsible-summary">
-      <span class="collapsible-summary-main">
-        <span class="meta">正文</span>
-        <span class="collapsible-title">Windows 桌面便签工具 PaperTodo</span>
-        <span class="collapsible-subtitle">它提供了低复杂度桌面效率工具的样本：少账号、少分类、强调快速记录和本地窗口体验。</span>
-      </span>
-      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
-    </summary>
-    <div class="collapsible-content">
-
-    <div class="rendered-markdown"><p><strong><a href="https://github.com/snownico0722/PaperTodo" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="HelloGitHub" decoding="async"> Windows 桌面便签工具 PaperTodo</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：PaperTodo 是 Windows 桌面便签工具，采用独立无边框浮动窗口，内容自动保存，支持待办纸、轻量 Markdown 笔记纸和置顶小胶囊。</li><li>为什么值得看：它提供了低复杂度桌面效率工具的样本：少账号、少分类、强调快速记录和本地窗口体验。</li><li>来源：<a href="https://github.com/snownico0722/PaperTodo" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="HelloGitHub" decoding="async"> HelloGitHub</a></li></ul></div>
-    <template data-rich-source data-source-fallback>**[![HelloGitHub](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) Windows 桌面便签工具 PaperTodo](https://github.com/snownico0722/PaperTodo)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：PaperTodo 是 Windows 桌面便签工具，采用独立无边框浮动窗口，内容自动保存，支持待办纸、轻量 Markdown 笔记纸和置顶小胶囊。
-- 为什么值得看：它提供了低复杂度桌面效率工具的样本：少账号、少分类、强调快速记录和本地窗口体验。
-- 来源：[![HelloGitHub](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) HelloGitHub](https://github.com/snownico0722/PaperTodo)</template></div>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-8" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-section-collapsed="true" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback data-collapsed-section>
-    <summary class="collapsible-summary">
-      <span class="collapsible-summary-main">
-        <span class="meta">正文</span>
-        <span class="collapsible-title">低成本设备手写笔记工具 SpeedyNote</span>
-        <span class="collapsible-subtitle">它的价值在于把旧平板和低成本设备纳入手写工作流，验证重点是延迟、PDF 兼容、OCR 质量和跨平台输入体验。</span>
-      </span>
-      <span class="collapsible-summary-side"><span class="collapsible-hint" aria-hidden="true"></span></span>
-    </summary>
-    <div class="collapsible-content">
-
-    <div class="rendered-markdown"><p><strong><a href="https://github.com/alpha-liu-01/SpeedyNote" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="HelloGitHub" decoding="async"> 低成本设备手写笔记工具 SpeedyNote</a></strong> <mark class="text-highlight daily-tag daily-tag-general">一般</mark> <mark class="text-highlight daily-tag daily-tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：SpeedyNote 面向低成本设备优化手写笔记体验，支持压感书写、多图层、PDF 批注和手写 OCR，并覆盖多个桌面和移动平台。</li><li>为什么值得看：它的价值在于把旧平板和低成本设备纳入手写工作流，验证重点是延迟、PDF 兼容、OCR 质量和跨平台输入体验。</li><li>来源：<a href="https://github.com/alpha-liu-01/SpeedyNote" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="HelloGitHub" decoding="async"> HelloGitHub</a></li></ul></div>
-    <template data-rich-source data-source-fallback>**[![HelloGitHub](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) 低成本设备手写笔记工具 SpeedyNote](https://github.com/alpha-liu-01/SpeedyNote)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：SpeedyNote 面向低成本设备优化手写笔记体验，支持压感书写、多图层、PDF 批注和手写 OCR，并覆盖多个桌面和移动平台。
-- 为什么值得看：它的价值在于把旧平板和低成本设备纳入手写工作流，验证重点是延迟、PDF 兼容、OCR 质量和跨平台输入体验。
-- 来源：[![HelloGitHub](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) HelloGitHub](https://github.com/alpha-liu-01/SpeedyNote)</template></div>
-  </details>
-<section class="panel rich-section" id="section-github-trending-top-8-11" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-github-trending-top-8-7" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>GitHub Trending · Top 8</h2>
@@ -3335,7 +3331,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 7. **[![simplex-chat/simplex-chat](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) simplex-chat/simplex-chat](https://github.com/simplex-chat/simplex-chat)** ==tag-general|一般== ==trend-new|NEW== ==tag-stars|本周 +3,218 stars==: simplex-chat 是面向AI 工程实践的开源项目，README 显示核心能力包括项目框架、示例代码和可复用工具链，并给出README 说明和使用入口。读者应先确认快速开始、运行前提、许可证和近期维护，再判断是否适合团队试用或接入。；领域：AI tooling；#7，较前一日持平
 8. **[![interviewstreet/hiring-agent](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC) interviewstreet/hiring-agent](https://github.com/interviewstreet/hiring-agent)** ==tag-general|一般== ==trend-same|SAME== ==tag-stars|本周 +1,973 stars==: 领域：agent；#8，较前一日持平</template>
   </section>
-<section class="panel rich-section" id="section-hugging-face-trending-top-10-12" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-hugging-face-trending-top-10-8" data-section-type="markdown" data-section-group="projects" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>Hugging Face Trending · Top 10</h2>
@@ -3370,7 +3366,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <button data-filter-target="html-work-report" data-filter-value="all" aria-pressed="true">全部</button><button data-filter-target="html-work-report" data-filter-value="OpenRouter" aria-pressed="false">OpenRouter</button><button data-filter-target="html-work-report" data-filter-value="Artificial Analysis" aria-pressed="false">Artificial Analysis</button><button data-filter-target="html-work-report" data-filter-value="SWE-bench" aria-pressed="false">SWE-bench</button>
     </div>
     <div class="evidence-grid focus-field tracking-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="7">
     <div class="meta">OpenRouter</div>
     <h3><a class="card-title-link" href="https://openrouter.ai/rankings" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenRouter</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型使用</span><span class="chip chip-date">2026-06-29</span></div>
@@ -3539,7 +3535,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">最大变化</span>
       <strong>GLM 5.2</strong>
       <span class="card-stat-detail">+66%</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="openrouter-rankings" data-trend-points="7" aria-label="7日趋势 榜首周用量: 06-17 4.64T tokens to 06-29 4.66T tokens">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首周用量</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首周用量: 06-17 4.64T tokens to 06-29 4.66T tokens" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,90.0 78.7,20.2 129.3,24.5 180.0,18.0 230.7,18.0 281.3,48.5 332.0,85.6"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-17: 4.64T tokens | MiniMax M3</title></circle><circle class="card-trend-point" cx="78.7" cy="20.2" r="3.2"><title>06-23: 4.96T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="129.3" cy="24.5" r="3.2"><title>06-24: 4.94T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="180.0" cy="18.0" r="3.2"><title>06-25: 4.97T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="230.7" cy="18.0" r="3.2"><title>06-26: 4.97T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="281.3" cy="48.5" r="3.2"><title>06-28: 4.83T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="332.0" cy="85.6" r="3.2"><title>06-29: 4.66T tokens | DeepSeek V4 Flash</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-17</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-29</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>4.64T tokens</span>
+      <span>4.66T tokens</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3608,7 +3617,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <p>榜首 DeepSeek V4 Flash（deepseek），4.66T tokens，+6%；最大周变化是 GLM 5.2（+66%）。</p>
 
   </article>
-<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Artificial Analysis" data-search-target="html-work-report">
+<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Artificial Analysis" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="7">
     <div class="meta">Artificial Analysis</div>
     <h3><a class="card-title-link" href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFBPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Artificial Analysis</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型基准</span><span class="chip chip-date">2026-06-29</span></div>
@@ -3710,7 +3719,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">榜首</span>
       <strong>Claude Fable 5 (with fallback)</strong>
       <span class="card-stat-detail">anthropic / 60 分 / AA Index</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="artificial-analysis-intelligence-index" data-trend-points="7" aria-label="7日趋势 榜首分数: 06-17 60 分 to 06-29 60 分">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首分数</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首分数: 06-17 60 分 to 06-29 60 分" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,90.0 78.7,90.0 129.3,90.0 180.0,90.0 230.7,90.0 281.3,90.0 332.0,90.0"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-17: 60 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="78.7" cy="90.0" r="3.2"><title>06-23: 60 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="129.3" cy="90.0" r="3.2"><title>06-24: 60 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="180.0" cy="90.0" r="3.2"><title>06-25: 60 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="230.7" cy="90.0" r="3.2"><title>06-26: 60 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="281.3" cy="90.0" r="3.2"><title>06-28: 60 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="332.0" cy="90.0" r="3.2"><title>06-29: 60 分 | Claude Fable 5 (with fallback)</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-17</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-29</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>60 分</span>
+      <span>60 分</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3767,7 +3789,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <p>榜首 Claude Fable 5 (with fallback)（anthropic），60 分，AA Index。</p>
 
   </article>
-<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SWE-bench" data-search-target="html-work-report">
+<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SWE-bench" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="7">
     <div class="meta">SWE-bench</div>
     <h3><a class="card-title-link" href="https://labs.scale.com/leaderboard/swe_bench_pro_public" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNMPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>SWE-bench Pro</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-major">重大</span><span class="chip chip-topic">代码基准</span><span class="chip chip-date">2026-06-29</span></div>
@@ -3874,7 +3896,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">新进榜</span>
       <strong>Muse Spark*</strong>
       <span class="card-stat-detail">1 个条目</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="swe-bench-pro-public" data-trend-points="7" aria-label="7日趋势 榜首 Resolve Rate: 06-17 59.10±3.56% to 06-29 59.10±3.56%">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首 Resolve Rate</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首 Resolve Rate: 06-17 59.10±3.56% to 06-29 59.10±3.56%" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,90.0 78.7,90.0 129.3,90.0 180.0,90.0 230.7,90.0 281.3,90.0 332.0,90.0"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-17: 59.10±3.56% | gpt-5.4 (xHigh)*</title></circle><circle class="card-trend-point" cx="78.7" cy="90.0" r="3.2"><title>06-23: 59.10±3.56% | gpt-5.4 (xHigh)*</title></circle><circle class="card-trend-point" cx="129.3" cy="90.0" r="3.2"><title>06-24: 59.10±3.56% | gpt-5.4 (xHigh)*</title></circle><circle class="card-trend-point" cx="180.0" cy="90.0" r="3.2"><title>06-25: 59.10±3.56% | gpt-5.4 (xHigh)*</title></circle><circle class="card-trend-point" cx="230.7" cy="90.0" r="3.2"><title>06-26: 59.10±3.56% | gpt-5.4 (xHigh)*</title></circle><circle class="card-trend-point" cx="281.3" cy="90.0" r="3.2"><title>06-28: 59.10±3.56% | gpt-5.4 (xHigh)*</title></circle><circle class="card-trend-point" cx="332.0" cy="90.0" r="3.2"><title>06-29: 59.10±3.56% | gpt-5.4 (xHigh)*</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-17</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-29</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>59.10±3.56%</span>
+      <span>59.10±3.56%</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3971,7 +4006,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel" id="section-x-twitter-16" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-x-twitter-12" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>X/Twitter 讨论</h2>
@@ -4065,65 +4100,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel" id="section-other-sources" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>其他信源</h2>
-
-    </div>
-
-  </div>
-
-
-    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SSPAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://sspai.com/post/111639" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>派早报：微软改口称 8GB 足够运行 Windows 11</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-28</span></div>
-
-
-    <p>微软改口称 8GB 足够运行 Windows 11 OpenAI 发布 GPT 5.6，称需美国政府批准提供对象 Notion Mail 宣布关闭 央视报道网络测评乱象 苹果、奥迪前员工推出豪华电瓶车 俄罗斯主流应用被苹果下架，克宫呼吁改用 Android 看看就行的简讯 少数派的近期动态 你可能错过的好文章 查看全…</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Leiphone" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.leiphone.com/category/industrynews/RC8Dz2VUQ4F9i90R.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACDklEQVQ4jbWSv2tTURTHv+e++5o01hptiSJYqJEWrIqIFsHq5CBuDhUcpOjsJv4Fji4KunURF8cOTg6SwckiSAWlUvrDNJKkL02bl/S9d+8957p2KEQKfrbv4Zzv+Q5f4H/QnCve6i088/H8nO+3qw4ayh6vYC8Dp6bvM71ftJ6efeG7HEs3+SbbDfiojdqd0WmdH7oNB+0tAnilrHEbZyq/5wGA9hvsvJz1SheQfPn8eqBcfsKtuON2e0uFiQsznFpQ4uAyBgmBuwlKbz+Sbj4aLvoE+uT7TsRrdXA4CN9zNcosyHlDSfbLrqzO2FoTtt2pu57RJGo0OHoCtRtTi3pg6vqyCodL0eDyJ79rIuj8qLJkuNuD/dMSW9tSWVoFO1kY/5neA4D18rErprH1FUH+qk4rS3UKj5TMdlpXEp+D3QJLB0EcgWN2YsPIUw7IURdIAQDehysqANgItNnspGI68DYwYIATgh6BpoICUXhaKToPoR/CNLE+OfLGC+XBeAwmkNC6ZpMfk0xBWZqAkjFwAIibVCKwVkEZussOIAbYq2nlPcAEcQCErmnEwQcYum8dKgiDHSTqMtJgUayfwZ6KOPCnwFRk+C4y2mSgRMAqhB6UG83tvkXpPc+9imaHfPth4V3fIh1EMC6XcqmDa6vpQxnY70Epq2q4hsr3jXsQ1ZvFterF4xuHOv4X/gK28RNl6mJD6QAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>独家|美团王兴正面回应股价破发，复盘五年战略节奏得失</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-27</span></div>
-
-
-    <p>6月26日美团举行了股东周年大会上，美团CEO王兴、CFO陈少晖回应了股价、竞争和业务相关的多个问题，并释放回购信号。 与此同时，王兴还复盘了过去五年战略节奏得失和对AI的看法。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="InfoQ CN" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.infoq.cn/article/6FP1sl5CrwdggVrXrwIN?utm_source=rss&amp;utm_medium=article" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAllBMVEX///8gn0ALdNsUnTluuX1jmt8AcNsAcdoAaNkAa9lTkeJ7p+cAZtj09/0Kct8WiZ4hoTbF2PRFi+AAmjBimOO4z/GLsenk7fpKq18AliHa3uAAYdfr7O7U4vddsm/P5tOhwO2t1bUzpE2IxJPc7d8rf914vYa83MIAWdaDrOg9qFXFys6j0Kv2+/fP1Nesx++Vyp9oqbW0KrLTAAABvUlEQVRYhe2T63KjMAyFZStrLGq2BQcIBELTkKbZbXp5/5erDNkLhdJ2dn91fDLDKCf2F/kgA3h5eXl5/W9dZ1n6ykrHFmw3N2K1aycACdHF0NmT0uHQatCiEIjF7RgQBmoIqLVU++PAagshbFFYfm7mAHXtnjEF++5rFMd1/4PgndsTtCsUxQGqshoBojuzftRamxrCJJAyPEK0NERkMl5ysLz/TMIfUP2cAGgptSYpCQyXwToEqSSxQ5zGLQrbL763ojhVZTkFUMc8JalrSClIAC6UlK6WOoUN4vnoDffSVuXDFEBznQSUugwYoCXF7GQqCGGFuDinyYCmqiaPYLhe/gbkPRFqkoo7EKu/OigfJo8wApgzgGDH4feLu+qNEIcAMFLn7Dy6d9oUArsJOlnRpfGBDtjmw0PE7+UaOASeoKa5d5PU8hycPgDIjVRBwglI98+IAq3l/QIXr+9Doo0bJLpzML1mwFq7SawV8Ufvo673TWERkSMUo/tQdwMbx3Ff538mOM2OWfxrWbvd7Z4ad6uKqSv5CR2e/m2/l5eX15S+zWr5vHhHoGZFl1c4L5Cz+n55JeblAV8C8AIH1iXlvMdwFAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>不设KPI，MiniMax发6亿港元股票，员工满年限即可全拿；曝苹果游说特朗普采购中国长鑫存储芯片；DeepSeek 与北大联合开源 DSpark | AI周报</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-29</span></div>
-
-
-    <p>不设KPI，MiniMax发6亿港元股票，员工满年限即可全拿；曝苹果游说特朗普采购中国长鑫存储芯片；DeepSeek 与北大联合开源 DSpark | AI周报。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="36Kr" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://36kr.com/p/3868055841641476?f=rss" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACsklEQVRYhe2WPUwUQRzF39s9xMSDs5BCjSQaY7CSE7CgQqIm1n7ESmJioxhNgAgcJmCEPU2ARBMwUaOJpR+FlYWFWBgLNEClhSYqhRpoTigU2HkWfNzuecftfaAN/2r2zfz/7zeT2ZkB1uM/B5cb1X2uA6JNUslS1+REl12ZKVESo465I+A0oA0AQPLzeMzemQtAaKUg0IoVc4BE+WqJUcecF3Q2ZTYPcjEHACvZXJxFkGgYUhhEt8+cnIpErMECAIJHImFaJFWkyM5IM2fXHKCmX1sM0ObVSH7dGrZu51orL4CFOdMJqcyrCep5fpG/1xygbkA7ADT7RPLDnt32w3zMAc9fECTmfpkeQKVezaJ15fFJuvkCBF6BGkdVJJq8GoG3Y518mq85kMMKLMjtBWD7VTtWiHlggOgN1ZoF95hXI/FyPMYXQfL3xXWEci9BrBe0GeTMRMwuDwwg142naoTdFczcvQBjbgqwAC0VTP5FWffA/rgaJRzyu/PHWIxvsuXWxbULBgOAMvpkBTAm3eyDbd55Y9rTHfEk54MAhKsd976AA6kdkiqqr6s+G4CIOr8xXtmWXUtY25e1jHtAkg3gTMbqxu0F0Lg6AfYmzemWhKxTo5f53Tskr8toERAHq/t0OMuojUkWfEk1LwhgMVwn8FBhPp0cGIDgMIkn/pqojTo6HhgiXwCC05tCVkdJqd0C+m89A3PtxCPZmXKLAiDAed3OmdFWTgIY8neq6uMntyl9ZlEAOLmtzBpe/gptsOIgZ/wM7D56y39LFg+A6vY+Nt61cdoC+v0Aqvw2a84VHYDg+3SPjUjEGiQ5lSLHGoYULgCAc3/12lZnusfGSDNnIVz1apIqEgnTkjcAgYHlM5qkS/LueAefZUoci1nDBO95wZV6cnr2CqmfucKtxz+JPzzj7cBzmIcAAAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>港大教授李弘扬创业做通用全身具身大脑，获真格高榕IDG五源等数亿种子轮融资｜硬氪独家</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-29</span></div>
-
-
-    <p>s」近日完成数亿元种子轮融资，本轮投资方包括真格基金、高榕创投、IDG资本、五源资本等头部美元基金，以及戈壁创投与香港大学联名基金、奇绩创投、上海创智学院等。 光源资本担任独家财务顾问。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Leiphone" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.leiphone.com/category/weiwu/xwKJa2OJ5xsHkTRs.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACDklEQVQ4jbWSv2tTURTHv+e++5o01hptiSJYqJEWrIqIFsHq5CBuDhUcpOjsJv4Fji4KunURF8cOTg6SwckiSAWlUvrDNJKkL02bl/S9d+8957p2KEQKfrbv4Zzv+Q5f4H/QnCve6i088/H8nO+3qw4ayh6vYC8Dp6bvM71ftJ6efeG7HEs3+SbbDfiojdqd0WmdH7oNB+0tAnilrHEbZyq/5wGA9hvsvJz1SheQfPn8eqBcfsKtuON2e0uFiQsznFpQ4uAyBgmBuwlKbz+Sbj4aLvoE+uT7TsRrdXA4CN9zNcosyHlDSfbLrqzO2FoTtt2pu57RJGo0OHoCtRtTi3pg6vqyCodL0eDyJ79rIuj8qLJkuNuD/dMSW9tSWVoFO1kY/5neA4D18rErprH1FUH+qk4rS3UKj5TMdlpXEp+D3QJLB0EcgWN2YsPIUw7IURdIAQDehysqANgItNnspGI68DYwYIATgh6BpoICUXhaKToPoR/CNLE+OfLGC+XBeAwmkNC6ZpMfk0xBWZqAkjFwAIibVCKwVkEZussOIAbYq2nlPcAEcQCErmnEwQcYum8dKgiDHSTqMtJgUayfwZ6KOPCnwFRk+C4y2mSgRMAqhB6UG83tvkXpPc+9imaHfPth4V3fIh1EMC6XcqmDa6vpQxnY70Epq2q4hsr3jXsQ1ZvFterF4xuHOv4X/gK28RNl6mJD6QAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>vivo“再造”折叠屏</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-27</span></div>
-
-
-    <p>手机行业从来不缺挑战。 自从2023年中国科技产业开启了所谓的“大模型狂飙时代”后，从互联网巨头到传统制造业，从手机厂商到汽车新势力，中国科技行业迅速陷入了一场前所未有的焦虑当中。</p>
-
-  </article>
-    </div>
-  </section>
-<section class="panel" id="section-reddit-18" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-reddit-13" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>Reddit 线索</h2>
@@ -4145,7 +4122,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-19" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-14" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>信源覆盖与缺口</h2>

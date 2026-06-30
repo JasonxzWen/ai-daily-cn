@@ -1191,6 +1191,7 @@ body.lightbox-open {
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
     "tracking-component tracking-component"
+    "tracking-trend tracking-trend"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1209,6 +1210,7 @@ body.lightbox-open {
 .tracking-card > *,
 .tracking-card .card-stat-grid,
 .tracking-card .card-bars,
+.tracking-card .card-trend-curve,
 .tracking-card .card-table,
 .tracking-card .card-table-scroll {
   min-width: 0;
@@ -1222,9 +1224,80 @@ body.lightbox-open {
   grid-area: tracking-bars;
 }
 
+.tracking-card .card-trend-curve {
+  grid-area: tracking-trend;
+}
+
 .tracking-card .card-table {
   grid-area: tracking-table;
   max-width: 100%;
+}
+
+.card-trend-curve {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 10px 12px 8px;
+}
+
+.card-trend-curve .card-visual-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-trend-metric {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.card-trend-svg {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.card-trend-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-point {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.card-trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .tracking-card > p {
@@ -1853,6 +1926,7 @@ body.lightbox-open {
       "tracking-tags"
       "tracking-component"
       "tracking-stats"
+      "tracking-trend"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
@@ -3128,7 +3202,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-story-3" title="Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK</span></a>
 <a href="#section-story-4" title="xAI 发布 Grok Build 终端 coding agent early beta" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>xAI 发布 Grok Build 终端 coding agent early beta</span></a>
 <a href="#section-story-5" title="OpenAI 发布 ChatGPT 在敏感对话中的上下文安全更新" data-nav-link data-nav-index="6" data-nav-group-name="main" data-nav-status="info"><span>OpenAI 发布 ChatGPT 在敏感对话中的上下文安全更新</span></a>
-<a href="#section-other-sources" title="其他信源" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>其他信源</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3235,46 +3308,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - 为什么值得看：OpenAI 公布的内部评估显示，长单轮对话中 suicide/self-harm 场景 intended safe response 提升 50%，harm-to-others 提升 16%；在 GPT-5.5 Instant 上，跨多对话 harm-to-others 提升 52%，suicide/self-harm 提升 39%。
 - 来源：[![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI](https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/)</template></div>
   </details>
-<section class="panel" id="section-other-sources" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>其他信源</h2>
-
-    </div>
-
-  </div>
-
-
-    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.mux.com/docs/changelog/robots-pricing-update-may-2026" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1DPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Mux 在 2026-05-15 更新 Robots workflow unit 计算，并把 free technic…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>Mux 在 2026-05-15 更新 Robots workflow unit 计算，并把 free technical preview 延长到 2026-06-15； 该条更偏计费和试用期变化，本轮不计入主体。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://help.openai.com/en/articles/6825453-chatgpt-release-notes" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI 2026-05-15 的 ChatGPT personal finances 和 xAI 2026-05…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>OpenAI 2026-05-15 的 ChatGPT personal finances 和 xAI 2026-05-15 的 model retirement 已在 2026-05-16 日报主体覆盖，本轮仅作为连续跟踪线索，不重复写入主体。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://huggingface.co/blog" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Hugging Face 社区页出现多个近期热度条目，但打开后 Reachy Mini appstore 与 QVAC…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>Hugging Face 社区页出现多个近期热度条目，但打开后 Reachy Mini appstore 与 QVAC MedPsy 的明确发布日期分别为 2026-05-06 和 2026-05-07，超出本轮最近 5 天补充窗口。</p>
-
-  </article>
-    </div>
-  </section>
 
 
 

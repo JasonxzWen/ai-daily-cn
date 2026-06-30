@@ -1191,6 +1191,7 @@ body.lightbox-open {
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
     "tracking-component tracking-component"
+    "tracking-trend tracking-trend"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1209,6 +1210,7 @@ body.lightbox-open {
 .tracking-card > *,
 .tracking-card .card-stat-grid,
 .tracking-card .card-bars,
+.tracking-card .card-trend-curve,
 .tracking-card .card-table,
 .tracking-card .card-table-scroll {
   min-width: 0;
@@ -1222,9 +1224,80 @@ body.lightbox-open {
   grid-area: tracking-bars;
 }
 
+.tracking-card .card-trend-curve {
+  grid-area: tracking-trend;
+}
+
 .tracking-card .card-table {
   grid-area: tracking-table;
   max-width: 100%;
+}
+
+.card-trend-curve {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 10px 12px 8px;
+}
+
+.card-trend-curve .card-visual-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-trend-metric {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.card-trend-svg {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.card-trend-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-point {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.card-trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .tracking-card > p {
@@ -1853,6 +1926,7 @@ body.lightbox-open {
       "tracking-tags"
       "tracking-component"
       "tracking-stats"
+      "tracking-trend"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
@@ -3130,7 +3204,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-story-5" title="Anthropic 与 KPMG 建立全球联盟，把 Claude 嵌入审计、税务、法务和 PE 工作流" data-nav-link data-nav-index="6" data-nav-group-name="main" data-nav-status="info"><span>Anthropic 与 KPMG 建立全球联盟，把 Claude 嵌入审计、税务、法务和 PE 工作流</span></a>
 <a href="#section-story-6" title="dbt 发布 Developer Agent、MCP OAuth/Admin API 和 BYOK 更新，让 AI 工具进入 analytics engineering 工作面" data-nav-link data-nav-index="7" data-nav-group-name="main" data-nav-status="info"><span>dbt 发布 Developer Agent、MCP OAuth/Admin API 和 BYOK 更新，让 AI 工具进入 analytics engineering 工作面</span></a>
 <a href="#section-official-blog-updates" title="官方 Blog 更新" data-nav-link data-nav-index="8" data-nav-group-name="main" data-nav-status="info"><span>官方 Blog 更新</span></a>
-<a href="#section-other-sources" title="其他信源" data-nav-link data-nav-index="9" data-nav-group-name="signals" data-nav-status="info"><span>其他信源</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3273,46 +3346,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <p>文章说明 reranker 与 embedder 的配合、6 个 CrossEncoder 模型、蒸馏数据、训练 recipe 和 MTEB retrieval 结果。</p>
-
-  </article>
-    </div>
-  </section>
-<section class="panel" id="section-other-sources" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>其他信源</h2>
-
-    </div>
-
-  </div>
-
-
-    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://mistral.ai/news/mistral-3" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzA0Nzg1NyIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1BPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>mistral.ai</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>Mistral 3 官方页披露 Mistral Large 3、Ministral 3 系列、Apache 2.0、vLLM/Hugging Face/AWS Bedrock 等可用路径，但本轮页面未暴露稳定 published date； 按规则暂不写入主体或 model_releases。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.anthropic.com/news/anthropic-acquires-stainless?s=09" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Anthropic 在 2026-05-18 宣布收购 Stainless，强化 SDK、CLI 和 MCP serv…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>Anthropic 在 2026-05-18 宣布收购 Stainless，强化 SDK、CLI 和 MCP server tooling； 该事件高信号但超出本轮 24 小时主体窗口，未扩窗补入。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://make.wordpress.org/core/7-0/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1XPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>make.wordpress.org</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>WordPress 7.0 release schedule 显示 2026-05-20 发布，Beta 1 文档曾说明 Web Client AI API 会进入 Core； 待最终 release post 出现后可复核是否进入主体。</p>
 
   </article>
     </div>

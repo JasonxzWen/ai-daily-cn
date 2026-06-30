@@ -602,7 +602,8 @@ try {
   assert.equal(await trackingComponent.locator("[data-tracking-trace]").count(), 0);
   await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
   await imageLightboxOpensAndCloses(page, ".builder-card .card-media-grid img");
-  await imageLightboxOpensAndCloses(page, ".community-card .card-media-grid img");
+  assert.equal(await page.locator(".community-card").count(), 0);
+  assert.equal(await page.locator(".community-card .card-media-grid img").count(), 0);
   assert.equal(await page.locator(".project-card-grid").count(), 0);
   assert.equal(await allExternalLinksHaveRel(page), true);
 

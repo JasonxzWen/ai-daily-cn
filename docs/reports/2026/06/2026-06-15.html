@@ -1191,6 +1191,7 @@ body.lightbox-open {
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
     "tracking-component tracking-component"
+    "tracking-trend tracking-trend"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1209,6 +1210,7 @@ body.lightbox-open {
 .tracking-card > *,
 .tracking-card .card-stat-grid,
 .tracking-card .card-bars,
+.tracking-card .card-trend-curve,
 .tracking-card .card-table,
 .tracking-card .card-table-scroll {
   min-width: 0;
@@ -1222,9 +1224,80 @@ body.lightbox-open {
   grid-area: tracking-bars;
 }
 
+.tracking-card .card-trend-curve {
+  grid-area: tracking-trend;
+}
+
 .tracking-card .card-table {
   grid-area: tracking-table;
   max-width: 100%;
+}
+
+.card-trend-curve {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 10px 12px 8px;
+}
+
+.card-trend-curve .card-visual-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-trend-metric {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.card-trend-svg {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.card-trend-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-point {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.card-trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .tracking-card > p {
@@ -1853,6 +1926,7 @@ body.lightbox-open {
       "tracking-tags"
       "tracking-component"
       "tracking-stats"
+      "tracking-trend"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
@@ -3131,8 +3205,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-trend-tracking" title="趋势追踪" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>趋势追踪</span></a>
 <a href="#section-chinese-media-rss" title="中文媒体 RSS" data-nav-link data-nav-index="8" data-nav-group-name="main" data-nav-status="info"><span>中文媒体 RSS</span></a>
 <a href="#section-x-twitter-9" title="X/Twitter 讨论" data-nav-link data-nav-index="9" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
-<a href="#section-other-sources" title="其他信源" data-nav-link data-nav-index="10" data-nav-group-name="signals" data-nav-status="info"><span>其他信源</span></a>
-<a href="#section-html-work-report-11" title="信源覆盖与缺口" data-nav-link data-nav-index="11" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
+<a href="#section-html-work-report-10" title="信源覆盖与缺口" data-nav-link data-nav-index="10" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3249,7 +3322,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <button data-filter-target="html-work-report" data-filter-value="all" aria-pressed="true">全部</button><button data-filter-target="html-work-report" data-filter-value="OpenRouter" aria-pressed="false">OpenRouter</button><button data-filter-target="html-work-report" data-filter-value="Artificial Analysis" aria-pressed="false">Artificial Analysis</button>
     </div>
     <div class="evidence-grid focus-field tracking-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="7">
     <div class="meta">OpenRouter</div>
     <h3><a class="card-title-link" href="https://openrouter.ai/rankings" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenRouter</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型使用</span><span class="chip chip-date">2026-06-15</span></div>
@@ -3418,7 +3491,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">最大变化</span>
       <strong>MiniMax M3</strong>
       <span class="card-stat-detail">+73%</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="openrouter-rankings" data-trend-points="7" aria-label="7日趋势 榜首周用量: 06-08 3.69T tokens to 06-15 4.41T tokens">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首周用量</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首周用量: 06-08 3.69T tokens to 06-15 4.41T tokens" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,90.0 78.7,56.2 129.3,42.0 180.0,32.2 230.7,18.0 281.3,26.0 332.0,26.0"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-08: 3.69T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="78.7" cy="56.2" r="3.2"><title>06-09: 4.07T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="129.3" cy="42.0" r="3.2"><title>06-10: 4.23T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="180.0" cy="32.2" r="3.2"><title>06-11: 4.34T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="230.7" cy="18.0" r="3.2"><title>06-12: 4.5T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="281.3" cy="26.0" r="3.2"><title>06-14: 4.41T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="332.0" cy="26.0" r="3.2"><title>06-15: 4.41T tokens | DeepSeek V4 Flash</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-08</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-15</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>3.69T tokens</span>
+      <span>4.41T tokens</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3481,7 +3567,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <p>榜首 DeepSeek V4 Flash（deepseek），4.41T tokens，+20%；最大周变化是 MiniMax M3（+73%）。</p>
 
   </article>
-<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Artificial Analysis" data-search-target="html-work-report">
+<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Artificial Analysis" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="6">
     <div class="meta">Artificial Analysis</div>
     <h3><a class="card-title-link" href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFBPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Artificial Analysis</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型基准</span><span class="chip chip-date">2026-06-15</span></div>
@@ -3599,7 +3685,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">榜首</span>
       <strong>Claude Fable 5 (with fallback)</strong>
       <span class="card-stat-detail">anthropic / 65 分 / AA Index</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="artificial-analysis-intelligence-index" data-trend-points="6" aria-label="7日趋势 榜首分数: 06-08 61 分 to 06-15 65 分">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首分数</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首分数: 06-08 61 分 to 06-15 65 分" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,90.0 88.8,90.0 149.6,18.0 210.4,18.0 271.2,18.0 332.0,18.0"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-08: 61 分 | Claude Opus4.8 (max)</title></circle><circle class="card-trend-point" cx="88.8" cy="90.0" r="3.2"><title>06-09: 61 分 | Claude Opus 4.8 (max)</title></circle><circle class="card-trend-point" cx="149.6" cy="18.0" r="3.2"><title>06-10: 65 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="210.4" cy="18.0" r="3.2"><title>06-11: 65 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="271.2" cy="18.0" r="3.2"><title>06-12: 65 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="332.0" cy="18.0" r="3.2"><title>06-15: 65 分 | Claude Fable 5 (with fallback)</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-08</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-15</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>61 分</span>
+      <span>65 分</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3735,83 +3834,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel" id="section-other-sources" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>其他信源</h2>
-
-    </div>
-
-  </div>
-
-
-    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenAI Company News RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://openai.com/index/introducing-openai-partner-network" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI 发布 Partner Network，面向企业客户整理合作伙伴入口</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-14</span></div>
-
-
-    <p>OpenAI 发布 Partner Network，面向企业客户整理合作伙伴入口。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="QbitAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/435520.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>智源大会 | 天工AI重新定义世界模型，公布Matrix-Game 3.5 最新技术突破。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="QbitAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/435531.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Agent时代，华为云开始重新造地基了</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>Agent时代，华为云开始重新造地基了。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="InfoQ CN" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.infoq.cn/article/WeSfARjdEkQpMaFYOb3s?utm_source=rss&amp;utm_medium=article" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAllBMVEX///8gn0ALdNsUnTluuX1jmt8AcNsAcdoAaNkAa9lTkeJ7p+cAZtj09/0Kct8WiZ4hoTbF2PRFi+AAmjBimOO4z/GLsenk7fpKq18AliHa3uAAYdfr7O7U4vddsm/P5tOhwO2t1bUzpE2IxJPc7d8rf914vYa83MIAWdaDrOg9qFXFys6j0Kv2+/fP1Nesx++Vyp9oqbW0KrLTAAABvUlEQVRYhe2T63KjMAyFZStrLGq2BQcIBELTkKbZbXp5/5erDNkLhdJ2dn91fDLDKCf2F/kgA3h5eXl5/W9dZ1n6ykrHFmw3N2K1aycACdHF0NmT0uHQatCiEIjF7RgQBmoIqLVU++PAagshbFFYfm7mAHXtnjEF++5rFMd1/4PgndsTtCsUxQGqshoBojuzftRamxrCJJAyPEK0NERkMl5ysLz/TMIfUP2cAGgptSYpCQyXwToEqSSxQ5zGLQrbL763ojhVZTkFUMc8JalrSClIAC6UlK6WOoUN4vnoDffSVuXDFEBznQSUugwYoCXF7GQqCGGFuDinyYCmqiaPYLhe/gbkPRFqkoo7EKu/OigfJo8wApgzgGDH4feLu+qNEIcAMFLn7Dy6d9oUArsJOlnRpfGBDtjmw0PE7+UaOASeoKa5d5PU8hycPgDIjVRBwglI98+IAq3l/QIXr+9Doo0bJLpzML1mwFq7SawV8Ufvo673TWERkSMUo/tQdwMbx3Ff538mOM2OWfxrWbvd7Z4ad6uKqSv5CR2e/m2/l5eX15S+zWr5vHhHoGZFl1c4L5Cz+n55JeblAV8C8AIH1iXlvMdwFAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Swiggy通过实时机器学习排序提升搜索自动补全效果</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>Swiggy通过实时机器学习排序提升搜索自动补全效果。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Leiphone" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.leiphone.com/category/industrynews/d1EqrpsXBW4c1JjR.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACDklEQVQ4jbWSv2tTURTHv+e++5o01hptiSJYqJEWrIqIFsHq5CBuDhUcpOjsJv4Fji4KunURF8cOTg6SwckiSAWlUvrDNJKkL02bl/S9d+8957p2KEQKfrbv4Zzv+Q5f4H/QnCve6i088/H8nO+3qw4ayh6vYC8Dp6bvM71ftJ6efeG7HEs3+SbbDfiojdqd0WmdH7oNB+0tAnilrHEbZyq/5wGA9hvsvJz1SheQfPn8eqBcfsKtuON2e0uFiQsznFpQ4uAyBgmBuwlKbz+Sbj4aLvoE+uT7TsRrdXA4CN9zNcosyHlDSfbLrqzO2FoTtt2pu57RJGo0OHoCtRtTi3pg6vqyCodL0eDyJ79rIuj8qLJkuNuD/dMSW9tSWVoFO1kY/5neA4D18rErprH1FUH+qk4rS3UKj5TMdlpXEp+D3QJLB0EcgWN2YsPIUw7IURdIAQDehysqANgItNnspGI68DYwYIATgh6BpoICUXhaKToPoR/CNLE+OfLGC+XBeAwmkNC6ZpMfk0xBWZqAkjFwAIibVCKwVkEZussOIAbYq2nlPcAEcQCErmnEwQcYum8dKgiDHSTqMtJgUayfwZ6KOPCnwFRk+C4y2mSgRMAqhB6UG83tvkXpPc+9imaHfPth4V3fIh1EMC6XcqmDa6vpQxnY70Epq2q4hsr3jXsQ1ZvFterF4xuHOv4X/gK28RNl6mJD6QAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>健康AI阿福测试“医生把关”新功能：提供AI+医生协作观察样本</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>6月15日，健康AI应用&quot;蚂蚁阿福&quot;宣布“拍皮肤”功能升级：可识别皮肤病种类从50种增至100多种，覆盖99%的线上就医常见皮肤问题。 同时，阿福还上线了“医生把关”这一新服务：用户获得阿福的解答后，可选择邀请三甲医院的医生对阿福的分析结果进行复核并补充意见。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SSPAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://sspai.com/post/111045" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>派早报：Fable 5 和 Mythos 5 模型因美国商务部禁令下线</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-14</span></div>
-
-
-    <p>Fable 5 和 Mythos 5 模型因美国商务部禁令下线 SpaceX 挂牌，市值达 2.1 万亿美元 《广告引证内容执法指南》出台 华为推出 HarmonyOS 7 英伟达开始接受中国客户下单 Vera CPU 大疆与影石在美互诉专利侵权 看看就行的简讯 少数派的近期动态 你可能错过的好文章 查看全文。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="ML Papers of the Week" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://arxiv.org/abs/2606.01444" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1QPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>论文讨论自修正科学发现系统</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-07</span></div>
-
-
-    <p>论文讨论自修正科学发现系统。</p>
-
-  </article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-11" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-10" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>信源覆盖与缺口</h2>

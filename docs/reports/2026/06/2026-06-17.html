@@ -1191,6 +1191,7 @@ body.lightbox-open {
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
     "tracking-component tracking-component"
+    "tracking-trend tracking-trend"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1209,6 +1210,7 @@ body.lightbox-open {
 .tracking-card > *,
 .tracking-card .card-stat-grid,
 .tracking-card .card-bars,
+.tracking-card .card-trend-curve,
 .tracking-card .card-table,
 .tracking-card .card-table-scroll {
   min-width: 0;
@@ -1222,9 +1224,80 @@ body.lightbox-open {
   grid-area: tracking-bars;
 }
 
+.tracking-card .card-trend-curve {
+  grid-area: tracking-trend;
+}
+
 .tracking-card .card-table {
   grid-area: tracking-table;
   max-width: 100%;
+}
+
+.card-trend-curve {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 10px 12px 8px;
+}
+
+.card-trend-curve .card-visual-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-trend-metric {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.card-trend-svg {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.card-trend-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-point {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.card-trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .tracking-card > p {
@@ -1853,6 +1926,7 @@ body.lightbox-open {
       "tracking-tags"
       "tracking-component"
       "tracking-stats"
+      "tracking-trend"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
@@ -3107,7 +3181,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <p class="hero-summary-text">今天最值得看的主线有 OpenAI披露模型能力和评估方法更新；Qwen 团队介绍机器人学习与多模态推理实验；微软研究院更新AI 产品、平台或工程实践；热门博客这轮主要看 agent 和开发工具的落地边界。</p>
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>主体</span><strong>8</strong><small>重点条目</small></div>
-<div class="hero-stat"><span>AIGC</span><strong>8</strong><small>产品/内容</small></div>
+<div class="hero-stat"><span>AIGC</span><strong>4</strong><small>产品/内容</small></div>
 <div class="hero-stat"><span>追踪</span><strong>3</strong><small>榜单变化</small></div>
 <div class="hero-stat"><span>精选博客</span><strong>8</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>20</strong><small>Top 10</small></div>
@@ -3140,9 +3214,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-subscribed-rss" title="订阅 RSS" data-nav-link data-nav-index="15" data-nav-group-name="main" data-nav-status="info"><span>订阅 RSS</span></a>
 <a href="#section-chinese-media-rss" title="中文媒体 RSS" data-nav-link data-nav-index="16" data-nav-group-name="main" data-nav-status="info"><span>中文媒体 RSS</span></a>
 <a href="#section-x-twitter-17" title="X/Twitter 讨论" data-nav-link data-nav-index="17" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
-<a href="#section-other-sources" title="其他信源" data-nav-link data-nav-index="18" data-nav-group-name="signals" data-nav-status="info"><span>其他信源</span></a>
-<a href="#section-reddit-19" title="Reddit 线索" data-nav-link data-nav-index="19" data-nav-group-name="signals" data-nav-status="info"><span>Reddit 线索</span></a>
-<a href="#section-html-work-report-20" title="信源覆盖与缺口" data-nav-link data-nav-index="20" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
+<a href="#section-reddit-18" title="Reddit 线索" data-nav-link data-nav-index="18" data-nav-group-name="signals" data-nav-status="info"><span>Reddit 线索</span></a>
+<a href="#section-html-work-report-19" title="信源覆盖与缺口" data-nav-link data-nav-index="19" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3429,7 +3502,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <button data-filter-target="html-work-report" data-filter-value="all" aria-pressed="true">全部</button><button data-filter-target="html-work-report" data-filter-value="OpenRouter" aria-pressed="false">OpenRouter</button><button data-filter-target="html-work-report" data-filter-value="Artificial Analysis" aria-pressed="false">Artificial Analysis</button><button data-filter-target="html-work-report" data-filter-value="SWE-bench" aria-pressed="false">SWE-bench</button>
     </div>
     <div class="evidence-grid focus-field tracking-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="7">
     <div class="meta">OpenRouter</div>
     <h3><a class="card-title-link" href="https://openrouter.ai/rankings" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenRouter</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型使用</span><span class="chip chip-date">2026-06-17</span></div>
@@ -3598,7 +3671,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">最大变化</span>
       <strong>Claude Opus 4.7</strong>
       <span class="card-stat-detail">+67%</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="openrouter-rankings" data-trend-points="7" aria-label="7日趋势 榜首周用量: 06-10 4.23T tokens to 06-17 4.64T tokens">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首周用量</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首周用量: 06-10 4.23T tokens to 06-17 4.64T tokens" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,90.0 78.7,70.7 129.3,42.6 180.0,58.4 230.7,58.4 281.3,32.0 332.0,18.0"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-10: 4.23T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="78.7" cy="70.7" r="3.2"><title>06-11: 4.34T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="129.3" cy="42.6" r="3.2"><title>06-12: 4.5T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="180.0" cy="58.4" r="3.2"><title>06-14: 4.41T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="230.7" cy="58.4" r="3.2"><title>06-15: 4.41T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="281.3" cy="32.0" r="3.2"><title>06-16: 4.56T tokens | MiniMax M3</title></circle><circle class="card-trend-point" cx="332.0" cy="18.0" r="3.2"><title>06-17: 4.64T tokens | MiniMax M3</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-10</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-17</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>4.23T tokens</span>
+      <span>4.64T tokens</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3661,7 +3747,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <p>榜首 MiniMax M3（minimax），4.64T tokens，+44%；最大周变化是 Claude Opus 4.7（+67%）。</p>
 
   </article>
-<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Artificial Analysis" data-search-target="html-work-report">
+<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Artificial Analysis" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="6">
     <div class="meta">Artificial Analysis</div>
     <h3><a class="card-title-link" href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFBPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Artificial Analysis</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型基准</span><span class="chip chip-date">2026-06-17</span></div>
@@ -3763,7 +3849,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">榜首</span>
       <strong>Claude Fable 5 (with fallback)</strong>
       <span class="card-stat-detail">anthropic / 60 分 / AA Index</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="artificial-analysis-intelligence-index" data-trend-points="6" aria-label="7日趋势 榜首分数: 06-10 65 分 to 06-17 60 分">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首分数</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首分数: 06-10 65 分 to 06-17 60 分" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,18.0 88.8,18.0 149.6,18.0 210.4,18.0 271.2,90.0 332.0,90.0"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="18.0" r="3.2"><title>06-10: 65 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="88.8" cy="18.0" r="3.2"><title>06-11: 65 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="149.6" cy="18.0" r="3.2"><title>06-12: 65 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="210.4" cy="18.0" r="3.2"><title>06-15: 65 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="271.2" cy="90.0" r="3.2"><title>06-16: 60 分 | Claude Fable 5 (with fallback)</title></circle><circle class="card-trend-point" cx="332.0" cy="90.0" r="3.2"><title>06-17: 60 分 | Claude Fable 5 (with fallback)</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-10</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-17</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>65 分</span>
+      <span>60 分</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3820,7 +3919,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <p>榜首 Claude Fable 5 (with fallback)（anthropic），60 分，AA Index。</p>
 
   </article>
-<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SWE-bench" data-search-target="html-work-report">
+<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SWE-bench" data-search-target="html-work-report" data-trend-status="insufficient-history" data-trend-history-points="1">
     <div class="meta">SWE-bench</div>
     <h3><a class="card-title-link" href="https://labs.scale.com/leaderboard/swe_bench_pro_public" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNMPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>SWE-bench Pro</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-major">重大</span><span class="chip chip-topic">代码基准</span><span class="chip chip-date">2026-06-17</span></div>
@@ -4183,227 +4282,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel" id="section-other-sources" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>其他信源</h2>
-
-    </div>
-
-  </div>
-
-
-    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Z.ai Hugging Face Organization" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://huggingface.co/zai-org/SCAIL-2" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>相关团队更新agent 工作流和开发工具能力</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>相关团队更新agent 工作流和开发工具能力。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Meta Newsroom" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://about.fb.com/news/2026/06/new-ai-tools-to-help-you-make-things-happen-on-facebook/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Meta Newsroom更新agent 工作流和开发工具能力</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>Meta Newsroom更新agent 工作流和开发工具能力。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Latent.Space" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.latent.space/p/ainews-glm-52-the-top-frontend-coding" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Latent.Space说明SageMaker 推测解码并行化方案</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-17</span></div>
-
-
-    <p>Latent.Space说明SageMaker 推测解码并行化方案。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="GitHub Blog Feed" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://github.blog/ai-and-ml/github-copilot/github-copilot-cli-for-beginners-overview-of-common-slash-commands/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>该开源项目更新agent 工作流和开发工具能力</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>该开源项目更新agent 工作流和开发工具能力。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="GitHub Blog Feed" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://github.blog/ai-and-ml/llms/accelerating-researchers-and-developers-building-multilingual-ai-with-a-new-open-dataset/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>该开源项目更新agent 工作流和开发工具能力</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>该开源项目更新agent 工作流和开发工具能力。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="xAI Company News" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://x.ai/news/grok-plugin-marketplace" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>xAI Company接入终端助手里的模型选项</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>xAI Company接入终端助手里的模型选项。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="arXiv cs.AI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://arxiv.org/abs/2606.18237v1" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI3IiBmaWxsPSIjYjMxYjFiIi8+PHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QVJYPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>ReproRepo公开agent 失败复现报告流程</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-16</span></div>
-
-
-    <p>ReproRepo公开agent 失败复现报告流程。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SSPAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://sspai.com/post/110958" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>具透 | 动态应用网格、Liquid Glass 微调，watchOS 27 首个开发者测试版一览</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-17</span></div>
-
-
-    <p>AI 之外，watchOS 27 中还有这些新功能。 查看全文。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Leiphone" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.leiphone.com/category/industrynews/65PN2PmZCC0YKFaS.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACDklEQVQ4jbWSv2tTURTHv+e++5o01hptiSJYqJEWrIqIFsHq5CBuDhUcpOjsJv4Fji4KunURF8cOTg6SwckiSAWlUvrDNJKkL02bl/S9d+8957p2KEQKfrbv4Zzv+Q5f4H/QnCve6i088/H8nO+3qw4ayh6vYC8Dp6bvM71ftJ6efeG7HEs3+SbbDfiojdqd0WmdH7oNB+0tAnilrHEbZyq/5wGA9hvsvJz1SheQfPn8eqBcfsKtuON2e0uFiQsznFpQ4uAyBgmBuwlKbz+Sbj4aLvoE+uT7TsRrdXA4CN9zNcosyHlDSfbLrqzO2FoTtt2pu57RJGo0OHoCtRtTi3pg6vqyCodL0eDyJ79rIuj8qLJkuNuD/dMSW9tSWVoFO1kY/5neA4D18rErprH1FUH+qk4rS3UKj5TMdlpXEp+D3QJLB0EcgWN2YsPIUw7IURdIAQDehysqANgItNnspGI68DYwYIATgh6BpoICUXhaKToPoR/CNLE+OfLGC+XBeAwmkNC6ZpMfk0xBWZqAkjFwAIibVCKwVkEZussOIAbYq2nlPcAEcQCErmnEwQcYum8dKgiDHSTqMtJgUayfwZ6KOPCnwFRk+C4y2mSgRMAqhB6UG83tvkXpPc+9imaHfPth4V3fIh1EMC6XcqmDa6vpQxnY70Epq2q4hsr3jXsQ1ZvFterF4xuHOv4X/gK28RNl6mJD6QAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>阿里云扩建全球基础设施，新增法国巴黎、马来西亚柔佛地域</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-17</span></div>
-
-
-    <p>6月17日，阿里云在‌VivaTech大会期间宣布法国巴黎、马来西亚柔佛地域正式开服，同时扩建日本东京和墨西哥的数据中心，以满足AI出海与全球市场激增的Token调用需求。 本轮扩张完成后，阿里云全球布局升至 32 个地域、105个可用区。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="NVIDIA Newsroom RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://blogs.nvidia.com/blog/nvidia-xr-ai/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA介绍机器人学习与多模态推理实验</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-16</span></div>
-
-
-    <p>NVIDIA介绍机器人学习与多模态推理实验。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="NVIDIA Newsroom RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://blogs.nvidia.com/blog/coherent-texas-ai-optical/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA更新AI 产品、平台或工程实践</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-16</span></div>
-
-
-    <p>NVIDIA更新AI 产品、平台或工程实践。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Nature Machine Learning" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.nature.com/articles/s44161-026-00815-5" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAATlBMVEVHcEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////n5+fT09MxMTGJiYmOjo6YmJi8vLxPT0/09PRtbW2oqKghISGiEhN+AAAADHRSTlMA0rZK5WJ4FJD5qzc35ZrKAAAB8ElEQVRYhaVX2ZbDIAhNJtZsmqbN2v//0UnaVBTR6uE+ZRy4BUSWogigrmRXilapVpSdrOqQHI2+EQpBNH2qdi097YtDJtnRtLT6gbZtfqrfwuofjlvc+jKufqKM+HH7rX4iaESTpq9UIBJ/qfpK/TH1SYYsfYIh2f8vUBwS42/DuYs6X18pOx/I/HmZj2Xblpf3/zLqwDjd9edrH/QbwxR2Auf/Nq+nyvn51IB1ccVa8gaW46cvHH/N2saK/LhuonYM2EEe62s9IxM+cZTu6QoED42BTJBvAlR/JiBYPYLNlRWnfo8iOBrpSa/7tiyb5dWOhHsqiQcj/rhOXsYUFIR3GL0KaiL39N26I1lBZfGEDTjuNkRw5HPlETx9gjFIUOFLzCWQRccj6IiHmEVQ+peQRyC8l5hJ0Baefh6B4hOwXWAHkX2N7ERip3LkMcFzjj2myHOGRhAmqImCkkMgqJK2+wSmoAxItiGKKpQ0qKCGYEWyPVHWKYLte6R9D7zGAlV5JgjcziKJ1ma1JogYNBunv16tDYURGgs4DD3yYYuaMccxAczVo+eV01lMe3cHjGkwMJ0QjuxEsKakhBHZhzXi8Ics9pjHHzT5oy5/2OaP+/yFg7/y8Jeugr32vSMRoUhYPAv+6nuCt3xfdiSu//8FKZxtayUOKgAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Nature更新AI 产品、平台或工程实践</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-16</span></div>
-
-
-    <p>Nature更新AI 产品、平台或工程实践。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Nature Machine Learning" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.nature.com/articles/s41467-026-74122-9" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAATlBMVEVHcEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////n5+fT09MxMTGJiYmOjo6YmJi8vLxPT0/09PRtbW2oqKghISGiEhN+AAAADHRSTlMA0rZK5WJ4FJD5qzc35ZrKAAAB8ElEQVRYhaVX2ZbDIAhNJtZsmqbN2v//0UnaVBTR6uE+ZRy4BUSWogigrmRXilapVpSdrOqQHI2+EQpBNH2qdi097YtDJtnRtLT6gbZtfqrfwuofjlvc+jKufqKM+HH7rX4iaESTpq9UIBJ/qfpK/TH1SYYsfYIh2f8vUBwS42/DuYs6X18pOx/I/HmZj2Xblpf3/zLqwDjd9edrH/QbwxR2Auf/Nq+nyvn51IB1ccVa8gaW46cvHH/N2saK/LhuonYM2EEe62s9IxM+cZTu6QoED42BTJBvAlR/JiBYPYLNlRWnfo8iOBrpSa/7tiyb5dWOhHsqiQcj/rhOXsYUFIR3GL0KaiL39N26I1lBZfGEDTjuNkRw5HPlETx9gjFIUOFLzCWQRccj6IiHmEVQ+peQRyC8l5hJ0Baefh6B4hOwXWAHkX2N7ERip3LkMcFzjj2myHOGRhAmqImCkkMgqJK2+wSmoAxItiGKKpQ0qKCGYEWyPVHWKYLte6R9D7zGAlV5JgjcziKJ1ma1JogYNBunv16tDYURGgs4DD3yYYuaMccxAczVo+eV01lMe3cHjGkwMJ0QjuxEsKakhBHZhzXi8Ics9pjHHzT5oy5/2OaP+/yFg7/y8Jeugr32vSMRoUhYPAv+6nuCt3xfdiSu//8FKZxtayUOKgAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Nature更新AI 产品、平台或工程实践</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>Nature更新AI 产品、平台或工程实践。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Nature Machine Learning" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.nature.com/articles/d41586-026-01887-w" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAATlBMVEVHcEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////n5+fT09MxMTGJiYmOjo6YmJi8vLxPT0/09PRtbW2oqKghISGiEhN+AAAADHRSTlMA0rZK5WJ4FJD5qzc35ZrKAAAB8ElEQVRYhaVX2ZbDIAhNJtZsmqbN2v//0UnaVBTR6uE+ZRy4BUSWogigrmRXilapVpSdrOqQHI2+EQpBNH2qdi097YtDJtnRtLT6gbZtfqrfwuofjlvc+jKufqKM+HH7rX4iaESTpq9UIBJ/qfpK/TH1SYYsfYIh2f8vUBwS42/DuYs6X18pOx/I/HmZj2Xblpf3/zLqwDjd9edrH/QbwxR2Auf/Nq+nyvn51IB1ccVa8gaW46cvHH/N2saK/LhuonYM2EEe62s9IxM+cZTu6QoED42BTJBvAlR/JiBYPYLNlRWnfo8iOBrpSa/7tiyb5dWOhHsqiQcj/rhOXsYUFIR3GL0KaiL39N26I1lBZfGEDTjuNkRw5HPlETx9gjFIUOFLzCWQRccj6IiHmEVQ+peQRyC8l5hJ0Baefh6B4hOwXWAHkX2N7ERip3LkMcFzjj2myHOGRhAmqImCkkMgqJK2+wSmoAxItiGKKpQ0qKCGYEWyPVHWKYLte6R9D7zGAlV5JgjcziKJ1ma1JogYNBunv16tDYURGgs4DD3yYYuaMccxAczVo+eV01lMe3cHjGkwMJ0QjuxEsKakhBHZhzXi8Ics9pjHHzT5oy5/2OaP+/yFg7/y8Jeugr32vSMRoUhYPAv+6nuCt3xfdiSu//8FKZxtayUOKgAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Nature更新AI 产品、平台或工程实践</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-15</span></div>
-
-
-    <p>Nature更新AI 产品、平台或工程实践。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="ML Papers of the Week" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://arxiv.org/abs/2606.09079" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1QPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>ML Papers of the Week更新agent 工作流和开发工具能力</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-14</span></div>
-
-
-    <p>ML Papers of the Week更新agent 工作流和开发工具能力。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Interconnects" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.interconnects.ai/p/frontier-post-training-recipe-review" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Interconnects更新AI 产品、平台或工程实践</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-16</span></div>
-
-
-    <p>Interconnects更新AI 产品、平台或工程实践。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="QbitAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436148.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>头部具身大脑公司再获数亿美元融资！世界模型路线，15家VC抢着投</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-17</span></div>
-
-
-    <p>半年三连发：从开源到端侧再到训练场。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="QbitAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/436085.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>刚刚，Fable-5之下，智谱开源的GLM-5.2拿下AI编程第一！</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-17</span></div>
-
-
-    <p>刚刚，Fable-5之下，智谱开源的GLM-5.2拿下AI编程第一。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SSPAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://sspai.com/post/111124" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>派早报：SpaceX 宣布收购 Cursor、字节跳动推出 Seedance 2.0 Mini 等</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-17</span></div>
-
-
-    <p>夏普推出 AQUOS R11 手机、理光宣布 GR 系列调整建议零售价等。 查看全文。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="TechCrunch Enterprise" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://techcrunch.com/2026/06/16/anthropics-latest-feud-with-the-trump-admin-may-actually-help-it-sales-data-suggests/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBEQACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAACAwQFBgcBAP/EADgQAAEDAwEEBQcNAAAAAAAAAAEAAgMEBREGEiFBkxMWVWHSFDFRU4GR4RUiMjM1Q2NydJKxstH/xAAaAQACAwEBAAAAAAAAAAAAAAACAwABBAUG/8QALhEAAgEDAQYFAwUBAAAAAAAAAAECAwQRkRIUITFR0QUTFVJhMlNxIzOhsfAi/9oADAMBAAIRAxEAPwCO4pR4I6AoQMNULFGtUCwKNYoXgUa1UFgUaxVkJIUa1VktEUGozOG1qheBVrFAsCjWKBYFGtVZLwKNahyFgMNQ5LDDVWSDe0Wue61zKSmMYkcCQZCQNwzwBT1xKoW8q89iPMsI0Ddx95Rcx3hV7Jv9IuOq1fYIaEu/rKPmu8KmyX6TcfGr7BjQ124yUfMd4VWwy14TcdVq+xX3Rlj3MPnaSD7ErJz2sPBPUOk7hW0kVTDJTCOVu00Oe4HHuRKDaN1Pw6tUgpxaw/8AdBx1LunrKTmO8KrypDPSq/VavsQ1xopbdWPpagsMjMZLDkbxlJn/AMvDMNalKjNwlzQOlq2C2XmKrqdromtcDsjJ3jC0p4DsqsaNZTlyL7S6utdVUxU8XT7crwxuY8DJOEe2juw8RoTkorPH4J/giN5XTrK0jOfKN34fxS/Mic71S3+dCvv0jdJZHys8n2XuLhmQ5wd/oS/Lkc+XhteTbWOPyTVFf6KzUsVtrOk8opmhkmwzLc9xReZGCwzbTvaVvBUp848GL9crT6Z+X8VW8QC9Vt/nQpmoa6G4Xeaqp9ro3huNoYO5oCx1qilLKOHeVo1qznDkRIateRJIWJuL1QfqI/7BRPih9t+/D8o1ngtB60x1/md7VibPFs1+D6iP8o/hbFyPZR+lFBvtkulTeKuaCikfE+TLXAjeMDvWKrTm5PCPPXdpcTrylGOU/wAEedO3ns+X3t/1IdGr0Mrsbr2P+O5G1dPPRzugqojHK3GWnhnestTai8SMlSE6ctmawzgaupkaPLQ9kN0o5JHBrGTsc5x8wAI3qJrKG0JKNWLfLKNH+XrTj7Rp/wB4WjzIdT0m+2/vWplkh+ljvXOlI8nJmnw3+0thjDrjTAhoyDIFvVanj6j1Ub62UV+otQ+sFn7SpuYFW8Uvci9/tfuLU91hs/aVNzAq3qh7kTf7X7i1M71dVQ1V/qJqaVksTgzD2HIPzQuJeVYyqtxeUeY8SqRqXMpQeVw/oZrpuQJwlLcisgkpTmA2CXJUpgtgFyTKYDYBckymC2CSlOYDYJKU5A5HpO9dxzNrYJKVKYLYBckymA2AXJUpANglyTKQLYBKW5ANnMpbZWTiEo//2Q==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>TechCrunch Enterprise更新AI 产品、平台或工程实践</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-16</span></div>
-
-
-    <p>TechCrunch Enterprise更新AI 产品、平台或工程实践。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Baidu AI News" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://ai.baidu.com/support/news?module=AIOfficialWeb&amp;tag=13" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>语音技术</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-17</span></div>
-
-
-    <p>图像技术 文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【商用】端到端语音语言大模型Pro版火热开售，最高享100万免费tokens 2026-06-17 03:。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Baidu AI News" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://ai.baidu.com/support/news?module=AIOfficialWeb&amp;tag=68" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>图像技术</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-17</span></div>
-
-
-    <p>文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【商用】端到端语音语言大模型Pro版火热开售，最高享100万免费tokens 2026-06-17 03:09 全新智能语音交互，即刻感受“开口即真人”的全新体验。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Baidu AI News" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://ai.baidu.com/support/news?module=AIOfficialWeb&amp;tag=2" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>文字识别</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-17</span></div>
-
-
-    <p>人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【商用】端到端语音语言大模型Pro版火热开售，最高享100万免费tokens 2026-06-17 03:09 全新智能语音交互，即刻感受“开口即真人”的全新体验。</p>
-
-  </article>
-    </div>
-  </section>
-<section class="panel" id="section-reddit-19" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-reddit-18" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>Reddit 线索</h2>
@@ -4434,7 +4313,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-20" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-19" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>信源覆盖与缺口</h2>

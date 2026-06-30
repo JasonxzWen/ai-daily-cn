@@ -1191,6 +1191,7 @@ body.lightbox-open {
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
     "tracking-component tracking-component"
+    "tracking-trend tracking-trend"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1209,6 +1210,7 @@ body.lightbox-open {
 .tracking-card > *,
 .tracking-card .card-stat-grid,
 .tracking-card .card-bars,
+.tracking-card .card-trend-curve,
 .tracking-card .card-table,
 .tracking-card .card-table-scroll {
   min-width: 0;
@@ -1222,9 +1224,80 @@ body.lightbox-open {
   grid-area: tracking-bars;
 }
 
+.tracking-card .card-trend-curve {
+  grid-area: tracking-trend;
+}
+
 .tracking-card .card-table {
   grid-area: tracking-table;
   max-width: 100%;
+}
+
+.card-trend-curve {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 10px 12px 8px;
+}
+
+.card-trend-curve .card-visual-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-trend-metric {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.card-trend-svg {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.card-trend-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-point {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.card-trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .tracking-card > p {
@@ -1853,6 +1926,7 @@ body.lightbox-open {
       "tracking-tags"
       "tracking-component"
       "tracking-stats"
+      "tracking-trend"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
@@ -3107,7 +3181,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <ul class="hero-summary-text hero-summary-list"><li>今天 24 小时内可回源的新增主体偏少，本轮先扩大官方信源覆盖，再把窗口扩展到 2026-05-15：OpenAI 同时推进 GPT-5.5 企业 agent 工作流和 Malta 全国 ChatGPT Plus 项目，GitHub Copilot 进入用户级记忆与 GPT-5.3-Codex 企业默认模型切换节点，xAI 把 Grok 订阅接入 Hermes Agent，Pi Coding Agent 0.74.1 补齐图像生成、Together AI 和 Windows ARM64，Palantir Global Branching 从 2026-05-18 起进入 GA</li><li>上一期已覆盖的 ThreatConnect、AWS Partner Central、Firecrawl、Grok Build 和 OpenAI sensitive-conversation safety 本轮不重复计入主体</li></ul>
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>主体</span><strong>6</strong><small>重点条目</small></div>
-<div class="hero-stat"><span>AIGC</span><strong>3</strong><small>产品/内容</small></div>
+<div class="hero-stat"><span>AIGC</span><strong>2</strong><small>产品/内容</small></div>
 <div class="hero-stat"><span>精选博客</span><strong>0</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>0</strong><small>Top 10</small></div>
 <div class="hero-stat"><span>Builder</span><strong>0</strong><small>观察</small></div>
@@ -3129,7 +3203,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-story-4" title="xAI 允许 Grok 订阅直接接入 Hermes Agent" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>xAI 允许 Grok 订阅直接接入 Hermes Agent</span></a>
 <a href="#section-story-5" title="Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物" data-nav-link data-nav-index="6" data-nav-group-name="main" data-nav-status="info"><span>Pi Coding Agent 0.74.1 增加图像生成、Together AI 和 Windows ARM64 产物</span></a>
 <a href="#section-story-6" title="Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流" data-nav-link data-nav-index="7" data-nav-group-name="main" data-nav-status="info"><span>Palantir Global Branching 从 2026-05-18 起进入 GA，覆盖 AIP Logic 等工作流</span></a>
-<a href="#section-other-sources" title="其他信源" data-nav-link data-nav-index="8" data-nav-group-name="signals" data-nav-status="info"><span>其他信源</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3254,46 +3327,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 - 为什么值得看：分支工作流包括创建或访问 branch、修改资源、从 Main 引入更新并解决冲突、保护资源、定义 approval policies、查看 branched resources 和在 checks 通过后 merge。
 - 来源：[![Palantir Foundry Announcements](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlBGPC90ZXh0Pjwvc3ZnPg==) Palantir Foundry Announcements](https://www.palantir.com/docs/foundry/announcements/2026-05)</template></div>
   </details>
-<section class="panel" id="section-other-sources" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>其他信源</h2>
-
-    </div>
-
-  </div>
-
-
-    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://github.com/supertone-inc/supertonic" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Supertonic 在 2026-05-17 左右有社区热度，但仓库 README 的最近明确发布记录是 2026-…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>Supertonic 在 2026-05-17 左右有社区热度，但仓库 README 的最近明确发布记录是 2026-04-29 的 Supertonic 3； 本轮不作为近 5 天主体，只作为本地 TTS 线索。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://github.com/tinyhumansai/openhuman" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenHuman 在 GitHub 和社区站点出现 trending 讨论，但主仓库没有足够稳定的 dated re…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>OpenHuman 在 GitHub 和社区站点出现 trending 讨论，但主仓库没有足够稳定的 dated release note； 可继续观察其本地个人 agent、长期记忆和 OAuth 权限边界。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://github.com/K-Dense-AI/scientific-agent-skills" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX///8kKS74+PgsMTY+Q0f8/Pzw8PGRk5ZNUVXr6+xDSEzCxMUpLjLV1tYuMzc/Q0i3ubuUl5lbX2NTV1uLjpFKTlKxs7Xh4uOFh4rn5+h3en1vcnZ9gIPc3d6/wcJzd3o3PECmqKpjZ2rOz9CfoaRP5W5KAAABU0lEQVQ4jW1T7aKCIAzdEEUTSUuzLMtuvf8zXtiQVDx/lJ3DvgEIEPU9l1rL/F4LiFEMCQYkj2JDC6VxhaRJl3x2xgin7MePMuYRD7cQftrjrcL7ELk9nNt8yXXtyRm5mquzXADKA6LpzgZRlgBPZ1WO7yn/yrmqyGdGn95Zjav2hbNghZHMV3uNG3DZCigEmhRq+pmyrUAcifj4CO+49xciWqAe6p3pCJrNH1ATp5gH6KghQLrDnoB8GxaYPYFkhpONipjrl+wI61hQ8tB5EvYb4eTL5Ebhd8u/2f4EYfhvvWJpw9ZJ0LQfb5uxbMKi3pp5xVp30miexZHbRriHvUnojrKt7isXqWRBFQQNF2w3aYCPUl8/EREWzxtuE+pVI/wbkSGp0a51Nyg1F+L5/nel56xXgt+zcMgeC0FK27gdTzVoPXtI9DBuO2tRhJj94m3/A1GiDZXoM3d5AAAAAElFTkSuQmCC" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>github.com</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>K-Dense Scientific Agent Skills 仓库强调从 Claude Scientific Skills 扩展到 open Agent Skills standard，但本轮未找到近 48 小时官方 dated release，暂列研究 agent 技能生态线索。</p>
-
-  </article>
-    </div>
-  </section>
 
 
 

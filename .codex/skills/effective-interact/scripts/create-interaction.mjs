@@ -1282,6 +1282,80 @@ function renderCardBars(bars) {
   </div>`;
 }
 
+function renderCardTrendCurve(curve) {
+  if (!curve || typeof curve !== "object") {
+    return "";
+  }
+  const points = Array.isArray(curve.points)
+    ? curve.points
+        .map((point) => ({
+          date: String(point?.date || ""),
+          label: String(point?.label || point?.date || "").trim(),
+          value: Number(point?.value),
+          valueLabel: String(point?.valueLabel || point?.value_label || point?.value || "").trim(),
+          topLabel: String(point?.topLabel || point?.top_label || "").trim()
+        }))
+        .filter((point) => point.label && Number.isFinite(point.value))
+        .slice(-7)
+    : [];
+  if (points.length < 2) {
+    return "";
+  }
+
+  const width = 360;
+  const height = 118;
+  const padX = 28;
+  const padTop = 18;
+  const padBottom = 28;
+  const values = points.map((point) => point.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const xStep = points.length > 1 ? (width - padX * 2) / (points.length - 1) : 0;
+  const yScale = height - padTop - padBottom;
+  const coordinates = points.map((point, index) => {
+    const x = padX + xStep * index;
+    const y = padTop + (1 - ((point.value - min) / span)) * yScale;
+    return { ...point, x, y };
+  });
+  const polyline = coordinates.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(" ");
+  const first = points[0];
+  const last = points[points.length - 1];
+  const title = curve.title || "7-day trend";
+  const metric = curve.metric || "";
+  const sourceId = curve.sourceId || curve.source_id || "";
+  const ariaLabel = `${title}${metric ? ` ${metric}` : ""}: ${first.label} ${first.valueLabel || formatTrendPointValue(first.value)} to ${last.label} ${last.valueLabel || formatTrendPointValue(last.value)}`;
+
+  return `<div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="${escapeAttr(sourceId)}" data-trend-points="${points.length}" aria-label="${escapeAttr(ariaLabel)}">
+    <div class="card-visual-title"><span>${escapeHtml(title)}</span>${metric ? `<span class="card-trend-metric">${escapeHtml(metric)}</span>` : ""}</div>
+    <svg class="card-trend-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeAttr(ariaLabel)}" focusable="false">
+      <line class="card-trend-grid" x1="${padX}" y1="${padTop}" x2="${width - padX}" y2="${padTop}"></line>
+      <line class="card-trend-grid" x1="${padX}" y1="${height - padBottom}" x2="${width - padX}" y2="${height - padBottom}"></line>
+      <polyline class="card-trend-line" points="${escapeAttr(polyline)}"></polyline>
+      ${coordinates.map((point) => `<circle class="card-trend-point" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="3.2"><title>${escapeHtml(`${point.label}: ${point.valueLabel || formatTrendPointValue(point.value)}${point.topLabel ? ` | ${point.topLabel}` : ""}`)}</title></circle>`).join("")}
+      ${coordinates.map((point, index) => index === 0 || index === coordinates.length - 1
+        ? `<text class="card-trend-axis-label" x="${point.x.toFixed(1)}" y="${height - 8}" text-anchor="${index === 0 ? "start" : "end"}">${escapeHtml(point.label)}</text>`
+        : "").join("")}
+    </svg>
+    <div class="card-trend-summary">
+      <span>${escapeHtml(first.valueLabel || formatTrendPointValue(first.value))}</span>
+      <span>${escapeHtml(last.valueLabel || formatTrendPointValue(last.value))}</span>
+    </div>
+  </div>`;
+}
+
+function formatTrendPointValue(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return "";
+  }
+  if (numeric >= 1_000_000_000_000) return `${(numeric / 1_000_000_000_000).toFixed(2).replace(/\.00$/, "")}T`;
+  if (numeric >= 1_000_000_000) return `${(numeric / 1_000_000_000).toFixed(2).replace(/\.00$/, "")}B`;
+  if (numeric >= 1_000_000) return `${(numeric / 1_000_000).toFixed(2).replace(/\.00$/, "")}M`;
+  if (numeric >= 1_000) return `${(numeric / 1_000).toFixed(2).replace(/\.00$/, "")}K`;
+  return String(Math.round(numeric * 100) / 100);
+}
+
 function renderCardTable(table) {
   const rows = cardVisualRows(table);
   if (!table || typeof table !== "object" || rows.length === 0) {
@@ -1644,6 +1718,7 @@ function renderCardVisuals(item) {
   return [
     renderTrackingComponent(item.component || item.trackingComponent || item.tracking_component),
     renderCardStats(item.stats || item.summaryStats || item.summary_stats),
+    renderCardTrendCurve(item.trendCurve || item.trend_curve || item.trend),
     renderCardBars(item.bars || item.barChart || item.bar_chart),
     renderCardTable(item.table || item.dataTable || item.data_table)
   ].join("");
@@ -1681,7 +1756,13 @@ function renderFilterableCard(item, target, cardClass) {
   const className = ["interactive-card", "evidence-card", "evidence-spotlight", cardClass].filter(Boolean).join(" ");
   const groupMeta = item.showGroup === false ? "" : `<div class="meta">${escapeHtml(group)}</div>`;
   const body = item.body ? `<p>${inlineMarkdown(item.body)}</p>` : "";
-  return `<article class="${escapeAttr(className)}" data-evidence-spotlight data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" data-search-target="${target}">
+  const trendStatus = item.trendStatus || item.trend_status || "";
+  const trendPointCount = Number(item.trendPointCount ?? item.trend_point_count);
+  const trendAttrs = [
+    trendStatus ? `data-trend-status="${escapeAttr(trendStatus)}"` : "",
+    Number.isFinite(trendPointCount) ? `data-trend-history-points="${Math.max(0, Math.round(trendPointCount))}"` : ""
+  ].filter(Boolean).join(" ");
+  return `<article class="${escapeAttr(className)}" data-evidence-spotlight data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" data-search-target="${target}"${trendAttrs ? ` ${trendAttrs}` : ""}>
     ${groupMeta}
     ${renderCardTitle(item)}
     ${renderCardTags(item.tags)}

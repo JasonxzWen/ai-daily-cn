@@ -1191,6 +1191,7 @@ body.lightbox-open {
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
     "tracking-component tracking-component"
+    "tracking-trend tracking-trend"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1209,6 +1210,7 @@ body.lightbox-open {
 .tracking-card > *,
 .tracking-card .card-stat-grid,
 .tracking-card .card-bars,
+.tracking-card .card-trend-curve,
 .tracking-card .card-table,
 .tracking-card .card-table-scroll {
   min-width: 0;
@@ -1222,9 +1224,80 @@ body.lightbox-open {
   grid-area: tracking-bars;
 }
 
+.tracking-card .card-trend-curve {
+  grid-area: tracking-trend;
+}
+
 .tracking-card .card-table {
   grid-area: tracking-table;
   max-width: 100%;
+}
+
+.card-trend-curve {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 10px 12px 8px;
+}
+
+.card-trend-curve .card-visual-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-trend-metric {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.card-trend-svg {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.card-trend-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-point {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.card-trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .tracking-card > p {
@@ -1853,6 +1926,7 @@ body.lightbox-open {
       "tracking-tags"
       "tracking-component"
       "tracking-stats"
+      "tracking-trend"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
@@ -3107,7 +3181,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <ul class="hero-summary-text hero-summary-list"><li>今天主线集中在平台生态、无障碍硬件、云数据库高可用和智能体工程：OpenAI 发布合作伙伴网络，Meta 推出面向失明退伍军人的免费 AI 眼镜计划，阿里云介绍 PolarDB-X Proxy 支撑百万级 QPS 与秒级故障恢复</li><li>同时收录 Anthropic 公共记录、Claude 合作与访问限制、Google Research 低碳计算和医疗理解研究，以及 agent 与开发工具博客动向</li></ul>
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>主体</span><strong>8</strong><small>重点条目</small></div>
-<div class="hero-stat"><span>AIGC</span><strong>2</strong><small>产品/内容</small></div>
+<div class="hero-stat"><span>AIGC</span><strong>1</strong><small>产品/内容</small></div>
 <div class="hero-stat"><span>追踪</span><strong>1</strong><small>榜单变化</small></div>
 <div class="hero-stat"><span>精选博客</span><strong>8</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>10</strong><small>Top 10</small></div>
@@ -3140,9 +3214,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-chinese-media-rss" title="中文媒体 RSS" data-nav-link data-nav-index="15" data-nav-group-name="main" data-nav-status="info"><span>中文媒体 RSS</span></a>
 <a href="#section-x-twitter-16" title="X/Twitter 讨论" data-nav-link data-nav-index="16" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
 <a href="#section-other-github-repository-updates" title="其他 GitHub 仓库更新" data-nav-link data-nav-index="17" data-nav-group-name="signals" data-nav-status="info"><span>其他 GitHub 仓库更新</span></a>
-<a href="#section-other-sources" title="其他信源" data-nav-link data-nav-index="18" data-nav-group-name="signals" data-nav-status="info"><span>其他信源</span></a>
-<a href="#section-reddit-19" title="Reddit 线索" data-nav-link data-nav-index="19" data-nav-group-name="signals" data-nav-status="info"><span>Reddit 线索</span></a>
-<a href="#section-html-work-report-20" title="信源覆盖与缺口" data-nav-link data-nav-index="20" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
+<a href="#section-reddit-18" title="Reddit 线索" data-nav-link data-nav-index="18" data-nav-group-name="signals" data-nav-status="info"><span>Reddit 线索</span></a>
+<a href="#section-html-work-report-19" title="信源覆盖与缺口" data-nav-link data-nav-index="19" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3423,7 +3496,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 
 
     <div class="evidence-grid focus-field tracking-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="7">
     <div class="meta">OpenRouter</div>
     <h3><a class="card-title-link" href="https://openrouter.ai/rankings" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenRouter</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型使用</span><span class="chip chip-date">2026-06-14</span></div>
@@ -3592,7 +3665,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">最大变化</span>
       <strong>MiniMax M3</strong>
       <span class="card-stat-detail">+73%</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="openrouter-rankings" data-trend-points="7" aria-label="7日趋势 榜首周用量: 06-07 3.69T tokens to 06-14 4.41T tokens">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首周用量</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首周用量: 06-07 3.69T tokens to 06-14 4.41T tokens" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,90.0 78.7,90.0 129.3,56.2 180.0,42.0 230.7,32.2 281.3,18.0 332.0,26.0"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-07: 3.69T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="78.7" cy="90.0" r="3.2"><title>06-08: 3.69T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="129.3" cy="56.2" r="3.2"><title>06-09: 4.07T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="180.0" cy="42.0" r="3.2"><title>06-10: 4.23T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="230.7" cy="32.2" r="3.2"><title>06-11: 4.34T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="281.3" cy="18.0" r="3.2"><title>06-12: 4.5T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="332.0" cy="26.0" r="3.2"><title>06-14: 4.41T tokens | DeepSeek V4 Flash</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-07</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-14</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>3.69T tokens</span>
+      <span>4.41T tokens</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3853,191 +3939,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel" id="section-other-sources" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>其他信源</h2>
-
-    </div>
-
-  </div>
-
-
-    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenAI Company News RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://openai.com/index/preply" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI Company News RSS 记录了一条产品与平台动态公开条目，详情需回到原文链接核对</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>OpenAI Company News RSS 记录了一条产品与平台动态公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Google Keyword Blog" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://blog.google/innovation-and-ai/technology/safety-security/combatting-ai-scams/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Google Keyword Blog 记录了一条安全治理公开条目，详情需回到原文链接核对</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>Google Keyword Blog 记录了一条安全治理公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SSPAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://sspai.com/post/110967" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>WWDC 26 发布会上，Apple 没告诉你的那些事</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>除了大谈特谈的 AI，今年的 WWDC 开幕式上还有这些有趣的细节值得注意。 查看全文。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Baidu AI News" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://ai.baidu.com/support/news?module=AIOfficialWeb&amp;tag=68" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>图像技术</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Baidu AI News" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://ai.baidu.com/support/news?module=AIOfficialWeb&amp;tag=2" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>文字识别</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Baidu AI News" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://ai.baidu.com/support/news?module=AIOfficialWeb&amp;tag=27" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>人脸与人体识别</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Baidu AI News" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://ai.baidu.com/support/news?module=AIOfficialWeb&amp;tag=85" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>内容审核</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。 新人专享9元/千页，欢迎使用！</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SSPAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://sspai.com/post/110973" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>具透 | 除了 AI，iOS 27 首个开发者测试版中你不能错过的新功能</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-13</span></div>
-
-
-    <p>少数派在体验了新版系统之后，帮你整理了 iOS 27 中值得关注的新功能和新特性，希望帮你能了解新版系统的方方面面。 查看全文。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="SSPAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://sspai.com/post/110975" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>派早报：五电商平台因「百亿补贴」问题被约谈、Xbox 启动业务重置计划等</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>文石发布第二代 BOOX Go 6，小米发布 AI 编程助手 MiMo Code 等。 查看全文。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Leiphone" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.leiphone.com/category/academic/PRkJuKQSDv4Q1le5.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACDklEQVQ4jbWSv2tTURTHv+e++5o01hptiSJYqJEWrIqIFsHq5CBuDhUcpOjsJv4Fji4KunURF8cOTg6SwckiSAWlUvrDNJKkL02bl/S9d+8957p2KEQKfrbv4Zzv+Q5f4H/QnCve6i088/H8nO+3qw4ayh6vYC8Dp6bvM71ftJ6efeG7HEs3+SbbDfiojdqd0WmdH7oNB+0tAnilrHEbZyq/5wGA9hvsvJz1SheQfPn8eqBcfsKtuON2e0uFiQsznFpQ4uAyBgmBuwlKbz+Sbj4aLvoE+uT7TsRrdXA4CN9zNcosyHlDSfbLrqzO2FoTtt2pu57RJGo0OHoCtRtTi3pg6vqyCodL0eDyJ79rIuj8qLJkuNuD/dMSW9tSWVoFO1kY/5neA4D18rErprH1FUH+qk4rS3UKj5TMdlpXEp+D3QJLB0EcgWN2YsPIUw7IURdIAQDehysqANgItNnspGI68DYwYIATgh6BpoICUXhaKToPoR/CNLE+OfLGC+XBeAwmkNC6ZpMfk0xBWZqAkjFwAIibVCKwVkEZussOIAbYq2nlPcAEcQCErmnEwQcYum8dKgiDHSTqMtJgUayfwZ6KOPCnwFRk+C4y2mSgRMAqhB6UG83tvkXpPc+9imaHfPth4V3fIh1EMC6XcqmDa6vpQxnY70Epq2q4hsr3jXsQ1ZvFterF4xuHOv4X/gK28RNl6mJD6QAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>2026北京智源大会开幕 | 从“悟道”到“悟界”，智源研究院推动人工智能、物理世界和生命科学“三体互动”</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-13</span></div>
-
-
-    <p>2026年6月12日，第八届“北京智源大会”在中关村国际创新中心开幕。 北京智源大会是智源研究院主办的“AI内行学术盛会”，以“技术前沿、国际视野、青年人才”为特色，汇聚海内外研究者分享研究成果、探寻前沿知识、交流实践经验。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Google News Big Tech Company Watch RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://news.google.com/rss/articles/CBMikwFBVV95cUxNNFhMemNTMlVyRGpaRGg4V055OXdUVzFzdEp5dTBwMzhKNE5ydU4teFdlQ2k3TWJNV196bzFmVVU2b0ZwQWM1RVBBc1RJOTE4c0kyUjQ4Ukl3U3RYdWVyN2wzYllIZkhIdHlVVk9ZS1FFNnBCTXk5NEdhY21LZGFkdEoxa1ZPNmdtUk5pSm9jOFZDVnc?oc=5" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdOPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Google News Big Tech Company Watch RSS 记录了一条agent 与开发工具公开条目…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-14</span></div>
-
-
-    <p>Google News Big Tech Company Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Google News Official Open Source Watch RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://news.google.com/rss/articles/CBMilwFBVV95cUxNQ0Z0NGdwVWkzOUZZZDdreS1XSDJJd253SXN4dm9FWXVjSHotdmVvR1ozUEVkRTgxaGhPSHVCdEtQNVZvODhkNTI2N2hOeC1mbkhBQW5RZEk4R2YtZU1nSTV3QXNwNnBWNmFoajhmaXhmNGRaUjNpNXJNYVRzLXdSLVZoNGpBS1FrTjBlazlha05IRkxPajM0?oc=5" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdOPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-14</span></div>
-
-
-    <p>Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Google News Official Open Source Watch RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://news.google.com/rss/articles/CBMioAFBVV95cUxNUmVrd1pEbFNNY2szM2gzYmNOc0FMR2hBMDNWaWZKZ3Ewb3ppb0NnVEtLREVkRXdaNTFXUDlXOGJxeXRxYTh3SkVwQm5uVFBjdGU3UWlWS1ZZcnZJYVZqeXFwT1ItUGxsV0h1NGF4YkVPZWFSd1g2U05pWUlmZGRyaFY0dExQOEZ3YklIOFZoQzBDR2hhajBSUDFFeWlBU2dX?oc=5" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdOPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Google News Official Open Source Watch RSS 记录了一条agent 与开发工具…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-14</span></div>
-
-
-    <p>Google News Official Open Source Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Google News Official Open Source Watch RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://news.google.com/rss/articles/CBMiT0FVX3lxTE16SVNQelRIY0FlQlNfaTB2WUZXNDN4QUFYd2tBRDZuNDR4X25SSWFSd29QZ2E4bmNyMUF3NnJjNjhrdTh2Z3FBZ1BRTmVmQlE?oc=5" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdOPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-14</span></div>
-
-
-    <p>Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Google News Official Open Source Watch RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://news.google.com/rss/articles/CBMi1AFBVV95cUxQOEVPaVQ2TFY4Ym9pbFdhSFRjd08yRVlsNUhPMmxTLWJsRmdlSE9XekJsdjBCaTZzZk1yMENQTXoxSkkyM1NIbnF5S1huWVI5UzBqR3prSk5IMU9xbi0xVlhadWpVRHFHNnJpY3hRMFFUenBWZ193MWNoT1NVZFcyN2JOQkdwZHdiLUxJU3JHdTFqVWJwbE5RTUdkYkh3ODg0YjVuZ1ZlYXRvRWFNeE5IdTdGY21vbF9GZi1yeTBhYXc4Qk9UbWVvekh5Y2xlQk1zT0szUw?oc=5" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdOPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Google News Official Open Source Watch RSS 记录了一条agent 与开发工具…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-13</span></div>
-
-
-    <p>Google News Official Open Source Watch RSS 记录了一条agent 与开发工具公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Google News Official Open Source Watch RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://news.google.com/rss/articles/CBMivgFBVV95cUxPZGNTWnRpZEI3WWl2S1pOS3F1N3NEQ1Nxd3dPR0xUVVU5QTVOVDBob0cyYmt6aVlveWo0dlJnVWVuUkI5MHFBOXVHRUVGT2VOU0wwUVRQMlFSMXZsQWJsU2w3T1JKVTZQQ3ZfN1JoenhCRG1UbFRIaHdfSmNrLUFpOWpwTG1Rby1UNXhtNEFUUEJaNXdKbURLVVM5Ti1Mbmo5UE0yVlQ3aFZGdU5rM2xJcU5MODZReG5aZ1VmSjlR?oc=5" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdOPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-13</span></div>
-
-
-    <p>Google News Official Open Source Watch RSS 记录了一条开源项目公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Nature Machine Learning" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.nature.com/articles/s41598-026-44468-7" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAATlBMVEVHcEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////n5+fT09MxMTGJiYmOjo6YmJi8vLxPT0/09PRtbW2oqKghISGiEhN+AAAADHRSTlMA0rZK5WJ4FJD5qzc35ZrKAAAB8ElEQVRYhaVX2ZbDIAhNJtZsmqbN2v//0UnaVBTR6uE+ZRy4BUSWogigrmRXilapVpSdrOqQHI2+EQpBNH2qdi097YtDJtnRtLT6gbZtfqrfwuofjlvc+jKufqKM+HH7rX4iaESTpq9UIBJ/qfpK/TH1SYYsfYIh2f8vUBwS42/DuYs6X18pOx/I/HmZj2Xblpf3/zLqwDjd9edrH/QbwxR2Auf/Nq+nyvn51IB1ccVa8gaW46cvHH/N2saK/LhuonYM2EEe62s9IxM+cZTu6QoED42BTJBvAlR/JiBYPYLNlRWnfo8iOBrpSa/7tiyb5dWOhHsqiQcj/rhOXsYUFIR3GL0KaiL39N26I1lBZfGEDTjuNkRw5HPlETx9gjFIUOFLzCWQRccj6IiHmEVQ+peQRyC8l5hJ0Baefh6B4hOwXWAHkX2N7ERip3LkMcFzjj2myHOGRhAmqImCkkMgqJK2+wSmoAxItiGKKpQ0qKCGYEWyPVHWKYLte6R9D7zGAlV5JgjcziKJ1ma1JogYNBunv16tDYURGgs4DD3yYYuaMccxAczVo+eV01lMe3cHjGkwMJ0QjuxEsKakhBHZhzXi8Ics9pjHHzT5oy5/2OaP+/yFg7/y8Jeugr32vSMRoUhYPAv+6nuCt3xfdiSu//8FKZxtayUOKgAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Nature Machine Learning 记录了一条开源项目公开条目，详情需回到原文链接核对</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>Nature Machine Learning 记录了一条开源项目公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="QbitAI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.qbitai.com/2026/06/435105.html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB3klEQVRYhe2WP0hbURTGf326uDqHNDhLMV0KYpfSqUNcHFw6pFVi0Rgy2Y4dSxEJ/lkqFqVC6OAQnLIVQ0AEdTAi6BBKB6csti9Ni8bhfRefj5gmQXkP6geH30ty7rl5H/fce+F/14MWcsJiWnwh9nnyyuKmOCv+aFbcauEP3KmaOfBKXBSPxM/irif/kRgX+8WkuNxoEt8daKQJxbliWtFpnb+KMcU1BcqBkKKq6PTNvTJOmLphrjrLfwfcXWD69pkYveW5tsWimIYAONDteo6J83c016qYdjNQDkTE/VYGLuwXLIDzen0EIBV9+vUfQ0zda2dIoBwwumizxipAopiPA5Tsahyg8Hz49IZ868YPfsjtQFkcEAvNBk4NDF0AZPa2zH6xLpYAenPZcYBKbHTDU/fEXcd3B9w74Zw4KD5pp1CimO8GKNnV9wCHdvUtQKVmrwEQT+4A8PPXQw2ZgYA5YE6oY9HsWEudFO7NZQcBKjXbWRt/bOeH32cvAXj9rgABcMDdBd/FN+InT25bTlRio86q7+n5AsDyxxAAlvVNKV0QAAea3YonRNMdB6K5FXvPDNPn3lvxpLjijP7w2Mma2YWAO2AUEVNizPO9eQmzw+XEjGjWVkP57sC9LgFvi2uRRCFjAAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>2026奇点智能产品大会首批嘉宾官宣：在 AI 的“可交付的时代”，看一线专家如何拆解真实落地闭环！</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-12</span></div>
-
-
-    <p>2026奇点智能产品大会首批嘉宾官宣：在 AI 的“可交付的时代”，看一线专家如何拆解真实落地闭环。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="InfoQ CN" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.infoq.cn/article/sMxf71RUtLYgI0BsQhKw?utm_source=rss&amp;utm_medium=article" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAllBMVEX///8gn0ALdNsUnTluuX1jmt8AcNsAcdoAaNkAa9lTkeJ7p+cAZtj09/0Kct8WiZ4hoTbF2PRFi+AAmjBimOO4z/GLsenk7fpKq18AliHa3uAAYdfr7O7U4vddsm/P5tOhwO2t1bUzpE2IxJPc7d8rf914vYa83MIAWdaDrOg9qFXFys6j0Kv2+/fP1Nesx++Vyp9oqbW0KrLTAAABvUlEQVRYhe2T63KjMAyFZStrLGq2BQcIBELTkKbZbXp5/5erDNkLhdJ2dn91fDLDKCf2F/kgA3h5eXl5/W9dZ1n6ykrHFmw3N2K1aycACdHF0NmT0uHQatCiEIjF7RgQBmoIqLVU++PAagshbFFYfm7mAHXtnjEF++5rFMd1/4PgndsTtCsUxQGqshoBojuzftRamxrCJJAyPEK0NERkMl5ysLz/TMIfUP2cAGgptSYpCQyXwToEqSSxQ5zGLQrbL763ojhVZTkFUMc8JalrSClIAC6UlK6WOoUN4vnoDffSVuXDFEBznQSUugwYoCXF7GQqCGGFuDinyYCmqiaPYLhe/gbkPRFqkoo7EKu/OigfJo8wApgzgGDH4feLu+qNEIcAMFLn7Dy6d9oUArsJOlnRpfGBDtjmw0PE7+UaOASeoKa5d5PU8hycPgDIjVRBwglI98+IAq3l/QIXr+9Doo0bJLpzML1mwFq7SawV8Ufvo673TWERkSMUo/tQdwMbx3Ff538mOM2OWfxrWbvd7Z4ad6uKqSv5CR2e/m2/l5eX15S+zWr5vHhHoGZFl1c4L5Cz+n55JeblAV8C8AIH1iXlvMdwFAAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>面壁智能开源社区负责人井晨哲将在AICon上海站，分享高效端侧大模型的技术趋势与产业应用观察</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-13</span></div>
-
-
-    <p>面壁智能开源社区负责人井晨哲将在AICon上海站，分享高效端侧大模型的技术趋势与产业应用观察。</p>
-
-  </article>
-    </div>
-  </section>
-<section class="panel" id="section-reddit-19" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-reddit-18" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>Reddit 线索</h2>
@@ -4077,7 +3979,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-20" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-19" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>信源覆盖与缺口</h2>

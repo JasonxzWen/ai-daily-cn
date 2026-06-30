@@ -1191,6 +1191,7 @@ body.lightbox-open {
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
     "tracking-component tracking-component"
+    "tracking-trend tracking-trend"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1209,6 +1210,7 @@ body.lightbox-open {
 .tracking-card > *,
 .tracking-card .card-stat-grid,
 .tracking-card .card-bars,
+.tracking-card .card-trend-curve,
 .tracking-card .card-table,
 .tracking-card .card-table-scroll {
   min-width: 0;
@@ -1222,9 +1224,80 @@ body.lightbox-open {
   grid-area: tracking-bars;
 }
 
+.tracking-card .card-trend-curve {
+  grid-area: tracking-trend;
+}
+
 .tracking-card .card-table {
   grid-area: tracking-table;
   max-width: 100%;
+}
+
+.card-trend-curve {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 10px 12px 8px;
+}
+
+.card-trend-curve .card-visual-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-trend-metric {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.card-trend-svg {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.card-trend-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-point {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.card-trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .tracking-card > p {
@@ -1853,6 +1926,7 @@ body.lightbox-open {
       "tracking-tags"
       "tracking-component"
       "tracking-stats"
+      "tracking-trend"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
@@ -3135,8 +3209,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-github-trending-top-8-11" title="GitHub Trending · Top 8" data-nav-link data-nav-index="11" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
 <a href="#section-subscribed-rss" title="订阅 RSS" data-nav-link data-nav-index="12" data-nav-group-name="main" data-nav-status="info"><span>订阅 RSS</span></a>
 <a href="#section-x-twitter-13" title="X/Twitter 讨论" data-nav-link data-nav-index="13" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
-<a href="#section-other-sources" title="其他信源" data-nav-link data-nav-index="14" data-nav-group-name="signals" data-nav-status="info"><span>其他信源</span></a>
-<a href="#section-html-work-report-15" title="信源覆盖与缺口" data-nav-link data-nav-index="15" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
+<a href="#section-html-work-report-14" title="信源覆盖与缺口" data-nav-link data-nav-index="14" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3434,29 +3507,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel" id="section-other-sources" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>其他信源</h2>
-
-    </div>
-
-  </div>
-
-
-    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="社区线索" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>模型可用性：Claude Opus 4.8 在 GitHub Copilot 中 GA 属于产品入口可用性更新，本轮从…</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span></div>
-
-
-    <p>模型可用性：Claude Opus 4.8 在 GitHub Copilot 中 GA 属于产品入口可用性更新，本轮从模型发布移出，作为 Copilot 管理员策略和用户入口变更记录。</p>
-
-  </article>
-    </div>
-  </section>
-<section class="panel rich-section" id="section-html-work-report-15" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-14" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>信源覆盖与缺口</h2>
