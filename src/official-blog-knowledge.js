@@ -257,6 +257,47 @@ export function triageOfficialBlogPreview(preview = {}) {
   };
 }
 
+export function createOfficialBlogPreviewFeed(input = "", options = {}) {
+  const parsed = officialBlogPreviewRawEntries(input);
+  const optionCompany = normalizeOfficialBlogCompany(options.company);
+  const candidates = [];
+  const invalidEntries = [...parsed.invalid_entries];
+
+  for (const [index, rawEntry] of parsed.entries.entries()) {
+    try {
+      candidates.push(normalizeOfficialBlogPreviewFeedEntry(rawEntry, {
+        index,
+        company: optionCompany,
+        sourceLabel: options.sourceLabel || options.source_label
+      }));
+    } catch (error) {
+      invalidEntries.push({
+        index,
+        title_original: String(rawEntry?.title_original || rawEntry?.title || "").trim(),
+        canonical_url: String(rawEntry?.canonical_url || rawEntry?.canonicalUrl || rawEntry?.url || rawEntry?.link || rawEntry?.href || "").trim(),
+        reason: error.message
+      });
+    }
+  }
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_preview_feed",
+    visibility: "internal",
+    company: optionCompany,
+    report_date: String(options.reportDate || options.report_date || ""),
+    generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
+    source_label: String(options.sourceLabel || options.source_label || "").trim(),
+    stats: {
+      total_entries: parsed.entries.length + parsed.invalid_entries.length,
+      candidates: candidates.length,
+      invalid_entries: invalidEntries.length
+    },
+    candidates,
+    invalid_entries: invalidEntries
+  };
+}
+
 export function createOfficialBlogIntakeQueue(input = {}, options = {}) {
   const candidates = officialBlogIntakeCandidates(input);
   const existingByUrl = existingOfficialBlogRecordByUrl(options.existingIndex);
@@ -425,6 +466,302 @@ function safeNormalizeOfficialBlogUrl(value) {
   } catch {
     return "";
   }
+}
+
+function officialBlogPreviewRawEntries(input) {
+  const invalidEntries = [];
+  if (typeof input === "string") {
+    const trimmed = input.trim();
+    if (!trimmed) {
+      return {
+        entries: [],
+        invalid_entries: [{ index: 0, reason: "official blog preview feed input is empty" }]
+      };
+    }
+    if (trimmed.startsWith("<")) {
+      const entries = officialBlogPreviewXmlEntries(trimmed);
+      return {
+        entries,
+        invalid_entries: entries.length > 0 ? [] : [{ index: 0, reason: "official blog preview feed contains no RSS item or Atom entry elements" }]
+      };
+    }
+    try {
+      return officialBlogPreviewRawEntries(JSON.parse(trimmed));
+    } catch (error) {
+      invalidEntries.push({ index: 0, reason: `official blog preview feed JSON parse failed: ${error.message}` });
+      return { entries: [], invalid_entries: invalidEntries };
+    }
+  }
+
+  if (Array.isArray(input)) {
+    return { entries: input, invalid_entries: [] };
+  }
+  if (input && typeof input === "object") {
+    if (Array.isArray(input.candidates)) {
+      return { entries: input.candidates, invalid_entries: [] };
+    }
+    if (Array.isArray(input.items)) {
+      return { entries: input.items, invalid_entries: [] };
+    }
+    if (Array.isArray(input.entries)) {
+      return { entries: input.entries, invalid_entries: [] };
+    }
+  }
+
+  return {
+    entries: [],
+    invalid_entries: [{ index: 0, reason: "official blog preview feed input must be RSS, Atom, JSON array, or JSON object with items, entries, or candidates" }]
+  };
+}
+
+function officialBlogPreviewXmlEntries(xml) {
+  const atomEntries = matchOfficialBlogXmlBlocks(xml, "entry").map(parseOfficialBlogAtomEntry);
+  if (atomEntries.length > 0) {
+    return atomEntries;
+  }
+  return matchOfficialBlogXmlBlocks(xml, "item").map(parseOfficialBlogRssItem);
+}
+
+function parseOfficialBlogAtomEntry(block) {
+  const contentHtml =
+    officialBlogXmlInner(block, "summary") ||
+    officialBlogXmlInner(block, "content") ||
+    officialBlogXmlInner(block, "description");
+  return {
+    title: officialBlogXmlText(block, "title"),
+    url: officialBlogAtomLink(block) || officialBlogXmlText(block, "link"),
+    published_at: officialBlogDateOnly(officialBlogXmlText(block, "published") || officialBlogXmlText(block, "updated")),
+    content_html: contentHtml
+  };
+}
+
+function parseOfficialBlogRssItem(block) {
+  const contentHtml =
+    officialBlogXmlInner(block, "description") ||
+    officialBlogXmlInner(block, "encoded") ||
+    officialBlogXmlInner(block, "summary") ||
+    officialBlogXmlInner(block, "content");
+  return {
+    title: officialBlogXmlText(block, "title"),
+    url: officialBlogXmlText(block, "link") || officialBlogAtomLink(block) || officialBlogXmlText(block, "guid"),
+    published_at: officialBlogDateOnly(
+      officialBlogXmlText(block, "pubDate") ||
+      officialBlogXmlText(block, "date") ||
+      officialBlogXmlText(block, "published") ||
+      officialBlogXmlText(block, "updated")
+    ),
+    content_html: contentHtml
+  };
+}
+
+function normalizeOfficialBlogPreviewFeedEntry(rawEntry = {}, context = {}) {
+  const canonicalUrl = String(
+    rawEntry.canonical_url ||
+    rawEntry.canonicalUrl ||
+    rawEntry.url ||
+    rawEntry.link ||
+    rawEntry.href ||
+    ""
+  ).trim();
+  if (!canonicalUrl) {
+    throw new Error(`official blog preview feed entry missing URL at index ${context.index}`);
+  }
+
+  const normalizedUrl = normalizeOfficialBlogUrl(canonicalUrl);
+  const company = normalizeOfficialBlogCompany(rawEntry.company || context.company || inferOfficialBlogCompany(normalizedUrl));
+  if (!SUPPORTED_COMPANIES.has(company)) {
+    throw new Error(`unsupported official blog company at index ${context.index}: ${company || "(missing)"}`);
+  }
+
+  const title = String(rawEntry.title_original || rawEntry.titleOriginal || rawEntry.title || "").trim();
+  if (!title) {
+    throw new Error(`official blog preview feed entry missing title at index ${context.index}`);
+  }
+
+  const openingParagraphs = cappedOfficialBlogPreviewEntryParagraphs(rawEntry);
+  const openingPreview = officialBlogOpeningPreview({
+    opening_paragraphs: openingParagraphs
+  });
+  const publishedAt = officialBlogDateOnly(
+    rawEntry.published_at ||
+    rawEntry.publishedAt ||
+    rawEntry.event_date ||
+    rawEntry.eventDate ||
+    rawEntry.pubDate ||
+    rawEntry.date ||
+    rawEntry.updated_at ||
+    rawEntry.updatedAt ||
+    rawEntry.updated
+  );
+  const sourceLabel = String(rawEntry.source_label || rawEntry.sourceLabel || rawEntry.source || context.sourceLabel || "").trim();
+  const sourceEntryId = String(rawEntry.source_entry_id || rawEntry.sourceEntryId || rawEntry.id || rawEntry.guid || "").trim();
+
+  return {
+    company,
+    canonical_url: canonicalUrl,
+    normalized_url: normalizedUrl,
+    published_at: publishedAt,
+    title_original: title,
+    opening_paragraphs: openingParagraphs,
+    opening_preview: openingPreview,
+    source_label: sourceLabel,
+    ...(sourceEntryId ? { source_entry_id: sourceEntryId } : {})
+  };
+}
+
+function officialBlogPreviewEntryParagraphs(rawEntry = {}) {
+  const explicitParagraphs = Array.isArray(rawEntry.opening_paragraphs)
+    ? rawEntry.opening_paragraphs
+    : Array.isArray(rawEntry.openingParagraphs)
+      ? rawEntry.openingParagraphs
+      : null;
+  if (explicitParagraphs) {
+    return explicitParagraphs
+      .map((paragraph) => cleanOfficialBlogInlineText(paragraph))
+      .filter(Boolean);
+  }
+
+  const source = firstOfficialBlogText(
+    rawEntry.opening_preview,
+    rawEntry.openingPreview,
+    rawEntry.opening_excerpt,
+    rawEntry.openingExcerpt,
+    rawEntry.excerpt,
+    rawEntry.summary,
+    rawEntry.description,
+    rawEntry.content_html,
+    rawEntry.contentHtml,
+    rawEntry.content,
+    rawEntry.body
+  );
+  return officialBlogMarkupParagraphs(source);
+}
+
+function cappedOfficialBlogPreviewEntryParagraphs(rawEntry = {}) {
+  const paragraphs = officialBlogPreviewEntryParagraphs(rawEntry).slice(0, TRIAGE_OPENING_PARAGRAPH_LIMIT);
+  const capped = [];
+  let remaining = TRIAGE_OPENING_CHAR_LIMIT;
+  for (const paragraph of paragraphs) {
+    if (remaining <= 0) {
+      break;
+    }
+    const next = paragraph.slice(0, remaining).trim();
+    if (!next) {
+      continue;
+    }
+    capped.push(next);
+    remaining -= next.length;
+  }
+  return capped;
+}
+
+function firstOfficialBlogText(...values) {
+  for (const value of values) {
+    if (Array.isArray(value)) {
+      const joined = value.map((item) => String(item || "").trim()).filter(Boolean).join("\n\n");
+      if (joined) {
+        return joined;
+      }
+      continue;
+    }
+    if (typeof value === "string" && value.trim()) {
+      return value;
+    }
+  }
+  return "";
+}
+
+function officialBlogMarkupParagraphs(value) {
+  const withoutCdata = String(value || "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1");
+  const decoded = decodeOfficialBlogEntities(withoutCdata)
+    .replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<br\b[^>]*\/?>/gi, "\n")
+    .replace(/<\/(?:p|div|section|article|li|h[1-6]|blockquote)>/gi, "\n\n")
+    .replace(/<[^>]*(?:>|$)/g, " ");
+  return decoded
+    .split(/\n\s*\n/g)
+    .map((paragraph) => cleanOfficialBlogInlineText(paragraph))
+    .filter(Boolean)
+    .slice(0, TRIAGE_OPENING_PARAGRAPH_LIMIT);
+}
+
+function cleanOfficialBlogInlineText(value) {
+  return decodeOfficialBlogEntities(value)
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function matchOfficialBlogXmlBlocks(xml, tagName) {
+  const pattern = new RegExp(`<(?:[\\w.-]+:)?${tagName}\\b[\\s\\S]*?<\\/(?:[\\w.-]+:)?${tagName}>`, "gi");
+  return [...String(xml || "").matchAll(pattern)].map((match) => match[0]);
+}
+
+function officialBlogXmlInner(block, tagName) {
+  const pattern = new RegExp(`<(?:[\\w.-]+:)?${tagName}\\b[^>]*>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?${tagName}>`, "i");
+  return block.match(pattern)?.[1] || "";
+}
+
+function officialBlogXmlText(block, tagName) {
+  return officialBlogMarkupParagraphs(officialBlogXmlInner(block, tagName)).join(" ");
+}
+
+function officialBlogAtomLink(block) {
+  let fallback = "";
+  for (const match of String(block || "").matchAll(/<link\b[^>]*>/gi)) {
+    const tag = match[0];
+    const href = officialBlogXmlAttribute(tag, "href");
+    if (!href) {
+      continue;
+    }
+    const rel = officialBlogXmlAttribute(tag, "rel").toLowerCase();
+    if (!rel || rel === "alternate") {
+      return href;
+    }
+    fallback ||= href;
+  }
+  return fallback;
+}
+
+function officialBlogXmlAttribute(tag, name) {
+  const pattern = new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]+)"|'([^']+)'|([^\\s>]+))`, "i");
+  const match = String(tag || "").match(pattern);
+  return decodeOfficialBlogEntities(match?.[1] || match?.[2] || match?.[3] || "");
+}
+
+function officialBlogDateOnly(value) {
+  const raw = String(value || "").trim();
+  if (!raw) {
+    return "";
+  }
+  const direct = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (direct) {
+    return direct[1];
+  }
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  return date.toISOString().slice(0, 10);
+}
+
+function decodeOfficialBlogEntities(value) {
+  return String(value || "")
+    .replace(/&(?:#(\d+)|#x([0-9a-f]+)|amp|lt|gt|quot|apos|nbsp);/gi, (entity, decimal, hex) => {
+      if (decimal) {
+        return String.fromCodePoint(Number.parseInt(decimal, 10));
+      }
+      if (hex) {
+        return String.fromCodePoint(Number.parseInt(hex, 16));
+      }
+      const normalized = entity.toLowerCase();
+      if (normalized === "&amp;") return "&";
+      if (normalized === "&lt;") return "<";
+      if (normalized === "&gt;") return ">";
+      if (normalized === "&quot;") return "\"";
+      if (normalized === "&apos;") return "'";
+      if (normalized === "&nbsp;") return " ";
+      return entity;
+    });
 }
 
 function officialBlogIntakeCandidates(input = {}) {

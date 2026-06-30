@@ -6014,8 +6014,7 @@ test("official blog intake CLI writes a clean internal review queue", async () =
 test("official blog intake CLI refuses public output paths", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-intake-public-"));
   const inputPath = path.join(tmp, "official-blog-previews.json");
-  const publicOutputPath = path.join(rootDir, "docs", "data", "official-blog-intake.json");
-  await fs.rm(publicOutputPath, { force: true });
+  const publicOutputPath = path.join(tmp, "docs", "data", "official-blog-intake.json");
   await fs.writeFile(inputPath, `${JSON.stringify({
     candidates: [
       {
@@ -6035,7 +6034,9 @@ test("official blog intake CLI refuses public output paths", async () => {
       "--input",
       inputPath,
       "--output",
-      publicOutputPath
+      publicOutputPath,
+      "--repo-root",
+      tmp
     ], {
       cwd: rootDir,
       maxBuffer: 1024 * 1024
@@ -6043,6 +6044,101 @@ test("official blog intake CLI refuses public output paths", async () => {
     (error) => {
       assert.equal(error.code, 1);
       assert.match(error.stdout, /official_blog_intake_public_output_forbidden/);
+      return true;
+    }
+  );
+  await assert.rejects(
+    () => fs.stat(publicOutputPath),
+    /ENOENT/
+  );
+});
+
+test("official blog parse-feed CLI writes a clean internal preview feed", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-parse-feed-"));
+  const inputPath = path.join(tmp, "openai-rss.xml");
+  const outputPath = path.join(tmp, "official-blog-preview-feed.json");
+  await fs.writeFile(inputPath, `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <item>
+      <title>Introducing Agents API for production workflows</title>
+      <link>https://openai.com/index/agents-api-production?utm_source=rss</link>
+      <pubDate>Tue, 30 Jun 2026 00:00:00 GMT</pubDate>
+      <description><![CDATA[
+        <p>We are launching a new developer product for building production agent workflows with tool permissions and deployment constraints.</p>
+        <p>The post covers API integration guidance, observability, and eval harness patterns.</p>
+        <p>Later full body paragraph should not be stored.</p>
+      ]]></description>
+    </item>
+  </channel>
+</rss>
+`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:parse-feed",
+    "--input",
+    inputPath,
+    "--company",
+    "openai",
+    "--output",
+    outputPath,
+    "--date",
+    "2026-06-30",
+    "--generated-at",
+    "2026-06-30T08:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.feed.kind, "official_blog_preview_feed");
+  assert.equal(parsed.feed.visibility, "internal");
+  assert.equal(parsed.feed.company, "openai");
+  assert.equal(parsed.feed.candidates.length, 1);
+  assert.equal(parsed.feed.candidates[0].opening_preview.includes("Later full body"), false);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
+test("official blog parse-feed CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-parse-feed-public-"));
+  const inputPath = path.join(tmp, "openai-rss.xml");
+  const publicOutputPath = path.join(tmp, "docs", "data", "official-blog-preview-feed.json");
+  await fs.writeFile(inputPath, `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <item>
+      <title>Introducing Agents API for production workflows</title>
+      <link>https://openai.com/index/agents-api-production</link>
+      <description><![CDATA[<p>A new developer product for production agent workflows.</p>]]></description>
+    </item>
+  </channel>
+</rss>
+`, "utf8");
+
+  await assert.rejects(
+    () => execFileAsync(process.execPath, [
+      path.join(rootDir, "src/cli.js"),
+      "official-blog:parse-feed",
+      "--input",
+      inputPath,
+      "--company",
+      "openai",
+      "--output",
+      publicOutputPath,
+      "--repo-root",
+      tmp
+    ], {
+      cwd: rootDir,
+      maxBuffer: 1024 * 1024
+    }),
+    (error) => {
+      assert.equal(error.code, 1);
+      assert.match(error.stdout, /official_blog_parse_feed_public_output_forbidden/);
       return true;
     }
   );

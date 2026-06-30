@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
   loadOfficialBlogKnowledge,
   normalizeOfficialBlogUrl,
@@ -351,6 +352,162 @@ test("official blog intake creates an internal review queue from opening preview
   assert(result.excluded.some((candidate) => candidate.title_original.includes("strategic partnership")));
   assert(result.duplicates.some((candidate) => candidate.duplicate_source === "existing_knowledge"));
   assert(result.duplicates.some((candidate) => candidate.duplicate_source === "same_batch"));
+});
+
+test("official blog preview feed parses rss and atom entries for intake", async () => {
+  const rss = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <item>
+      <title>Introducing Agents API for production workflows</title>
+      <link>https://openai.com/index/agents-api-production?utm_source=rss</link>
+      <pubDate>Tue, 30 Jun 2026 00:00:00 GMT</pubDate>
+      <description><![CDATA[
+        <script>tracking()</script>
+        <p>We are launching a new developer product for building production agent workflows with tool permissions and deployment constraints.</p>
+        <p>The post covers API integration guidance, observability, and eval harness patterns.</p>
+        <p>Later full body paragraph should not be stored.</p>
+      ]]></description>
+    </item>
+    <item>
+      <title>OpenAI and ExampleCorp expand enterprise partnership</title>
+      <link>https://openai.com/news/examplecorp-partnership</link>
+      <pubDate>Tue, 30 Jun 2026 02:00:00 GMT</pubDate>
+      <description><![CDATA[
+        <p>The companies will bring AI tools to more employees and customers.</p>
+        <p>Executives discussed future business workflows across global markets.</p>
+      ]]></description>
+    </item>
+  </channel>
+</rss>`;
+  const atom = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <title>How ExampleBank built a Claude support workflow</title>
+    <link rel="alternate" href="https://www.anthropic.com/news/examplebank-claude-support?utm_source=atom" />
+    <updated>2026-06-30T05:00:00Z</updated>
+    <summary><![CDATA[
+      <p>The opening preview describes routing architecture, tool permissions, evaluation harnesses, observability, and rollout controls for production agents.</p>
+      <p>It includes deployment constraints and regression checks for safe rollout.</p>
+    ]]></summary>
+  </entry>
+</feed>`;
+
+  const openaiFeed = createOfficialBlogPreviewFeed(rss, {
+    company: "openai",
+    reportDate: "2026-06-30",
+    generatedAt: "2026-06-30T08:00:00.000Z",
+    sourceLabel: "OpenAI RSS fixture"
+  });
+  const anthropicFeed = createOfficialBlogPreviewFeed(atom, {
+    company: "anthropic",
+    reportDate: "2026-06-30",
+    generatedAt: "2026-06-30T08:00:00.000Z",
+    sourceLabel: "Anthropic Atom fixture"
+  });
+
+  assert.equal(openaiFeed.kind, "official_blog_preview_feed");
+  assert.equal(openaiFeed.visibility, "internal");
+  assert.equal(openaiFeed.company, "openai");
+  assert.equal(openaiFeed.stats.total_entries, 2);
+  assert.equal(openaiFeed.candidates.length, 2);
+  assert.equal(openaiFeed.invalid_entries.length, 0);
+
+  const productCandidate = openaiFeed.candidates[0];
+  assert.equal(productCandidate.normalized_url, "https://openai.com/index/agents-api-production");
+  assert.equal(productCandidate.published_at, "2026-06-30");
+  assert.equal(productCandidate.opening_paragraphs.length, 2);
+  assert.match(productCandidate.opening_preview, /new developer product/);
+  assert.equal(productCandidate.opening_preview.includes("Later full body"), false);
+  assert.equal(productCandidate.opening_preview.includes("tracking()"), false);
+
+  assert.equal(anthropicFeed.candidates.length, 1);
+  assert.equal(anthropicFeed.candidates[0].normalized_url, "https://www.anthropic.com/news/examplebank-claude-support");
+
+  const existingIndex = await loadOfficialBlogKnowledge({ rootDir });
+  const queue = createOfficialBlogIntakeQueue({
+    candidates: [
+      ...openaiFeed.candidates,
+      ...anthropicFeed.candidates
+    ]
+  }, {
+    existingIndex,
+    reportDate: "2026-06-30",
+    generatedAt: "2026-06-30T08:00:00.000Z"
+  });
+
+  assert.equal(queue.review_queue.length, 2);
+  assert.equal(queue.excluded.length, 1);
+  assert(queue.review_queue.some((candidate) => candidate.title_original.includes("Agents API") && candidate.admission.decision === "include"));
+  assert(queue.review_queue.some((candidate) => candidate.company === "anthropic" && candidate.admission.decision === "needs_review"));
+  assert(queue.excluded.some((candidate) => candidate.excluded_as === "company_news"));
+});
+
+test("official blog preview feed parses json exports with partial invalid entries", () => {
+  const feed = createOfficialBlogPreviewFeed({
+    items: [
+      {
+        company: "openai",
+        url: "https://openai.com/index/new-api-primitive?utm_source=json",
+        date: "2026-06-29",
+        title: "Launching a new API primitive for agents",
+        content_html: [
+          "<p>This new API primitive gives developers an orchestration pattern for tool use, structured outputs, and deployment constraints.</p>",
+          "<p>It includes implementation details for production agent workflows.</p>",
+          "<p>Full article body should not be retained.</p>"
+        ].join("")
+      },
+      {
+        company: "cohere",
+        url: "https://cohere.com/blog/example",
+        title: "Unsupported company entry",
+        summary: "This should be reported as invalid."
+      },
+      {
+        company: "openai",
+        title: "Missing URL entry",
+        summary: "This should be reported as invalid without blocking the valid item."
+      }
+    ]
+  }, {
+    reportDate: "2026-06-30",
+    generatedAt: "2026-06-30T08:00:00.000Z",
+    sourceLabel: "JSON export fixture"
+  });
+
+  assert.equal(feed.kind, "official_blog_preview_feed");
+  assert.equal(feed.visibility, "internal");
+  assert.equal(feed.stats.total_entries, 3);
+  assert.equal(feed.candidates.length, 1);
+  assert.equal(feed.invalid_entries.length, 2);
+  assert.equal(feed.candidates[0].company, "openai");
+  assert.equal(feed.candidates[0].normalized_url, "https://openai.com/index/new-api-primitive");
+  assert.equal(feed.candidates[0].opening_preview.includes("Full article body"), false);
+  assert(feed.invalid_entries.some((entry) => /unsupported official blog company/.test(entry.reason)));
+  assert(feed.invalid_entries.some((entry) => /missing URL/.test(entry.reason)));
+});
+
+test("official blog preview feed caps stored opening paragraphs", () => {
+  const longParagraph = "A".repeat(1500);
+  const feed = createOfficialBlogPreviewFeed({
+    items: [
+      {
+        company: "openai",
+        url: "https://openai.com/index/long-opening-preview",
+        title: "Introducing long preview handling for agents",
+        content_html: `<p>${longParagraph}</p><p>This second paragraph should not be retained after the character cap.</p>`
+      }
+    ]
+  }, {
+    reportDate: "2026-06-30",
+    generatedAt: "2026-06-30T08:00:00.000Z"
+  });
+
+  assert.equal(feed.candidates.length, 1);
+  assert.equal(feed.candidates[0].opening_paragraphs.length, 1);
+  assert.equal(feed.candidates[0].opening_paragraphs[0].length, 1200);
+  assert.equal(feed.candidates[0].opening_preview.length, 1200);
+  assert.equal(feed.candidates[0].opening_preview.includes("This second paragraph"), false);
 });
 
 test("repository seed knowledge includes curated OpenAI and Anthropic records", async () => {

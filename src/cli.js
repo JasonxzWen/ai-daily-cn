@@ -42,6 +42,7 @@ import {
 import { runDailyWorkflow } from "./daily-runner.js";
 import { runStatusSelfCheck } from "./status-self-check.js";
 import {
+  createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
   loadOfficialBlogKnowledge
 } from "./official-blog-knowledge.js";
@@ -183,6 +184,31 @@ try {
       ok: true,
       input_path: resolvedInputPath,
       queue
+    }, outputPath);
+  } else if (command === "official-blog:parse-feed") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_parse_feed_input_required", "official-blog:parse-feed requires --input <rss-or-json>.");
+    }
+    if (!args.company) {
+      throw new PublisherError("official_blog_parse_feed_company_required", "official-blog:parse-feed requires --company <openai|anthropic>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogParseFeedOutputPath({ outputPath, rootDir });
+    const input = fs.readFileSync(resolvedInputPath, "utf8");
+    const feed = createOfficialBlogPreviewFeed(input, {
+      company: args.company,
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"],
+      sourceLabel: args["source-label"] || args.source || path.basename(resolvedInputPath)
+    });
+    printJson({
+      ok: true,
+      input_path: resolvedInputPath,
+      feed
     }, outputPath);
   } else if (command === "preflight:worktree") {
     const args = parseArgs(argv);
@@ -909,28 +935,52 @@ function outputPathFromArgs(args) {
     return "";
   }
   const parsed = parseArgs(args);
-  if (command === "official-blog:intake" && typeof parsed.output === "string" && parsed.output.trim()) {
+  if (isOfficialBlogInternalCommand(command) && typeof parsed.output === "string" && parsed.output.trim()) {
     const rootDir = path.resolve(parsed["repo-root"] || process.cwd());
-    return isOfficialBlogIntakePublicOutputPath(parsed.output, rootDir) ? "" : parsed.output;
+    return isOfficialBlogInternalPublicOutputPath(parsed.output, rootDir) ? "" : parsed.output;
   }
   return typeof parsed.output === "string" && parsed.output.trim() ? parsed.output : "";
 }
 
 function assertOfficialBlogIntakeOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_intake_public_output_forbidden",
+    message: "official-blog:intake writes internal candidate and triage data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
+function assertOfficialBlogParseFeedOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_parse_feed_public_output_forbidden",
+    message: "official-blog:parse-feed writes internal preview candidate data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
+function assertOfficialBlogInternalOutputPath(options = {}) {
   const outputPath = String(options.outputPath || "").trim();
   if (!outputPath) {
     return;
   }
   const rootDir = path.resolve(options.rootDir || process.cwd());
-  if (isOfficialBlogIntakePublicOutputPath(outputPath, rootDir)) {
+  if (isOfficialBlogInternalPublicOutputPath(outputPath, rootDir)) {
     throw new PublisherError(
-      "official_blog_intake_public_output_forbidden",
-      "official-blog:intake writes internal candidate and triage data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+      options.errorCode,
+      options.message
     );
   }
 }
 
 function isOfficialBlogIntakePublicOutputPath(outputPath, rootDir) {
+  return isOfficialBlogInternalPublicOutputPath(outputPath, rootDir);
+}
+
+function isOfficialBlogInternalCommand(value) {
+  return value === "official-blog:intake" || value === "official-blog:parse-feed";
+}
+
+function isOfficialBlogInternalPublicOutputPath(outputPath, rootDir) {
   const resolved = path.resolve(outputPath);
   const publicRoot = path.resolve(rootDir, "docs");
   const relative = path.relative(publicRoot, resolved).split(path.sep).join("/");
