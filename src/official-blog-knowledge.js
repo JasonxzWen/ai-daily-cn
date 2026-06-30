@@ -11,6 +11,26 @@ const SUPPORTED_COMPANIES = new Set(["openai", "anthropic"]);
 const MAX_DIGEST_LENGTH = 1200;
 const TRIAGE_OPENING_PARAGRAPH_LIMIT = 2;
 const TRIAGE_OPENING_CHAR_LIMIT = 1200;
+const OFFICIAL_BLOG_IMPORTANCE_VALUES = new Set(["foundational", "major", "notable", "reference"]);
+const OFFICIAL_BLOG_CONTENT_TYPES = new Set([
+  "research",
+  "engineering_note",
+  "best_practice",
+  "product_practice",
+  "safety_policy",
+  "model_release_context"
+]);
+const OFFICIAL_BLOG_MATCHED_CRITERIA = new Set([
+  "new_product",
+  "new_model",
+  "engineering_practice",
+  "harness_engineering",
+  "agent_workflow",
+  "eval_methodology",
+  "safety_engineering"
+]);
+const OFFICIAL_BLOG_RECORD_ID_RE = /^(openai|anthropic)-[a-z0-9][a-z0-9-]*-[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
+const OFFICIAL_BLOG_TOPIC_ID_RE = /^[a-z0-9][a-z0-9_:-]*$/;
 const REPORT_ITEM_SECTIONS = [
   "main_items",
   "hot_blogs",
@@ -294,6 +314,61 @@ export function createOfficialBlogPreviewFeed(input = "", options = {}) {
       invalid_entries: invalidEntries.length
     },
     candidates,
+    invalid_entries: invalidEntries
+  };
+}
+
+export function createOfficialBlogKnowledgeDrafts(input = {}, options = {}) {
+  const entries = officialBlogReviewedEntries(input);
+  const existingByUrl = existingOfficialBlogRecordByUrl(options.existingIndex);
+  const existingIds = new Set((Array.isArray(options.existingIndex?.records) ? options.existingIndex.records : []).map((record) => record.id));
+  const seenByUrl = new Map();
+  const seenById = new Map();
+  const records = [];
+  const invalidEntries = [];
+
+  for (const [index, rawEntry] of entries.entries()) {
+    let record;
+    try {
+      record = normalizeOfficialBlogKnowledgeDraftEntry(rawEntry, { index });
+    } catch (error) {
+      invalidEntries.push(officialBlogKnowledgeDraftInvalidEntry(rawEntry, index, error.message));
+      continue;
+    }
+
+    if (existingByUrl.has(record.normalized_url)) {
+      invalidEntries.push(officialBlogKnowledgeDraftInvalidEntry(rawEntry, index, `duplicate canonical_url already exists in official blog knowledge: ${record.canonical_url}`));
+      continue;
+    }
+    if (existingIds.has(record.id)) {
+      invalidEntries.push(officialBlogKnowledgeDraftInvalidEntry(rawEntry, index, `duplicate id already exists in official blog knowledge: ${record.id}`));
+      continue;
+    }
+    if (seenByUrl.has(record.normalized_url)) {
+      invalidEntries.push(officialBlogKnowledgeDraftInvalidEntry(rawEntry, index, `duplicate canonical_url in authored batch: ${record.canonical_url}`));
+      continue;
+    }
+    if (seenById.has(record.id)) {
+      invalidEntries.push(officialBlogKnowledgeDraftInvalidEntry(rawEntry, index, `duplicate id in authored batch: ${record.id}`));
+      continue;
+    }
+
+    seenByUrl.set(record.normalized_url, record.id);
+    seenById.set(record.id, record.normalized_url);
+    records.push(record);
+  }
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_knowledge_drafts",
+    visibility: "internal",
+    generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
+    stats: {
+      total_entries: entries.length,
+      records: records.length,
+      invalid_entries: invalidEntries.length
+    },
+    records,
     invalid_entries: invalidEntries
   };
 }
@@ -786,6 +861,201 @@ function existingOfficialBlogRecordByUrl(index = {}) {
     }
   }
   return byUrl;
+}
+
+function officialBlogReviewedEntries(input = {}) {
+  if (Array.isArray(input)) {
+    return input;
+  }
+  if (Array.isArray(input.reviewed_entries)) {
+    return input.reviewed_entries;
+  }
+  if (Array.isArray(input.reviewedEntries)) {
+    return input.reviewedEntries;
+  }
+  if (Array.isArray(input.entries)) {
+    return input.entries;
+  }
+  if (Array.isArray(input.records)) {
+    return input.records;
+  }
+  if (Array.isArray(input.candidates)) {
+    return input.candidates;
+  }
+  return [];
+}
+
+function normalizeOfficialBlogKnowledgeDraftEntry(rawEntry = {}, context = {}) {
+  const reviewDecision = normalizeOfficialBlogReviewDecision(
+    rawEntry.review_decision ||
+    rawEntry.reviewDecision ||
+    rawEntry.review?.decision ||
+    rawEntry.authoring_review?.decision ||
+    rawEntry.authoringReview?.decision
+  );
+  const admissionDecision = normalizeOfficialBlogReviewDecision(rawEntry.admission?.decision || "include");
+  if (reviewDecision !== "include" || admissionDecision !== "include") {
+    throw new Error(`reviewed include approval is required at index ${context.index}`);
+  }
+
+  const canonicalUrl = String(rawEntry.canonical_url || rawEntry.canonicalUrl || rawEntry.url || "").trim();
+  if (!canonicalUrl) {
+    throw new Error(`official blog knowledge draft missing canonical_url at index ${context.index}`);
+  }
+  const normalizedUrl = normalizeOfficialBlogUrl(canonicalUrl);
+  const company = normalizeOfficialBlogCompany(rawEntry.company || inferOfficialBlogCompany(normalizedUrl));
+  if (!SUPPORTED_COMPANIES.has(company)) {
+    throw new Error(`unsupported official blog company at index ${context.index}: ${company || "(missing)"}`);
+  }
+
+  const publishedAt = officialBlogDateOnly(rawEntry.published_at || rawEntry.publishedAt || rawEntry.event_date || rawEntry.date);
+  if (!publishedAt) {
+    throw new Error(`official blog knowledge draft missing valid published_at at index ${context.index}`);
+  }
+
+  const titleOriginal = requiredOfficialBlogString(rawEntry.title_original || rawEntry.titleOriginal || rawEntry.title, `title_original at index ${context.index}`);
+  const titleZh = requiredOfficialBlogString(rawEntry.title_zh || rawEntry.titleZh, `title_zh at index ${context.index}`);
+  const summaryZh = requiredOfficialBlogString(rawEntry.summary_zh || rawEntry.summaryZh, `summary_zh at index ${context.index}`);
+  if (summaryZh.length < 40) {
+    throw new Error(`official blog summary_zh must be at least 40 characters at index ${context.index}`);
+  }
+  if (summaryZh.length > MAX_DIGEST_LENGTH) {
+    throw new Error(`possible full-text translation detected at index ${context.index}: summary_zh exceeds ${MAX_DIGEST_LENGTH} characters`);
+  }
+
+  const importance = String(rawEntry.importance || "").trim();
+  if (!OFFICIAL_BLOG_IMPORTANCE_VALUES.has(importance)) {
+    throw new Error(`invalid official blog importance at index ${context.index}: ${importance || "(missing)"}`);
+  }
+  const contentType = String(rawEntry.content_type || rawEntry.contentType || "").trim();
+  if (!OFFICIAL_BLOG_CONTENT_TYPES.has(contentType)) {
+    throw new Error(`invalid official blog content_type at index ${context.index}: ${contentType || "(missing)"}`);
+  }
+
+  const topics = normalizeOfficialBlogTopicIds(
+    rawEntry.topics || rawEntry.suggested_topics || rawEntry.suggestedTopics || [],
+    `topics at index ${context.index}`
+  );
+  if (topics.length === 0) {
+    throw new Error(`official blog record topics must be non-empty at index ${context.index}`);
+  }
+
+  const keyIdeas = stringArray(rawEntry.key_ideas || rawEntry.keyIdeas);
+  if (keyIdeas.length < 3 || keyIdeas.length > 7) {
+    throw new Error(`official blog key_ideas must contain 3-7 items at index ${context.index}`);
+  }
+  const practiceChecklist = stringArray(rawEntry.practice_checklist || rawEntry.practiceChecklist);
+  if (practiceChecklist.length > 7) {
+    throw new Error(`official blog practice_checklist must contain at most 7 items at index ${context.index}`);
+  }
+
+  const matchedCriteria = uniqueSorted(rawEntry.admission?.matched_criteria || rawEntry.matched_criteria || rawEntry.matchedCriteria || [])
+    .filter((criterion) => OFFICIAL_BLOG_MATCHED_CRITERIA.has(criterion));
+  if (matchedCriteria.length === 0) {
+    throw new Error(`official blog admission matched_criteria must be non-empty at index ${context.index}`);
+  }
+  const admissionRationale = requiredOfficialBlogString(
+    rawEntry.admission?.rationale ||
+    rawEntry.admission_rationale ||
+    rawEntry.admissionRationale ||
+    rawEntry.review?.rationale ||
+    rawEntry.authoring_review?.rationale ||
+    rawEntry.admission?.reason,
+    `admission rationale at index ${context.index}`
+  );
+
+  const id = String(rawEntry.id || officialBlogRecordId({
+    company,
+    normalizedUrl,
+    publishedAt,
+    titleOriginal
+  })).trim();
+  if (!OFFICIAL_BLOG_RECORD_ID_RE.test(id)) {
+    throw new Error(`invalid official blog record id at index ${context.index}: ${id || "(missing)"}`);
+  }
+
+  return normalizeOfficialBlogRecord({
+    id,
+    company,
+    canonical_url: canonicalUrl,
+    normalized_url: normalizedUrl,
+    published_at: publishedAt,
+    title_original: titleOriginal,
+    title_zh: titleZh,
+    importance,
+    content_type: contentType,
+    topics,
+    admission: {
+      decision: "include",
+      rationale: admissionRationale,
+      matched_criteria: matchedCriteria
+    },
+    summary_zh: summaryZh,
+    key_ideas: keyIdeas,
+    practice_checklist: practiceChecklist,
+    related_blog_ids: normalizeOfficialBlogRelatedBlogIds(rawEntry.related_blog_ids || rawEntry.relatedBlogIds || [], `related_blog_ids at index ${context.index}`),
+    related_report_dates: normalizeOfficialBlogRelatedReportDates(rawEntry.related_report_dates || rawEntry.relatedReportDates || [], `related_report_dates at index ${context.index}`)
+  });
+}
+
+function normalizeOfficialBlogReviewDecision(value) {
+  return String(value || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
+}
+
+function requiredOfficialBlogString(value, label) {
+  const text = String(value || "").trim();
+  if (!text) {
+    throw new Error(`official blog knowledge draft missing ${label}`);
+  }
+  return text;
+}
+
+function officialBlogRecordId({ company, normalizedUrl, publishedAt, titleOriginal }) {
+  const url = new URL(normalizedUrl);
+  const pathSlug = url.pathname.split("/").filter(Boolean).pop() || titleOriginal;
+  const slug = slugifyOfficialBlogToken(pathSlug || titleOriginal) || "official-blog";
+  return `${company}-${slug}-${publishedAt}`;
+}
+
+function normalizeOfficialBlogTopicIds(items, label) {
+  const values = uniqueSorted(items);
+  for (const value of values) {
+    if (!OFFICIAL_BLOG_TOPIC_ID_RE.test(value)) {
+      throw new Error(`invalid official blog ${label}: ${value}`);
+    }
+  }
+  return values;
+}
+
+function normalizeOfficialBlogRelatedBlogIds(items, label) {
+  const values = uniqueSorted(items);
+  for (const value of values) {
+    if (!OFFICIAL_BLOG_RECORD_ID_RE.test(value)) {
+      throw new Error(`invalid official blog ${label}: ${value}`);
+    }
+  }
+  return values;
+}
+
+function normalizeOfficialBlogRelatedReportDates(items, label) {
+  const values = [];
+  for (const item of Array.isArray(items) ? items : []) {
+    const date = officialBlogDateOnly(item);
+    if (!date) {
+      throw new Error(`invalid official blog ${label}: ${String(item || "").trim() || "(missing)"}`);
+    }
+    values.push(date);
+  }
+  return uniqueSorted(values);
+}
+
+function officialBlogKnowledgeDraftInvalidEntry(rawEntry, index, reason) {
+  return {
+    index,
+    title_original: String(rawEntry?.title_original || rawEntry?.titleOriginal || rawEntry?.title || "").trim(),
+    canonical_url: String(rawEntry?.canonical_url || rawEntry?.canonicalUrl || rawEntry?.url || "").trim(),
+    reason
+  };
 }
 
 function normalizeOfficialBlogIntakeCandidate(rawCandidate = {}, context = {}) {

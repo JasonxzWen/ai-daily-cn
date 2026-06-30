@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
   loadOfficialBlogKnowledge,
@@ -508,6 +509,201 @@ test("official blog preview feed caps stored opening paragraphs", () => {
   assert.equal(feed.candidates[0].opening_paragraphs[0].length, 1200);
   assert.equal(feed.candidates[0].opening_preview.length, 1200);
   assert.equal(feed.candidates[0].opening_preview.includes("This second paragraph"), false);
+});
+
+test("official blog knowledge drafts require reviewed authoring fields and omit queue internals", async () => {
+  const existingIndex = await loadOfficialBlogKnowledge({ rootDir });
+  const result = createOfficialBlogKnowledgeDrafts({
+    reviewed_entries: [
+      {
+        intake_id: "openai-agents-api-production-2026-06-30",
+        company: "openai",
+        canonical_url: "https://openai.com/index/agents-api-production?utm_source=authoring",
+        published_at: "2026-06-30",
+        title_original: "Introducing Agents API for production workflows",
+        opening_preview: "This preview must not be copied into the curated record.",
+        source_label: "OpenAI RSS",
+        next_action: "draft_knowledge_record",
+        admission: {
+          decision: "include",
+          reason: "Preview contains a new developer product and agent workflow implementation guidance.",
+          matched_criteria: ["new_product", "agent_workflow", "engineering_practice"]
+        },
+        review: {
+          decision: "include",
+          rationale: "Reviewed as a product-practice record because it introduces reusable agent workflow primitives."
+        },
+        title_zh: "面向生产工作流的 Agents API",
+        summary_zh: "这条记录把 OpenAI 的 Agents API 作为生产智能体工作流的知识节点处理，重点保留工具权限、部署约束、可观测性和评测闭环等可复用工程实践，而不是复述发布新闻。",
+        key_ideas: [
+          "Agents API 把工具调用、权限和状态管理放进同一条生产工作流。",
+          "开发者需要为每个工具定义输入输出边界、失败恢复和观测指标。",
+          "上线前应把 eval harness 和回归检查纳入部署约束。"
+        ],
+        practice_checklist: [
+          "为每个 agent 工具声明权限、schema 和失败恢复路径。",
+          "把部署约束、观测指标和 eval harness 作为发布前检查项。"
+        ],
+        importance: "major",
+        content_type: "product_practice",
+        topics: ["agent", "tool_use", "workflow_orchestration"],
+        related_blog_ids: ["openai-new-tools-building-agents-2025-03-11"],
+        related_report_dates: ["2026-06-30"],
+        body: "Full article body must not be copied."
+      },
+      {
+        company: "anthropic",
+        canonical_url: "https://www.anthropic.com/news/examplebank-claude-support",
+        published_at: "2026-06-30",
+        title_original: "How ExampleBank built a Claude support workflow",
+        admission: {
+          decision: "needs_review",
+          reason: "Implementation detail is hinted but not approved.",
+          matched_criteria: ["engineering_practice"]
+        },
+        review_decision: "needs_review",
+        title_zh: "未审核通过的客户工作流",
+        summary_zh: "这条记录即使有中文摘要，也不能在 needs_review 状态下进入 curated knowledge。",
+        key_ideas: ["不能入库", "需要复核", "防止误收"],
+        importance: "notable",
+        content_type: "engineering_note",
+        topics: ["agent"]
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/introducing-structured-outputs-in-the-api/?ref=authoring",
+        published_at: "2024-08-06",
+        title_original: "Introducing structured outputs in the API",
+        review_decision: "include",
+        title_zh: "重复的结构化输出记录",
+        summary_zh: "这条记录对应已有知识库 URL，应该作为重复项报告，不能再次生成 curated record。",
+        key_ideas: ["重复 URL", "不应入库", "保持唯一性"],
+        importance: "foundational",
+        content_type: "best_practice",
+        topics: ["structured_outputs"],
+        admission: {
+          decision: "include",
+          reason: "Duplicate fixture.",
+          matched_criteria: ["new_product"]
+        }
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/missing-authoring-fields",
+        published_at: "2026-06-30",
+        title_original: "Missing authoring fields",
+        review_decision: "include",
+        admission: {
+          decision: "include",
+          reason: "Approved but incomplete.",
+          matched_criteria: ["engineering_practice"]
+        }
+      },
+      {
+        id: "bad-id",
+        company: "openai",
+        canonical_url: "https://openai.com/index/malformed-authoring-fields",
+        published_at: "2026-06-30",
+        title_original: "Malformed authoring fields",
+        review_decision: "include",
+        title_zh: "格式错误的字段",
+        summary_zh: "这条记录带有错误的 id、topic、related blog id 和 report date，必须在 draft 阶段被拒绝，不能等到 schema validation 才失败。",
+        key_ideas: ["错误 id", "错误 topic", "错误关联字段"],
+        importance: "notable",
+        content_type: "engineering_note",
+        topics: ["Agent Workflow"],
+        related_blog_ids: ["bad-related-id"],
+        related_report_dates: ["not-a-date"],
+        admission: {
+          decision: "include",
+          reason: "Malformed fixture.",
+          matched_criteria: ["engineering_practice"]
+        }
+      }
+    ]
+  }, {
+    existingIndex,
+    generatedAt: "2026-06-30T08:00:00.000Z"
+  });
+
+  assert.equal(result.kind, "official_blog_knowledge_drafts");
+  assert.equal(result.visibility, "internal");
+  assert.equal(result.stats.total_entries, 5);
+  assert.equal(result.records.length, 1);
+  assert.equal(result.invalid_entries.length, 4);
+  assert.equal(result.records[0].id, "openai-agents-api-production-2026-06-30");
+  assert.equal(result.records[0].normalized_url, "https://openai.com/index/agents-api-production");
+  assert.deepEqual(result.records[0].admission.matched_criteria, ["agent_workflow", "engineering_practice", "new_product"]);
+  assert.equal(Object.hasOwn(result.records[0], "opening_preview"), false);
+  assert.equal(Object.hasOwn(result.records[0], "source_label"), false);
+  assert.equal(Object.hasOwn(result.records[0], "next_action"), false);
+  assert.equal(Object.hasOwn(result.records[0], "body"), false);
+  assert(result.invalid_entries.some((entry) => /reviewed include approval/.test(entry.reason)));
+  assert(result.invalid_entries.some((entry) => /duplicate canonical_url/.test(entry.reason)));
+  assert(result.invalid_entries.some((entry) => /title_zh/.test(entry.reason)));
+  assert(result.invalid_entries.some((entry) => /topics/.test(entry.reason)));
+
+  await withTempKnowledge([result.records[0]], async (knowledgeDir) => {
+    const index = await loadOfficialBlogKnowledge({ knowledgeDir });
+    assert.equal(index.records.length, 1);
+    assert.equal(index.records[0].id, "openai-agents-api-production-2026-06-30");
+  });
+});
+
+test("official blog knowledge drafts reject schema-invalid ids topics and related fields", () => {
+  const validAuthoring = {
+    company: "openai",
+    published_at: "2026-06-30",
+    review_decision: "include",
+    title_zh: "格式校验记录",
+    summary_zh: "这条记录用于验证 authoring 阶段会提前拒绝 schema-invalid 字段，而不是让坏记录进入 records 后再等 schema validation 失败。",
+    key_ideas: ["提前拒绝坏字段", "不写 schema-invalid record", "保持 curated knowledge 可加载"],
+    importance: "notable",
+    content_type: "engineering_note",
+    topics: ["agent"],
+    admission: {
+      decision: "include",
+      reason: "Schema validation boundary fixture.",
+      matched_criteria: ["engineering_practice"]
+    }
+  };
+  const result = createOfficialBlogKnowledgeDrafts({
+    reviewed_entries: [
+      {
+        ...validAuthoring,
+        id: "bad-id",
+        canonical_url: "https://openai.com/index/bad-id-authoring",
+        title_original: "Bad id authoring"
+      },
+      {
+        ...validAuthoring,
+        canonical_url: "https://openai.com/index/bad-topic-authoring",
+        title_original: "Bad topic authoring",
+        topics: ["Agent Workflow"]
+      },
+      {
+        ...validAuthoring,
+        canonical_url: "https://openai.com/index/bad-related-id-authoring",
+        title_original: "Bad related id authoring",
+        related_blog_ids: ["bad-related-id"]
+      },
+      {
+        ...validAuthoring,
+        canonical_url: "https://openai.com/index/bad-related-date-authoring",
+        title_original: "Bad related date authoring",
+        related_report_dates: ["not-a-date"]
+      }
+    ]
+  }, {
+    generatedAt: "2026-06-30T08:00:00.000Z"
+  });
+
+  assert.equal(result.records.length, 0);
+  assert.equal(result.invalid_entries.length, 4);
+  assert(result.invalid_entries.some((entry) => /record id/.test(entry.reason)));
+  assert(result.invalid_entries.some((entry) => /topics/.test(entry.reason)));
+  assert(result.invalid_entries.some((entry) => /related_blog_ids/.test(entry.reason)));
+  assert(result.invalid_entries.some((entry) => /related_report_dates/.test(entry.reason)));
 });
 
 test("repository seed knowledge includes curated OpenAI and Anthropic records", async () => {

@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.official-blog-knowledge-stage8",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Official blog knowledge stage 8",
+  "slug": "official-blog-knowledge-stage8",
+  "status": "completed",
+  "summary": "This iteration adds a reviewed authoring step for OpenAI and Anthropic official blog knowledge records. Approved intake entries with explicit Chinese authoring fields can now be normalized into schema-constrained curated records and written through a clean CLI without live fetching, automatic translation, public docs output, or queue diagnostic leakage.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog author records|official blog knowledge drafts\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run content:contract",
+      "npm run test",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Curated official blog records need explicit reviewed authoring fields, not automatic promotion from intake previews.",
+      "evidence": "Stage 8 requires reviewed include approval plus `title_zh`, `summary_zh`, `key_ideas`, `importance`, `content_type`, `topics`, and admission rationale before a record is produced.",
+      "scope": "official_blog_reviewed_authoring",
+      "persistence": "implemented",
+      "recommended_action": "Keep authoring inputs separate from preview ingestion and require reviewer-supplied Chinese synthesis before writing knowledge records."
+    },
+    {
+      "lesson": "Authoring output should be a curated schema record, not a review queue dump.",
+      "evidence": "Stage 8 tests assert curated records omit `opening_preview`, `source_label`, `next_action`, body fields, and queue-only diagnostics while preserving canonical URL, topics, related blog ids, and report dates.",
+      "scope": "official_blog_record_minimization",
+      "persistence": "implemented",
+      "recommended_action": "Use `knowledge/official-blogs/**` only for final curated records; keep queue artifacts in internal outputs."
+    },
+    {
+      "lesson": "Authoring must dedupe before writing files.",
+      "evidence": "Stage 8 reports existing-knowledge URL duplicates and incomplete/unapproved entries as invalid instead of writing duplicate record files.",
+      "scope": "official_blog_authoring_dedupe",
+      "persistence": "implemented",
+      "recommended_action": "Preserve URL and id dedupe as the first authoring gate before adding richer related-link generation."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Approved official blog intake entries had no deterministic path into curated `knowledge/official-blogs/**` records.",
+      "evidence": "Stage 8 adds `createOfficialBlogKnowledgeDrafts`, CLI command `official-blog:author-records`, authoring-field validation, queue-internal field omission, duplicate rejection, clean `--output` summary behavior, and public-output path rejection.",
+      "module": "src/official-blog-knowledge.js, src/cli.js, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Use reviewed authoring JSON as the bridge from intake queue entries into curated official blog knowledge records.",
+      "expected_benefit": "OpenAI and Anthropic blog knowledge can be expanded with durable Chinese summaries and graph links while keeping raw candidate diagnostics and full article text out of public artifacts.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through deterministic authoring, CLI, and schema-loading tests.",
+      "ledger_links": [
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-editorial-importance-density-source-visibility",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog knowledge drafts require reviewed authoring fields and omit queue internals",
+        "official blog author records CLI writes curated records and clean summary JSON",
+        "official blog author records CLI refuses public output paths"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add relationship suggestions that compare a reviewed record's topics and matched criteria against existing official blog records before authoring.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add optional live fetching only after it writes the Stage 7 preview feed artifact and remains separated from reviewed authoring.",
+      "owner": "project"
+    }
+  ]
+}
