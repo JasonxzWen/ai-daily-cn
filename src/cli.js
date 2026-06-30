@@ -501,6 +501,12 @@ try {
       reportDate: args.date || firstPositionalDate(argv),
       sourcesPath: args.sources || firstSourcePath(argv),
       enablement: args.enablement || firstEnablement(argv) || "core,optional,manual",
+      sourceIds: splitCliList(args["source-id"] || args["source-ids"] || args.source || args.id),
+      sourceKinds: splitCliList(args["source-kind"] || args["source-kinds"] || args.kind),
+      tiers: splitCliList(args.tier || args.tiers),
+      categories: splitCliList(args.category || args.categories || args["candidate-category"]),
+      tags: splitCliList(args.tag || args.tags || args.signal || args["source-level"]),
+      filterTokens: sourceHealthFilterTokens(argv),
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
@@ -811,6 +817,35 @@ function resolveQualityRepairExtras(parsed, extraPositionals) {
 
 function splitInputPathToken(value) {
   return String(value).split(/[,\s]+/).map((token) => token.trim()).filter(Boolean);
+}
+
+function splitCliList(value) {
+  if (!value || value === true) {
+    return [];
+  }
+  return String(value).split(",").map((token) => token.trim()).filter(Boolean);
+}
+
+function sourceHealthFilterTokens(args) {
+  return positionalArgs(args).filter((token) => {
+    const value = String(token || "").trim();
+    if (!value) {
+      return false;
+    }
+    if (/^\d{4}-\d{2}-\d{2}(T.*)?$/.test(value)) {
+      return false;
+    }
+    if (/^(core|optional|manual)(,(core|optional|manual))*$/.test(value)) {
+      return false;
+    }
+    if (/^\d+$/.test(value)) {
+      return false;
+    }
+    if (/\.json$/i.test(value) || /(^|[\\/])sources([\\/]|$)/i.test(value) || /(^|[\\/])reports-data([\\/]|$)|^reports-data$/i.test(value)) {
+      return false;
+    }
+    return true;
+  });
 }
 
 function positionalArgs(args) {

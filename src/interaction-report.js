@@ -4666,7 +4666,7 @@ function formatPublicSourceCoverageV2(audit) {
   if (!audit) {
     return "";
   }
-  const groups = sourceAuditGroups(audit);
+  const groups = publicSourceCoverageGroups(audit);
   const rows = groups.map(({ title, group }) => formatPublicSourceCoverageGroupV2(title, group)).filter(Boolean);
   if (rows.length === 0) {
     return "";
@@ -4709,9 +4709,10 @@ function formatPublicSourceCoverageGroupV2(title, group) {
     `${sourceStatusTag("skipped")} ${counts.skipped}`
   ].join(" ");
   const details = [
-    group.checked ? "checked" : "not checked",
-    group.blocked_reason ? `blocked_reason: ${group.blocked_reason}` : "",
-    group.notes ? `notes: ${trimText(group.notes, 220)}` : ""
+    group.checked ? "本组信源已检查。" : "本组信源未完成检查。",
+    counts.blocked > 0 ? "部分信源本轮不可用。" : "",
+    counts.no_signal > 0 ? "部分信源本轮没有可发布新信号。" : "",
+    counts.skipped > 0 ? "部分信源本轮跳过或需要人工输入。" : ""
   ].filter(Boolean).join(" · ");
   const sources = publicSourceCoverageDetailsV2(group.sources);
   return [
@@ -4730,10 +4731,31 @@ function publicSourceCoverageDetailsV2(sources) {
     .map((source) => {
       const name = String(source?.name || "Unknown source").trim();
       const status = String(source?.status || "unknown").trim();
-      const notes = String(source?.notes || "").trim();
-      return `- ${sourceStatusTag(status)} \`${status}\` ${markdownLink(source?.url, name)}${notes ? `: ${trimText(notes, 180)}` : ""}`;
+      const note = publicSourceCoverageStatusNote(status);
+      return `- ${sourceStatusTag(status)} ${markdownLink(source?.url, name)}${note ? `: ${note}` : ""}`;
     })
     .join("\n");
+}
+
+function publicSourceCoverageGroups(audit) {
+  return sourceAuditGroups(audit).filter(({ group }) => group !== audit.sources_health);
+}
+
+function publicSourceCoverageStatusNote(status) {
+  const normalized = sourceStatusClass(status);
+  if (normalized === "checked") {
+    return "本轮可访问。";
+  }
+  if (normalized === "no-signal") {
+    return "本轮没有可发布新信号。";
+  }
+  if (normalized === "blocked") {
+    return "本轮未能访问或解析。";
+  }
+  if (normalized === "skipped") {
+    return "本轮跳过或需要人工输入。";
+  }
+  return "";
 }
 
 function escapeInlineHtml(value) {

@@ -1,4 +1,5 @@
 import { contentSourceRequestUrl, contentSourceSkipReason, createDiscoveryFetch, formatDiscoveryErrorNote } from "./discovery.js";
+import { PublisherError } from "./errors.js";
 import { loadSourceRegistry, normalizeEnablements } from "./source-registry.js";
 import { isValidDateString } from "./time.js";
 
@@ -21,7 +22,10 @@ export async function checkSourcesHealth(options = {}) {
     includeEnablement: options.enablement || ["core", "optional", "manual"]
   });
   const enabled = new Set(normalizeEnablements(options.enablement || "core,optional,manual"));
-  const sources = registry.sources.filter((source) => enabled.has(source.enablement));
+  const enabledSources = registry.sources.filter((source) => enabled.has(source.enablement));
+  const filters = resolveHealthFilters(options, enabledSources);
+  const sources = applyHealthFilters(enabledSources, filters);
+  assertHealthFiltersMatched(filters, enabledSources, sources);
   const results = [];
 
   for (const source of sources) {
@@ -84,18 +88,198 @@ export async function checkSourcesHealth(options = {}) {
     }
   }
 
+  const summary = healthSummary(results, filters);
   return {
     source_audit: {
       sources_health: {
         checked: true,
         sources: results,
+        total_sources: results.length,
+        status_counts: summary.status_counts,
+        source_kind_counts: summary.source_kind_counts,
+        enablement_counts: summary.enablement_counts,
+        filter_summary: summary.filter_summary,
         candidates_found: 0,
         included: 0,
         notes: "Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report."
       }
     },
+    summary,
     results
   };
+}
+
+function resolveHealthFilters(options, enabledSources) {
+  const filters = {
+    sourceIds: normalizeFilterValues(options.sourceIds || options.sourceId || options["source-id"] || options["source-ids"]),
+    sourceKinds: normalizeFilterValues(options.sourceKinds || options.sourceKind || options["source-kind"] || options["source-kinds"]),
+    tiers: normalizeFilterValues(options.tiers || options.tier),
+    categories: normalizeFilterValues(options.categories || options.category || options["candidate-category"]),
+    tags: normalizeFilterValues(options.tags || options.tag),
+    unknownTokens: []
+  };
+  const tokenValues = normalizeFilterValues(options.filterTokens || options.filterToken);
+  if (tokenValues.length === 0) {
+    return filters;
+  }
+
+  const indexes = sourceFilterIndexes(enabledSources);
+  for (const token of tokenValues) {
+    if (indexes.sourceIds.has(token)) {
+      filters.sourceIds.push(token);
+    } else if (indexes.sourceKinds.has(token)) {
+      filters.sourceKinds.push(token);
+    } else if (indexes.tiers.has(token)) {
+      filters.tiers.push(token);
+    } else if (indexes.categories.has(token)) {
+      filters.categories.push(token);
+    } else if (indexes.tags.has(token)) {
+      filters.tags.push(token);
+    } else {
+      filters.unknownTokens.push(token);
+    }
+  }
+
+  return dedupeHealthFilters(filters);
+}
+
+function normalizeFilterValues(value) {
+  if (value === undefined || value === null || value === false) {
+    return [];
+  }
+  const values = Array.isArray(value) ? value : [value];
+  return values
+    .flatMap((item) => String(item).split(","))
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function dedupeHealthFilters(filters) {
+  return {
+    sourceIds: [...new Set(filters.sourceIds)],
+    sourceKinds: [...new Set(filters.sourceKinds)],
+    tiers: [...new Set(filters.tiers)],
+    categories: [...new Set(filters.categories)],
+    tags: [...new Set(filters.tags)],
+    unknownTokens: [...new Set(filters.unknownTokens)]
+  };
+}
+
+function applyHealthFilters(sources, filters) {
+  return sources.filter((source) => {
+    if (filters.sourceIds.length > 0 && !filters.sourceIds.includes(source.id)) {
+      return false;
+    }
+    if (filters.sourceKinds.length > 0 && !filters.sourceKinds.includes(source.source_kind)) {
+      return false;
+    }
+    if (filters.tiers.length > 0 && !filters.tiers.includes(source.tier)) {
+      return false;
+    }
+    if (filters.categories.length > 0 && !filters.categories.includes(source.candidate_category)) {
+      return false;
+    }
+    if (filters.tags.length > 0 && !filters.tags.some((tag) => sourceHealthTags(source).includes(tag))) {
+      return false;
+    }
+    return true;
+  });
+}
+
+function assertHealthFiltersMatched(filters, enabledSources, filteredSources) {
+  const hasFilters = filterCount(filters) > 0;
+  if (!hasFilters) {
+    return;
+  }
+
+  const indexes = sourceFilterIndexes(enabledSources);
+  const unmatched = {
+    sourceIds: filters.sourceIds.filter((value) => !indexes.sourceIds.has(value)),
+    sourceKinds: filters.sourceKinds.filter((value) => !indexes.sourceKinds.has(value)),
+    tiers: filters.tiers.filter((value) => !indexes.tiers.has(value)),
+    categories: filters.categories.filter((value) => !indexes.categories.has(value)),
+    tags: filters.tags.filter((value) => !indexes.tags.has(value)),
+    unknownTokens: filters.unknownTokens
+  };
+  const unmatchedEntries = Object.entries(unmatched).filter(([, values]) => values.length > 0);
+  if (unmatchedEntries.length > 0) {
+    const details = unmatchedEntries.map(([key, values]) => `${key}=${values.join(",")}`).join("; ");
+    throw new PublisherError("source_health_filter_no_match", `No registered sources matched explicit health filter values: ${details}`);
+  }
+  if (filteredSources.length === 0) {
+    throw new PublisherError("source_health_filter_no_match", `No sources matched health filters: ${JSON.stringify(filterSummary(filters))}`);
+  }
+}
+
+function filterCount(filters) {
+  return filters.sourceIds.length +
+    filters.sourceKinds.length +
+    filters.tiers.length +
+    filters.categories.length +
+    filters.tags.length +
+    filters.unknownTokens.length;
+}
+
+function sourceFilterIndexes(sources) {
+  return sources.reduce((acc, source) => {
+    if (source.id) acc.sourceIds.add(source.id);
+    if (source.source_kind) acc.sourceKinds.add(source.source_kind);
+    if (source.tier) acc.tiers.add(source.tier);
+    if (source.candidate_category) acc.categories.add(source.candidate_category);
+    for (const tag of sourceHealthTags(source)) {
+      acc.tags.add(tag);
+    }
+    return acc;
+  }, {
+    sourceIds: new Set(),
+    sourceKinds: new Set(),
+    tiers: new Set(),
+    categories: new Set(),
+    tags: new Set()
+  });
+}
+
+function sourceHealthTags(source) {
+  return [
+    source.signal,
+    source.source_level,
+    source.platform,
+    source.source_group,
+    source.display_section,
+    ...(Array.isArray(source.tags) ? source.tags : normalizeFilterValues(source.tags))
+  ]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+}
+
+function healthSummary(results, filters) {
+  return {
+    total_sources: results.length,
+    status_counts: countBy(results, "status"),
+    source_kind_counts: countBy(results, "source_kind"),
+    enablement_counts: countBy(results, "enablement"),
+    filter_summary: filterSummary(filters)
+  };
+}
+
+function filterSummary(filters) {
+  return {
+    source_ids: filters.sourceIds,
+    source_kinds: filters.sourceKinds,
+    tiers: filters.tiers,
+    categories: filters.categories,
+    tags: filters.tags,
+    unknown_tokens: filters.unknownTokens
+  };
+}
+
+function countBy(items, key) {
+  const counts = {};
+  for (const item of items) {
+    const value = item?.[key] || "unspecified";
+    counts[value] = (counts[value] || 0) + 1;
+  }
+  return counts;
 }
 
 function skipReasonForSource(source) {

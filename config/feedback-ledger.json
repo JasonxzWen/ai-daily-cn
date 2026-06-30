@@ -523,6 +523,26 @@
       }
     },
     {
+      "id": "feedback/p1-public-daily-not-machine-log",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep public daily from becoming a machine audit log",
+      "problem": "The public daily can regress from a reader-facing story report into dense machine audit output: source health logs, fetch/retry notes, candidate pool diagnostics, parsed counters, ledger notes, or regression self-check text appearing as public content.",
+      "expected_behavior": "Public daily sections stay story-first and reader-facing. Source coverage may show concise reader status tags and source links, but raw source_audit, sources_health, candidate_pool, fetch/retry logs, parsed_count, notes fields, ledger review, regression self-check, and machine execution details remain internal-only.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "src/interaction-report.js",
+        "src/page-checklist.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "node --test tests/unit.test.js",
+        "test_name": "public daily rejects machine audit logs from reader-facing sections",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-public-importance-selection",
       "severity": "P1",
       "status": "implemented",

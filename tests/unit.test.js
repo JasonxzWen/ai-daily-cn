@@ -5654,6 +5654,136 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
   assert.equal(health.results[3].status, "skipped_missing_base_url");
 });
 
+test("source health filters by source id, kind, tier, category, and tag", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-health-filters-"));
+  const sourcesPath = path.join(tmp, "sources.json");
+  await fs.writeFile(
+    sourcesPath,
+    JSON.stringify({
+      schema_version: 1,
+      sources: [
+        sourceHealthFixtureSource({
+          id: "health-core-rss",
+          name: "Health Core RSS",
+          url: "https://example.com/core.xml",
+          source_kind: "rss",
+          candidate_category: "hot_blog",
+          tier: "T0",
+          enablement: "core"
+        }),
+        sourceHealthFixtureSource({
+          id: "health-hf-papers",
+          name: "Health HF Papers",
+          url: "https://example.com/hf.json",
+          source_kind: "huggingface_daily_papers_api",
+          candidate_category: "community_lead",
+          tier: "T2",
+          enablement: "optional",
+          source_level: "paper_api"
+        }),
+        sourceHealthFixtureSource({
+          id: "health-product-hunt",
+          name: "Health Product Hunt",
+          url: "https://example.com/product-hunt.xml",
+          source_kind: "rss",
+          candidate_category: "project",
+          tier: "T2",
+          enablement: "optional",
+          signal: "product_hunt"
+        }),
+        sourceHealthFixtureSource({
+          id: "health-manual",
+          name: "Health Manual",
+          url: "https://example.com/manual",
+          source_kind: "manual",
+          candidate_category: "community_lead",
+          tier: "T3",
+          enablement: "manual",
+          verification_policy: "community_only"
+        })
+      ]
+    }),
+    "utf8"
+  );
+  const fetchImpl = async (url) => {
+    if (String(url).endsWith("hf.json")) {
+      return textResponse(JSON.stringify([{ title: "Paper" }]), 200);
+    }
+    return textResponse(contentSourceRssFixture(), 200);
+  };
+
+  const byId = await checkSourcesHealth({
+    rootDir: tmp,
+    sourcesPath,
+    reportDate: "2026-05-26",
+    enablement: "core,optional,manual",
+    sourceIds: ["health-manual"],
+    fetchImpl
+  });
+  assert.deepEqual(byId.results.map((source) => source.id), ["health-manual"]);
+  assert.equal(byId.source_audit.sources_health.total_sources, 1);
+
+  const byKind = await checkSourcesHealth({
+    rootDir: tmp,
+    sourcesPath,
+    reportDate: "2026-05-26",
+    enablement: "core,optional,manual",
+    sourceKinds: ["huggingface_daily_papers_api"],
+    fetchImpl
+  });
+  assert.deepEqual(byKind.results.map((source) => source.id), ["health-hf-papers"]);
+  assert.equal(byKind.results[0].status, "checked");
+
+  const byTierCategoryTag = await checkSourcesHealth({
+    rootDir: tmp,
+    sourcesPath,
+    reportDate: "2026-05-26",
+    enablement: "core,optional,manual",
+    tiers: ["T2"],
+    categories: ["project"],
+    tags: ["product_hunt"],
+    fetchImpl
+  });
+  assert.deepEqual(byTierCategoryTag.results.map((source) => source.id), ["health-product-hunt"]);
+  assert.equal(byTierCategoryTag.source_audit.sources_health.filter_summary.tags[0], "product_hunt");
+});
+
+test("source health rejects unmatched explicit filters", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-health-filter-reject-"));
+  const sourcesPath = path.join(tmp, "sources.json");
+  await fs.writeFile(
+    sourcesPath,
+    JSON.stringify({
+      schema_version: 1,
+      sources: [
+        sourceHealthFixtureSource({
+          id: "health-manual",
+          name: "Health Manual",
+          url: "https://example.com/manual",
+          source_kind: "manual",
+          candidate_category: "community_lead",
+          tier: "T3",
+          enablement: "manual",
+          verification_policy: "community_only"
+        })
+      ]
+    }),
+    "utf8"
+  );
+
+  await assert.rejects(
+    () => checkSourcesHealth({
+      rootDir: tmp,
+      sourcesPath,
+      reportDate: "2026-05-26",
+      enablement: "manual",
+      sourceIds: ["does-not-exist"],
+      fetchImpl: async () => textResponse(contentSourceRssFixture())
+    }),
+    /does-not-exist/
+  );
+});
+
 test("shared URL identity normalizes tracking parameters for dedupe gates", () => {
   assert.equal(
     normalizeUrlIdentity("https://www.Example.com/news/item/?utm_source=newsletter&ref=feed#section"),
@@ -19865,6 +19995,38 @@ test("public daily contract accepts no-image short news without explanation fiel
   assert(!issueCodes.includes("evidence_assets_gate_failed"));
 });
 
+test("public daily rejects machine audit logs from reader-facing sections", () => {
+  const report = strictPublishReportFixture();
+  report.source_audit = {
+    sources_health: {
+      checked: true,
+      candidates_found: 0,
+      included: 0,
+      notes: "machine audit log: fetch_retries=0 parsed_count=17 candidate_pool debug output",
+      sources: [
+        {
+          id: "debug-source-health",
+          name: "Debug Source Health",
+          status: "blocked",
+          notes: "source_audit internal fetch log must stay private"
+        }
+      ]
+    }
+  };
+  report.self_check = {
+    notes: "Regression Self-Check and Feedback Ledger Review are internal machine notes."
+  };
+
+  const input = reportToInteractionInput(report);
+  const serializedSections = JSON.stringify(input.sections);
+
+  assert.doesNotMatch(
+    serializedSections,
+    /source_audit|sources_health|candidate_pool|fetch_retries|parsed_count|machine audit log|Feedback Ledger Review|Regression Self-Check/i
+  );
+  assert.match(serializedSections, /story|section/i);
+});
+
 test("public daily contract rejects invalid public media but allows missing media", () => {
   const report = strictPublishReportFixture();
   const options = strictPublishOptionsFixture();
@@ -20230,7 +20392,7 @@ test("public daily renders source coverage gaps without internal audit dumps", (
   const coverageSection = input.sections.find((section) =>
     section.group === "verification" &&
     typeof section.content === "string" &&
-    section.content.includes("manual_input_empty")
+    section.content.includes("WeChat Industry Whitelist Manual Intake")
   );
   const serialized = JSON.stringify(input.sections);
 
@@ -20242,6 +20404,9 @@ test("public daily renders source coverage gaps without internal audit dumps", (
   assert(!serialized.includes("candidate_pool"));
   assert(!serialized.includes("Source status"));
   assert(!serialized.includes("candidate counts"));
+  assert(!serialized.includes("manual_input_empty"));
+  assert(!serialized.includes("manual_review_empty"));
+  assert(!serialized.includes("notes:"));
 });
 
 test("public source coverage visualization uses tags and collapsed details", () => {
@@ -23687,6 +23852,22 @@ function builderObservationFixture(candidateId, url, source) {
     url,
     event_date: "2026-05-16",
     source
+  };
+}
+
+function sourceHealthFixtureSource(overrides = {}) {
+  return {
+    id: "health-source",
+    name: "Health Source",
+    url: "https://example.com/feed.xml",
+    source_kind: "rss",
+    candidate_category: "community_lead",
+    tier: "T2",
+    authority: "aggregator",
+    enablement: "optional",
+    verification_policy: "primary_required",
+    requires_original_url: false,
+    ...overrides
   };
 }
 
