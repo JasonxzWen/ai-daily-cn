@@ -1100,7 +1100,7 @@ function sweBenchProSnapshotFixture(rows = 10) {
     collection_method: "public_page_playwright",
     snapshot_status: rows === 10 ? "complete" : "partial",
     snapshot_as_of: fixedGeneratedAt,
-    source_url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+    source_url: "https://scaleapi.github.io/SWE-bench_Pro-os/",
     top_entries: parseSweBenchProText(sweBenchProSampleText(rows)),
     notes: "Public Scale Labs SWE-Bench Pro snapshot."
   };
@@ -1694,10 +1694,13 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!mainContent.includes("Generic follow-up metadata should not render"));
   assert(!mainContent.includes("==影响=="));
   assert(!mainContent.includes("==留意=="));
-  const trackingSection = input.sections.find((section) => section.title === "每日追踪");
+  const trackingSection = input.sections.find((section) => section.title === "趋势追踪");
   assert.equal(trackingSection.type, "filterable-cards");
   assert.equal(trackingSection.cardClass, "tracking-card");
+  assert.equal(trackingSection.showFilters, true);
+  assert.equal(trackingSection.filterLabel, "榜单切换");
   assert.equal(trackingSection.items.length, 1);
+  assert.equal(trackingSection.items[0].group, "OpenRouter");
   assert.equal(trackingSection.items[0].title, "OpenRouter");
   assert.equal(trackingSection.items[0].href, "https://openrouter.ai/rankings");
   assert.match(trackingSection.items[0].titleIcon, /^data:image\/png;base64,/);
@@ -1709,9 +1712,10 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(trackingSection.items[0].table.rows.length, 1);
   assert.equal(trackingSection.items[0].table.rows[0].label, "核心指标");
   assert(trackingSection.items[0].stats.some((stat) => stat.label === "核心指标"));
-  const hotBlogsSection = input.sections.find((section) => section.title === "精选博客更新");
+  const hotBlogsSection = input.sections.find((section) => section.title === "订阅 RSS");
   assert.equal(hotBlogsSection.type, "filterable-cards");
   assert.equal(hotBlogsSection.cardClass, "blog-card");
+  assert.equal(hotBlogsSection.richId, "subscribed-rss");
   assert.equal(hotBlogsSection.items.length, 1);
   assert(!JSON.stringify(hotBlogsSection).includes("技不止术"));
   assert.equal(hotBlogsSection.items[0].title, "Harness Engineering for Long Running Agents");
@@ -1795,7 +1799,7 @@ test("每日追踪没有可核验变化时不渲染公开正文板块", async ()
 
   const input = reportToInteractionInput(report, { includeInternalSections: true });
 
-  assert(!input.sections.some((section) => section.title === "每日追踪"));
+  assert(!input.sections.some((section) => section.title === "趋势追踪"));
   assert(!input.heroStats.some((item) => item.label === "追踪"));
 });
 
@@ -2016,7 +2020,7 @@ test("interaction input keeps non-primary viewpoint audit notes out of reader-fa
   };
 
   const input = reportToInteractionInput(report);
-  const hotBlogsSection = input.sections.find((section) => section.title === "精选博客更新");
+  const hotBlogsSection = input.sections.find((section) => section.title === "订阅 RSS");
   const pointsText = JSON.stringify(hotBlogsSection.items[0].points);
 
   assert(!pointsText.includes("行业媒体/播客整理"));
@@ -2199,7 +2203,7 @@ test("community leads omit low-signal statuspage troubleshooting items", async (
   assert(JSON.stringify(section).includes("Example Builder"));
   assert(!JSON.stringify(input).includes("Claude Status"));
   assert(!JSON.stringify(input).includes("elevated errors"));
-  assert(!input.sections.some((item) => item.title === "社区线索"));
+  assert(!input.sections.some((item) => item.title === "其他信源"));
 });
 
 test("domestic community leads stay inside the shared community section", async () => {
@@ -2229,7 +2233,7 @@ test("domestic community leads stay inside the shared community section", async 
 
   const input = reportToInteractionInput(report);
   const builderHeroStat = input.heroStats.find((item) => item.label === "Builder");
-  const communitySection = input.sections.find((section) => section.title === "社区线索");
+  const communitySection = input.sections.find((section) => section.richId === "other-sources");
 
   assert.equal(builderHeroStat.value, "0");
   assert(!input.sections.some((section) => section.title === "国内动态"));
@@ -2282,7 +2286,7 @@ test("community lead cards keep fuller news summaries and preserve images", asyn
   ];
 
   const input = reportToInteractionInput(report);
-  const section = input.sections.find((item) => item.title === "社区线索");
+  const section = input.sections.find((item) => item.richId === "other-sources");
 
   assert(section);
   assert.equal(section.type, "filterable-cards");
@@ -2312,7 +2316,7 @@ test("community lead cards keep short summaries without template expansion", asy
   ];
 
   const input = reportToInteractionInput(report);
-  const section = input.sections.find((item) => item.title === "社区线索");
+  const section = input.sections.find((item) => item.richId === "other-sources");
   const body = section.items[0].body;
 
   assert(body.length >= 20);
@@ -3318,7 +3322,7 @@ test("huggingface trending discovery and public section", async () => {
     verification_status: "primary_confirmed"
   }));
   const input = reportToInteractionInput(report);
-  const section = input.sections.find((item) => item.title === "Hugging Face Trending 路 Top 10");
+  const section = input.sections.find((item) => item.title === "Hugging Face Trending · Top 10");
 
   assert(section);
   assert.match(section.content, /Qwen\/Qwen3-235B-A22B/);
@@ -3727,7 +3731,7 @@ test("GitHub report markdown parser extracts report links as discovery leads", (
 | --- | --- |
 | 1) **SkillOpt** - Optimizes agent skill documents through validation-gated rollouts. | [Paper](https://arxiv.org/abs/2605.23904), [Tweet](https://x.com/omarsar0/status/2058936160291004483) |
 
-1、[codex-provider-sync](https://hellogithub.com/periodical/statistics/click?target=https://github.com/Dailin521/codex-provider-sync)：Codex 切换 Provider 找回历史对话的工具。
+1、[codex-provider-sync](https://github.com/Dailin521/codex-provider-sync)：Codex 切换 Provider 找回历史对话的工具。
 `, {
     name: "GitHub report fixture",
     url: "https://raw.githubusercontent.com/example/repo/main/report.md",
@@ -3750,14 +3754,14 @@ test("content source discovery reads latest GitHub markdown report instead of co
     limit: 10,
     sources: [
       {
-        id: "content-ruanyf-weekly",
-        name: "RuanYF Weekly",
-        url: "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
+        id: "content-example-ai-weekly",
+        name: "Example AI Weekly",
+        url: "https://raw.githubusercontent.com/example/ai-weekly/main/README.md",
         source_kind: "github_report_markdown",
         candidate_category: "community_lead",
         authority: "aggregator",
         verification_policy: "primary_required",
-        latest_report_link_pattern: "docs/issue-\\d+\\.md",
+        latest_report_link_pattern: "reports/issue-\\d+\\.md",
         lookback_days: 14,
         maxItemsPerRun: 2
       }
@@ -3765,7 +3769,7 @@ test("content source discovery reads latest GitHub markdown report instead of co
     fetchImpl: async (url) => {
       fetchedUrls.push(url);
       if (url.endsWith("/README.md")) {
-        return textResponse("- Issue 399: [China AI labs visit](docs/issue-399.md)");
+        return textResponse("- Issue 399: [China AI labs visit](reports/issue-399.md)");
       }
       return textResponse(`
 # Weekly issue 399: China AI labs visit
@@ -3775,15 +3779,147 @@ Analysts wrote trip notes: [Kevin Xu](https://interconnect.substack.com/p/chinai
   });
 
   assert.deepEqual(fetchedUrls, [
-    "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
-    "https://raw.githubusercontent.com/ruanyf/weekly/master/docs/issue-399.md"
+    "https://raw.githubusercontent.com/example/ai-weekly/main/README.md",
+    "https://raw.githubusercontent.com/example/ai-weekly/main/reports/issue-399.md"
   ]);
   assert.equal(collected.source_audit.content_sources.sources[0].status, "checked");
   assert.equal(collected.candidates.length, 2);
-  assert.equal(collected.candidates[0].source_id, "content-ruanyf-weekly");
+  assert.equal(collected.candidates[0].source_id, "content-example-ai-weekly");
   assert.equal(collected.candidates[0].category, "community_lead");
   assert.equal(collected.candidates[0].verification_status, "intermediary_only");
-  assert.match(collected.candidates[0].notes, /source_report_url=https:\/\/raw\.githubusercontent\.com\/ruanyf\/weekly\/master\/docs\/issue-399\.md/);
+  assert.match(collected.candidates[0].notes, /source_report_url=https:\/\/raw\.githubusercontent\.com\/example\/ai-weekly\/main\/reports\/issue-399\.md/);
+});
+
+test("source cleanup and Hugging Face Papers API", async () => {
+  const fetchedUrls = [];
+  const collected = await collectContentSources({
+    reportDate: "2026-06-30",
+    generatedAt: fixedGeneratedAt,
+    limit: 5,
+    perSourceLimit: 3,
+    sources: [
+      {
+        id: "content-huggingface-daily-papers",
+        name: "Hugging Face Daily Papers",
+        url: "https://huggingface.co/api/daily_papers?date={YYYY-MM-DD}",
+        source_kind: "huggingface_daily_papers_api",
+        candidate_category: "community_lead",
+        tier: "T2",
+        authority: "aggregator",
+        enablement: "optional",
+        verification_policy: "primary_required",
+        max_items_per_run: 3,
+        source_level: "paper_aggregator"
+      }
+    ],
+    fetchImpl: async (url) => {
+      fetchedUrls.push(String(url));
+      return jsonResponse([
+        {
+          title: "TACO: Tool-Augmented Credit Optimization for Agentic Tool Use",
+          publishedAt: "2026-06-28T20:00:00.000Z",
+          summary: "Agentic multimodal models perform diverse operations via code and reason over returned views.",
+          numComments: 12,
+          paper: {
+            id: "2606.30251",
+            title: "TACO: Tool-Augmented Credit Optimization for Agentic Tool Use",
+            authors: [
+              { name: "Mingkuan Feng" },
+              { name: "Jinyang Wu" }
+            ]
+          }
+        }
+      ]);
+    }
+  });
+
+  assert.deepEqual(fetchedUrls, ["https://huggingface.co/api/daily_papers?date=2026-06-30"]);
+  assert.equal(collected.source_audit.content_sources.sources[0].status, "checked");
+  assert.equal(collected.source_audit.content_sources.sources[0].parsed_count, 1);
+  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates[0].source_id, "content-huggingface-daily-papers");
+  assert.equal(collected.candidates[0].title, "TACO: Tool-Augmented Credit Optimization for Agentic Tool Use");
+  assert.equal(collected.candidates[0].url, "https://huggingface.co/papers/2606.30251");
+  assert.equal(collected.candidates[0].event_date, "2026-06-28");
+  assert.match(collected.candidates[0].evidence, /Mingkuan Feng/);
+  assert.match(collected.candidates[0].evidence, /12 comments/);
+
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-cleanup-"));
+  const sourcesPath = path.join(tmp, "sources.json");
+  await fs.writeFile(
+    sourcesPath,
+    JSON.stringify({
+      schema_version: 1,
+      sources: [
+        {
+          id: "content-openrouter-rankings",
+          name: "OpenRouter Rankings",
+          url: "https://openrouter.ai/rankings",
+          source_kind: "openrouter_rankings_public_playwright",
+          candidate_category: "community_lead",
+          tier: "T0",
+          authority: "primary",
+          enablement: "core",
+          verification_policy: "primary_allowed"
+        },
+        {
+          id: "content-artificial-analysis-intelligence-index",
+          name: "Artificial Analysis Intelligence Index",
+          url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+          source_kind: "artificial_analysis_index_public_playwright",
+          candidate_category: "community_lead",
+          tier: "T0",
+          authority: "primary",
+          enablement: "core",
+          verification_policy: "primary_allowed"
+        },
+        {
+          id: "content-swe-bench-pro-public",
+          name: "Scale Labs SWE-Bench Pro",
+          url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+          source_kind: "swe_bench_pro_public_playwright",
+          candidate_category: "community_lead",
+          tier: "T0",
+          authority: "primary",
+          enablement: "core",
+          verification_policy: "primary_allowed"
+        }
+      ]
+    }),
+    "utf8"
+  );
+  const health = await checkSourcesHealth({
+    rootDir: tmp,
+    sourcesPath,
+    reportDate: "2026-06-30",
+    fetchImpl: async () => textResponse("<html><main>public leaderboard shell</main></html>")
+  });
+
+  assert.deepEqual(health.results.map((result) => result.status), ["checked", "checked", "checked"]);
+  assert(health.results.every((result) => /source-specific tracking health/.test(result.notes)));
+
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional,manual"
+  });
+  const removedIds = new Set([
+    "content-hellogithub",
+    "content-ruanyf-weekly",
+    "content-papers-with-code-api",
+    "content-reddit-machinelearning",
+    "content-ai-news-buttondown",
+    "content-adobe-ai-blog",
+    "content-fastcompany-creator-economy",
+    "platform-reddit-local-llama-feed",
+    "platform-jike-rsshub-ai-topic",
+    "platform-zhihu-rsshub-hotlist",
+    "wechat-rsshub-newrank-template",
+    "wechat-wechat2rss-feed"
+  ]);
+  const registeredIds = new Set(registry.sources.map((source) => source.id));
+  for (const id of removedIds) {
+    assert(!registeredIds.has(id), `removed source should not be registered: ${id}`);
+  }
 });
 
 test("default content sources cover broader tech, big-tech, and Product Hunt trending", () => {
@@ -3799,25 +3935,29 @@ test("default content sources cover broader tech, big-tech, and Product Hunt tre
   assert(names.includes("Amazon News"));
   assert(names.includes("Product Hunt Trending Feed"));
   assert(names.includes("The Magnifier AI"));
-  assert(names.includes("Fast Company Creator Economy"));
   assert(names.includes("Crunchbase News AI"));
   assert(names.includes("OpenAI Blog RSS"));
   assert(names.includes("Google DeepMind RSS"));
   assert(names.includes("MIT Technology Review"));
   assert(names.includes("VentureBeat AI"));
   assert(names.includes("ML Papers of the Week"));
-  assert(names.includes("HelloGitHub"));
-  assert(names.includes("RuanYF Weekly"));
   assert(names.includes("Jiqizhixin"));
   assert(names.includes("SSPAI"));
   assert(names.includes("arXiv cs.AI"));
+  assert(names.includes("arXiv cs.CL"));
+  assert(names.includes("arXiv cs.LG"));
+  assert(names.includes("arXiv cs.MA"));
+  assert(names.includes("arXiv stat.ML"));
   assert(names.includes("Hacker News Topstories API"));
   assert(names.includes("Hugging Face Daily Papers"));
-  assert(names.includes("Papers with Code API"));
-  assert(names.includes("Reddit r/MachineLearning"));
   assert(names.includes("Smol AI News"));
-  assert(names.includes("AI News Archive"));
   assert(names.includes("Ben's Bites"));
+  assert(!names.includes("Fast Company Creator Economy"));
+  assert(!names.includes("HelloGitHub"));
+  assert(!names.includes("RuanYF Weekly"));
+  assert(!names.includes("Papers with Code API"));
+  assert(!names.includes("Reddit r/MachineLearning"));
+  assert(!names.includes("AI News Archive"));
 });
 
 test("registered discovery sources cover the user requested AI source list", async () => {
@@ -3838,8 +3978,6 @@ test("registered discovery sources cover the user requested AI source list", asy
   const expected = [
     ["follow-builders", ["https://github.com/zarazhangrui/follow-builders"]],
     ["ML-Papers-of-the-Week", ["https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/README.md"]],
-    ["HelloGitHub", ["https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/README.md"]],
-    ["RuanYF Weekly", ["https://raw.githubusercontent.com/ruanyf/weekly/master/README.md"]],
     ["OpenAI Blog RSS", ["https://openai.com/blog/rss.xml", "https://openai.com/news/rss.xml"]],
     ["Google DeepMind", ["https://deepmind.google/blog/rss.xml", "https://deepmind.google/discover/blog/"]],
     ["Google Research", ["https://research.google/blog/rss/"]],
@@ -3860,13 +3998,12 @@ test("registered discovery sources cover the user requested AI source list", asy
     ["36Kr", ["https://36kr.com/feed", "https://www.36kr.com/feed"]],
     ["InfoQ CN", ["https://www.infoq.cn/feed"]],
     ["arXiv cs.AI", ["http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20"]],
+    ["arXiv cs.CL", ["http://export.arxiv.org/api/query?search_query=cat:cs.CL&sortBy=submittedDate&sortOrder=descending&max_results=20"]],
+    ["arXiv cs.LG", ["http://export.arxiv.org/api/query?search_query=cat:cs.LG&sortBy=submittedDate&sortOrder=descending&max_results=20"]],
     ["Hacker News API", ["https://hacker-news.firebaseio.com/v0/topstories.json"]],
-    ["Hugging Face Daily Papers", ["https://huggingface.co/papers"]],
-    ["Papers with Code API", ["https://paperswithcode.com/api/v1/"]],
-    ["Reddit r/MachineLearning", ["https://www.reddit.com/r/MachineLearning/.json"]],
+    ["Hugging Face Daily Papers", ["https://huggingface.co/api/daily_papers?date={YYYY-MM-DD}"]],
     ["GitHub Trending", ["https://github.com/trending?since=daily"]],
     ["Smol AI News", ["https://news.smol.ai/rss.xml", "https://news.smol.ai/"]],
-    ["AI News Archive", ["https://buttondown.com/ainews/rss", "https://buttondown.com/ainews/archive/"]],
     ["Latent Space", ["https://www.latent.space/feed", "https://www.latent.space/"]],
     ["Ben's Bites", ["https://bensbites.com/feed", "https://bensbites.com/"]]
   ];
@@ -3875,6 +4012,20 @@ test("registered discovery sources cover the user requested AI source list", asy
     assert(
       fixedSources.some((source) => urls.some((url) => normalizedSourceUrl(source.url) === normalizedSourceUrl(url))),
       `missing requested source: ${label}`
+    );
+  }
+
+  const removedUrls = [
+    "https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/README.md",
+    "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
+    "https://paperswithcode.com/api/v1/",
+    "https://www.reddit.com/r/MachineLearning/.json",
+    "https://buttondown.com/ainews/rss"
+  ];
+  for (const url of removedUrls) {
+    assert(
+      !fixedSources.some((source) => normalizedSourceUrl(source.url) === normalizedSourceUrl(url)),
+      `removed source should not be present: ${url}`
     );
   }
 });
@@ -3915,7 +4066,7 @@ test("registered content sources include fixed daily tracking leaderboards", asy
   const expected = [
     ["content-openrouter-rankings", "https://openrouter.ai/rankings"],
     ["content-artificial-analysis-intelligence-index", "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index"],
-    ["content-swe-bench-pro-public", "https://labs.scale.com/leaderboard/swe_bench_pro_public"]
+    ["content-swe-bench-pro-public", "https://scaleapi.github.io/SWE-bench_Pro-os/"]
   ];
 
   for (const [id, url] of expected) {
@@ -4288,6 +4439,37 @@ test("collectContentSources recovers SWE-bench Pro with official snapshot fallba
   assert.equal(collected.candidates.length, 0);
 });
 
+test("collectContentSources keeps live SWE-bench Pro partial rows instead of static fallback", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-06-17",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-swe-bench-pro-public",
+        name: "Scale Labs SWE-Bench Pro",
+        url: "https://scaleapi.github.io/SWE-bench_Pro-os/",
+        source_kind: "swe_bench_pro_public_playwright",
+        candidate_category: "community_lead",
+        tier: "T0",
+        authority: "primary",
+        enablement: "core",
+        verification_policy: "primary_allowed"
+      }
+    ],
+    sweBenchProText: sweBenchProSampleText(7)
+  });
+
+  const source = collected.source_audit.content_sources.sources[0];
+  assert.equal(source.status, "checked");
+  assert.match(source.notes, /snapshot_status=partial/);
+  assert.equal(source.snapshot.snapshot_status, "partial");
+  assert.equal(source.snapshot.collection_method, "public_page_playwright");
+  assert.equal(source.snapshot.top_entries.length, 7);
+  assert.equal(source.snapshot.top_entries[0].model, "gpt-5.4 (xHigh)*");
+  assert(!/official_page_snapshot_static_fallback/.test(source.notes));
+  assert.equal(collected.candidates.length, 0);
+});
+
 test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking card", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-openrouter-snapshot-"));
   const reportDate = "2026-06-05";
@@ -4322,7 +4504,7 @@ test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking
   assert(tracking.watch_points.some((point) => point.includes("MiniMax M3") || point.includes("MiMo-V2.5")));
 
   const input = reportToInteractionInput(drafted.report);
-  const trackingSection = input.sections.find((section) => section.title === "每日追踪" || section.title.includes("追踪"));
+  const trackingSection = input.sections.find((section) => section.title === "趋势追踪");
   assert(trackingSection);
   assert.equal(trackingSection.items.length, 1);
   assert.equal(trackingSection.items[0].title, "OpenRouter");
@@ -4401,21 +4583,21 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
   assert(card.stats.length > 0);
 });
 
-test("report:draft publishes SWE-bench Pro official snapshot as reader-facing daily tracking card", async () => {
+test("report:draft publishes partial SWE-bench Pro official snapshot as reader-facing daily tracking card", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-swe-bench-pro-snapshot-"));
   const reportDate = "2026-06-17";
   const discoveryPath = path.join(tmp, "discovery.json");
   const discovery = autodraftDiscoveryFixture(reportDate);
   discovery.source_audit.content_sources.sources.push({
     name: "Scale Labs SWE-Bench Pro",
-    url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+    url: "https://scaleapi.github.io/SWE-bench_Pro-os/",
     status: "checked",
-    notes: "official_page_snapshot_static_fallback; 10 rows parsed",
+    notes: "public_page_snapshot; 7 rows parsed; snapshot_status=partial",
     snapshot: {
-      ...sweBenchProSnapshotFixture(),
+      ...sweBenchProSnapshotFixture(7),
       official_component_snapshot: officialComponentSnapshotFixture({
         componentKind: "swe_bench_pro",
-        sourceUrl: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+        sourceUrl: "https://scaleapi.github.io/SWE-bench_Pro-os/",
         selectorVersion: "swe-bench-pro-v1",
         fixture: sweBenchProOfficialComponentFixture()
       })
@@ -4435,7 +4617,8 @@ test("report:draft publishes SWE-bench Pro official snapshot as reader-facing da
   assert.equal(tracking.publish_to_public, true);
   assert.equal(tracking.change_status, "changed");
   assert.equal(tracking.verification_status, "primary_confirmed");
-  assert.equal(tracking.snapshot.top_entries.length, 10);
+  assert.equal(tracking.snapshot.top_entries.length, 7);
+  assert.equal(tracking.snapshot.snapshot_status, "partial");
   assert.equal(tracking.tracking_component_snapshot.component_kind, "swe_bench_pro");
   assert.equal(tracking.tracking_component_snapshot.tabs.length, 1);
   assert.equal(tracking.tracking_component_snapshot.public_trace.selector_version, "swe-bench-pro-v1");
@@ -4450,7 +4633,7 @@ test("report:draft publishes SWE-bench Pro official snapshot as reader-facing da
   assert.equal(card.component.kind, "swe_bench_pro");
   assert.equal(card.component.tabs.length, 1);
   assert.equal(card.component.officialSnapshot, undefined);
-  assert.equal(card.table.rows.length, 10);
+  assert.equal(card.table.rows.length, 7);
   assert(card.bars.rows.length > 0);
   assert(card.stats.length > 0);
   assert(!JSON.stringify(card).includes("HTTP 403"));
@@ -5099,22 +5282,6 @@ test("content source discovery parses JSON API sources", async () => {
         source_kind: "search_api",
         category: "intermediary",
         source_level: "community_api"
-      },
-      {
-        id: "content-papers-with-code-api",
-        name: "Papers with Code API",
-        url: "https://paperswithcode.com/api/v1/",
-        source_kind: "search_api",
-        category: "intermediary",
-        source_level: "paper_api"
-      },
-      {
-        id: "content-reddit-machinelearning",
-        name: "Reddit r/MachineLearning",
-        url: "https://www.reddit.com/r/MachineLearning/.json",
-        source_kind: "search_api",
-        category: "intermediary",
-        source_level: "community_api"
       }
     ],
     fetchImpl: async (url) => {
@@ -5131,47 +5298,16 @@ test("content source discovery parses JSON API sources", async () => {
           text: "Discussion about production agent eval loops."
         }));
       }
-      if (String(url).endsWith("/api/v1/papers/")) {
-        return textResponse(JSON.stringify({
-          results: [
-            {
-              title: "Agentic Evaluation for Long-Horizon Tasks",
-              url: "https://paperswithcode.com/paper/agentic-evaluation",
-              published: "2026-05-26",
-              abstract: "A paper about long-horizon agent evaluation."
-            }
-          ]
-        }));
-      }
-      if (String(url).endsWith("/r/MachineLearning/.json")) {
-        return textResponse(JSON.stringify({
-          data: {
-            children: [
-              {
-                data: {
-                  title: "[D] Practical lessons for AI agents",
-                  url: "https://www.reddit.com/r/MachineLearning/comments/example/practical_agents/",
-                  created_utc: 1779746400,
-                  selftext: "Practitioners compare agent memory and eval results."
-                }
-              }
-            ]
-          }
-        }));
-      }
       return textResponse("{}", 404);
     }
   });
 
   assert(requestedUrls.includes("https://hacker-news.firebaseio.com/v0/item/12345.json"));
-  assert(requestedUrls.includes("https://paperswithcode.com/api/v1/papers/"));
-  assert.equal(collected.source_audit.content_sources.candidates_found, 3);
+  assert.equal(collected.source_audit.content_sources.candidates_found, 1);
   assert.deepEqual(
     collected.candidates.map((candidate) => [candidate.source_id, candidate.url]),
     [
-      ["content-hacker-news-api", "https://example.com/hn-agent-evals"],
-      ["content-papers-with-code-api", "https://paperswithcode.com/paper/agentic-evaluation"],
-      ["content-reddit-machinelearning", "https://www.reddit.com/r/MachineLearning/comments/example/practical_agents/"]
+      ["content-hacker-news-api", "https://example.com/hn-agent-evals"]
     ]
   );
 });
@@ -7839,7 +7975,7 @@ test("daily runner wires platform exempt discovery outputs into report draft", a
     calls
       .map((stage) => stage.id)
       .filter((id) => id.includes("platform")),
-    ["discover_wechat_platform", "discover_zhihu_platform", "discover_reddit_platform"]
+    ["discover_wechat_platform", "discover_zhihu_platform"]
   );
   const reportDraft = calls.find((stage) => stage.id === "report_draft");
   const inputIndex = reportDraft.command.args.indexOf("--input");
@@ -7848,7 +7984,7 @@ test("daily runner wires platform exempt discovery outputs into report draft", a
   assert(inputPaths.includes(".tmp/china-ai-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/wechat-platform-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/zhihu-platform-2026-06-09.json"));
-  assert(inputPaths.includes(".tmp/reddit-platform-2026-06-09.json"));
+  assert(!inputPaths.includes(".tmp/reddit-platform-2026-06-09.json"));
   assert(reportDraft.command.args.includes("--allow-degraded-inputs"));
 });
 
@@ -7882,18 +8018,14 @@ test("daily runner gives content source discovery enough candidate budget for th
   assert(limit >= 150, `content source limit ${limit} is below fixed source surface budget`);
 });
 
-test("reddit platform source is enabled with deterministic safety gates", async () => {
-  const config = JSON.parse(
-    await fs.readFile(path.join(rootDir, "config", "sources", "reddit-platform-sources.json"), "utf8")
-  );
-  const redditSource = config.sources.find((source) => source.id === "platform-reddit-local-llama-feed");
-
-  assert(redditSource);
-  assert.equal(redditSource.kill_switch, false);
-  assert.equal(redditSource.verification_policy, "platform_signal_exempt");
-  assert(redditSource.allowed_hosts.includes("reddit.com"));
-  assert(redditSource.exclude_keywords.includes("slop"));
-  assert(redditSource.exclude_keywords.includes("bot"));
+test("reddit platform source is removed from default discovery", async () => {
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional,manual"
+  });
+  const ids = new Set(registry.sources.map((source) => source.id));
+  assert(!ids.has("platform-reddit-local-llama-feed"));
+  assert(!Object.hasOwn(JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8")).scripts, "discover:reddit-platform"));
 });
 
 test("daily runner hands AI repair back to Codex with publish review budget", async () => {
@@ -9652,7 +9784,7 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(!html.includes("ExampleModel 2"));
   assert(!html.includes("多平台可见"));
   assert(!html.includes("官方可用性"));
-  assert(html.includes("精选博客更新"));
+  assert(html.includes("订阅 RSS"));
   assert(html.includes("Harness Engineering for Long Running Agents"));
   assert(html.includes(">重大<"));
   assert(html.includes(">值得关注<"));
@@ -11345,7 +11477,7 @@ test("interaction input renders AI industry, content track, and selected blog se
   assert(storyDetailSections.every((section) => section.collapsed === true && section.open === false));
   assert(storyDetailSections.some((section) => section.content.includes("发生了什么")));
   assert(storyDetailSections.some((section) => section.content.includes("为什么值得看")));
-  assert(titles.includes("精选博客更新"));
+  assert(titles.includes("订阅 RSS"));
   assert(!titles.includes("AI 资讯"));
   assert(!titles.includes("热门博客"));
 });
@@ -11490,15 +11622,15 @@ test("report:draft rewrites Builder English fallbacks and strips community inter
       original_url: "https://x.com/rauchg/status/2059000000000000111"
     },
     {
-      id: "ruanyf-miscompile-lead",
-      source_id: "content-ruanyf-weekly",
+      id: "example-weekly-miscompile-lead",
+      source_id: "content-example-ai-weekly",
       category: "community_lead",
       title: "我用 AI 寻找 Bug 的经历",
       url: "https://newsletter.semianalysis.com/p/finding-miscompiles-for-fun-not-profit",
-      source: "RuanYF Weekly",
+      source: "Example AI Weekly",
       event_date: reportDate,
       status: "excluded",
-      evidence: "（英文）。RuanYF Weekly latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      evidence: "（英文）。Example AI Weekly latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       verification_status: "intermediary_only",
       source_level: "primary",
       primary_url: "https://newsletter.semianalysis.com/p/finding-miscompiles-for-fun-not-profit",
@@ -11520,7 +11652,7 @@ test("report:draft rewrites Builder English fallbacks and strips community inter
   assert.match(builderItem.translation, /1T token|容灾|零数据留存/u);
   assert.doesNotMatch(builderItem.translation, /Much like Stripe recovers revenue/i);
 
-  const leadItem = drafted.report.community_leads.find((item) => item.candidate_id === "ruanyf-miscompile-lead");
+  const leadItem = drafted.report.community_leads.find((item) => item.candidate_id === "example-weekly-miscompile-lead");
   assert(leadItem);
   assert.doesNotMatch(leadItem.content, /latest report listed this entry/i);
   assert.doesNotMatch(leadItem.content, /intermediary\/self-media/i);
@@ -11871,12 +12003,12 @@ test("report:draft filters unreadable blog titles and low-signal community leads
       verification_sources: ["https://www.alibabacloud.com/blog/example-openclaw-thai"]
     },
     {
-      id: "ruanyf-ai-bug-story",
-      source_id: "content-ruanyf-weekly",
+      id: "semianalysis-ai-bug-story",
+      source_id: "content-semianalysis-newsletter",
       category: "community_lead",
       title: "我用 AI 寻找 Bug 的经历",
       url: "https://newsletter.semianalysis.com/p/finding-miscompiles-for-fun-not-profit",
-      source: "RuanYF Weekly",
+      source: "SemiAnalysis",
       event_date: reportDate,
       status: "excluded",
       evidence: "作者复盘了用 AI 找 miscompile 和 bug 的过程，重点是提示词、验证链路和失败模式。",
@@ -11952,8 +12084,8 @@ test("report:draft filters unreadable blog titles and low-signal community leads
 
   assert(!drafted.report.hot_blogs.some((item) => item.title.includes("OpenClaw")));
   assert(
-    drafted.report.hot_blogs.some((item) => item.candidate_id === "ruanyf-ai-bug-story") ||
-    drafted.report.community_leads.some((item) => item.candidate_id === "ruanyf-ai-bug-story")
+    drafted.report.hot_blogs.some((item) => item.candidate_id === "semianalysis-ai-bug-story") ||
+    drafted.report.community_leads.some((item) => item.candidate_id === "semianalysis-ai-bug-story")
   );
   assert(!drafted.report.community_leads.some((item) => item.source === "OpenAI Status"));
   assert(!drafted.report.community_leads.some((item) => item.source === "OpenAlex"));
@@ -12088,11 +12220,11 @@ test("report:draft limits paper and GitHub overflow in community leads while kee
     },
     {
       id: "codex-provider-sync",
-      source_id: "content-hellogithub",
+      source_id: "content-github-example-org",
       category: "community_lead",
       title: "codex-provider-sync",
-      url: "https://hellogithub.com/repository/codex-provider-sync",
-      source: "HelloGitHub",
+      url: "https://github.com/example/codex-provider-sync",
+      source: "Example GitHub Watch",
       event_date: reportDate,
       status: "excluded",
       evidence: "A tool that keeps Codex sessions when switching providers.",
@@ -12101,11 +12233,11 @@ test("report:draft limits paper and GitHub overflow in community leads while kee
     },
     {
       id: "agent-memory-sync",
-      source_id: "content-hellogithub",
+      source_id: "content-github-example-org",
       category: "community_lead",
       title: "agent-memory-sync",
-      url: "https://hellogithub.com/repository/agent-memory-sync",
-      source: "HelloGitHub",
+      url: "https://github.com/example/agent-memory-sync",
+      source: "Example GitHub Watch",
       event_date: reportDate,
       status: "excluded",
       evidence: "An AI agent memory sync utility for multi-provider workflows.",
@@ -13447,7 +13579,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-first runtime is internal governance by default",
     "Public daily pages remain story-first and exclude source runtime audit sections",
     "source signal story before source metrics dashboard in internal source-first runtime",
-    "154 collection entries are complete inventory rows, not public daily story content",
+    "144 collection entries are complete inventory rows, not public daily story content",
     "Story-centered content remains the fact carrier",
     "Promote a collection entry only when source governance should track it as a named source"
   ]) {
@@ -13458,7 +13590,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-First V2 Addendum",
     "Public daily pages are story-first by default and exclude source-first runtime audit sections.",
     "The internal source-first runtime puts `source_signal_story` before `source_metrics_dashboard`.",
-    "The current 154 collection entries are full inventory rows, not public daily story content.",
+    "The current 144 collection entries are full inventory rows, not public daily story content.",
     "`config/source-display-contract.json` is the executable authority"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation should preserve source-first v2 decision: ${phrase}`);
@@ -13495,7 +13627,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 81);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -13520,7 +13652,7 @@ test("source order tuning review is validator-backed and complete", async () => 
   for (const sourceId of [
     "content-azure-blog",
     "content-tencent-hunyuan-blog",
-    "content-arxiv-cs-ai",
+    "content-smol-ai-news",
     "content-builder-simon-willison",
     "intermediary-qbitai",
     "content-product-hunt-trending"
@@ -13581,7 +13713,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 81);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
 
   const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
   assert(logical, "CORE_SOURCE_CONTRACTS should include anthropic-research-engineering");
@@ -13611,7 +13743,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
 
   assert(handbook.includes("anthropic-research-engineering"), "handbook should document the promoted logical source");
   assert(!review.includes("| `content-anthropic-research` | `anthropic-research-engineering` |"), "review should no longer list the promoted source as a future candidate");
-  assert.match(review, /order-tuning-total-unmapped:81/);
+  assert.match(review, /order-tuning-total-unmapped:72/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -13665,7 +13797,7 @@ test("core primary official logical source promotions are executable and review-
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 81);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
 
   const promotions = [
     {
@@ -13748,7 +13880,7 @@ test("core primary official logical source promotions are executable and review-
   for (const replacementSourceId of ["content-azure-blog", "content-tiktok-developers-blog", "content-cloudflare-blog", "content-google-keyword"]) {
     assert(review.includes(`| \`${replacementSourceId}\``), `review should include replacement promotion candidate ${replacementSourceId}`);
   }
-  assert.match(review, /order-tuning-total-unmapped:81/);
+  assert.match(review, /order-tuning-total-unmapped:72/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -13795,7 +13927,7 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 81);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -13833,7 +13965,7 @@ test("china model logical sources are promoted into the fixed display contract",
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 81);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official"]) {
@@ -13931,7 +14063,7 @@ test("source inventory order reference validator rejects drift and private field
 
   await expectInvalid(
     reference.replace(firstSourceLinePattern, ""),
-    /must list 154 source ids|must list source id exactly once/
+    /must list 144 source ids|must list source id exactly once/
   );
   await expectInvalid(
     reference.replace(firstSourceLinePattern, `${firstSourceLine}${firstSourceLine}`),
@@ -14441,12 +14573,12 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
     metricByTitle.get(title)?.stats?.find((stat) => stat.label === label)?.value;
   const serializedDashboard = JSON.stringify(dashboard);
 
-  assert.equal(inventoryRows.length, 154);
-  assert.equal(statValue("全量采集入口"), "154");
-  assert.equal(statValue("已知入口运行态"), "154");
-  assert.equal(statValue("继承逻辑状态"), "9");
-  assert.equal(statValue("未上报逻辑源"), "64");
-  assert.equal(statValue("仅采集入口"), "81");
+  assert.equal(inventoryRows.length, 144);
+  assert.equal(statValue("全量采集入口"), "144");
+  assert.equal(statValue("已知入口运行态"), "144");
+  assert.equal(statValue("继承逻辑状态"), "6");
+  assert.equal(statValue("未上报逻辑源"), "66");
+  assert.equal(statValue("仅采集入口"), "72");
   assert.match(serializedDashboard, /INVENTORY_TOTAL/);
   assert.match(serializedDashboard, /RUNTIME_KNOWN/);
   assert.match(serializedDashboard, /INHERITED_RUNTIME/);
@@ -14551,7 +14683,7 @@ test("system operating dashboard summarizes public report metrics after source d
   assert.equal(statValue("信号模块"), "7");
   assert.equal(statValue("趋势与追踪"), "22");
   assert.equal(statValue("信源覆盖"), "1/6");
-  assert.equal(statValue("信源覆盖", "全量入口"), "154");
+  assert.equal(statValue("信源覆盖", "全量入口"), "144");
   assert.equal(statValue("运行质量"), "degraded");
   assert.equal(statValue("运行质量", "降级提醒"), "2");
   assert.match(serializedDashboard, /SYSTEM_CONTENT/);
@@ -14606,7 +14738,7 @@ test("source inventory overview renders fixed section cards", () => {
   assert(inventory.items.every((item) => item.showGroup === false));
   assert(inventory.items.every((item) => Array.isArray(item.tags) && item.tags.length > 0));
   assert.match(JSON.stringify(inventory.items[0]), /core_primary|OpenAI Blog RSS|OpenAI News RSS/);
-  assert.match(JSON.stringify(inventory.items.find((item) => item.title === "中文平台与媒体线索")), /platform_cn_media|WeChat Platform AI Feed|Zhihu Platform AI Feed/);
+  assert.match(JSON.stringify(inventory.items.find((item) => item.title === "中文平台与媒体线索")), /platform_cn_media|WeChat Industry Whitelist Manual Intake|QbitAI/);
   assert.match(JSON.stringify(inventory.items.find((item) => item.title === "榜单与持续指标")), /OpenRouter Rankings|Artificial Analysis Intelligence Index/);
   assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview must not duplicate all detail rows");
   assert.equal(inventoryGroupRowCount, inventoryRows.length, "detail groups must keep every collection entry");
@@ -14957,12 +15089,12 @@ test("source signal story renders first-screen cards before metrics", () => {
     ["低信号", "2"],
     ["阻塞", "1"],
     ["未配置或跳过", "1"],
-    ["全量入口", "154"],
-    ["入口运行态", "154/154"]
+    ["全量入口", "144"],
+    ["入口运行态", "144/144"]
   ]);
   assert(story.items.every((item) => item.showGroup === false));
   assert(story.items.every((item) => item.titleIcon));
-  assert.match(story.summary, /全量采集入口 154/);
+  assert.match(story.summary, /全量采集入口 144/);
   assert.match(story.content, /全量信源入口/);
   assert.match(serializedStory, /OpenAI 发布企业平台能力/);
   assert.match(serializedStory, /GitHub Trending 出现 agent 工具链/);
@@ -15357,14 +15489,14 @@ test("internal source inventory panel lists all registered source entries before
   assert(inventoryGroupIndexes.length > 0, "inventory detail groups should render");
   assert(storyIndex > Math.max(...inventoryGroupIndexes), "stories should remain after the complete source-first area");
   assert.equal(inventory.type, "filterable-cards");
-  assert.match(inventory.summary, /154/);
+  assert.match(inventory.summary, /144/);
   assert.equal((inventoryCardsText.match(/- \*\*/g) || []).length, 0);
   assert.equal(inventoryGroupRowCount, inventoryRows.length);
   assert.match(inventoryGroupContent, /DeepSeek News/);
   assert.match(inventoryGroupContent, /OpenAI News RSS/);
   assert.match(inventoryGroupContent, /OpenRouter Rankings/);
-  assert.match(inventoryGroupContent, /WeChat Platform AI Feed/);
-  assert.match(inventoryGroupContent, /Zhihu Platform AI Feed/);
+  assert.match(inventoryGroupContent, /WeChat Industry Whitelist Manual Intake/);
+  assert.match(inventoryGroupContent, /QbitAI/);
   assert.match(inventoryCardsText, /html_index/);
   assert.match(inventoryCardsText, /openrouter_rankings_public_playwright/);
   assert.match(inventoryCardsText, /manual/);
@@ -15391,7 +15523,7 @@ test("source inventory rows expose runtime status layer", () => {
   assert.equal(missingRuntimeLines.length, 0, JSON.stringify(missingRuntimeLines));
   assert.match(findInventoryLine("OpenAI News RSS"), /运行状态：[\s\S]*included/);
   assert.match(findInventoryLine("Anthropic News"), /运行状态：[\s\S]*updated_not_selected/);
-  assert.match(findInventoryLine("WeChat Platform AI Feed"), /运行状态：[\s\S]*not_configured_or_skipped/);
+  assert.match(findInventoryLine("WeChat Industry Whitelist Manual Intake"), /运行状态：[\s\S]*not_configured_or_skipped/);
   assert.match(findInventoryLine("Hugging Face Blog"), /运行状态：[\s\S]*unreported/);
   assert.match(findInventoryLine("Azure Blog"), /运行状态：[\s\S]*collection_only/);
   assert.doesNotMatch(inventoryLines.join("\n"), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
@@ -15442,7 +15574,7 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert(inventory, "inventory overview should render");
   assert.equal(inventory.type, "filterable-cards");
   assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview should not carry all detail rows");
-  assert.match(inventory.summary, /154/);
+  assert.match(inventory.summary, /144/);
   assert(inventoryHrefs.includes("#section-source-inventory-group-core-primary"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-china-models"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-tracking-metrics"), JSON.stringify(inventoryHrefs));
@@ -15457,8 +15589,8 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert.match(groupText, /DeepSeek News/);
   assert.match(groupText, /OpenAI News RSS/);
   assert.match(groupText, /OpenRouter Rankings/);
-  assert.match(groupText, /WeChat Platform AI Feed/);
-  assert.match(groupText, /Zhihu Platform AI Feed/);
+  assert.match(groupText, /WeChat Industry Whitelist Manual Intake/);
+  assert.match(groupText, /QbitAI/);
   assert(lastGroupIndex > inventoryIndex, JSON.stringify(publicSectionOrder));
   assert(firstStoryIndex > lastGroupIndex, JSON.stringify(publicSectionOrder));
   assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
@@ -15569,7 +15701,7 @@ test("source inventory section cards expose important slices without filtering r
   assert.match(inventory.summary, /下方明细全部保留/);
   assert.match(cardsText, /中文平台与媒体线索/);
   assert.match(cardsText, /platform_cn_media/);
-  assert.match(cardsText, /WeChat Platform AI Feed|Zhihu Platform AI Feed/);
+  assert.match(cardsText, /WeChat Industry Whitelist Manual Intake|QbitAI/);
   assert.match(cardsText, /手动或无更新/);
   assert.equal(platformCard?.href, "#section-source-inventory-group-platform-cn-media");
   assert.equal(platformCard?.stats?.[0]?.value, String(platformSectionCount));
@@ -16025,15 +16157,6 @@ test("public daily followups expose inactive platform and GitHub-watch source co
       content_sources: {
         sources: [
           {
-            id: "content-ruanyf-weekly",
-            name: "RuanYF Weekly",
-            url: "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
-            source_kind: "github_report_markdown",
-            status: "checked",
-            parsed_count: 1,
-            notes: "source-specific markdown contract"
-          },
-          {
             id: "content-github-openai-org",
             name: "OpenAI GitHub Organization",
             url: "https://github.com/openai.atom",
@@ -16043,7 +16166,7 @@ test("public daily followups expose inactive platform and GitHub-watch source co
             notes: "0 recent repository events parsed"
           }
         ],
-        candidates_found: 1,
+        candidates_found: 0,
         included: 0
       },
       github_trending: {
@@ -16076,7 +16199,7 @@ test("public daily followups expose inactive platform and GitHub-watch source co
   });
   const byId = new Map(rows.map((row) => [row.id, row]));
 
-  assert.equal(byId.get("ruanyf-weekly")?.candidate_count, 0);
+  assert.equal(byId.has("ruanyf-weekly"), false);
   assert.match(byId.get("wechat-platform")?.notes || "", /kill_switch_enabled|placeholder_source/);
   assert.equal(byId.get("wechat-platform")?.public_included, false);
   assert.match(byId.get("zhihu-platform")?.notes || "", /kill_switch_enabled|placeholder_source/);
@@ -17365,22 +17488,22 @@ test("report:draft rejects title-only self-media discovery leads from main strea
   const discoveryPath = path.join(tmp, "discovery.json");
   const titleOnlyLead = {
     ...mainStreamRepairCandidate(reportDate, {
-      id: "ruanyf-title-only-main-refill",
+      id: "example-weekly-title-only-main-refill",
       category: "community_lead",
-      source: "RuanYF Weekly",
-      sourceId: "content-ruanyf-weekly",
+      source: "Example AI Weekly",
+      sourceId: "content-example-ai-weekly",
       sourceLevel: "primary",
       verificationStatus: "intermediary_only",
       title: "大模型权重是什么",
-      url: "https://github.com/ruanyf/weekly/blob/master/docs/issue-399.md",
-      evidence: "（中文）。RuanYF Weekly latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      url: "https://example.com/weekly/issue-399",
+      evidence: "（中文）。Example AI Weekly latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       editorialCategory: "model_infrastructure"
     }),
     primary_url: "",
     verification_sources: [],
-    intermediary_url: "https://github.com/ruanyf/weekly/blob/master/docs/issue-399.md",
-    notes: "intermediary_url=https://github.com/ruanyf/weekly/blob/master/docs/issue-399.md; primary_verification_required=true",
-    verification_note: "intermediary_url=https://github.com/ruanyf/weekly/blob/master/docs/issue-399.md; primary_verification_required=true"
+    intermediary_url: "https://example.com/weekly/issue-399",
+    notes: "intermediary_url=https://example.com/weekly/issue-399; primary_verification_required=true",
+    verification_note: "intermediary_url=https://example.com/weekly/issue-399; primary_verification_required=true"
   };
   const discovery = discoveryEnvelope({
     candidates: [
@@ -17414,7 +17537,7 @@ test("report:draft rejects title-only self-media discovery leads from main strea
       }),
       titleOnlyLead
     ],
-    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Meta AI Blog", "RuanYF Weekly"]
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Meta AI Blog", "Example AI Weekly"]
   });
   await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
 
@@ -19104,10 +19227,10 @@ test("publish quality blocks strict daily reports when intermediary sources carr
 
 test("publish quality accepts strict fixed source proof when a public source is blocked", () => {
   const report = strictPublishReportFixture();
-  const redditSource = report.source_audit.content_sources.sources
-    .find((source) => source.name === "Reddit r/MachineLearning");
-  redditSource.status = "blocked";
-  redditSource.notes = "HTTP 403";
+  const publicSource = report.source_audit.content_sources.sources
+    .find((source) => source.name === "Hugging Face Daily Papers");
+  publicSource.status = "blocked";
+  publicSource.notes = "HTTP 503";
 
   const issues = findPublishQualityIssues(report, strictPublishOptionsFixture());
 
@@ -19567,8 +19690,8 @@ test("public daily contract renders tables instead of screenshots and hides audi
   ];
 
   const input = reportToInteractionInput(report);
-  const tracking = input.sections.find((section) => section.title === "每日追踪");
-  const hotBlogs = input.sections.find((section) => section.title === "精选博客更新");
+  const tracking = input.sections.find((section) => section.title === "趋势追踪");
+  const hotBlogs = input.sections.find((section) => section.title === "订阅 RSS");
   const serialized = JSON.stringify(input.sections);
 
   assert(tracking);
@@ -19810,16 +19933,16 @@ test("public daily renders source coverage gaps without internal audit dumps", (
     notes: "WeChat sources checked; no public item selected.",
     sources: [
       {
-        name: "WeChat Platform AI Feed",
-        url: "https://example.com/ai-daily-cn/platform/wechat.xml",
+        name: "WeChat Industry Whitelist Manual Intake",
+        url: "https://example.com/ai-daily-cn/platform/wechat-manual",
         status: "no_signal",
-        notes: "kill_switch_enabled"
+        notes: "manual_input_empty"
       },
       {
-        name: "RSSHub NewRank WeChat Route",
-        url: "https://example.com/rsshub/newrank",
-        status: "skipped_missing_base_url",
-        notes: "RSSHUB_BASE_URL missing"
+        name: "QbitAI",
+        url: "https://www.qbitai.com/feed",
+        status: "no_signal",
+        notes: "no recent public item selected"
       }
     ]
   };
@@ -19830,10 +19953,10 @@ test("public daily renders source coverage gaps without internal audit dumps", (
     notes: "Zhihu sources checked; no public item selected.",
     sources: [
       {
-        name: "Zhihu Platform AI Feed",
-        url: "https://example.com/ai-daily-cn/platform/zhihu.xml",
+        name: "Zhihu manual review",
+        url: "https://www.zhihu.com/",
         status: "no_signal",
-        notes: "kill_switch_enabled"
+        notes: "manual_review_empty"
       }
     ]
   };
@@ -19842,14 +19965,14 @@ test("public daily renders source coverage gaps without internal audit dumps", (
   const coverageSection = input.sections.find((section) =>
     section.group === "verification" &&
     typeof section.content === "string" &&
-    section.content.includes("kill_switch_enabled")
+    section.content.includes("manual_input_empty")
   );
   const serialized = JSON.stringify(input.sections);
 
   assert(coverageSection, "public coverage summary should mention WeChat/Zhihu source gaps");
-  assert(coverageSection.content.includes("WeChat Platform AI Feed"));
-  assert(coverageSection.content.includes("Zhihu Platform AI Feed"));
-  assert(coverageSection.content.includes("skipped_missing_base_url"));
+  assert(coverageSection.content.includes("WeChat Industry Whitelist Manual Intake"));
+  assert(coverageSection.content.includes("QbitAI"));
+  assert(coverageSection.content.includes("Zhihu manual review"));
   assert(!serialized.includes("source_audit"));
   assert(!serialized.includes("candidate_pool"));
   assert(!serialized.includes("Source status"));
@@ -20372,6 +20495,106 @@ test("public daily renders stories with source links and keeps GitHub Trending v
   assert(githubSection, "GitHub Trending section must stay directly visible");
   assert.notEqual(githubSection.appendix, true);
   assert(serialized.includes("example/agent-workflow-8"));
+});
+
+test("public daily source sections follow the agreed IA order", () => {
+  const report = strictPublishReportFixture();
+  report.hot_blogs = [
+    {
+      candidate_id: "official-anthropic-blog",
+      title: "Anthropic publishes a Claude engineering update",
+      url: "https://www.anthropic.com/news/claude-engineering-update",
+      publisher: "Anthropic",
+      event_date: report.report_date,
+      topic: "Claude",
+      summary: "Anthropic 官方更新说明 Claude 工程能力变化，适合放在官方 Blog 前排。"
+    },
+    {
+      candidate_id: "smol-ai-news-roundup",
+      title: "Smol AI News weekly roundup",
+      url: "https://news.smol.ai/issues/example",
+      publisher: "Smol AI News",
+      event_date: report.report_date,
+      topic: "newsletter",
+      summary: "Smol AI News 聚合本周工程和产品线索，应作为订阅 RSS 保留而不是官方 Blog。"
+    }
+  ];
+  report.daily_tracking = [
+    {
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      publish_to_public: true,
+      change_status: "changed",
+      verification_status: "primary_confirmed",
+      summary: "OpenRouter 公开榜单解析出模型用量变化。"
+    },
+    {
+      id: "artificial-analysis-intelligence-index",
+      name: "Artificial Analysis Intelligence Index",
+      url: "https://artificialanalysis.ai/models",
+      source: "Artificial Analysis",
+      category: "model_benchmark",
+      publish_to_public: true,
+      change_status: "changed",
+      verification_status: "primary_confirmed",
+      summary: "Artificial Analysis 公开榜单解析出模型能力变化。"
+    },
+    {
+      id: "swe-bench-pro-public",
+      name: "SWE-bench Pro",
+      url: "https://scale.com/leaderboard/swe-bench-pro",
+      source: "Scale Labs SWE-Bench Pro",
+      category: "coding_benchmark",
+      publish_to_public: true,
+      change_status: "changed",
+      verification_status: "primary_confirmed",
+      summary: "SWE-bench Pro 公开榜单解析出代码基准变化。"
+    }
+  ];
+  report.official_org_updates = [
+    {
+      title: "OpenAI GitHub organization update",
+      summary: "OpenAI 官方仓库更新了示例和文档。",
+      url: "https://github.com/openai/example/releases/tag/v1",
+      source: "OpenAI GitHub Organization",
+      organization: "OpenAI"
+    }
+  ];
+  report.community_leads = [
+    {
+      title: "Community signal on agent evals",
+      content: "社区讨论 agent evals 的任务回放和失败证据留存。",
+      url: "https://example.com/community/agent-evals",
+      source: "Example Community"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const titles = input.sections.map((section) => section.title);
+  const expectedOrder = [
+    "官方 Blog 更新",
+    "GitHub Trending · Top 8",
+    "Hugging Face Trending · Top 10",
+    "趋势追踪",
+    "订阅 RSS",
+    "X/Twitter 讨论",
+    "其他 GitHub 仓库更新",
+    "其他信源"
+  ];
+  const indexes = expectedOrder.map((title) => titles.indexOf(title));
+
+  assert(indexes.every((index) => index >= 0), JSON.stringify(titles));
+  assert.deepEqual(indexes, indexes.slice().sort((left, right) => left - right));
+  const trackingSection = input.sections.find((section) => section.title === "趋势追踪");
+  assert.equal(trackingSection.showFilters, true);
+  assert.deepEqual(trackingSection.items.map((item) => item.group), [
+    "OpenRouter",
+    "Artificial Analysis",
+    "SWE-bench"
+  ]);
 });
 
 test("report:write rejects expanded main items with templated prose or thin detail", async () => {
@@ -20973,7 +21196,7 @@ test("official organization updates render separately from Builder observations"
   report.builder_observations = [];
   const input = reportToInteractionInput(report);
   const rendered = JSON.stringify(input);
-  assert(rendered.includes("官方组织动态"));
+  assert(rendered.includes("其他 GitHub 仓库更新"));
   assert(rendered.includes("OpenAI updates enterprise admin controls"));
   assert(!rendered.includes("Builder comment about enterprise AI"));
 });
@@ -21695,8 +21918,6 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("TechCrunch AI"));
   assert(prompt.includes("TechCrunch AI/Enterprise"));
   assert(prompt.includes("ML Papers of the Week"));
-  assert(prompt.includes("HelloGitHub"));
-  assert(prompt.includes("RuanYF Weekly"));
   assert(prompt.includes("OpenAI Blog RSS"));
   assert(prompt.includes("Google DeepMind RSS"));
   assert(prompt.includes("MIT Technology Review"));
@@ -21706,13 +21927,17 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("36Kr"));
   assert(prompt.includes("InfoQ CN"));
   assert(prompt.includes("arXiv cs.AI"));
+  assert(prompt.includes("arXiv cs.CL"));
+  assert(prompt.includes("arXiv cs.LG"));
   assert(prompt.includes("Hacker News Topstories API"));
   assert(prompt.includes("Hugging Face Daily Papers"));
-  assert(prompt.includes("Papers with Code API"));
-  assert(prompt.includes("Reddit r/MachineLearning"));
   assert(prompt.includes("Smol AI News"));
-  assert(prompt.includes("AI News Archive"));
   assert(prompt.includes("Ben's Bites"));
+  assert(!prompt.includes("HelloGitHub"));
+  assert(!prompt.includes("RuanYF Weekly"));
+  assert(!prompt.includes("Papers with Code API"));
+  assert(!prompt.includes("Reddit r/MachineLearning"));
+  assert(!prompt.includes("AI News Archive"));
   assert(prompt.includes("Big-company moves"));
   assert(prompt.includes("Models and papers"));
   assert(prompt.includes("Products and tools"));
@@ -22153,22 +22378,20 @@ function strictPublishReportFixture() {
     "MIT Technology Review",
     "VentureBeat AI",
     "ML Papers of the Week",
-    "HelloGitHub",
-    "RuanYF Weekly",
     "Product Hunt Trending Feed",
     "Product Hunt Developer Tools Feed",
     "Latent.Space",
     "arXiv cs.AI",
+    "arXiv cs.CL",
+    "arXiv cs.LG",
+    "arXiv cs.MA",
+    "arXiv stat.ML",
     "Hacker News Topstories API",
     "Hugging Face Daily Papers",
-    "Papers with Code API",
-    "Reddit r/MachineLearning",
     "Smol AI News",
-    "AI News Archive",
     "Ben's Bites",
     "Interconnects",
     "The Magnifier AI",
-    "Fast Company Creator Economy",
     "Crunchbase News AI",
     "Planet AI",
     "HNRSS Frontpage",

@@ -155,16 +155,6 @@
       "replay_fixtures": ["zhihu-unconfigured"]
     },
     {
-      "id": "discover_reddit_platform",
-      "description": "Collect Reddit platform candidates when configured.",
-      "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["timeout", "network_error"] },
-      "fallback": { "kind": "empty_degraded_lane", "action": "emit_public_platform_degraded_note" },
-      "degrade": { "allowed": true, "action": "publish_with_reddit_platform_degraded_note" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
-      "summary_fields": ["stage_id", "status", "attempts", "configured", "candidate_count", "degraded_reason"],
-      "replay_fixtures": ["reddit-platform-timeout"]
-    },
-    {
       "id": "sources_health",
       "description": "Run source health checks and expose outages.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["timeout", "network_error"] },

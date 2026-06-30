@@ -119,7 +119,8 @@ const DOMAIN_ICONS = new Map([
   ["openrouter.ai", SOURCE_ICONS.get("OpenRouter Rankings")],
   ["artificialanalysis.ai", SOURCE_ICONS.get("Artificial Analysis Intelligence Index")],
   ["scale.com", SOURCE_ICONS.get("Scale Labs SWE-Bench Pro")],
-  ["labs.scale.com", SOURCE_ICONS.get("Scale Labs SWE-Bench Pro")]
+  ["labs.scale.com", SOURCE_ICONS.get("Scale Labs SWE-Bench Pro")],
+  ["scaleapi.github.io", SOURCE_ICONS.get("Scale Labs SWE-Bench Pro")]
 ]);
 
 for (const [source, icon] of Object.entries(CACHED_SOURCE_ICONS)) {
@@ -188,6 +189,9 @@ export function reportToInteractionInput(report, options = {}) {
       sourceEffectiveness: sourceEffectivenessRows
     })
   ];
+  const { officialBlogItems, subscribedRssItems } = splitHotBlogSourceGroups(hotBlogs);
+  const subscribedSignalItems = subscribedRssItems;
+  const chineseMediaRssItems = chineseMediaDynamics;
   const sections = [];
   if (includeSourceFirstRuntimeSections) {
     const sourceFirstRuntimeSections = formatSourceFirstRuntimeSections({
@@ -229,61 +233,67 @@ export function reportToInteractionInput(report, options = {}) {
     mediaOptions
   }));
 
-  if (publicDailyTracking.length > 0) {
+  if (officialBlogItems.length > 0) {
     sections.push({
       type: "filterable-cards",
-      title: "每日追踪",
-      group: "signals",
-      cardClass: "tracking-card",
-      showFilters: false,
-      items: formatDailyTrackingCards(publicDailyTracking, { report, evidenceByUrl, mediaOptions })
-    });
-  }
-  if (hotBlogs.length > 0) {
-    sections.push({
-      type: "filterable-cards",
-      title: "精选博客更新",
+      title: "官方 Blog 更新",
       group: "main",
       cardClass: "blog-card",
-      filterLabel: "博客主题筛选",
+      richId: "official-blog-updates",
       showFilters: false,
-      items: formatHotBlogCards(hotBlogs, { report, evidenceByUrl, mediaOptions })
-    });
-  }
-  if (chineseMediaDynamics.length > 0) {
-    sections.push({
-      type: "filterable-cards",
-      title: "中文媒体动态",
-      group: "main",
-      cardClass: "blog-card chinese-media-card",
-      showFilters: false,
-      items: formatHotBlogCards(chineseMediaDynamics, { report, evidenceByUrl, mediaOptions })
+      items: formatHotBlogCards(officialBlogItems, { report, evidenceByUrl, mediaOptions })
     });
   }
   if (githubTrending.length > 0) {
     sections.push({
       type: "markdown",
-          title: "GitHub Trending · Top 8",
-          group: "projects",
-          content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
-        });
+      title: "GitHub Trending · Top 8",
+      group: "projects",
+      content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
+    });
   }
   if (huggingFaceTrending.length > 0) {
     sections.push({
       type: "markdown",
-      title: "Hugging Face Trending 路 Top 10",
+      title: "Hugging Face Trending · Top 10",
       group: "projects",
       content: formatHuggingFaceTrending(huggingFaceTrending, { trendAnnotations })
     });
   }
-  if (officialOrgUpdates.length > 0) {
+  if (publicDailyTracking.length > 0) {
     sections.push({
       type: "filterable-cards",
-      title: "官方组织动态",
+      title: "趋势追踪",
       group: "signals",
-      cardClass: "official-card",
-      showFilters: false,
-      items: formatOfficialOrgUpdateCards(officialOrgUpdates, { report, evidenceByUrl, mediaOptions })
+      cardClass: "tracking-card",
+      richId: "trend-tracking",
+      filterLabel: "榜单切换",
+      showFilters: true,
+      items: formatDailyTrackingCards(publicDailyTracking, { report, evidenceByUrl, mediaOptions })
+    });
+  }
+  if (subscribedSignalItems.length > 0) {
+    sections.push({
+      type: "filterable-cards",
+      title: "订阅 RSS",
+      group: "main",
+      cardClass: "blog-card",
+      richId: "subscribed-rss",
+      filterLabel: "订阅来源",
+      showFilters: true,
+      items: formatHotBlogCards(subscribedSignalItems, { report, evidenceByUrl, mediaOptions })
+    });
+  }
+  if (chineseMediaRssItems.length > 0) {
+    sections.push({
+      type: "filterable-cards",
+      title: "中文媒体 RSS",
+      group: "main",
+      cardClass: "blog-card chinese-media-card",
+      richId: "chinese-media-rss",
+      filterLabel: "媒体来源",
+      showFilters: true,
+      items: formatHotBlogCards(chineseMediaRssItems, { report, evidenceByUrl, mediaOptions })
     });
   }
   if (builderObservations.length > 0) {
@@ -307,13 +317,25 @@ export function reportToInteractionInput(report, options = {}) {
       content: twitterDegradation
     });
   }
+  if (officialOrgUpdates.length > 0) {
+    sections.push({
+      type: "filterable-cards",
+      title: "其他 GitHub 仓库更新",
+      group: "signals",
+      cardClass: "official-card",
+      richId: "other-github-repository-updates",
+      showFilters: false,
+      items: formatOfficialOrgUpdateCards(officialOrgUpdates, { report, evidenceByUrl, mediaOptions })
+    });
+  }
   const communityCards = formatCommunityLeadCards(communityLeads, { report, evidenceByUrl, mediaOptions });
   if (communityCards.length > 0) {
     sections.push({
       type: "filterable-cards",
-      title: "社区线索",
+      title: "其他信源",
       group: "signals",
       cardClass: "community-card",
+      richId: "other-sources",
       showFilters: false,
       items: communityCards
     });
@@ -1738,7 +1760,7 @@ function formatDailyTrackingCards(items, context = {}) {
       ...(context.mediaOptions || {})
     });
     return {
-      group: dailyTrackingCategoryLabel(item.category),
+      group: dailyTrackingSourceLabel(item),
       title: item.name,
       href: item.url,
       titleIcon: siteIconForUrl(item.url, item.source || item.name),
@@ -2025,12 +2047,51 @@ function dailyTrackingCategoryLabel(category) {
   return "每日追踪";
 }
 
+function dailyTrackingSourceLabel(item = {}) {
+  const text = `${item.id || ""} ${item.name || ""} ${item.source || ""} ${item.url || ""}`.toLowerCase();
+  if (text.includes("openrouter")) return "OpenRouter";
+  if (text.includes("artificialanalysis") || text.includes("artificial analysis")) return "Artificial Analysis";
+  if (text.includes("swe-bench") || text.includes("swe bench") || text.includes("scale.com")) return "SWE-bench";
+  return dailyTrackingCategoryLabel(item.category);
+}
+
+function splitHotBlogSourceGroups(items = []) {
+  const officialBlogItems = [];
+  const subscribedRssItems = [];
+  for (const item of Array.isArray(items) ? items : []) {
+    if (isOfficialBlogSource(item)) {
+      officialBlogItems.push(item);
+    } else {
+      subscribedRssItems.push(item);
+    }
+  }
+  return { officialBlogItems, subscribedRssItems };
+}
+
+function isOfficialBlogSource(item = {}) {
+  const sourceText = [
+    item.publisher,
+    item.source,
+    item.source_id,
+    item.organization,
+    item.source_level,
+    item.url
+  ].filter(Boolean).join(" ").toLowerCase();
+  if (!sourceText) {
+    return false;
+  }
+  if (/smol|ben'?s bites|rundown|buttondown|techcrunch|the verge|venturebeat|ars technica|mit technology review|36kr|qbitai|infoq|jiqizhixin|leiphone|product hunt|hacker news|hnrss|arxiv/.test(sourceText)) {
+    return false;
+  }
+  return /openai|anthropic|claude|google deepmind|google research|hugging face blog|github changelog|github blog|microsoft research|apple machine learning|nvidia developer|aws machine learning|aws blog|azure blog|meta ai|meta engineering|mistral|xai|deepseek|qwen|alibaba cloud|bytedance seed|tencent hunyuan|moonshot|kimi|minimax|z\.ai|cloudflare|vercel|openrouter|artificial analysis/.test(sourceText);
+}
+
 function formatHotBlogCards(items, context = {}) {
   return items.map((item) => {
     const media = formatCardMediaForItem(context.report, item, evidenceForUrl(context.evidenceByUrl, item.url), {
       ...(context.mediaOptions || {})
     });
-    const body = String(item.summary || "").trim();
+    const body = hotBlogCardBody(item);
     return {
       group: item.topic || item.publisher || "BLOG",
       title: item.title,
@@ -2048,6 +2109,34 @@ function formatHotBlogCards(items, context = {}) {
       ...(media.length > 0 ? { media } : {})
     };
   });
+}
+
+function hotBlogCardBody(item = {}) {
+  const body = String(item.summary || "").replace(/\s+/g, " ").trim();
+  if (!isChineseMediaRssItem(item)) {
+    return body;
+  }
+  const source = String(item.publisher || item.source || "中文媒体").trim();
+  const title = String(item.title || "这条动态").replace(/\s+/g, " ").trim();
+  const cleaned = body
+    .replace(/This is an intermediary\/self-media lead; trace it to a primary source before treating it as a reported fact\.?/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const lead = cleaned && /[\p{Script=Han}]/u.test(cleaned)
+    ? cleaned.replace(/[。；;]\s*$/u, "")
+    : `${source} 记录了「${title}」这条中文媒体动态`;
+  return `${lead}。这条 RSS 适合观察国内 AI 产品、产业反馈和工程实践的讨论方向；读者若要引用事实、数据或公司动作，仍应点开原文并继续追溯一手来源核对。`;
+}
+
+function isChineseMediaRssItem(item = {}) {
+  const text = [
+    item.publisher,
+    item.source,
+    item.author,
+    item.source_id,
+    item.url
+  ].filter(Boolean).join(" ").toLowerCase();
+  return /qbitai|36kr|jiqizhixin|machine heart|infoq|leiphone|sspai|ithome|量子位|机器之心|雷峰网|少数派/.test(text);
 }
 
 function formatOfficialOrgUpdateCards(items, context = {}) {

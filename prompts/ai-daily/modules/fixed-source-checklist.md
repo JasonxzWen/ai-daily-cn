@@ -2,21 +2,21 @@
 
 Every daily run must check and audit this user-requested source surface, using `config/sources/*.json`, dedicated discovery commands, or a documented equivalent feed endpoint:
 
-- Open-source aggregators: `follow-builders`, `ML Papers of the Week`, `HelloGitHub`, `RuanYF Weekly`.
+- Open-source aggregators: `follow-builders`, `ML Papers of the Week`.
 - Official lab/company sources: `OpenAI Blog RSS`, `OpenAI News RSS`, `Google DeepMind RSS`, `Google Research Blog`, `Meta AI RSS` or `Meta AI Blog`, `Microsoft Research Blog`, `AWS Machine Learning Blog`, `Anthropic News`, `Hugging Face Blog`.
 - International tech media: `TechCrunch AI`, `The Verge`, `MIT Technology Review`, `Ars Technica`, `VentureBeat AI`, `HNRSS Frontpage`.
 - Chinese AI/tech media leads: `Jiqizhixin`, `QbitAI`, `36Kr`, `InfoQ CN`; keep them as intermediary leads until traced to primary sources.
-- Public APIs and paper/community sources: `arXiv cs.AI`, `Hacker News Topstories API`, `Hugging Face Daily Papers`, `Papers with Code API`, `Reddit r/MachineLearning`, `GitHub Trending`.
-- High-quality AI aggregators/newsletters: `Smol AI News`, `AI News Archive`, `Latent.Space`, `Ben's Bites`.
+- Public APIs and paper/community sources: `arXiv cs.AI`, `arXiv cs.CL`, `arXiv cs.LG`, `arXiv cs.MA`, `arXiv stat.ML`, `Hacker News Topstories API`, `Hugging Face Daily Papers`, `GitHub Trending`.
+- High-quality AI aggregators/newsletters: `Smol AI News`, `Latent.Space`, `Ben's Bites`.
 
 Map selected items into these six public-topic buckets before rendering:
 
 - Big-company moves: OpenAI, Google, Meta, Anthropic, Microsoft, ByteDance, Alibaba, Tencent, and comparable platform/lab updates.
-- Models and papers: real model releases, model-card updates, SOTA results, and notable arXiv/HF/Papers with Code items.
+- Models and papers: real model releases, model-card updates, SOTA results, and notable arXiv/Hugging Face paper items.
 - Products and tools: new AI products, Product Hunt candidates, Hugging Face Spaces/models, and developer tools.
 - Industry and funding: financing, M&A, IPO, regulation, creator-economy, AIGC/content-industry, and platform policy moves.
-- Open-source projects: GitHub Trending, HelloGitHub, and other runnable repositories with recent activity.
-- Opinions and long-form reads: Latent.Space, AI News, Smol AI News, Ben's Bites, a16z-style long reads, podcasts, and high-signal builder commentary.
+- Open-source projects: GitHub Trending and other runnable repositories with recent activity.
+- Opinions and long-form reads: Latent.Space, Smol AI News, Ben's Bites, podcasts, and high-signal builder commentary.
 
 Same-event multi-source reports must be merged. T3, intermediary, community, and aggregator items must not enter factual sections without primary-source or multi-source confirmation.
 

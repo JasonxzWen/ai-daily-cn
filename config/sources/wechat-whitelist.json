@@ -17,42 +17,6 @@
       "source_level": "wechat_industry_whitelist",
       "allowed_low_risk_sections": ["community_leads", "main_items"],
       "notes": "Manual entrypoint for user-approved WeChat public-account industry dynamics. High-stakes facts still require primary or multi-source verification."
-    },
-    {
-      "id": "wechat-rsshub-newrank-template",
-      "name": "RSSHub NewRank WeChat Route",
-      "url": "https://rsshub.example.invalid/newrank/wechat/example",
-      "source_kind": "rsshub",
-      "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "aggregator",
-      "enablement": "manual",
-      "verification_policy": "primary_required",
-      "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000,
-      "source_level": "wechat_industry_whitelist",
-      "base_url_env": "AI_DAILY_RSSHUB_BASE_URL",
-      "route_path": "/newrank/wechat/example",
-      "required_env": ["NEWRANK_COOKIE"],
-      "notes": "Optional self-hosted RSSHub NewRank route. Requires AI_DAILY_RSSHUB_BASE_URL and NEWRANK_COOKIE; missing config is recorded as skipped, not as a publish blocker."
-    },
-    {
-      "id": "wechat-wechat2rss-feed",
-      "name": "Wechat2RSS Private Feed",
-      "url": "https://wechat2rss.example.invalid/feed.xml",
-      "source_kind": "aggregator",
-      "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "aggregator",
-      "enablement": "manual",
-      "verification_policy": "primary_required",
-      "requires_original_url": false,
-      "max_items_per_run": 5,
-      "timeout_ms": 15000,
-      "source_level": "wechat_industry_whitelist",
-      "url_env": "AI_DAILY_WECHAT2RSS_FEED_URL",
-      "notes": "Optional private Wechat2RSS normalized feed. The real feed URL must come from AI_DAILY_WECHAT2RSS_FEED_URL and is never written to public source_audit."
     }
   ]
 }

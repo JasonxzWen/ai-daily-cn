@@ -36,7 +36,7 @@ const REQUIRED_AUDIT_GROUPS = [
   "content_sources",
   "search_sources",
   "sources_health",
-  ...PLATFORM_AUDIT_GROUPS
+  ...PLATFORM_AUDIT_GROUPS.filter((groupName) => groupName !== "reddit_sources")
 ];
 const DEGRADED_DISCOVERY_INPUT_FALLBACKS = [
   {
@@ -103,14 +103,6 @@ const DEGRADED_DISCOVERY_INPUT_FALLBACKS = [
     sourceUrl: "https://www.zhihu.com/",
     sourceCategory: "community",
     platform: "zhihu"
-  },
-  {
-    pattern: /^reddit-platform-\d{4}-\d{2}-\d{2}\.json$/i,
-    auditGroup: "reddit_sources",
-    sourceName: "Reddit platform discovery",
-    sourceUrl: "https://www.reddit.com/r/MachineLearning/",
-    sourceCategory: "community",
-    platform: "reddit"
   },
   {
     pattern: /^sources-health-\d{4}-\d{2}-\d{2}\.json$/i,
@@ -200,7 +192,6 @@ const MAIN_STREAM_SOURCE_IMPACT_GROUPS = [
   "search_sources",
   "wechat_sources",
   "zhihu_sources",
-  "reddit_sources",
   "sources_health"
 ];
 const STORY_TARGET_MIN = 1;
@@ -2298,7 +2289,7 @@ const DAILY_TRACKERS = [
     id: "swe-bench-pro-public",
     name: "SWE-bench Pro",
     source: "Scale Labs SWE-Bench Pro",
-    url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
+    url: "https://scaleapi.github.io/SWE-bench_Pro-os/",
     category: "coding_benchmark",
     importance: "major",
     summary: "关注 coding agent 在长周期真实工程任务上的 Resolve Rate；它比短题 benchmark 更接近修 bug、跨文件修改和测试通过能力。",
@@ -2384,7 +2375,7 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       watchNext: "若榜首或 Top 10 构成变化，继续核对分项 benchmark、价格、延迟和自有 workload 复测结果。"
     };
   }
-  if (tracker.id === "swe-bench-pro-public" && isCompleteSweBenchProSnapshot(snapshot) && !hasOfficialComponentSnapshot(snapshot)) {
+  if (tracker.id === "swe-bench-pro-public" && isUsableSweBenchProSnapshot(snapshot) && !hasOfficialComponentSnapshot(snapshot)) {
     return {
       status: "blocked",
       verificationStatus: "unverified",
@@ -2396,7 +2387,7 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       watchNext: "下次抓取若恢复官方 snapshot，再展示榜单组件；本轮以官方入口人工核对为准。"
     };
   }
-  if (tracker.id === "swe-bench-pro-public" && isCompleteSweBenchProSnapshot(snapshot)) {
+  if (tracker.id === "swe-bench-pro-public" && isUsableSweBenchProSnapshot(snapshot)) {
     return {
       status: source.status,
       verificationStatus: "primary_confirmed",
@@ -2455,7 +2446,7 @@ function isCompleteDailyTrackingSnapshotForTracker(snapshot, tracker) {
     return isCompleteArtificialAnalysisSnapshot(snapshot);
   }
   if (tracker.id === "swe-bench-pro-public") {
-    return isCompleteSweBenchProSnapshot(snapshot);
+    return isUsableSweBenchProSnapshot(snapshot);
   }
   return false;
 }
@@ -2478,6 +2469,13 @@ function isCompleteSweBenchProSnapshot(snapshot) {
   return snapshot?.snapshot_status === "complete" &&
     Array.isArray(snapshot.top_entries) &&
     snapshot.top_entries.length === 10 &&
+    snapshot.top_entries.every((entry, index) => entry.rank === index + 1 && entry.model && entry.provider && /\d+(?:\.\d+)?/.test(entry.tokens || "") && entry.change);
+}
+
+function isUsableSweBenchProSnapshot(snapshot) {
+  return (snapshot?.snapshot_status === "complete" || snapshot?.snapshot_status === "partial") &&
+    Array.isArray(snapshot.top_entries) &&
+    snapshot.top_entries.length > 0 &&
     snapshot.top_entries.every((entry, index) => entry.rank === index + 1 && entry.model && entry.provider && /\d+(?:\.\d+)?/.test(entry.tokens || "") && entry.change);
 }
 
@@ -4645,9 +4643,6 @@ function isRepositoryLikeUrl(url) {
 function isBlogLikeCandidate(candidate) {
   const source = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`.toLowerCase();
   if (isRepositoryLikeUrl(candidate.url)) {
-    return false;
-  }
-  if (source.includes("hellogithub")) {
     return false;
   }
   if (candidate.category === "hot_blog") {

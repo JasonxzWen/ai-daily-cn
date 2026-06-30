@@ -76,13 +76,6 @@ const DISCOVERY_DEGRADE_FALLBACKS = {
     sourceCategory: "community",
     platform: "zhihu"
   },
-  discover_reddit_platform: {
-    auditGroup: "reddit_sources",
-    sourceName: "Reddit platform discovery",
-    sourceUrl: "https://www.reddit.com/r/MachineLearning/",
-    sourceCategory: "community",
-    platform: "reddit"
-  },
   sources_health: {
     auditGroup: "sources_health",
     sourceName: "Source health check",
@@ -832,7 +825,6 @@ function buildInitialWorkflowStages({ reportDate }) {
     tmp("search-news"),
     tmp("wechat-platform"),
     tmp("zhihu-platform"),
-    tmp("reddit-platform"),
     tmp("sources-health")
   ].join(",");
   const stages = [
@@ -931,15 +923,6 @@ function buildInitialWorkflowStages({ reportDate }) {
       "20",
       "--output",
       tmp("zhihu-platform")
-    ]),
-    nodeCliStage("discover_reddit_platform", [
-      "discover:reddit-platform",
-      "--date",
-      reportDate,
-      "--limit",
-      "20",
-      "--output",
-      tmp("reddit-platform")
     ]),
     nodeCliStage("sources_health", [
       "sources:health",

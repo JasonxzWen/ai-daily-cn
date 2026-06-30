@@ -27,7 +27,7 @@
    - 至少检查 OpenAI、Anthropic Engineering/News、GitHub Changelog、Google DeepMind/Research、Meta AI、Microsoft Research、Hugging Face Blog 中可访问的官方或工程博客源。
    - AI 日报不局限在狭义 AI：也要检查科技行业、大厂动态、平台政策、开发者生态、算力/芯片、云服务、产品分发和产业趋势。广义来源已注册为 `optional`，包括 TechCrunch AI/Enterprise、The Verge AI/main、Ars Technica、Product Hunt、Latent.Space、Interconnects、Planet AI 等。
    - 至少检查一个高质量博客/访谈聚合源，例如 Latent.Space、Interconnects、Planet AI、Product Hunt、TechCrunch AI、The Verge AI 或 Follow AI Builders。
-   - 优先运行 `npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3`，默认检查 `core,optional` 官方/工程/研究源、广义科技/大厂来源、Runway/Pika/Luma/Kling/Adobe/Unity 等 AIGC 图片/视频/游戏创作产品源、Product Hunt 和聚合源。公众号/中文自媒体等 `manual` 来源必须显式加 `--enablement core,optional,manual` 或通过人工白名单录入。arXiv/Reddit 等易限流固定源成功抓取后可写入 `.tmp/source-cache`，后续 429/5xx/timeout 时使用未过期缓存并在 `source_audit` 标注 `cache_fallback_used`。`--per-source-limit` 用于避免单一大源挤掉其他来源。
+   - 优先运行 `npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3`，默认检查 `core,optional` 官方/工程/研究源、广义科技/大厂来源、AIGC 图片/视频/游戏创作产品源、Product Hunt 和聚合源。公众号/中文自媒体等 `manual` 来源必须显式加 `--enablement core,optional,manual` 或通过人工白名单录入。arXiv 等易限流固定源成功抓取后可写入 `.tmp/source-cache`，后续 429/5xx/timeout 时使用未过期缓存并在 `source_audit` 标注 `cache_fallback_used`。`--per-source-limit` 用于避免单一大源挤掉其他来源。
    - Product Hunt 和新产品榜单只产生候选；入选项目区前必须用官网、GitHub、文档或 README 交叉确认，并补充“领域”和“作用”。
    - Product Hunt 必须同时覆盖 developer-tools feed 和 Product Hunt Trending feed；Product Hunt 本身只证明“上榜/热度”，不证明产品事实。
    - 普通微信公众号、华尔街见闻、自媒体和中文科技媒体默认作为 `category:"intermediary"` 的中介发现源；入选事实性栏目之前，必须先追溯它们引用的一手来源。用户确认的公众号白名单可使用 `source_level:"wechat_primary_like"` 或 `source_level:"wechat_industry_whitelist"`，低风险行业动态可进入 `main_items`，但必须保留公众号名、发布时间、待核验点和风险等级。

@@ -21,7 +21,7 @@ HTML 要求：
 - AIGC 与内容产业、图片生成、视频生成、创作者工具和 AI 辅助游戏创作在有合格事实主体条目时渲染为现有一级 `AIGC 动态` 分组；只有中介线索或待核验时进入 `community_leads` 并披露核验边界。不要为了模仿外部日报新增静态空板块或手写 HTML 分区。
 - `model_releases` 不渲染成公开“模型发布”板块；相关新闻必须合入主体信息，`model_releases` 只作为结构化索引。
 - 热门博客公开卡片只展示 100-200 个中文字符的文章概括和来源，概括要说明核心问题、方法或论证、关键结论、适用场景或局限；不要渲染 `key_points`，也不要展示“为什么重要”、读者画像、后续跟进或风险模板字段。原文有能直接支撑判断的架构图、流程图、benchmark 或关键截图时，通过 `evidence_assets` 贴图；没有信息密度的封面/装饰图不贴。
-- 公共 HTML 必须保留“信源覆盖与缺口”摘要，尤其说明微信、知乎、Reddit/X、Builder、热门博客源本轮是否检查、是否 `no_signal`、是否因 kill switch、token、base URL 或人工输入缺失而跳过；但不得公开候选池、筛选分数、内部附录或发布调试日志。
+- 公共 HTML 必须保留“信源覆盖与缺口”摘要，尤其说明微信、知乎、X/Builder、热门博客源本轮是否检查、是否 `no_signal`、是否因 kill switch、token、base URL 或人工输入缺失而跳过；但不得公开候选池、筛选分数、内部附录或发布调试日志。
 - 正文证据图和热门博客/卡片图片必须可点开放大；来源 icon 只作为标识，不触发图片放大。
 - 榜单类公开内容优先渲染结构化表格，例如 OpenRouter / Artificial Analysis 的排名、模型、供应商、分数/token 和周变化；整页截图、浏览器截图或 viewport 截图不得作为公开正文主内容。真正网页内部图片资产只有在尺寸、语义和可读性合格时才展示；无图日报可以通过。
 - GitHub Trending 默认展示 weekly all-language 加 Python、TypeScript、Rust、Go、Java weekly Top10 合并去重后的 Top20，排名变化、重要级别和 star 变化必须做成不同颜色的 tag；README 拉取成功时 `description` 要充分概括 README，说明“是什么、解决什么问题、适合观察什么”，README 拉取失败时只展示排名、star、trend 并标注 `README拉取失败`。

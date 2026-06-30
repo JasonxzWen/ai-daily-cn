@@ -574,7 +574,7 @@ try {
   assert.match(await storyPanels.first().textContent(), /发生了什么|为什么值得看/);
   assert.equal(await page.locator('section[data-section-type="filterable-cards"]').count() > 0, true);
   assert.doesNotMatch(reportBody, /模型发布|ExampleModel 2|信源审计|自检与产物|发布质量说明|source_audit|self_check|candidate_id|quality_status|degraded_sections|remediation/);
-  assert.match(reportBody, /精选博客更新/);
+  assert.match(reportBody, /订阅 RSS/);
   assert.match(reportBody, /Harness Engineering for Long Running Agents/);
   assert.match(reportBody, /GitHub Trending/);
   assert.doesNotMatch(reportBody, /项目 highlight|项目 highlights|技不止术|热门技术博客|来源\s*第三方报道|第三方报道|这条动态主要围绕|完整列表|优先核对 README|进入 GitHub Trending Top 10|序号\s*1/);

@@ -116,7 +116,7 @@ const REQUIRED_SOURCE_FIRST_V2_HANDBOOK_PHRASES = [
   "Source-first runtime is internal governance by default",
   "Public daily pages remain story-first and exclude source runtime audit sections",
   "source signal story before source metrics dashboard in internal source-first runtime",
-  "154 collection entries are complete inventory rows, not public daily story content",
+  "144 collection entries are complete inventory rows, not public daily story content",
   "Story-centered content remains the fact carrier",
   "Promote a collection entry only when source governance should track it as a named source"
 ];

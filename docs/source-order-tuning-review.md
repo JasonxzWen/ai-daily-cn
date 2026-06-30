@@ -19,18 +19,18 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:81 -->
+<!-- order-tuning-total-unmapped:72 -->
 
-These counts come from the 154-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
+These counts come from the 144-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
 | `core_primary` | 3 | Phase 22 promotes the reviewed Apple, Meta Engineering, NVIDIA Developer, and xAI official sources; keep reviewing the remaining durable company/platform blogs. |
 | `china_models` | 20 | Phase 17 promotes the first five official China model sources; continue with platform/lab sources in later batches. |
-| `open_source_platforms` | 12 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
+| `open_source_platforms` | 9 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
 | `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
-| `builder_community` | 38 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
-| `platform_cn_media` | 6 | Promote stable Chinese media/platform clue sources after WeChat/Zhihu. |
+| `builder_community` | 33 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
+| `platform_cn_media` | 5 | Promote stable Chinese media/platform clue sources after WeChat/Zhihu. |
 | `english_media_search` | 2 | Keep most search/media aggregation low priority; Product Hunt can be promoted if product discovery remains useful. |
 
 ## Promotion Candidate Review
@@ -49,15 +49,15 @@ These candidates are proposed first-class logical sources. They are not merged i
 | `content-bytedance-seed-blog` | `bytedance-seed` | `china_models` | 70 | `promote` | ByteDance Seed is a distinct model/research source. |
 | `china-ai-baidu-ai-news` | `baidu-ai` | `china_models` | 80 | `promote` | Baidu AI remains a recurring Chinese model/platform signal. |
 | `content-alibaba-cloud-blog` | `alibaba-cloud-ai` | `china_models` | 90 | `promote` | Alibaba Cloud AI posts are useful platform signals next to Qwen. |
-| `content-arxiv-cs-ai` | `arxiv-cs-ai` | `open_source_platforms` | 30 | `promote` | arXiv cs.AI is a durable paper stream. |
-| `content-huggingface-daily-papers` | `huggingface-daily-papers` | `open_source_platforms` | 40 | `promote` | Hugging Face Daily Papers is a recognizable paper discovery surface. |
-| `content-papers-with-code-api` | `papers-with-code` | `open_source_platforms` | 50 | `promote` | Papers with Code is a structured model/paper ecosystem source. |
 | `content-builder-simon-willison` | `simon-willison` | `builder_community` | 30 | `promote` | Simon Willison is a high-signal builder/analyst source. |
 | `content-builder-lilian-weng` | `lilian-weng` | `builder_community` | 40 | `promote` | Lilian Weng is a high-signal technical explainer source. |
 | `content-latent-space` | `latent-space` | `builder_community` | 50 | `promote` | Latent Space is a recurring builder/research community source. |
 | `content-interconnects` | `interconnects` | `builder_community` | 60 | `promote` | Interconnects is a high-signal analysis source. |
-| `content-reddit-machinelearning` | `reddit-machinelearning` | `builder_community` | 70 | `promote` | r/MachineLearning is a broad community signal, below named expert sources. |
-| `platform-reddit-local-llama-feed` | `reddit-local-llama` | `builder_community` | 80 | `promote` | LocalLLaMA is a distinct open-model community signal. |
+| `content-nature-machine-learning` | `nature-machine-learning` | `builder_community` | 70 | `promote` | Nature Machine Learning can surface durable paper and research-context signals. |
+| `content-runway-changelog` | `runway-ai-products` | `builder_community` | 80 | `promote` | Runway product changes are useful AIGC workflow signals when dated and concrete. |
+| `content-luma-changelog` | `luma-ai-products` | `builder_community` | 90 | `promote` | Luma changelog entries can carry useful image/video generation product updates. |
+| `content-smol-ai-news` | `smol-ai-news` | `builder_community` | 100 | `promote` | Smol AI News is now the maintained AI News feed after the Buttondown migration. |
+| `content-bens-bites` | `bens-bites` | `builder_community` | 110 | `promote` | Ben's Bites remains a low-threshold AI product/newsletter discovery source. |
 | `intermediary-qbitai` | `qbitai` | `platform_cn_media` | 30 | `promote` | QbitAI is a stable Chinese AI media clue source. |
 | `intermediary-jiqizhixin` | `machine-heart` | `platform_cn_media` | 40 | `promote` | Machine Heart is a durable Chinese AI media source. |
 | `intermediary-infoq-cn` | `infoq-cn` | `platform_cn_media` | 50 | `promote` | InfoQ CN is useful for Chinese enterprise/engineering AI signals. |
