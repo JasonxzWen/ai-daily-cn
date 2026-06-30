@@ -95,7 +95,7 @@ export const CORE_SOURCE_CONTRACTS = [
     id: "deepseek-official",
     name: "DeepSeek Official",
     role: "china_model_official",
-    aliases: ["china-ai-deepseek-news", "deepseek news", "api-docs.deepseek.com/news"]
+    aliases: ["china-ai-deepseek-news", "deepseek news", "api-docs.deepseek.com/news", "api-docs.deepseek.com/updates"]
   },
   {
     id: "qwen-official",
@@ -160,16 +160,16 @@ export const CORE_SOURCE_CONTRACTS = [
     aliases: ["ml papers of the week", "dair-ai/ml-papers-of-the-week"]
   },
   {
-    id: "hellogithub",
-    name: "HelloGitHub",
-    role: "open_source_aggregator",
-    aliases: ["hellogithub", "521xueweihan/hellogithub"]
+    id: "arxiv-papers",
+    name: "arXiv AI Papers",
+    role: "paper_api",
+    aliases: ["content-arxiv-cs-ai", "content-arxiv-cs-cl", "content-arxiv-cs-lg", "content-arxiv-cs-ma", "content-arxiv-stat-ml", "arxiv cs.ai", "arxiv cs.cl", "arxiv cs.lg", "arxiv cs.ma", "arxiv stat.ml", "export.arxiv.org"]
   },
   {
-    id: "ruanyf-weekly",
-    name: "RuanYF Weekly",
-    role: "open_source_aggregator",
-    aliases: ["ruanyf weekly", "ruanyf/weekly", "阮一峰"]
+    id: "huggingface-daily-papers",
+    name: "Hugging Face Daily Papers",
+    role: "paper_api",
+    aliases: ["content-huggingface-daily-papers", "hugging face daily papers", "huggingface.co/api/daily_papers", "huggingface.co/papers"]
   },
   {
     id: "techcrunch-ai",
@@ -568,7 +568,7 @@ function inferSourceInventorySectionId(source = {}) {
   if (/wechat|zhihu|jike|qbitai|machine heart|jiqizhixin|sspai|36kr|infoq cn|newrank|weixin|mp\.weixin/.test(text)) {
     return "platform_cn_media";
   }
-  if (/github|huggingface|hugging face|arxiv|papers|open source|opensource|hellogithub|ruanyf|model card/.test(text)) {
+  if (/github|huggingface|hugging face|arxiv|papers|open source|opensource|model card/.test(text)) {
     return "open_source_platforms";
   }
   if (/follow-builders|hacker news|hnrss|reddit|x\/twitter|twitter|builder|community/.test(text)) {

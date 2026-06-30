@@ -71,9 +71,7 @@ const FIXED_SOURCE_REQUIREMENTS = [
     label: "A. open-source aggregators",
     sources: [
       { groups: ["builder_sources"], label: "follow-builders X feed", name: /follow-builders x feed/i, url: /zarazhangrui\/follow-builders/i },
-      { groups: ["content_sources"], label: "ML Papers of the Week", name: /ML Papers of the Week/i },
-      { groups: ["content_sources"], label: "HelloGitHub", name: /HelloGitHub/i },
-      { groups: ["content_sources"], label: "RuanYF Weekly", name: /RuanYF Weekly/i }
+      { groups: ["content_sources"], label: "ML Papers of the Week", name: /ML Papers of the Week/i }
     ]
   },
   {
@@ -118,10 +116,10 @@ const FIXED_SOURCE_REQUIREMENTS = [
     label: "E. public APIs and paper sources",
     sources: [
       { groups: ["content_sources"], label: "arXiv cs.AI", name: /arXiv cs\.AI/i },
+      { groups: ["content_sources"], label: "arXiv cs.CL", name: /arXiv cs\.CL/i },
+      { groups: ["content_sources"], label: "arXiv cs.LG", name: /arXiv cs\.LG/i },
       { groups: ["content_sources"], label: "Hacker News Topstories API", name: /Hacker News Topstories API/i },
       { groups: ["content_sources"], label: "Hugging Face Daily Papers", name: /Hugging Face Daily Papers/i },
-      { groups: ["content_sources"], label: "Papers with Code API", name: /Papers with Code API/i },
-      { groups: ["content_sources"], label: "Reddit r/MachineLearning", name: /Reddit r\/MachineLearning/i },
       { groups: ["github_trending"], label: "GitHub Trending daily", name: /GitHub Trending daily/i }
     ]
   },
@@ -130,7 +128,6 @@ const FIXED_SOURCE_REQUIREMENTS = [
     label: "F. high-quality AI aggregators",
     sources: [
       { groups: ["content_sources"], label: "Smol AI News", name: /Smol AI News/i },
-      { groups: ["content_sources"], label: "AI News Archive", name: /AI News Archive/i },
       { groups: ["content_sources"], label: "Latent.Space", name: /Latent\.Space/i },
       { groups: ["content_sources"], label: "Ben's Bites", name: /Ben's Bites/i }
     ]

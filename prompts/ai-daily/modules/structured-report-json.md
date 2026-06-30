@@ -53,7 +53,7 @@ npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 扩容逻辑栏目先映射到现有字段，不新增 schema：
 
 - AI 核心动态：高信号模型类重大变化必须作为主体新闻写入 `stories`，讲清楚能力、限制、可用性、成本或迁移影响；`model_releases` 仅作历史兼容字段，新草稿默认空数组，不生成公开栏目。平台、工程、算力、监管、企业采用和重大产品变化也写入 `stories`。
-- AIGC 与内容产业动态：覆盖图片生成、视频生成、创作者工具、AI 游戏资产/关卡/角色生成、Runway/Pika/Luma/Kling/Adobe/Unity 等公司产品动作；事实已回源时写入 `stories` 并使用 `editorial_category:"content_aigc"`，只有中介线索或待验证时写入 `community_leads`。
+- AIGC 与内容产业动态：覆盖图片生成、视频生成、创作者工具、AI 游戏资产/关卡/角色生成、Runway/Pika/Luma/Kling/Unity 等公司产品动作；事实已回源时写入 `stories` 并使用 `editorial_category:"content_aigc"`，只有中介线索或待验证时写入 `community_leads`。
 - 产品与融资雷达：产品写入 `projects` 或 `community_leads`；融资、估值、ARR、并购和 IPO 只有官方公告、投资方公告、监管文件或两个独立可信来源确认时，才可写入 `stories`。
 - 精选博客与播客：长摘要写入 `hot_blogs`；只有一个 builder 原始观点时写入 `builder_observations`；无 transcript 或无原始单集页时写入 `community_leads` 或丢弃。
 - X / 社区热点讨论：builder 原始帖写入 `builder_observations`；泛讨论写入 `community_leads`，并必须保留原始 X status URL。Builder 观点必须保留原文和完整中文翻译，不得写成概括。

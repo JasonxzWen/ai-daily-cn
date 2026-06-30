@@ -2,6 +2,12 @@ import { contentSourceRequestUrl, contentSourceSkipReason, createDiscoveryFetch,
 import { loadSourceRegistry, normalizeEnablements } from "./source-registry.js";
 import { isValidDateString } from "./time.js";
 
+const SOURCE_SPECIFIC_TRACKING_KINDS = new Set([
+  "openrouter_rankings_public_playwright",
+  "artificial_analysis_index_public_playwright",
+  "swe_bench_pro_public_playwright"
+]);
+
 export async function checkSourcesHealth(options = {}) {
   const reportDate = requireReportDate(options.reportDate);
   const fetchImpl = createDiscoveryFetch(options.fetchImpl || globalThis.fetch, options);
@@ -30,7 +36,7 @@ export async function checkSourcesHealth(options = {}) {
     }
 
     try {
-      const response = await fetchImpl(contentSourceRequestUrl(source), {
+      const response = await fetchImpl(contentSourceRequestUrl(source, options.env || process.env, reportDate), {
         headers: {
           accept: "application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
           "user-agent": "ai-daily-cn-static-publisher"
@@ -107,6 +113,16 @@ function skipReasonForSource(source) {
 
 function sourceSpecificHealthResult(source, text, httpStatus, reportDate) {
   const sourceKind = String(source?.source_kind || "").trim();
+  if (SOURCE_SPECIFIC_TRACKING_KINDS.has(sourceKind)) {
+    const reachable = String(text || "").trim().length > 0;
+    return healthResult(source, reachable ? "checked" : "no_signal", {
+      http_status: httpStatus,
+      feed_like: false,
+      recent_48h_entries: reachable ? 1 : 0,
+      notes: `source-specific tracking health; source_kind=${sourceKind}; reachable=${reachable}; feed_like=false`
+    });
+  }
+
   if (sourceKind === "github_report_markdown") {
     const recentHints = countRecentMarkdownHints(text, reportDate);
     const linkCount = markdownLinkCount(text);
@@ -126,6 +142,16 @@ function sourceSpecificHealthResult(source, text, httpStatus, reportDate) {
       feed_like: false,
       recent_48h_entries: recordCount,
       notes: `source-specific search_api health; api_records=${recordCount}`
+    });
+  }
+
+  if (sourceKind === "huggingface_daily_papers_api") {
+    const recordCount = jsonRecordCount(text);
+    return healthResult(source, recordCount > 0 ? "checked" : "no_signal", {
+      http_status: httpStatus,
+      feed_like: false,
+      recent_48h_entries: recordCount,
+      notes: `source-specific huggingface_daily_papers_api health; api_records=${recordCount}`
     });
   }
 

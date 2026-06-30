@@ -48,7 +48,7 @@ test("individual-builder blog class is registered (catch-net for practitioner po
   }
 });
 
-test("handoff source plan registers official GitHub org feeds and RSSHub-ready platform routes", () => {
+test("handoff source plan registers official GitHub org feeds and removes placeholder platform routes", () => {
   const officialGithubOrgFeeds = [
     "content-github-openai-org",
     "content-github-anthropics-org",
@@ -66,17 +66,16 @@ test("handoff source plan registers official GitHub org feeds and RSSHub-ready p
     assert.equal(source.verification_policy, "primary_allowed", `${id} should be usable as primary evidence`);
   }
 
-  const rsshubRoutes = [
-    ["wechat-rsshub-newrank-template", "/newrank/wechat/"],
-    ["platform-zhihu-rsshub-hotlist", "/zhihu/hotlist"],
-    ["platform-jike-rsshub-ai-topic", "/jike/"]
+  const removedPlaceholderRoutes = [
+    "wechat-rsshub-newrank-template",
+    "wechat-wechat2rss-feed",
+    "platform-wechat-ai-feed",
+    "platform-zhihu-rsshub-hotlist",
+    "platform-zhihu-ai-feed",
+    "platform-jike-rsshub-ai-topic",
+    "platform-reddit-local-llama-feed"
   ];
-  for (const [id, routePattern] of rsshubRoutes) {
-    const source = allById.get(id);
-    assert.ok(source, `${id} must be registered as an RSSHub-ready source`);
-    assert.equal(source.source_kind, "rsshub", `${id} must use the rsshub source kind`);
-    assert.equal(source.base_url_env, "AI_DAILY_RSSHUB_BASE_URL", `${id} must be gated by the shared RSSHub base URL`);
-    assert.ok(source.route_path.includes(routePattern), `${id} route_path should include ${routePattern}`);
-    assert.equal(source.enablement, "manual", `${id} must not run until explicitly configured`);
+  for (const id of removedPlaceholderRoutes) {
+    assert.equal(allById.has(id), false, `${id} should not remain registered as an inactive placeholder source`);
   }
 });

@@ -42,7 +42,7 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 | `china_models` | 20 | expanded | 中国模型厂商、平台和官方技术博客的预留主段 |
 | `open_source_platforms` | 30 | expanded | GitHub、Hugging Face、论文和开源生态 |
 | `tracking_metrics` | 40 | expanded | OpenRouter、Artificial Analysis、SWE-Bench 等持续指标 |
-| `builder_community` | 50 | collapsed | Builder、HN、Reddit、个人博客和社区原始信号 |
+| `builder_community` | 50 | collapsed | Builder、HN、个人博客和社区原始信号 |
 | `platform_cn_media` | 60 | expanded | WeChat、Zhihu、Jike、QbitAI、机器之心、36Kr、InfoQ CN 等中文平台与媒体线索 |
 | `english_media_search` | 70 | collapsed | 英文媒体、搜索和新闻聚合 |
 
@@ -82,9 +82,9 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 |---:|---|---|
 | 10 | `github-trending` | GitHub Trending，公开项目趋势入口 |
 | 20 | `github-org-watch` | GitHub 官方组织和仓库 watch |
+| 30 | `arxiv-papers` | arXiv AI/ML/CL paper API streams |
+| 40 | `huggingface-daily-papers` | Hugging Face Daily Papers API |
 | 80 | `ml-papers-week` | 长尾论文聚合，默认可折叠 |
-| 90 | `hellogithub` | 中文开源项目线索 |
-| 100 | `ruanyf-weekly` | 中文技术周刊线索 |
 
 ### `tracking_metrics`
 
@@ -168,7 +168,7 @@ Codex may propose the baseline placement, but the fixed importance order is user
 6. 判断是否是英文媒体或搜索聚合。是则进入 `english_media_search`。
 7. 选择 rank：优先使用相邻源之间的空位；没有空位时重排该 section，保持 10 点间隔。
 8. 在同一 PR 中补充测试，证明新 logical source 有 section、rank、display mode 和可推导状态。
-9. 若新增或移动底层采集入口，运行 `node scripts/generate-source-inventory-order.mjs` 刷新 `docs/source-inventory-order.md`，并用 `npm run sources:display-contract` 确认 154+ 全量入口参考表仍完整。
+9. 若新增或移动底层采集入口，运行 `node scripts/generate-source-inventory-order.mjs` 刷新 `docs/source-inventory-order.md`，并用 `npm run sources:display-contract` 确认 144+ 全量入口参考表仍完整。
 
 不要把 source `tier`、`authority`、当日候选数或当天是否阻塞作为 public display rank 的动态输入。它们可以影响采集和候选排序，但不能改变固定图谱顺序。
 
@@ -226,7 +226,7 @@ Logical sources are ordered by fixed editorial importance in `config/source-disp
 
 The Collection Entry Layer is the complete registered inventory. Collection entries are concrete feed, page, bridge, manual, API, or platform inputs. They are visible so blocked, skipped, unconfigured, manual, or no-update rows do not disappear from review.
 
-154 collection entries are complete inventory rows, not public daily story content. They remain grouped and expanded in fixed source sections inside the internal source-first runtime with non-hiding search/highlight behavior.
+144 collection entries are complete inventory rows, not public daily story content. They remain grouped and expanded in fixed source sections inside the internal source-first runtime with non-hiding search/highlight behavior.
 
 Internal source-first inventory rows project a runtime layer onto this fixed inventory: mapped collection entries inherit the daily `status_label` from their logical source; mapped entries whose logical source is missing from today's runtime table show `unreported`; unmapped entries show `collection_only`. The generated `docs/source-inventory-order.md` reference remains a static order and configuration review surface, so runtime status must never reorder it.
 
@@ -251,7 +251,7 @@ The source metrics dashboard has two required metric bands:
 - Logical-source operating cards keep the fixed reader-facing source graph visible: total logical sources, public included, updated but not selected, blocked, not configured or skipped, and low-signal sources.
 - Collection-entry runtime cards summarize the complete inventory before readers reach the long inventory: `INVENTORY_TOTAL`, `RUNTIME_KNOWN`, `INHERITED_RUNTIME`, `UNREPORTED_RUNTIME`, and `COLLECTION_ONLY`.
 
-These collection-entry metrics are internal coverage indicators. They are derived from the same 154-row inventory runtime projection used by the full inventory, but they do not replace the expanded `source-inventory-group-*` sections and must not reorder, hide, or filter any collection entry.
+These collection-entry metrics are internal coverage indicators. They are derived from the same 144-row inventory runtime projection used by the full inventory, but they do not replace the expanded `source-inventory-group-*` sections and must not reorder, hide, or filter any collection entry.
 
 The system operating dashboard is an internal metrics layer. It must show exactly five diagnostic cards: `公开内容规模`, `信号模块`, `趋势与追踪`, `信源覆盖`, and `运行质量`. The cards use tags `SYSTEM_CONTENT`, `SYSTEM_SIGNALS`, `SYSTEM_TRENDS`, `SYSTEM_SOURCES`, and `SYSTEM_QUALITY`. They may summarize public arrays and reader-safe quality status, but they must not be rendered into the public daily page by default.
 
@@ -325,7 +325,7 @@ Contract checks must reject:
 - a source metrics dashboard that omits full-inventory runtime metric cards for `INVENTORY_TOTAL`, `RUNTIME_KNOWN`, `INHERITED_RUNTIME`, `UNREPORTED_RUNTIME`, and `COLLECTION_ONLY`;
 - a public daily page that renders source-first runtime audit sections by default;
 - a missing logical source vs collection entry distinction;
-- documentation that treats the 154-entry inventory as first-viewport story content;
+- documentation that treats the 144-entry inventory as first-viewport story content;
 - runtime status being used to reorder fixed source rows.
 
 验收时必须确认：

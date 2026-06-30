@@ -746,11 +746,11 @@ function firstEnablement(args) {
 }
 
 function isPlatformDiscoverCommand(value) {
-  return /^discover:(wechat|zhihu|reddit)-platform$/.test(String(value || ""));
+  return /^discover:(wechat|zhihu)-platform$/.test(String(value || ""));
 }
 
 function platformDiscoverCommandPlatform(value) {
-  return String(value || "").match(/^discover:(wechat|zhihu|reddit)-platform$/)?.[1] || "";
+  return String(value || "").match(/^discover:(wechat|zhihu)-platform$/)?.[1] || "";
 }
 
 function firstJsonPath(args) {

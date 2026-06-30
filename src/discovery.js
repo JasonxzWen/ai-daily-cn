@@ -38,6 +38,7 @@ const OPENROUTER_RANKINGS_SOURCE_KIND = "openrouter_rankings_public_playwright";
 const ARTIFICIAL_ANALYSIS_INDEX_SOURCE_KIND = "artificial_analysis_index_public_playwright";
 const SWE_BENCH_PRO_PUBLIC_SOURCE_KIND = "swe_bench_pro_public_playwright";
 const GITHUB_REPORT_MARKDOWN_SOURCE_KIND = "github_report_markdown";
+const HUGGINGFACE_DAILY_PAPERS_API_SOURCE_KIND = "huggingface_daily_papers_api";
 const DEFAULT_X_BUILDER_SEARCH_TERMS = [
   "Claude Code",
   "coding agents",
@@ -197,28 +198,6 @@ export const DEFAULT_CONTENT_SOURCES = [
     sourceLevel: "weekly_paper_aggregator"
   },
   {
-    id: "content-hellogithub",
-    name: "HelloGitHub",
-    url: "https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/README.md",
-    category: "intermediary",
-    source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
-    latest_report_link_pattern: "/content/HelloGitHub\\d+\\.md",
-    lookback_days: 45,
-    maxItemsPerRun: 8,
-    sourceLevel: "open_source_aggregator"
-  },
-  {
-    id: "content-ruanyf-weekly",
-    name: "RuanYF Weekly",
-    url: "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
-    category: "intermediary",
-    source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
-    latest_report_link_pattern: "docs/issue-\\d+\\.md",
-    lookback_days: 14,
-    maxItemsPerRun: 8,
-    sourceLevel: "tech_weekly_aggregator"
-  },
-  {
     id: "content-google-keyword",
     name: "Google Keyword Blog",
     url: "https://blog.google/rss/"
@@ -358,6 +337,35 @@ export const DEFAULT_CONTENT_SOURCES = [
     id: "content-arxiv-cs-ai",
     name: "arXiv cs.AI",
     url: "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
+    source_kind: "rss",
+    sourceLevel: "paper_api"
+  },
+  {
+    id: "content-arxiv-cs-cl",
+    name: "arXiv cs.CL",
+    url: "http://export.arxiv.org/api/query?search_query=cat:cs.CL&sortBy=submittedDate&sortOrder=descending&max_results=20",
+    source_kind: "rss",
+    sourceLevel: "paper_api"
+  },
+  {
+    id: "content-arxiv-cs-lg",
+    name: "arXiv cs.LG",
+    url: "http://export.arxiv.org/api/query?search_query=cat:cs.LG&sortBy=submittedDate&sortOrder=descending&max_results=20",
+    source_kind: "rss",
+    sourceLevel: "paper_api"
+  },
+  {
+    id: "content-arxiv-cs-ma",
+    name: "arXiv cs.MA",
+    url: "http://export.arxiv.org/api/query?search_query=cat:cs.MA&sortBy=submittedDate&sortOrder=descending&max_results=20",
+    source_kind: "rss",
+    sourceLevel: "paper_api"
+  },
+  {
+    id: "content-arxiv-stat-ml",
+    name: "arXiv stat.ML",
+    url: "http://export.arxiv.org/api/query?search_query=cat:stat.ML&sortBy=submittedDate&sortOrder=descending&max_results=20",
+    source_kind: "rss",
     sourceLevel: "paper_api"
   },
   {
@@ -370,46 +378,26 @@ export const DEFAULT_CONTENT_SOURCES = [
   {
     id: "content-huggingface-daily-papers",
     name: "Hugging Face Daily Papers",
-    url: "https://huggingface.co/papers",
-    format: "html_index",
-    linkPattern: "/papers/",
-    category: "intermediary",
-    sourceLevel: "paper_aggregator"
-  },
-  {
-    id: "content-papers-with-code-api",
-    name: "Papers with Code API",
-    url: "https://paperswithcode.com/api/v1/",
+    url: "https://huggingface.co/api/daily_papers?date={YYYY-MM-DD}",
+    source_kind: HUGGINGFACE_DAILY_PAPERS_API_SOURCE_KIND,
     category: "intermediary",
     sourceLevel: "paper_api"
-  },
-  {
-    id: "content-reddit-machinelearning",
-    name: "Reddit r/MachineLearning",
-    url: "https://www.reddit.com/r/MachineLearning/.json",
-    category: "intermediary",
-    sourceLevel: "community_api"
   },
   {
     id: "content-smol-ai-news",
     name: "Smol AI News",
     url: "https://news.smol.ai/rss.xml",
     category: "intermediary",
-    sourceLevel: "ai_news_aggregator"
-  },
-  {
-    id: "content-ai-news-buttondown",
-    name: "AI News Archive",
-    url: "https://buttondown.com/ainews/rss",
-    category: "intermediary",
-    sourceLevel: "ai_news_aggregator"
+    sourceLevel: "ai_news_aggregator",
+    lookback_days: 7
   },
   {
     id: "content-bens-bites",
     name: "Ben's Bites",
     url: "https://bensbites.com/feed",
     category: "intermediary",
-    sourceLevel: "ai_news_aggregator"
+    sourceLevel: "ai_news_aggregator",
+    lookback_days: 7
   },
   {
     id: "content-interconnects",
@@ -422,14 +410,6 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://themagnifier.ai/",
     format: "html_index",
     linkPattern: "https://themagnifier.ai/",
-    sourceLevel: "aigc_content_industry"
-  },
-  {
-    id: "content-fastcompany-creator-economy",
-    name: "Fast Company Creator Economy",
-    url: "https://www.fastcompany.com/section/creator-economy",
-    format: "html_index",
-    linkPattern: "/section/creator-economy",
     sourceLevel: "aigc_content_industry"
   },
   {
@@ -1691,7 +1671,7 @@ export async function collectContentSources(options = {}) {
     }
 
     try {
-      const response = await fetchImpl(contentSourceRequestUrl(currentSource, options.env || process.env), {
+      const response = await fetchImpl(contentSourceRequestUrl(currentSource, options.env || process.env, reportDate), {
         headers: {
           accept: "application/json, application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
           "user-agent": "ai-daily-cn-static-publisher"
@@ -3247,6 +3227,9 @@ function parseContentSourceEntries(content, sourceInfo) {
   if (sourceInfo.source_kind === GITHUB_REPORT_MARKDOWN_SOURCE_KIND) {
     return parseGitHubReportMarkdownEntries(content, sourceInfo);
   }
+  if (sourceInfo.source_kind === HUGGINGFACE_DAILY_PAPERS_API_SOURCE_KIND && looksLikeJson(content)) {
+    return parseHuggingFaceDailyPapersEntries(content, sourceInfo);
+  }
   if (sourceInfo.source_kind === "search_api" && looksLikeJson(content)) {
     return parseJsonSearchApiEntries(content, sourceInfo);
   }
@@ -3476,10 +3459,6 @@ function resolveGitHubReportEntryUrl(href, baseUrl) {
   }
   try {
     const url = new URL(rawHref, baseUrl);
-    if (url.hostname === "hellogithub.com" && url.pathname.includes("/periodical/statistics/click")) {
-      const target = url.searchParams.get("target");
-      return target ? new URL(target).toString() : url.toString();
-    }
     if (url.hostname === "github.com" && /\/blob\//.test(url.pathname)) {
       const [, owner, repo, , ref, ...parts] = url.pathname.split("/");
       return `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${parts.join("/")}${url.hash}`;
@@ -3983,10 +3962,12 @@ async function collectSweBenchProSource(sourceInfo, options = {}) {
       officialComponentSnapshot: pageSnapshot.official_component_snapshot
     });
     const complete = snapshot.snapshot_status === "complete";
-    if (complete) {
+    if (snapshot.top_entries.length > 0) {
       return {
         status: "checked",
-        notes: `public_page_snapshot; ${snapshot.top_entries.length} rows parsed; collection_method=playwright_dom`,
+        notes: complete
+          ? `public_page_snapshot; ${snapshot.top_entries.length} rows parsed; collection_method=playwright_dom`
+          : `public_page_snapshot; ${snapshot.top_entries.length} rows parsed; snapshot_status=partial; collection_method=playwright_dom`,
         snapshot,
         evidence_assets: pageSnapshot.evidence_assets || []
       };
@@ -4009,7 +3990,7 @@ async function readSweBenchProPageSnapshot(sourceInfo, options = {}) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     await page.goto(sourceInfo.url, { waitUntil: "networkidle", timeout: timeoutMs });
     await page.waitForTimeout(Math.min(2000, Math.max(500, Math.floor(timeoutMs / 10))));
-    const text = await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
+    let text = await page.locator("body").innerText({ timeout: Math.min(10000, timeoutMs) });
     const official_component_snapshot = await captureOfficialComponentSnapshot(page, sourceInfo, {
       componentKind: "swe_bench_pro",
       selectorVersion: "swe-bench-pro-v1",
@@ -4023,6 +4004,12 @@ async function readSweBenchProPageSnapshot(sourceInfo, options = {}) {
         "table"
       ]
     });
+    if (parseSweBenchProText(text).length === 0) {
+      const htmlText = await readSweBenchProRawHtmlText(sourceInfo, timeoutMs);
+      if (parseSweBenchProText(htmlText).length > 0) {
+        text = htmlText;
+      }
+    }
     const evidence_assets = await captureDailyTrackingPageEvidence({
       page,
       sourceInfo,
@@ -4034,6 +4021,27 @@ async function readSweBenchProPageSnapshot(sourceInfo, options = {}) {
     return { text, official_component_snapshot, evidence_assets };
   } finally {
     await browser.close();
+  }
+}
+
+async function readSweBenchProRawHtmlText(sourceInfo, timeoutMs) {
+  if (typeof globalThis.fetch !== "function") {
+    return "";
+  }
+  try {
+    const response = await globalThis.fetch(sourceInfo.url, {
+      headers: {
+        accept: "text/html,application/xhtml+xml,*/*",
+        "user-agent": "ai-daily-cn-static-publisher"
+      },
+      ...timeoutInit(timeoutMs)
+    });
+    if (!response.ok) {
+      return "";
+    }
+    return response.text();
+  } catch {
+    return "";
   }
 }
 
@@ -4776,17 +4784,25 @@ export function contentSourceSkipReason(sourceInfo, env = process.env) {
   return "";
 }
 
-export function contentSourceRequestUrl(sourceInfo, env = process.env) {
+export function contentSourceRequestUrl(sourceInfo, env = process.env, reportDate = "") {
   if (sourceInfo.url_env && env[sourceInfo.url_env]) {
-    return env[sourceInfo.url_env];
+    return resolveSourceUrlPlaceholders(env[sourceInfo.url_env], reportDate);
   }
   if ((sourceInfo.source_kind === "rsshub" || sourceInfo.source_kind === "rss_bridge") && sourceInfo.base_url_env && env[sourceInfo.base_url_env] && sourceInfo.route_path) {
-    return new URL(sourceInfo.route_path, withTrailingSlash(env[sourceInfo.base_url_env])).toString();
+    return resolveSourceUrlPlaceholders(new URL(sourceInfo.route_path, withTrailingSlash(env[sourceInfo.base_url_env])).toString(), reportDate);
   }
-  if (sourceInfo.id === "content-papers-with-code-api" && /\/api\/v1\/?$/i.test(sourceInfo.url || "")) {
-    return `${String(sourceInfo.url).replace(/\/?$/, "/")}papers/`;
+  return resolveSourceUrlPlaceholders(sourceInfo.url, reportDate);
+}
+
+function resolveSourceUrlPlaceholders(value, reportDate = "") {
+  const url = String(value || "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(reportDate || "")) {
+    return url;
   }
-  return sourceInfo.url;
+  const compact = reportDate.replace(/-/g, "");
+  return url
+    .replace(/\{YYYY-MM-DD\}|\{date\}|\{REPORT_DATE\}/g, reportDate)
+    .replace(/\{YYYYMMDD\}/g, compact);
 }
 
 async function writeContentSourceCache({ rootDir, sourceInfo, content, fetchedAt, enabled }) {
@@ -4903,6 +4919,80 @@ function parseJsonSearchApiEntries(content, sourceInfo) {
     : arrayFromPossibleKeys(payload, ["results", "data", "items", "papers", "posts", "children"]);
 
   return items.map((item) => normalizeJsonApiEntry(item, sourceInfo)).filter((entry) => entry.title && entry.url);
+}
+
+function parseHuggingFaceDailyPapersEntries(content, sourceInfo) {
+  let payload;
+  try {
+    payload = JSON.parse(content);
+  } catch {
+    return [];
+  }
+
+  return arrayFromPossibleKeys(payload, ["results", "data", "items", "papers", "dailyPapers", "daily_papers"])
+    .map((item) => normalizeHuggingFaceDailyPaperEntry(item, sourceInfo))
+    .filter((entry) => entry.title && entry.url);
+}
+
+function normalizeHuggingFaceDailyPaperEntry(rawItem, sourceInfo = {}) {
+  const item = rawItem?.data && !rawItem.title ? rawItem.data : rawItem;
+  if (!item || typeof item !== "object") {
+    return {};
+  }
+  const paper = item.paper && typeof item.paper === "object" ? item.paper : {};
+  const paperId = firstString(paper.id, item.paper_id, item.paperId, item.id);
+  const paperUrl = paperId ? `https://huggingface.co/papers/${paperId}` : "";
+  const url = absoluteUrl(
+    firstString(item.url_abs, item.html_url, item.url, paper.url, item.paper_url, item.paperUrl, paperUrl),
+    sourceInfo.url || "https://huggingface.co"
+  );
+  const authors = normalizeHuggingFaceAuthors(paper.authors || item.authors);
+  const comments = Number.isFinite(Number(item.numComments ?? item.num_comments ?? item.comments))
+    ? Number(item.numComments ?? item.num_comments ?? item.comments)
+    : null;
+  const summary = huggingFaceDailyPaperSummary(
+    firstString(item.summary, paper.summary, item.abstract, paper.abstract, item.description),
+    authors,
+    comments
+  );
+
+  return {
+    title: cleanText(firstString(item.title, paper.title, item.name, paper.name)),
+    url,
+    event_date: jsonDateOnly(firstString(item.publishedAt, item.published_at, item.date, paper.publishedAt, paper.published_at)),
+    summary,
+    links: unique([
+      absoluteUrl(firstString(paper.url, item.paper_url, item.paperUrl), sourceInfo.url || "https://huggingface.co"),
+      paperId && /^\d{4}\.\d{4,5}/.test(paperId) ? `https://arxiv.org/abs/${paperId}` : ""
+    ].filter(Boolean)),
+    paper_id: paperId,
+    authors,
+    comments,
+    source_level: "paper_api"
+  };
+}
+
+function normalizeHuggingFaceAuthors(value) {
+  const list = Array.isArray(value) ? value : [];
+  return list
+    .map((author) => cleanText(firstString(author?.name, author?.username, author?.fullname, author)))
+    .filter(Boolean)
+    .slice(0, 5);
+}
+
+function huggingFaceDailyPaperSummary(summary, authors, comments) {
+  const parts = [];
+  if (authors.length > 0) {
+    parts.push(`Authors: ${authors.join(", ")}.`);
+  }
+  if (comments !== null) {
+    parts.push(`${comments} comments.`);
+  }
+  const cleaned = cleanText(summary);
+  if (cleaned) {
+    parts.push(cleaned);
+  }
+  return parts.join(" ");
 }
 
 function normalizeJsonApiEntry(rawItem, sourceInfo = {}) {
