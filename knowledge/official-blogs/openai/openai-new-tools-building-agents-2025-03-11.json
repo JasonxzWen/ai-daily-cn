@@ -1,0 +1,29 @@
+{
+  "id": "openai-new-tools-building-agents-2025-03-11",
+  "company": "openai",
+  "canonical_url": "https://openai.com/index/new-tools-for-building-agents/",
+  "published_at": "2025-03-11",
+  "title_original": "New tools for building agents",
+  "title_zh": "用于构建智能体的新工具",
+  "importance": "foundational",
+  "content_type": "product_practice",
+  "topics": ["agent", "responses_api", "tool_use", "workflow_orchestration"],
+  "admission": {
+    "decision": "include",
+    "rationale": "Introduces agent-building platform primitives and tool interfaces that affect how developers compose agent workflows.",
+    "matched_criteria": ["new_product", "agent_workflow", "engineering_practice"]
+  },
+  "summary_zh": "这篇文章适合作为 OpenAI agent 平台化路线的基础节点：它把模型调用、工具使用、响应编排和开发者接口放进同一套构建语境，后续涉及 Responses API、Agent SDK 或工具链封装的日报都可以反向引用。",
+  "key_ideas": [
+    "agent 不只是模型能力，还需要统一的工具接口和执行编排入口。",
+    "平台原语会改变应用层对搜索、文件、计算机使用和工具调用的组织方式。",
+    "日报中出现新的 agent 产品或 SDK 时，应判断它是能力更新还是工作流抽象更新。"
+  ],
+  "practice_checklist": [
+    "把模型响应、工具调用和状态管理作为同一条执行链设计。",
+    "为每个工具定义权限、输入输出 schema 和失败恢复路径。",
+    "在引入 agent SDK 前先明确哪些步骤需要模型决策，哪些步骤应保持确定性。"
+  ],
+  "related_blog_ids": ["openai-structured-outputs-2024-08-06"],
+  "related_report_dates": []
+}

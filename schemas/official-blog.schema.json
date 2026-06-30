@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/official-blog.schema.json",
+  "title": "Official Blog Knowledge Index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "admission_policy", "companies", "topics", "stats", "records"],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "admission_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "include", "exclude", "review"],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "include": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "exclude": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "review": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "companies": {
+      "type": "array",
+      "items": {
+        "enum": ["anthropic", "openai"]
+      },
+      "uniqueItems": true
+    },
+    "topics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/topic_id"
+      },
+      "uniqueItems": true
+    },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total_records", "by_company", "by_importance"],
+      "properties": {
+        "total_records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_company": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "by_importance": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    }
+  },
+  "$defs": {
+    "topic_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_:-]*$"
+    },
+    "record_id": {
+      "type": "string",
+      "pattern": "^(openai|anthropic)-[a-z0-9][a-z0-9-]*-[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "absolute_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "company",
+        "canonical_url",
+        "normalized_url",
+        "published_at",
+        "title_original",
+        "title_zh",
+        "importance",
+        "content_type",
+        "topics",
+        "admission",
+        "summary_zh",
+        "key_ideas",
+        "practice_checklist",
+        "related_blog_ids",
+        "related_report_dates"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/record_id"
+        },
+        "company": {
+          "enum": ["openai", "anthropic"]
+        },
+        "canonical_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "normalized_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "published_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "title_original": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title_zh": {
+          "type": "string",
+          "minLength": 1
+        },
+        "importance": {
+          "enum": ["foundational", "major", "notable", "reference"]
+        },
+        "content_type": {
+          "enum": [
+            "research",
+            "engineering_note",
+            "best_practice",
+            "product_practice",
+            "safety_policy",
+            "model_release_context"
+          ]
+        },
+        "topics": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/topic_id"
+          },
+          "uniqueItems": true
+        },
+        "admission": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["decision", "rationale", "matched_criteria"],
+          "properties": {
+            "decision": {
+              "const": "include"
+            },
+            "rationale": {
+              "type": "string",
+              "minLength": 1
+            },
+            "matched_criteria": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "enum": [
+                  "new_product",
+                  "new_model",
+                  "engineering_practice",
+                  "harness_engineering",
+                  "agent_workflow",
+                  "eval_methodology",
+                  "safety_engineering"
+                ]
+              },
+              "uniqueItems": true
+            }
+          }
+        },
+        "summary_zh": {
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 1200
+        },
+        "key_ideas": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 7,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "practice_checklist": {
+          "type": "array",
+          "maxItems": 7,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "related_blog_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/record_id"
+          },
+          "uniqueItems": true
+        },
+        "related_report_dates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

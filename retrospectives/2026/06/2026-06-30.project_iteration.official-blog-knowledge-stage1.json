@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.official-blog-knowledge-stage1",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Official blog knowledge stage 1",
+  "slug": "official-blog-knowledge-stage1",
+  "status": "completed",
+  "summary": "This iteration adds the data-layer MVP for a curated OpenAI and Anthropic official blog knowledge base. It defines the source-controlled record schema, loader, URL normalization, admission triage, six seed records, and regression coverage for the boundary between durable technical knowledge and ordinary company news.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/official-blog-knowledge.test.js",
+      "npm run test",
+      "node scripts/harness-validate.mjs",
+      "git diff --check",
+      "npm run validate",
+      "Stage 1 verification subagent Wegener: Pass",
+      "Stage 1 arbitration subagent Huygens: Approve"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Official company blogs need a durable-knowledge admission gate before they become reusable daily-report context.",
+      "evidence": "The stage 1 triage excludes ordinary partnership, customer adoption, funding, hiring, event, award, market, and sales announcements while admitting product, model, agent workflow, eval, MCP, tool-use, context-engineering, safety-engineering, and implementation-practice posts.",
+      "scope": "official_blog_admission",
+      "persistence": "implemented",
+      "recommended_action": "Keep future ingestion stages tied to the same include/exclude/review policy before exposing records on public index pages."
+    },
+    {
+      "lesson": "Customer stories with technical hints should be reviewed instead of admitted automatically.",
+      "evidence": "A regression test now proves that `How ExampleCorp uses Claude for support` with routing, permissions, evaluation harness, observability, and rollout controls returns `needs_review`, while a plain customer-use announcement returns `exclude`.",
+      "scope": "official_blog_triage",
+      "persistence": "implemented",
+      "recommended_action": "Use `needs_review` as the handoff point for later AI-assisted reading instead of treating customer-case wording as direct knowledge-base inclusion."
+    },
+    {
+      "lesson": "Knowledge records should store Chinese digests and reusable practice notes, not full translations.",
+      "evidence": "The schema and loader cap `summary_zh`, require concise `key_ideas` and `practice_checklist`, and reject source records whose summaries look like full-text translations.",
+      "scope": "official_blog_schema",
+      "persistence": "implemented",
+      "recommended_action": "Keep public knowledge pages summary-oriented and link back to canonical sources rather than copying full official posts."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The site had no structured, reusable layer for important OpenAI and Anthropic blog posts beyond daily-report mentions.",
+      "evidence": "Stage 1 adds `schemas/official-blog.schema.json`, `src/official-blog-knowledge.js`, six curated seed records, and tests wired into `npm run test`.",
+      "module": "schemas/official-blog.schema.json, src/official-blog-knowledge.js, knowledge/official-blogs/**, tests/official-blog-knowledge.test.js",
+      "suggestion": "Create a validated official-blog knowledge layer before adding index-page rendering or daily-report cross-linking.",
+      "expected_benefit": "Later stages can generate blog excerpt pages, daily-report links, and trend tracking from a stable contract instead of ad hoc article notes.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through schema, loader, admission policy, URL normalization, seed records, red/green tests, subagent verification, and arbitration.",
+      "ledger_links": [
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-official-org-updates-section",
+        "feedback/p1-editorial-importance-density-source-visibility",
+        "feedback/p1-prepublish-editorial-prune-gate"
+      ],
+      "validation_evidence": [
+        "official blog admission triage excludes ordinary customer use announcements",
+        "official blog admission triage sends technical customer use framing to review",
+        "repository seed knowledge includes curated OpenAI and Anthropic records",
+        "npm run validate"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-official-org-updates-section",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-prepublish-editorial-prune-gate",
+    "feedback/p1-ledger-validation-binding"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Stage 2 should add a generated index-page surface and daily-report cross-link metadata without changing the stage 1 admission contract.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Before automatic ingestion, add a second-stage AI reading prompt that classifies previews against this policy and sends technical customer stories to review.",
+      "owner": "project"
+    }
+  ]
+}

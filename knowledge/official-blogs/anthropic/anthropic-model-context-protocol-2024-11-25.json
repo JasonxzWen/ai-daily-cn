@@ -1,0 +1,29 @@
+{
+  "id": "anthropic-model-context-protocol-2024-11-25",
+  "company": "anthropic",
+  "canonical_url": "https://www.anthropic.com/news/model-context-protocol",
+  "published_at": "2024-11-25",
+  "title_original": "Introducing the Model Context Protocol",
+  "title_zh": "Anthropic 发布 Model Context Protocol",
+  "importance": "foundational",
+  "content_type": "engineering_note",
+  "topics": ["agent", "mcp", "tool_use", "context_engineering"],
+  "admission": {
+    "decision": "include",
+    "rationale": "Introduces MCP as an integration protocol for connecting models and agent systems to external tools and context sources.",
+    "matched_criteria": ["new_product", "engineering_practice", "agent_workflow"]
+  },
+  "summary_zh": "这篇文章是理解 MCP 生态的基础节点。它把模型上下文、外部工具和数据源连接抽象成协议问题，后续任何 MCP server、connector、agent toolchain 的新闻都可以用它解释底层动机。",
+  "key_ideas": [
+    "MCP 试图把模型与工具/数据源的连接从一次性集成变成协议化接口。",
+    "协议层价值在于复用权限、上下文注入和工具发现方式。",
+    "判断 MCP 项目价值时，应看它解决的真实上下文来源和权限边界。"
+  ],
+  "practice_checklist": [
+    "为 MCP server 明确数据范围、认证方式和最小权限。",
+    "把工具输出结构化，避免把长文本直接塞回上下文。",
+    "在 agent workflow 中记录每次外部上下文注入和工具调用证据。"
+  ],
+  "related_blog_ids": [],
+  "related_report_dates": []
+}

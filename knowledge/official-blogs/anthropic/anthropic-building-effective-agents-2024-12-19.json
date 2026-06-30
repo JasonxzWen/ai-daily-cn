@@ -1,0 +1,29 @@
+{
+  "id": "anthropic-building-effective-agents-2024-12-19",
+  "company": "anthropic",
+  "canonical_url": "https://www.anthropic.com/research/building-effective-agents",
+  "published_at": "2024-12-19",
+  "title_original": "Building effective agents",
+  "title_zh": "构建有效智能体",
+  "importance": "foundational",
+  "content_type": "best_practice",
+  "topics": ["agent", "evals", "harness_engineering", "workflow_orchestration"],
+  "admission": {
+    "decision": "include",
+    "rationale": "Provides reusable agent design patterns, eval framing, and workflow composition guidance rather than a company announcement.",
+    "matched_criteria": ["engineering_practice", "harness_engineering", "agent_workflow", "eval_methodology"]
+  },
+  "summary_zh": "这篇文章适合作为 agent 工程实践的长期基准：它强调先用简单工作流，再根据任务需要增加 agent 自主性、工具和评测闭环。后续多智能体、长任务和 harness 相关新闻都可以用它校准是否真正提升工程可控性。",
+  "key_ideas": [
+    "有效 agent 不等于最大自治度，很多任务应从确定性 workflow 开始。",
+    "工具、记忆、规划和多步骤执行都需要 eval 与可观测性支撑。",
+    "多智能体只有在分工、上下文隔离和结果合并明确时才值得引入。"
+  ],
+  "practice_checklist": [
+    "先实现可测的单路径 workflow，再增加模型决策点。",
+    "为每个 agent 步骤记录输入、工具调用、输出和失败恢复策略。",
+    "用任务级 eval 验证 agent 改动，而不是只看单轮回答质量。"
+  ],
+  "related_blog_ids": ["anthropic-model-context-protocol-2024-11-25"],
+  "related_report_dates": []
+}
