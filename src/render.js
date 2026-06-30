@@ -200,6 +200,68 @@ function indexStyleHref(styleVersion) {
   return version ? `assets/style.css?v=${encodeURIComponent(version)}` : "assets/style.css";
 }
 
+export function renderOfficialBlogsHtml(knowledge = {}, options = {}) {
+  const records = sortedOfficialBlogRecords(Array.isArray(knowledge.records) ? knowledge.records : []);
+  const recordById = new Map(records.map((record) => [record.id, record]));
+  const stats = knowledge.stats || {};
+  const byCompany = stats.by_company || {};
+  const topics = Array.isArray(knowledge.topics) ? knowledge.topics.slice(0, 18) : [];
+  const styleHref = String(options.styleHref || "../assets/style.css");
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>官方博客知识库 | AI 日报</title>
+  <link rel="stylesheet" href="${escapeAttribute(styleHref)}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="../index.html">AI 日报</a>
+    <span class="site-date">官方博客知识库</span>
+  </header>
+  <main class="report-shell index-page official-blog-page" data-index-style="effective-interact">
+    <section class="report-hero report-hero-index official-blog-page-hero" id="official-blog-excerpts" aria-labelledby="official-blog-excerpts-title" data-section-type="knowledge">
+      <div class="title-row">
+        <div>
+          <p class="eyebrow">OpenAI / Anthropic</p>
+          <h1 class="report-title" id="official-blog-excerpts-title">官方博客节选</h1>
+        </div>
+        <span class="chip status-info">${escapeHtml(records.length)} 篇</span>
+      </div>
+      <p class="hero-summary-text">${escapeHtml(officialBlogCurationSummary(knowledge.curation_scope))}</p>
+      <div class="hero-stat-grid" aria-label="官方博客知识库统计">
+        ${renderConsoleStat("记录", stats.total_records ?? records.length, "official_blog_records")}
+        ${renderConsoleStat("OpenAI", byCompany.openai || 0, "official_blog_openai")}
+        ${renderConsoleStat("Anthropic", byCompany.anthropic || 0, "official_blog_anthropic")}
+        ${renderConsoleStat("主题", topics.length, "official_blog_topics")}
+      </div>
+      <nav class="artifact-links official-blog-page-actions" aria-label="官方博客知识库入口">
+        <a href="../index.html">返回首页</a>
+        <a href="../data/official-blogs.json">official-blogs.json</a>
+      </nav>
+    </section>
+    <section class="panel official-blog-topic-panel" aria-labelledby="official-blog-topic-title">
+      <div class="section-heading split-row">
+        <div>
+          <p class="eyebrow">主题索引</p>
+          <h2 id="official-blog-topic-title">长期跟踪主题</h2>
+        </div>
+        <span class="chip status-info">${escapeHtml(topics.length)} topics</span>
+      </div>
+      <div class="official-blog-topic-row" aria-label="官方博客主题">
+        ${topics.map((topic) => `<span class="tag tag-topic">${escapeHtml(topic)}</span>`).join("")}
+      </div>
+    </section>
+    <section class="official-blog-excerpt-grid" aria-label="官方博客节选列表">
+      ${records.map((record) => renderOfficialBlogExcerptCard(record, recordById)).join("\n")}
+    </section>
+  </main>
+</body>
+</html>
+`;
+}
+
 function renderIndexNav() {
   const links = [
     ["index-console", "总览"],
@@ -453,12 +515,7 @@ function renderOfficialBlogKnowledge(knowledge) {
   }
   const stats = knowledge.stats || {};
   const byCompany = stats.by_company || {};
-  const featured = [...records]
-    .sort((left, right) =>
-      officialBlogImportanceRank(right.importance) - officialBlogImportanceRank(left.importance) ||
-      String(right.published_at || "").localeCompare(String(left.published_at || ""))
-    )
-    .slice(0, 6);
+  const featured = sortedOfficialBlogRecords(records).slice(0, 6);
   const topics = (Array.isArray(knowledge.topics) ? knowledge.topics : [])
     .slice(0, 12);
   return `<section class="panel official-blog-knowledge" id="official-blog-knowledge" aria-labelledby="official-blog-knowledge-title" data-section-type="knowledge">
@@ -467,9 +524,12 @@ function renderOfficialBlogKnowledge(knowledge) {
           <p class="eyebrow">OpenAI / Anthropic</p>
           <h2 id="official-blog-knowledge-title">官方博客知识库</h2>
         </div>
-        <a class="chip status-info" href="data/official-blogs.json">official-blogs.json</a>
+        <span class="official-blog-actions">
+          <a class="chip status-info" href="official-blogs/">博客节选</a>
+          <a class="chip status-info" href="data/official-blogs.json">official-blogs.json</a>
+        </span>
       </div>
-      <p class="official-blog-summary">${escapeHtml(knowledge.curation_scope || "Curated official blog knowledge for durable product, model, and engineering practice references.")}</p>
+      <p class="official-blog-summary">${escapeHtml(officialBlogCurationSummary(knowledge.curation_scope))}</p>
       <div class="official-blog-stat-grid" aria-label="官方博客知识库统计">
         ${renderOfficialBlogStat("总记录", stats.total_records ?? records.length)}
         ${renderOfficialBlogStat("OpenAI", byCompany.openai || 0)}
@@ -483,6 +543,22 @@ function renderOfficialBlogKnowledge(knowledge) {
         ${featured.map(renderOfficialBlogCard).join("\n")}
       </div>
     </section>`;
+}
+
+function sortedOfficialBlogRecords(records) {
+  return [...records].sort((left, right) =>
+    officialBlogImportanceRank(right.importance) - officialBlogImportanceRank(left.importance) ||
+    String(right.published_at || "").localeCompare(String(left.published_at || "")) ||
+    String(left.id || "").localeCompare(String(right.id || ""))
+  );
+}
+
+function officialBlogCurationSummary(value) {
+  const text = String(value || "").trim();
+  if (!text || text === "Curated OpenAI and Anthropic official blogs with durable product, model, technical-practice, harness, agent workflow, eval, safety-engineering, or implementation knowledge value.") {
+    return "收录 OpenAI 与 Anthropic 官方博客中具有长期知识价值的产品、模型、技术实践、harness 工程、智能体工作流、评测、安全工程与工程落地内容。";
+  }
+  return text;
 }
 
 function renderOfficialBlogStat(label, value) {
@@ -513,6 +589,75 @@ function renderOfficialBlogCard(record) {
         <span>${escapeHtml(record.content_type || "")}</span>
       </div>
     </article>`;
+}
+
+function renderOfficialBlogExcerptCard(record, recordById) {
+  const title = record.title_zh || record.title_original || record.id;
+  const ideas = Array.isArray(record.key_ideas) ? record.key_ideas : [];
+  const practices = Array.isArray(record.practice_checklist) ? record.practice_checklist : [];
+  const topics = Array.isArray(record.topics) ? record.topics : [];
+  return `<article class="official-blog-card official-blog-excerpt-card" id="blog-${escapeAttribute(record.id || "")}" data-official-blog-excerpt-card="${escapeAttribute(record.id || "")}" data-official-blog-company="${escapeAttribute(record.company || "")}">
+      <div class="official-blog-card-head">
+        <span class="chip status-info official-blog-company">${escapeHtml(record.company_label || record.company || "")}</span>
+        <span class="chip official-blog-importance importance-${escapeAttribute(record.importance || "notable")}">${escapeHtml(officialBlogImportanceLabel(record.importance))}</span>
+        <span class="chip">${escapeHtml(record.content_type || "")}</span>
+      </div>
+      <h2><a href="${escapeAttribute(record.canonical_url || "#")}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a></h2>
+      <p class="official-blog-original">${escapeHtml(record.title_original || "")}</p>
+      <p>${escapeHtml(record.summary_zh || "")}</p>
+      ${renderOfficialBlogTextList("核心想法", ideas, "official-blog-ideas")}
+      ${renderOfficialBlogTextList("实践清单", practices, "official-blog-practices")}
+      <div class="official-blog-topic-row official-blog-card-topics">
+        ${topics.map((topic) => `<span class="tag">${escapeHtml(topic)}</span>`).join("")}
+      </div>
+      ${renderRelatedBlogLinks(record, recordById)}
+      ${renderRelatedReportLinks(record)}
+      <div class="item-meta">
+        <span>${escapeHtml(record.published_at || "")}</span>
+        <a href="${escapeAttribute(record.canonical_url || "#")}" target="_blank" rel="noopener noreferrer">阅读原文</a>
+      </div>
+    </article>`;
+}
+
+function renderOfficialBlogTextList(label, items, className) {
+  const list = Array.isArray(items) ? items.filter(Boolean) : [];
+  if (list.length === 0) {
+    return "";
+  }
+  return `<div class="${escapeAttribute(className)}">
+        <h3>${escapeHtml(label)}</h3>
+        <ul class="compact-list">
+          ${list.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </div>`;
+}
+
+function renderRelatedBlogLinks(record, recordById) {
+  const relatedIds = Array.isArray(record.related_blog_ids) ? record.related_blog_ids : [];
+  const links = relatedIds
+    .map((id) => recordById.get(id))
+    .filter(Boolean)
+    .map((related) => {
+      const title = related.title_zh || related.title_original || related.id;
+      return `<a class="tag" href="#blog-${escapeAttribute(related.id)}" data-related-blog-link="${escapeAttribute(related.id)}">${escapeHtml(title)}</a>`;
+    });
+  return `<div class="official-blog-related" data-related-blog-links="${escapeAttribute(record.id || "")}">
+      <span class="official-blog-related-label">相关博客</span>
+      ${links.length > 0 ? links.join("") : '<span class="muted">暂无关联博客</span>'}
+    </div>`;
+}
+
+function renderRelatedReportLinks(record) {
+  const dates = Array.isArray(record.related_report_dates) ? record.related_report_dates : [];
+  const links = dates.map((date) => {
+    const paths = reportRelativePaths(date);
+    const href = relativeAssetHref("official-blogs/index.html", paths.htmlPath);
+    return `<a class="tag" href="${escapeAttribute(href)}" data-related-report-link="${escapeAttribute(date)}">${escapeHtml(date)}</a>`;
+  });
+  return `<div class="official-blog-related" data-related-report-links="${escapeAttribute(record.id || "")}">
+      <span class="official-blog-related-label">相关日报</span>
+      ${links.length > 0 ? links.join("") : '<span class="muted">暂无关联日报</span>'}
+    </div>`;
 }
 
 function officialBlogImportanceRank(value) {
@@ -1637,6 +1782,31 @@ h3 {
   margin: 10px 0;
 }
 
+.official-blog-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: flex-end;
+}
+
+.official-blog-page {
+  gap: 16px;
+}
+
+.official-blog-page-actions {
+  margin-top: 16px;
+}
+
+.official-blog-topic-panel {
+  margin-top: 12px;
+}
+
+.official-blog-excerpt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
 .official-blog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -1659,6 +1829,16 @@ h3 {
   margin: 0;
   font-size: 1.02rem;
   line-height: 1.32;
+}
+
+.official-blog-excerpt-card h2 {
+  margin: 0;
+  font-size: 1.12rem;
+  line-height: 1.35;
+}
+
+.official-blog-excerpt-card h2 a {
+  color: var(--text);
 }
 
 .official-blog-card h3 a {
@@ -1686,8 +1866,34 @@ h3 {
   margin: 0;
 }
 
+.official-blog-ideas h3,
+.official-blog-practices h3 {
+  margin: 0 0 5px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.2;
+}
+
+.official-blog-practices {
+  margin: 0;
+}
+
 .official-blog-card-topics {
   margin: 0;
+}
+
+.official-blog-related {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+}
+
+.official-blog-related-label {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
 }
 
 .item,

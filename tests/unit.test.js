@@ -38,7 +38,7 @@ import {
 } from "../src/source-status-history.js";
 import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
 import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
-import { renderIndexHtml, renderReportHtml } from "../src/render.js";
+import { renderIndexHtml, renderOfficialBlogsHtml, renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { buildSourceInventoryRows } from "../src/source-effectiveness.js";
 import { generateReportDraft, canPromoteToBuilderObservation } from "../src/draft.js";
@@ -62,7 +62,7 @@ import {
 } from "../src/github-readme.js";
 import { selectChineseMediaDynamics } from "../src/chinese-media.js";
 import { officialOrgUpdateItem, selectOfficialOrgUpdates } from "../src/official-updates.js";
-import { loadOfficialBlogKnowledge } from "../src/official-blog-knowledge.js";
+import { loadOfficialBlogKnowledge, toPublicOfficialBlogKnowledge } from "../src/official-blog-knowledge.js";
 import { buildAutomationRevision } from "../src/automation-revision.js";
 import { inspectAutomationInventory } from "../src/automation-inventory.js";
 import {
@@ -10886,6 +10886,7 @@ test("official blog knowledge homepage renders curated blog graph entrypoint", a
   assert((html.match(/data-official-blog-card=/g) || []).length >= 6);
   assert(html.includes('data-official-blog-company="openai"'));
   assert(html.includes('data-official-blog-company="anthropic"'));
+  assert(html.includes('href="official-blogs/"'));
   assert(html.includes("Introducing Structured Outputs in the API"));
   assert(html.includes("Building effective agents"));
   const hrefs = new Set([...html.matchAll(/\shref="([^"]+)"/g)].map((match) => match[1]));
@@ -10896,7 +10897,38 @@ test("official blog knowledge homepage renders curated blog graph entrypoint", a
   assert(!html.includes("self_check"));
 });
 
-test("public official blog knowledge projection is generated and planned", async () => {
+test("official blog excerpt page renders reader safe graph links", async () => {
+  const rawKnowledge = await loadOfficialBlogKnowledge({ rootDir });
+  const officialBlogKnowledge = toPublicOfficialBlogKnowledge(rawKnowledge, { generatedAt: fixedGeneratedAt });
+
+  const html = renderOfficialBlogsHtml(officialBlogKnowledge, {
+    styleHref: "../assets/style.css"
+  });
+
+  assert(html.includes('id="official-blog-excerpts"'));
+  assert(html.includes('href="../index.html"'));
+  assert(html.includes('href="../data/official-blogs.json"'));
+  assert((html.match(/data-official-blog-excerpt-card=/g) || []).length >= 6);
+  assert((html.match(/data-related-report-links=/g) || []).length >= 6);
+  assert((html.match(/data-related-blog-link=/g) || []).length >= 4);
+  assert(html.includes('data-official-blog-company="openai"'));
+  assert(html.includes('data-official-blog-company="anthropic"'));
+  assert(html.includes("Introducing Structured Outputs in the API"));
+  assert(html.includes("Building effective agents"));
+  assert(html.includes("official-blog-practices"));
+  const hrefs = new Set([...html.matchAll(/\shref="([^"]+)"/g)].map((match) => match[1]));
+  assert(hrefs.has("https://openai.com/index/introducing-structured-outputs-in-the-api/"));
+  assert(hrefs.has("#blog-anthropic-model-context-protocol-2024-11-25"));
+  assert(hrefs.has("#blog-openai-new-tools-building-agents-2025-03-11"));
+  assert(!html.includes("admission"));
+  assert(!html.includes("admission_policy"));
+  assert(!html.includes("rationale"));
+  assert(!html.includes("source_audit"));
+  assert(!html.includes("self_check"));
+  assert(!html.includes("candidate_id"));
+});
+
+test("official blog knowledge generated file public projection is generated and planned", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-public-"));
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
@@ -10917,6 +10949,7 @@ test("public official blog knowledge projection is generated and planned", async
   });
 
   assert(result.writtenFiles.includes("data/official-blogs.json"));
+  assert(result.writtenFiles.includes("official-blogs/index.html"));
   assert.equal(result.officialBlogKnowledge.stats.total_records, 6);
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data", "official-blogs.json"), "utf8"));
   assert.equal(publicData.records.length, 6);
@@ -10932,6 +10965,13 @@ test("public official blog knowledge projection is generated and planned", async
   const html = await fs.readFile(path.join(outDir, "index.html"), "utf8");
   assert(html.includes('id="official-blog-knowledge"'));
   assert(html.includes('href="data/official-blogs.json"'));
+  assert(html.includes('href="official-blogs/"'));
+  const excerptHtml = await fs.readFile(path.join(outDir, "official-blogs", "index.html"), "utf8");
+  assert(excerptHtml.includes('id="official-blog-excerpts"'));
+  assert((excerptHtml.match(/data-official-blog-excerpt-card=/g) || []).length >= 6);
+  assert(!excerptHtml.includes("admission_policy"));
+  assert(!excerptHtml.includes("source_audit"));
+  assert(!excerptHtml.includes("self_check"));
 
   const generated = await planGeneratedFiles({
     rootDir: tmp,
@@ -10942,6 +10982,7 @@ test("public official blog knowledge projection is generated and planned", async
     generatedAt: fixedGeneratedAt
   });
   assert(generated.files.includes("data/official-blogs.json"));
+  assert(generated.files.includes("official-blogs/index.html"));
 });
 
 test("effective interact index style uses report primitives", async () => {
