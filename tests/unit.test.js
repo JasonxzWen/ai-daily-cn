@@ -6148,6 +6148,142 @@ test("official blog parse-feed CLI refuses public output paths", async () => {
   );
 });
 
+test("official blog author records CLI writes curated records and clean summary JSON", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-author-records-"));
+  const inputPath = path.join(tmp, "reviewed-official-blogs.json");
+  const outputDir = path.join(tmp, "knowledge", "official-blogs");
+  const outputPath = path.join(tmp, "official-blog-author-records-summary.json");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    reviewed_entries: [
+      {
+        company: "anthropic",
+        canonical_url: "https://www.anthropic.com/research/production-agent-evals",
+        published_at: "2026-06-30",
+        title_original: "Production agent evals for Claude workflows",
+        review_decision: "include",
+        title_zh: "Claude 工作流的生产智能体评测",
+        summary_zh: "这条知识记录总结 Anthropic 面向生产智能体工作流的评测方法，重点保留任务级回归、工具权限、观测指标和上线约束等可复用工程实践，而不是保存原文或候选池诊断。",
+        key_ideas: [
+          "生产智能体评测应覆盖工具调用、权限边界和任务完成质量。",
+          "回归检查需要绑定真实工作流，而不是只看单轮回答。",
+          "上线前应把观测指标和失败恢复路径纳入评测报告。"
+        ],
+        practice_checklist: [
+          "为每条 agent 工作流配置任务级 eval。",
+          "记录工具权限、失败恢复和观测指标。"
+        ],
+        importance: "major",
+        content_type: "engineering_note",
+        topics: ["agent", "evals", "tool_use"],
+        related_blog_ids: ["anthropic-building-effective-agents-2024-12-19"],
+        related_report_dates: ["2026-06-30"],
+        admission: {
+          decision: "include",
+          reason: "Reviewed engineering practice record.",
+          matched_criteria: ["engineering_practice", "agent_workflow", "eval_methodology"]
+        }
+      },
+      {
+        id: "bad-id",
+        company: "anthropic",
+        canonical_url: "https://www.anthropic.com/research/malformed-author-record",
+        published_at: "2026-06-30",
+        title_original: "Malformed author record",
+        review_decision: "include",
+        title_zh: "格式错误的 author record",
+        summary_zh: "这条记录故意包含错误 id、topic、related id 和 report date，CLI 应该报告 invalid，不应该写出 curated record 文件。",
+        key_ideas: ["错误 id", "错误 topic", "错误关联字段"],
+        importance: "notable",
+        content_type: "engineering_note",
+        topics: ["Agent Workflow"],
+        related_blog_ids: ["bad-related-id"],
+        related_report_dates: ["not-a-date"],
+        admission: {
+          decision: "include",
+          reason: "Malformed fixture.",
+          matched_criteria: ["engineering_practice"]
+        }
+      }
+    ]
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:author-records",
+    "--input",
+    inputPath,
+    "--output-dir",
+    outputDir,
+    "--output",
+    outputPath,
+    "--generated-at",
+    "2026-06-30T08:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.drafts.visibility, "internal");
+  assert.equal(parsed.records_written.length, 1);
+  assert.equal(parsed.drafts.invalid_entries.length, 1);
+  assert.match(parsed.drafts.invalid_entries[0].reason, /topics|record id|related_/);
+  assert(!raw.startsWith("\uFEFF"));
+  const index = await loadOfficialBlogKnowledge({ knowledgeDir: outputDir });
+  assert.equal(index.records.length, 1);
+  assert.equal(index.records[0].id, "anthropic-production-agent-evals-2026-06-30");
+  assert.equal(Object.hasOwn(index.records[0], "opening_preview"), false);
+  await assert.rejects(
+    () => fs.stat(path.join(outputDir, "anthropic", "bad-id.json")),
+    /ENOENT/
+  );
+});
+
+test("official blog author records CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-author-records-public-"));
+  const inputPath = path.join(tmp, "reviewed-official-blogs.json");
+  const publicOutputDir = path.join(tmp, "docs", "data", "official-blog-records");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    reviewed_entries: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/new-authoring-test",
+        published_at: "2026-06-30",
+        title_original: "New authoring test",
+        review_decision: "include"
+      }
+    ]
+  })}\n`, "utf8");
+
+  await assert.rejects(
+    () => execFileAsync(process.execPath, [
+      path.join(rootDir, "src/cli.js"),
+      "official-blog:author-records",
+      "--input",
+      inputPath,
+      "--output-dir",
+      publicOutputDir,
+      "--repo-root",
+      tmp
+    ], {
+      cwd: rootDir,
+      maxBuffer: 1024 * 1024
+    }),
+    (error) => {
+      assert.equal(error.code, 1);
+      assert.match(error.stdout, /official_blog_author_records_public_output_forbidden/);
+      return true;
+    }
+  );
+  await assert.rejects(
+    () => fs.stat(publicOutputDir),
+    /ENOENT/
+  );
+});
+
 test("publish:verify-pages emits structured retryable misses without nonzero exit", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-pages-verify-"));
   const preloadPath = path.join(tmp, "fake-fetch.mjs");

@@ -42,6 +42,7 @@ import {
 import { runDailyWorkflow } from "./daily-runner.js";
 import { runStatusSelfCheck } from "./status-self-check.js";
 import {
+  createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
   loadOfficialBlogKnowledge
@@ -209,6 +210,52 @@ try {
       ok: true,
       input_path: resolvedInputPath,
       feed
+    }, outputPath);
+  } else if (command === "official-blog:author-records") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_author_records_input_required", "official-blog:author-records requires --input <reviewed-official-blogs.json>.");
+    }
+    const outputDir = args["output-dir"];
+    if (!outputDir) {
+      throw new PublisherError("official_blog_author_records_output_dir_required", "official-blog:author-records requires --output-dir <knowledge/official-blogs>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const resolvedOutputDir = path.resolve(outputDir);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogAuthorRecordsOutputPath({
+      outputPath,
+      outputDir: resolvedOutputDir,
+      rootDir
+    });
+    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const existingIndex = await loadOfficialBlogKnowledge({
+      rootDir,
+      knowledgeDir: args["knowledge-dir"] ? path.resolve(args["knowledge-dir"]) : undefined
+    });
+    const drafts = createOfficialBlogKnowledgeDrafts(input, {
+      existingIndex,
+      generatedAt: args["generated-at"]
+    });
+    const recordsWritten = [];
+    for (const record of drafts.records) {
+      const recordPath = path.join(resolvedOutputDir, record.company, `${record.id}.json`);
+      fs.mkdirSync(path.dirname(recordPath), { recursive: true });
+      fs.writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`, "utf8");
+      recordsWritten.push({
+        id: record.id,
+        company: record.company,
+        path: recordPath
+      });
+    }
+    printJson({
+      ok: true,
+      input_path: resolvedInputPath,
+      output_dir: resolvedOutputDir,
+      drafts,
+      records_written: recordsWritten
     }, outputPath);
   } else if (command === "preflight:worktree") {
     const args = parseArgs(argv);
@@ -958,6 +1005,21 @@ function assertOfficialBlogParseFeedOutputPath(options = {}) {
   });
 }
 
+function assertOfficialBlogAuthorRecordsOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    outputPath: options.outputPath,
+    rootDir: options.rootDir,
+    errorCode: "official_blog_author_records_public_output_forbidden",
+    message: "official-blog:author-records writes reviewed knowledge authoring output; choose an output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+  assertOfficialBlogInternalOutputPath({
+    outputPath: options.outputDir,
+    rootDir: options.rootDir,
+    errorCode: "official_blog_author_records_public_output_forbidden",
+    message: "official-blog:author-records writes reviewed knowledge authoring output; choose an output directory outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
 function assertOfficialBlogInternalOutputPath(options = {}) {
   const outputPath = String(options.outputPath || "").trim();
   if (!outputPath) {
@@ -977,7 +1039,7 @@ function isOfficialBlogIntakePublicOutputPath(outputPath, rootDir) {
 }
 
 function isOfficialBlogInternalCommand(value) {
-  return value === "official-blog:intake" || value === "official-blog:parse-feed";
+  return value === "official-blog:intake" || value === "official-blog:parse-feed" || value === "official-blog:author-records";
 }
 
 function isOfficialBlogInternalPublicOutputPath(outputPath, rootDir) {
