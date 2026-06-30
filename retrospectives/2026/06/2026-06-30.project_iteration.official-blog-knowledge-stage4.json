@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.official-blog-knowledge-stage4",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Official blog knowledge stage 4",
+  "slug": "official-blog-knowledge-stage4",
+  "status": "completed",
+  "summary": "This iteration infers public official blog related report dates from daily report item URLs during site build. Curated OpenAI and Anthropic records now merge explicit related_report_dates with exact normalized URL matches found in reader-facing report sections, so the generated official blog excerpt page can link back to the daily reports where a post appeared.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "report_json": "docs/data/official-blogs.json",
+    "html": "docs/official-blogs/index.html",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog related report dates\" tests/unit.test.js tests/e2e/site.e2e.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "npm run build",
+      "npm run test",
+      "npm run test:e2e",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Related report inference should be URL-identity based, not domain based.",
+      "evidence": "The Stage 4 unit test proves tracking parameters, fragments, and trailing slashes normalize to the curated canonical URL, while an unrelated OpenAI same-domain URL does not attach a report date.",
+      "scope": "official_blog_daily_links",
+      "persistence": "implemented",
+      "recommended_action": "Keep future graph edges anchored on normalized canonical URLs unless a separate reviewed alias table is introduced."
+    },
+    {
+      "lesson": "The public knowledge graph can derive reader-facing dates without exposing matching diagnostics.",
+      "evidence": "The public projection merges inferred and explicit dates, and tests continue to assert that admission, source audit, self-check, candidate, rationale, and debug fields are absent from public JSON and pages.",
+      "scope": "official_blog_public_projection",
+      "persistence": "implemented",
+      "recommended_action": "Expose only durable reader-facing graph edges in `docs/data/official-blogs.json`; keep triage and matching rationale inside authoring data."
+    },
+    {
+      "lesson": "The current historical corpus has no seed official blog URL matches yet.",
+      "evidence": "`npm run build` completed with `written_files: []`, and a public JSON inspection found zero records with related_report_dates in the real generated data.",
+      "scope": "official_blog_history_backfill",
+      "persistence": "session_note",
+      "recommended_action": "Let new daily reports create links automatically, or run a separate reviewed backfill if historical official blog items should be connected."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Stage 3 rendered stable related-report containers, but they stayed empty unless dates were manually curated on each official blog record.",
+      "evidence": "Stage 4 adds report URL scanning in `toPublicOfficialBlogKnowledge`, passes `reports` from `buildSite`, and verifies generated `official-blogs/index.html` renders `../reports/YYYY/MM/YYYY-MM-DD.html` links from inferred dates.",
+      "module": "src/official-blog-knowledge.js, src/site.js, tests/unit.test.js, tests/e2e/site.e2e.js",
+      "suggestion": "Infer official blog related_report_dates from daily report item URLs during site build.",
+      "expected_benefit": "Daily reports and the OpenAI/Anthropic official blog knowledge page stay connected automatically as new product, model, and engineering-practice posts are covered.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through normalized URL lookup, site build wiring, unit/build tests, E2E browser assertions, and validation.",
+      "ledger_links": [
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog related report dates are inferred from report item URLs",
+        "official blog related report dates generated file public projection is generated and planned",
+        "tests/e2e/site.e2e.js official-blogs related report link assertion"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add the next ingestion-stage gate that admits official blog candidates only for new products, new models, technical practices, harness engineering, agent workflows, evals, safety engineering with methods, or reusable implementation lessons, while excluding ordinary partnerships and company news.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Consider a reviewed historical backfill that maps already-published daily report URLs to existing official blog records instead of editing seed knowledge just to force links.",
+      "owner": "project"
+    }
+  ]
+}

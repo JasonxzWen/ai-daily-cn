@@ -10957,7 +10957,57 @@ test("official blog excerpt page renders reader safe graph links", async () => {
   assert(!html.includes("candidate_id"));
 });
 
-test("official blog knowledge generated file public projection is generated and planned", async () => {
+test("official blog related report dates are inferred from report item URLs", async () => {
+  const rawKnowledge = structuredClone(await loadOfficialBlogKnowledge({ rootDir }));
+  const openAiRecord = rawKnowledge.records.find((record) => record.id === "openai-new-tools-building-agents-2025-03-11");
+  openAiRecord.related_report_dates = ["2026-05-10"];
+
+  const officialBlogKnowledge = toPublicOfficialBlogKnowledge(rawKnowledge, {
+    generatedAt: fixedGeneratedAt,
+    reports: [
+      {
+        report_date: "2026-05-14",
+        main_items: [
+          {
+            title: "OpenAI agent tools",
+            url: "https://openai.com/index/new-tools-for-building-agents/?utm_source=newsletter#tools"
+          }
+        ],
+        hot_blogs: []
+      },
+      {
+        report_date: "2026-05-15",
+        main_items: [],
+        hot_blogs: [
+          {
+            title: "Anthropic agents",
+            url: "https://www.anthropic.com/research/building-effective-agents/"
+          }
+        ]
+      },
+      {
+        report_date: "2026-05-16",
+        main_items: [
+          {
+            title: "Same domain different article",
+            url: "https://openai.com/index/unrelated-company-news/"
+          }
+        ],
+        hot_blogs: []
+      }
+    ]
+  });
+
+  const openai = officialBlogKnowledge.records.find((record) => record.id === "openai-new-tools-building-agents-2025-03-11");
+  const anthropic = officialBlogKnowledge.records.find((record) => record.id === "anthropic-building-effective-agents-2024-12-19");
+  const codex = officialBlogKnowledge.records.find((record) => record.id === "openai-introducing-codex-2025-05-16");
+
+  assert.deepEqual(openai.related_report_dates, ["2026-05-10", "2026-05-14"]);
+  assert.deepEqual(anthropic.related_report_dates, ["2026-05-15"]);
+  assert.deepEqual(codex.related_report_dates, []);
+});
+
+test("official blog related report dates generated file public projection is generated and planned", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-public-"));
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
@@ -10965,6 +11015,17 @@ test("official blog knowledge generated file public projection is generated and 
   await fs.cp(path.join(rootDir, "knowledge"), path.join(tmp, "knowledge"), { recursive: true });
   const base = JSON.parse(await readFixture("reports/good/structured-report.json"));
   const report = structuredReportForDate(base, "2026-05-14");
+  report.hot_blogs = [
+    {
+      title: "OpenAI agent tools",
+      url: "https://openai.com/index/new-tools-for-building-agents/?utm_source=newsletter",
+      publisher: "OpenAI",
+      author: "OpenAI",
+      event_date: "2026-05-14",
+      topic: "agent workflow",
+      summary: "This fixture verifies that a daily report hot_blogs URL can infer related_report_dates for the public official blog knowledge page."
+    }
+  ];
   await fs.writeFile(path.join(dataInputDir, "2026-05-14.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
 
   const result = await buildSite({
@@ -10985,6 +11046,8 @@ test("official blog knowledge generated file public projection is generated and 
   assert.equal(publicData.stats.by_company.openai, 3);
   assert.equal(publicData.stats.by_company.anthropic, 3);
   assert(publicData.records.every((record) => record.canonical_url && record.summary_zh && record.key_ideas?.length >= 3));
+  const relatedOpenAi = publicData.records.find((record) => record.id === "openai-new-tools-building-agents-2025-03-11");
+  assert.deepEqual(relatedOpenAi.related_report_dates, ["2026-05-14"]);
   const serialized = JSON.stringify(publicData);
   assert(!serialized.includes("admission"));
   assert(!serialized.includes("admission_policy"));
@@ -10998,6 +11061,8 @@ test("official blog knowledge generated file public projection is generated and 
   const excerptHtml = await fs.readFile(path.join(outDir, "official-blogs", "index.html"), "utf8");
   assert(excerptHtml.includes('id="official-blog-excerpts"'));
   assert((excerptHtml.match(/data-official-blog-excerpt-card=/g) || []).length >= 6);
+  assert(excerptHtml.includes('data-related-report-link="2026-05-14"'));
+  assert(excerptHtml.includes('href="../reports/2026/05/2026-05-14.html"'));
   assert(!excerptHtml.includes("admission_policy"));
   assert(!excerptHtml.includes("source_audit"));
   assert(!excerptHtml.includes("self_check"));
