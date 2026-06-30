@@ -2206,7 +2206,7 @@ test("community leads omit low-signal statuspage troubleshooting items", async (
   assert(!input.sections.some((item) => item.title === "其他信源"));
 });
 
-test("domestic community leads stay inside the shared community section", async () => {
+test("domestic community leads are omitted from public interaction sections", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [];
   report.community_leads = [
@@ -2236,6 +2236,13 @@ test("domestic community leads stay inside the shared community section", async 
   const communitySection = input.sections.find((section) => section.richId === "other-sources");
 
   assert.equal(builderHeroStat.value, "0");
+  assert.equal(communitySection, undefined);
+  assert(!input.sections.some((section) => section.cardClass === "community-card"));
+  assert(!JSON.stringify(input.sections).includes("Leiphone"));
+  assert(!JSON.stringify(input.sections).includes("TechCrunch AI"));
+  return;
+
+  assert.equal(builderHeroStat.value, "0");
   assert(!input.sections.some((section) => section.title === "国内动态"));
   assert(communitySection);
   assert.equal(communitySection.type, "filterable-cards");
@@ -2256,7 +2263,7 @@ test("domestic community leads stay inside the shared community section", async 
   assert.equal(techcrunch.points.length, 0);
 });
 
-test("community lead cards keep fuller news summaries and preserve images", async () => {
+test("community leads with images are omitted from public cards", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [];
   report.self_check.builder_observations = 0;
@@ -2288,6 +2295,11 @@ test("community lead cards keep fuller news summaries and preserve images", asyn
   const input = reportToInteractionInput(report);
   const section = input.sections.find((item) => item.richId === "other-sources");
 
+  assert.equal(section, undefined);
+  assert(!input.sections.some((item) => item.cardClass === "community-card"));
+  assert(!JSON.stringify(input.sections).includes("openai-super-app.png"));
+  return;
+
   assert(section);
   assert.equal(section.type, "filterable-cards");
   assert.equal(section.cardClass, "community-card");
@@ -2298,7 +2310,7 @@ test("community lead cards keep fuller news summaries and preserve images", asyn
   assert(section.items[0].media[0].src.endsWith("assets/evidence/openai-super-app.png"));
 });
 
-test("community lead cards keep short summaries without template expansion", async () => {
+test("community lead short summaries are omitted from public cards", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [];
   report.self_check.builder_observations = 0;
@@ -2317,6 +2329,10 @@ test("community lead cards keep short summaries without template expansion", asy
 
   const input = reportToInteractionInput(report);
   const section = input.sections.find((item) => item.richId === "other-sources");
+  assert.equal(section, undefined);
+  assert(!input.sections.some((item) => item.cardClass === "community-card"));
+  assert(!JSON.stringify(input.sections).includes("TechCrunch 鎶ラ亾 OpenAI"));
+  return;
   const body = section.items[0].body;
 
   assert(body.length >= 20);
@@ -2329,7 +2345,7 @@ test("community lead cards keep short summaries without template expansion", asy
   assert.doesNotMatch(body, /读者可以|公开信息仍应|产品入口|后续可复核/);
 });
 
-test("community lead cards keep title-only Chinese media items without boilerplate expansion", async () => {
+test("community lead title-only Chinese media items are omitted from public cards", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [];
   report.self_check.builder_observations = 0;
@@ -2347,6 +2363,9 @@ test("community lead cards keep title-only Chinese media items without boilerpla
 
   const input = reportToInteractionInput(report);
   const section = input.sections.find((item) => item.cardClass === "community-card");
+  assert.equal(section, undefined);
+  assert(!JSON.stringify(input.sections).includes("Qwen-Robot"));
+  return;
   assert(section);
   const body = section.items[0].body;
 
@@ -2487,7 +2506,7 @@ test("public card media prefers local evidence assets and drops remote fallbacks
   assert(hotBlogsSection.items[0].media[0].src.endsWith("assets/evidence/harness-architecture.png"));
   assert(!JSON.stringify(hotBlogsSection.items[0].media).includes("https://example.com/blog-cover.png"));
   assert.equal(builderSection.items[0].media?.length || 0, 0);
-  assert.equal(communitySection.items[0].media?.length || 0, 0);
+  assert.equal(communitySection, undefined);
 });
 
 test("AIGC hero stat counts Chinese signals and omits zero-value cards", async () => {
@@ -10053,6 +10072,166 @@ test("buildSite writes reader-safe public data without internal fields or candid
   assert.match(publicData.source_effectiveness[0].notes, /strategy=html_index:https:\/\/ai\.meta\.com\/blog\//);
   assert.equal(publicData.evidence_assets.length, 1);
   assert.equal(publicData.evidence_assets[0].local_path, "assets/evidence/valid-source-asset.jpg");
+});
+
+test("public artifacts omit removed community sources", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-removed-community-sources-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const [year, month] = report.report_date.split("-");
+  const reportDir = path.join(dataInputDir, year, month);
+  await fs.mkdir(reportDir, { recursive: true });
+
+  report.stories = [
+    {
+      story_id: "story-content-hellogithub-demo",
+      title: "Demo project from removed source",
+      importance: "general",
+      trend: "open source AI",
+      event_date: report.report_date,
+      primary_entity: "example/removed-source-demo",
+      event_type: "launch",
+      object: "removed source demo",
+      what_happened: "A removed community source item should not enter public artifacts.",
+      why_it_matters: "This guards the public page and JSON against reintroducing weak community feeds.",
+      evidence_level: "primary",
+      sources: [
+        {
+          label: "HelloGitHub",
+          url: "https://github.com/example/removed-source-demo",
+          type: "github"
+        }
+      ]
+    }
+  ];
+  report.community_leads = [
+    {
+      candidate_id: "content-hellogithub-demo",
+      title: "Removed community lead",
+      content: "This HelloGitHub community lead is intentionally injected to verify it is stripped from public HTML and JSON.",
+      url: "https://github.com/example/removed-community-lead",
+      event_date: report.report_date,
+      source: "HelloGitHub",
+      evidence: "HelloGitHub item",
+      editorial_category: "community_signal",
+      source_level: "community",
+      verification_status: "intermediary_only",
+      importance: "general"
+    }
+  ];
+  report.source_effectiveness = [
+    {
+      id: "hellogithub",
+      name: "HelloGitHub",
+      role: "community",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: true,
+      not_included_reason: "",
+      source_ids: ["content-hellogithub"],
+      source_kinds: ["github_report_markdown"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 1,
+      notes: "latest_report_url=https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/content/HelloGitHub123.md"
+    },
+    {
+      id: "ruanyf-weekly",
+      name: "RuanYF Weekly",
+      role: "community",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: true,
+      public_included: false,
+      not_included_reason: "removed_source",
+      source_ids: ["content-ruanyf-weekly"],
+      source_kinds: ["github_report_markdown"],
+      statuses: ["checked"],
+      candidate_count: 1,
+      included_count: 0,
+      notes: "latest_report_url=https://raw.githubusercontent.com/ruanyf/weekly/master/docs/issue-401.md"
+    },
+    {
+      id: "meta-ai",
+      name: "Meta AI Blog",
+      role: "official",
+      configured: true,
+      reachable: true,
+      parsed_recent: true,
+      candidate_created: false,
+      public_included: false,
+      not_included_reason: "parsed_but_no_candidate_created",
+      source_ids: ["content-meta-ai-blog"],
+      source_kinds: ["html_index"],
+      statuses: ["checked"],
+      candidate_count: 0,
+      included_count: 0,
+      notes: "official source retained"
+    }
+  ];
+
+  await fs.writeFile(path.join(reportDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  const html = await fs.readFile(path.join(outDir, `reports/${year}/${month}/${report.report_date}.html`), "utf8");
+  const publicData = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
+  const publicJson = JSON.stringify(publicData);
+
+  assert.doesNotMatch(html, /HelloGitHub|RuanYF|hellogithub|ruanyf/i);
+  assert.doesNotMatch(publicJson, /HelloGitHub|RuanYF|hellogithub|ruanyf/i);
+  assert.doesNotMatch(html, /<article[^>]+community-card/);
+  assert.doesNotMatch(html, /id="section-other-sources"/);
+  assert.equal(publicData.community_leads, undefined);
+  assert.deepEqual(publicData.source_effectiveness.map((row) => row.id), ["meta-ai"]);
+});
+
+test("daily tracking renders seven day trend curves", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-tracking-trend-curves-"));
+  const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
+  const outDir = path.join(tmp, "docs");
+  const baseReport = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const dates = ["2026-06-24", "2026-06-25", "2026-06-26", "2026-06-27", "2026-06-28", "2026-06-29", "2026-06-30"];
+  await fs.mkdir(dataInputDir, { recursive: true });
+
+  for (const [index, reportDate] of dates.entries()) {
+    const report = structuredReportForDate(baseReport, reportDate);
+    report.daily_tracking = trackingTrendCurveFixtureItems(reportDate, index);
+    await fs.writeFile(path.join(dataInputDir, `${reportDate}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  }
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir: path.join(tmp, "reports-data"),
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  const html = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-30.html"), "utf8");
+  const curveCount = (html.match(/data-tracking-trend-curve/g) || []).length;
+
+  assert.equal(curveCount, 3);
+  assert.match(html, /data-tracking-source="openrouter-rankings"[^>]+data-trend-points="7"/);
+  assert.match(html, /data-tracking-source="artificial-analysis-intelligence-index"[^>]+data-trend-points="7"/);
+  assert.match(html, /data-tracking-source="swe-bench-pro-public"[^>]+data-trend-points="7"/);
+  assert.match(html, /OpenRouter/);
+  assert.match(html, /Artificial Analysis/);
+  assert.match(html, /SWE-bench Pro/);
 });
 
 test("public report projection preserves sanitized public quality events", async () => {
@@ -20584,9 +20763,11 @@ test("public daily source sections follow the agreed IA order", () => {
     "其他 GitHub 仓库更新",
     "其他信源"
   ];
+  expectedOrder.pop();
   const indexes = expectedOrder.map((title) => titles.indexOf(title));
 
   assert(indexes.every((index) => index >= 0), JSON.stringify(titles));
+  assert(!input.sections.some((section) => section.richId === "other-sources"));
   assert.deepEqual(indexes, indexes.slice().sort((left, right) => left - right));
   const trackingSection = input.sections.find((section) => section.title === "趋势追踪");
   assert.equal(trackingSection.showFilters, true);
@@ -22086,6 +22267,74 @@ function structuredReportForDate(base, reportDate) {
     }
   }
   return report;
+}
+
+function trackingTrendCurveFixtureItems(reportDate, index) {
+  const openRouterSnapshot = openRouterSnapshotFixture();
+  openRouterSnapshot.snapshot_as_of = `${reportDate}T00:00:00.000Z`;
+  openRouterSnapshot.top_entries[0].tokens = `${(2.2 + index * 0.18).toFixed(2)}T tokens`;
+
+  const artificialAnalysisSnapshot = artificialAnalysisSnapshotFixture();
+  artificialAnalysisSnapshot.snapshot_as_of = `${reportDate}T00:00:00.000Z`;
+  artificialAnalysisSnapshot.top_entries[0].tokens = String(55 + index);
+
+  const sweBenchSnapshot = sweBenchProSnapshotFixture(7);
+  sweBenchSnapshot.snapshot_as_of = `${reportDate}T00:00:00.000Z`;
+  sweBenchSnapshot.top_entries[0].tokens = `${(52 + index * 0.8).toFixed(2)}%`;
+
+  return [
+    trackingTrendCurveFixtureItem({
+      id: "openrouter-rankings",
+      name: "OpenRouter",
+      url: "https://openrouter.ai/rankings",
+      source: "OpenRouter Rankings",
+      category: "model_usage",
+      summary: "OpenRouter weekly usage leaderboard parsed from the public page.",
+      reportDate,
+      snapshot: openRouterSnapshot
+    }),
+    trackingTrendCurveFixtureItem({
+      id: "artificial-analysis-intelligence-index",
+      name: "Artificial Analysis",
+      url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+      source: "Artificial Analysis Intelligence Index",
+      category: "model_benchmark",
+      summary: "Artificial Analysis Intelligence Index score leaderboard parsed from the public page.",
+      reportDate,
+      snapshot: artificialAnalysisSnapshot
+    }),
+    trackingTrendCurveFixtureItem({
+      id: "swe-bench-pro-public",
+      name: "SWE-bench Pro",
+      url: "https://scaleapi.github.io/SWE-bench_Pro-os/",
+      source: "Scale Labs SWE-Bench Pro",
+      category: "coding_benchmark",
+      summary: "SWE-bench Pro public resolve-rate leaderboard parsed from the public page.",
+      reportDate,
+      snapshot: sweBenchSnapshot
+    })
+  ];
+}
+
+function trackingTrendCurveFixtureItem({ id, name, url, source, category, summary, reportDate, snapshot }) {
+  return {
+    id,
+    name,
+    url,
+    source,
+    event_date: reportDate,
+    category,
+    importance: "notable",
+    publish_to_public: true,
+    change_status: "changed",
+    verification_status: "primary_confirmed",
+    source_level: "primary",
+    summary,
+    evidence: `${source} public snapshot fixture.`,
+    metrics: [],
+    watch_points: ["Top-ranked entry remains available for seven-day trend aggregation."],
+    snapshot
+  };
 }
 
 function platformAuditGroupFixture(name, url, candidatesFound, included) {

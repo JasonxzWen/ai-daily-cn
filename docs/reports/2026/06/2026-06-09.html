@@ -1191,6 +1191,7 @@ body.lightbox-open {
     "tracking-title tracking-stats"
     "tracking-tags tracking-stats"
     "tracking-component tracking-component"
+    "tracking-trend tracking-trend"
     "tracking-bars tracking-table"
     "tracking-body tracking-table";
   gap: 12px 16px;
@@ -1209,6 +1210,7 @@ body.lightbox-open {
 .tracking-card > *,
 .tracking-card .card-stat-grid,
 .tracking-card .card-bars,
+.tracking-card .card-trend-curve,
 .tracking-card .card-table,
 .tracking-card .card-table-scroll {
   min-width: 0;
@@ -1222,9 +1224,80 @@ body.lightbox-open {
   grid-area: tracking-bars;
 }
 
+.tracking-card .card-trend-curve {
+  grid-area: tracking-trend;
+}
+
 .tracking-card .card-table {
   grid-area: tracking-table;
   max-width: 100%;
+}
+
+.card-trend-curve {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 10px 12px 8px;
+}
+
+.card-trend-curve .card-visual-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-trend-metric {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.card-trend-svg {
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.card-trend-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-point {
+  fill: #ffffff;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.card-trend-axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.card-trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .tracking-card > p {
@@ -1853,6 +1926,7 @@ body.lightbox-open {
       "tracking-tags"
       "tracking-component"
       "tracking-stats"
+      "tracking-trend"
       "tracking-bars"
       "tracking-table"
       "tracking-body";
@@ -3107,7 +3181,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
         <ul class="hero-summary-text hero-summary-list"><li>今天最值得看的主线有 英伟达介绍 Blackwell 低精度训练方案，用 JAX 工具链提速</li><li>苹果发布新一代系统级 AI 和 Siri</li><li>OpenAI 推出经济研究交流项目，面向 AI 经济影响研究</li><li>热门博客这轮主要看 agent 和开发工具的落地边界</li></ul>
         <div class="hero-stat-grid" aria-label="报告摘要指标">
     <div class="hero-stat"><span>主体</span><strong>8</strong><small>重点条目</small></div>
-<div class="hero-stat"><span>AIGC</span><strong>2</strong><small>产品/内容</small></div>
+<div class="hero-stat"><span>AIGC</span><strong>1</strong><small>产品/内容</small></div>
 <div class="hero-stat"><span>追踪</span><strong>2</strong><small>榜单变化</small></div>
 <div class="hero-stat"><span>精选博客</span><strong>3</strong><small>深读</small></div>
 <div class="hero-stat"><span>GitHub</span><strong>10</strong><small>Top 10</small></div>
@@ -3137,9 +3211,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
 <a href="#section-github-trending-top-8-12" title="GitHub Trending · Top 8" data-nav-link data-nav-index="12" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
 <a href="#section-trend-tracking" title="趋势追踪" data-nav-link data-nav-index="13" data-nav-group-name="signals" data-nav-status="info"><span>趋势追踪</span></a>
 <a href="#section-x-twitter-14" title="X/Twitter 讨论" data-nav-link data-nav-index="14" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
-<a href="#section-other-sources" title="其他信源" data-nav-link data-nav-index="15" data-nav-group-name="signals" data-nav-status="info"><span>其他信源</span></a>
-<a href="#section-reddit-16" title="Reddit 线索" data-nav-link data-nav-index="16" data-nav-group-name="signals" data-nav-status="info"><span>Reddit 线索</span></a>
-<a href="#section-html-work-report-17" title="信源覆盖与缺口" data-nav-link data-nav-index="17" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
+<a href="#section-reddit-15" title="Reddit 线索" data-nav-link data-nav-index="15" data-nav-group-name="signals" data-nav-status="info"><span>Reddit 线索</span></a>
+<a href="#section-html-work-report-16" title="信源覆盖与缺口" data-nav-link data-nav-index="16" data-nav-group-name="verification" data-nav-status="info"><span>信源覆盖与缺口</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3386,7 +3459,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <button data-filter-target="html-work-report" data-filter-value="all" aria-pressed="true">全部</button><button data-filter-target="html-work-report" data-filter-value="OpenRouter" aria-pressed="false">OpenRouter</button><button data-filter-target="html-work-report" data-filter-value="Artificial Analysis" aria-pressed="false">Artificial Analysis</button>
     </div>
     <div class="evidence-grid focus-field tracking-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report">
+      <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenRouter" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="5">
     <div class="meta">OpenRouter</div>
     <h3><a class="card-title-link" href="https://openrouter.ai/rankings" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenRouter</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型使用</span><span class="chip chip-date">2026-06-09</span></div>
@@ -3555,7 +3628,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">最大变化</span>
       <strong>MiniMax M3</strong>
       <span class="card-stat-detail">+999%</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="openrouter-rankings" data-trend-points="5" aria-label="7日趋势 榜首周用量: 06-05 2.9T tokens to 06-09 4.07T tokens">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首周用量</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首周用量: 06-05 2.9T tokens to 06-09 4.07T tokens" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,90.0 104.0,41.4 180.0,41.4 256.0,41.4 332.0,18.0"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-05: 2.9T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="104.0" cy="41.4" r="3.2"><title>06-06: 3.69T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="180.0" cy="41.4" r="3.2"><title>06-07: 3.69T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="256.0" cy="41.4" r="3.2"><title>06-08: 3.69T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="332.0" cy="18.0" r="3.2"><title>06-09: 4.07T tokens | DeepSeek V4 Flash</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-05</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-09</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>2.9T tokens</span>
+      <span>4.07T tokens</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3618,7 +3704,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <p>榜首 DeepSeek V4 Flash（deepseek），4.07T tokens，+41%；最大周变化是 MiniMax M3（+999%）。</p>
 
   </article>
-<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Artificial Analysis" data-search-target="html-work-report">
+<article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Artificial Analysis" data-search-target="html-work-report" data-trend-status="available" data-trend-history-points="5">
     <div class="meta">Artificial Analysis</div>
     <h3><a class="card-title-link" href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFBPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Artificial Analysis</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型基准</span><span class="chip chip-date">2026-06-09</span></div>
@@ -3633,7 +3719,20 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">榜首</span>
       <strong>Claude Opus 4.8 (max)</strong>
       <span class="card-stat-detail">anthropic / 61 分 / AA Index</span>
-    </div></div><div class="card-visual card-bars" data-card-bars>
+    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="artificial-analysis-intelligence-index" data-trend-points="5" aria-label="7日趋势 榜首分数: 06-05 61 分 to 06-09 61 分">
+    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首分数</span></div>
+    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首分数: 06-05 61 分 to 06-09 61 分" focusable="false">
+      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
+      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
+      <polyline class="card-trend-line" points="28.0,90.0 104.0,90.0 180.0,90.0 256.0,90.0 332.0,90.0"></polyline>
+      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-05: 61 分 | Claude Opus4.8 (max)</title></circle><circle class="card-trend-point" cx="104.0" cy="90.0" r="3.2"><title>06-06: 61 分 | Claude Opus4.8 (max)</title></circle><circle class="card-trend-point" cx="180.0" cy="90.0" r="3.2"><title>06-07: 61 分 | Claude Opus4.8 (max)</title></circle><circle class="card-trend-point" cx="256.0" cy="90.0" r="3.2"><title>06-08: 61 分 | Claude Opus4.8 (max)</title></circle><circle class="card-trend-point" cx="332.0" cy="90.0" r="3.2"><title>06-09: 61 分 | Claude Opus 4.8 (max)</title></circle>
+      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-05</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-09</text>
+    </svg>
+    <div class="card-trend-summary">
+      <span>61 分</span>
+      <span>61 分</span>
+    </div>
+  </div><div class="card-visual card-bars" data-card-bars>
     <div class="card-visual-title">供应商分布</div>
     <div class="chart-bars" aria-hidden="true">
     <div class="chart-bar-row">
@@ -3771,83 +3870,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel" id="section-other-sources" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
-    <div class="section-heading split-row">
-    <div>
-      <h2>其他信源</h2>
-
-    </div>
-
-  </div>
-
-
-    <div class="evidence-grid focus-field community-card-grid" data-focus-field="html-work-report">
-      <article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenAI Company News RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://openai.com/index/openai-submits-confidential-s-1" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI 向美国证监会秘密提交上市草案</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-08</span></div>
-
-
-    <p>OpenAI 向美国证监会秘密提交上市草案。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="OpenAI Company News RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://openai.com/index/built-to-benefit-everyone-our-plan" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI 发布公司治理和公共利益计划</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-08</span></div>
-
-
-    <p>OpenAI 发布公司治理和公共利益计划。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="MIT Technology Review" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.technologyreview.com/2026/06/08/1138485/the-download-world-cup-ball-openai-super-app/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzkzMzNlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1UPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenAI 还在推进“super app”方向，想把聊天和工具入口做成统一应用</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-08</span></div>
-
-
-    <p>讨论焦点在于 OpenAI 会不会把聊天、搜索和工具入口继续往同一个应用里收。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="NVIDIA Newsroom RSS" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://blogs.nvidia.com/blog/nvidia-and-lg-group-ai-factory/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk5OPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>NVIDIA 与 LG Group 共建 AI factory，覆盖机器人、自动驾驶和 GPU 云</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-08</span></div>
-    <div class="card-media-grid" data-count="1"><figure><img src="../../../assets/evidence/nvidia-and-lg-group-build-an-ai-factory-to-advance-physical-ai-mobility-and-ai-infrastructure-20.jpg" alt="NVIDIA and LG Group Build an AI Factory to Advance Physical AI, Mobility and AI..." loading="lazy" data-lightbox-image="true" data-lightbox-caption="NVIDIA and LG Group Build an AI Factory to Advance Physical AI, Mobility and AI...：图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。" role="button" tabindex="0" aria-label="点击放大图片：NVIDIA and LG Group Build an AI Factory to Advance Physical AI, Mobility and AI...：图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。" decoding="async"><figcaption>NVIDIA and LG Group Build an AI Factory to Advance Physical AI, Mobility and AI...：图片来自 NVIDIA Newsroom RSS，由 feed 提供，用于辅助理解该条目的产品、研究或内容生成语境。</figcaption></figure></div>
-
-    <p>NVIDIA 与 LG Group 共建 AI factory，覆盖机器人、自动驾驶和 GPU 云。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="TechCrunch AI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://techcrunch.com/2026/06/08/as-openai-files-for-ipo-sam-altmans-eye-scanning-company-is-doing-layoffs-report-says/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBEQACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAACAwQFBgcBAP/EADgQAAEDAwEEBQcNAAAAAAAAAAEAAgMEBREGEiFBkxMWVWHSFDFRU4GR4RUiMjM1Q2NydJKxstH/xAAaAQACAwEBAAAAAAAAAAAAAAACAwABBAUG/8QALhEAAgEDAQYFAwUBAAAAAAAAAAECAwQRkRIUITFR0QUTFVJhMlNxIzOhsfAi/9oADAMBAAIRAxEAPwCO4pR4I6AoQMNULFGtUCwKNYoXgUa1UFgUaxVkJIUa1VktEUGozOG1qheBVrFAsCjWKBYFGtVZLwKNahyFgMNQ5LDDVWSDe0Wue61zKSmMYkcCQZCQNwzwBT1xKoW8q89iPMsI0Ddx95Rcx3hV7Jv9IuOq1fYIaEu/rKPmu8KmyX6TcfGr7BjQ124yUfMd4VWwy14TcdVq+xX3Rlj3MPnaSD7ErJz2sPBPUOk7hW0kVTDJTCOVu00Oe4HHuRKDaN1Pw6tUgpxaw/8AdBx1LunrKTmO8KrypDPSq/VavsQ1xopbdWPpagsMjMZLDkbxlJn/AMvDMNalKjNwlzQOlq2C2XmKrqdromtcDsjJ3jC0p4DsqsaNZTlyL7S6utdVUxU8XT7crwxuY8DJOEe2juw8RoTkorPH4J/giN5XTrK0jOfKN34fxS/Mic71S3+dCvv0jdJZHys8n2XuLhmQ5wd/oS/Lkc+XhteTbWOPyTVFf6KzUsVtrOk8opmhkmwzLc9xReZGCwzbTvaVvBUp848GL9crT6Z+X8VW8QC9Vt/nQpmoa6G4Xeaqp9ro3huNoYO5oCx1qilLKOHeVo1qznDkRIateRJIWJuL1QfqI/7BRPih9t+/D8o1ngtB60x1/md7VibPFs1+D6iP8o/hbFyPZR+lFBvtkulTeKuaCikfE+TLXAjeMDvWKrTm5PCPPXdpcTrylGOU/wAEedO3ns+X3t/1IdGr0Mrsbr2P+O5G1dPPRzugqojHK3GWnhnestTai8SMlSE6ctmawzgaupkaPLQ9kN0o5JHBrGTsc5x8wAI3qJrKG0JKNWLfLKNH+XrTj7Rp/wB4WjzIdT0m+2/vWplkh+ljvXOlI8nJmnw3+0thjDrjTAhoyDIFvVanj6j1Ub62UV+otQ+sFn7SpuYFW8Uvci9/tfuLU91hs/aVNzAq3qh7kTf7X7i1M71dVQ1V/qJqaVksTgzD2HIPzQuJeVYyqtxeUeY8SqRqXMpQeVw/oZrpuQJwlLcisgkpTmA2CXJUpgtgFyTKYDYBckymC2CSlOYDYJKU5A5HpO9dxzNrYJKVKYLYBckymA2AXJUpANglyTKQLYBKW5ANnMpbZWTiEo//2Q==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>TechCrunch 报道 World 项目出现裁员</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-08</span></div>
-
-
-    <p>TechCrunch 报道 World 项目出现裁员。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="Nature Machine Learning" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://www.nature.com/articles/s41568-026-00949-5" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAATlBMVEVHcEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////n5+fT09MxMTGJiYmOjo6YmJi8vLxPT0/09PRtbW2oqKghISGiEhN+AAAADHRSTlMA0rZK5WJ4FJD5qzc35ZrKAAAB8ElEQVRYhaVX2ZbDIAhNJtZsmqbN2v//0UnaVBTR6uE+ZRy4BUSWogigrmRXilapVpSdrOqQHI2+EQpBNH2qdi097YtDJtnRtLT6gbZtfqrfwuofjlvc+jKufqKM+HH7rX4iaESTpq9UIBJ/qfpK/TH1SYYsfYIh2f8vUBwS42/DuYs6X18pOx/I/HmZj2Xblpf3/zLqwDjd9edrH/QbwxR2Auf/Nq+nyvn51IB1ccVa8gaW46cvHH/N2saK/LhuonYM2EEe62s9IxM+cZTu6QoED42BTJBvAlR/JiBYPYLNlRWnfo8iOBrpSa/7tiyb5dWOhHsqiQcj/rhOXsYUFIR3GL0KaiL39N26I1lBZfGEDTjuNkRw5HPlETx9gjFIUOFLzCWQRccj6IiHmEVQ+peQRyC8l5hJ0Baefh6B4hOwXWAHkX2N7ERip3LkMcFzjj2myHOGRhAmqImCkkMgqJK2+wSmoAxItiGKKpQ0qKCGYEWyPVHWKYLte6R9D7zGAlV5JgjcziKJ1ma1JogYNBunv16tDYURGgs4DD3yYYuaMccxAczVo+eV01lMe3cHjGkwMJ0QjuxEsKakhBHZhzXi8Ics9pjHHzT5oy5/2OaP+/yFg7/y8Jeugr32vSMRoUhYPAv+6nuCt3xfdiSu//8FKZxtayUOKgAAAABJRU5ErkJggg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Nature Machine Learning 记录了一条开源项目公开条目，详情需回到原文链接核对</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-08</span></div>
-
-
-    <p>Nature Machine Learning 记录了一条开源项目公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-<article class="interactive-card evidence-card evidence-spotlight community-card" data-evidence-spotlight data-filter-target="html-work-report" data-filter-value="TechCrunch AI" data-search-target="html-work-report">
-
-    <h3><a class="card-title-link" href="https://techcrunch.com/2026/06/08/mercors-brendan-foody-calls-out-sequoia-over-dual-pricing-valuation-tricks/" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAEAAQAMBEQACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAACAwQFBgcBAP/EADgQAAEDAwEEBQcNAAAAAAAAAAEAAgMEBREGEiFBkxMWVWHSFDFRU4GR4RUiMjM1Q2NydJKxstH/xAAaAQACAwEBAAAAAAAAAAAAAAACAwABBAUG/8QALhEAAgEDAQYFAwUBAAAAAAAAAAECAwQRkRIUITFR0QUTFVJhMlNxIzOhsfAi/9oADAMBAAIRAxEAPwCO4pR4I6AoQMNULFGtUCwKNYoXgUa1UFgUaxVkJIUa1VktEUGozOG1qheBVrFAsCjWKBYFGtVZLwKNahyFgMNQ5LDDVWSDe0Wue61zKSmMYkcCQZCQNwzwBT1xKoW8q89iPMsI0Ddx95Rcx3hV7Jv9IuOq1fYIaEu/rKPmu8KmyX6TcfGr7BjQ124yUfMd4VWwy14TcdVq+xX3Rlj3MPnaSD7ErJz2sPBPUOk7hW0kVTDJTCOVu00Oe4HHuRKDaN1Pw6tUgpxaw/8AdBx1LunrKTmO8KrypDPSq/VavsQ1xopbdWPpagsMjMZLDkbxlJn/AMvDMNalKjNwlzQOlq2C2XmKrqdromtcDsjJ3jC0p4DsqsaNZTlyL7S6utdVUxU8XT7crwxuY8DJOEe2juw8RoTkorPH4J/giN5XTrK0jOfKN34fxS/Mic71S3+dCvv0jdJZHys8n2XuLhmQ5wd/oS/Lkc+XhteTbWOPyTVFf6KzUsVtrOk8opmhkmwzLc9xReZGCwzbTvaVvBUp848GL9crT6Z+X8VW8QC9Vt/nQpmoa6G4Xeaqp9ro3huNoYO5oCx1qilLKOHeVo1qznDkRIateRJIWJuL1QfqI/7BRPih9t+/D8o1ngtB60x1/md7VibPFs1+D6iP8o/hbFyPZR+lFBvtkulTeKuaCikfE+TLXAjeMDvWKrTm5PCPPXdpcTrylGOU/wAEedO3ns+X3t/1IdGr0Mrsbr2P+O5G1dPPRzugqojHK3GWnhnestTai8SMlSE6ctmawzgaupkaPLQ9kN0o5JHBrGTsc5x8wAI3qJrKG0JKNWLfLKNH+XrTj7Rp/wB4WjzIdT0m+2/vWplkh+ljvXOlI8nJmnw3+0thjDrjTAhoyDIFvVanj6j1Ub62UV+otQ+sFn7SpuYFW8Uvci9/tfuLU91hs/aVNzAq3qh7kTf7X7i1M71dVQ1V/qJqaVksTgzD2HIPzQuJeVYyqtxeUeY8SqRqXMpQeVw/oZrpuQJwlLcisgkpTmA2CXJUpgtgFyTKYDYBckymC2CSlOYDYJKU5A5HpO9dxzNrYJKVKYLYBckymA2AXJUpANglyTKQLYBKW5ANnMpbZWTiEo//2Q==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>TechCrunch AI 记录了一条开源项目公开条目，详情需回到原文链接核对</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-general">一般</span><span class="chip chip-date">2026-06-09</span></div>
-
-
-    <p>TechCrunch AI 记录了一条开源项目公开条目，详情需回到原文链接核对。</p>
-
-  </article>
-    </div>
-  </section>
-<section class="panel" id="section-reddit-16" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
+<section class="panel" id="section-reddit-15" data-section-type="filterable-cards" data-section-group="signals" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
       <h2>Reddit 线索</h2>
@@ -3878,7 +3901,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </article>
     </div>
   </section>
-<section class="panel rich-section" id="section-html-work-report-17" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
+<section class="panel rich-section" id="section-html-work-report-16" data-section-type="markdown" data-section-group="verification" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
       <h2>信源覆盖与缺口</h2>

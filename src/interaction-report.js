@@ -46,6 +46,22 @@ const PUBLIC_MEDIA_MIN_WIDTH = 240;
 const PUBLIC_MEDIA_MIN_HEIGHT = 160;
 const PUBLIC_MEDIA_MIN_AREA = 80000;
 const NON_CONTENT_MEDIA_ROLES = new Set(["icon", "favicon", "logo", "avatar", "decorative"]);
+const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf)/i;
+const PUBLIC_SOURCE_FILTER_SECTIONS = [
+  "stories",
+  "main_items",
+  "model_releases",
+  "hot_blogs",
+  "chinese_media_dynamics",
+  "projects",
+  "github_trending",
+  "huggingface_trending",
+  "builder_observations",
+  "official_org_updates",
+  "wechat_items",
+  "zhihu_items",
+  "reddit_items"
+];
 
 const SOURCE_ICONS = new Map([
   ...Object.entries(CACHED_SOURCE_ICONS),
@@ -131,12 +147,53 @@ for (const [domain, icon] of Object.entries(CACHED_DOMAIN_ICONS)) {
   DOMAIN_ICONS.set(domain, icon);
 }
 
+function publicReportWithoutRemovedSources(report) {
+  if (!report || typeof report !== "object") {
+    return report;
+  }
+  const next = structuredClone(report);
+  for (const sectionName of PUBLIC_SOURCE_FILTER_SECTIONS) {
+    if (Array.isArray(next[sectionName])) {
+      next[sectionName] = next[sectionName].filter((item) => !isRemovedPublicSourceItem(item));
+    }
+  }
+  delete next.community_leads;
+  if (Array.isArray(next.source_effectiveness)) {
+    next.source_effectiveness = next.source_effectiveness.filter((row) => !isRemovedPublicSourceItem(row));
+  }
+  if (Array.isArray(next.hero_highlights)) {
+    next.hero_highlights = next.hero_highlights.filter((item) => !isRemovedPublicSourceItem(item));
+  }
+  return next;
+}
+
+function isRemovedPublicSourceItem(item) {
+  return REMOVED_PUBLIC_SOURCE_RE.test(publicSourceSearchText(item));
+}
+
+function publicSourceSearchText(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
 export function reportToInteractionInput(report, options = {}) {
   const rawReport = report && typeof report === "object" ? report : {};
-  const rawMainItems = Array.isArray(rawReport.main_items) ? rawReport.main_items : [];
-  report = normalizeStoryFirstReport(report);
   const includeInternalSections = options.includeInternalSections === true;
   const includeSourceFirstRuntimeSections = options.includeSourceFirstRuntimeSections === true;
+  const renderReport = !includeInternalSections && !includeSourceFirstRuntimeSections && options.suppressRemovedPublicSources !== false
+    ? publicReportWithoutRemovedSources(rawReport)
+    : rawReport;
+  const rawMainItems = Array.isArray(renderReport.main_items) ? renderReport.main_items : [];
+  report = normalizeStoryFirstReport(renderReport);
   const mediaOptions = {
     assetRootDir: options.assetRootDir || options.outDir || ""
   };
@@ -269,7 +326,12 @@ export function reportToInteractionInput(report, options = {}) {
       richId: "trend-tracking",
       filterLabel: "榜单切换",
       showFilters: true,
-      items: formatDailyTrackingCards(publicDailyTracking, { report, evidenceByUrl, mediaOptions })
+      items: formatDailyTrackingCards(publicDailyTracking, {
+        report,
+        evidenceByUrl,
+        mediaOptions,
+        trackingHistoryById: options.trackingHistoryById
+      })
     });
   }
   if (subscribedSignalItems.length > 0) {
@@ -328,7 +390,7 @@ export function reportToInteractionInput(report, options = {}) {
       items: formatOfficialOrgUpdateCards(officialOrgUpdates, { report, evidenceByUrl, mediaOptions })
     });
   }
-  const communityCards = formatCommunityLeadCards(communityLeads, { report, evidenceByUrl, mediaOptions });
+  const communityCards = [];
   if (communityCards.length > 0) {
     sections.push({
       type: "filterable-cards",
@@ -881,7 +943,8 @@ export async function renderReportWithEffectiveInteract(report, options = {}) {
     rootDir,
     trendAnnotations: options.trendAnnotations,
     assetRootDir: options.assetRootDir,
-    includeInternalSections: options.includeInternalSections
+    includeInternalSections: options.includeInternalSections,
+    trackingHistoryById: options.trackingHistoryById
   }), null, 2)}\n`, "utf8");
 
   const { stdout } = await execFileAsync(process.execPath, [
@@ -1755,6 +1818,9 @@ function formatDailyTrackingCards(items, context = {}) {
     const stats = unavailable ? [] : dailyTrackingStats(item, entries);
     const bars = unavailable ? { rows: [] } : dailyTrackingProviderBars(entries);
     const table = unavailable ? { rows: [] } : dailyTrackingTable(item, entries);
+    const trendState = unavailable
+      ? { curve: null, status: "unavailable", pointCount: 0 }
+      : dailyTrackingTrendState(item, context.trackingHistoryById);
     const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url), {
       limit: 5,
       ...(context.mediaOptions || {})
@@ -1774,11 +1840,62 @@ function formatDailyTrackingCards(items, context = {}) {
       points: [],
       ...(media.length > 0 ? { media } : {}),
       ...(publicComponent ? { component: publicComponent } : {}),
+      ...(trendState.status ? { trendStatus: trendState.status, trendPointCount: trendState.pointCount } : {}),
+      ...(trendState.curve ? { trendCurve: trendState.curve } : {}),
       ...(stats.length > 0 ? { stats } : {}),
       ...(bars.rows.length > 0 ? { bars } : {}),
       ...(table.rows.length > 0 ? { table } : {})
     };
   });
+}
+
+function dailyTrackingTrendCurve(item, trackingHistoryById = {}) {
+  return dailyTrackingTrendState(item, trackingHistoryById).curve;
+}
+
+function dailyTrackingTrendState(item, trackingHistoryById = {}) {
+  const sourceId = String(item?.id || item?.name || item?.source || item?.url || "").trim();
+  if (!sourceId || !trackingHistoryById || typeof trackingHistoryById !== "object") {
+    return { curve: null, status: "missing-history", pointCount: 0 };
+  }
+  const rawPoints = Array.isArray(trackingHistoryById[sourceId]) ? trackingHistoryById[sourceId] : [];
+  const points = rawPoints
+    .map((point) => ({
+      date: String(point?.date || ""),
+      label: String(point?.label || point?.date || "").trim(),
+      value: Number(point?.value),
+      valueLabel: String(point?.valueLabel || point?.value_label || point?.value || "").trim(),
+      topLabel: String(point?.topLabel || point?.top_label || "").trim()
+    }))
+    .filter((point) => point.date && Number.isFinite(point.value))
+    .slice(-7);
+  if (points.length < 2) {
+    return { curve: null, status: "insufficient-history", pointCount: points.length };
+  }
+  return {
+    curve: {
+      sourceId,
+    title: "7日趋势",
+    metric: dailyTrackingTrendMetricLabel(item),
+      points
+    },
+    status: "available",
+    pointCount: points.length
+  };
+}
+
+function dailyTrackingTrendMetricLabel(item = {}) {
+  const text = `${item.id || ""} ${item.name || ""} ${item.source || ""}`.toLowerCase();
+  if (text.includes("openrouter")) {
+    return "榜首周用量";
+  }
+  if (text.includes("artificial-analysis") || text.includes("artificial analysis")) {
+    return "榜首分数";
+  }
+  if (text.includes("swe-bench") || text.includes("swe bench")) {
+    return "榜首 Resolve Rate";
+  }
+  return "榜首指标";
 }
 
 function dailyTrackingPublicComponent(component, entries) {

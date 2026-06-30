@@ -69,6 +69,23 @@ const PUBLIC_DATA_PRIVATE_KEYS = new Set([
 ]);
 const NON_PUBLIC_ASSET_ROLES = new Set(["icon", "favicon", "logo", "avatar", "thumbnail"]);
 const SCREENSHOT_CAPTURE_RE = /(?:full[_-]?page|browser|viewport|screenshot|page[_-]?capture)/i;
+const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf)/i;
+const PUBLIC_SOURCE_FILTER_SECTIONS = [
+  "stories",
+  "main_items",
+  "model_releases",
+  "hot_blogs",
+  "chinese_media_dynamics",
+  "projects",
+  "github_trending",
+  "huggingface_trending",
+  "builder_observations",
+  "official_org_updates",
+  "wechat_items",
+  "zhihu_items",
+  "reddit_items"
+];
+const TRACKING_HISTORY_LIMIT = 7;
 const DAILY_REPORT_HTML_OVERRIDES = `<style data-ai-daily-css-overrides>
 /* Stage D: denser collapsible panels at every width. */
 .report-section-stack .collapsible-panel {
@@ -211,12 +228,14 @@ export async function buildSite(options = {}) {
 
   const dateIndex = buildDateIndex(feedValidation.value, reports, trendValidation.value);
   const reportNavigationByDate = buildReportNavigation(feedValidation.value.reports, dateIndex.items);
+  const trackingHistoryByDate = buildDailyTrackingHistoryByReportDate(reports);
 
   for (const record of reportRecords) {
     await writeReportArtifacts(rootDir, outDir, record.report, writtenFiles, record.markdown, record.reportJsonPath, {
       trendAnnotations: trendValidation.value.annotations_by_date[record.report.report_date],
       reportNavigation: reportNavigationByDate.get(record.report.report_date),
       dateIndexItem: dateIndex.items.find((item) => item.date === record.report.report_date),
+      trackingHistoryById: trackingHistoryByDate.get(record.report.report_date),
       fetchImpl: options.fetchImpl,
       siteUrl,
       includeInternalData: Boolean(options.includeInternalData)
@@ -566,7 +585,7 @@ function dateSignalMetrics(feedReport = {}, report = {}) {
   const githubTrending = arrayValue(report.github_trending);
   const huggingFaceTrending = arrayValue(report.huggingface_trending);
   const builderObservations = arrayValue(report.builder_observations);
-  const communityLeads = arrayValue(report.community_leads);
+  const communityLeads = [];
   const evidenceAssets = arrayValue(report.evidence_assets);
   const platformItems = [
     ...arrayValue(report.wechat_items),
@@ -664,6 +683,161 @@ function arrayValue(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function publicReportWithoutRemovedSources(report) {
+  if (!report || typeof report !== "object") {
+    return report;
+  }
+  const next = structuredClone(report);
+  for (const sectionName of PUBLIC_SOURCE_FILTER_SECTIONS) {
+    if (Array.isArray(next[sectionName])) {
+      next[sectionName] = next[sectionName].filter((item) => !isRemovedPublicSourceItem(item));
+    }
+  }
+  delete next.community_leads;
+  if (Array.isArray(next.source_effectiveness)) {
+    next.source_effectiveness = next.source_effectiveness.filter((row) => !isRemovedPublicSourceItem(row));
+  }
+  if (Array.isArray(next.hero_highlights)) {
+    next.hero_highlights = next.hero_highlights.filter((item) => !isRemovedPublicSourceItem(item));
+  }
+  return next;
+}
+
+function isRemovedPublicSourceItem(item) {
+  return REMOVED_PUBLIC_SOURCE_RE.test(publicSourceSearchText(item));
+}
+
+function publicSourceSearchText(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function buildDailyTrackingHistoryByReportDate(reports = []) {
+  const sortedReports = arrayValue(reports)
+    .filter((report) => report?.report_date)
+    .slice()
+    .sort((left, right) => String(left.report_date).localeCompare(String(right.report_date)));
+  const historyByReportDate = new Map();
+
+  for (const report of sortedReports) {
+    const reportDate = String(report.report_date || "");
+    const windowReports = sortedReports
+      .filter((candidate) => String(candidate.report_date || "") <= reportDate)
+      .slice(-TRACKING_HISTORY_LIMIT);
+    const historyById = {};
+
+    for (const historyReport of windowReports) {
+      const historyDate = String(historyReport.report_date || "");
+      for (const item of arrayValue(historyReport.daily_tracking)) {
+        const point = dailyTrackingHistoryPoint(historyDate, item);
+        if (!point) {
+          continue;
+        }
+        if (!historyById[point.sourceId]) {
+          historyById[point.sourceId] = [];
+        }
+        historyById[point.sourceId].push(point);
+      }
+    }
+
+    for (const [sourceId, points] of Object.entries(historyById)) {
+      const byDate = new Map();
+      for (const point of points) {
+        byDate.set(point.date, point);
+      }
+      historyById[sourceId] = [...byDate.values()]
+        .sort((left, right) => String(left.date).localeCompare(String(right.date)))
+        .slice(-TRACKING_HISTORY_LIMIT);
+    }
+    historyByReportDate.set(reportDate, historyById);
+  }
+
+  return historyByReportDate;
+}
+
+function dailyTrackingHistoryPoint(reportDate, item) {
+  if (!item || item.publish_to_public === false) {
+    return null;
+  }
+  const sourceId = String(item.id || item.name || item.source || item.url || "").trim();
+  if (!sourceId) {
+    return null;
+  }
+  const entry = firstTrackingHistoryEntry(item);
+  const valueLabel = firstNonEmpty(entry?.tokens, entry?.value_label, entry?.value, entry?.score, entry?.metric);
+  const value = parseTrackingHistoryNumericValue(valueLabel);
+  if (!Number.isFinite(value)) {
+    return null;
+  }
+  return {
+    sourceId,
+    date: reportDate,
+    label: String(reportDate || "").slice(5),
+    value,
+    valueLabel: String(valueLabel || ""),
+    topLabel: firstNonEmpty(entry?.model, entry?.name, entry?.title, item.name),
+    rank: Number.isFinite(Number(entry?.rank)) ? Number(entry.rank) : 1
+  };
+}
+
+function firstTrackingHistoryEntry(item) {
+  const snapshotEntries = arrayValue(item?.snapshot?.top_entries);
+  if (snapshotEntries.length > 0) {
+    return snapshotEntries[0];
+  }
+  const componentRows = arrayValue(item?.tracking_component_snapshot?.rows);
+  if (componentRows.length > 0) {
+    return componentRows[0];
+  }
+  const metrics = arrayValue(item?.metrics);
+  if (metrics.length > 0) {
+    return metrics[0];
+  }
+  return null;
+}
+
+function firstNonEmpty(...values) {
+  for (const value of values) {
+    const text = String(value ?? "").trim();
+    if (text) {
+      return text;
+    }
+  }
+  return "";
+}
+
+function parseTrackingHistoryNumericValue(value) {
+  const text = String(value || "").replace(/,/g, "").trim();
+  const match = text.match(/[-+]?\d+(?:\.\d+)?/);
+  if (!match) {
+    return NaN;
+  }
+  const amount = Number(match[0]);
+  if (!Number.isFinite(amount)) {
+    return NaN;
+  }
+  const unit = String((text.match(/\b([KMBGT])(?:\b|(?=\s*tokens?))/i) || [])[1] || "").toUpperCase();
+  const multiplier = unit === "T"
+    ? 1_000_000_000_000
+    : unit === "G" || unit === "B"
+      ? 1_000_000_000
+      : unit === "M"
+        ? 1_000_000
+        : unit === "K"
+          ? 1_000
+          : 1;
+  return amount * multiplier;
+}
+
 function weekdayLabel(dateString) {
   const date = new Date(`${dateString}T00:00:00Z`);
   if (Number.isNaN(date.getTime())) {
@@ -743,7 +917,8 @@ async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markd
     assetRootDir: outDir,
     trendAnnotations: options.trendAnnotations,
     reportNavigation: options.reportNavigation,
-    dateIndexItem: options.dateIndexItem
+    dateIndexItem: options.dateIndexItem,
+    trackingHistoryById: options.trackingHistoryById
   }), report.report_date);
   await writeJsonTracked(outDir, paths.dataPath, publicReportData(report), writtenFiles);
   await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);
@@ -816,20 +991,22 @@ function withDefaultImportanceForReport(report) {
 }
 
 function publicReportData(report) {
-  const result = sanitizePublicValue(report);
-  result.stories = publicStories(report?.stories);
-  result.hero_highlights = publicHeroHighlights(report?.hero_highlights);
-  const qualityStatus = publicQualityStatus(report?.quality_status);
+  const publicReport = publicReportWithoutRemovedSources(report);
+  const result = sanitizePublicValue(publicReport);
+  delete result.community_leads;
+  result.stories = publicStories(publicReport?.stories);
+  result.hero_highlights = publicHeroHighlights(publicReport?.hero_highlights);
+  const qualityStatus = publicQualityStatus(publicReport?.quality_status);
   if (qualityStatus) {
     result.quality_status = qualityStatus;
   }
   result.daily_tracking = (Array.isArray(result.daily_tracking) ? result.daily_tracking : [])
-    .filter((item) => report?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false)
+    .filter((item) => publicReport?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false)
     .map(stripUnpublishableOfficialSnapshots);
-  result.github_trending = publicGithubTrending(report?.github_trending);
-  result.projects = publicGithubProjects(report?.projects);
-  result.source_effectiveness = publicSourceEffectiveness(report?.source_effectiveness);
-  result.evidence_assets = publicEvidenceAssets(report?.evidence_assets);
+  result.github_trending = publicGithubTrending(publicReport?.github_trending);
+  result.projects = publicGithubProjects(publicReport?.projects);
+  result.source_effectiveness = publicSourceEffectiveness(publicReport?.source_effectiveness);
+  result.evidence_assets = publicEvidenceAssets(publicReport?.evidence_assets);
   return result;
 }
 

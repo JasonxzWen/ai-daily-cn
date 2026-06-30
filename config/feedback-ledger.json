@@ -204,7 +204,7 @@
       "status": "implemented",
       "title": "Surface domestic dynamics without weakening source gates",
       "problem": "Domestic Chinese AI dynamics could be present in the candidate pool but remain buried in source audit or mixed community leads, making the public report look dominated by overseas vendor updates.",
-      "expected_behavior": "When qualified Chinese or domestic candidates exist, public content preserves domestic visibility inside existing main groups, hot blogs, GitHub Trending, or the shared `社区线索` section; unresolved high-risk intermediary facts keep verification/risk disclosure and are not promoted to factual main items or a separate `国内动态` navigation item.",
+      "expected_behavior": "When qualified Chinese or domestic candidates exist, public content preserves domestic visibility inside existing main groups, hot blogs, Chinese media/RSS, GitHub Trending, or story sections. `community_leads` is not a public card surface; unresolved high-risk intermediary facts keep verification/risk disclosure and are not promoted to factual main items or a separate `国内动态` navigation item.",
       "scope": [
         "config/feedback-ledger.json",
         "src/interaction-report.js",
@@ -213,7 +213,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "domestic community leads stay inside the shared community section",
+        "test_name": "domestic community leads are omitted from public interaction sections",
         "gate": "npm run validate"
       }
     },

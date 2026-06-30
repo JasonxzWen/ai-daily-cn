@@ -287,6 +287,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         const hasVisualData = Boolean(
           card.querySelector("[data-card-data-table]") ||
           card.querySelector("[data-card-bars]") ||
+          card.querySelector("[data-tracking-trend-curve]") ||
           card.querySelector("[data-official-component-snapshot]") ||
           card.querySelector(".card-media-grid img")
         );
@@ -313,6 +314,38 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       trackingCards.length > 0 && weakTrackingCards.length === 0,
       "Daily tracking should render at least one visual/table-first public card and must not render leaderboard rows as text detail logs.",
       { count: trackingCards.length, weak_cards: weakTrackingCards }
+    );
+    const missingTrendCurveCards = trackingCards
+      .map((card, index) => {
+        if (hasTrackingSourceUnavailableNote(card)) {
+          return null;
+        }
+        const title = card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const hasStructuredTracking = Boolean(
+          card.querySelector("[data-card-data-table]") ||
+          card.querySelector("[data-card-bars]") ||
+          card.querySelector("[data-official-component-snapshot]")
+        );
+        if (!hasStructuredTracking) {
+          return null;
+        }
+        const trendStatus = card.getAttribute("data-trend-status") || "";
+        const historyPointCount = Number(card.getAttribute("data-trend-history-points") || 0);
+        if (trendStatus === "insufficient-history" && historyPointCount < 2) {
+          return null;
+        }
+        const curve = card.querySelector("[data-tracking-trend-curve]");
+        const pointCount = Number(curve?.getAttribute("data-trend-points") || 0);
+        return curve && pointCount >= 2
+          ? null
+          : { index, title, point_count: pointCount };
+      })
+      .filter(Boolean);
+    addCheck(
+      "daily_tracking_trend_curves",
+      missingTrendCurveCards.length === 0,
+      "Daily tracking cards with structured leaderboard data should include a pre-rendered recent trend curve when history is available.",
+      { missing_cards: missingTrendCurveCards }
     );
     const trackingScreenshotIssues = trackingCards
       .map((card) => {
@@ -445,7 +478,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     );
     const trackingOverlapIssues = trackingCards
       .map((card, index) => {
-        const selectors = [":scope > h3", ":scope > .card-tags", ":scope > .card-stat-grid", ":scope > .card-bars", ":scope > .card-table", ":scope > .card-media-grid", ":scope > p"];
+        const selectors = [":scope > h3", ":scope > .card-tags", ":scope > .card-stat-grid", ":scope > .card-trend-curve", ":scope > .card-bars", ":scope > .card-table", ":scope > .card-media-grid", ":scope > p"];
         const rects = selectors
           .flatMap((selector) => Array.from(card.querySelectorAll(selector)))
           .map((node) => {
