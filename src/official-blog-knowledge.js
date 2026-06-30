@@ -161,7 +161,21 @@ export function triageOfficialBlogPreview(preview = {}) {
   const matchedCriteria = [];
   const suggestedTopics = [];
 
-  addIf(hasAny(text, ["codex", "claude code", "agent sdk", "responses api", "structured outputs", "model context protocol", "mcp connector", "computer use"]), matchedCriteria, "new_product");
+  addIf(hasAny(text, [
+    "codex",
+    "claude code",
+    "agent sdk",
+    "responses api",
+    "structured outputs",
+    "model context protocol",
+    "mcp connector",
+    "computer use",
+    "new product",
+    "new developer product",
+    "developer platform",
+    "developer platform primitive",
+    "new api primitive"
+  ]), matchedCriteria, "new_product");
   addIf(hasAny(text, ["new model", "model release", "system card", "model spec", "capability", "benchmark", "evals"]), matchedCriteria, "new_model");
   addIf(hasAny(text, ["best practice", "pattern", "architecture", "implementation", "workflow", "orchestration", "permissions", "observability", "sandbox", "tool use", "context engineering"]), matchedCriteria, "engineering_practice");
   addIf(hasAny(text, ["harness", "long running agent", "long horizon", "environment management"]), matchedCriteria, "harness_engineering");
@@ -243,6 +257,107 @@ export function triageOfficialBlogPreview(preview = {}) {
   };
 }
 
+export function createOfficialBlogIntakeQueue(input = {}, options = {}) {
+  const candidates = officialBlogIntakeCandidates(input);
+  const existingByUrl = existingOfficialBlogRecordByUrl(options.existingIndex);
+  const seenByUrl = new Map();
+  const reviewQueue = [];
+  const excluded = [];
+  const duplicates = [];
+  const invalidCandidates = [];
+
+  for (const [index, rawCandidate] of candidates.entries()) {
+    let candidate;
+    try {
+      candidate = normalizeOfficialBlogIntakeCandidate(rawCandidate, { index });
+    } catch (error) {
+      invalidCandidates.push({
+        index,
+        title_original: String(rawCandidate?.title_original || rawCandidate?.title || ""),
+        canonical_url: String(rawCandidate?.canonical_url || rawCandidate?.canonicalUrl || rawCandidate?.url || ""),
+        reason: error.message
+      });
+      continue;
+    }
+
+    const existingRecord = existingByUrl.get(candidate.normalized_url);
+    if (existingRecord) {
+      duplicates.push({
+        ...officialBlogIntakeCandidateBase(candidate),
+        duplicate_source: "existing_knowledge",
+        duplicate_of: existingRecord.id || ""
+      });
+      continue;
+    }
+
+    const seenRecord = seenByUrl.get(candidate.normalized_url);
+    if (seenRecord) {
+      duplicates.push({
+        ...officialBlogIntakeCandidateBase(candidate),
+        duplicate_source: "same_batch",
+        duplicate_of: seenRecord.intake_id
+      });
+      continue;
+    }
+
+    const triage = triageOfficialBlogPreview({
+      title: candidate.title_original,
+      opening_preview: candidate.opening_preview
+    });
+    const base = officialBlogIntakeCandidateBase(candidate);
+    seenByUrl.set(candidate.normalized_url, base);
+
+    if (triage.admission === "include" || triage.admission === "needs_review") {
+      reviewQueue.push({
+        ...base,
+        admission: {
+          decision: triage.admission,
+          reason: triage.reason,
+          matched_criteria: triage.matched_criteria
+        },
+        suggested_topics: triage.suggested_topics,
+        knowledge_value: triage.knowledge_value,
+        next_action: triage.admission === "include" ? "draft_knowledge_record" : "manual_review_required"
+      });
+      continue;
+    }
+
+    excluded.push({
+      ...base,
+      admission: {
+        decision: "exclude",
+        reason: triage.reason,
+        matched_criteria: triage.matched_criteria
+      },
+      excluded_as: triage.excluded_as,
+      suggested_topics: triage.suggested_topics,
+      knowledge_value: triage.knowledge_value
+    });
+  }
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_intake_queue",
+    visibility: "internal",
+    report_date: String(options.reportDate || ""),
+    generated_at: String(options.generatedAt || new Date().toISOString()),
+    policy_scope: OFFICIAL_BLOG_ADMISSION_POLICY.scope,
+    stats: {
+      total_candidates: candidates.length,
+      review_queue: reviewQueue.length,
+      included: reviewQueue.filter((candidate) => candidate.admission.decision === "include").length,
+      needs_review: reviewQueue.filter((candidate) => candidate.admission.decision === "needs_review").length,
+      excluded: excluded.length,
+      duplicates: duplicates.length,
+      invalid: invalidCandidates.length
+    },
+    review_queue: reviewQueue,
+    excluded,
+    duplicates,
+    invalid_candidates: invalidCandidates
+  };
+}
+
 export async function validateOfficialBlogKnowledge(index) {
   const schema = JSON.parse(await fs.readFile(SCHEMA_PATH, "utf8"));
   const ajv = createAjv();
@@ -310,6 +425,118 @@ function safeNormalizeOfficialBlogUrl(value) {
   } catch {
     return "";
   }
+}
+
+function officialBlogIntakeCandidates(input = {}) {
+  if (Array.isArray(input)) {
+    return input;
+  }
+  if (Array.isArray(input.candidates)) {
+    return input.candidates;
+  }
+  if (Array.isArray(input.items)) {
+    return input.items;
+  }
+  return [];
+}
+
+function existingOfficialBlogRecordByUrl(index = {}) {
+  const byUrl = new Map();
+  for (const record of Array.isArray(index.records) ? index.records : []) {
+    const normalized = safeNormalizeOfficialBlogUrl(record.normalized_url || record.canonical_url);
+    if (normalized) {
+      byUrl.set(normalized, record);
+    }
+  }
+  return byUrl;
+}
+
+function normalizeOfficialBlogIntakeCandidate(rawCandidate = {}, context = {}) {
+  const canonicalUrl = String(rawCandidate.canonical_url || rawCandidate.canonicalUrl || rawCandidate.url || "").trim();
+  if (!canonicalUrl) {
+    throw new Error(`official blog intake candidate missing URL at index ${context.index}`);
+  }
+
+  const normalizedUrl = normalizeOfficialBlogUrl(canonicalUrl);
+  const company = normalizeOfficialBlogCompany(rawCandidate.company || inferOfficialBlogCompany(normalizedUrl));
+  if (!SUPPORTED_COMPANIES.has(company)) {
+    throw new Error(`unsupported official blog company at index ${context.index}: ${company || "(missing)"}`);
+  }
+
+  const title = String(rawCandidate.title_original || rawCandidate.titleOriginal || rawCandidate.title || "").trim();
+  if (!title) {
+    throw new Error(`official blog intake candidate missing title at index ${context.index}`);
+  }
+
+  const openingPreview = officialBlogOpeningPreview(rawCandidate);
+  const publishedAt = String(rawCandidate.published_at || rawCandidate.publishedAt || "").trim();
+  const candidate = {
+    company,
+    canonical_url: canonicalUrl,
+    normalized_url: normalizedUrl,
+    published_at: publishedAt,
+    title_original: title,
+    opening_preview: openingPreview,
+    source_label: String(rawCandidate.source_label || rawCandidate.source || "").trim()
+  };
+  candidate.intake_id = officialBlogIntakeId(candidate, context);
+  return candidate;
+}
+
+function normalizeOfficialBlogCompany(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "openai" || normalized === "openai blog") {
+    return "openai";
+  }
+  if (normalized === "anthropic" || normalized === "anthropic blog") {
+    return "anthropic";
+  }
+  return normalized;
+}
+
+function inferOfficialBlogCompany(value) {
+  try {
+    const hostname = new URL(String(value || "")).hostname.toLowerCase();
+    if (hostname === "openai.com" || hostname.endsWith(".openai.com")) {
+      return "openai";
+    }
+    if (hostname === "anthropic.com" || hostname.endsWith(".anthropic.com")) {
+      return "anthropic";
+    }
+  } catch {
+    return "";
+  }
+  return "";
+}
+
+function officialBlogIntakeCandidateBase(candidate) {
+  return {
+    intake_id: candidate.intake_id,
+    company: candidate.company,
+    company_label: candidate.company === "anthropic" ? "Anthropic" : "OpenAI",
+    canonical_url: candidate.canonical_url,
+    normalized_url: candidate.normalized_url,
+    published_at: candidate.published_at,
+    title_original: candidate.title_original,
+    opening_preview: candidate.opening_preview,
+    source_label: candidate.source_label
+  };
+}
+
+function officialBlogIntakeId(candidate, context = {}) {
+  const url = new URL(candidate.normalized_url);
+  const pathSlug = url.pathname.split("/").filter(Boolean).pop() || url.hostname;
+  const slug = slugifyOfficialBlogToken(pathSlug || candidate.title_original) || `candidate-${context.index || 0}`;
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(candidate.published_at) ? candidate.published_at : "undated";
+  return `${candidate.company}-${slug}-${date}`;
+}
+
+function slugifyOfficialBlogToken(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
 }
 
 function normalizeOfficialBlogRecord(record, context = {}) {

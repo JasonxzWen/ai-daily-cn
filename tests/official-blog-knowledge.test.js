@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  createOfficialBlogIntakeQueue,
   loadOfficialBlogKnowledge,
   normalizeOfficialBlogUrl,
   triageOfficialBlogPreview
@@ -253,6 +254,103 @@ test("official blog admission threshold sends concrete implementation customer s
   assert.equal(result.admission, "needs_review");
   assert(result.matched_criteria.includes("engineering_practice"));
   assert(result.suggested_topics.includes("evals"));
+});
+
+test("official blog intake creates an internal review queue from opening previews", async () => {
+  const existingIndex = await loadOfficialBlogKnowledge({ rootDir });
+  const result = createOfficialBlogIntakeQueue({
+    candidates: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/introducing-examplemodel-5/?utm_source=newsletter",
+        published_at: "2026-06-30",
+        title: "Introducing ExampleModel 5",
+        opening_paragraphs: [
+          "Today we are releasing a new model with improved coding capabilities, benchmark results, evals, safety mitigations, and integration guidance.",
+          "The post explains model behavior changes and deployment constraints for developers."
+        ]
+      },
+      {
+        company: "anthropic",
+        url: "https://www.anthropic.com/news/examplebank-claude-support",
+        published_at: "2026-06-30",
+        title_original: "How ExampleBank built a Claude support workflow",
+        opening_preview: "The opening preview describes routing architecture, tool permissions, evaluation harnesses, observability, and rollout controls for production agents."
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/new-developer-product-for-agents",
+        published_at: "2026-06-30",
+        title: "Launching a new developer product for agent orchestration",
+        opening_preview: "This new developer product adds a developer platform primitive for orchestrating tool calls, deployment constraints, and integration guidance."
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/news/examplecorp-partnership",
+        published_at: "2026-06-30",
+        title: "OpenAI and ExampleCorp expand enterprise API partnership",
+        excerpt: "The companies will bring API tools to more teams and improve everyday business workflows for employees and customers."
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/news/strategic-partnership",
+        published_at: "2026-06-30",
+        title: "OpenAI and ExampleCorp expand strategic partnership",
+        summary: [
+          "OpenAI and ExampleCorp announced a broader partnership to bring AI tools to employees and customers.",
+          "Executives said the collaboration will support future business workflows across global markets.",
+          "Later paragraphs mention routing architecture, evaluation harnesses, tool permissions, and rollout controls."
+        ].join("\n\n")
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/introducing-structured-outputs-in-the-api/?ref=queue",
+        published_at: "2024-08-06",
+        title: "Introducing structured outputs in the API",
+        opening_preview: "Existing curated record should not be queued again."
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/introducing-examplemodel-5/#details",
+        published_at: "2026-06-30",
+        title: "Introducing ExampleModel 5 duplicate",
+        opening_preview: "Duplicate candidate URL should not be queued again."
+      }
+    ]
+  }, {
+    existingIndex,
+    reportDate: "2026-06-30",
+    generatedAt: "2026-06-30T08:00:00.000Z"
+  });
+
+  assert.equal(result.kind, "official_blog_intake_queue");
+  assert.equal(result.visibility, "internal");
+  assert.equal(result.stats.total_candidates, 7);
+  assert.equal(result.review_queue.length, 3);
+  assert.equal(result.excluded.length, 2);
+  assert.equal(result.duplicates.length, 2);
+  assert.equal(result.invalid_candidates.length, 0);
+
+  const model = result.review_queue.find((candidate) => candidate.title_original === "Introducing ExampleModel 5");
+  assert.equal(model.admission.decision, "include");
+  assert.equal(model.next_action, "draft_knowledge_record");
+  assert(model.admission.matched_criteria.includes("new_model"));
+  assert.equal(model.opening_preview.includes("Later paragraphs"), false);
+
+  const customerStory = result.review_queue.find((candidate) => candidate.company === "anthropic");
+  assert.equal(customerStory.admission.decision, "needs_review");
+  assert.equal(customerStory.next_action, "manual_review_required");
+  assert(customerStory.admission.matched_criteria.includes("engineering_practice"));
+
+  const product = result.review_queue.find((candidate) => candidate.title_original.includes("new developer product"));
+  assert.equal(product.admission.decision, "include");
+  assert(product.admission.matched_criteria.includes("new_product"));
+  assert(product.suggested_topics.includes("agent"));
+
+  assert(result.excluded.some((candidate) => candidate.excluded_as === "company_news" && candidate.title_original.includes("enterprise API partnership")));
+  assert(result.excluded.some((candidate) => candidate.title_original.includes("strategic partnership")));
+  assert(result.duplicates.some((candidate) => candidate.duplicate_source === "existing_knowledge"));
+  assert(result.duplicates.some((candidate) => candidate.duplicate_source === "same_batch"));
 });
 
 test("repository seed knowledge includes curated OpenAI and Anthropic records", async () => {

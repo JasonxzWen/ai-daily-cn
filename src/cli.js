@@ -41,6 +41,10 @@ import {
 } from "./quality-loop.js";
 import { runDailyWorkflow } from "./daily-runner.js";
 import { runStatusSelfCheck } from "./status-self-check.js";
+import {
+  createOfficialBlogIntakeQueue,
+  loadOfficialBlogKnowledge
+} from "./official-blog-knowledge.js";
 
 const [command, ...argv] = process.argv.slice(2);
 
@@ -155,6 +159,31 @@ try {
     if (result.status === "blocked") {
       process.exitCode = 1;
     }
+  } else if (command === "official-blog:intake") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_intake_input_required", "official-blog:intake requires --input <candidate-previews.json>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogIntakeOutputPath({ outputPath, rootDir });
+    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const existingIndex = await loadOfficialBlogKnowledge({
+      rootDir,
+      knowledgeDir: args["knowledge-dir"] ? path.resolve(args["knowledge-dir"]) : undefined
+    });
+    const queue = createOfficialBlogIntakeQueue(input, {
+      existingIndex,
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"]
+    });
+    printJson({
+      ok: true,
+      input_path: resolvedInputPath,
+      queue
+    }, outputPath);
   } else if (command === "preflight:worktree") {
     const args = parseArgs(argv);
     const result = await checkWorktreePreflight({
@@ -880,7 +909,44 @@ function outputPathFromArgs(args) {
     return "";
   }
   const parsed = parseArgs(args);
+  if (command === "official-blog:intake" && typeof parsed.output === "string" && parsed.output.trim()) {
+    const rootDir = path.resolve(parsed["repo-root"] || process.cwd());
+    return isOfficialBlogIntakePublicOutputPath(parsed.output, rootDir) ? "" : parsed.output;
+  }
   return typeof parsed.output === "string" && parsed.output.trim() ? parsed.output : "";
+}
+
+function assertOfficialBlogIntakeOutputPath(options = {}) {
+  const outputPath = String(options.outputPath || "").trim();
+  if (!outputPath) {
+    return;
+  }
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  if (isOfficialBlogIntakePublicOutputPath(outputPath, rootDir)) {
+    throw new PublisherError(
+      "official_blog_intake_public_output_forbidden",
+      "official-blog:intake writes internal candidate and triage data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+    );
+  }
+}
+
+function isOfficialBlogIntakePublicOutputPath(outputPath, rootDir) {
+  const resolved = path.resolve(outputPath);
+  const publicRoot = path.resolve(rootDir, "docs");
+  const relative = path.relative(publicRoot, resolved).split(path.sep).join("/");
+  const insidePublicRoot = relative === "" || (!relative.startsWith("../") && relative !== ".." && !path.isAbsolute(relative));
+  if (!insidePublicRoot) {
+    return false;
+  }
+
+  const normalized = relative.toLowerCase();
+  return (
+    normalized === "data" ||
+    normalized.startsWith("data/") ||
+    normalized === "official-blogs" ||
+    normalized.startsWith("official-blogs/") ||
+    normalized.endsWith(".html")
+  );
 }
 
 function countBy(items, key) {
