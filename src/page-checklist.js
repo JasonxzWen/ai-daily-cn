@@ -861,6 +861,19 @@ export async function evaluateIndexPageChecklist(page, options = {}) {
         border_style: getComputedStyle(card).borderStyle
       }))
       .filter((card) => card.quality_channel !== "degraded" && card.quality_channel !== "blocked" || !card.has_badge);
+    const officialBlogKnowledge = document.querySelector("#official-blog-knowledge");
+    const officialBlogCards = Array.from(document.querySelectorAll("[data-official-blog-card]"));
+    const officialBlogCompanies = new Set(
+      officialBlogCards
+        .map((card) => card.getAttribute("data-official-blog-company") || "")
+        .filter(Boolean)
+    );
+    const officialBlogJsonLink = document.querySelector('#official-blog-knowledge a[href="data/official-blogs.json"]');
+    const officialBlogPrivateHits = officialBlogKnowledge
+      ? ["admission", "admission_policy", "source_audit", "self_check", "candidate_id"].filter((token) =>
+          (officialBlogKnowledge.textContent || "").includes(token)
+        )
+      : [];
 
     addCheck(
       "index_console_present",
@@ -916,6 +929,30 @@ export async function evaluateIndexPageChecklist(page, options = {}) {
       "topic_radar_present",
       Boolean(topicRadar),
       "Homepage should render a topic radar when trend data is available."
+    );
+    addCheck(
+      "official_blog_knowledge_present",
+      Boolean(officialBlogKnowledge),
+      "Homepage should render the official blog knowledge module."
+    );
+    addCheck(
+      "official_blog_knowledge_cards",
+      officialBlogCards.length >= 6 &&
+        officialBlogCompanies.has("openai") &&
+        officialBlogCompanies.has("anthropic") &&
+        Boolean(officialBlogJsonLink),
+      "Official blog module should expose curated OpenAI/Anthropic cards and the public JSON projection.",
+      {
+        card_count: officialBlogCards.length,
+        companies: [...officialBlogCompanies].sort(),
+        json_link: Boolean(officialBlogJsonLink)
+      }
+    );
+    addCheck(
+      "official_blog_knowledge_public_only",
+      officialBlogPrivateHits.length === 0,
+      "Official blog module should not expose admission or internal audit fields.",
+      { hits: officialBlogPrivateHits }
     );
     addCheck(
       "archive_first_copy_absent",

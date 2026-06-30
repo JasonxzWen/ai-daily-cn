@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.official-blog-knowledge-stage2",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Official blog knowledge stage 2",
+  "slug": "official-blog-knowledge-stage2",
+  "status": "completed",
+  "summary": "This iteration promotes the curated OpenAI and Anthropic official blog knowledge layer into the generated homepage and a minimized public JSON projection. It keeps admission and audit details private while exposing reader-facing company counts, topics, source links, and compact knowledge cards.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog knowledge homepage|public official blog knowledge projection|official blog knowledge generated file\" tests/unit.test.js tests/e2e/site.e2e.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "npm run test",
+      "npm run build",
+      "npm run test:e2e",
+      "node scripts/harness-validate.mjs",
+      "git diff --check",
+      "npm run validate",
+      "Playwright desktop/mobile screenshot inspection for the generated index page"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The official blog module needs a public projection separate from the source knowledge index.",
+      "evidence": "The generated `data/official-blogs.json` contains six reader-facing records and excludes admission, admission policy, source audit, self-check, candidate, and rationale fields.",
+      "scope": "official_blog_public_projection",
+      "persistence": "implemented",
+      "recommended_action": "Keep future blog excerpt pages and daily cross-links reading from the public projection unless an internal authoring task explicitly needs admission metadata."
+    },
+    {
+      "lesson": "Homepage quality gates should cover the knowledge module directly.",
+      "evidence": "`evaluateIndexPageChecklist` now checks for the official blog module, OpenAI/Anthropic cards, the public JSON link, and absence of internal admission/audit text.",
+      "scope": "index_page_checklist",
+      "persistence": "implemented",
+      "recommended_action": "Add later graph/cross-link requirements to the same deterministic index checklist before expanding the public surface."
+    },
+    {
+      "lesson": "First-pass blog admission should use the title plus opening preview rather than full manual reading.",
+      "evidence": "The admission policy now treats new products, new models, technical practices, harness engineering, agent workflows, evals, and implementation write-ups as includable, while ordinary partnerships, customer-adoption news, market updates, events, hiring, funding, and sales copy are excluded unless reusable implementation detail is hinted and needs review.",
+      "scope": "official_blog_admission_triage",
+      "persistence": "implemented",
+      "recommended_action": "Use this first-pass rule when adding automated OpenAI/Anthropic blog feed ingestion."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The homepage had no visible entrypoint for curated official blog knowledge even after Stage 1 created the data layer.",
+      "evidence": "Stage 2 adds `#official-blog-knowledge`, `docs/data/official-blogs.json`, generated-file planning, publish keep-list coverage, unit tests, e2e checks, and desktop/mobile screenshot inspection.",
+      "module": "src/render.js, src/site.js, src/page-checklist.js, docs/data/official-blogs.json",
+      "suggestion": "Expose the official blog knowledge base as a compact homepage module backed by a sanitized public JSON projection.",
+      "expected_benefit": "Daily reports and future blog excerpt pages can link to a stable, reader-facing knowledge surface without exposing internal triage metadata.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through generated homepage rendering, public data projection, publish planning, deterministic checklist coverage, e2e browser checks, and full validation.",
+      "ledger_links": [
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-editorial-importance-density-source-visibility",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog knowledge homepage renders curated blog graph entrypoint",
+        "public official blog knowledge projection is generated and planned",
+        "npm run validate"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-official-org-updates-section",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-prepublish-editorial-prune-gate",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Stage 3 should connect daily report items to official blog knowledge records through related blog ids and related report dates.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add automated OpenAI/Anthropic blog feed ingestion with first-pass title/opening-preview triage and needs-review output for technical customer stories.",
+      "owner": "project"
+    }
+  ]
+}

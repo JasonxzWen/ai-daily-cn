@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-29T18:42:27.633Z",
+  "curation_scope": "Curated OpenAI and Anthropic official blogs with durable product, model, technical-practice, harness, agent workflow, eval, safety-engineering, or implementation knowledge value.",
+  "companies": [
+    "anthropic",
+    "openai"
+  ],
+  "topics": [
+    "agent",
+    "api_reliability",
+    "coding_agent",
+    "context_engineering",
+    "developer_tooling",
+    "evals",
+    "harness_engineering",
+    "mcp",
+    "responses_api",
+    "sandbox",
+    "structured_outputs",
+    "tool_use",
+    "workflow_orchestration"
+  ],
+  "stats": {
+    "total_records": 6,
+    "by_company": {
+      "anthropic": 3,
+      "openai": 3
+    },
+    "by_importance": {
+      "major": 2,
+      "foundational": 4
+    }
+  },
+  "records": [
+    {
+      "id": "openai-introducing-codex-2025-05-16",
+      "company": "openai",
+      "company_label": "OpenAI",
+      "canonical_url": "https://openai.com/index/introducing-codex/",
+      "normalized_url": "https://openai.com/index/introducing-codex",
+      "published_at": "2025-05-16",
+      "title_original": "Introducing Codex",
+      "title_zh": "OpenAI 发布 Codex",
+      "importance": "major",
+      "content_type": "product_practice",
+      "topics": [
+        "agent",
+        "coding_agent",
+        "developer_tooling",
+        "sandbox"
+      ],
+      "summary_zh": "这篇文章是 OpenAI 把 coding agent 推向产品形态的重要节点。它的知识价值不在“又有一个代码助手”，而在 repo 级任务、隔离执行、结果交付和人类复核如何组成工程工作流。",
+      "key_ideas": [
+        "coding agent 的产品边界从补全转向异步任务执行和可审查交付。",
+        "仓库上下文、隔离运行环境和验证命令是判断可用性的关键。",
+        "后续日报中的 Codex 更新应回到工作流、权限、评审和验证能力上理解。"
+      ],
+      "practice_checklist": [
+        "给 coding agent 任务提供明确规格、允许路径和验证命令。",
+        "把 agent 输出纳入代码审查、测试和回滚策略，而不是直接发布。",
+        "关注 sandbox、依赖安装、长任务恢复和 PR 交付链路。"
+      ],
+      "related_blog_ids": [
+        "openai-new-tools-building-agents-2025-03-11"
+      ],
+      "related_report_dates": []
+    },
+    {
+      "id": "anthropic-claude-code-best-practices-2025-04-18",
+      "company": "anthropic",
+      "company_label": "Anthropic",
+      "canonical_url": "https://www.anthropic.com/engineering/claude-code-best-practices",
+      "normalized_url": "https://www.anthropic.com/engineering/claude-code-best-practices",
+      "published_at": "2025-04-18",
+      "title_original": "Claude Code: Best practices for agentic coding",
+      "title_zh": "Claude Code：agentic coding 最佳实践",
+      "importance": "major",
+      "content_type": "engineering_note",
+      "topics": [
+        "agent",
+        "coding_agent",
+        "developer_tooling",
+        "harness_engineering"
+      ],
+      "summary_zh": "这篇文章的价值在于把 Claude Code 当作工程协作者而不是聊天窗口：任务拆分、上下文准备、迭代验收和工具使用方式都会影响产出质量。它适合和 Codex、Claude Code、repo 级 agent 工作流新闻互链。",
+      "key_ideas": [
+        "coding agent 的效果高度依赖任务规格、仓库上下文和反馈循环。",
+        "小步迭代、明确验证命令和人工审查比一次性大任务更可靠。",
+        "agentic coding 的最佳实践应被固化到项目 runbook 和 harness 中。"
+      ],
+      "practice_checklist": [
+        "给 coding agent 明确目标、限制、文件边界和验收命令。",
+        "把复杂任务拆成可独立验证的阶段。",
+        "让 agent 在交付前运行测试并报告残余风险。"
+      ],
+      "related_blog_ids": [
+        "anthropic-building-effective-agents-2024-12-19"
+      ],
+      "related_report_dates": []
+    },
+    {
+      "id": "openai-new-tools-building-agents-2025-03-11",
+      "company": "openai",
+      "company_label": "OpenAI",
+      "canonical_url": "https://openai.com/index/new-tools-for-building-agents/",
+      "normalized_url": "https://openai.com/index/new-tools-for-building-agents",
+      "published_at": "2025-03-11",
+      "title_original": "New tools for building agents",
+      "title_zh": "用于构建智能体的新工具",
+      "importance": "foundational",
+      "content_type": "product_practice",
+      "topics": [
+        "agent",
+        "responses_api",
+        "tool_use",
+        "workflow_orchestration"
+      ],
+      "summary_zh": "这篇文章适合作为 OpenAI agent 平台化路线的基础节点：它把模型调用、工具使用、响应编排和开发者接口放进同一套构建语境，后续涉及 Responses API、Agent SDK 或工具链封装的日报都可以反向引用。",
+      "key_ideas": [
+        "agent 不只是模型能力，还需要统一的工具接口和执行编排入口。",
+        "平台原语会改变应用层对搜索、文件、计算机使用和工具调用的组织方式。",
+        "日报中出现新的 agent 产品或 SDK 时，应判断它是能力更新还是工作流抽象更新。"
+      ],
+      "practice_checklist": [
+        "把模型响应、工具调用和状态管理作为同一条执行链设计。",
+        "为每个工具定义权限、输入输出 schema 和失败恢复路径。",
+        "在引入 agent SDK 前先明确哪些步骤需要模型决策，哪些步骤应保持确定性。"
+      ],
+      "related_blog_ids": [
+        "openai-structured-outputs-2024-08-06"
+      ],
+      "related_report_dates": []
+    },
+    {
+      "id": "anthropic-building-effective-agents-2024-12-19",
+      "company": "anthropic",
+      "company_label": "Anthropic",
+      "canonical_url": "https://www.anthropic.com/research/building-effective-agents",
+      "normalized_url": "https://www.anthropic.com/research/building-effective-agents",
+      "published_at": "2024-12-19",
+      "title_original": "Building effective agents",
+      "title_zh": "构建有效智能体",
+      "importance": "foundational",
+      "content_type": "best_practice",
+      "topics": [
+        "agent",
+        "evals",
+        "harness_engineering",
+        "workflow_orchestration"
+      ],
+      "summary_zh": "这篇文章适合作为 agent 工程实践的长期基准：它强调先用简单工作流，再根据任务需要增加 agent 自主性、工具和评测闭环。后续多智能体、长任务和 harness 相关新闻都可以用它校准是否真正提升工程可控性。",
+      "key_ideas": [
+        "有效 agent 不等于最大自治度，很多任务应从确定性 workflow 开始。",
+        "工具、记忆、规划和多步骤执行都需要 eval 与可观测性支撑。",
+        "多智能体只有在分工、上下文隔离和结果合并明确时才值得引入。"
+      ],
+      "practice_checklist": [
+        "先实现可测的单路径 workflow，再增加模型决策点。",
+        "为每个 agent 步骤记录输入、工具调用、输出和失败恢复策略。",
+        "用任务级 eval 验证 agent 改动，而不是只看单轮回答质量。"
+      ],
+      "related_blog_ids": [
+        "anthropic-model-context-protocol-2024-11-25"
+      ],
+      "related_report_dates": []
+    },
+    {
+      "id": "anthropic-model-context-protocol-2024-11-25",
+      "company": "anthropic",
+      "company_label": "Anthropic",
+      "canonical_url": "https://www.anthropic.com/news/model-context-protocol",
+      "normalized_url": "https://www.anthropic.com/news/model-context-protocol",
+      "published_at": "2024-11-25",
+      "title_original": "Introducing the Model Context Protocol",
+      "title_zh": "Anthropic 发布 Model Context Protocol",
+      "importance": "foundational",
+      "content_type": "engineering_note",
+      "topics": [
+        "agent",
+        "context_engineering",
+        "mcp",
+        "tool_use"
+      ],
+      "summary_zh": "这篇文章是理解 MCP 生态的基础节点。它把模型上下文、外部工具和数据源连接抽象成协议问题，后续任何 MCP server、connector、agent toolchain 的新闻都可以用它解释底层动机。",
+      "key_ideas": [
+        "MCP 试图把模型与工具/数据源的连接从一次性集成变成协议化接口。",
+        "协议层价值在于复用权限、上下文注入和工具发现方式。",
+        "判断 MCP 项目价值时，应看它解决的真实上下文来源和权限边界。"
+      ],
+      "practice_checklist": [
+        "为 MCP server 明确数据范围、认证方式和最小权限。",
+        "把工具输出结构化，避免把长文本直接塞回上下文。",
+        "在 agent workflow 中记录每次外部上下文注入和工具调用证据。"
+      ],
+      "related_blog_ids": [],
+      "related_report_dates": []
+    },
+    {
+      "id": "openai-structured-outputs-2024-08-06",
+      "company": "openai",
+      "company_label": "OpenAI",
+      "canonical_url": "https://openai.com/index/introducing-structured-outputs-in-the-api/",
+      "normalized_url": "https://openai.com/index/introducing-structured-outputs-in-the-api",
+      "published_at": "2024-08-06",
+      "title_original": "Introducing Structured Outputs in the API",
+      "title_zh": "OpenAI API 引入结构化输出",
+      "importance": "foundational",
+      "content_type": "best_practice",
+      "topics": [
+        "api_reliability",
+        "structured_outputs",
+        "tool_use"
+      ],
+      "summary_zh": "这篇文章的长期价值在于把“让模型按格式输出”从提示词约定推进为 API 层约束。它适合被后续日报引用到结构化抽取、工具参数生成、工作流状态写入和降低解析失败率等场景。",
+      "key_ideas": [
+        "结构化输出把 JSON Schema 变成模型调用契约，而不是应用层事后修补。",
+        "严格 schema 能降低解析、重试和下游字段缺失的工程成本。",
+        "这类能力会影响 agent 工具调用、数据抽取和自动化工作流的可靠性基线。"
+      ],
+      "practice_checklist": [
+        "为关键模型输出定义最小但明确的 JSON Schema。",
+        "把 schema 校验失败纳入重试、降级和人工复核路径。",
+        "在日报生成、候选筛选和工具调用参数里优先使用结构化契约。"
+      ],
+      "related_blog_ids": [],
+      "related_report_dates": []
+    }
+  ]
+}

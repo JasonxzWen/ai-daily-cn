@@ -864,6 +864,7 @@ function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
     `${outPrefix}/feed.json`,
     `${outPrefix}/index.html`,
     `${outPrefix}/trends.json`,
+    `${outPrefix}/data/official-blogs.json`,
     `${outPrefix}/${paths.dataPath}`,
     `${outPrefix}/${paths.htmlPath}`
   ]);
