@@ -3971,13 +3971,40 @@ test("default content sources cover broader tech, big-tech, and Product Hunt tre
   assert(names.includes("Hacker News Topstories API"));
   assert(names.includes("Hugging Face Daily Papers"));
   assert(names.includes("Smol AI News"));
-  assert(names.includes("Ben's Bites"));
+  assert(!names.includes("Ben's Bites"));
   assert(!names.includes("Fast Company Creator Economy"));
   assert(!names.includes("HelloGitHub"));
   assert(!names.includes("RuanYF Weekly"));
   assert(!names.includes("Papers with Code API"));
   assert(!names.includes("Reddit r/MachineLearning"));
   assert(!names.includes("AI News Archive"));
+});
+
+test("source registry excludes rejected low threshold aggregators", async () => {
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional,manual"
+  });
+  const haystack = registry.sources
+    .map((source) => [
+      source.id,
+      source.name,
+      source.url
+    ].filter(Boolean).join(" "))
+    .join("\n")
+    .toLowerCase();
+
+  for (const forbidden of [
+    "content-bens-bites",
+    "ben's bites",
+    "bensbites.com",
+    "the rundown",
+    "therundown.ai",
+    "buttondown.com/ainews",
+    "a16z.com/ai"
+  ]) {
+    assert(!haystack.includes(forbidden), `rejected source should not be registered: ${forbidden}`);
+  }
 });
 
 test("registered discovery sources cover the user requested AI source list", async () => {
@@ -4024,8 +4051,7 @@ test("registered discovery sources cover the user requested AI source list", asy
     ["Hugging Face Daily Papers", ["https://huggingface.co/api/daily_papers?date={YYYY-MM-DD}"]],
     ["GitHub Trending", ["https://github.com/trending?since=daily"]],
     ["Smol AI News", ["https://news.smol.ai/rss.xml", "https://news.smol.ai/"]],
-    ["Latent Space", ["https://www.latent.space/feed", "https://www.latent.space/"]],
-    ["Ben's Bites", ["https://bensbites.com/feed", "https://bensbites.com/"]]
+    ["Latent Space", ["https://www.latent.space/feed", "https://www.latent.space/"]]
   ];
 
   for (const [label, urls] of expected) {
@@ -4040,7 +4066,10 @@ test("registered discovery sources cover the user requested AI source list", asy
     "https://raw.githubusercontent.com/ruanyf/weekly/master/README.md",
     "https://paperswithcode.com/api/v1/",
     "https://www.reddit.com/r/MachineLearning/.json",
-    "https://buttondown.com/ainews/rss"
+    "https://buttondown.com/ainews/rss",
+    "https://bensbites.com/feed",
+    "https://www.therundown.ai/",
+    "https://a16z.com/ai/"
   ];
   for (const url of removedUrls) {
     assert(
@@ -14015,7 +14044,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-first runtime is internal governance by default",
     "Public daily pages remain story-first and exclude source runtime audit sections",
     "source signal story before source metrics dashboard in internal source-first runtime",
-    "144 collection entries are complete inventory rows, not public daily story content",
+    "143 collection entries are complete inventory rows, not public daily story content",
     "Story-centered content remains the fact carrier",
     "Promote a collection entry only when source governance should track it as a named source"
   ]) {
@@ -14026,7 +14055,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-First V2 Addendum",
     "Public daily pages are story-first by default and exclude source-first runtime audit sections.",
     "The internal source-first runtime puts `source_signal_story` before `source_metrics_dashboard`.",
-    "The current 144 collection entries are full inventory rows, not public daily story content.",
+    "The current 143 collection entries are full inventory rows, not public daily story content.",
     "`config/source-display-contract.json` is the executable authority"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation should preserve source-first v2 decision: ${phrase}`);
@@ -14063,7 +14092,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -14149,7 +14178,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
 
   const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
   assert(logical, "CORE_SOURCE_CONTRACTS should include anthropic-research-engineering");
@@ -14179,7 +14208,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
 
   assert(handbook.includes("anthropic-research-engineering"), "handbook should document the promoted logical source");
   assert(!review.includes("| `content-anthropic-research` | `anthropic-research-engineering` |"), "review should no longer list the promoted source as a future candidate");
-  assert.match(review, /order-tuning-total-unmapped:72/);
+  assert.match(review, /order-tuning-total-unmapped:71/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -14233,7 +14262,7 @@ test("core primary official logical source promotions are executable and review-
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
 
   const promotions = [
     {
@@ -14316,7 +14345,7 @@ test("core primary official logical source promotions are executable and review-
   for (const replacementSourceId of ["content-azure-blog", "content-tiktok-developers-blog", "content-cloudflare-blog", "content-google-keyword"]) {
     assert(review.includes(`| \`${replacementSourceId}\``), `review should include replacement promotion candidate ${replacementSourceId}`);
   }
-  assert.match(review, /order-tuning-total-unmapped:72/);
+  assert.match(review, /order-tuning-total-unmapped:71/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -14363,7 +14392,7 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -14401,7 +14430,7 @@ test("china model logical sources are promoted into the fixed display contract",
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 72);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official"]) {
@@ -14499,7 +14528,7 @@ test("source inventory order reference validator rejects drift and private field
 
   await expectInvalid(
     reference.replace(firstSourceLinePattern, ""),
-    /must list 144 source ids|must list source id exactly once/
+    /must list 143 source ids|must list source id exactly once/
   );
   await expectInvalid(
     reference.replace(firstSourceLinePattern, `${firstSourceLine}${firstSourceLine}`),
@@ -15009,12 +15038,12 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
     metricByTitle.get(title)?.stats?.find((stat) => stat.label === label)?.value;
   const serializedDashboard = JSON.stringify(dashboard);
 
-  assert.equal(inventoryRows.length, 144);
-  assert.equal(statValue("全量采集入口"), "144");
-  assert.equal(statValue("已知入口运行态"), "144");
+  assert.equal(inventoryRows.length, 143);
+  assert.equal(statValue("全量采集入口"), "143");
+  assert.equal(statValue("已知入口运行态"), "143");
   assert.equal(statValue("继承逻辑状态"), "6");
   assert.equal(statValue("未上报逻辑源"), "66");
-  assert.equal(statValue("仅采集入口"), "72");
+  assert.equal(statValue("仅采集入口"), "71");
   assert.match(serializedDashboard, /INVENTORY_TOTAL/);
   assert.match(serializedDashboard, /RUNTIME_KNOWN/);
   assert.match(serializedDashboard, /INHERITED_RUNTIME/);
@@ -15119,7 +15148,7 @@ test("system operating dashboard summarizes public report metrics after source d
   assert.equal(statValue("信号模块"), "7");
   assert.equal(statValue("趋势与追踪"), "22");
   assert.equal(statValue("信源覆盖"), "1/6");
-  assert.equal(statValue("信源覆盖", "全量入口"), "144");
+  assert.equal(statValue("信源覆盖", "全量入口"), "143");
   assert.equal(statValue("运行质量"), "degraded");
   assert.equal(statValue("运行质量", "降级提醒"), "2");
   assert.match(serializedDashboard, /SYSTEM_CONTENT/);
@@ -15525,12 +15554,12 @@ test("source signal story renders first-screen cards before metrics", () => {
     ["低信号", "2"],
     ["阻塞", "1"],
     ["未配置或跳过", "1"],
-    ["全量入口", "144"],
-    ["入口运行态", "144/144"]
+    ["全量入口", "143"],
+    ["入口运行态", "143/143"]
   ]);
   assert(story.items.every((item) => item.showGroup === false));
   assert(story.items.every((item) => item.titleIcon));
-  assert.match(story.summary, /全量采集入口 144/);
+  assert.match(story.summary, /全量采集入口 143/);
   assert.match(story.content, /全量信源入口/);
   assert.match(serializedStory, /OpenAI 发布企业平台能力/);
   assert.match(serializedStory, /GitHub Trending 出现 agent 工具链/);
@@ -15925,7 +15954,7 @@ test("internal source inventory panel lists all registered source entries before
   assert(inventoryGroupIndexes.length > 0, "inventory detail groups should render");
   assert(storyIndex > Math.max(...inventoryGroupIndexes), "stories should remain after the complete source-first area");
   assert.equal(inventory.type, "filterable-cards");
-  assert.match(inventory.summary, /144/);
+  assert.match(inventory.summary, /143/);
   assert.equal((inventoryCardsText.match(/- \*\*/g) || []).length, 0);
   assert.equal(inventoryGroupRowCount, inventoryRows.length);
   assert.match(inventoryGroupContent, /DeepSeek News/);
@@ -16010,7 +16039,7 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert(inventory, "inventory overview should render");
   assert.equal(inventory.type, "filterable-cards");
   assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview should not carry all detail rows");
-  assert.match(inventory.summary, /144/);
+  assert.match(inventory.summary, /143/);
   assert(inventoryHrefs.includes("#section-source-inventory-group-core-primary"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-china-models"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-tracking-metrics"), JSON.stringify(inventoryHrefs));
@@ -22405,7 +22434,7 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("Hacker News Topstories API"));
   assert(prompt.includes("Hugging Face Daily Papers"));
   assert(prompt.includes("Smol AI News"));
-  assert(prompt.includes("Ben's Bites"));
+  assert(!prompt.includes("Ben's Bites"));
   assert(!prompt.includes("HelloGitHub"));
   assert(!prompt.includes("RuanYF Weekly"));
   assert(!prompt.includes("Papers with Code API"));
@@ -22930,7 +22959,6 @@ function strictPublishReportFixture() {
     "Hacker News Topstories API",
     "Hugging Face Daily Papers",
     "Smol AI News",
-    "Ben's Bites",
     "Interconnects",
     "The Magnifier AI",
     "Crunchbase News AI",

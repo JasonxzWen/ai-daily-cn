@@ -7,7 +7,7 @@ Every daily run must check and audit this user-requested source surface, using `
 - International tech media: `TechCrunch AI`, `The Verge`, `MIT Technology Review`, `Ars Technica`, `VentureBeat AI`, `HNRSS Frontpage`.
 - Chinese AI/tech media leads: `Jiqizhixin`, `QbitAI`, `36Kr`, `InfoQ CN`; keep them as intermediary leads until traced to primary sources.
 - Public APIs and paper/community sources: `arXiv cs.AI`, `arXiv cs.CL`, `arXiv cs.LG`, `arXiv cs.MA`, `arXiv stat.ML`, `Hacker News Topstories API`, `Hugging Face Daily Papers`, `GitHub Trending`.
-- High-quality AI aggregators/newsletters: `Smol AI News`, `Latent.Space`, `Ben's Bites`.
+- High-quality AI aggregators/newsletters: `Smol AI News`, `Latent.Space`.
 
 Map selected items into these six public-topic buckets before rendering:
 
@@ -16,7 +16,7 @@ Map selected items into these six public-topic buckets before rendering:
 - Products and tools: new AI products, Product Hunt candidates, Hugging Face Spaces/models, and developer tools.
 - Industry and funding: financing, M&A, IPO, regulation, creator-economy, AIGC/content-industry, and platform policy moves.
 - Open-source projects: GitHub Trending and other runnable repositories with recent activity.
-- Opinions and long-form reads: Latent.Space, Smol AI News, Ben's Bites, podcasts, and high-signal builder commentary.
+- Opinions and long-form reads: Latent.Space, Smol AI News, podcasts, and high-signal builder commentary.
 
 Same-event multi-source reports must be merged. T3, intermediary, community, and aggregator items must not enter factual sections without primary-source or multi-source confirmation.
 

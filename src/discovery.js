@@ -392,14 +392,6 @@ export const DEFAULT_CONTENT_SOURCES = [
     lookback_days: 7
   },
   {
-    id: "content-bens-bites",
-    name: "Ben's Bites",
-    url: "https://bensbites.com/feed",
-    category: "intermediary",
-    sourceLevel: "ai_news_aggregator",
-    lookback_days: 7
-  },
-  {
     id: "content-interconnects",
     name: "Interconnects",
     url: "https://www.interconnects.ai/feed"

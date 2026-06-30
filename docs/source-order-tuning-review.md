@@ -19,9 +19,9 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:72 -->
+<!-- order-tuning-total-unmapped:71 -->
 
-These counts come from the 144-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
+These counts come from the 143-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
@@ -29,7 +29,7 @@ These counts come from the 144-entry safe inventory. They show how many collecti
 | `china_models` | 20 | Phase 17 promotes the first five official China model sources; continue with platform/lab sources in later batches. |
 | `open_source_platforms` | 9 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
 | `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
-| `builder_community` | 33 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
+| `builder_community` | 32 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
 | `platform_cn_media` | 5 | Promote stable Chinese media/platform clue sources after WeChat/Zhihu. |
 | `english_media_search` | 2 | Keep most search/media aggregation low priority; Product Hunt can be promoted if product discovery remains useful. |
 
@@ -56,8 +56,8 @@ These candidates are proposed first-class logical sources. They are not merged i
 | `content-nature-machine-learning` | `nature-machine-learning` | `builder_community` | 70 | `promote` | Nature Machine Learning can surface durable paper and research-context signals. |
 | `content-runway-changelog` | `runway-ai-products` | `builder_community` | 80 | `promote` | Runway product changes are useful AIGC workflow signals when dated and concrete. |
 | `content-luma-changelog` | `luma-ai-products` | `builder_community` | 90 | `promote` | Luma changelog entries can carry useful image/video generation product updates. |
-| `content-smol-ai-news` | `smol-ai-news` | `builder_community` | 100 | `promote` | Smol AI News is now the maintained AI News feed after the Buttondown migration. |
-| `content-bens-bites` | `bens-bites` | `builder_community` | 110 | `promote` | Ben's Bites remains a low-threshold AI product/newsletter discovery source. |
+| `content-smol-ai-news` | `smol-ai-news` | `builder_community` | 100 | `promote` | Smol AI News is a maintained AI news feed suitable for low-threshold discovery review. |
+| `content-the-magnifier-ai` | `the-magnifier-ai` | `builder_community` | 110 | `promote` | The Magnifier AI can remain a low-threshold analysis and discovery review candidate. |
 | `intermediary-qbitai` | `qbitai` | `platform_cn_media` | 30 | `promote` | QbitAI is a stable Chinese AI media clue source. |
 | `intermediary-jiqizhixin` | `machine-heart` | `platform_cn_media` | 40 | `promote` | Machine Heart is a durable Chinese AI media source. |
 | `intermediary-infoq-cn` | `infoq-cn` | `platform_cn_media` | 50 | `promote` | InfoQ CN is useful for Chinese enterprise/engineering AI signals. |

@@ -128,8 +128,7 @@ const FIXED_SOURCE_REQUIREMENTS = [
     label: "F. high-quality AI aggregators",
     sources: [
       { groups: ["content_sources"], label: "Smol AI News", name: /Smol AI News/i },
-      { groups: ["content_sources"], label: "Latent.Space", name: /Latent\.Space/i },
-      { groups: ["content_sources"], label: "Ben's Bites", name: /Ben's Bites/i }
+      { groups: ["content_sources"], label: "Latent.Space", name: /Latent\.Space/i }
     ]
   }
 ];
