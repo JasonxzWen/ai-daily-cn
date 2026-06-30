@@ -735,6 +735,29 @@ test("public daily renders story-first sections without compact full list", asyn
   assert(storyDetailSections.some((section) => section.content.includes("发生了什么")));
 });
 
+test("public daily reports do not render source-first audit panels before story content", async () => {
+  const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
+  report.source_effectiveness = sourceMetricsDashboardRowsFixture();
+
+  const input = reportToInteractionInput(report);
+  const richIds = input.sections.map((section) => section.richId).filter(Boolean);
+  const firstPublicSection = input.sections.find((section) => !section.appendix);
+  const serializedSections = JSON.stringify(input.sections);
+
+  for (const forbiddenRichId of [
+    "source-signal-story",
+    "source-first-dashboard",
+    "system-operating-dashboard",
+    "source-status-focus",
+    "source-map",
+    "source-inventory"
+  ]) {
+    assert.equal(richIds.includes(forbiddenRichId), false, `${forbiddenRichId} is an internal source audit panel`);
+  }
+  assert(/^track-/.test(firstPublicSection?.richId || ""), "public daily body should start with editorial story content");
+  assert.doesNotMatch(serializedSections, /全量信源清单|信源运行概况|系统运行概况|采集入口|source-inventory|source-first-dashboard/);
+});
+
 function openRouterRankingsSampleText(rows = 10) {
   const entries = [
     ["DeepSeek V4 Flash", "deepseek", "2.9T tokens", "18%"],
@@ -9691,7 +9714,7 @@ test("buildSite ignores source status history metadata in reports-data", async (
   assert(result.writtenFiles.includes(`data/${year}/${month}/${structuredReport.report_date}.json`));
 });
 
-test("source-first IA contract keeps display fields while buildSite writes reader-safe public data without internal fields or candidate pools", async () => {
+test("buildSite writes reader-safe public data without internal fields or candidate pools", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-public-data-"));
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
@@ -9859,6 +9882,12 @@ test("source-first IA contract keeps display fields while buildSite writes reade
     "source_id",
     "source_level",
     "verification_status",
+    "display_section",
+    "display_section_label",
+    "display_section_rank",
+    "display_rank",
+    "display_mode",
+    "status_label",
     "blocking_issues",
     "degraded_sections",
     "publish_status"
@@ -9878,12 +9907,16 @@ test("source-first IA contract keeps display fields while buildSite writes reade
   assert.equal(publicData.hero_highlights[0].source_item_ref, report.main_items[0].url);
   assert(!JSON.stringify(publicData.hero_highlights).includes(report.main_items[0].candidate_id));
   assert.equal(publicData.source_effectiveness.length, 1);
-  assert.equal(publicData.source_effectiveness[0].display_section, "core_primary");
-  assert.equal(publicData.source_effectiveness[0].display_section_label, "核心一手源");
-  assert.equal(publicData.source_effectiveness[0].display_section_rank, 10);
-  assert.equal(publicData.source_effectiveness[0].display_rank, 60);
-  assert.equal(publicData.source_effectiveness[0].display_mode, "expanded");
-  assert.equal(publicData.source_effectiveness[0].status_label, "parsed_not_candidate");
+  for (const key of [
+    "display_section",
+    "display_section_label",
+    "display_section_rank",
+    "display_rank",
+    "display_mode",
+    "status_label"
+  ]) {
+    assert.equal(publicData.source_effectiveness[0][key], undefined, `${key} must stay out of public docs data`);
+  }
   assert.match(publicData.source_effectiveness[0].notes, /rss_not_available_404=https:\/\/ai\.meta\.com\/blog\/rss\//);
   assert.match(publicData.source_effectiveness[0].notes, /strategy=html_index:https:\/\/ai\.meta\.com\/blog\//);
   assert.equal(publicData.evidence_assets.length, 1);
@@ -13356,7 +13389,7 @@ test("source insertion handbook validator rejects drift", async () => {
   assert.match(result.failures.join("\n"), /handbook missing insertion handbook phrase: Source Insertion Decision Tree/);
 });
 
-test("source-first v2 contract defines first viewport source order and inventory layering", async () => {
+test("source-first v2 contract defines internal runtime order and public exclusion", async () => {
   const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
   const result = await validateSourceDisplayContract({ rootDir });
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
@@ -13366,6 +13399,9 @@ test("source-first v2 contract defines first viewport source order and inventory
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.deepEqual(result.summary.required_presentation_contract, contract.presentation_contract);
   assert.equal(contract.presentation_contract.version, "source-first-v2");
+  assert.equal(contract.presentation_contract.surface, "internal_source_governance");
+  assert.equal(contract.presentation_contract.public_daily_default, "story_first_without_source_runtime_sections");
+  assert.equal(contract.presentation_contract.public_runtime_sections, "excluded_by_default");
   assert.deepEqual(contract.presentation_contract.first_viewport_order, [
     "source_signal_story",
     "source_metrics_dashboard"
@@ -13381,11 +13417,20 @@ test("source-first v2 contract defines first viewport source order and inventory
   assert.equal(contract.presentation_contract.inventory_unit, "collection_entry");
   assert.equal(contract.presentation_contract.full_inventory_semantics, "visible_grouped_expanded_non_hiding_search");
   assert.equal(contract.presentation_contract.story_content_contract, "story-centered-daily-contract");
+  assert.deepEqual(contract.presentation_contract.public_excluded_section_ids, [
+    "source_signal_story",
+    "source_first_dashboard",
+    "system_operating_dashboard",
+    "source_status_focus",
+    "source_map",
+    "source_inventory"
+  ]);
 
   for (const marker of [
     "source-first-v2-contract:v1",
     "source-first-v2-layering",
-    "first-viewport-source-order",
+    "internal-source-runtime-order",
+    "public-daily-source-audit-exclusion",
     "full-inventory-expansion-semantics",
     "baseline-source-importance-2026-06",
     "source-promotion-review-loop",
@@ -13399,18 +13444,21 @@ test("source-first v2 contract defines first viewport source order and inventory
   for (const phrase of [
     "Logical Source Layer",
     "Collection Entry Layer",
-    "source signal story before source metrics dashboard",
-    "154 collection entries are complete inventory rows, not first-viewport story content",
+    "Source-first runtime is internal governance by default",
+    "Public daily pages remain story-first and exclude source runtime audit sections",
+    "source signal story before source metrics dashboard in internal source-first runtime",
+    "154 collection entries are complete inventory rows, not public daily story content",
     "Story-centered content remains the fact carrier",
-    "Promote a collection entry only when readers should track it as a named source"
+    "Promote a collection entry only when source governance should track it as a named source"
   ]) {
     assert(handbook.includes(phrase), `handbook should explain source-first v2 phrase: ${phrase}`);
   }
 
   for (const phrase of [
     "Source-First V2 Addendum",
-    "The first viewport source area puts `source_signal_story` before `source_metrics_dashboard`.",
-    "The current 154 collection entries are full inventory rows, not first-viewport story content.",
+    "Public daily pages are story-first by default and exclude source-first runtime audit sections.",
+    "The internal source-first runtime puts `source_signal_story` before `source_metrics_dashboard`.",
+    "The current 154 collection entries are full inventory rows, not public daily story content.",
     "`config/source-display-contract.json` is the executable authority"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation should preserve source-first v2 decision: ${phrase}`);
@@ -14013,7 +14061,7 @@ test("source-first IA contract extends source effectiveness rows with stable dis
   assert(orderedIds.indexOf("github-trending") < orderedIds.indexOf("wechat-platform"));
 });
 
-test("source-first IA dashboard promotes source metrics and fixed source graph", () => {
+test("internal source-first IA dashboard promotes source metrics and fixed source graph", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = [
     {
@@ -14133,7 +14181,7 @@ test("source-first IA dashboard promotes source metrics and fixed source graph",
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const sourceStats = input.heroStats.filter((item) =>
     ["公开信源", "候选信源", "阻塞信源"].includes(item.label)
   );
@@ -14190,6 +14238,13 @@ function sourceFirstContractRichId(sectionId) {
     source_inventory: "source-inventory"
   };
   return map[sectionId] || sectionId;
+}
+
+function reportToSourceFirstInteractionInput(report, options = {}) {
+  return reportToInteractionInput(report, {
+    ...options,
+    includeSourceFirstRuntimeSections: true
+  });
 }
 
 function sourceFirstRuntimeRowsFixture() {
@@ -14345,7 +14400,7 @@ test("source metrics dashboard cards render operational metrics as cards", () =>
   const report = strictPublishReportFixture();
   report.source_effectiveness = sourceMetricsDashboardRowsFixture();
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
 
   assert(dashboard, "source dashboard section should render");
@@ -14378,7 +14433,7 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = sourceMetricsDashboardRowsFixture();
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
   const metricByTitle = new Map((dashboard?.items || []).map((item) => [item.title, item]));
@@ -14466,7 +14521,7 @@ test("system operating dashboard summarizes public report metrics after source d
     public_note: "部分公开信源降级。"
   };
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const storyIndex = input.sections.findIndex((section) => section.richId === "source-signal-story");
   const sourceDashboardIndex = input.sections.findIndex((section) => section.richId === "source-first-dashboard");
   const systemDashboardIndex = input.sections.findIndex((section) => section.richId === "system-operating-dashboard");
@@ -14511,7 +14566,7 @@ test("source inventory overview renders fixed section cards", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = sourceFirstRuntimeRowsFixture();
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const inventory = input.sections.find((section) => section.richId === "source-inventory");
   const inventoryGroups = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
@@ -14563,7 +14618,7 @@ test("source status focus renders attention cards", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = sourceMetricsDashboardRowsFixture();
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const statusFocus = input.sections.find((section) => section.richId === "source-status-focus");
 
   assert(statusFocus, "source status focus section should render");
@@ -14595,7 +14650,7 @@ test("source status focus renders attention cards", () => {
   report.source_effectiveness = sourceFirstRuntimeRowsFixture().filter((row) =>
     ["openai-news", "wechat-platform"].includes(row.id)
   );
-  const sparseInput = reportToInteractionInput(report);
+  const sparseInput = reportToSourceFirstInteractionInput(report);
   const sparseStatusFocus = sparseInput.sections.find((section) => section.richId === "source-status-focus");
   assert.deepEqual(sparseStatusFocus.items.map((item) => item.title), [
     "需处理",
@@ -14611,7 +14666,7 @@ test("source-first runtime contract binds interaction sections to presentation c
   report.source_effectiveness = sourceFirstRuntimeRowsFixture();
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const expectedRichIds = contract.presentation_contract.source_first_section_order.map(sourceFirstContractRichId);
   const sourceFirstRichIds = input.sections
     .map((section) => section.richId)
@@ -14638,7 +14693,7 @@ test("source-first runtime contract can reorder top source sections from contrac
     ]
   };
 
-  const input = reportToInteractionInput(report, { sourceFirstPresentationContract: override });
+  const input = reportToSourceFirstInteractionInput(report, { sourceFirstPresentationContract: override });
   assert.deepEqual(input.sourceFirstRuntimeSectionOrder, [
     "source-first-dashboard",
     "source-signal-story",
@@ -14660,7 +14715,7 @@ test("source-first runtime contract rejects unknown section ids", async () => {
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
 
   assert.throws(
-    () => reportToInteractionInput(report, {
+    () => reportToSourceFirstInteractionInput(report, {
       sourceFirstPresentationContract: {
         ...contract.presentation_contract,
         source_first_section_order: [
@@ -14816,7 +14871,7 @@ test("source map scan index summarizes fixed groups before detail rows", () => {
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const graph = input.sections.find((section) => section.richId === "source-map");
   const graphIndex = input.sections.findIndex((section) => section.richId === "source-map");
   const coreIndex = input.sections.findIndex((section) => section.richId === "source-map-group-core-primary");
@@ -14875,7 +14930,7 @@ test("source signal story renders first-screen cards before metrics", () => {
   ];
   report.source_effectiveness = sourceMetricsDashboardRowsFixture();
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const story = input.sections.find((section) => section.richId === "source-signal-story");
   const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
   const storyIndex = input.sections.findIndex((section) => section.richId === "source-signal-story");
@@ -14924,7 +14979,7 @@ test("source signal story renders first-screen cards before metrics", () => {
   assert.doesNotMatch(serializedStory, /RSSHUB_BASE_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
 
-test("source signal story rollup summarizes public source signals before metrics", () => {
+test("internal source signal story rollup summarizes source signals before metrics", () => {
   const report = strictPublishReportFixture();
   report.stories = [
     {
@@ -15060,7 +15115,7 @@ test("source signal story rollup summarizes public source signals before metrics
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const story = input.sections.find((section) => section.richId === "source-signal-story");
   const storyIndex = input.sections.findIndex((section) => section.richId === "source-signal-story");
   const dashboardIndex = input.sections.findIndex((section) => section.richId === "source-first-dashboard");
@@ -15091,7 +15146,7 @@ test("source signal story rollup summarizes public source signals before metrics
   assert.doesNotMatch(serializedStory, /RSSHUB_BASE_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
 
-test("source-first hero synopsis promotes public source signals into the first viewport summary", () => {
+test("internal source-first hero synopsis promotes source signals into the diagnostic summary", () => {
   const report = strictPublishReportFixture();
   report.summary = "今天主线集中在 OpenAI 企业平台能力和 GitHub agent 工具链。";
   report.stories = [
@@ -15228,7 +15283,7 @@ test("source-first hero synopsis promotes public source signals into the first v
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const serializedHero = JSON.stringify({ summary: input.summary, heroStats: input.heroStats });
 
   assert.match(input.summary, /今天主线集中在 OpenAI 企业平台能力和 GitHub agent 工具链/);
@@ -15249,7 +15304,7 @@ test("source-first hero synopsis promotes public source signals into the first v
   assert.doesNotMatch(serializedHero, /RSSHUB_BASE_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
 
-test("source inventory panel lists all registered source entries before stories", () => {
+test("internal source inventory panel lists all registered source entries before stories", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = [
     {
@@ -15277,7 +15332,7 @@ test("source inventory panel lists all registered source entries before stories"
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const dashboardIndex = input.sections.findIndex((section) => section.richId === "source-first-dashboard");
   const graphIndex = input.sections.findIndex((section) => section.richId === "source-map");
   const sourceGroupIndex = input.sections.findIndex((section) => section.richId === "source-map-group-core-primary");
@@ -15321,7 +15376,7 @@ test("source inventory rows expose runtime status layer", () => {
   const report = strictPublishReportFixture();
   report.source_effectiveness = sourceFirstRuntimeRowsFixture();
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
   const inventoryGroups = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
   const inventoryLines = inventoryGroups
@@ -15370,7 +15425,7 @@ test("source inventory navigation splits overview from fixed-section detail grou
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
   const publicSectionOrder = input.sections.map((section) => section.richId).filter(Boolean);
   const inventoryIndex = publicSectionOrder.indexOf("source-inventory");
@@ -15437,7 +15492,7 @@ test("source inventory density controls keep all rows visible with fixed section
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
   const inventory = input.sections.find((section) => section.richId === "source-inventory");
   const groupSections = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
@@ -15497,7 +15552,7 @@ test("source inventory section cards expose important slices without filtering r
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
   const inventory = input.sections.find((section) => section.richId === "source-inventory");
   const groupSections = input.sections.filter((section) => String(section.richId || "").startsWith("source-inventory-group-"));
@@ -15690,7 +15745,7 @@ test("source-first IA status focus surfaces actionable source states before the 
     }
   ];
 
-  const input = reportToInteractionInput(report);
+  const input = reportToSourceFirstInteractionInput(report);
   const dashboardIndex = input.sections.findIndex((section) => section.richId === "source-first-dashboard");
   const focusIndex = input.sections.findIndex((section) => section.richId === "source-status-focus");
   const graphIndex = input.sections.findIndex((section) => section.richId === "source-map");

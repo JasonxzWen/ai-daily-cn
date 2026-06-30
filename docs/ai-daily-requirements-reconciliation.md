@@ -34,19 +34,20 @@ The user confirmed on 2026-06-26 that the highest-priority follow-up from the Co
 
 ## Source-First V2 Addendum
 
-Status: `contract-implemented / runtime-layout-pending`.
+Status: `superseded-for-public-runtime / retained-as-internal-governance`.
 
-The user confirmed on 2026-06-29 that subscribed sources and platform coverage should become a first-class reader surface, not a late appendix or silent diagnostic. This addendum is now the controlling product direction for the next source-first page iteration.
+The user confirmed on 2026-06-30 that the 2026-06-29 source-first public page iteration produced excessive machine audit content. Public daily pages are story-first by default and exclude source-first runtime audit sections. The 2026-06-29 source-first contract is retained only as internal source governance and optional diagnostics.
 
-- The first viewport source area puts `source_signal_story` before `source_metrics_dashboard`.
-- `source_signal_story` summarizes the day's effective, updated, blocked, stale, skipped, and empty source lanes as one source-coverage story.
-- `source_metrics_dashboard` follows the story and shows operational metrics, including effective source counts, blocked/stale/no-update counts, and section health.
-- Reader-facing source order is fixed editorial order, not a daily dynamic sort: `core_primary`, `china_models`, `open_source_platforms`, `tracking_metrics`, `builder_community`, `platform_cn_media`, then `english_media_search`.
-- The reader-facing source unit is `logical_source`. A logical source may group multiple collection entries when they represent the same named source identity.
-- The complete inventory unit is `collection_entry`. The current 154 collection entries are full inventory rows, not first-viewport story content.
-- Full inventory expansion means every collection entry remains visible exactly once, grouped by fixed section rank, with search or focus behavior that highlights but does not hide non-matching rows.
-- Blocked, stale, skipped, unconfigured, disabled, manual, and no-update sources must remain visible rather than silently disappearing.
-- Story-centered daily content remains the fact carrier; source-first sections explain coverage, reliability, gaps, and provenance.
+- Public daily pages must not render `source_signal_story`, `source_first_dashboard`, `system_operating_dashboard`, `source_status_focus`, `source_map`, `source_inventory`, or their generated detail groups by default.
+- The internal source-first runtime puts `source_signal_story` before `source_metrics_dashboard`.
+- `source_signal_story` summarizes the day's effective, updated, blocked, stale, skipped, and empty source lanes only inside the internal diagnostic surface.
+- `source_metrics_dashboard` follows the story and shows operational metrics, including effective source counts, blocked/stale/no-update counts, and section health, only inside the internal diagnostic surface.
+- Source governance order is fixed editorial order, not a daily dynamic sort: `core_primary`, `china_models`, `open_source_platforms`, `tracking_metrics`, `builder_community`, `platform_cn_media`, then `english_media_search`.
+- The source governance unit is `logical_source`. A logical source may group multiple collection entries when they represent the same named source identity.
+- The complete inventory unit is `collection_entry`. The current 154 collection entries are full inventory rows, not public daily story content.
+- Full inventory expansion means every collection entry remains visible exactly once inside the internal source-first runtime, grouped by fixed section rank, with search or focus behavior that highlights but does not hide non-matching rows.
+- Blocked, stale, skipped, unconfigured, disabled, manual, and no-update sources must remain visible to source governance rather than silently disappearing.
+- Story-centered daily content remains the public fact carrier; source-first sections explain coverage, reliability, gaps, and provenance only in internal governance or explicit diagnostic contexts.
 - `config/source-display-contract.json` is the executable authority, and `docs/source-first-ia-handbook.md` is the maintenance handbook for inserting future sources.
 
 ## Current Contract

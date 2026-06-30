@@ -2072,6 +2072,23 @@ function renderNextActionsSection(input) {
   return `<section class="panel supplemental-panel" id="next-actions" data-section-type="actions" data-section-group="next" data-report-region="actions"><div class="section-heading split-row"><div><h2>下一步</h2><p class="section-summary">${summary}</p></div><button data-copy-from="#next-action-list">复制行动项</button></div>${list}</section>`;
 }
 
+function hasSourceInventoryFinder(sections = []) {
+  return sections.some((section) => section?.sourceInventoryFinder === true);
+}
+
+function maybeStripSourceInventoryCss(css, includeSourceInventoryRuntime) {
+  if (includeSourceInventoryRuntime) return css;
+  return css.replace(/\n\.source-inventory-finder \{[\s\S]*?\n(?=\.chip,)/, "\n");
+}
+
+function maybeStripSourceInventoryJs(js, includeSourceInventoryRuntime) {
+  if (includeSourceInventoryRuntime) return js;
+  return js
+    .replace(/\n  function sourceInventoryRows\(root\) \{[\s\S]*?\n  function updateEvidenceSpotlight/, "\n  function updateEvidenceSpotlight")
+    .replace(/\n    if \(button\.matches\("\[data-source-inventory-next\]"\)\) \{[\s\S]*?\n    if \(button\.matches\("\[data-copy-text\]"\)\) \{/, "\n    if (button.matches(\"[data-copy-text]\")) {")
+    .replace(/\n    if \(event\.target\.matches\("\[data-source-inventory-search\]"\)\) \{[\s\S]*?\n    if \(event\.target\.matches\("\[data-search-for\]"\)\) \{/, "\n    if (event.target.matches(\"[data-search-for]\")) {");
+}
+
 async function createInteraction(input, options = {}) {
   validateInput(input);
   const { mode, compatibility } = normalizeRenderMode(input.renderMode);
@@ -2086,14 +2103,23 @@ async function createInteraction(input, options = {}) {
     sections.push(await renderSection(normalizedSections[index], mode, index, input, options));
   }
 
-  const css = [
+  const includeSourceInventoryRuntime = hasSourceInventoryFinder(normalizedSections);
+  const reportUiCss = maybeStripSourceInventoryCss(
     fs.readFileSync(reportUiCssPath, "utf8"),
+    includeSourceInventoryRuntime
+  );
+  const reportUiJs = maybeStripSourceInventoryJs(
+    fs.readFileSync(reportUiJsPath, "utf8"),
+    includeSourceInventoryRuntime
+  );
+  const css = [
+    reportUiCss,
     isRuntimeMode(mode) ? fs.readFileSync(richRuntimeCssPath, "utf8") : "",
     "table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0 4px}.markdown-table-scroll table{margin:0}.markdown-image{display:block;width:auto;max-width:min(100%,760px);max-height:420px;height:auto;margin:10px auto 6px;border:1px solid var(--line);border-radius:8px;background:#fff;object-fit:contain}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}.markdown-table-scroll table{min-width:100%;font-size:12.5px}.markdown-table-scroll th,.markdown-table-scroll td{padding:7px 8px;word-break:break-word}}"
   ].join("\n");
 
   const js = [
-    fs.readFileSync(reportUiJsPath, "utf8"),
+    reportUiJs,
     isRuntimeMode(mode) ? fs.readFileSync(richRuntimeJsPath, "utf8") : ""
   ].join("\n");
 

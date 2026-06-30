@@ -15,19 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../..");
 const execFileAsync = promisify(execFile);
 const trendConfigPath = path.join(rootDir, "config/trends.json");
-const sourceDisplayContract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
-
-function sourceFirstBrowserSectionId(sectionId) {
-  const map = {
-    source_signal_story: "section-source-signal-story",
-    source_first_dashboard: "section-source-first-dashboard",
-    source_status_focus: "section-source-status-focus",
-    source_map: "section-source-map",
-    source_inventory: "section-source-inventory"
-  };
-  return map[sectionId] || sectionId;
-}
 
 const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-e2e-"));
 const inputDir = path.join(tmp, "reports-source");
@@ -523,74 +511,17 @@ try {
   const desktopChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(desktopChecklist.ok, true, JSON.stringify(desktopChecklist.issues, null, 2));
   assert.equal(desktopChecklist.checks.find((check) => check.id === "story_first_sections_expanded")?.ok, true);
+  assert.equal(desktopChecklist.checks.find((check) => check.id === "public_source_audit_sections_absent")?.ok, true);
   await page.evaluate(() => {
-    document.querySelector("#section-source-signal-story")?.remove();
+    const stack = document.querySelector(".report-section-stack");
+    const section = document.createElement("section");
+    section.id = "section-source-first-dashboard";
+    section.textContent = "信源运行概况 全量采集入口 source-first audit panel";
+    stack?.prepend(section);
   });
-  const missingSourceStoryChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
-  assert.equal(missingSourceStoryChecklist.ok, false, JSON.stringify(missingSourceStoryChecklist.checks, null, 2));
-  assert(missingSourceStoryChecklist.issues.some((issue) => issue.id === "source_first_public_contract"));
-
-  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
-  await page.evaluate(() => {
-    document.querySelectorAll("[id^='section-source-inventory-group-'] li").forEach((row) => {
-      const sourceName = row.querySelector("strong")?.textContent?.trim();
-      if (sourceName) {
-        const nameNode = document.createElement("strong");
-        nameNode.textContent = sourceName;
-        row.replaceChildren(nameNode);
-      }
-    });
-  });
-  const missingInventoryMetadataChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
-  assert.equal(missingInventoryMetadataChecklist.ok, false, JSON.stringify(missingInventoryMetadataChecklist.checks, null, 2));
-  assert(missingInventoryMetadataChecklist.issues.some((issue) => issue.id === "source_first_public_contract"));
-
-  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
-  await page.evaluate(() => {
-    document.querySelectorAll("[id^='section-source-inventory-group-'] li").forEach((row) => {
-      const sourceName = row.querySelector("strong")?.textContent?.trim();
-      const rowText = row.textContent?.replace(/\s+/g, " ").trim() || "";
-      if (!sourceName || !rowText.includes("运行状态：")) {
-        return;
-      }
-      const nameNode = document.createElement("strong");
-      nameNode.textContent = sourceName;
-      const nameIndex = rowText.indexOf(sourceName);
-      const details = rowText
-        .slice(nameIndex >= 0 ? nameIndex + sourceName.length : sourceName.length)
-        .replace(/；运行状态：[^；]+(?=；)/u, "")
-        .replace(/；运行状态：[^；]+$/u, "");
-      row.replaceChildren(nameNode, document.createTextNode(details));
-    });
-  });
-  const missingInventoryRuntimeChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
-  assert.equal(missingInventoryRuntimeChecklist.ok, false, JSON.stringify(missingInventoryRuntimeChecklist.checks, null, 2));
-  const missingInventoryRuntimeIssue = missingInventoryRuntimeChecklist.issues.find((issue) => issue.id === "source_first_public_contract");
-  assert(missingInventoryRuntimeIssue, JSON.stringify(missingInventoryRuntimeChecklist.checks, null, 2));
-  assert.notEqual(missingInventoryRuntimeIssue.details.inventory.rows_with_runtime_status, 154);
-
-  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
-  await page.evaluate(() => {
-    document.querySelectorAll("#section-source-first-dashboard .source-metric-card").forEach((card) => {
-      const text = card.textContent || "";
-      if (/全量采集入口|已知入口运行态|继承逻辑状态|未上报逻辑源|仅采集入口/.test(text)) {
-        card.remove();
-      }
-    });
-  });
-  const missingDashboardInventoryChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
-  assert.equal(missingDashboardInventoryChecklist.ok, false, JSON.stringify(missingDashboardInventoryChecklist.checks, null, 2));
-  const missingDashboardInventoryIssue = missingDashboardInventoryChecklist.issues.find((issue) => issue.id === "source_first_public_contract");
-  assert(missingDashboardInventoryIssue, JSON.stringify(missingDashboardInventoryChecklist.checks, null, 2));
-  assert.notEqual(missingDashboardInventoryIssue.details.dashboard.inventory_metric_cards_present, true);
-
-  await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
-  await page.evaluate(() => {
-    document.querySelector("#section-system-operating-dashboard")?.remove();
-  });
-  const missingSystemDashboardChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
-  assert.equal(missingSystemDashboardChecklist.ok, false, JSON.stringify(missingSystemDashboardChecklist.checks, null, 2));
-  assert(missingSystemDashboardChecklist.issues.some((issue) => issue.id === "system_metrics_dashboard"));
+  const leakedSourceAuditChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
+  assert.equal(leakedSourceAuditChecklist.ok, false, JSON.stringify(leakedSourceAuditChecklist.checks, null, 2));
+  assert(leakedSourceAuditChecklist.issues.some((issue) => issue.id === "public_source_audit_sections_absent"));
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
   const heroStats = await page.$$eval("#report-top .hero-stat", (nodes) =>
@@ -600,197 +531,33 @@ try {
     ])
   );
   const heroText = await page.locator("#report-top").textContent();
-  assert.deepEqual(heroStats.slice(0, 3), [
-    ["公开信源", "2/5"],
-    ["候选信源", "1"],
-    ["阻塞信源", "1"]
-  ]);
-  assert.match(heroText, /信源信号/);
-  assert.match(heroText, /有效信源 3\/5/);
-  assert.match(heroText, /公开入选 2\/5/);
-  assert.match(heroText, /有更新未入选 1/);
-  assert.match(heroText, /阻塞 1/);
-  assert.match(heroText, /未配置或跳过 1/);
-  assert.match(heroText, /Hugging Face Blog/);
-  assert.match(heroText, /WeChat Platform/);
+  assert(heroStats.length > 0);
+  assert.equal(heroStats.some(([label]) => ["公开信源", "候选信源", "阻塞信源"].includes(label)), false);
+  assert.doesNotMatch(heroText, /信源信号|有效信源|公开入选|有更新未入选|未配置或跳过|Hugging Face Blog|WeChat Platform|今日信源故事|信源运行概况|系统运行概况|全量信源清单/);
   assert.doesNotMatch(heroText, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
   assert.equal(await page.evaluate(() => {
     const heroSummary = document.querySelector("#report-top .hero-summary-text");
     const nav = document.querySelector("nav.report-nav");
     return Boolean(heroSummary && nav && (heroSummary.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_FOLLOWING));
   }), true);
-  assert.equal(await page.locator("#section-source-signal-story").count(), 1);
-  assert.equal(await page.locator('#section-source-signal-story[data-section-type="filterable-cards"]').count(), 1);
-  assert.equal(await page.locator("#section-source-signal-story .source-signal-story-card").count(), 4);
-  assert.equal(await page.locator("#section-source-signal-story .source-signal-story-card [data-card-stats]").count(), 4);
-  assert.equal(await page.locator("#section-source-signal-story .source-signal-story-card .card-title-icon").count(), 4);
-  assert.equal(await page.locator("#section-source-first-dashboard").count(), 1);
-  assert.equal(await page.locator('#section-source-first-dashboard[data-section-type="filterable-cards"]').count(), 1);
-  assert.equal(await page.locator("#section-source-first-dashboard .source-metric-card").count() >= 6, true);
-  assert.equal(await page.locator("#section-source-first-dashboard .source-metric-card [data-card-stats]").count() >= 6, true);
-  assert.equal(await page.locator("#section-source-status-focus").count(), 1);
-  assert.equal(await page.locator('#section-source-status-focus[data-section-type="filterable-cards"]').count(), 1);
-  assert.equal(await page.locator("#section-source-status-focus .source-status-focus-card").count(), 4);
-  assert.equal(await page.locator("#section-source-status-focus .source-status-focus-card [data-card-stats]").count(), 4);
-  assert.equal(await page.locator("#section-source-map").count(), 1);
-  assert.equal(await page.locator("#section-source-inventory").count(), 1);
-  const sourceSignalStoryText = await page.locator("#section-source-signal-story").textContent();
-  assert.match(sourceSignalStoryText, /有效信源主线/);
-  assert.match(sourceSignalStoryText, /可见 story/);
-  assert.match(sourceSignalStoryText, /旁路与缺口/);
-  assert.match(sourceSignalStoryText, /今日信源故事/);
-  assert.match(sourceSignalStoryText, /有效信源|公开入选/);
-  assert.match(sourceSignalStoryText, /Hugging Face Blog/);
-  assert.match(sourceSignalStoryText, /WeChat Platform/);
-  assert.match(sourceSignalStoryText, /信源运行概况/);
-  assert.match(sourceSignalStoryText, /全量信源清单/);
-  assert.doesNotMatch(sourceSignalStoryText, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
-  const sourceDashboardText = await page.locator("#section-source-first-dashboard").textContent();
-  assert.match(sourceDashboardText, /全部逻辑信源|公开入选|未配置或跳过/);
-  assert.match(sourceDashboardText, /全量采集入口/);
-  assert.match(sourceDashboardText, /已知入口运行态/);
-  assert.match(sourceDashboardText, /继承逻辑状态/);
-  assert.match(sourceDashboardText, /未上报逻辑源/);
-  assert.match(sourceDashboardText, /仅采集入口/);
-  assert.equal(await page.locator("#section-system-operating-dashboard").count(), 1);
-  assert.equal(await page.locator('#section-system-operating-dashboard[data-section-type="filterable-cards"]').count(), 1);
-  assert.equal(await page.locator("#section-system-operating-dashboard .system-metric-card").count(), 5);
-  assert.equal(await page.locator("#section-system-operating-dashboard .system-metric-card [data-card-stats]").count(), 5);
-  const systemDashboardText = await page.locator("#section-system-operating-dashboard").textContent();
-  assert.match(systemDashboardText, /公开内容规模/);
-  assert.match(systemDashboardText, /信号模块/);
-  assert.match(systemDashboardText, /趋势与追踪/);
-  assert.match(systemDashboardText, /信源覆盖/);
-  assert.match(systemDashboardText, /运行质量/);
-  assert.doesNotMatch(systemDashboardText, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|quality_status|degraded_sections|remediation|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
-  const sourceFocusText = await page.locator("#section-source-status-focus").textContent();
-  assert.match(sourceFocusText, /需处理/);
-  assert.match(sourceFocusText, /有更新未入选/);
-  assert.match(sourceFocusText, /无近期更新[\s\S]*数量\s+0[\s\S]*no_recent_update\s+0/);
-  assert.match(sourceFocusText, /解析未成候选[\s\S]*数量\s+0[\s\S]*parsed_not_candidate\s+0/);
-  assert.match(sourceFocusText, /代表信源\s*暂无/);
-  assert.match(sourceFocusText, /Hugging Face Blog/);
-  assert.match(sourceFocusText, /WeChat Platform/);
-  assert.match(sourceFocusText, /Anthropic News/);
-  assert.doesNotMatch(sourceFocusText, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
-  const sourceMapText = await page.locator("#section-source-map").textContent();
-  assert.match(sourceMapText, /固定顺序快速索引|鍥哄畾椤哄簭蹇€熺储寮?/);
-  assert.equal(await page.locator('#section-source-map a[href="#section-source-map-group-core-primary"]').count(), 1);
-  assert.equal(await page.locator('#section-source-map a[href="#section-source-map-group-open-source-platforms"]').count(), 1);
-  assert.equal(await page.locator("#section-source-map-group-core-primary").count(), 1);
-  assert.equal(await page.locator("#section-source-map-group-open-source-platforms").count(), 1);
-  const coreSourceGroupText = await page.locator("#section-source-map-group-core-primary").textContent();
-  const platformSourceGroupText = await page.locator("#section-source-map-group-platform-cn-media").textContent();
-  assert.match(coreSourceGroupText, /Hugging Face Blog/);
-  assert.match(coreSourceGroupText, /blocked/);
-  assert.match(platformSourceGroupText, /WeChat Platform/);
-  assert.match(platformSourceGroupText, /not_configured_or_skipped/);
-  const sourceInventoryText = await page.locator("#section-source-inventory").textContent();
-  const sourceInventoryGroupLocator = page.locator("[id^='section-source-inventory-group-']");
-  const sourceInventoryDetailText = await sourceInventoryGroupLocator.allTextContents();
-  assert.match(sourceInventoryText, /154/);
-  assert.equal(await page.locator('#section-source-inventory[data-section-type="filterable-cards"]').count(), 1);
-  assert.equal(await page.locator("#section-source-inventory .source-inventory-section-card").count(), 7);
-  assert.equal(await page.locator("#section-source-inventory .source-inventory-section-card [data-card-stats]").count(), 7);
-  assert(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-core-primary"]').count() >= 1);
-  assert(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-china-models"]').count() >= 1);
-  assert(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-tracking-metrics"]').count() >= 1);
-  assert(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-platform-cn-media"]').count() >= 1);
-  assert(await page.locator('#section-source-inventory a[href="#section-source-inventory-group-english-media-search"]').count() >= 1);
-  assert.match(sourceInventoryText, /html_index/);
-  assert.match(sourceInventoryText, /openrouter_rankings_public_playwright/);
-  assert.match(sourceInventoryText, /manual/);
-  assert.match(sourceInventoryText, /核心一手源/);
-  assert.match(sourceInventoryText, /中国模型与厂商/);
-  assert.match(sourceInventoryText, /开源、模型平台与代码生态/);
-  assert.match(sourceInventoryText, /榜单与持续指标/);
-  assert.match(sourceInventoryText, /Builder 与社区原始信号/);
-  assert.match(sourceInventoryText, /中文平台与媒体线索/);
-  assert.match(sourceInventoryText, /英文媒体与搜索聚合/);
-  assert.match(sourceInventoryText, /固定排序第/);
-  assert.match(sourceInventoryText, /搜索只高亮不隐藏|仍保留在页面中/);
-  assert.doesNotMatch(sourceInventoryText, /\|---|---:/);
-  assert.equal(await sourceInventoryGroupLocator.count() >= 7, true);
-  assert.equal(await page.locator("[id^='section-source-inventory-group-'] li strong").count(), 154);
-  assert.equal(await page.locator("#section-source-inventory [data-source-inventory-finder]").count(), 1);
-  assert.equal(await page.locator("#section-source-inventory [data-source-inventory-search]").count(), 1);
-  const sourceInventoryDetails = sourceInventoryDetailText.join("\n");
-  assert.match(sourceInventoryDetails, /回到全量信源清单/);
-  assert.match(sourceInventoryDetails, /类型分布/);
-  assert.match(sourceInventoryDetails, /保留规则/);
-  assert.equal(
-    await page.locator("[id^='section-source-inventory-group-'] a[href='#section-source-inventory']").count(),
-    await sourceInventoryGroupLocator.count()
-  );
-  assert.match(sourceInventoryDetails, /DeepSeek News/);
-  assert.match(sourceInventoryDetails, /OpenAI News RSS/);
-  assert.match(sourceInventoryDetails, /OpenRouter Rankings/);
-  assert.match(sourceInventoryDetails, /WeChat Platform AI Feed/);
-  assert.match(sourceInventoryDetails, /Zhihu Platform AI Feed/);
-  assert.doesNotMatch(
-    `${sourceInventoryText}\n${sourceInventoryDetails}`,
-    /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i
-  );
-  const sourceInventorySearch = page.locator("#section-source-inventory [data-source-inventory-search]");
-  await sourceInventorySearch.fill("WeChat");
-  const wechatFinderState = await page.evaluate(() => {
-    const rows = Array.from(document.querySelectorAll("[id^='section-source-inventory-group-'] li"));
-    return {
-      total: rows.length,
-      hidden: rows.filter((row) => row.hidden || row.getAttribute("aria-hidden") === "true" || getComputedStyle(row).display === "none").length,
-      matches: rows.filter((row) => row.classList.contains("source-inventory-match")).length,
-      active: rows.filter((row) => row.classList.contains("source-inventory-active-match")).length,
-      status: document.querySelector("#section-source-inventory [data-source-inventory-status]")?.textContent || ""
-    };
-  });
-  assert.equal(wechatFinderState.total, 154);
-  assert.equal(wechatFinderState.hidden, 0);
-  assert(wechatFinderState.matches >= 1, JSON.stringify(wechatFinderState));
-  assert.equal(wechatFinderState.active, 1, JSON.stringify(wechatFinderState));
-  assert.match(wechatFinderState.status, /154/);
-  assert.match(wechatFinderState.status, /WeChat/i);
-  await page.locator("#section-source-inventory [data-source-inventory-next]").click();
-  assert.equal(await page.locator("[id^='section-source-inventory-group-'] li.source-inventory-active-match").count(), 1);
-  await page.locator("#section-source-inventory [data-source-inventory-clear]").click();
-  assert.equal(await page.locator("[id^='section-source-inventory-group-'] li.source-inventory-match").count(), 0);
-  assert.equal(await page.locator("[id^='section-source-inventory-group-'] li strong").count(), 154);
-  await sourceInventorySearch.fill("no-such-source-xyz");
-  const emptyFinderState = await page.evaluate(() => {
-    const rows = Array.from(document.querySelectorAll("[id^='section-source-inventory-group-'] li"));
-    return {
-      total: rows.length,
-      hidden: rows.filter((row) => row.hidden || row.getAttribute("aria-hidden") === "true" || getComputedStyle(row).display === "none").length,
-      matches: rows.filter((row) => row.classList.contains("source-inventory-match")).length,
-      status: document.querySelector("#section-source-inventory [data-source-inventory-status]")?.textContent || ""
-    };
-  });
-  assert.equal(emptyFinderState.total, 154);
-  assert.equal(emptyFinderState.hidden, 0);
-  assert.equal(emptyFinderState.matches, 0);
-  assert.match(emptyFinderState.status, /0\/154/);
   const publicSectionOrder = await page.$$eval(".report-section-stack > [id]", (nodes) =>
     nodes.map((node) => node.id)
   );
-  const expectedSourceFirstOrder = sourceDisplayContract.presentation_contract.source_first_section_order.map(sourceFirstBrowserSectionId);
-  for (const sectionId of expectedSourceFirstOrder) {
-    assert(publicSectionOrder.indexOf(sectionId) >= 0, JSON.stringify(publicSectionOrder));
-  }
-  assert.deepEqual(
-    publicSectionOrder.filter((sectionId) => expectedSourceFirstOrder.includes(sectionId)),
-    expectedSourceFirstOrder
-  );
-  const sourceMapGroupIndexes = publicSectionOrder
-    .map((id, index) => id.startsWith("section-source-map-group-") ? index : -1)
-    .filter((index) => index >= 0);
-  assert(sourceMapGroupIndexes.length > 0, JSON.stringify(publicSectionOrder));
-  assert(publicSectionOrder.indexOf("section-source-inventory") > Math.max(...sourceMapGroupIndexes), JSON.stringify(publicSectionOrder));
-  const sourceInventoryGroupIndexes = publicSectionOrder
-    .map((id, index) => id.startsWith("section-source-inventory-group-") ? index : -1)
-    .filter((index) => index >= 0);
-  assert(sourceInventoryGroupIndexes.length > 0, JSON.stringify(publicSectionOrder));
-  assert(Math.min(...sourceInventoryGroupIndexes) > publicSectionOrder.indexOf("section-source-inventory"), JSON.stringify(publicSectionOrder));
   const firstTrackOrderIndex = publicSectionOrder.findIndex((id) => id.startsWith("section-track-"));
-  assert(firstTrackOrderIndex > Math.max(...sourceInventoryGroupIndexes), JSON.stringify(publicSectionOrder));
+  const publicAuditSectionHits = publicSectionOrder.filter((id) =>
+    [
+      "section-source-signal-story",
+      "section-source-first-dashboard",
+      "section-system-operating-dashboard",
+      "section-source-status-focus",
+      "section-source-map",
+      "section-source-inventory"
+    ].includes(id) ||
+    id.startsWith("section-source-map-group-") ||
+    id.startsWith("section-source-inventory-group-")
+  );
+  assert.deepEqual(publicAuditSectionHits, [], JSON.stringify(publicSectionOrder));
+  assert(firstTrackOrderIndex >= 0, JSON.stringify(publicSectionOrder));
   assert.equal(await page.locator("#section-today-must-read").count(), 0);
   assert.equal(await page.locator("#section-compact-main-list").count(), 0);
   assert(await page.locator("[id^='section-track-']").count() >= 1, "editorial track sections render");
@@ -847,12 +614,15 @@ try {
   const railBox = await page.locator("nav.report-nav").boundingBox();
   const contentBox = await page.locator(".report-section-stack").boundingBox();
   assert(railBox && contentBox && railBox.x < contentBox.x, "nav rail should sit left of the content stack");
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-first-dashboard"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-status-focus"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory-group-core-primary"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory-group-platform-cn-media"), true);
+  await assertSectionsAbsent(page, [
+    "#section-source-first-dashboard",
+    "#section-system-operating-dashboard",
+    "#section-source-status-focus",
+    "#section-source-map",
+    "#section-source-inventory",
+    "#section-source-inventory-group-core-primary",
+    "#section-source-inventory-group-platform-cn-media"
+  ]);
   assert.equal(await hasHorizontalOverflow(page), false);
 
   await page.evaluate(() => {
@@ -879,12 +649,15 @@ try {
   assert.equal(mobileChecklist.ok, true, JSON.stringify(mobileChecklist.issues, null, 2));
   const mobileLayoutColumns = await page.locator(".report-layout").evaluate((node) => getComputedStyle(node).gridTemplateColumns);
   assert.equal(mobileLayoutColumns.trim().split(/\s+/).length, 1, `report-layout should collapse to one column on mobile, got: ${mobileLayoutColumns}`);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-first-dashboard"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-status-focus"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-map"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory-group-core-primary"), true);
-  assert.equal(await sectionHasVisibleBox(page, "#section-source-inventory-group-platform-cn-media"), true);
+  await assertSectionsAbsent(page, [
+    "#section-source-first-dashboard",
+    "#section-system-operating-dashboard",
+    "#section-source-status-focus",
+    "#section-source-map",
+    "#section-source-inventory",
+    "#section-source-inventory-group-core-primary",
+    "#section-source-inventory-group-platform-cn-media"
+  ]);
   const firstTrackHeading = page.locator("[id^='section-track-'] h2").first();
   await firstTrackHeading.evaluate((node) => {
     node.scrollIntoView({ block: "start", behavior: "instant" });
@@ -1009,11 +782,10 @@ async function hasHorizontalOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
 }
 
-async function sectionHasVisibleBox(page, selector) {
-  return page.locator(selector).evaluate((node) => {
-    const rect = node.getBoundingClientRect();
-    return rect.width > 240 && rect.height > 80 && getComputedStyle(node).display !== "none";
-  });
+async function assertSectionsAbsent(page, selectors) {
+  for (const selector of selectors) {
+    assert.equal(await page.locator(selector).count(), 0, `${selector} should not render`);
+  }
 }
 
 async function dateCardOrder(page) {
