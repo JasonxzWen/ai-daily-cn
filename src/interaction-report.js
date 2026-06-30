@@ -135,6 +135,7 @@ export function reportToInteractionInput(report, options = {}) {
   const rawMainItems = Array.isArray(rawReport.main_items) ? rawReport.main_items : [];
   report = normalizeStoryFirstReport(report);
   const includeInternalSections = options.includeInternalSections === true;
+  const includeSourceFirstRuntimeSections = options.includeSourceFirstRuntimeSections === true;
   const mediaOptions = {
     assetRootDir: options.assetRootDir || options.outDir || ""
   };
@@ -150,9 +151,13 @@ export function reportToInteractionInput(report, options = {}) {
   const builderObservations = Array.isArray(report.builder_observations) ? report.builder_observations : [];
   const officialOrgUpdates = Array.isArray(report.official_org_updates) ? report.official_org_updates : [];
   const communityLeads = Array.isArray(report.community_leads) ? report.community_leads : [];
-  const sourceEffectivenessRows = sourceFirstRows(report.source_effectiveness);
-  const sourceFirstPresentation = sourceFirstPresentationContract(options.sourceFirstPresentationContract);
-  const sourceFirstRuntimeSectionOrder = sourceFirstPresentationRichIds(sourceFirstPresentation);
+  const sourceEffectivenessRows = includeSourceFirstRuntimeSections ? sourceFirstRows(report.source_effectiveness) : [];
+  const sourceFirstPresentation = includeSourceFirstRuntimeSections
+    ? sourceFirstPresentationContract(options.sourceFirstPresentationContract)
+    : undefined;
+  const sourceFirstRuntimeSectionOrder = sourceFirstPresentation
+    ? sourceFirstPresentationRichIds(sourceFirstPresentation)
+    : [];
   const sourceInventoryRows = sourceEffectivenessRows.length > 0
     ? sourceInventoryRowsWithRuntime(
       buildSourceInventoryRows({ rootDir: options.rootDir || process.cwd() }),
@@ -184,36 +189,38 @@ export function reportToInteractionInput(report, options = {}) {
     })
   ];
   const sections = [];
-  const sourceFirstRuntimeSections = formatSourceFirstRuntimeSections({
-    presentation: sourceFirstPresentation,
-    sourceEffectivenessRows,
-    sourceInventoryRows,
-    stories,
-    mainItems
-  });
-  const systemOperatingDashboard = formatSystemOperatingDashboardSection(report, {
-    stories,
-    mainItems: rawMainItems.length > 0 ? rawMainItems : mainItems,
-    hotBlogs,
-    chineseMediaDynamics,
-    dailyTracking: publicDailyTracking,
-    githubTrending,
-    huggingFaceTrending,
-    builderObservations,
-    officialOrgUpdates,
-    communityLeads,
-    sourceEffectivenessRows,
-    sourceInventoryRows
-  });
-  if (systemOperatingDashboard) {
-    const sourceDashboardIndex = sourceFirstRuntimeSections.findIndex((section) => section?.richId === "source-first-dashboard");
-    sourceFirstRuntimeSections.splice(
-      sourceDashboardIndex >= 0 ? sourceDashboardIndex + 1 : sourceFirstRuntimeSections.length,
-      0,
-      systemOperatingDashboard
-    );
+  if (includeSourceFirstRuntimeSections) {
+    const sourceFirstRuntimeSections = formatSourceFirstRuntimeSections({
+      presentation: sourceFirstPresentation,
+      sourceEffectivenessRows,
+      sourceInventoryRows,
+      stories,
+      mainItems
+    });
+    const systemOperatingDashboard = formatSystemOperatingDashboardSection(report, {
+      stories,
+      mainItems: rawMainItems.length > 0 ? rawMainItems : mainItems,
+      hotBlogs,
+      chineseMediaDynamics,
+      dailyTracking: publicDailyTracking,
+      githubTrending,
+      huggingFaceTrending,
+      builderObservations,
+      officialOrgUpdates,
+      communityLeads,
+      sourceEffectivenessRows,
+      sourceInventoryRows
+    });
+    if (systemOperatingDashboard) {
+      const sourceDashboardIndex = sourceFirstRuntimeSections.findIndex((section) => section?.richId === "source-first-dashboard");
+      sourceFirstRuntimeSections.splice(
+        sourceDashboardIndex >= 0 ? sourceDashboardIndex + 1 : sourceFirstRuntimeSections.length,
+        0,
+        systemOperatingDashboard
+      );
+    }
+    sections.push(...sourceFirstRuntimeSections);
   }
-  sections.push(...sourceFirstRuntimeSections);
   sections.push(...formatStoryFirstSections(stories, {
     report,
     evidenceByUrl,
@@ -402,7 +409,7 @@ export function reportToInteractionInput(report, options = {}) {
         "主体信息不强行凑数",
         "模型发布合入主体信息",
         "项目补充信息只合并到 GitHub Trending 条目内",
-        "信源审计可展开",
+        "公开页不暴露内部信源审计",
         "结构化 JSON 可追溯"
       ],
       ...dailyIntent(report)

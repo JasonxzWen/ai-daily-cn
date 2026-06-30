@@ -223,285 +223,31 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "Public card title links should include source or avatar icons.",
       { count: cardTitleLinks.length, missing_titles: missingCardTitleIcons }
     );
-    const sourceFirstSectionOrder = [
+    const sectionOrder = Array.from(document.querySelectorAll(".report-section-stack > [id]"))
+      .map((node) => node.id);
+    const publicAuditSectionIds = new Set([
       "section-source-signal-story",
       "section-source-first-dashboard",
+      "section-system-operating-dashboard",
       "section-source-status-focus",
       "section-source-map",
       "section-source-inventory"
-    ];
-    const sectionOrder = Array.from(document.querySelectorAll(".report-section-stack > [id]"))
-      .map((node) => node.id);
-    const sourceFirstOrderHits = sectionOrder.filter((id) => sourceFirstSectionOrder.includes(id));
-    const sourceFirstOrderIndexes = Object.fromEntries(
-      sourceFirstSectionOrder.map((id) => [id, sectionOrder.indexOf(id)])
+    ]);
+    const publicAuditSectionHits = sectionOrder.filter((id) =>
+      publicAuditSectionIds.has(id) ||
+      id.startsWith("section-source-map-group-") ||
+      id.startsWith("section-source-inventory-group-")
     );
-    const sourceMapGroupIndexes = sectionOrder
-      .map((id, index) => id.startsWith("section-source-map-group-") ? index : -1)
-      .filter((index) => index >= 0);
-    const sourceInventoryGroupIndexes = sectionOrder
-      .map((id, index) => id.startsWith("section-source-inventory-group-") ? index : -1)
-      .filter((index) => index >= 0);
     const firstTrackOrderIndex = sectionOrder.findIndex((id) => id.startsWith("section-track-"));
-    const cardSectionContract = ({ id, cardSelector, expectedCards, minCards = 0, requireIcons = false }) => {
-      const section = document.querySelector(`#${id}`);
-      const cards = Array.from(section?.querySelectorAll(cardSelector) || []);
-      const expectedCountOk = typeof expectedCards === "number"
-        ? cards.length === expectedCards
-        : cards.length >= minCards;
-      const cardsWithStats = cards.filter((card) => card.querySelector("[data-card-stats]")).length;
-      const cardsWithIcons = cards.filter((card) => card.querySelector(".card-title-icon")).length;
-      return {
-        present: Boolean(section),
-        section_type: section?.getAttribute("data-section-type") || "",
-        card_count: cards.length,
-        expected_cards: typeof expectedCards === "number" ? expectedCards : `>=${minCards}`,
-        cards_with_stats: cardsWithStats,
-        cards_with_icons: cardsWithIcons,
-        ok: Boolean(section) &&
-          section.getAttribute("data-section-type") === "filterable-cards" &&
-          expectedCountOk &&
-          cardsWithStats === cards.length &&
-          (!requireIcons || cardsWithIcons === cards.length)
-      };
-    };
-    const sourceFirstContract = {
-      story: cardSectionContract({
-        id: "section-source-signal-story",
-        cardSelector: ".source-signal-story-card",
-        expectedCards: 4,
-        requireIcons: true
-      }),
-      dashboard: cardSectionContract({
-        id: "section-source-first-dashboard",
-        cardSelector: ".source-metric-card",
-        minCards: 6
-      }),
-      status_focus: cardSectionContract({
-        id: "section-source-status-focus",
-        cardSelector: ".source-status-focus-card",
-        expectedCards: 4
-      }),
-      inventory: cardSectionContract({
-        id: "section-source-inventory",
-        cardSelector: ".source-inventory-section-card",
-        expectedCards: 7
-      })
-    };
-    const systemDashboardContract = cardSectionContract({
-      id: "section-system-operating-dashboard",
-      cardSelector: ".system-metric-card",
-      expectedCards: 5
-    });
-    const systemDashboardText = document.querySelector("#section-system-operating-dashboard")?.textContent || "";
-    const systemDashboardRequiredLabels = [
-      "公开内容规模",
-      "信号模块",
-      "趋势与追踪",
-      "信源覆盖",
-      "运行质量"
-    ];
-    const systemDashboardRequiredTags = [
-      "SYSTEM_CONTENT",
-      "SYSTEM_SIGNALS",
-      "SYSTEM_TRENDS",
-      "SYSTEM_SOURCES",
-      "SYSTEM_QUALITY"
-    ];
-    const systemDashboardForbiddenPattern = /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|quality_status|degraded_sections|remediation|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i;
-    const systemDashboardOrder = {
-      index: sectionOrder.indexOf("section-system-operating-dashboard"),
-      source_dashboard_index: sourceFirstOrderIndexes["section-source-first-dashboard"],
-      status_focus_index: sourceFirstOrderIndexes["section-source-status-focus"]
-    };
-    systemDashboardContract.required_labels = Object.fromEntries(
-      systemDashboardRequiredLabels.map((label) => [label, systemDashboardText.includes(label)])
-    );
-    systemDashboardContract.required_tags = Object.fromEntries(
-      systemDashboardRequiredTags.map((label) => [label, systemDashboardText.includes(label)])
-    );
-    systemDashboardContract.forbidden_hits = systemDashboardForbiddenPattern.test(systemDashboardText);
-    systemDashboardContract.order = systemDashboardOrder;
-    const inventorySection = document.querySelector("#section-source-inventory");
-    const inventoryRows = Array.from(document.querySelectorAll("[id^='section-source-inventory-group-'] li"))
-      .filter((row) => row.querySelector("strong"));
-    const inventoryRowsWithLogicalMapping = inventoryRows.filter((row) =>
-      (row.textContent || "").includes("逻辑源：")
-    );
-    const inventoryRowsWithMetadata = inventoryRows.filter((row) => {
-      const text = row.textContent?.replace(/\s+/g, " ").trim() || "";
-      const metadataParts = text.split(/\s\/\s/).map((part) => part.trim()).filter(Boolean);
-      return text.includes("逻辑源：") &&
-        metadataParts.length >= 5 &&
-        metadataParts.some((part) => /^T[0-9]$/i.test(part)) &&
-        /\b(configured|configuration_needed)\b/i.test(metadataParts.at(-1) || "");
-    });
-    const inventoryRuntimeStatusLabels = [
-      "included",
-      "updated_not_selected",
-      "parsed_not_candidate",
-      "no_recent_update",
-      "blocked",
-      "not_configured_or_skipped",
-      "unreported",
-      "collection_only",
-      "unknown"
-    ];
-    const inventoryRuntimeSegment = (row) => {
-      const text = row.textContent?.replace(/\s+/g, " ").trim() || "";
-      const marker = "运行状态：";
-      const markerIndex = text.indexOf(marker);
-      if (markerIndex < 0) {
-        return "";
+    addCheck(
+      "public_source_audit_sections_absent",
+      publicAuditSectionHits.length === 0,
+      "Public report should not render source-first, source inventory, source map, or system operating audit sections.",
+      {
+        hits: publicAuditSectionHits,
+        first_track_order_index: firstTrackOrderIndex,
+        checked_ids: [...publicAuditSectionIds]
       }
-      const tail = text.slice(markerIndex + marker.length);
-      const nextBreak = tail.indexOf("；");
-      return (nextBreak >= 0 ? tail.slice(0, nextBreak) : tail).trim();
-    };
-    const inventoryRuntimeSegments = inventoryRows.map(inventoryRuntimeSegment);
-    const inventoryRowsWithRuntimeStatus = inventoryRows.filter((row) => inventoryRuntimeSegment(row));
-    const inventoryRowsWithKnownRuntimeStatus = inventoryRowsWithRuntimeStatus.filter((row) => {
-      const segment = inventoryRuntimeSegment(row);
-      return inventoryRuntimeStatusLabels.some((label) => segment.includes(label));
-    });
-    const inventoryRowsWithInheritedRuntimeStatus = inventoryRowsWithRuntimeStatus.filter((row) => {
-      const segment = inventoryRuntimeSegment(row);
-      return [
-        "included",
-        "updated_not_selected",
-        "parsed_not_candidate",
-        "no_recent_update",
-        "blocked",
-        "not_configured_or_skipped"
-      ].some((label) => segment.includes(label));
-    });
-    const inventoryRowsWithUnreportedRuntimeStatus = inventoryRowsWithRuntimeStatus.filter((row) =>
-      inventoryRuntimeSegment(row).includes("unreported")
-    );
-    const inventoryRowsWithCollectionOnlyRuntimeStatus = inventoryRowsWithRuntimeStatus.filter((row) =>
-      inventoryRuntimeSegment(row).includes("collection_only")
-    );
-    const inventoryMissingMetadataSamples = inventoryRows
-      .filter((row) => !inventoryRowsWithMetadata.includes(row))
-      .slice(0, 5)
-      .map((row) => row.textContent?.replace(/\s+/g, " ").trim().slice(0, 160) || "");
-    const inventoryMissingRuntimeSamples = inventoryRows
-      .filter((row) => !inventoryRowsWithRuntimeStatus.includes(row))
-      .slice(0, 5)
-      .map((row) => row.textContent?.replace(/\s+/g, " ").trim().slice(0, 160) || "");
-    sourceFirstContract.inventory.rows = inventoryRows.length;
-    sourceFirstContract.inventory.rows_with_logical_mapping = inventoryRowsWithLogicalMapping.length;
-    sourceFirstContract.inventory.rows_with_metadata = inventoryRowsWithMetadata.length;
-    sourceFirstContract.inventory.missing_metadata_samples = inventoryMissingMetadataSamples;
-    sourceFirstContract.inventory.rows_with_runtime_status = inventoryRowsWithRuntimeStatus.length;
-    sourceFirstContract.inventory.rows_with_known_runtime_status = inventoryRowsWithKnownRuntimeStatus.length;
-    sourceFirstContract.inventory.rows_with_inherited_runtime_status = inventoryRowsWithInheritedRuntimeStatus.length;
-    sourceFirstContract.inventory.rows_with_unreported_runtime_status = inventoryRowsWithUnreportedRuntimeStatus.length;
-    sourceFirstContract.inventory.rows_with_collection_only_runtime_status = inventoryRowsWithCollectionOnlyRuntimeStatus.length;
-    sourceFirstContract.inventory.missing_runtime_status_samples = inventoryMissingRuntimeSamples;
-    sourceFirstContract.inventory.runtime_status_labels = Object.fromEntries(
-      inventoryRuntimeStatusLabels.map((label) => [label, inventoryRuntimeSegments.some((segment) => segment.includes(label))])
-    );
-    const dashboardMetricCards = Array.from(document.querySelectorAll("#section-source-first-dashboard .source-metric-card"));
-    const dashboardInventoryExpectedMetrics = [
-      { label: "全量采集入口", count: sourceFirstContract.inventory.rows },
-      { label: "已知入口运行态", count: sourceFirstContract.inventory.rows_with_known_runtime_status },
-      { label: "继承逻辑状态", count: sourceFirstContract.inventory.rows_with_inherited_runtime_status },
-      { label: "未上报逻辑源", count: sourceFirstContract.inventory.rows_with_unreported_runtime_status },
-      { label: "仅采集入口", count: sourceFirstContract.inventory.rows_with_collection_only_runtime_status }
-    ];
-    sourceFirstContract.dashboard.inventory_metric_cards = dashboardInventoryExpectedMetrics.map(({ label, count }) => {
-      const card = dashboardMetricCards.find((node) => (node.textContent || "").includes(label));
-      const text = card?.textContent?.replace(/\s+/g, " ").trim() || "";
-      const countPattern = new RegExp(`(^|\\D)${escapeRegExp(String(count))}(\\D|$)`);
-      return {
-        label,
-        expected_count: count,
-        present: Boolean(card),
-        has_expected_count: Boolean(card && countPattern.test(text)),
-        text: text.slice(0, 180)
-      };
-    });
-    sourceFirstContract.dashboard.inventory_metric_cards_present =
-      sourceFirstContract.dashboard.inventory_metric_cards.every((item) => item.present && item.has_expected_count);
-    sourceFirstContract.inventory.finder = {
-      root: Boolean(inventorySection?.querySelector("[data-source-inventory-finder]")),
-      search: Boolean(inventorySection?.querySelector("[data-source-inventory-search]")),
-      status: Boolean(inventorySection?.querySelector("[data-source-inventory-status]")),
-      next: Boolean(inventorySection?.querySelector("[data-source-inventory-next]")),
-      clear: Boolean(inventorySection?.querySelector("[data-source-inventory-clear]"))
-    };
-    const sourceStatusFocusText = document.querySelector("#section-source-status-focus")?.textContent || "";
-    const sourceStatusFocusLabels = [
-      "blocked",
-      "not_configured_or_skipped",
-      "updated_not_selected",
-      "no_recent_update",
-      "parsed_not_candidate"
-    ];
-    sourceFirstContract.status_focus.status_labels = Object.fromEntries(
-      sourceStatusFocusLabels.map((label) => [label, sourceStatusFocusText.includes(label)])
-    );
-    sourceFirstContract.order = {
-      expected: sourceFirstSectionOrder,
-      actual_source_first_hits: sourceFirstOrderHits,
-      indexes: sourceFirstOrderIndexes,
-      source_map_group_count: sourceMapGroupIndexes.length,
-      inventory_group_count: sourceInventoryGroupIndexes.length,
-      first_track_order_index: firstTrackOrderIndex
-    };
-    const directOrderOk = sourceFirstOrderHits.length === sourceFirstSectionOrder.length &&
-      sourceFirstOrderHits.every((id, index) => id === sourceFirstSectionOrder[index]);
-    const sourceFirstDownstreamOrderOk = sourceMapGroupIndexes.length > 0 &&
-      sourceInventoryGroupIndexes.length > 0 &&
-      sourceFirstOrderIndexes["section-source-inventory"] > Math.max(...sourceMapGroupIndexes) &&
-      Math.min(...sourceInventoryGroupIndexes) > sourceFirstOrderIndexes["section-source-inventory"] &&
-      firstTrackOrderIndex > Math.max(...sourceInventoryGroupIndexes);
-    const inventoryFinderOk = Object.values(sourceFirstContract.inventory.finder).every(Boolean);
-    const sourceInventoryMetadataOk =
-      sourceFirstContract.inventory.rows === 154 &&
-      sourceFirstContract.inventory.rows_with_logical_mapping === 154 &&
-      sourceFirstContract.inventory.rows_with_metadata === 154;
-    const sourceInventoryRuntimeOk =
-      sourceFirstContract.inventory.rows === 154 &&
-      sourceFirstContract.inventory.rows_with_runtime_status === 154 &&
-      sourceFirstContract.inventory.rows_with_known_runtime_status === 154;
-    const sourceStatusFocusLabelsOk = Object.values(sourceFirstContract.status_focus.status_labels).every(Boolean);
-    const sourceDashboardInventoryMetricsOk = sourceFirstContract.dashboard.inventory_metric_cards_present;
-    const sourceFirstPublicContractOk =
-      sourceFirstContract.story.ok &&
-      sourceFirstContract.dashboard.ok &&
-      sourceFirstContract.status_focus.ok &&
-      sourceFirstContract.inventory.ok &&
-      sourceDashboardInventoryMetricsOk &&
-      sourceInventoryMetadataOk &&
-      sourceInventoryRuntimeOk &&
-      sourceStatusFocusLabelsOk &&
-      inventoryFinderOk &&
-      directOrderOk &&
-      sourceFirstDownstreamOrderOk;
-    const systemDashboardLabelsOk = Object.values(systemDashboardContract.required_labels).every(Boolean);
-    const systemDashboardTagsOk = Object.values(systemDashboardContract.required_tags).every(Boolean);
-    const systemDashboardOrderOk =
-      systemDashboardOrder.index > systemDashboardOrder.source_dashboard_index &&
-      systemDashboardOrder.index < systemDashboardOrder.status_focus_index;
-    const systemDashboardPublicContractOk =
-      systemDashboardContract.ok &&
-      systemDashboardLabelsOk &&
-      systemDashboardTagsOk &&
-      systemDashboardOrderOk &&
-      !systemDashboardContract.forbidden_hits;
-    addCheck(
-      "system_metrics_dashboard",
-      systemDashboardPublicContractOk,
-      "System operating metrics dashboard should summarize public content, signal, trend, source, and quality status immediately after source metrics.",
-      systemDashboardContract
-    );
-    addCheck(
-      "source_first_public_contract",
-      sourceFirstPublicContractOk,
-      "Source-first story, metrics, status, map and full inventory sections should be visible as the leading public page contract.",
-      sourceFirstContract
     );
     const githubTrendingSection = document.querySelector(".github-trending-card-grid")?.closest("section") ||
       document.querySelector("section[id*='github-trending']");

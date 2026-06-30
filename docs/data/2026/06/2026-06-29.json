@@ -43,12 +43,6 @@
       "candidate_created": true,
       "public_included": true,
       "not_included_reason": "",
-      "display_section": "core_primary",
-      "display_section_label": "核心一手源",
-      "display_section_rank": 10,
-      "display_rank": 10,
-      "display_mode": "expanded",
-      "status_label": "included",
       "source_ids": [
         "content-openai-company-news",
         "content-openai-news",
@@ -65,37 +59,6 @@
       "notes": "canonical_rss=https://openai.com/news/rss.xml; legacy_alias=https://openai.com/blog/rss.xml is grouped here to avoid duplicate source accounting; 1 recent intermediary lead entries parsed; 1 recent blog/interview entries parsed; 1023 feed entries parsed; 1 within 48h"
     },
     {
-      "id": "anthropic-news",
-      "name": "Anthropic News",
-      "role": "official",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": false,
-      "public_included": false,
-      "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "core_primary",
-      "display_section_label": "核心一手源",
-      "display_section_rank": 10,
-      "display_rank": 20,
-      "display_mode": "expanded",
-      "status_label": "parsed_not_candidate",
-      "source_ids": [
-        "content-anthropic-company-news",
-        "content-anthropic-news"
-      ],
-      "source_kinds": [
-        "html_index"
-      ],
-      "statuses": [
-        "no_signal",
-        "checked"
-      ],
-      "candidate_count": 0,
-      "included_count": 0,
-      "notes": "0 recent intermediary lead entries parsed; 0 recent blog/interview entries parsed; html_index source is reachable; feed_like=false"
-    },
-    {
       "id": "google-deepmind",
       "name": "Google DeepMind RSS",
       "role": "official",
@@ -105,12 +68,6 @@
       "candidate_created": false,
       "public_included": false,
       "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "core_primary",
-      "display_section_label": "核心一手源",
-      "display_section_rank": 10,
-      "display_rank": 30,
-      "display_mode": "expanded",
-      "status_label": "parsed_not_candidate",
       "source_ids": [
         "content-google-deepmind-blog",
         "content-google-deepmind-rss",
@@ -138,12 +95,6 @@
       "candidate_created": false,
       "public_included": false,
       "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "core_primary",
-      "display_section_label": "核心一手源",
-      "display_section_rank": 10,
-      "display_rank": 40,
-      "display_mode": "expanded",
-      "status_label": "parsed_not_candidate",
       "source_ids": [
         "content-google-research"
       ],
@@ -158,35 +109,6 @@
       "notes": "0 recent blog/interview entries parsed; 100 feed entries parsed; 0 within 48h"
     },
     {
-      "id": "microsoft-research",
-      "name": "Microsoft Research Blog",
-      "role": "official",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": false,
-      "public_included": false,
-      "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "core_primary",
-      "display_section_label": "核心一手源",
-      "display_section_rank": 10,
-      "display_rank": 50,
-      "display_mode": "expanded",
-      "status_label": "parsed_not_candidate",
-      "source_ids": [
-        "content-microsoft-research"
-      ],
-      "source_kinds": [
-        "rss"
-      ],
-      "statuses": [
-        "no_signal"
-      ],
-      "candidate_count": 0,
-      "included_count": 0,
-      "notes": "0 recent blog/interview entries parsed; 10 feed entries parsed; 0 within 48h"
-    },
-    {
       "id": "meta-ai",
       "name": "Meta AI Blog",
       "role": "official",
@@ -196,12 +118,6 @@
       "candidate_created": false,
       "public_included": false,
       "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "core_primary",
-      "display_section_label": "核心一手源",
-      "display_section_rank": 10,
-      "display_rank": 60,
-      "display_mode": "expanded",
-      "status_label": "parsed_not_candidate",
       "source_ids": [
         "content-meta-ai-blog"
       ],
@@ -217,6 +133,29 @@
       "notes": "rss_not_available_404=https://ai.meta.com/blog/rss/; strategy=html_index:https://ai.meta.com/blog/; 0 recent blog/interview entries parsed; html_index source is reachable; feed_like=false"
     },
     {
+      "id": "microsoft-research",
+      "name": "Microsoft Research Blog",
+      "role": "official",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": false,
+      "public_included": false,
+      "not_included_reason": "parsed_but_no_candidate_created",
+      "source_ids": [
+        "content-microsoft-research"
+      ],
+      "source_kinds": [
+        "rss"
+      ],
+      "statuses": [
+        "no_signal"
+      ],
+      "candidate_count": 0,
+      "included_count": 0,
+      "notes": "0 recent blog/interview entries parsed; 10 feed entries parsed; 0 within 48h"
+    },
+    {
       "id": "aws-ml",
       "name": "AWS ML Blog",
       "role": "official",
@@ -226,12 +165,6 @@
       "candidate_created": false,
       "public_included": false,
       "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "core_primary",
-      "display_section_label": "核心一手源",
-      "display_section_rank": 10,
-      "display_rank": 70,
-      "display_mode": "expanded",
-      "status_label": "parsed_not_candidate",
       "source_ids": [
         "content-aws-machine-learning"
       ],
@@ -246,6 +179,31 @@
       "notes": "0 recent blog/interview entries parsed; 20 feed entries parsed; 0 within 48h"
     },
     {
+      "id": "anthropic-news",
+      "name": "Anthropic News",
+      "role": "official",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": false,
+      "public_included": false,
+      "not_included_reason": "parsed_but_no_candidate_created",
+      "source_ids": [
+        "content-anthropic-company-news",
+        "content-anthropic-news"
+      ],
+      "source_kinds": [
+        "html_index"
+      ],
+      "statuses": [
+        "no_signal",
+        "checked"
+      ],
+      "candidate_count": 0,
+      "included_count": 0,
+      "notes": "0 recent intermediary lead entries parsed; 0 recent blog/interview entries parsed; html_index source is reachable; feed_like=false"
+    },
+    {
       "id": "hugging-face-blog",
       "name": "Hugging Face Blog",
       "role": "official",
@@ -255,12 +213,6 @@
       "candidate_created": false,
       "public_included": false,
       "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "core_primary",
-      "display_section_label": "核心一手源",
-      "display_section_rank": 10,
-      "display_rank": 80,
-      "display_mode": "expanded",
-      "status_label": "parsed_not_candidate",
       "source_ids": [
         "content-hugging-face-blog"
       ],
@@ -275,29 +227,293 @@
       "notes": "0 recent blog/interview entries parsed; 811 feed entries parsed; 0 within 48h"
     },
     {
-      "id": "github-trending",
-      "name": "GitHub Trending",
-      "role": "github_trending",
+      "id": "follow-builders",
+      "name": "follow-builders",
+      "role": "builder_aggregator",
       "configured": true,
       "reachable": true,
       "parsed_recent": true,
       "candidate_created": true,
       "public_included": true,
       "not_included_reason": "",
-      "display_section": "open_source_platforms",
-      "display_section_label": "开源、模型平台与代码生态",
-      "display_section_rank": 30,
-      "display_rank": 10,
-      "display_mode": "expanded",
-      "status_label": "included",
       "source_ids": [],
       "source_kinds": [],
       "statuses": [
+        "checked",
+        "blocked",
+        "no_signal"
+      ],
+      "candidate_count": 20,
+      "included_count": 9,
+      "notes": "25 recent original entries parsed; 0 recent original entries parsed; upstream_error=Podcast: Transcript error for \"Why the Frontier Ecosystem must be Open — Matei Zaharia and Reynold Xin, Databricks\": HTTP 404: {\"status\":\"error\",\"message\":\"Episode not found\"}; 0 recent original entries parsed"
+    },
+    {
+      "id": "ml-papers-week",
+      "name": "ML Papers of the Week",
+      "role": "open_source_aggregator",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": true,
+      "public_included": false,
+      "not_included_reason": "candidate_not_selected_for_public_page",
+      "source_ids": [
+        "content-ml-papers-week"
+      ],
+      "source_kinds": [
+        "github_report_markdown"
+      ],
+      "statuses": [
         "checked"
       ],
-      "candidate_count": 70,
-      "included_count": 30,
-      "notes": "13 repositories parsed; 22 repositories parsed; 17 repositories parsed"
+      "candidate_count": 8,
+      "included_count": 0,
+      "notes": "10 report entries parsed; latest_report_url=https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/years/2026.md#top-ai-papers-of-the-week-june-14---june-21---2026; report_title=Top_AI_Papers_of_the_Week_(June_14_-_June_21); 10 within 14d source window; source-specific github_report_markdown health; markdown_links=3; recent_48h_hints=1"
+    },
+    {
+      "id": "hellogithub",
+      "name": "HelloGitHub",
+      "role": "open_source_aggregator",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": true,
+      "public_included": true,
+      "not_included_reason": "",
+      "source_ids": [
+        "content-hellogithub"
+      ],
+      "source_kinds": [
+        "github_report_markdown"
+      ],
+      "statuses": [
+        "checked"
+      ],
+      "candidate_count": 12,
+      "included_count": 4,
+      "notes": "30 report entries parsed; latest_report_url=https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/content/HelloGitHub123.md; report_title=第_123_期; 30 within 45d source window; source-specific github_report_markdown health; markdown_links=5; recent_48h_hints=1"
+    },
+    {
+      "id": "ruanyf-weekly",
+      "name": "RuanYF Weekly",
+      "role": "open_source_aggregator",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": true,
+      "public_included": false,
+      "not_included_reason": "candidate_not_selected_for_public_page",
+      "source_ids": [
+        "content-ruanyf-weekly"
+      ],
+      "source_kinds": [
+        "github_report_markdown"
+      ],
+      "statuses": [
+        "checked"
+      ],
+      "candidate_count": 8,
+      "included_count": 0,
+      "notes": "30 report entries parsed; latest_report_url=https://raw.githubusercontent.com/ruanyf/weekly/master/docs/issue-401.md; report_title=如何赚到10亿美元; 30 within 14d source window; source-specific github_report_markdown health; markdown_links=2; recent_48h_hints=1"
+    },
+    {
+      "id": "techcrunch-ai",
+      "name": "TechCrunch AI",
+      "role": "media",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": true,
+      "public_included": false,
+      "not_included_reason": "candidate_not_selected_for_public_page",
+      "source_ids": [
+        "content-techcrunch-ai"
+      ],
+      "source_kinds": [
+        "rss"
+      ],
+      "statuses": [
+        "checked"
+      ],
+      "candidate_count": 3,
+      "included_count": 0,
+      "notes": "7 recent intermediary lead entries parsed; 20 feed entries parsed; 2 within 48h"
+    },
+    {
+      "id": "the-verge",
+      "name": "The Verge",
+      "role": "media",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": true,
+      "public_included": false,
+      "not_included_reason": "candidate_not_selected_for_public_page",
+      "source_ids": [
+        "content-the-verge-ai",
+        "content-the-verge-main"
+      ],
+      "source_kinds": [
+        "rss"
+      ],
+      "statuses": [
+        "checked"
+      ],
+      "candidate_count": 6,
+      "included_count": 0,
+      "notes": "6 recent intermediary lead entries parsed; 10 recent intermediary lead entries parsed; 10 feed entries parsed; 3 within 48h; 10 feed entries parsed; 7 within 48h"
+    },
+    {
+      "id": "mit-technology-review",
+      "name": "MIT Technology Review",
+      "role": "media",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": false,
+      "public_included": false,
+      "not_included_reason": "parsed_but_no_candidate_created",
+      "source_ids": [
+        "content-mit-technology-review"
+      ],
+      "source_kinds": [
+        "rss"
+      ],
+      "statuses": [
+        "no_signal"
+      ],
+      "candidate_count": 0,
+      "included_count": 0,
+      "notes": "0 recent intermediary lead entries parsed; 10 feed entries parsed; 0 within 48h"
+    },
+    {
+      "id": "ars-technica",
+      "name": "Ars Technica",
+      "role": "media",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": true,
+      "public_included": false,
+      "not_included_reason": "candidate_not_selected_for_public_page",
+      "source_ids": [
+        "content-ars-technica"
+      ],
+      "source_kinds": [
+        "rss"
+      ],
+      "statuses": [
+        "checked"
+      ],
+      "candidate_count": 2,
+      "included_count": 0,
+      "notes": "2 recent intermediary lead entries parsed; 20 feed entries parsed; 1 within 48h"
+    },
+    {
+      "id": "venturebeat-ai",
+      "name": "VentureBeat AI",
+      "role": "media",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": false,
+      "public_included": false,
+      "not_included_reason": "parsed_but_no_candidate_created",
+      "source_ids": [
+        "content-venturebeat-ai"
+      ],
+      "source_kinds": [
+        "rss"
+      ],
+      "statuses": [
+        "no_signal"
+      ],
+      "candidate_count": 0,
+      "included_count": 0,
+      "notes": "0 recent intermediary lead entries parsed; 7 feed entries parsed; 0 within 48h"
+    },
+    {
+      "id": "hacker-news",
+      "name": "Hacker News",
+      "role": "community_api",
+      "configured": true,
+      "reachable": true,
+      "parsed_recent": true,
+      "candidate_created": true,
+      "public_included": true,
+      "not_included_reason": "",
+      "source_ids": [
+        "content-hacker-news-api",
+        "content-hn-frontpage"
+      ],
+      "source_kinds": [
+        "search_api",
+        "rss"
+      ],
+      "statuses": [
+        "checked"
+      ],
+      "candidate_count": 6,
+      "included_count": 1,
+      "notes": "13 recent intermediary lead entries parsed; 20 recent intermediary lead entries parsed; source-specific search_api health; api_records=500; 20 feed entries parsed; 20 within 48h"
+    },
+    {
+      "id": "wechat-platform",
+      "name": "WeChat Platform Sources",
+      "role": "platform_signal",
+      "configured": false,
+      "reachable": false,
+      "parsed_recent": false,
+      "candidate_created": false,
+      "public_included": false,
+      "not_included_reason": "not_configured_or_not_checked",
+      "source_ids": [
+        "platform-wechat-ai-feed",
+        "wechat-industry-whitelist-manual",
+        "wechat-rsshub-newrank-template",
+        "wechat-wechat2rss-feed"
+      ],
+      "source_kinds": [
+        "rss",
+        "manual",
+        "rsshub",
+        "aggregator"
+      ],
+      "statuses": [
+        "no_signal",
+        "skipped_manual_source",
+        "skipped_missing_base_url"
+      ],
+      "candidate_count": 0,
+      "included_count": 0,
+      "notes": "WeChat requires a date-scoped article input or an explicitly configured private/self-hosted feed; placeholder and kill-switch rows mean the lane is not active.; no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true; kill_switch_enabled; skipped_manual_source; skipped_missing_base_url"
+    },
+    {
+      "id": "zhihu-platform",
+      "name": "Zhihu Platform Sources",
+      "role": "platform_signal",
+      "configured": false,
+      "reachable": false,
+      "parsed_recent": false,
+      "candidate_created": false,
+      "public_included": false,
+      "not_included_reason": "not_configured_or_not_checked",
+      "source_ids": [
+        "platform-zhihu-ai-feed",
+        "platform-zhihu-rsshub-hotlist"
+      ],
+      "source_kinds": [
+        "rss",
+        "rsshub"
+      ],
+      "statuses": [
+        "skipped_manual_source",
+        "skipped_missing_base_url",
+        "no_signal"
+      ],
+      "candidate_count": 0,
+      "included_count": 0,
+      "notes": "Zhihu requires an explicitly configured feed or platform source; placeholder and kill-switch rows mean the lane is not active.; kill_switch_enabled; skipped_missing_base_url"
     },
     {
       "id": "github-org-watch",
@@ -309,12 +525,6 @@
       "candidate_created": false,
       "public_included": false,
       "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "open_source_platforms",
-      "display_section_label": "开源、模型平台与代码生态",
-      "display_section_rank": 30,
-      "display_rank": 20,
-      "display_mode": "expanded",
-      "status_label": "parsed_not_candidate",
       "source_ids": [
         "content-github-blog-feed",
         "content-github-changelog",
@@ -347,365 +557,23 @@
       "notes": "Official organization/repository Atom feeds are monitored separately from GitHub Trending and only count when recent parsed repository events produce candidates.; 0 recent intermediary lead entries parsed; 0 recent blog/interview entries parsed"
     },
     {
-      "id": "ml-papers-week",
-      "name": "ML Papers of the Week",
-      "role": "open_source_aggregator",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": true,
-      "public_included": false,
-      "not_included_reason": "candidate_not_selected_for_public_page",
-      "display_section": "open_source_platforms",
-      "display_section_label": "开源、模型平台与代码生态",
-      "display_section_rank": 30,
-      "display_rank": 80,
-      "display_mode": "collapsed",
-      "status_label": "updated_not_selected",
-      "source_ids": [
-        "content-ml-papers-week"
-      ],
-      "source_kinds": [
-        "github_report_markdown"
-      ],
-      "statuses": [
-        "checked"
-      ],
-      "candidate_count": 8,
-      "included_count": 0,
-      "notes": "10 report entries parsed; latest_report_url=https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/years/2026.md#top-ai-papers-of-the-week-june-14---june-21---2026; report_title=Top_AI_Papers_of_the_Week_(June_14_-_June_21); 10 within 14d source window; source-specific github_report_markdown health; markdown_links=3; recent_48h_hints=1"
-    },
-    {
-      "id": "hellogithub",
-      "name": "HelloGitHub",
-      "role": "open_source_aggregator",
+      "id": "github-trending",
+      "name": "GitHub Trending",
+      "role": "github_trending",
       "configured": true,
       "reachable": true,
       "parsed_recent": true,
       "candidate_created": true,
       "public_included": true,
       "not_included_reason": "",
-      "display_section": "open_source_platforms",
-      "display_section_label": "开源、模型平台与代码生态",
-      "display_section_rank": 30,
-      "display_rank": 90,
-      "display_mode": "collapsed",
-      "status_label": "included",
-      "source_ids": [
-        "content-hellogithub"
-      ],
-      "source_kinds": [
-        "github_report_markdown"
-      ],
-      "statuses": [
-        "checked"
-      ],
-      "candidate_count": 12,
-      "included_count": 4,
-      "notes": "30 report entries parsed; latest_report_url=https://raw.githubusercontent.com/521xueweihan/HelloGitHub/master/content/HelloGitHub123.md; report_title=第_123_期; 30 within 45d source window; source-specific github_report_markdown health; markdown_links=5; recent_48h_hints=1"
-    },
-    {
-      "id": "ruanyf-weekly",
-      "name": "RuanYF Weekly",
-      "role": "open_source_aggregator",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": true,
-      "public_included": false,
-      "not_included_reason": "candidate_not_selected_for_public_page",
-      "display_section": "open_source_platforms",
-      "display_section_label": "开源、模型平台与代码生态",
-      "display_section_rank": 30,
-      "display_rank": 100,
-      "display_mode": "collapsed",
-      "status_label": "updated_not_selected",
-      "source_ids": [
-        "content-ruanyf-weekly"
-      ],
-      "source_kinds": [
-        "github_report_markdown"
-      ],
-      "statuses": [
-        "checked"
-      ],
-      "candidate_count": 8,
-      "included_count": 0,
-      "notes": "30 report entries parsed; latest_report_url=https://raw.githubusercontent.com/ruanyf/weekly/master/docs/issue-401.md; report_title=如何赚到10亿美元; 30 within 14d source window; source-specific github_report_markdown health; markdown_links=2; recent_48h_hints=1"
-    },
-    {
-      "id": "follow-builders",
-      "name": "follow-builders",
-      "role": "builder_aggregator",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": true,
-      "public_included": true,
-      "not_included_reason": "",
-      "display_section": "builder_community",
-      "display_section_label": "Builder 与社区原始信号",
-      "display_section_rank": 50,
-      "display_rank": 10,
-      "display_mode": "expanded",
-      "status_label": "included",
       "source_ids": [],
       "source_kinds": [],
       "statuses": [
-        "checked",
-        "blocked",
-        "no_signal"
-      ],
-      "candidate_count": 20,
-      "included_count": 9,
-      "notes": "25 recent original entries parsed; 0 recent original entries parsed; upstream_error=Podcast: Transcript error for \"Why the Frontier Ecosystem must be Open — Matei Zaharia and Reynold Xin, Databricks\": HTTP 404: {\"status\":\"error\",\"message\":\"Episode not found\"}; 0 recent original entries parsed"
-    },
-    {
-      "id": "hacker-news",
-      "name": "Hacker News",
-      "role": "community_api",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": true,
-      "public_included": true,
-      "not_included_reason": "",
-      "display_section": "builder_community",
-      "display_section_label": "Builder 与社区原始信号",
-      "display_section_rank": 50,
-      "display_rank": 20,
-      "display_mode": "collapsed",
-      "status_label": "included",
-      "source_ids": [
-        "content-hacker-news-api",
-        "content-hn-frontpage"
-      ],
-      "source_kinds": [
-        "search_api",
-        "rss"
-      ],
-      "statuses": [
         "checked"
       ],
-      "candidate_count": 6,
-      "included_count": 1,
-      "notes": "13 recent intermediary lead entries parsed; 20 recent intermediary lead entries parsed; source-specific search_api health; api_records=500; 20 feed entries parsed; 20 within 48h"
-    },
-    {
-      "id": "wechat-platform",
-      "name": "WeChat Platform Sources",
-      "role": "platform_signal",
-      "configured": false,
-      "reachable": false,
-      "parsed_recent": false,
-      "candidate_created": false,
-      "public_included": false,
-      "not_included_reason": "not_configured_or_not_checked",
-      "display_section": "platform_cn_media",
-      "display_section_label": "中文平台与媒体线索",
-      "display_section_rank": 60,
-      "display_rank": 10,
-      "display_mode": "expanded",
-      "status_label": "not_configured_or_skipped",
-      "source_ids": [
-        "platform-wechat-ai-feed",
-        "wechat-industry-whitelist-manual",
-        "wechat-rsshub-newrank-template",
-        "wechat-wechat2rss-feed"
-      ],
-      "source_kinds": [
-        "rss",
-        "manual",
-        "rsshub",
-        "aggregator"
-      ],
-      "statuses": [
-        "no_signal",
-        "skipped_manual_source",
-        "skipped_missing_base_url"
-      ],
-      "candidate_count": 0,
-      "included_count": 0,
-      "notes": "WeChat requires a date-scoped article input or an explicitly configured private/self-hosted feed; placeholder and kill-switch rows mean the lane is not active.; no date-scoped WeChat article input found。input_source=wechat_article_input; input_path_redacted=true; primary_verification_required=true; kill_switch_enabled; skipped_manual_source; skipped_missing_base_url"
-    },
-    {
-      "id": "zhihu-platform",
-      "name": "Zhihu Platform Sources",
-      "role": "platform_signal",
-      "configured": false,
-      "reachable": false,
-      "parsed_recent": false,
-      "candidate_created": false,
-      "public_included": false,
-      "not_included_reason": "not_configured_or_not_checked",
-      "display_section": "platform_cn_media",
-      "display_section_label": "中文平台与媒体线索",
-      "display_section_rank": 60,
-      "display_rank": 20,
-      "display_mode": "expanded",
-      "status_label": "not_configured_or_skipped",
-      "source_ids": [
-        "platform-zhihu-ai-feed",
-        "platform-zhihu-rsshub-hotlist"
-      ],
-      "source_kinds": [
-        "rss",
-        "rsshub"
-      ],
-      "statuses": [
-        "skipped_manual_source",
-        "skipped_missing_base_url",
-        "no_signal"
-      ],
-      "candidate_count": 0,
-      "included_count": 0,
-      "notes": "Zhihu requires an explicitly configured feed or platform source; placeholder and kill-switch rows mean the lane is not active.; kill_switch_enabled; skipped_missing_base_url"
-    },
-    {
-      "id": "techcrunch-ai",
-      "name": "TechCrunch AI",
-      "role": "media",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": true,
-      "public_included": false,
-      "not_included_reason": "candidate_not_selected_for_public_page",
-      "display_section": "english_media_search",
-      "display_section_label": "英文媒体与搜索聚合",
-      "display_section_rank": 70,
-      "display_rank": 10,
-      "display_mode": "collapsed",
-      "status_label": "updated_not_selected",
-      "source_ids": [
-        "content-techcrunch-ai"
-      ],
-      "source_kinds": [
-        "rss"
-      ],
-      "statuses": [
-        "checked"
-      ],
-      "candidate_count": 3,
-      "included_count": 0,
-      "notes": "7 recent intermediary lead entries parsed; 20 feed entries parsed; 2 within 48h"
-    },
-    {
-      "id": "the-verge",
-      "name": "The Verge",
-      "role": "media",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": true,
-      "public_included": false,
-      "not_included_reason": "candidate_not_selected_for_public_page",
-      "display_section": "english_media_search",
-      "display_section_label": "英文媒体与搜索聚合",
-      "display_section_rank": 70,
-      "display_rank": 20,
-      "display_mode": "collapsed",
-      "status_label": "updated_not_selected",
-      "source_ids": [
-        "content-the-verge-ai",
-        "content-the-verge-main"
-      ],
-      "source_kinds": [
-        "rss"
-      ],
-      "statuses": [
-        "checked"
-      ],
-      "candidate_count": 6,
-      "included_count": 0,
-      "notes": "6 recent intermediary lead entries parsed; 10 recent intermediary lead entries parsed; 10 feed entries parsed; 3 within 48h; 10 feed entries parsed; 7 within 48h"
-    },
-    {
-      "id": "mit-technology-review",
-      "name": "MIT Technology Review",
-      "role": "media",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": false,
-      "public_included": false,
-      "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "english_media_search",
-      "display_section_label": "英文媒体与搜索聚合",
-      "display_section_rank": 70,
-      "display_rank": 30,
-      "display_mode": "collapsed",
-      "status_label": "parsed_not_candidate",
-      "source_ids": [
-        "content-mit-technology-review"
-      ],
-      "source_kinds": [
-        "rss"
-      ],
-      "statuses": [
-        "no_signal"
-      ],
-      "candidate_count": 0,
-      "included_count": 0,
-      "notes": "0 recent intermediary lead entries parsed; 10 feed entries parsed; 0 within 48h"
-    },
-    {
-      "id": "ars-technica",
-      "name": "Ars Technica",
-      "role": "media",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": true,
-      "public_included": false,
-      "not_included_reason": "candidate_not_selected_for_public_page",
-      "display_section": "english_media_search",
-      "display_section_label": "英文媒体与搜索聚合",
-      "display_section_rank": 70,
-      "display_rank": 40,
-      "display_mode": "collapsed",
-      "status_label": "updated_not_selected",
-      "source_ids": [
-        "content-ars-technica"
-      ],
-      "source_kinds": [
-        "rss"
-      ],
-      "statuses": [
-        "checked"
-      ],
-      "candidate_count": 2,
-      "included_count": 0,
-      "notes": "2 recent intermediary lead entries parsed; 20 feed entries parsed; 1 within 48h"
-    },
-    {
-      "id": "venturebeat-ai",
-      "name": "VentureBeat AI",
-      "role": "media",
-      "configured": true,
-      "reachable": true,
-      "parsed_recent": true,
-      "candidate_created": false,
-      "public_included": false,
-      "not_included_reason": "parsed_but_no_candidate_created",
-      "display_section": "english_media_search",
-      "display_section_label": "英文媒体与搜索聚合",
-      "display_section_rank": 70,
-      "display_rank": 50,
-      "display_mode": "collapsed",
-      "status_label": "parsed_not_candidate",
-      "source_ids": [
-        "content-venturebeat-ai"
-      ],
-      "source_kinds": [
-        "rss"
-      ],
-      "statuses": [
-        "no_signal"
-      ],
-      "candidate_count": 0,
-      "included_count": 0,
-      "notes": "0 recent intermediary lead entries parsed; 7 feed entries parsed; 0 within 48h"
+      "candidate_count": 70,
+      "included_count": 30,
+      "notes": "13 repositories parsed; 22 repositories parsed; 17 repositories parsed"
     }
   ],
   "stories": [

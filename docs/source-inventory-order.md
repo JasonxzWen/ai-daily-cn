@@ -13,7 +13,7 @@ Snapshot: 154 registered collection entries, generated mode deterministic.
 
 This reference is the static human review surface for the full collection-entry order used by the public `source-inventory-group-*` sections. It deliberately shows only source names, ids, logical-source mapping, source kind, enablement, tier, authority, platform, and generic configuration status.
 
-Public daily pages additionally project a per-row runtime layer onto these entries: mapped entries inherit their logical source `status_label`, mapped-but-missing entries show `unreported`, and unmapped entries show `collection_only`. That runtime layer is intentionally omitted here so this file remains a fixed order reference.
+Internal source-first runtime may project a per-row runtime layer onto these entries: mapped entries inherit their logical source `status_label`, mapped-but-missing entries show `unreported`, and unmapped entries show `collection_only`. Public daily pages do not render this inventory by default. That runtime layer is intentionally omitted here so this file remains a fixed order reference.
 
 Daily source status must not reorder this reference. Blocked, unconfigured, manual, skipped, or no-update entries stay in their fixed section so source gaps remain visible.
 
@@ -253,4 +253,3 @@ npm run validate
 | 70.006 | `content-venturebeat-ai` | VentureBeat AI | `venturebeat-ai` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
 | 70.007 | `content-product-hunt-trending` | Product Hunt Trending Feed | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
 | 70.008 | `content-product-hunt-devtools` | Product Hunt Developer Tools Feed | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
-

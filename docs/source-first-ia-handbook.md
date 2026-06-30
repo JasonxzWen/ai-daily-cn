@@ -10,13 +10,13 @@ Full inventory order reference: `docs/source-inventory-order.md`
 
 Maintenance owner: `user-reviewed-fixed-source-order`
 
-This handbook is the human-facing maintenance guide for the source-first daily IA. The JSON contract is the executable authority; this document explains how to change it without losing the fixed source order the public report depends on.
+This handbook is the human-facing maintenance guide for source-first governance and optional diagnostics. The JSON contract is the executable authority; this document explains how to change the fixed source order without making the public daily report expose internal audit panels by default.
 
 ## 目标
 
-日报不再把“订阅了哪些信源、哪些平台可用、哪些阻塞或未更新”藏在后置审计里。读者应该先看到信源运行概况、显式状态焦点和固定顺序的信源图谱，然后再读 story 主体。
+日报公开页默认保持 story-first。信源运行概况、显式状态焦点、固定顺序信源图谱和全量采集入口属于内部治理/诊断表面，不能作为公开日报首屏或正文默认区块输出。
 
-The fixed order is intentionally editorial and stable. It answers “what matters most to this daily report” rather than “which source happened to update today.” In operational terms: do not reorder by daily status.
+The fixed order is intentionally editorial and stable. It answers “which sources should governance track consistently” rather than “which source happened to update today.” In operational terms: do not reorder by daily status.
 
 ## 固定排序维护者与修改边界
 
@@ -146,11 +146,11 @@ This is the fixed source insertion handbook for new sources. The goal is to keep
 
 ### Collection Entry Only
 
-Use a collection-only entry when the new source is a feed, org page, API endpoint, search query, bridge, or manual input that supports an existing logical source. In that case, update the source registry and regenerate `docs/source-inventory-order.md`; do not add a new row to `config/source-display-contract.json` unless the source deserves reader-visible first-class identity.
+Use a collection-only entry when the new source is a feed, org page, API endpoint, search query, bridge, or manual input that supports an existing logical source. In that case, update the source registry and regenerate `docs/source-inventory-order.md`; do not add a new row to `config/source-display-contract.json` unless source governance should track it as a first-class identity.
 
 ### Promotion To Logical Source
 
-Promote a source to a first-class logical source when readers should understand it as a named source in the public source graph, when it has distinct editorial importance, or when its blocked/skipped/no-update status should be visible independently. The same PR must update `config/source-display-contract.json`, this handbook if the insertion rule is new, focused tests, and the source inventory reference when registry entries move.
+Promote a collection entry only when source governance should track it as a named source. Promotion is appropriate when the source has distinct editorial importance, stable identity, or an independently meaningful blocked/skipped/no-update state. The same PR must update `config/source-display-contract.json`, this handbook if the insertion rule is new, focused tests, and the source inventory reference when registry entries move.
 
 ### User Review
 
@@ -212,7 +212,7 @@ npm run test:e2e
 
 Status: `phase-18-contract`
 
-The daily report is source-first v2. Source visibility is a first-class reader surface, but source lists do not replace edited stories. The page must show where the day came from, which source lanes worked, which lanes were blocked or stale, and which full inventory entries exist.
+Source-first runtime is internal governance by default. Source visibility remains important for maintenance and optional diagnostics, but public daily pages remain story-first and exclude source runtime audit sections unless the user explicitly requests a diagnostic surface.
 
 <!-- source-first-v2-layering -->
 
@@ -226,15 +226,15 @@ Logical sources are ordered by fixed editorial importance in `config/source-disp
 
 The Collection Entry Layer is the complete registered inventory. Collection entries are concrete feed, page, bridge, manual, API, or platform inputs. They are visible so blocked, skipped, unconfigured, manual, or no-update rows do not disappear from review.
 
-154 collection entries are complete inventory rows, not first-viewport story content. They remain grouped and expanded in fixed source sections with non-hiding search/highlight behavior.
+154 collection entries are complete inventory rows, not public daily story content. They remain grouped and expanded in fixed source sections inside the internal source-first runtime with non-hiding search/highlight behavior.
 
-Public daily inventory rows project a runtime layer onto this fixed inventory: mapped collection entries inherit the daily `status_label` from their logical source; mapped entries whose logical source is missing from today's runtime table show `unreported`; unmapped entries show `collection_only`. The generated `docs/source-inventory-order.md` reference remains a static order and configuration review surface, so runtime status must never reorder it.
+Internal source-first inventory rows project a runtime layer onto this fixed inventory: mapped collection entries inherit the daily `status_label` from their logical source; mapped entries whose logical source is missing from today's runtime table show `unreported`; unmapped entries show `collection_only`. The generated `docs/source-inventory-order.md` reference remains a static order and configuration review surface, so runtime status must never reorder it.
 
-<!-- first-viewport-source-order -->
+<!-- internal-source-runtime-order -->
 
-### First Viewport Order
+### Internal Source Runtime Order
 
-The first viewport must put source signal story before source metrics dashboard. The renderer then inserts the reader-safe `system-operating-dashboard` immediately after `source_first_dashboard` and before `source_status_focus`; it is not part of `source_first_section_order`, so the fixed source order remains controlled only by the JSON contract.
+The internal source-first runtime puts source signal story before source metrics dashboard in internal source-first runtime. When explicitly enabled, the renderer inserts the `system-operating-dashboard` immediately after `source_first_dashboard` and before `source_status_focus`; it is not part of `source_first_section_order`, so the fixed source order remains controlled only by the JSON contract.
 
 The source-first section order is:
 
@@ -251,15 +251,21 @@ The source metrics dashboard has two required metric bands:
 - Logical-source operating cards keep the fixed reader-facing source graph visible: total logical sources, public included, updated but not selected, blocked, not configured or skipped, and low-signal sources.
 - Collection-entry runtime cards summarize the complete inventory before readers reach the long inventory: `INVENTORY_TOTAL`, `RUNTIME_KNOWN`, `INHERITED_RUNTIME`, `UNREPORTED_RUNTIME`, and `COLLECTION_ONLY`.
 
-These collection-entry metrics are first-screen coverage indicators. They are derived from the same 154-row inventory runtime projection used by the full inventory, but they do not replace the expanded `source-inventory-group-*` sections and must not reorder, hide, or filter any collection entry.
+These collection-entry metrics are internal coverage indicators. They are derived from the same 154-row inventory runtime projection used by the full inventory, but they do not replace the expanded `source-inventory-group-*` sections and must not reorder, hide, or filter any collection entry.
 
-The system operating dashboard is the broader first-screen metrics layer. It must show exactly five public cards: `公开内容规模`, `信号模块`, `趋势与追踪`, `信源覆盖`, and `运行质量`. The cards use tags `SYSTEM_CONTENT`, `SYSTEM_SIGNALS`, `SYSTEM_TRENDS`, `SYSTEM_SOURCES`, and `SYSTEM_QUALITY`. They may summarize public arrays and reader-safe quality status, but they must not expose internal fields such as source audits, candidate pools, selection snapshots, debug fields, environment variable names, or remediation logs.
+The system operating dashboard is an internal metrics layer. It must show exactly five diagnostic cards: `公开内容规模`, `信号模块`, `趋势与追踪`, `信源覆盖`, and `运行质量`. The cards use tags `SYSTEM_CONTENT`, `SYSTEM_SIGNALS`, `SYSTEM_TRENDS`, `SYSTEM_SOURCES`, and `SYSTEM_QUALITY`. They may summarize public arrays and reader-safe quality status, but they must not be rendered into the public daily page by default.
+
+<!-- public-daily-source-audit-exclusion -->
+
+### Public Daily Source Audit Exclusion
+
+Public daily pages remain story-first and exclude source runtime audit sections by default. The public renderer must not output `source_signal_story`, `source_first_dashboard`, `system_operating_dashboard`, `source_status_focus`, `source_map`, `source_inventory`, or their `source-map-group-*` / `source-inventory-group-*` detail groups unless a future user-approved diagnostic mode explicitly requests them.
 
 <!-- full-inventory-expansion-semantics -->
 
 ### Full Inventory Expansion Semantics
 
-All collection entries stay present in the public source-first area. Search, quick links, and focus lanes may help navigation, but they must not remove, hide, or reorder rows.
+All collection entries stay present in the internal source-first runtime. Search, quick links, and focus lanes may help navigation, but they must not remove, hide, or reorder rows.
 
 Full expansion means:
 
@@ -285,13 +291,13 @@ The baseline source importance order is:
 
 Within each section, existing rank values remain the baseline until the user reviews a change. Codex may propose a rank, but merged JSON is the executable authority.
 
-Story-centered content remains the fact carrier. Stories explain what happened and why it matters. Source-first sections explain coverage, reliability, gaps, and provenance.
+Story-centered content remains the fact carrier. Stories explain what happened and why it matters. Source-first sections explain coverage, reliability, gaps, and provenance only in internal governance or explicit diagnostic contexts.
 
 <!-- source-promotion-review-loop -->
 
 ### Source Promotion Review Loop
 
-Promote a collection entry only when readers should track it as a named source.
+Promote a collection entry only when source governance should track it as a named source.
 
 Default loop:
 
@@ -315,9 +321,9 @@ npm run validate
 Contract checks must reject:
 
 - missing or renamed source-first v2 markers;
-- first viewport order that does not start with `source_signal_story` then `source_first_dashboard`;
+- internal source-first runtime order that does not start with `source_signal_story` then `source_first_dashboard`;
 - a source metrics dashboard that omits full-inventory runtime metric cards for `INVENTORY_TOTAL`, `RUNTIME_KNOWN`, `INHERITED_RUNTIME`, `UNREPORTED_RUNTIME`, and `COLLECTION_ONLY`;
-- a missing `system-operating-dashboard` between source metrics and source status focus, or a system dashboard that omits one of the five public metrics cards;
+- a public daily page that renders source-first runtime audit sections by default;
 - a missing logical source vs collection entry distinction;
 - documentation that treats the 154-entry inventory as first-viewport story content;
 - runtime status being used to reorder fixed source rows.

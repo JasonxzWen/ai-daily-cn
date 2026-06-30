@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.public-daily-source-audit-rollback",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Public daily source audit rollback",
+  "slug": "public-daily-source-audit-rollback",
+  "status": "completed",
+  "summary": "This iteration rolls back the public daily source-first runtime surface after the 2026-06-29 page became dominated by source audit dashboards, inventory rows, and system-style operating logs. The fix restores story-first public daily output, keeps source-first sections behind an explicit internal diagnostic mode, removes dormant source-inventory runtime assets from public pages, and regenerates affected public artifacts.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "html": "docs/reports/2026/06/2026-06-29.html",
+    "validation_commands": [
+      "node --test --test-name-pattern \"public daily reports do not render source-first audit panels before story content\" tests/unit.test.js",
+      "node --test --test-name-pattern \"effective-interact renders source inventory finder|effective-interact generator creates|public daily reports do not render source-first\" tests/skills.test.js tests/unit.test.js",
+      "npm test",
+      "npm run build",
+      "npm run build:check-clean",
+      "npm run privacy:validate",
+      "npm run test:e2e",
+      "Playwright desktop/mobile visual check for docs/reports/2026/06/2026-06-29.html at 1365x900 and 390x844",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate",
+      "git diff --check"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Source health proof is not the same thing as public daily content.",
+      "evidence": "The polluted public page rendered source dashboards, inventory groups, and system metrics ahead of the daily stories; the restored page starts with story sections and has zero source audit section ids.",
+      "scope": "public_daily_layout",
+      "persistence": "implemented",
+      "recommended_action": "Keep source-first runtime sections excluded from public daily pages by default and require an explicit internal diagnostic flag for future use."
+    },
+    {
+      "lesson": "Public generated data must not carry runtime display/status fields that only exist to support internal source dashboards.",
+      "evidence": "The public data projection now strips display_section, display_rank, display_mode, and status_label fields while private reports-data remains available for internal checks.",
+      "scope": "public_data_minimization",
+      "persistence": "implemented",
+      "recommended_action": "Bind future public data additions to reader-facing rendering needs rather than internal operating dashboards."
+    },
+    {
+      "lesson": "Renderer assets should be conditional when a capability is internal or optional.",
+      "evidence": "Effective-interact now emits source inventory finder CSS and JavaScript only when the rendered interaction actually contains a source inventory finder section.",
+      "scope": "effective_interact_renderer",
+      "persistence": "implemented",
+      "recommended_action": "Keep optional diagnostic widgets behind section-presence checks so public pages do not accumulate invisible runtime machinery."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The public daily page was dominated by source-first audit and operations panels instead of reader-facing AI daily stories.",
+      "evidence": "Diagnosis traced the regression to source-first runtime sections inserted by default into public interaction input and then enforced by tests and the source display contract.",
+      "module": "src/interaction-report.js, src/site.js, src/page-checklist.js, tests/unit.test.js, tests/e2e/site.e2e.js, config/source-display-contract.json, .codex/skills/effective-interact/scripts/create-interaction.mjs",
+      "suggestion": "Make source-first runtime sections an explicit internal diagnostic mode and assert that public daily pages exclude source audit panels by default.",
+      "expected_benefit": "Public daily pages return to compact story scanning while internal source governance can still be inspected when deliberately requested.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through interaction-input gating, public data minimization, page-check changes, unit/e2e regression coverage, contract documentation, regenerated public artifacts, and desktop/mobile visual verification.",
+      "ledger_links": [
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-daily-content-contract",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-daily-ia-source-effectiveness-reset",
+        "feedback/p1-effective-interact-production-renderer",
+        "feedback/p1-feedback-memory-self-check"
+      ],
+      "validation_evidence": [
+        "public daily reports do not render source-first audit panels before story content",
+        "npm run test:e2e",
+        "npm run privacy:validate",
+        "Playwright desktop/mobile visual check for docs/reports/2026/06/2026-06-29.html"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Before the next daily-page iteration, decide whether any source-health summary belongs in public output at all, and if so keep it compact, reader-facing, and below the main story sections.",
+      "owner": "project"
+    }
+  ]
+}
