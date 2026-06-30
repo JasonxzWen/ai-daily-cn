@@ -83,6 +83,7 @@ test("daily dry-run requires an explicit report date and stays date-scoped", asy
   assert.equal(plan.reports[0].report_date, "2026-05-13");
   assert.equal(plan.expected_pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
   assert(plan.will_stage_files.includes("docs/data/official-blogs.json"));
+  assert(plan.will_stage_files.includes("docs/official-blogs/index.html"));
   assert(plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.json"));
   assert(!plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.candidates.json"));
 });

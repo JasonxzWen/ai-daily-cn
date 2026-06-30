@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { parseDailyMarkdown } from "./parser.js";
-import { defaultStyleCss, renderIndexHtml } from "./render.js";
+import { defaultStyleCss, renderIndexHtml, renderOfficialBlogsHtml } from "./render.js";
 import { renderReportWithEffectiveInteract } from "./interaction-report.js";
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import { defaultGeneratedAt } from "./time.js";
@@ -253,6 +253,9 @@ export async function buildSite(options = {}) {
   await writeJsonTracked(outDir, "feed.json", feedValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "data/official-blogs.json", officialBlogKnowledge, writtenFiles);
+  await writeFileTracked(outDir, "official-blogs/index.html", renderOfficialBlogsHtml(officialBlogKnowledge, {
+    styleHref: `../assets/style.css?v=${encodeURIComponent(indexStyleVersion)}`
+  }), writtenFiles);
   await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value, dateIndex, {
     styleVersion: indexStyleVersion,
     officialBlogKnowledge
@@ -316,7 +319,7 @@ export async function planGeneratedFiles(options = {}) {
   const generatedAt = options.generatedAt || defaultGeneratedAt();
   const markdownFiles = await collectMarkdownFiles(inputDir);
   const reportJsonFiles = await collectJsonFiles(dataInputDir);
-  const files = [".nojekyll", "assets/style.css", "feed.json", "index.html", "trends.json", "data/official-blogs.json"];
+  const files = [".nojekyll", "assets/style.css", "feed.json", "index.html", "trends.json", "data/official-blogs.json", "official-blogs/index.html"];
   const reports = [];
 
   for (const file of markdownFiles) {

@@ -466,6 +466,7 @@ try {
   assert.equal(await page.locator('[data-official-blog-company="openai"]').count() >= 1, true);
   assert.equal(await page.locator('[data-official-blog-company="anthropic"]').count() >= 1, true);
   assert.equal(await page.locator('a[href="data/official-blogs.json"]').count() >= 1, true);
+  assert.equal(await page.locator('a[href="official-blogs/"]').count() >= 1, true);
   assert.equal(await page.locator('[data-index-style="effective-interact"]').count(), 1);
   assert.equal(await page.locator("main.report-shell.index-page").count(), 1);
   assert.equal(await page.locator(".report-hero.report-hero-index").count(), 1);
@@ -492,6 +493,24 @@ try {
   assert.equal(await hasHorizontalOverflow(page), false);
   await page.setViewportSize({ width: 1280, height: 900 });
   assert.equal(await page.locator("[data-source-lane]").count(), 6);
+
+  await page.goto(`${server.url}/official-blogs/index.html`);
+  assert.equal(await page.locator("#official-blog-excerpts").count(), 1);
+  assert.equal(await page.locator("[data-official-blog-excerpt-card]").count() >= 6, true);
+  assert.equal(await page.locator('[data-official-blog-company="openai"]').count() >= 1, true);
+  assert.equal(await page.locator('[data-official-blog-company="anthropic"]').count() >= 1, true);
+  assert.equal(await page.locator("[data-related-report-links]").count() >= 6, true);
+  assert.equal(await page.locator("[data-related-blog-link]").count() >= 4, true);
+  assert.equal(await page.locator('a[href="../index.html"]').count() >= 1, true);
+  assert.equal(await page.locator('a[href="../data/official-blogs.json"]').count() >= 1, true);
+  assert.equal(await page.locator('a[href^="https://openai.com"][target="_blank"][rel*="noopener"]').count() >= 1, true);
+  assert.equal(await page.locator('a[href^="https://www.anthropic.com"][target="_blank"][rel*="noopener"]').count() >= 1, true);
+  assert.doesNotMatch(await page.locator("body").textContent(), /admission_policy|source_audit|self_check|candidate_id|rationale/i);
+  assert.equal(await hasRemoteScripts(page), false);
+  assert.equal(await hasHorizontalOverflow(page), false);
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await hasHorizontalOverflow(page), false);
+  await page.setViewportSize({ width: 1280, height: 900 });
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-13.html`);
   assert.equal((await page.locator("#report-top h1").textContent()).trim(), "2026-05-13");

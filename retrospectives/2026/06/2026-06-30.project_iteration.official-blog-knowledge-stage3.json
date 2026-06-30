@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.official-blog-knowledge-stage3",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Official blog knowledge stage 3",
+  "slug": "official-blog-knowledge-stage3",
+  "status": "completed",
+  "summary": "This iteration adds a generated official blog excerpt page for curated OpenAI and Anthropic knowledge records. The page links from the homepage, renders summaries, key ideas, practice checklists, related blog anchors, and stable related-report containers, and stays backed by the minimized public knowledge projection.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "html": "docs/official-blogs/index.html",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog excerpt page|official blog knowledge generated file|daily dry-run requires an explicit report date\" tests/unit.test.js tests/e2e/site.e2e.js tests/publish.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "npm run build",
+      "npm run test",
+      "npm run test:e2e",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate",
+      "Playwright desktop/mobile screenshot inspection for docs/index.html and docs/official-blogs/index.html"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The official blog graph needs a stable reader-facing page, not only a homepage module and JSON file.",
+      "evidence": "Stage 3 generates `official-blogs/index.html`, links it from `#official-blog-knowledge`, includes it in generated-file planning, and keeps daily dry-run staging date-scoped while preserving the page.",
+      "scope": "official_blog_excerpt_page",
+      "persistence": "implemented",
+      "recommended_action": "Keep future official blog graph expansion centered on this page unless a separate per-record detail route becomes necessary."
+    },
+    {
+      "lesson": "Related daily report links should have a deterministic container before all historical dates are curated.",
+      "evidence": "Each excerpt card renders `data-related-report-links`, so adding `related_report_dates` to knowledge records later automatically turns the container into report links.",
+      "scope": "official_blog_daily_links",
+      "persistence": "implemented",
+      "recommended_action": "In the next stage, populate selected `related_report_dates` from daily report items and add reverse links from daily pages."
+    },
+    {
+      "lesson": "The public excerpt page must stay on the minimized projection.",
+      "evidence": "Unit and E2E checks assert the excerpt page and public JSON omit admission policy, rationale, source audit, self-check, and candidate/debug fields.",
+      "scope": "official_blog_public_safety",
+      "persistence": "implemented",
+      "recommended_action": "Do not render authoring or admission metadata on public knowledge surfaces."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The Stage 2 homepage module did not provide a dedicated blog excerpt surface for future daily-report back-links or trend tracking.",
+      "evidence": "Stage 3 adds `renderOfficialBlogsHtml`, `docs/official-blogs/index.html`, homepage linkage, generated-file planning, daily dry-run staging, unit tests, E2E checks, and page-check coverage for the new homepage entrypoint.",
+      "module": "src/render.js, src/site.js, src/publish.js, src/page-checklist.js, docs/official-blogs/index.html",
+      "suggestion": "Use a generated official blog excerpt page as the first knowledge-graph surface.",
+      "expected_benefit": "New OpenAI/Anthropic product, model, and engineering-practice posts can be summarized once and linked from daily reports, later reports, and trend tracking without exposing internal triage metadata.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through renderer, site build, publish plan, checklist, unit tests, e2e browser checks, and validation.",
+      "ledger_links": [
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-authoritative-retrospectives",
+        "feedback/p1-feedback-memory-self-check"
+      ],
+      "validation_evidence": [
+        "official blog excerpt page renders reader safe graph links",
+        "official blog knowledge generated file public projection is generated and planned",
+        "daily dry-run requires an explicit report date and stays date-scoped"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-prepublish-editorial-prune-gate",
+    "feedback/p1-official-org-updates-section"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Populate `related_report_dates` from daily report items and render reverse links from daily reports to official blog records.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Consider per-record routes only after the single excerpt page becomes too dense for reader scanning.",
+      "owner": "project"
+    }
+  ]
+}

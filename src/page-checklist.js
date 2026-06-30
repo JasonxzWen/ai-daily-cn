@@ -869,6 +869,7 @@ export async function evaluateIndexPageChecklist(page, options = {}) {
         .filter(Boolean)
     );
     const officialBlogJsonLink = document.querySelector('#official-blog-knowledge a[href="data/official-blogs.json"]');
+    const officialBlogPageLink = document.querySelector('#official-blog-knowledge a[href="official-blogs/"]');
     const officialBlogPrivateHits = officialBlogKnowledge
       ? ["admission", "admission_policy", "source_audit", "self_check", "candidate_id"].filter((token) =>
           (officialBlogKnowledge.textContent || "").includes(token)
@@ -940,12 +941,14 @@ export async function evaluateIndexPageChecklist(page, options = {}) {
       officialBlogCards.length >= 6 &&
         officialBlogCompanies.has("openai") &&
         officialBlogCompanies.has("anthropic") &&
-        Boolean(officialBlogJsonLink),
-      "Official blog module should expose curated OpenAI/Anthropic cards and the public JSON projection.",
+        Boolean(officialBlogJsonLink) &&
+        Boolean(officialBlogPageLink),
+      "Official blog module should expose curated OpenAI/Anthropic cards, the excerpt page, and the public JSON projection.",
       {
         card_count: officialBlogCards.length,
         companies: [...officialBlogCompanies].sort(),
-        json_link: Boolean(officialBlogJsonLink)
+        json_link: Boolean(officialBlogJsonLink),
+        page_link: Boolean(officialBlogPageLink)
       }
     );
     addCheck(
