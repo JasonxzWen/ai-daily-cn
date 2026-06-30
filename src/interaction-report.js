@@ -328,6 +328,8 @@ export function reportToInteractionInput(report, options = {}) {
       richId: "trend-tracking",
       filterLabel: "榜单切换",
       showFilters: true,
+      includeAllFilter: false,
+      defaultFilterValue: "OpenRouter",
       items: formatDailyTrackingCards(publicDailyTracking, {
         report,
         evidenceByUrl,

@@ -3339,8 +3339,8 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </div>
 
 
-    <div class="evidence-grid focus-field blog-card-grid" data-focus-field="blog">
-      <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="blog" data-filter-value="agent output / HTML reports / coding workflow" data-search-target="blog">
+    <div class="evidence-grid focus-field blog-card-grid" data-focus-field="section-official-blog-updates">
+      <article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="section-official-blog-updates" data-filter-value="agent output / HTML reports / coding workflow" data-search-target="section-official-blog-updates">
 
     <h3><a class="card-title-link" href="https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzBmNzY2ZSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkNCPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Using Claude Code: The unreasonable effectiveness of HTML</span><span class="card-subtitle">Claude Blog / 2026-05-20</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">agent output</span><span class="chip chip-topic">HTML reports</span><span class="chip chip-topic">coding workflow</span></div>
@@ -3349,7 +3349,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <p>Claude Code 团队解释为何在复杂规格、研究报告、PR 说明和可交互调参界面中偏向 HTML，而不是长 Markdown。</p>
 
   </article>
-<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="blog" data-filter-value="AI security operations / Opus / vulnerability remediation" data-search-target="blog">
+<article class="interactive-card evidence-card evidence-spotlight blog-card" data-evidence-spotlight data-filter-target="section-official-blog-updates" data-filter-value="AI security operations / Opus / vulnerability remediation" data-search-target="section-official-blog-updates">
 
     <h3><a class="card-title-link" href="https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzBmNzY2ZSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkNCPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>How our partners are putting Opus to work for cybersecurity</span><span class="card-subtitle">Claude Blog / 2026-05-21</span></span></a></h3>
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">AI security operations</span><span class="chip chip-topic">Opus</span><span class="chip chip-topic">vulnerability remediation</span></div>
@@ -3508,6 +3508,7 @@ Builder 原始源 ==tag-status-checked|checked== 0 ==tag-status-no-signal|no_sig
     if (!target || !value) return;
 
     document.querySelectorAll("[data-filter-target='" + target + "']").forEach(function (item) {
+      if (item.matches("button")) return;
       var match = value === "all" || item.getAttribute("data-filter-value") === value;
       item.hidden = !match;
     });
