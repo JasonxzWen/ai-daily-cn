@@ -193,6 +193,68 @@ test("official blog admission triage sends technical customer use framing to rev
   assert(result.suggested_topics.includes("evals"));
 });
 
+test("official blog admission threshold excludes generic partnership workflow news", () => {
+  const result = triageOfficialBlogPreview({
+    title: "OpenAI and ExampleCorp launch an enterprise AI partnership",
+    excerpt: "The companies will bring AI tools to more employees and improve business workflows across sales and support teams."
+  });
+  assert.equal(result.admission, "exclude");
+  assert.equal(result.knowledge_value, "none");
+  assert.equal(result.excluded_as, "company_news");
+});
+
+test("official blog admission threshold excludes generic API partnership news", () => {
+  const result = triageOfficialBlogPreview({
+    title: "OpenAI and ExampleCorp expand enterprise API partnership",
+    excerpt: "The companies will bring API tools to more teams and improve everyday business workflows for employees and customers."
+  });
+  assert.equal(result.admission, "exclude");
+  assert.equal(result.knowledge_value, "none");
+  assert.equal(result.excluded_as, "company_news");
+});
+
+test("official blog admission threshold uses only the opening preview for first-pass triage", () => {
+  const result = triageOfficialBlogPreview({
+    title: "OpenAI and ExampleCorp expand strategic partnership",
+    summary: [
+      "OpenAI and ExampleCorp announced a broader partnership to bring AI tools to employees and customers.",
+      "Executives said the collaboration will support future business workflows across global markets.",
+      "Later paragraphs mention routing architecture, evaluation harnesses, tool permissions, and rollout controls."
+    ].join("\n\n")
+  });
+  assert.equal(result.admission, "exclude");
+  assert.equal(result.excluded_as, "company_news");
+  assert.deepEqual(result.matched_criteria, []);
+});
+
+test("official blog admission threshold includes new models and engineering practice previews", () => {
+  const model = triageOfficialBlogPreview({
+    title: "Introducing ExampleModel 5",
+    excerpt: "This new model release describes capabilities, benchmark results, evals, safety mitigations, and integration guidance."
+  });
+  assert.equal(model.admission, "include");
+  assert(model.matched_criteria.includes("new_model"));
+  assert(model.suggested_topics.includes("evals"));
+
+  const practice = triageOfficialBlogPreview({
+    title: "Harness engineering for long-running agents",
+    excerpt: "This engineering note explains environment management, sandbox boundaries, observability, regression checks, and failure modes for long-running agent workflows."
+  });
+  assert.equal(practice.admission, "include");
+  assert.equal(practice.knowledge_value, "major");
+  assert(practice.matched_criteria.includes("harness_engineering"));
+});
+
+test("official blog admission threshold sends concrete implementation customer stories to review", () => {
+  const result = triageOfficialBlogPreview({
+    title: "How ExampleBank built a Claude support workflow",
+    excerpt: "The opening preview describes routing architecture, tool permissions, evaluation harnesses, observability, and rollout controls for production agents."
+  });
+  assert.equal(result.admission, "needs_review");
+  assert(result.matched_criteria.includes("engineering_practice"));
+  assert(result.suggested_topics.includes("evals"));
+});
+
 test("repository seed knowledge includes curated OpenAI and Anthropic records", async () => {
   const index = await loadOfficialBlogKnowledge({ rootDir });
   assert(index.records.length >= 6, `expected at least 6 seed records, got ${index.records.length}`);

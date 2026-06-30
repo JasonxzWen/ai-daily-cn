@@ -9,6 +9,8 @@ const DEFAULT_KNOWLEDGE_DIR = path.join(DEFAULT_ROOT, "knowledge", "official-blo
 const SCHEMA_PATH = path.join(DEFAULT_ROOT, "schemas", "official-blog.schema.json");
 const SUPPORTED_COMPANIES = new Set(["openai", "anthropic"]);
 const MAX_DIGEST_LENGTH = 1200;
+const TRIAGE_OPENING_PARAGRAPH_LIMIT = 2;
+const TRIAGE_OPENING_CHAR_LIMIT = 1200;
 const REPORT_ITEM_SECTIONS = [
   "main_items",
   "hot_blogs",
@@ -52,9 +54,10 @@ export const OFFICIAL_BLOG_ADMISSION_POLICY = {
     "ordinary partnerships or customer adoption announcements without implementation detail",
     "funding, hiring, events, awards, market expansion, regional availability, or sales copy",
     "policy statements or company news without reusable model, product, engineering, or safety methodology",
-    "customer stories that only say a company adopted OpenAI or Claude"
+    "customer stories that only say a company adopted OpenAI or Claude",
+    "business-news previews that use broad workflow, productivity, employee, customer, or AI-tools language without concrete reusable engineering detail"
   ],
-  review: "First pass should use the title plus opening preview/paragraphs. Use needs_review when a partnership or customer story hints at concrete architecture, evals, permissions, workflow, or rollout controls but the preview is not enough to prove durable knowledge value."
+  review: "First pass should use only the title plus opening preview/first paragraphs, not the full article body. Use needs_review when a partnership or customer story hints at concrete architecture, evals, permissions, observability, agent workflow, or rollout controls but the opening preview is not enough to prove durable knowledge value."
 };
 
 export async function loadOfficialBlogKnowledge(options = {}) {
@@ -153,7 +156,7 @@ export function normalizeOfficialBlogUrl(value) {
 
 export function triageOfficialBlogPreview(preview = {}) {
   const title = String(preview.title || "");
-  const excerpt = String(preview.excerpt || preview.summary || "");
+  const excerpt = officialBlogOpeningPreview(preview);
   const text = normalizeText(`${title} ${excerpt}`);
   const matchedCriteria = [];
   const suggestedTopics = [];
@@ -195,10 +198,12 @@ export function triageOfficialBlogPreview(preview = {}) {
     "leaders discussed"
   ]) || hasCustomerCaseFraming(text);
 
-  if (companyNews && matchedCriteria.length === 0) {
+  const implementationDetail = hasConcreteImplementationDetail(text);
+
+  if (companyNews && !implementationDetail) {
     return {
       admission: "exclude",
-      reason: "Company news or partnership/customer announcement without concrete reusable product, model, or engineering practice detail.",
+      reason: "Company news or partnership/customer announcement without concrete reusable product, model, or engineering implementation detail in the opening preview.",
       matched_criteria: [],
       excluded_as: "company_news",
       knowledge_value: "none",
@@ -209,7 +214,7 @@ export function triageOfficialBlogPreview(preview = {}) {
   if (companyNews && matchedCriteria.length > 0) {
     return {
       admission: "needs_review",
-      reason: "Customer or partnership framing hints at technical implementation detail; read beyond the preview before admitting.",
+      reason: "Customer or partnership framing hints at concrete technical implementation detail in the opening preview; read beyond the preview before admitting.",
       matched_criteria: matchedCriteria,
       excluded_as: "",
       knowledge_value: "notable",
@@ -426,6 +431,70 @@ function createAjv() {
     }
   });
   return ajv;
+}
+
+function officialBlogOpeningPreview(preview = {}) {
+  const explicitParagraphs = Array.isArray(preview.opening_paragraphs)
+    ? preview.opening_paragraphs
+    : Array.isArray(preview.openingParagraphs)
+      ? preview.openingParagraphs
+      : null;
+  const source = explicitParagraphs
+    ? explicitParagraphs.join("\n\n")
+    : String(
+        preview.opening_preview ||
+        preview.openingPreview ||
+        preview.opening_excerpt ||
+        preview.openingExcerpt ||
+        preview.excerpt ||
+        preview.summary ||
+        ""
+      );
+  return source
+    .split(/\n\s*\n/g)
+    .map((paragraph) => paragraph.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .slice(0, TRIAGE_OPENING_PARAGRAPH_LIMIT)
+    .join(" ")
+    .slice(0, TRIAGE_OPENING_CHAR_LIMIT)
+    .trim();
+}
+
+function hasConcreteImplementationDetail(text) {
+  return hasAny(text, [
+    "agent workflow",
+    "agent workflows",
+    "api integration guidance",
+    "architecture",
+    "benchmark",
+    "code example",
+    "computer use",
+    "deployment constraint",
+    "environment management",
+    "eval harness",
+    "evaluation harness",
+    "failure mode",
+    "implementation detail",
+    "json schema",
+    "memory",
+    "model context protocol",
+    "mcp",
+    "multi agent",
+    "observability",
+    "orchestration",
+    "permission model",
+    "permissions",
+    "production agents",
+    "regression checks",
+    "rollout control",
+    "rollout controls",
+    "routing",
+    "sandbox",
+    "sdk architecture",
+    "structured outputs",
+    "system card",
+    "tool execution"
+  ]);
 }
 
 function addIf(condition, target, value) {
