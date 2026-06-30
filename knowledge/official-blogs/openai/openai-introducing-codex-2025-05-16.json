@@ -1,0 +1,29 @@
+{
+  "id": "openai-introducing-codex-2025-05-16",
+  "company": "openai",
+  "canonical_url": "https://openai.com/index/introducing-codex/",
+  "published_at": "2025-05-16",
+  "title_original": "Introducing Codex",
+  "title_zh": "OpenAI 发布 Codex",
+  "importance": "major",
+  "content_type": "product_practice",
+  "topics": ["agent", "coding_agent", "developer_tooling", "sandbox"],
+  "admission": {
+    "decision": "include",
+    "rationale": "Defines a productized coding-agent workflow with implications for repository-scoped execution, sandboxing, review, and handoff.",
+    "matched_criteria": ["new_product", "agent_workflow", "engineering_practice"]
+  },
+  "summary_zh": "这篇文章是 OpenAI 把 coding agent 推向产品形态的重要节点。它的知识价值不在“又有一个代码助手”，而在 repo 级任务、隔离执行、结果交付和人类复核如何组成工程工作流。",
+  "key_ideas": [
+    "coding agent 的产品边界从补全转向异步任务执行和可审查交付。",
+    "仓库上下文、隔离运行环境和验证命令是判断可用性的关键。",
+    "后续日报中的 Codex 更新应回到工作流、权限、评审和验证能力上理解。"
+  ],
+  "practice_checklist": [
+    "给 coding agent 任务提供明确规格、允许路径和验证命令。",
+    "把 agent 输出纳入代码审查、测试和回滚策略，而不是直接发布。",
+    "关注 sandbox、依赖安装、长任务恢复和 PR 交付链路。"
+  ],
+  "related_blog_ids": ["openai-new-tools-building-agents-2025-03-11"],
+  "related_report_dates": []
+}

@@ -1,0 +1,29 @@
+{
+  "id": "openai-structured-outputs-2024-08-06",
+  "company": "openai",
+  "canonical_url": "https://openai.com/index/introducing-structured-outputs-in-the-api/",
+  "published_at": "2024-08-06",
+  "title_original": "Introducing Structured Outputs in the API",
+  "title_zh": "OpenAI API 引入结构化输出",
+  "importance": "foundational",
+  "content_type": "best_practice",
+  "topics": ["api_reliability", "structured_outputs", "tool_use"],
+  "admission": {
+    "decision": "include",
+    "rationale": "Introduces a reusable API reliability primitive for schema-constrained model outputs and downstream workflow integration.",
+    "matched_criteria": ["new_product", "engineering_practice"]
+  },
+  "summary_zh": "这篇文章的长期价值在于把“让模型按格式输出”从提示词约定推进为 API 层约束。它适合被后续日报引用到结构化抽取、工具参数生成、工作流状态写入和降低解析失败率等场景。",
+  "key_ideas": [
+    "结构化输出把 JSON Schema 变成模型调用契约，而不是应用层事后修补。",
+    "严格 schema 能降低解析、重试和下游字段缺失的工程成本。",
+    "这类能力会影响 agent 工具调用、数据抽取和自动化工作流的可靠性基线。"
+  ],
+  "practice_checklist": [
+    "为关键模型输出定义最小但明确的 JSON Schema。",
+    "把 schema 校验失败纳入重试、降级和人工复核路径。",
+    "在日报生成、候选筛选和工具调用参数里优先使用结构化契约。"
+  ],
+  "related_blog_ids": [],
+  "related_report_dates": []
+}

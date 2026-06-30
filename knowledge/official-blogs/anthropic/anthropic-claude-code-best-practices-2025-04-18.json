@@ -1,0 +1,29 @@
+{
+  "id": "anthropic-claude-code-best-practices-2025-04-18",
+  "company": "anthropic",
+  "canonical_url": "https://www.anthropic.com/engineering/claude-code-best-practices",
+  "published_at": "2025-04-18",
+  "title_original": "Claude Code: Best practices for agentic coding",
+  "title_zh": "Claude Code：agentic coding 最佳实践",
+  "importance": "major",
+  "content_type": "engineering_note",
+  "topics": ["agent", "coding_agent", "developer_tooling", "harness_engineering"],
+  "admission": {
+    "decision": "include",
+    "rationale": "Offers practical coding-agent workflow guidance, including task framing, iteration, tooling, and verification habits.",
+    "matched_criteria": ["engineering_practice", "harness_engineering", "agent_workflow"]
+  },
+  "summary_zh": "这篇文章的价值在于把 Claude Code 当作工程协作者而不是聊天窗口：任务拆分、上下文准备、迭代验收和工具使用方式都会影响产出质量。它适合和 Codex、Claude Code、repo 级 agent 工作流新闻互链。",
+  "key_ideas": [
+    "coding agent 的效果高度依赖任务规格、仓库上下文和反馈循环。",
+    "小步迭代、明确验证命令和人工审查比一次性大任务更可靠。",
+    "agentic coding 的最佳实践应被固化到项目 runbook 和 harness 中。"
+  ],
+  "practice_checklist": [
+    "给 coding agent 明确目标、限制、文件边界和验收命令。",
+    "把复杂任务拆成可独立验证的阶段。",
+    "让 agent 在交付前运行测试并报告残余风险。"
+  ],
+  "related_blog_ids": ["anthropic-building-effective-agents-2024-12-19"],
+  "related_report_dates": []
+}
