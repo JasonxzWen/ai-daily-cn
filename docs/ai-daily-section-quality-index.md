@@ -65,8 +65,8 @@
 
 - `follow-builders`: Builder 观察的一手线索入口，优先读取 raw `feed-x.json`、`feed-podcasts.json`、`feed-blogs.json`。X 原帖、博客原文和播客原始链接可进入候选池；上游错误必须写入 `source_audit`。
 - `ML-Papers-of-the-Week`: 不再读取 commits Atom，改为 `github_report_markdown`，从 raw README 定位最新 `years/YYYY.md#...` 小节，再解析论文表格。适合补齐“本周论文/研究趋势”线索。
-- `HelloGitHub`: 不再读取 commits Atom，改为 `github_report_markdown`，从 raw README 定位最新 `content/HelloGitHubNNN.md`。适合补齐开源项目、工具、开发者实用项目线索，点击跳转链接会还原为真实 GitHub repo URL。
-- `RuanYF Weekly`: 不再读取 commits Atom，改为 `github_report_markdown`，从 raw README 定位最新 `docs/issue-NNN.md`。适合补齐技术文章、工具、社会技术观察线索。
+- `Awesome AI News`: 使用 raw README 作为低门槛开源 AI 信息聚合/工具目录线索，进入候选池后仍需回链到原始 repo、产品页或一手公告。
+- `ML & AI News of the Week`: 使用 raw README 的 same-file anchor 定位最新周报小节；当前仓库内容偏旧，适合作为低优先级周报线索，不直接构成当天事实。
 
 落地规则：
 - `source_kind: "github_report_markdown"` 用于“README 索引 -> 最新 Markdown 报告 -> 报告条目”的二段抓取。
@@ -83,14 +83,12 @@
 
 需要显式记录降级的入口：
 - 机器之心 RSS 当前返回 HTML 非 feed-like，抓取失败时应保留 `status:"blocked"` 或 `no_signal`，不得写未核验事实。
-- Reddit `r/MachineLearning/.json` 当前可能 403；允许 cache fallback，但正文不得使用 blocked 响应中的未核验内容。
 
 ### 公开 API/论文与榜单
 
 - arXiv cs.AI: 可作为论文候选入口，适合补“研究/模型方法”线索。
 - Hacker News Firebase topstories: 需要二段 hydrate item，适合补社区讨论和工程趋势线索。
-- Hugging Face Daily Papers: 页面可达，当前用 `html_index` 作为论文发现入口。
-- Papers with Code API: 默认请求 `/api/v1/papers/`，若返回形态异常必须记录 blocked/no_signal。
+- Hugging Face Daily Papers: 使用 `huggingface_daily_papers_api` 适配器作为论文发现入口。
 - GitHub Trending: 仍是项目板块主入口；Top 10 覆盖、rank 和 star 变化是公开展示合同的一部分。
 
 ### AI 新闻聚合站
@@ -108,11 +106,13 @@
 - `report:draft publishes OpenRouter snapshot as reader-facing daily tracking card`
 - `GitHub report markdown parser extracts report links as discovery leads`
 - `content source discovery reads latest GitHub markdown report instead of commit feed`
+- `content source discovery follows same-file GitHub markdown report anchors`
+- `registered discovery sources include requested GitHub weekly repositories`
 - `registered discovery sources cover the user requested AI source list`
 
 必跑命令：
 - `npm run sources:validate`
-- `node --test tests/unit.test.js --test-name-pattern "GitHub report markdown|latest GitHub markdown|registered discovery sources cover the user requested AI source list"`
+- `node --test tests/unit.test.js --test-name-pattern "GitHub report markdown|same-file GitHub markdown|GitHub weekly repositories|registered discovery sources cover the user requested AI source list"`
 - `npm run validate`
 
 ## 质量要求

@@ -3810,6 +3810,57 @@ Analysts wrote trip notes: [Kevin Xu](https://interconnect.substack.com/p/chinai
   assert.match(collected.candidates[0].notes, /source_report_url=https:\/\/raw\.githubusercontent\.com\/example\/ai-weekly\/main\/reports\/issue-399\.md/);
 });
 
+test("content source discovery follows same-file GitHub markdown report anchors", async () => {
+  const fetchedUrls = [];
+  const collected = await collectContentSources({
+    reportDate: "2026-06-30",
+    generatedAt: fixedGeneratedAt,
+    limit: 10,
+    sources: [
+      {
+        id: "content-same-file-weekly",
+        name: "Same File Weekly",
+        url: "https://raw.githubusercontent.com/example/weekly/main/README.md",
+        source_kind: "github_report_markdown",
+        candidate_category: "community_lead",
+        authority: "aggregator",
+        verification_policy: "primary_required",
+        latest_report_link_pattern: "#ML-news-Week",
+        lookback_days: 14,
+        maxItemsPerRun: 3
+      }
+    ],
+    fetchImpl: async (url) => {
+      fetchedUrls.push(url);
+      return textResponse(`# Index
+
+* [ML news: Week 23 - 30 June](#ML-news-Week-23-30-June)
+
+# ML news: Week 23 - 30 June
+
+## News
+|Link|description|
+|---|---|
+|[Agent platform update](https://example.com/agent-platform) |A concrete AI platform update.|
+
+# ML news: Week 16 - 22 June
+
+## News
+|Link|description|
+|---|---|
+|[Older update](https://example.com/older) |Older item.|
+`);
+    }
+  });
+
+  assert.deepEqual(fetchedUrls, ["https://raw.githubusercontent.com/example/weekly/main/README.md"]);
+  assert.equal(collected.source_audit.content_sources.sources[0].status, "checked");
+  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates[0].url, "https://example.com/agent-platform");
+  assert.match(collected.candidates[0].notes, /source_report_url=https:\/\/raw\.githubusercontent\.com\/example\/weekly\/main\/README\.md#ML-news-Week-23-30-June/);
+  assert(!collected.candidates.some((candidate) => candidate.url === "https://example.com/older"));
+});
+
 test("source cleanup and Hugging Face Papers API", async () => {
   const fetchedUrls = [];
   const collected = await collectContentSources({
@@ -4007,6 +4058,37 @@ test("source registry excludes rejected low threshold aggregators", async () => 
   }
 });
 
+test("registered discovery sources include requested GitHub weekly repositories", async () => {
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional,manual"
+  });
+  const registryById = new Map(registry.sources.map((source) => [source.id, source]));
+  const runtimeById = new Map(DEFAULT_CONTENT_SOURCES.map((source) => [source.id, source]));
+
+  const expected = [
+    [
+      "content-awesome-ai-news",
+      "Awesome AI News",
+      "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
+    ],
+    [
+      "content-salvatorera-ml-news-week",
+      "ML & AI News of the Week",
+      "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+    ]
+  ];
+
+  for (const [id, name, url] of expected) {
+    assert.equal(registryById.get(id)?.name, name);
+    assert.equal(registryById.get(id)?.url, url);
+    assert.equal(registryById.get(id)?.source_kind, "github_report_markdown");
+    assert.equal(runtimeById.get(id)?.name, name);
+    assert.equal(runtimeById.get(id)?.url, url);
+    assert.equal(runtimeById.get(id)?.source_kind, "github_report_markdown");
+  }
+});
+
 test("registered discovery sources cover the user requested AI source list", async () => {
   const registry = await loadSourceRegistry({
     rootDir,
@@ -4025,6 +4107,8 @@ test("registered discovery sources cover the user requested AI source list", asy
   const expected = [
     ["follow-builders", ["https://github.com/zarazhangrui/follow-builders"]],
     ["ML-Papers-of-the-Week", ["https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/README.md"]],
+    ["Awesome AI News", ["https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"]],
+    ["ML & AI News of the Week", ["https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"]],
     ["OpenAI Blog RSS", ["https://openai.com/blog/rss.xml", "https://openai.com/news/rss.xml"]],
     ["Google DeepMind", ["https://deepmind.google/blog/rss.xml", "https://deepmind.google/discover/blog/"]],
     ["Google Research", ["https://research.google/blog/rss/"]],
@@ -14044,7 +14128,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-first runtime is internal governance by default",
     "Public daily pages remain story-first and exclude source runtime audit sections",
     "source signal story before source metrics dashboard in internal source-first runtime",
-    "143 collection entries are complete inventory rows, not public daily story content",
+    "145 collection entries are complete inventory rows, not public daily story content",
     "Story-centered content remains the fact carrier",
     "Promote a collection entry only when source governance should track it as a named source"
   ]) {
@@ -14055,7 +14139,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-First V2 Addendum",
     "Public daily pages are story-first by default and exclude source-first runtime audit sections.",
     "The internal source-first runtime puts `source_signal_story` before `source_metrics_dashboard`.",
-    "The current 143 collection entries are full inventory rows, not public daily story content.",
+    "The current 145 collection entries are full inventory rows, not public daily story content.",
     "`config/source-display-contract.json` is the executable authority"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation should preserve source-first v2 decision: ${phrase}`);
@@ -14092,7 +14176,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -14178,7 +14262,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
 
   const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
   assert(logical, "CORE_SOURCE_CONTRACTS should include anthropic-research-engineering");
@@ -14208,7 +14292,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
 
   assert(handbook.includes("anthropic-research-engineering"), "handbook should document the promoted logical source");
   assert(!review.includes("| `content-anthropic-research` | `anthropic-research-engineering` |"), "review should no longer list the promoted source as a future candidate");
-  assert.match(review, /order-tuning-total-unmapped:71/);
+  assert.match(review, /order-tuning-total-unmapped:73/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -14262,7 +14346,7 @@ test("core primary official logical source promotions are executable and review-
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
 
   const promotions = [
     {
@@ -14345,7 +14429,7 @@ test("core primary official logical source promotions are executable and review-
   for (const replacementSourceId of ["content-azure-blog", "content-tiktok-developers-blog", "content-cloudflare-blog", "content-google-keyword"]) {
     assert(review.includes(`| \`${replacementSourceId}\``), `review should include replacement promotion candidate ${replacementSourceId}`);
   }
-  assert.match(review, /order-tuning-total-unmapped:71/);
+  assert.match(review, /order-tuning-total-unmapped:73/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -14392,7 +14476,7 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -14430,7 +14514,7 @@ test("china model logical sources are promoted into the fixed display contract",
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 35);
   assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 71);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official"]) {
@@ -14528,7 +14612,7 @@ test("source inventory order reference validator rejects drift and private field
 
   await expectInvalid(
     reference.replace(firstSourceLinePattern, ""),
-    /must list 143 source ids|must list source id exactly once/
+    /must list 145 source ids|must list source id exactly once/
   );
   await expectInvalid(
     reference.replace(firstSourceLinePattern, `${firstSourceLine}${firstSourceLine}`),
@@ -15038,12 +15122,12 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
     metricByTitle.get(title)?.stats?.find((stat) => stat.label === label)?.value;
   const serializedDashboard = JSON.stringify(dashboard);
 
-  assert.equal(inventoryRows.length, 143);
-  assert.equal(statValue("全量采集入口"), "143");
-  assert.equal(statValue("已知入口运行态"), "143");
+  assert.equal(inventoryRows.length, 145);
+  assert.equal(statValue("全量采集入口"), "145");
+  assert.equal(statValue("已知入口运行态"), "145");
   assert.equal(statValue("继承逻辑状态"), "6");
   assert.equal(statValue("未上报逻辑源"), "66");
-  assert.equal(statValue("仅采集入口"), "71");
+  assert.equal(statValue("仅采集入口"), "73");
   assert.match(serializedDashboard, /INVENTORY_TOTAL/);
   assert.match(serializedDashboard, /RUNTIME_KNOWN/);
   assert.match(serializedDashboard, /INHERITED_RUNTIME/);
@@ -15148,7 +15232,7 @@ test("system operating dashboard summarizes public report metrics after source d
   assert.equal(statValue("信号模块"), "7");
   assert.equal(statValue("趋势与追踪"), "22");
   assert.equal(statValue("信源覆盖"), "1/6");
-  assert.equal(statValue("信源覆盖", "全量入口"), "143");
+  assert.equal(statValue("信源覆盖", "全量入口"), "145");
   assert.equal(statValue("运行质量"), "degraded");
   assert.equal(statValue("运行质量", "降级提醒"), "2");
   assert.match(serializedDashboard, /SYSTEM_CONTENT/);
@@ -15554,12 +15638,12 @@ test("source signal story renders first-screen cards before metrics", () => {
     ["低信号", "2"],
     ["阻塞", "1"],
     ["未配置或跳过", "1"],
-    ["全量入口", "143"],
-    ["入口运行态", "143/143"]
+    ["全量入口", "145"],
+    ["入口运行态", "145/145"]
   ]);
   assert(story.items.every((item) => item.showGroup === false));
   assert(story.items.every((item) => item.titleIcon));
-  assert.match(story.summary, /全量采集入口 143/);
+  assert.match(story.summary, /全量采集入口 145/);
   assert.match(story.content, /全量信源入口/);
   assert.match(serializedStory, /OpenAI 发布企业平台能力/);
   assert.match(serializedStory, /GitHub Trending 出现 agent 工具链/);
@@ -15954,7 +16038,7 @@ test("internal source inventory panel lists all registered source entries before
   assert(inventoryGroupIndexes.length > 0, "inventory detail groups should render");
   assert(storyIndex > Math.max(...inventoryGroupIndexes), "stories should remain after the complete source-first area");
   assert.equal(inventory.type, "filterable-cards");
-  assert.match(inventory.summary, /143/);
+  assert.match(inventory.summary, /145/);
   assert.equal((inventoryCardsText.match(/- \*\*/g) || []).length, 0);
   assert.equal(inventoryGroupRowCount, inventoryRows.length);
   assert.match(inventoryGroupContent, /DeepSeek News/);
@@ -16039,7 +16123,7 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert(inventory, "inventory overview should render");
   assert.equal(inventory.type, "filterable-cards");
   assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview should not carry all detail rows");
-  assert.match(inventory.summary, /143/);
+  assert.match(inventory.summary, /145/);
   assert(inventoryHrefs.includes("#section-source-inventory-group-core-primary"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-china-models"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-tracking-metrics"), JSON.stringify(inventoryHrefs));

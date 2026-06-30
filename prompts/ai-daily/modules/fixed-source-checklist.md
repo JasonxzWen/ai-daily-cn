@@ -2,7 +2,7 @@
 
 Every daily run must check and audit this user-requested source surface, using `config/sources/*.json`, dedicated discovery commands, or a documented equivalent feed endpoint:
 
-- Open-source aggregators: `follow-builders`, `ML Papers of the Week`.
+- Open-source aggregators: `follow-builders`, `ML Papers of the Week`, `Awesome AI News`, `ML & AI News of the Week`.
 - Official lab/company sources: `OpenAI Blog RSS`, `OpenAI News RSS`, `Google DeepMind RSS`, `Google Research Blog`, `Meta AI RSS` or `Meta AI Blog`, `Microsoft Research Blog`, `AWS Machine Learning Blog`, `Anthropic News`, `Hugging Face Blog`.
 - International tech media: `TechCrunch AI`, `The Verge`, `MIT Technology Review`, `Ars Technica`, `VentureBeat AI`, `HNRSS Frontpage`.
 - Chinese AI/tech media leads: `Jiqizhixin`, `QbitAI`, `36Kr`, `InfoQ CN`; keep them as intermediary leads until traced to primary sources.

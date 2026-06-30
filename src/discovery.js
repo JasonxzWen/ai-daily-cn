@@ -198,6 +198,29 @@ export const DEFAULT_CONTENT_SOURCES = [
     sourceLevel: "weekly_paper_aggregator"
   },
   {
+    id: "content-awesome-ai-news",
+    name: "Awesome AI News",
+    url: "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md",
+    category: "project",
+    source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
+    lookback_days: 30,
+    maxItemsPerRun: 5,
+    timeoutMs: 15000,
+    sourceLevel: "github_ai_news_directory"
+  },
+  {
+    id: "content-salvatorera-ml-news-week",
+    name: "ML & AI News of the Week",
+    url: "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md",
+    category: "intermediary",
+    source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
+    latest_report_link_pattern: "#ML-news-Week",
+    lookback_days: 14,
+    maxItemsPerRun: 8,
+    timeoutMs: 20000,
+    sourceLevel: "weekly_ai_news_aggregator"
+  },
+  {
     id: "content-google-keyword",
     name: "Google Keyword Blog",
     url: "https://blog.google/rss/"
@@ -3250,9 +3273,11 @@ async function collectGitHubReportMarkdownSource({ sourceInfo, fetchImpl, report
   let reportUrl = sourceInfo.url;
   let reportTitle = sourceInfo.name;
   let reportResponse = indexResponse;
-  if (latest.url && latest.url !== sourceInfo.url) {
+  if (latest.url) {
     reportUrl = latest.url;
     reportTitle = latest.title || sourceInfo.name;
+  }
+  if (latest.url && urlWithoutHash(latest.url) !== urlWithoutHash(sourceInfo.url)) {
     reportResponse = await fetchImpl(reportUrl, {
       headers: {
         accept: "text/markdown, text/plain, text/html, */*",
@@ -3307,11 +3332,15 @@ function latestGitHubReportLink(markdown, sourceInfo = {}) {
 
 function resolveGitHubMarkdownUrl(href, baseUrl) {
   const rawHref = String(href || "").trim();
-  if (!rawHref || rawHref.startsWith("#") || /^(?:mailto|javascript):/i.test(rawHref)) {
+  if (!rawHref || /^(?:mailto|javascript):/i.test(rawHref)) {
     return "";
   }
   try {
     const base = new URL(baseUrl);
+    if (rawHref.startsWith("#")) {
+      base.hash = rawHref;
+      return base.toString();
+    }
     if (base.hostname === "raw.githubusercontent.com") {
       const resolved = rawHref.startsWith("/")
         ? rawGitHubRootRelativeUrl(rawHref, base)
@@ -3326,6 +3355,16 @@ function resolveGitHubMarkdownUrl(href, baseUrl) {
     return url.toString();
   } catch {
     return "";
+  }
+}
+
+function urlWithoutHash(value) {
+  try {
+    const url = new URL(value);
+    url.hash = "";
+    return url.toString();
+  } catch {
+    return String(value || "").replace(/#.*$/, "");
   }
 }
 
@@ -3506,7 +3545,7 @@ function markdownLineAround(markdown, index) {
 }
 
 function markdownSectionForGitHubAnchor(markdown, hash) {
-  const target = String(hash || "").replace(/^#/, "");
+  const target = normalizedGitHubAnchorHash(hash);
   if (!target) {
     return "";
   }
@@ -3514,7 +3553,8 @@ function markdownSectionForGitHubAnchor(markdown, hash) {
   const headings = [...String(markdown || "").matchAll(headingPattern)];
   for (let index = 0; index < headings.length; index += 1) {
     const heading = headings[index];
-    if (githubMarkdownAnchor(heading[2]) !== target) {
+    const headingAnchor = githubMarkdownAnchor(heading[2]);
+    if (headingAnchor !== target && relaxedGitHubAnchor(headingAnchor) !== relaxedGitHubAnchor(target)) {
       continue;
     }
     const level = heading[1].length;
@@ -3523,6 +3563,22 @@ function markdownSectionForGitHubAnchor(markdown, hash) {
     return String(markdown || "").slice(start, next?.index || undefined);
   }
   return "";
+}
+
+function normalizedGitHubAnchorHash(hash) {
+  const raw = String(hash || "").replace(/^#/, "");
+  if (!raw) {
+    return "";
+  }
+  try {
+    return githubMarkdownAnchor(decodeURIComponent(raw));
+  } catch {
+    return githubMarkdownAnchor(raw);
+  }
+}
+
+function relaxedGitHubAnchor(value) {
+  return String(value || "").replace(/[^a-z0-9]+/gi, "").toLowerCase();
 }
 
 function githubMarkdownAnchor(value) {
