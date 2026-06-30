@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.official-blog-knowledge-stage5",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Official blog knowledge stage 5",
+  "slug": "official-blog-knowledge-stage5",
+  "status": "completed",
+  "summary": "This iteration hardens official blog admission triage for OpenAI and Anthropic knowledge records. First-pass triage now uses only the title plus opening preview paragraphs, excludes generic partnership or company-news framing even when broad workflow/tools/API/SDK words appear, and keeps concrete product, model, harness, agent workflow, eval, safety-methodology, or implementation-practice previews admissible.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog admission threshold\" tests/official-blog-knowledge.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "npm run content:contract",
+      "npm run test",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Official blog knowledge admission needs a stronger company-news boundary than generic keyword matching.",
+      "evidence": "The red tests showed generic partnership workflow news and generic API partnership news were previously classifiable as `needs_review`; Stage 5 now excludes company-news framing unless the opening preview contains concrete reusable implementation detail.",
+      "scope": "official_blog_admission_threshold",
+      "persistence": "implemented",
+      "recommended_action": "Keep future official blog ingestion tied to product/model/engineering knowledge value rather than broad enterprise AI wording."
+    },
+    {
+      "lesson": "First-pass official blog triage should be based on the opening preview, not the full article body.",
+      "evidence": "A multi-paragraph summary whose later paragraph contained architecture/eval terms now remains excluded when the opening preview is ordinary partnership news.",
+      "scope": "official_blog_opening_preview_triage",
+      "persistence": "implemented",
+      "recommended_action": "When adding live ingestion, pass only title plus crawler opening paragraphs into the triage helper before any full-article summarization."
+    },
+    {
+      "lesson": "Borderline customer or partnership stories should remain reviewable when implementation detail is visible early.",
+      "evidence": "Stage 5 preserves `needs_review` for opening previews that mention routing architecture, tool permissions, evaluation harnesses, observability, or rollout controls.",
+      "scope": "official_blog_needs_review_boundary",
+      "persistence": "implemented",
+      "recommended_action": "Admit borderline company/customer stories only after a second read confirms reusable architecture, eval, permissions, workflow, or rollout lessons."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The official blog triage helper could overreact to broad words like workflow, tools, API, or SDK inside ordinary partnership announcements.",
+      "evidence": "Stage 5 adds admission-threshold tests and implementation logic for opening-preview extraction plus concrete implementation-detail gating; an independent verifier found a bare API/SDK edge case, which was fixed with an additional red/green test.",
+      "module": "src/official-blog-knowledge.js, tests/official-blog-knowledge.test.js",
+      "suggestion": "Use title plus opening preview and require concrete reusable implementation detail before reviewing company-news framed official blog candidates.",
+      "expected_benefit": "The official blog knowledge graph avoids low-value partnership/news filler while still capturing new products, models, harness engineering, agent workflow, eval, safety, and implementation-practice posts.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through deterministic triage tests and repository validation.",
+      "ledger_links": [
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog admission threshold excludes generic partnership workflow news",
+        "official blog admission threshold excludes generic API partnership news",
+        "official blog admission threshold uses only the opening preview for first-pass triage",
+        "official blog admission threshold includes new models and engineering practice previews",
+        "official blog admission threshold sends concrete implementation customer stories to review"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add a separate ingestion stage that fetches OpenAI/Anthropic RSS or index previews, passes only title plus opening paragraphs into triage, and writes accepted candidates to an internal review queue rather than public pages.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "If live ingestion later stores candidate decisions, keep admission rationale in internal authoring data and publish only accepted, curated knowledge summaries.",
+      "owner": "project"
+    }
+  ]
+}
