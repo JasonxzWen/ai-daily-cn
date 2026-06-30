@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.official-blog-knowledge-stage7",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Official blog knowledge stage 7",
+  "slug": "official-blog-knowledge-stage7",
+  "status": "completed",
+  "summary": "This iteration adds a non-network official blog preview parser for OpenAI and Anthropic RSS, Atom, and JSON exports. Local feed/index content can now be normalized into an internal `official_blog_preview_feed` artifact that Stage 6 intake can triage without fetching live pages, storing full blog bodies, or writing public docs/data output.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog preview feed|official blog parse-feed\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run content:contract",
+      "npm run test",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Official blog feed parsing should remain network-free until the review queue contract is stable.",
+      "evidence": "Stage 7 parses local RSS, Atom, and JSON fixture/export content through `createOfficialBlogPreviewFeed` and CLI `official-blog:parse-feed --input --output`, with no live fetch implementation.",
+      "scope": "official_blog_preview_feed_parser",
+      "persistence": "implemented",
+      "recommended_action": "Keep future live fetching as a separate stage that writes the same internal preview feed shape before intake."
+    },
+    {
+      "lesson": "Parser output should preserve opening signal while dropping full body content.",
+      "evidence": "Stage 7 tests assert HTML/script cleanup, URL/date normalization, and first-two-paragraph retention before parser output is passed into Stage 6 intake.",
+      "scope": "official_blog_opening_preview_sanitization",
+      "persistence": "implemented",
+      "recommended_action": "Use opening-preview fixtures for future parser regressions instead of full article snapshots."
+    },
+    {
+      "lesson": "Partial feed failures need to be isolated from healthy official entries.",
+      "evidence": "JSON export tests keep one valid OpenAI item while unsupported-company and missing-URL entries are reported under `invalid_entries`.",
+      "scope": "official_blog_feed_partial_invalid_entries",
+      "persistence": "implemented",
+      "recommended_action": "When adding live sources, preserve per-entry invalid diagnostics without blocking the whole batch unless the source itself is unavailable."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Official blog RSS/Atom/index entries had no deterministic local parser into the Stage 6 intake preview shape.",
+      "evidence": "Stage 7 adds `createOfficialBlogPreviewFeed`, CLI command `official-blog:parse-feed`, RSS/Atom/JSON parsing tests, parser-to-intake integration assertions, clean `--output` behavior, and public-output path rejection.",
+      "module": "src/official-blog-knowledge.js, src/cli.js, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Use the internal preview feed artifact as the handoff from future crawler/manual exports into the official blog intake queue.",
+      "expected_benefit": "OpenAI and Anthropic official blog discovery can move from local feed/index exports into review without leaking candidate diagnostics or full article bodies to public pages.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through deterministic parser, CLI, and intake-integration tests.",
+      "ledger_links": [
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-editorial-importance-density-source-visibility",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-fixed-source-candidate-effectiveness",
+        "feedback/p1-search-provider-partials",
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog preview feed parses rss and atom entries for intake",
+        "official blog preview feed parses json exports with partial invalid entries",
+        "official blog parse-feed CLI writes a clean internal preview feed",
+        "official blog parse-feed CLI refuses public output paths"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-fixed-source-candidate-effectiveness",
+    "feedback/p1-search-provider-partials",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add a reviewed authoring step that turns selected `include` queue entries into curated `knowledge/official-blogs/**` records with Chinese summaries and source links.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add optional live fetching only after it writes the Stage 7 preview feed artifact and remains separated from public output.",
+      "owner": "project"
+    }
+  ]
+}
