@@ -35,7 +35,7 @@ export const OFFICIAL_BLOG_ADMISSION_POLICY = {
     "policy statements or company news without reusable model, product, engineering, or safety methodology",
     "customer stories that only say a company adopted OpenAI or Claude"
   ],
-  review: "Use needs_review when a partnership or customer story hints at concrete architecture, evals, permissions, workflow, or rollout controls but the preview is not enough to prove durable knowledge value."
+  review: "First pass should use the title plus opening preview/paragraphs. Use needs_review when a partnership or customer story hints at concrete architecture, evals, permissions, workflow, or rollout controls but the preview is not enough to prove durable knowledge value."
 };
 
 export async function loadOfficialBlogKnowledge(options = {}) {
@@ -56,6 +56,32 @@ export async function loadOfficialBlogKnowledge(options = {}) {
     throw new Error(`official blog knowledge schema validation failed: ${validation.errors.map((error) => `${error.path} ${error.message}`).join("; ")}`);
   }
   return validation.value;
+}
+
+export function toPublicOfficialBlogKnowledge(index = {}, options = {}) {
+  const records = Array.isArray(index.records) ? index.records.map(publicOfficialBlogRecord) : [];
+  const companies = uniqueSorted(records.map((record) => record.company));
+  const topics = uniqueSorted(records.flatMap((record) => record.topics || []));
+  const byCompany = { anthropic: 0, openai: 0 };
+  const byImportance = {};
+  for (const record of records) {
+    byCompany[record.company] = (byCompany[record.company] || 0) + 1;
+    byImportance[record.importance] = (byImportance[record.importance] || 0) + 1;
+  }
+
+  return {
+    schema_version: 1,
+    generated_at: String(options.generatedAt || index.generated_at || ""),
+    curation_scope: OFFICIAL_BLOG_ADMISSION_POLICY.scope,
+    companies,
+    topics,
+    stats: {
+      total_records: records.length,
+      by_company: byCompany,
+      by_importance: byImportance
+    },
+    records
+  };
 }
 
 export function normalizeOfficialBlogUrl(value) {
@@ -184,6 +210,27 @@ export async function validateOfficialBlogKnowledge(index) {
       message: error.message || "schema validation failed",
       keyword: error.keyword
     }))
+  };
+}
+
+function publicOfficialBlogRecord(record = {}) {
+  return {
+    id: String(record.id || ""),
+    company: String(record.company || ""),
+    company_label: record.company === "anthropic" ? "Anthropic" : record.company === "openai" ? "OpenAI" : String(record.company || ""),
+    canonical_url: String(record.canonical_url || ""),
+    normalized_url: String(record.normalized_url || normalizeOfficialBlogUrl(record.canonical_url || "")),
+    published_at: String(record.published_at || ""),
+    title_original: String(record.title_original || ""),
+    title_zh: String(record.title_zh || ""),
+    importance: String(record.importance || ""),
+    content_type: String(record.content_type || ""),
+    topics: uniqueSorted(record.topics || []),
+    summary_zh: String(record.summary_zh || ""),
+    key_ideas: stringArray(record.key_ideas),
+    practice_checklist: stringArray(record.practice_checklist),
+    related_blog_ids: uniqueSorted(record.related_blog_ids || []),
+    related_report_dates: uniqueSorted(record.related_report_dates || [])
   };
 }
 
@@ -338,6 +385,10 @@ function normalizeText(value) {
     .replace(/[^a-z0-9\u4e00-\u9fff]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function stringArray(items) {
+  return (Array.isArray(items) ? items : []).map((item) => String(item || "").trim()).filter(Boolean);
 }
 
 function uniqueSorted(items) {

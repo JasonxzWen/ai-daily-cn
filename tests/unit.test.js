@@ -44,7 +44,7 @@ import { buildSourceInventoryRows } from "../src/source-effectiveness.js";
 import { generateReportDraft, canPromoteToBuilderObservation } from "../src/draft.js";
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
-import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite } from "../src/site.js";
+import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite, planGeneratedFiles } from "../src/site.js";
 import { validateCandidatePool, validateFeed, validateReport } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
@@ -62,6 +62,7 @@ import {
 } from "../src/github-readme.js";
 import { selectChineseMediaDynamics } from "../src/chinese-media.js";
 import { officialOrgUpdateItem, selectOfficialOrgUpdates } from "../src/official-updates.js";
+import { loadOfficialBlogKnowledge } from "../src/official-blog-knowledge.js";
 import { buildAutomationRevision } from "../src/automation-revision.js";
 import { inspectAutomationInventory } from "../src/automation-inventory.js";
 import {
@@ -10726,6 +10727,91 @@ test("index rewrite renders signal console from stored data", async () => {
   assert(!html.includes("GitHub Pages 静态归档"));
   assert(!html.includes('id="date-navigation"'));
   assert(!html.includes("<h2>历史日报</h2>"));
+});
+
+test("official blog knowledge homepage renders curated blog graph entrypoint", async () => {
+  const report = minimalDateIndexReport("2026-05-14", {
+    mainItems: 6,
+    majorItems: 2,
+    github: 4,
+    builder: 3,
+    hotBlogs: 2,
+    tracking: 1,
+    qualityStatus: { status: "ok" }
+  });
+  const feed = {
+    schema_version: 1,
+    site_title: "AI 鏃ユ姤",
+    site_url: siteUrl,
+    updated_at: fixedGeneratedAt,
+    reports: [feedEntryFor(report)]
+  };
+  const dateIndex = buildDateIndex(feed, [report], null);
+  const officialBlogKnowledge = await loadOfficialBlogKnowledge({ rootDir });
+
+  const html = renderIndexHtml(feed, null, dateIndex, { officialBlogKnowledge });
+
+  assert(html.includes('id="official-blog-knowledge"'));
+  assert(html.includes('href="#official-blog-knowledge"'));
+  assert((html.match(/data-official-blog-card=/g) || []).length >= 6);
+  assert(html.includes('data-official-blog-company="openai"'));
+  assert(html.includes('data-official-blog-company="anthropic"'));
+  assert(html.includes("Introducing Structured Outputs in the API"));
+  assert(html.includes("Building effective agents"));
+  const hrefs = new Set([...html.matchAll(/\shref="([^"]+)"/g)].map((match) => match[1]));
+  assert(hrefs.has("https://openai.com/index/introducing-structured-outputs-in-the-api/"));
+  assert(hrefs.has("https://www.anthropic.com/research/building-effective-agents"));
+  assert(!html.includes("admission_policy"));
+  assert(!html.includes("source_audit"));
+  assert(!html.includes("self_check"));
+});
+
+test("public official blog knowledge projection is generated and planned", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-public-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(dataInputDir, { recursive: true });
+  await fs.cp(path.join(rootDir, "knowledge"), path.join(tmp, "knowledge"), { recursive: true });
+  const base = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const report = structuredReportForDate(base, "2026-05-14");
+  await fs.writeFile(path.join(dataInputDir, "2026-05-14.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  assert(result.writtenFiles.includes("data/official-blogs.json"));
+  assert.equal(result.officialBlogKnowledge.stats.total_records, 6);
+  const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data", "official-blogs.json"), "utf8"));
+  assert.equal(publicData.records.length, 6);
+  assert.equal(publicData.stats.by_company.openai, 3);
+  assert.equal(publicData.stats.by_company.anthropic, 3);
+  assert(publicData.records.every((record) => record.canonical_url && record.summary_zh && record.key_ideas?.length >= 3));
+  const serialized = JSON.stringify(publicData);
+  assert(!serialized.includes("admission"));
+  assert(!serialized.includes("admission_policy"));
+  assert(!serialized.includes("rationale"));
+  assert(!serialized.includes("source_audit"));
+  assert(!serialized.includes("self_check"));
+  const html = await fs.readFile(path.join(outDir, "index.html"), "utf8");
+  assert(html.includes('id="official-blog-knowledge"'));
+  assert(html.includes('href="data/official-blogs.json"'));
+
+  const generated = await planGeneratedFiles({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt
+  });
+  assert(generated.files.includes("data/official-blogs.json"));
 });
 
 test("effective interact index style uses report primitives", async () => {

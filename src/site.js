@@ -18,6 +18,7 @@ import { isPublishableOfficialComponentFragment } from "./official-component-sna
 import { normalizeStoryFirstReport } from "./story-first.js";
 import { sanitizeTrackingComponentSnapshot } from "./tracking-components.js";
 import { sanitizePublicDegradationEvent } from "./degradation-events.js";
+import { loadOfficialBlogKnowledge, toPublicOfficialBlogKnowledge } from "./official-blog-knowledge.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
@@ -226,6 +227,13 @@ export async function buildSite(options = {}) {
     });
   }
 
+  const officialBlogKnowledgeRaw = await loadOfficialBlogKnowledge({
+    rootDir,
+    knowledgeDir: options.officialBlogKnowledgeDir
+  });
+  const officialBlogKnowledge = toPublicOfficialBlogKnowledge(officialBlogKnowledgeRaw, {
+    generatedAt: feedValidation.value.updated_at
+  });
   const dateIndex = buildDateIndex(feedValidation.value, reports, trendValidation.value);
   const reportNavigationByDate = buildReportNavigation(feedValidation.value.reports, dateIndex.items);
   const trackingHistoryByDate = buildDailyTrackingHistoryByReportDate(reports);
@@ -244,8 +252,10 @@ export async function buildSite(options = {}) {
 
   await writeJsonTracked(outDir, "feed.json", feedValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
+  await writeJsonTracked(outDir, "data/official-blogs.json", officialBlogKnowledge, writtenFiles);
   await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value, dateIndex, {
-    styleVersion: indexStyleVersion
+    styleVersion: indexStyleVersion,
+    officialBlogKnowledge
   }), writtenFiles);
 
   return {
@@ -253,6 +263,7 @@ export async function buildSite(options = {}) {
     reports,
     feed: feedValidation.value,
     trends: trendValidation.value,
+    officialBlogKnowledge,
     dateIndex,
     writtenFiles: uniqueSorted(writtenFiles)
   };
@@ -305,7 +316,7 @@ export async function planGeneratedFiles(options = {}) {
   const generatedAt = options.generatedAt || defaultGeneratedAt();
   const markdownFiles = await collectMarkdownFiles(inputDir);
   const reportJsonFiles = await collectJsonFiles(dataInputDir);
-  const files = [".nojekyll", "assets/style.css", "feed.json", "index.html", "trends.json"];
+  const files = [".nojekyll", "assets/style.css", "feed.json", "index.html", "trends.json", "data/official-blogs.json"];
   const reports = [];
 
   for (const file of markdownFiles) {

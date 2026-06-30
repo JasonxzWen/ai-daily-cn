@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI 日报</title>
-  <link rel="stylesheet" href="assets/style.css?v=5a5b613610b0">
+  <link rel="stylesheet" href="assets/style.css?v=c9aafba06837">
 </head>
 <body>
   <header class="site-header">
@@ -48,6 +48,7 @@
 <a href="#source-lane-board" data-nav-link><span>来源结构</span></a>
 <a href="#topic-radar" data-nav-link><span>主题线索</span></a>
 <a href="#date-research-index" data-nav-link><span>日期索引</span></a>
+        <a href="#official-blog-knowledge" data-nav-link><span>官方博客</span></a>
       </div>
     </nav>
     <div class="index-dashboard-grid report-section-stack">
@@ -103,6 +104,141 @@
       </div>
     </section>
     </div>
+    <section class="panel official-blog-knowledge" id="official-blog-knowledge" aria-labelledby="official-blog-knowledge-title" data-section-type="knowledge">
+      <div class="section-heading split-row">
+        <div>
+          <p class="eyebrow">OpenAI / Anthropic</p>
+          <h2 id="official-blog-knowledge-title">官方博客知识库</h2>
+        </div>
+        <a class="chip status-info" href="data/official-blogs.json">official-blogs.json</a>
+      </div>
+      <p class="official-blog-summary">Curated OpenAI and Anthropic official blogs with durable product, model, technical-practice, harness, agent workflow, eval, safety-engineering, or implementation knowledge value.</p>
+      <div class="official-blog-stat-grid" aria-label="官方博客知识库统计">
+        <span class="official-blog-stat"><strong>6</strong>总记录</span>
+        <span class="official-blog-stat"><strong>3</strong>OpenAI</span>
+        <span class="official-blog-stat"><strong>3</strong>Anthropic</span>
+        <span class="official-blog-stat"><strong>12</strong>主题</span>
+      </div>
+      <div class="official-blog-topic-row" aria-label="官方博客主题">
+        <span class="tag tag-topic">agent</span><span class="tag tag-topic">api_reliability</span><span class="tag tag-topic">coding_agent</span><span class="tag tag-topic">context_engineering</span><span class="tag tag-topic">developer_tooling</span><span class="tag tag-topic">evals</span><span class="tag tag-topic">harness_engineering</span><span class="tag tag-topic">mcp</span><span class="tag tag-topic">responses_api</span><span class="tag tag-topic">sandbox</span><span class="tag tag-topic">structured_outputs</span><span class="tag tag-topic">tool_use</span>
+      </div>
+      <div class="official-blog-grid">
+        <article class="official-blog-card" data-official-blog-card="openai-new-tools-building-agents-2025-03-11" data-official-blog-company="openai">
+      <div class="official-blog-card-head">
+        <span class="chip status-info official-blog-company">OpenAI</span>
+        <span class="chip official-blog-importance importance-foundational">foundational</span>
+      </div>
+      <h3><a href="https://openai.com/index/new-tools-for-building-agents/" target="_blank" rel="noopener noreferrer">用于构建智能体的新工具</a></h3>
+      <p class="official-blog-original">New tools for building agents</p>
+      <p>这篇文章适合作为 OpenAI agent 平台化路线的基础节点：它把模型调用、工具使用、响应编排和开发者接口放进同一套构建语境，后续涉及 Responses API、Agent SDK 或工具链封装的日报都可以反向引用。</p>
+      <ul class="compact-list official-blog-ideas">
+        <li>agent 不只是模型能力，还需要统一的工具接口和执行编排入口。</li><li>平台原语会改变应用层对搜索、文件、计算机使用和工具调用的组织方式。</li><li>把模型响应、工具调用和状态管理作为同一条执行链设计。</li>
+      </ul>
+      <div class="official-blog-topic-row official-blog-card-topics">
+        <span class="tag">agent</span><span class="tag">responses_api</span><span class="tag">tool_use</span><span class="tag">workflow_orchestration</span>
+      </div>
+      <div class="item-meta">
+        <span>2025-03-11</span>
+        <span>product_practice</span>
+      </div>
+    </article>
+<article class="official-blog-card" data-official-blog-card="anthropic-building-effective-agents-2024-12-19" data-official-blog-company="anthropic">
+      <div class="official-blog-card-head">
+        <span class="chip status-info official-blog-company">Anthropic</span>
+        <span class="chip official-blog-importance importance-foundational">foundational</span>
+      </div>
+      <h3><a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener noreferrer">构建有效智能体</a></h3>
+      <p class="official-blog-original">Building effective agents</p>
+      <p>这篇文章适合作为 agent 工程实践的长期基准：它强调先用简单工作流，再根据任务需要增加 agent 自主性、工具和评测闭环。</p>
+      <ul class="compact-list official-blog-ideas">
+        <li>有效 agent 不等于最大自治度，很多任务应从确定性 workflow 开始。</li><li>工具、记忆、规划和多步骤执行都需要 eval 与可观测性支撑。</li><li>先实现可测的单路径 workflow，再增加模型决策点。</li>
+      </ul>
+      <div class="official-blog-topic-row official-blog-card-topics">
+        <span class="tag">agent</span><span class="tag">evals</span><span class="tag">harness_engineering</span><span class="tag">workflow_orchestration</span>
+      </div>
+      <div class="item-meta">
+        <span>2024-12-19</span>
+        <span>best_practice</span>
+      </div>
+    </article>
+<article class="official-blog-card" data-official-blog-card="anthropic-model-context-protocol-2024-11-25" data-official-blog-company="anthropic">
+      <div class="official-blog-card-head">
+        <span class="chip status-info official-blog-company">Anthropic</span>
+        <span class="chip official-blog-importance importance-foundational">foundational</span>
+      </div>
+      <h3><a href="https://www.anthropic.com/news/model-context-protocol" target="_blank" rel="noopener noreferrer">Anthropic 发布 Model Context Protocol</a></h3>
+      <p class="official-blog-original">Introducing the Model Context Protocol</p>
+      <p>这篇文章是理解 MCP 生态的基础节点。</p>
+      <ul class="compact-list official-blog-ideas">
+        <li>MCP 试图把模型与工具/数据源的连接从一次性集成变成协议化接口。</li><li>协议层价值在于复用权限、上下文注入和工具发现方式。</li><li>为 MCP server 明确数据范围、认证方式和最小权限。</li>
+      </ul>
+      <div class="official-blog-topic-row official-blog-card-topics">
+        <span class="tag">agent</span><span class="tag">context_engineering</span><span class="tag">mcp</span><span class="tag">tool_use</span>
+      </div>
+      <div class="item-meta">
+        <span>2024-11-25</span>
+        <span>engineering_note</span>
+      </div>
+    </article>
+<article class="official-blog-card" data-official-blog-card="openai-structured-outputs-2024-08-06" data-official-blog-company="openai">
+      <div class="official-blog-card-head">
+        <span class="chip status-info official-blog-company">OpenAI</span>
+        <span class="chip official-blog-importance importance-foundational">foundational</span>
+      </div>
+      <h3><a href="https://openai.com/index/introducing-structured-outputs-in-the-api/" target="_blank" rel="noopener noreferrer">OpenAI API 引入结构化输出</a></h3>
+      <p class="official-blog-original">Introducing Structured Outputs in the API</p>
+      <p>这篇文章的长期价值在于把“让模型按格式输出”从提示词约定推进为 API 层约束。</p>
+      <ul class="compact-list official-blog-ideas">
+        <li>结构化输出把 JSON Schema 变成模型调用契约，而不是应用层事后修补。</li><li>严格 schema 能降低解析、重试和下游字段缺失的工程成本。</li><li>为关键模型输出定义最小但明确的 JSON Schema。</li>
+      </ul>
+      <div class="official-blog-topic-row official-blog-card-topics">
+        <span class="tag">api_reliability</span><span class="tag">structured_outputs</span><span class="tag">tool_use</span>
+      </div>
+      <div class="item-meta">
+        <span>2024-08-06</span>
+        <span>best_practice</span>
+      </div>
+    </article>
+<article class="official-blog-card" data-official-blog-card="openai-introducing-codex-2025-05-16" data-official-blog-company="openai">
+      <div class="official-blog-card-head">
+        <span class="chip status-info official-blog-company">OpenAI</span>
+        <span class="chip official-blog-importance importance-major">major</span>
+      </div>
+      <h3><a href="https://openai.com/index/introducing-codex/" target="_blank" rel="noopener noreferrer">OpenAI 发布 Codex</a></h3>
+      <p class="official-blog-original">Introducing Codex</p>
+      <p>这篇文章是 OpenAI 把 coding agent 推向产品形态的重要节点。</p>
+      <ul class="compact-list official-blog-ideas">
+        <li>coding agent 的产品边界从补全转向异步任务执行和可审查交付。</li><li>仓库上下文、隔离运行环境和验证命令是判断可用性的关键。</li><li>给 coding agent 任务提供明确规格、允许路径和验证命令。</li>
+      </ul>
+      <div class="official-blog-topic-row official-blog-card-topics">
+        <span class="tag">agent</span><span class="tag">coding_agent</span><span class="tag">developer_tooling</span><span class="tag">sandbox</span>
+      </div>
+      <div class="item-meta">
+        <span>2025-05-16</span>
+        <span>product_practice</span>
+      </div>
+    </article>
+<article class="official-blog-card" data-official-blog-card="anthropic-claude-code-best-practices-2025-04-18" data-official-blog-company="anthropic">
+      <div class="official-blog-card-head">
+        <span class="chip status-info official-blog-company">Anthropic</span>
+        <span class="chip official-blog-importance importance-major">major</span>
+      </div>
+      <h3><a href="https://www.anthropic.com/engineering/claude-code-best-practices" target="_blank" rel="noopener noreferrer">Claude Code：agentic coding 最佳实践</a></h3>
+      <p class="official-blog-original">Claude Code: Best practices for agentic coding</p>
+      <p>这篇文章的价值在于把 Claude Code 当作工程协作者而不是聊天窗口：任务拆分、上下文准备、迭代验收和工具使用方式都会影响产出质量。</p>
+      <ul class="compact-list official-blog-ideas">
+        <li>coding agent 的效果高度依赖任务规格、仓库上下文和反馈循环。</li><li>小步迭代、明确验证命令和人工审查比一次性大任务更可靠。</li><li>给 coding agent 明确目标、限制、文件边界和验收命令。</li>
+      </ul>
+      <div class="official-blog-topic-row official-blog-card-topics">
+        <span class="tag">agent</span><span class="tag">coding_agent</span><span class="tag">developer_tooling</span><span class="tag">harness_engineering</span>
+      </div>
+      <div class="item-meta">
+        <span>2025-04-18</span>
+        <span>engineering_note</span>
+      </div>
+    </article>
+      </div>
+    </section>
     <section class="panel signal-heat-section" id="signal-heat-strip" aria-labelledby="signal-heat-title" data-section-type="timeline">
       <div class="section-heading split-row">
         <div>

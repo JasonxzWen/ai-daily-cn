@@ -163,6 +163,7 @@ export function renderIndexHtml(feed, trends = null, dateIndex = null, options =
   const signalHeatStrip = renderSignalHeatStrip(dateIndex);
   const sourceLaneBoard = renderSourceLaneBoard(dateIndex);
   const topicRadar = renderTopicRadar(trends);
+  const officialBlogKnowledge = renderOfficialBlogKnowledge(options.officialBlogKnowledge);
   const dateResearchIndex = renderDateResearchIndex(dateIndex, latest);
   return `<!doctype html>
 <html lang="zh-CN">
@@ -184,6 +185,7 @@ export function renderIndexHtml(feed, trends = null, dateIndex = null, options =
       ${latestBriefing}
       ${topicRadar}
     </div>
+    ${officialBlogKnowledge}
     ${signalHeatStrip}
     ${sourceLaneBoard}
     ${dateResearchIndex}
@@ -212,6 +214,7 @@ function renderIndexNav() {
       <div class="report-nav-group">
         <span class="report-nav-group-title">首页模块</span>
         ${links.map(([id, label]) => `<a href="#${escapeAttribute(id)}" data-nav-link><span>${escapeHtml(label)}</span></a>`).join("\n")}
+        <a href="#official-blog-knowledge" data-nav-link><span>官方博客</span></a>
       </div>
     </nav>`;
 }
@@ -441,6 +444,90 @@ function renderTopicRadarItem(topic) {
         <span class="chip ${escapeAttribute(topic.status === "hot" ? "status-warn" : "status-info")} topic-status topic-status-${escapeAttribute(topic.status || "active")}">${escapeHtml(topic.status || "active")}</span>
       </div>
     </article>`;
+}
+
+function renderOfficialBlogKnowledge(knowledge) {
+  const records = Array.isArray(knowledge?.records) ? knowledge.records : [];
+  if (records.length === 0) {
+    return "";
+  }
+  const stats = knowledge.stats || {};
+  const byCompany = stats.by_company || {};
+  const featured = [...records]
+    .sort((left, right) =>
+      officialBlogImportanceRank(right.importance) - officialBlogImportanceRank(left.importance) ||
+      String(right.published_at || "").localeCompare(String(left.published_at || ""))
+    )
+    .slice(0, 6);
+  const topics = (Array.isArray(knowledge.topics) ? knowledge.topics : [])
+    .slice(0, 12);
+  return `<section class="panel official-blog-knowledge" id="official-blog-knowledge" aria-labelledby="official-blog-knowledge-title" data-section-type="knowledge">
+      <div class="section-heading split-row">
+        <div>
+          <p class="eyebrow">OpenAI / Anthropic</p>
+          <h2 id="official-blog-knowledge-title">官方博客知识库</h2>
+        </div>
+        <a class="chip status-info" href="data/official-blogs.json">official-blogs.json</a>
+      </div>
+      <p class="official-blog-summary">${escapeHtml(knowledge.curation_scope || "Curated official blog knowledge for durable product, model, and engineering practice references.")}</p>
+      <div class="official-blog-stat-grid" aria-label="官方博客知识库统计">
+        ${renderOfficialBlogStat("总记录", stats.total_records ?? records.length)}
+        ${renderOfficialBlogStat("OpenAI", byCompany.openai || 0)}
+        ${renderOfficialBlogStat("Anthropic", byCompany.anthropic || 0)}
+        ${renderOfficialBlogStat("主题", topics.length)}
+      </div>
+      <div class="official-blog-topic-row" aria-label="官方博客主题">
+        ${topics.map((topic) => `<span class="tag tag-topic">${escapeHtml(topic)}</span>`).join("")}
+      </div>
+      <div class="official-blog-grid">
+        ${featured.map(renderOfficialBlogCard).join("\n")}
+      </div>
+    </section>`;
+}
+
+function renderOfficialBlogStat(label, value) {
+  return `<span class="official-blog-stat"><strong>${escapeHtml(value)}</strong>${escapeHtml(label)}</span>`;
+}
+
+function renderOfficialBlogCard(record) {
+  const ideas = Array.isArray(record.key_ideas) ? record.key_ideas.slice(0, 2) : [];
+  const checklist = Array.isArray(record.practice_checklist) ? record.practice_checklist.slice(0, 1) : [];
+  const topics = Array.isArray(record.topics) ? record.topics.slice(0, 4) : [];
+  const title = record.title_zh || record.title_original || record.id;
+  return `<article class="official-blog-card" data-official-blog-card="${escapeAttribute(record.id || "")}" data-official-blog-company="${escapeAttribute(record.company || "")}">
+      <div class="official-blog-card-head">
+        <span class="chip status-info official-blog-company">${escapeHtml(record.company_label || record.company || "")}</span>
+        <span class="chip official-blog-importance importance-${escapeAttribute(record.importance || "notable")}">${escapeHtml(officialBlogImportanceLabel(record.importance))}</span>
+      </div>
+      <h3><a href="${escapeAttribute(record.canonical_url || "#")}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a></h3>
+      <p class="official-blog-original">${escapeHtml(record.title_original || "")}</p>
+      <p>${escapeHtml(firstSentence(record.summary_zh) || record.summary_zh || "")}</p>
+      <ul class="compact-list official-blog-ideas">
+        ${[...ideas, ...checklist].map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ul>
+      <div class="official-blog-topic-row official-blog-card-topics">
+        ${topics.map((topic) => `<span class="tag">${escapeHtml(topic)}</span>`).join("")}
+      </div>
+      <div class="item-meta">
+        <span>${escapeHtml(record.published_at || "")}</span>
+        <span>${escapeHtml(record.content_type || "")}</span>
+      </div>
+    </article>`;
+}
+
+function officialBlogImportanceRank(value) {
+  if (value === "foundational") return 4;
+  if (value === "major") return 3;
+  if (value === "notable") return 2;
+  if (value === "reference") return 1;
+  return 0;
+}
+
+function officialBlogImportanceLabel(value) {
+  if (value === "foundational") return "foundational";
+  if (value === "major") return "major";
+  if (value === "reference") return "reference";
+  return "notable";
 }
 
 function renderTrendOverview(trends) {
@@ -1508,6 +1595,99 @@ h3 {
 .topic-status-hot {
   border-color: #c36b1f;
   color: #7a3f00;
+}
+
+.official-blog-knowledge {
+  margin-top: 12px;
+}
+
+.official-blog-summary {
+  max-width: 880px;
+  color: var(--muted);
+}
+
+.official-blog-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.official-blog-stat {
+  min-height: 64px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.official-blog-stat strong {
+  display: block;
+  color: var(--text);
+  font-size: 1.25rem;
+  line-height: 1.15;
+}
+
+.official-blog-topic-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 10px 0;
+}
+
+.official-blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.official-blog-card {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.official-blog-card h3 {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.32;
+}
+
+.official-blog-card h3 a {
+  color: var(--text);
+}
+
+.official-blog-card p {
+  margin: 0;
+}
+
+.official-blog-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.official-blog-original,
+.official-blog-card .item-meta {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.official-blog-ideas {
+  margin: 0;
+}
+
+.official-blog-card-topics {
+  margin: 0;
 }
 
 .item,

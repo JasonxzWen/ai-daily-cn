@@ -23,6 +23,7 @@ const dataInputDir = path.join(tmp, "reports-data");
 const outDir = path.join(tmp, "docs");
 await fs.mkdir(inputDir, { recursive: true });
 await fs.mkdir(dataInputDir, { recursive: true });
+await fs.cp(path.join(rootDir, "knowledge"), path.join(tmp, "knowledge"), { recursive: true });
 await fs.copyFile(
   path.join(rootDir, "tests/fixtures/reports/good/official-release.md"),
   path.join(inputDir, "official-release.md")
@@ -460,6 +461,11 @@ try {
   assert.equal(await page.locator("#signal-heat-strip").count(), 1);
   assert.equal(await page.locator("#source-lane-board").count(), 1);
   assert.equal(await page.locator("#topic-radar").count(), 1);
+  assert.equal(await page.locator("#official-blog-knowledge").count(), 1);
+  assert.equal(await page.locator("[data-official-blog-card]").count() >= 6, true);
+  assert.equal(await page.locator('[data-official-blog-company="openai"]').count() >= 1, true);
+  assert.equal(await page.locator('[data-official-blog-company="anthropic"]').count() >= 1, true);
+  assert.equal(await page.locator('a[href="data/official-blogs.json"]').count() >= 1, true);
   assert.equal(await page.locator('[data-index-style="effective-interact"]').count(), 1);
   assert.equal(await page.locator("main.report-shell.index-page").count(), 1);
   assert.equal(await page.locator(".report-hero.report-hero-index").count(), 1);
