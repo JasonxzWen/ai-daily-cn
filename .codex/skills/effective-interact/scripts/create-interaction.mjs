@@ -1751,8 +1751,8 @@ function safeDataImage(value) {
   return "";
 }
 
-function renderFilterableCard(item, target, cardClass) {
-  const group = item.group || "item";
+function renderFilterableCard(item, target, cardClass, activeFilter = "all") {
+  const group = String(item.group || "item");
   const className = ["interactive-card", "evidence-card", "evidence-spotlight", cardClass].filter(Boolean).join(" ");
   const groupMeta = item.showGroup === false ? "" : `<div class="meta">${escapeHtml(group)}</div>`;
   const body = item.body ? `<p>${inlineMarkdown(item.body)}</p>` : "";
@@ -1762,7 +1762,8 @@ function renderFilterableCard(item, target, cardClass) {
     trendStatus ? `data-trend-status="${escapeAttr(trendStatus)}"` : "",
     Number.isFinite(trendPointCount) ? `data-trend-history-points="${Math.max(0, Math.round(trendPointCount))}"` : ""
   ].filter(Boolean).join(" ");
-  return `<article class="${escapeAttr(className)}" data-evidence-spotlight data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" data-search-target="${target}"${trendAttrs ? ` ${trendAttrs}` : ""}>
+  const hidden = activeFilter !== "all" && group !== activeFilter ? " hidden" : "";
+  return `<article class="${escapeAttr(className)}" data-evidence-spotlight data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" data-search-target="${target}"${trendAttrs ? ` ${trendAttrs}` : ""}${hidden}>
     ${groupMeta}
     ${renderCardTitle(item)}
     ${renderCardTags(item.tags)}
@@ -1773,21 +1774,32 @@ function renderFilterableCard(item, target, cardClass) {
   </article>`;
 }
 
+function filterableTargetForSection(section) {
+  return slugify(section.id || section.richId || section.title);
+}
+
 function renderFilterableCards(section) {
-  const target = slugify(section.title);
+  const target = filterableTargetForSection(section);
   const items = Array.isArray(section.items) ? section.items : [];
-  const groups = ["all", ...new Set(items.map((item) => item.group || "item"))];
+  const uniqueGroups = [...new Set(items.map((item) => String(item.group || "item")))];
+  const includeAllFilter = section.includeAllFilter !== false;
+  const groups = includeAllFilter ? ["all", ...uniqueGroups] : uniqueGroups;
+  const requestedDefaultFilterValue = String(section.defaultFilterValue || "").trim();
+  const defaultFilterValue = groups.includes(requestedDefaultFilterValue)
+    ? requestedDefaultFilterValue
+    : groups[0] || "all";
   const cardClass = safeClassList(section.cardClass);
   const gridClass = ["evidence-grid", "focus-field", cardClass ? `${cardClass}-grid` : ""].filter(Boolean).join(" ");
-  const showFilters = section.showFilters !== false && groups.length > 2;
+  const showFilters = section.showFilters !== false && (includeAllFilter ? groups.length > 2 : groups.length > 1);
+  const activeFilter = showFilters ? defaultFilterValue : "all";
   return `<section class="panel" ${sectionAttrs(section)}>
     ${renderSectionHeader(section)}
     ${renderSourceInventoryFinder(section)}
     ${showFilters ? `<div class="toolbar" role="toolbar" aria-label="${escapeAttr(section.filterLabel || section.title)} filters">
-      ${groups.map((group, index) => `<button data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" aria-pressed="${index === 0 ? "true" : "false"}">${escapeHtml(group === "all" ? "全部" : group)}</button>`).join("")}
+      ${groups.map((group) => `<button data-filter-target="${target}" data-filter-value="${escapeAttr(group)}" aria-pressed="${group === activeFilter ? "true" : "false"}">${escapeHtml(group === "all" ? "全部" : group)}</button>`).join("")}
     </div>` : ""}
     <div class="${escapeAttr(gridClass)}" data-focus-field="${target}">
-      ${items.map((item) => renderFilterableCard(item, target, cardClass)).join("\n")}
+      ${items.map((item) => renderFilterableCard(item, target, cardClass, activeFilter)).join("\n")}
     </div>
   </section>`;
 }

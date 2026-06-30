@@ -4,7 +4,7 @@ import fsp from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import test from "node:test";
 import { syncHarnessHub } from "../scripts/update-harness-hub.mjs";
 
@@ -1469,6 +1469,130 @@ test("effective-interact filterable cards can hide visual group labels", async (
   assert.match(card, /role="button"/);
   assert.match(card, /tabindex="0"/);
   assert.match(card, /<figcaption>Original blog architecture diagram\.<\/figcaption>/);
+});
+
+test("effective-interact filterable cards support exclusive default filters", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-exclusive-card-filters-"));
+  const inputPath = path.join(tmp, "exclusive-card-filters.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily Filter Contract",
+      summary: "Filterable card defaults.",
+      status: "complete",
+      template: "research-explainer",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "Exclusive Filters",
+          richId: "exclusive-filters",
+          group: "main",
+          includeAllFilter: false,
+          defaultFilterValue: "Beta",
+          items: [
+            {
+              group: "Alpha",
+              title: "Alpha card",
+              body: "Alpha should be hidden by default."
+            },
+            {
+              group: "Beta",
+              title: "Beta card",
+              body: "Beta should be visible by default."
+            }
+          ]
+        },
+        {
+          type: "filterable-cards",
+          title: "Default Filters",
+          richId: "default-filters",
+          group: "main",
+          items: [
+            {
+              group: "One",
+              title: "One card",
+              body: "Default filters keep the all button."
+            },
+            {
+              group: "Two",
+              title: "Two card",
+              body: "Default filters keep the all button."
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "exclusive-card-filters", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const sectionFor = (id) => html.match(new RegExp(`<section[^>]+id="section-${id}"[\\s\\S]*?<\\/section>`))?.[0] || "";
+  const buttonsFor = (section) => section.match(/<button\b[\s\S]*?<\/button>/g) || [];
+  const buttonValuesFor = (section) => buttonsFor(section).map((button) => button.match(/data-filter-value="([^"]+)"/)?.[1]);
+  const cardOpenTagFor = (section, value) => (
+    (section.match(/<article\b[\s\S]*?<\/article>/g) || [])
+      .find((card) => card.includes(`data-filter-value="${value}"`))
+      ?.match(/^<article[^>]+>/)?.[0] || ""
+  );
+
+  const exclusiveSection = sectionFor("exclusive-filters");
+  assert.ok(exclusiveSection, "exclusive filter section should render");
+  assert.deepEqual(buttonValuesFor(exclusiveSection), ["Alpha", "Beta"]);
+  assert.match(exclusiveSection, /data-filter-target="section-exclusive-filters"/);
+  assert.doesNotMatch(exclusiveSection, /data-filter-target="exclusive-filters"/);
+  assert.doesNotMatch(exclusiveSection, /data-filter-value="all"/);
+  assert.match(buttonsFor(exclusiveSection)[0], /data-filter-value="Alpha"[^>]+aria-pressed="false"/);
+  assert.match(buttonsFor(exclusiveSection)[1], /data-filter-value="Beta"[^>]+aria-pressed="true"/);
+  assert.match(cardOpenTagFor(exclusiveSection, "Alpha"), /\shidden(?=[\s>])/);
+  assert.doesNotMatch(cardOpenTagFor(exclusiveSection, "Beta"), /\shidden(?=[\s>])/);
+
+  const defaultSection = sectionFor("default-filters");
+  assert.ok(defaultSection, "default filter section should render");
+  assert.deepEqual(buttonValuesFor(defaultSection), ["all", "One", "Two"]);
+  assert.match(defaultSection, /data-filter-target="section-default-filters"/);
+  assert.match(buttonsFor(defaultSection)[0], /data-filter-value="all"[^>]+aria-pressed="true"/);
+
+  const { chromium } = await import("@playwright/test");
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({ viewport: { width: 900, height: 700 } });
+    await page.goto(pathToFileURL(payload.outputPath).href);
+    await page.click('#section-exclusive-filters > .toolbar button[data-filter-value="Alpha"]');
+    const clickedState = await page.evaluate(() => {
+      const section = document.querySelector("#section-exclusive-filters");
+      return {
+        buttons: [...(section?.querySelectorAll(":scope > .toolbar > button") || [])].map((button) => ({
+          value: button.getAttribute("data-filter-value"),
+          pressed: button.getAttribute("aria-pressed"),
+          hidden: button.hidden
+        })),
+        cards: [...(section?.querySelectorAll("[data-focus-field] > article[data-filter-value]") || [])].map((card) => ({
+          value: card.getAttribute("data-filter-value"),
+          hidden: card.hidden
+        }))
+      };
+    });
+    assert.deepEqual(clickedState.buttons, [
+      { value: "Alpha", pressed: "true", hidden: false },
+      { value: "Beta", pressed: "false", hidden: false }
+    ]);
+    assert.deepEqual(clickedState.cards, [
+      { value: "Alpha", hidden: false },
+      { value: "Beta", hidden: true }
+    ]);
+    await page.close();
+  } finally {
+    await browser.close();
+  }
 });
 
 test("effective-interact renders up to five card media items for daily tracking cards", async () => {

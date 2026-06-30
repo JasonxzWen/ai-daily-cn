@@ -83,6 +83,7 @@
     if (!target || !value) return;
 
     document.querySelectorAll("[data-filter-target='" + target + "']").forEach(function (item) {
+      if (item.matches("button")) return;
       var match = value === "all" || item.getAttribute("data-filter-value") === value;
       item.hidden = !match;
     });

@@ -10476,6 +10476,28 @@ test("daily tracking renders seven day trend curves", async () => {
   assert.match(html, /OpenRouter/);
   assert.match(html, /Artificial Analysis/);
   assert.match(html, /SWE-bench Pro/);
+
+  const trendSection = html.match(/<section[^>]+id="section-trend-tracking"[\s\S]*?<\/section>/)?.[0] || "";
+  assert.ok(trendSection, "trend tracking section should render with a stable public anchor");
+  const toolbar = trendSection.match(/<div class="toolbar"[\s\S]*?<\/div>/)?.[0] || "";
+  const buttons = toolbar.match(/<button\b[\s\S]*?<\/button>/g) || [];
+  const buttonValues = buttons.map((button) => button.match(/data-filter-value="([^"]+)"/)?.[1]);
+  const buttonTargets = buttons.map((button) => button.match(/data-filter-target="([^"]+)"/)?.[1]);
+  assert.deepEqual(buttonValues, ["OpenRouter", "Artificial Analysis", "SWE-bench"]);
+  assert.deepEqual(buttonTargets, ["section-trend-tracking", "section-trend-tracking", "section-trend-tracking"]);
+  assert.doesNotMatch(toolbar, /data-filter-value="all"/);
+  assert.doesNotMatch(toolbar, /data-filter-target="html-work-report"/);
+  assert.match(buttons[0], /data-filter-value="OpenRouter"[^>]+aria-pressed="true"/);
+  assert.match(buttons[1], /data-filter-value="Artificial Analysis"[^>]+aria-pressed="false"/);
+  assert.match(buttons[2], /data-filter-value="SWE-bench"[^>]+aria-pressed="false"/);
+
+  const trendCards = trendSection.match(/<article\b[\s\S]*?<\/article>/g) || [];
+  const cardOpenTagFor = (value) => (
+    trendCards.find((card) => card.includes(`data-filter-value="${value}"`))?.match(/^<article[^>]+>/)?.[0] || ""
+  );
+  assert.doesNotMatch(cardOpenTagFor("OpenRouter"), /\shidden(?=[\s>])/);
+  assert.match(cardOpenTagFor("Artificial Analysis"), /\shidden(?=[\s>])/);
+  assert.match(cardOpenTagFor("SWE-bench"), /\shidden(?=[\s>])/);
 });
 
 test("public report projection preserves sanitized public quality events", async () => {
