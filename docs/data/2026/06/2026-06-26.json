@@ -3448,32 +3448,7 @@
   "official_org_updates": [],
   "wechat_items": [],
   "zhihu_items": [],
-  "reddit_items": [
-    {
-      "platform": "reddit",
-      "title": "Reddit LocalLLaMA Platform披露模型权重和使用说明",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1ufc9vp/ornith10_released_on_hugging_face/",
-      "event_date": "2026-06-25",
-      "source": "Reddit LocalLLaMA Platform Feed",
-      "claim_text": "Including 9B Dense, 31B Dense, 35B MoE, and 397B MoE and reporting sota on different benchmark (let's see if this holds). https://huggingface.co/collections/deepreinforce-ai/ornith-10 submitted by /u/paf1138 [link] [comments]",
-      "disclosure": "平台内扩散发现，未做一手回源核验。",
-      "summary": "Including 9B Dense, 31B Dense, 35B MoE, and 397B MoE and reporting sota on different benchmark (let's see if this holds). https://huggingface.co/collections/deepreinforce-ai/ornith-10 submitted by /u/paf1138 [link] [comments]",
-      "risk_label": "medium",
-      "importance": "general"
-    },
-    {
-      "platform": "reddit",
-      "title": "Reddit LocalLLaMA Platform披露模型能力和推理入口变化",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uf4azy/nvidia_has_released/",
-      "event_date": "2026-06-25",
-      "source": "Reddit LocalLLaMA Platform Feed",
-      "claim_text": "NVIDIA has released Nemotron-TwoTower-30B-A3B-Base-BF16, an unusual diffusion-based language model built from the Nemotron 3 Nano 30B-A3B backbone. Instead of generating strictly one token at a time, it uses a frozen autoregressive context tower plus a diffusion denoiser tower that iteratively fills blocks of tokens in parallel. NVIDIA says its default mask-diffusion setup retains 98.7% of the autoregressive baseline’s aggregate benchmark quality while reaching 2.42× its wall-clock generation t...",
-      "disclosure": "平台内扩散发现，未做一手回源核验。",
-      "summary": "NVIDIA has released Nemotron-TwoTower-30B-A3B-Base-BF16, an unusual diffusion-based language model built from the Nemotron 3 Nano 30B-A3B backbone. Instead of generating strictly one token at a time, it uses a frozen autoregressive context",
-      "risk_label": "medium",
-      "importance": "general"
-    }
-  ],
+  "reddit_items": [],
   "evidence_assets": [],
   "generated_at": "2026-06-25T18:52:21.727Z",
   "report_status": "normal",

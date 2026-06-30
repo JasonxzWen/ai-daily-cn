@@ -46,7 +46,7 @@ const PUBLIC_MEDIA_MIN_WIDTH = 240;
 const PUBLIC_MEDIA_MIN_HEIGHT = 160;
 const PUBLIC_MEDIA_MIN_AREA = 80000;
 const NON_CONTENT_MEDIA_ROLES = new Set(["icon", "favicon", "logo", "avatar", "decorative"]);
-const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf)/i;
+const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf|reddit|r\/machinelearning|r\/localllama)/i;
 const PUBLIC_SOURCE_FILTER_SECTIONS = [
   "stories",
   "main_items",
@@ -306,6 +306,7 @@ export function reportToInteractionInput(report, options = {}) {
       type: "markdown",
       title: "GitHub Trending · Top 8",
       group: "projects",
+      richId: "github-trending",
       content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
     });
   }
@@ -314,6 +315,7 @@ export function reportToInteractionInput(report, options = {}) {
       type: "markdown",
       title: "Hugging Face Trending · Top 10",
       group: "projects",
+      richId: "huggingface-trending",
       content: formatHuggingFaceTrending(huggingFaceTrending, { trendAnnotations })
     });
   }
@@ -364,6 +366,7 @@ export function reportToInteractionInput(report, options = {}) {
       title: "X/Twitter 讨论",
       group: "signals",
       cardClass: "builder-card",
+      richId: "twitter-discussion",
       showFilters: false,
       items: formatBuilderObservationCards(builderObservations, report, { mediaOptions })
     });
@@ -376,6 +379,7 @@ export function reportToInteractionInput(report, options = {}) {
       type: "markdown",
       title: "X/Twitter 讨论",
       group: "signals",
+      richId: "twitter-discussion",
       content: twitterDegradation
     });
   }
@@ -422,6 +426,7 @@ export function reportToInteractionInput(report, options = {}) {
       type: "markdown",
       title: "信源覆盖与缺口",
       group: "verification",
+      richId: "public-source-coverage",
       content: publicSourceCoverage
     });
   }
@@ -4738,7 +4743,10 @@ function publicSourceCoverageDetailsV2(sources) {
 }
 
 function publicSourceCoverageGroups(audit) {
-  return sourceAuditGroups(audit).filter(({ group }) => group !== audit.sources_health);
+  return sourceAuditGroups(audit).filter(({ group }) =>
+    group !== audit.sources_health &&
+    group !== audit.reddit_sources
+  );
 }
 
 function publicSourceCoverageStatusNote(status) {

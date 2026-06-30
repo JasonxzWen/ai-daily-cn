@@ -21203,6 +21203,17 @@ test("public daily source sections follow the agreed IA order", () => {
       summary: "SWE-bench Pro 公开榜单解析出代码基准变化。"
     }
   ];
+  report.chinese_media_dynamics = [
+    {
+      candidate_id: "china-media-rss-signal",
+      title: "China AI media signal",
+      url: "https://example.cn/china-ai-media-signal",
+      publisher: "Example CN AI",
+      event_date: report.report_date,
+      topic: "China AI",
+      summary: "A verified Chinese media RSS signal should stay in its source category after subscribed RSS."
+    }
+  ];
   report.official_org_updates = [
     {
       title: "OpenAI GitHub organization update",
@@ -21222,21 +21233,27 @@ test("public daily source sections follow the agreed IA order", () => {
   ];
 
   const input = reportToInteractionInput(report);
-  const titles = input.sections.map((section) => section.title);
+  const sectionIds = input.sections.map((section) => section.richId || section.title);
   const expectedOrder = [
-    "官方 Blog 更新",
-    "GitHub Trending · Top 8",
-    "Hugging Face Trending · Top 10",
-    "趋势追踪",
-    "订阅 RSS",
-    "X/Twitter 讨论",
-    "其他 GitHub 仓库更新",
-    "其他信源"
+    "official-blog-updates",
+    "github-trending",
+    "huggingface-trending",
+    "trend-tracking",
+    "subscribed-rss",
+    "chinese-media-rss",
+    "twitter-discussion",
+    "other-github-repository-updates",
+    "public-source-coverage"
   ];
-  expectedOrder.pop();
-  const indexes = expectedOrder.map((title) => titles.indexOf(title));
+  const indexes = expectedOrder.map((sectionId) => sectionIds.indexOf(sectionId));
 
-  assert(indexes.every((index) => index >= 0), JSON.stringify(titles));
+  assert(indexes.every((index) => index >= 0), JSON.stringify(sectionIds));
+  const lastStoryIndex = Math.max(
+    ...input.sections
+      .map((section, index) => (/^(track-|story-\d+$)/.test(section.richId || "") ? index : -1))
+      .filter((index) => index >= 0)
+  );
+  assert(indexes[0] > lastStoryIndex, JSON.stringify(sectionIds));
   assert(!input.sections.some((section) => section.richId === "other-sources"));
   assert.deepEqual(indexes, indexes.slice().sort((left, right) => left - right));
   const trackingSection = input.sections.find((section) => section.title === "趋势追踪");
@@ -21918,8 +21935,9 @@ test("platform exempt report sections require public audit disclosure and render
   assert.equal(report.quality_status.status, "ok");
   assert(renderedText.includes("知乎线索"));
   assert(renderedText.includes("未做一手回源核验"));
-  assert(renderedText.includes("Reddit 讨论小米 1T MoE 模型 1000+ tokens/sec 声称"));
-  assert(renderedText.includes("标准 8-GPU 节点"));
+  assert(!renderedText.includes("Reddit 线索"));
+  assert(!renderedText.includes("Reddit 讨论小米 1T MoE 模型 1000+ tokens/sec 声称"));
+  assert(!renderedText.includes("标准 8-GPU 节点"));
   assert(!renderedText.includes("source_id"));
   assert(!renderedText.includes("rule_id"));
   assert(!renderedText.includes("verification_status"));
