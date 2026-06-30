@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.official-blog-knowledge-stage6",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Official blog knowledge stage 6",
+  "slug": "official-blog-knowledge-stage6",
+  "status": "completed",
+  "summary": "This iteration adds an internal intake queue for OpenAI and Anthropic official blog previews. Local candidate previews can now be triaged with the Stage 5 admission policy, deduplicated against curated official blog knowledge, and written through clean CLI JSON output while rejecting public docs/data, official-blog page, and public HTML output paths.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog intake\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run content:contract",
+      "npm run test",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Official blog ingestion should create an internal review queue before it creates public knowledge records.",
+      "evidence": "Stage 6 writes `official_blog_intake_queue` output with `visibility:\"internal\"`, review candidates, exclusions, duplicates, and invalid candidates while refusing public `docs/data`, `docs/official-blogs`, and public HTML output paths.",
+      "scope": "official_blog_internal_intake",
+      "persistence": "implemented",
+      "recommended_action": "Keep crawler and manual preview ingestion pointed at the internal queue until a human or a later audited step drafts curated knowledge records."
+    },
+    {
+      "lesson": "Opening-preview triage needs a stable interface independent from live fetching.",
+      "evidence": "`official-blog:intake --input --output` accepts local candidate previews and runs deterministic triage without network access, so crawler output can be tested before live RSS/page fetching is added.",
+      "scope": "official_blog_preview_intake_cli",
+      "persistence": "implemented",
+      "recommended_action": "When adding live fetching, write the crawler result into the same local preview shape and keep tests network-free."
+    },
+    {
+      "lesson": "Deduplication must happen before review work is created.",
+      "evidence": "Stage 6 reports existing curated knowledge URL duplicates and same-batch duplicates separately, preventing repeated translation or summary work for already known blog posts.",
+      "scope": "official_blog_intake_dedupe",
+      "persistence": "implemented",
+      "recommended_action": "Keep normalized URL matching as the first intake dedupe key and only add fuzzy title matching after separate review."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "New official blog previews had no internal queue between discovery and curated public knowledge records.",
+      "evidence": "Stage 6 adds `createOfficialBlogIntakeQueue`, CLI command `official-blog:intake`, deterministic tests for include/review/exclude/duplicate cases, public-output path rejection, controlled new-product matching, and clean `--output` JSON behavior.",
+      "module": "src/official-blog-knowledge.js, src/cli.js, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Use an internal review queue as the stable handoff between future OpenAI/Anthropic blog discovery and curated knowledge-record authoring.",
+      "expected_benefit": "New product, model, harness, agent workflow, eval, safety, and implementation-practice posts can be tracked without letting generic partnerships or internal triage diagnostics leak into public pages.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through deterministic intake tests, CLI output tests, and repository validation.",
+      "ledger_links": [
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog intake creates an internal review queue from opening previews",
+        "official blog intake CLI writes a clean internal review queue",
+        "official blog intake CLI refuses public output paths"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add a non-network fixture-backed official blog feed parser that converts OpenAI and Anthropic RSS/index entries into the Stage 6 preview input shape.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add a reviewed authoring step that turns selected `include` queue entries into curated `knowledge/official-blogs/**` records with Chinese summaries and source links.",
+      "owner": "project"
+    }
+  ]
+}

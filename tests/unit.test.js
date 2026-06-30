@@ -5958,6 +5958,100 @@ test("CLI JSON commands can write clean UTF-8 output files", async () => {
   assert(!raw.startsWith("\uFEFF"));
 });
 
+test("official blog intake CLI writes a clean internal review queue", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-intake-"));
+  const inputPath = path.join(tmp, "official-blog-previews.json");
+  const outputPath = path.join(tmp, "official-blog-intake.json");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    candidates: [
+      {
+        company: "anthropic",
+        canonical_url: "https://www.anthropic.com/research/harness-engineering-for-agents",
+        published_at: "2026-06-30",
+        title: "Harness engineering for long-running agents",
+        opening_paragraphs: [
+          "This engineering note explains environment management, sandbox boundaries, observability, regression checks, and failure modes for long-running agent workflows.",
+          "It focuses on reusable production-agent implementation practices."
+        ]
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/news/examplecorp-partnership",
+        published_at: "2026-06-30",
+        title: "OpenAI and ExampleCorp expand enterprise partnership",
+        opening_preview: "The companies will bring AI tools to more employees and improve business workflows."
+      }
+    ]
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:intake",
+    "--input",
+    inputPath,
+    "--output",
+    outputPath,
+    "--date",
+    "2026-06-30",
+    "--generated-at",
+    "2026-06-30T08:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.queue.visibility, "internal");
+  assert.equal(parsed.queue.review_queue.length, 1);
+  assert.equal(parsed.queue.excluded.length, 1);
+  assert.equal(parsed.queue.stats.total_candidates, 2);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
+test("official blog intake CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-intake-public-"));
+  const inputPath = path.join(tmp, "official-blog-previews.json");
+  const publicOutputPath = path.join(rootDir, "docs", "data", "official-blog-intake.json");
+  await fs.rm(publicOutputPath, { force: true });
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    candidates: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/new-developer-product-for-agents",
+        published_at: "2026-06-30",
+        title: "Launching a new developer product for agent orchestration",
+        opening_preview: "This new developer product adds a developer platform primitive for orchestrating tool calls."
+      }
+    ]
+  })}\n`, "utf8");
+
+  await assert.rejects(
+    () => execFileAsync(process.execPath, [
+      path.join(rootDir, "src/cli.js"),
+      "official-blog:intake",
+      "--input",
+      inputPath,
+      "--output",
+      publicOutputPath
+    ], {
+      cwd: rootDir,
+      maxBuffer: 1024 * 1024
+    }),
+    (error) => {
+      assert.equal(error.code, 1);
+      assert.match(error.stdout, /official_blog_intake_public_output_forbidden/);
+      return true;
+    }
+  );
+  await assert.rejects(
+    () => fs.stat(publicOutputPath),
+    /ENOENT/
+  );
+});
+
 test("publish:verify-pages emits structured retryable misses without nonzero exit", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-pages-verify-"));
   const preloadPath = path.join(tmp, "fake-fetch.mjs");
