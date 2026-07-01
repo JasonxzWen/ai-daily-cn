@@ -674,6 +674,36 @@ export function createOfficialBlogReviewSession(input = {}, options = {}) {
   };
 }
 
+export function createOfficialBlogAiReviewHandoff(input = {}, options = {}) {
+  const packet = officialBlogAiReviewSafePacket(officialBlogReviewDecisionPacket(input));
+  const reviewItems = packet.review_items;
+  const excludedItems = packet.excluded_items;
+  const duplicates = packet.duplicates;
+  const invalidCandidates = packet.invalid_candidates;
+  const decisionTemplate = reviewItems.map(officialBlogAiReviewDecisionTemplateItem);
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_ai_review_handoff",
+    visibility: "internal",
+    report_date: String(options.reportDate || options.report_date || packet.report_date || ""),
+    generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
+    ai_review_contract: packet.ai_review_contract || officialBlogAiReviewContract(),
+    stats: {
+      review_items: reviewItems.length,
+      included: reviewItems.filter((item) => item.deterministic_triage?.decision === "include").length,
+      needs_review: reviewItems.filter((item) => item.deterministic_triage?.decision === "needs_review").length,
+      excluded_items: excludedItems.length,
+      duplicates: duplicates.length,
+      invalid_candidates: invalidCandidates.length
+    },
+    prompt: officialBlogAiReviewHandoffPrompt(),
+    review_packet: packet,
+    decision_template: decisionTemplate
+  };
+}
+
 export function createOfficialBlogReviewDecisions(input = {}, options = {}) {
   const packet = officialBlogReviewDecisionPacket(input);
   const reviewItems = Array.isArray(packet.review_items) ? packet.review_items : [];
@@ -1353,6 +1383,110 @@ function combineOfficialBlogPreviewFeeds(feeds = [], options = {}) {
   };
 }
 
+function officialBlogAiReviewHandoffPrompt() {
+  return {
+    role: "official_blog_admission_reviewer",
+    review_basis: "title_and_opening_preview_only",
+    instructions: [
+      "Review only the title_original and opening_preview fields for each intake_id.",
+      "Do not use full article body, source audit payloads, candidate pools, raw transcripts, public rendering HTML, or outside context.",
+      "Return JSON with a top-level decisions array; include exactly one decision object for every intake_id in the decision_template.",
+      "Allowed decision values are include, needs_review, and exclude.",
+      "Use needs_review for customer or partnership stories when the preview hints at implementation detail but does not prove durable product, model, engineering, eval, or safety value."
+    ],
+    output_fields: [
+      "intake_id",
+      "decision",
+      "matched_criteria",
+      "suggested_topics",
+      "rationale",
+      "confidence"
+    ]
+  };
+}
+
+function officialBlogAiReviewSafePacket(packet = {}) {
+  const reviewItems = (Array.isArray(packet.review_items) ? packet.review_items : [])
+    .map(officialBlogAiReviewSafeReviewItem);
+  const excludedItems = (Array.isArray(packet.excluded_items) ? packet.excluded_items : [])
+    .map(officialBlogAiReviewSafeExcludedItem);
+  const duplicates = (Array.isArray(packet.duplicates) ? packet.duplicates : [])
+    .map(officialBlogAiReviewSafeDuplicateItem);
+  const invalidCandidates = (Array.isArray(packet.invalid_candidates) ? packet.invalid_candidates : [])
+    .map((entry) => officialBlogReviewPacketInvalidCandidate(entry));
+  const totalCandidates = Number(packet.stats?.total_candidates);
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_review_packet",
+    visibility: "internal",
+    report_date: String(packet.report_date || ""),
+    generated_at: String(packet.generated_at || ""),
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
+    ai_review_contract: officialBlogAiReviewContract(),
+    stats: {
+      total_candidates: Number.isFinite(totalCandidates)
+        ? totalCandidates
+        : reviewItems.length + excludedItems.length + duplicates.length + invalidCandidates.length,
+      review_items: reviewItems.length,
+      included: reviewItems.filter((item) => item.deterministic_triage.decision === "include").length,
+      needs_review: reviewItems.filter((item) => item.deterministic_triage.decision === "needs_review").length,
+      excluded_items: excludedItems.length,
+      duplicates: duplicates.length,
+      invalid_candidates: invalidCandidates.length
+    },
+    review_items: reviewItems,
+    excluded_items: excludedItems,
+    duplicates,
+    invalid_candidates: invalidCandidates
+  };
+}
+
+function officialBlogAiReviewSafeReviewItem(item = {}) {
+  return {
+    ...officialBlogReviewDecisionPacketItemBase(item),
+    suggested_topics: officialBlogReviewDecisionTopics(item.suggested_topics || item.suggestedTopics || item.topics),
+    knowledge_value: String(item.knowledge_value || ""),
+    next_action: String(item.next_action || "")
+  };
+}
+
+function officialBlogAiReviewSafeExcludedItem(item = {}) {
+  return {
+    ...officialBlogAiReviewSafeReviewItem(item),
+    excluded_as: String(item.excluded_as || "")
+  };
+}
+
+function officialBlogAiReviewSafeDuplicateItem(item = {}) {
+  return {
+    ...officialBlogReviewDecisionPacketItemBase(item),
+    duplicate_source: String(item.duplicate_source || ""),
+    duplicate_of: String(item.duplicate_of || "")
+  };
+}
+
+function officialBlogAiReviewDecisionTemplateItem(item = {}) {
+  return {
+    intake_id: String(item.intake_id || ""),
+    company: String(item.company || ""),
+    canonical_url: String(item.canonical_url || ""),
+    normalized_url: String(item.normalized_url || safeNormalizeOfficialBlogUrl(item.canonical_url) || ""),
+    published_at: String(item.published_at || ""),
+    title_original: String(item.title_original || ""),
+    opening_preview: String(item.opening_preview || ""),
+    deterministic_decision: String(item.deterministic_triage?.decision || ""),
+    deterministic_reason: String(item.deterministic_triage?.reason || ""),
+    allowed_decisions: ["include", "needs_review", "exclude"],
+    allowed_matched_criteria: uniqueSorted([...OFFICIAL_BLOG_MATCHED_CRITERIA]),
+    suggested_topics: uniqueSorted(item.suggested_topics || []),
+    decision: "",
+    matched_criteria: [],
+    rationale: "",
+    confidence: null
+  };
+}
+
 function officialBlogIntakeCandidates(input = {}) {
   if (Array.isArray(input)) {
     return input;
@@ -1432,9 +1566,15 @@ function officialBlogReviewDecisionPacket(input = {}) {
     input?.reviewPacket,
     input?.packet,
     input?.session?.review_packet,
+    input?.handoff?.review_packet,
+    input?.review_handoff?.review_packet,
+    input?.reviewHandoff?.review_packet,
     input?.review_packet?.session?.review_packet,
     input?.reviewPacket?.session?.review_packet,
-    input?.packet?.session?.review_packet
+    input?.packet?.session?.review_packet,
+    input?.review_packet?.handoff?.review_packet,
+    input?.reviewPacket?.handoff?.review_packet,
+    input?.packet?.handoff?.review_packet
   ].find((candidate) => candidate?.kind === "official_blog_review_packet");
   if (!packet) {
     throw new Error("official blog review decisions require review_packet");

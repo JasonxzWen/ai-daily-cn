@@ -11,6 +11,7 @@ import {
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogReviewedAuthoring,
+  createOfficialBlogAiReviewHandoff,
   createOfficialBlogReviewSession,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
@@ -1975,6 +1976,129 @@ test("official blog review session composes preview intake and review packet wit
   }
 });
 
+test("official blog AI review handoff creates prompt and blank decisions from review session", async () => {
+  const fixtureDir = path.join(rootDir, "tests", "fixtures", "official-blog-runbook-replay");
+  const fixture = JSON.parse(await fs.readFile(path.join(fixtureDir, "replay.json"), "utf8"));
+  const feeds = await Promise.all(fixture.feeds.map(async (feed) => ({
+    company: feed.company,
+    source_label: feed.source_label,
+    feed_text: await fs.readFile(path.join(fixtureDir, feed.file), "utf8")
+  })));
+  const session = createOfficialBlogReviewSession({ feeds }, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+
+  const handoff = createOfficialBlogAiReviewHandoff(session, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+
+  assert.equal(handoff.kind, "official_blog_ai_review_handoff");
+  assert.equal(handoff.visibility, "internal");
+  assert.equal(handoff.report_date, fixture.report_date);
+  assert.equal(handoff.stats.review_items, 3);
+  assert.equal(handoff.stats.included, 2);
+  assert.equal(handoff.stats.needs_review, 1);
+  assert.equal(handoff.stats.excluded_items, 1);
+  assert.equal(handoff.stats.duplicates, 0);
+  assert.equal(handoff.stats.invalid_candidates, 0);
+  assert.equal(handoff.review_packet.kind, "official_blog_review_packet");
+  assert.equal(handoff.ai_review_contract.review_basis, "title_and_opening_preview_only");
+  assert.equal(handoff.prompt.review_basis, "title_and_opening_preview_only");
+  assert(handoff.prompt.instructions.some((instruction) => instruction.includes("title_original") && instruction.includes("opening_preview")));
+  assert.equal(handoff.decision_template.length, 3);
+  assert(handoff.decision_template.every((entry) => entry.intake_id));
+  assert(handoff.decision_template.every((entry) => entry.decision === ""));
+  assert(handoff.decision_template.every((entry) => entry.rationale === ""));
+  assert(handoff.decision_template.every((entry) => entry.confidence === null));
+  assert.equal(
+    handoff.decision_template.find((entry) => entry.normalized_url === normalizeOfficialBlogUrl(fixture.ai_decisions[2].canonical_url))?.deterministic_decision,
+    "needs_review"
+  );
+  assert.equal(
+    handoff.decision_template.find((entry) => entry.normalized_url === normalizeOfficialBlogUrl(fixture.ai_decisions[2].canonical_url))?.decision,
+    ""
+  );
+  assert.equal(Object.hasOwn(handoff, "source_audit"), false);
+  assert.equal(Object.hasOwn(handoff, "candidate_pool"), false);
+
+  const handoffJson = JSON.stringify(handoff);
+  for (const marker of fixture.forbidden_markers) {
+    assert.equal(handoffJson.includes(marker), false, `${marker} must stay outside AI review handoff`);
+  }
+  for (const laterArtifact of [
+    "official_blog_review_decisions",
+    "official_blog_authoring_brief",
+    "official_blog_reviewed_authoring",
+    "official_blog_knowledge_drafts",
+    "records_planned",
+    "records_written",
+    "raw_transcript"
+  ]) {
+    assert.equal(handoffJson.includes(laterArtifact), false, `${laterArtifact} must not appear before AI decision checkpoint`);
+  }
+});
+
+test("official blog AI review handoff sanitizes embedded packet before AI handoff", async () => {
+  const fixtureDir = path.join(rootDir, "tests", "fixtures", "official-blog-runbook-replay");
+  const fixture = JSON.parse(await fs.readFile(path.join(fixtureDir, "replay.json"), "utf8"));
+  const feeds = await Promise.all(fixture.feeds.map(async (feed) => ({
+    company: feed.company,
+    source_label: feed.source_label,
+    feed_text: await fs.readFile(path.join(fixtureDir, feed.file), "utf8")
+  })));
+  const session = createOfficialBlogReviewSession({ feeds }, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  const pollutedPacket = JSON.parse(JSON.stringify(session.review_packet));
+  pollutedPacket.source_audit = { local_path: "C:\\Users\\Admin\\private-source-audit.json" };
+  pollutedPacket.candidate_pool = [{ body: "FULL BODY MUST NOT LEAK" }];
+  pollutedPacket.raw_transcript = "RAW TRANSCRIPT MUST NOT LEAK";
+  pollutedPacket.body = "PACKET BODY MUST NOT LEAK";
+  pollutedPacket.ai_review_contract.extra_private_payload = "PRIVATE CONTRACT PAYLOAD MUST NOT LEAK";
+  pollutedPacket.review_items[0].body = "ITEM BODY MUST NOT LEAK";
+  pollutedPacket.review_items[0].full_article_body = "FULL ARTICLE BODY MUST NOT LEAK";
+  pollutedPacket.review_items[0].source_audit = { request_id: "PRIVATE AUDIT MUST NOT LEAK" };
+  pollutedPacket.review_items[0].candidate_pool = [{ title: "PRIVATE CANDIDATE MUST NOT LEAK" }];
+  pollutedPacket.excluded_items[0].raw_transcript = "EXCLUDED RAW TRANSCRIPT MUST NOT LEAK";
+
+  const handoff = createOfficialBlogAiReviewHandoff(pollutedPacket, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+
+  assert.equal(handoff.review_packet.kind, "official_blog_review_packet");
+  assert.equal(handoff.review_packet.review_items.length, 3);
+  assert.equal(handoff.review_packet.excluded_items.length, 1);
+  assert.equal(Object.hasOwn(handoff.review_packet, "source_audit"), false);
+  assert.equal(Object.hasOwn(handoff.review_packet, "candidate_pool"), false);
+  assert.equal(Object.hasOwn(handoff.review_packet, "raw_transcript"), false);
+  assert.equal(Object.hasOwn(handoff.review_packet, "body"), false);
+  assert.equal(Object.hasOwn(handoff.review_packet.ai_review_contract, "extra_private_payload"), false);
+  assert.equal(Object.hasOwn(handoff.review_packet.review_items[0], "body"), false);
+  assert.equal(Object.hasOwn(handoff.review_packet.review_items[0], "full_article_body"), false);
+  assert.equal(Object.hasOwn(handoff.review_packet.review_items[0], "source_audit"), false);
+  assert.equal(Object.hasOwn(handoff.review_packet.review_items[0], "candidate_pool"), false);
+  assert.equal(Object.hasOwn(handoff.review_packet.excluded_items[0], "raw_transcript"), false);
+
+  const handoffJson = JSON.stringify(handoff);
+  for (const marker of [
+    "FULL BODY MUST NOT LEAK",
+    "RAW TRANSCRIPT MUST NOT LEAK",
+    "PACKET BODY MUST NOT LEAK",
+    "PRIVATE CONTRACT PAYLOAD MUST NOT LEAK",
+    "ITEM BODY MUST NOT LEAK",
+    "FULL ARTICLE BODY MUST NOT LEAK",
+    "PRIVATE AUDIT MUST NOT LEAK",
+    "PRIVATE CANDIDATE MUST NOT LEAK",
+    "EXCLUDED RAW TRANSCRIPT MUST NOT LEAK"
+  ]) {
+    assert.equal(handoffJson.includes(marker), false, `${marker} must stay outside AI review handoff`);
+  }
+});
+
 test("official blog workflow runbook is executable and safety-backed", async () => {
   const runbookPath = path.join(rootDir, "tasks", "official-blog-workflow-runbook.md");
   const planPath = path.join(rootDir, "docs", "official-blog-knowledge-plan.md");
@@ -1988,6 +2112,7 @@ test("official blog workflow runbook is executable and safety-backed", async () 
     "official-blog:parse-feed",
     "official-blog:intake",
     "official-blog:review-packet",
+    "official-blog:review-handoff",
     "official-blog:review-decisions",
     "official-blog:authoring-brief",
     "official-blog:reviewed-authoring",
@@ -2006,6 +2131,7 @@ test("official blog workflow runbook is executable and safety-backed", async () 
     "must not read full article text for first-pass admission",
     "review-session manifest",
     "session.review_packet",
+    "handoff.review_packet",
     "new products",
     "new models",
     "harness engineering",
@@ -2025,6 +2151,7 @@ test("official blog workflow runbook is executable and safety-backed", async () 
     "official_blog_preview_feed",
     "official_blog_intake_queue",
     "official_blog_review_packet",
+    "official_blog_ai_review_handoff",
     "official_blog_review_decisions",
     "official_blog_authoring_brief",
     "official_blog_reviewed_authoring",

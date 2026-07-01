@@ -76,7 +76,7 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected artifact kind: `official_blog_review_session` under `session`. This artifact contains `preview_feeds`, `combined_preview_feed`, `intake_queue`, and `review_packet`. It stops before AI decisions, manual `needs_review` resolution, human authoring, dry-run, and curated record writes. It must not contain `official_blog_review_decisions`, `official_blog_authoring_brief`, `official_blog_reviewed_authoring`, `official_blog_knowledge_drafts`, `records_planned`, or `records_written`.
 
-   The next step may use `<internal-dir>/03-review-session.json` directly as `--packet`; the CLI reads `session.review_packet` from the review-session artifact.
+   The next step may use `<internal-dir>/03-review-session.json` directly as `--input` for the AI review handoff; the CLI reads `session.review_packet` from the review-session artifact.
 
 3. Split audit path: parse feed or exported source input.
 
@@ -102,15 +102,23 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected artifact kind: `official_blog_review_packet`. The packet gives AI only the preview-safe material and the admission policy.
 
-6. Normalize AI review decisions.
+6. Create the AI review handoff prompt and blank decision template.
 
    ```powershell
-   node src/cli.js official-blog:review-decisions --packet <internal-dir>/03-review-session.json --input <internal-dir>/04-ai-decisions.json --output <internal-dir>/05-review-decisions.json --date <YYYY-MM-DD>
+   node src/cli.js official-blog:review-handoff --input <internal-dir>/03-review-session.json --output <internal-dir>/04-review-handoff.json --date <YYYY-MM-DD>
    ```
 
-   Expected artifact kind: `official_blog_review_decisions`. This step requires a separate AI decisions file and must not auto-promote deterministic `needs_review` items. If you used the split audit path, pass `<internal-dir>/03-review-packet.json` as `--packet` instead.
+   Expected artifact kind: `official_blog_ai_review_handoff` under `handoff`. This artifact contains the preview-safe prompt, the embedded review packet, and a blank `decision_template`. It does not call AI, does not normalize decisions, and does not fill any decision/rationale/confidence fields. If you used the split audit path, pass `<internal-dir>/03-review-packet.json` as `--input` instead.
 
-7. Create the human authoring brief.
+7. Normalize AI review decisions.
+
+   ```powershell
+   node src/cli.js official-blog:review-decisions --packet <internal-dir>/04-review-handoff.json --input <internal-dir>/04-ai-decisions.json --output <internal-dir>/05-review-decisions.json --date <YYYY-MM-DD>
+   ```
+
+   Expected artifact kind: `official_blog_review_decisions`. This step requires a separate AI decisions file and must not auto-promote deterministic `needs_review` items. `official-blog:review-decisions` reads `handoff.review_packet` from the handoff artifact but never uses the blank template as a completed decision file.
+
+8. Create the human authoring brief.
 
    ```powershell
    node src/cli.js official-blog:authoring-brief --input <internal-dir>/05-review-decisions.json --output <internal-dir>/06-authoring-brief.json --date <YYYY-MM-DD>
@@ -118,7 +126,7 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected artifact kind: `official_blog_authoring_brief`. Only accepted decisions become human authoring templates; manual-review items stay separate.
 
-8. Complete the human fields, then validate reviewed authoring.
+9. Complete the human fields, then validate reviewed authoring.
 
    ```powershell
    node src/cli.js official-blog:reviewed-authoring --input <internal-dir>/06-authoring-brief.completed.json --output <internal-dir>/07-reviewed-authoring.json --date <YYYY-MM-DD>
@@ -126,7 +134,7 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected artifact kind: `official_blog_reviewed_authoring`. The completed template supplies the Chinese digest fields; the command validates required fields and keeps manual-review items out of promotion.
 
-9. Validate final record writes without mutation.
+10. Validate final record writes without mutation.
 
    ```powershell
    node src/cli.js official-blog:author-records --dry-run --input <internal-dir>/07-reviewed-authoring.json --output-dir knowledge/official-blogs --output <internal-dir>/08-author-records-dry-run.json
@@ -134,7 +142,7 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected output includes `official_blog_knowledge_drafts`, `records_planned`, and `records_written: []`. Dry-run does not create directories or record files. Review the planned ids, companies, canonical URLs, topics, related ids, and output paths before writing anything to the curated knowledge directory.
 
-10. Write curated records only after dry-run review.
+11. Write curated records only after dry-run review.
 
    Step marker: `official-blog:author-records --output-dir knowledge/official-blogs`.
 
@@ -142,9 +150,9 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
    node src/cli.js official-blog:author-records --input <internal-dir>/07-reviewed-authoring.json --output-dir knowledge/official-blogs --output <internal-dir>/09-author-records-written.json
    ```
 
-   This is the only step that writes curated record JSON under `knowledge/official-blogs`. Do not run it until step 9 has been reviewed.
+   This is the only step that writes curated record JSON under `knowledge/official-blogs`. Do not run it until step 10 has been reviewed.
 
-11. Build and validate the public projection separately.
+12. Build and validate the public projection separately.
 
    ```powershell
    node --test --test-name-pattern "official blog runbook replay fixtures" tests/official-blog-knowledge.test.js
