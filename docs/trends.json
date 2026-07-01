@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-29T18:42:27.633Z",
+  "generated_at": "2026-07-01T02:30:01.705Z",
   "window_days": 7,
   "source": {
-    "report_count": 41,
-    "date_from": "2026-06-24",
-    "date_to": "2026-06-30"
+    "report_count": 42,
+    "date_from": "2026-06-25",
+    "date_to": "2026-07-01"
   },
   "thresholds": {
     "watching": {
@@ -33,7 +33,7 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 18,
+      "occurrences": 19,
       "active_days": 6,
       "sections": [
         "builder_observations",
@@ -45,20 +45,20 @@
         "OpenAI"
       ],
       "dates": [
-        "2026-06-24",
         "2026-06-25",
         "2026-06-26",
         "2026-06-28",
         "2026-06-29",
-        "2026-06-30"
+        "2026-06-30",
+        "2026-07-01"
       ],
       "related_reports": [
-        "2026-06-24",
         "2026-06-25",
         "2026-06-26",
         "2026-06-28",
         "2026-06-29",
-        "2026-06-30"
+        "2026-06-30",
+        "2026-07-01"
       ]
     },
     {
@@ -77,27 +77,27 @@
         "Google"
       ],
       "dates": [
-        "2026-06-24",
         "2026-06-25",
         "2026-06-26",
         "2026-06-28",
         "2026-06-29",
-        "2026-06-30"
+        "2026-06-30",
+        "2026-07-01"
       ],
       "related_reports": [
-        "2026-06-24",
         "2026-06-25",
         "2026-06-26",
         "2026-06-28",
         "2026-06-29",
-        "2026-06-30"
+        "2026-06-30",
+        "2026-07-01"
       ]
     }
   ],
   "candidate_topics": [
     {
       "term": "this",
-      "occurrences": 193,
+      "occurrences": 194,
       "active_days": 6,
       "display": false
     },
@@ -181,37 +181,37 @@
     },
     {
       "term": "readme",
-      "occurrences": 178,
+      "occurrences": 179,
       "active_days": 6,
       "display": false
     },
     {
       "term": "再判断是否适合团队试用或接入",
-      "occurrences": 177,
+      "occurrences": 178,
       "active_days": 6,
       "display": false
     },
     {
       "term": "release",
-      "occurrences": 155,
+      "occurrences": 158,
       "active_days": 6,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在",
-      "occurrences": 154,
+      "occurrences": 157,
       "active_days": 6,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在 github",
-      "occurrences": 154,
+      "occurrences": 157,
       "active_days": 6,
       "display": false
     },
     {
       "term": "是否有",
-      "occurrences": 154,
+      "occurrences": 157,
       "active_days": 6,
       "display": false
     }
@@ -1818,6 +1818,49 @@
       "github_trending": [
         {
           "index": 1,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 13x/6d",
+              "window_days": 7,
+              "occurrences": 13,
+              "active_days": 6,
+              "entities": [
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "2026-07-01": {
+      "main_items": [
+        {
+          "index": 6,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 19x/6d",
+              "window_days": 7,
+              "occurrences": 19,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "OpenAI"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": [
+        {
+          "index": 3,
           "tags": [
             {
               "topic_id": "mcp",
