@@ -6717,6 +6717,450 @@ test("official blog review-packet CLI refuses public output paths", async () => 
   }
 });
 
+test("official blog review-decisions CLI writes clean internal AI review decisions", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-decisions-"));
+  const packetPath = path.join(tmp, "official-blog-review-packet.json");
+  const inputPath = path.join(tmp, "official-blog-ai-decisions.json");
+  const outputPath = path.join(tmp, "official-blog-review-decisions.json");
+  await fs.writeFile(packetPath, `${JSON.stringify({
+    kind: "official_blog_review_packet",
+    visibility: "internal",
+    report_date: "2026-07-01",
+    generated_at: "2026-07-01T08:00:00.000Z",
+    admission_policy: {
+      version: "official-blog-admission-v1",
+      include_criteria: [
+        { id: "new_model" },
+        { id: "agent_workflow" }
+      ],
+      source_audit: { leaked_marker: "packet policy metadata must not leak" }
+    },
+    ai_review_contract: {
+      review_basis: "title_and_opening_preview_only",
+      raw_transcript: "packet contract transcript must not leak"
+    },
+    review_items: [
+      {
+        intake_id: "openai-examplemodel-8",
+        company: "openai",
+        company_label: "OpenAI",
+        canonical_url: "https://openai.com/index/examplemodel-8",
+        normalized_url: "https://openai.com/index/examplemodel-8",
+        published_at: "2026-07-01",
+        title_original: "Introducing ExampleModel 8",
+        opening_preview: "This new model release explains evals, safety mitigations, and developer integration guidance.",
+        opening_paragraph_count: 1,
+        deterministic_triage: {
+          decision: "include",
+          reason: "new model",
+          matched_criteria: ["new_model"]
+        }
+      },
+      {
+        intake_id: "anthropic-examplebank-workflow",
+        company: "anthropic",
+        company_label: "Anthropic",
+        canonical_url: "https://www.anthropic.com/news/examplebank-workflow",
+        normalized_url: "https://www.anthropic.com/news/examplebank-workflow",
+        published_at: "2026-07-01",
+        title_original: "How ExampleBank built a Claude support workflow",
+        opening_preview: "The preview describes routing architecture, permissions, eval harnesses, and observability.",
+        opening_paragraph_count: 1,
+        deterministic_triage: {
+          decision: "needs_review",
+          reason: "customer story with implementation hints",
+          matched_criteria: ["agent_workflow"]
+        }
+      }
+    ],
+    excluded_items: [],
+    duplicates: [],
+    invalid_candidates: []
+  }, null, 2)}\n`, "utf8");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    decisions: [
+      {
+        intake_id: "openai-examplemodel-8",
+        decision: "include",
+        matched_criteria: ["new_model"],
+        suggested_topics: ["model_release_context"],
+        rationale: "The preview shows a model release with reusable eval and integration detail.",
+        confidence: 0.92,
+        body: "This full body must not leak.",
+        notes: "raw transcript stored in notes must not leak"
+      },
+      {
+        intake_id: "anthropic-examplebank-workflow",
+        decision: "include",
+        matched_criteria: ["agent_workflow"],
+        suggested_topics: ["agent_workflow"],
+        rationale: "Customer story hints at implementation detail but still requires manual reading.",
+        confidence: "high",
+        raw_transcript: "This raw transcript must not leak."
+      }
+    ],
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-decisions",
+    "--packet",
+    packetPath,
+    "--input",
+    inputPath,
+    "--output",
+    outputPath,
+    "--date",
+    "2026-07-01",
+    "--generated-at",
+    "2026-07-01T08:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.review_decisions.kind, "official_blog_review_decisions");
+  assert.equal(parsed.review_decisions.visibility, "internal");
+  assert.equal(parsed.review_decisions.stats.accepted_for_authoring, 1);
+  assert.equal(parsed.review_decisions.stats.needs_manual_review, 1);
+  assert.equal(parsed.review_decisions.accepted_for_authoring[0].intake_id, "openai-examplemodel-8");
+  assert.equal(parsed.review_decisions.needs_manual_review[0].intake_id, "anthropic-examplebank-workflow");
+  assert.equal(JSON.stringify(parsed.review_decisions).includes("This full body must not leak"), false);
+  assert.equal(JSON.stringify(parsed.review_decisions).includes("raw transcript"), false);
+  assert.equal(JSON.stringify(parsed.review_decisions).includes("raw transcript stored in notes"), false);
+  assert.equal(JSON.stringify(parsed.review_decisions).includes("should_not_leak"), false);
+  assert.equal(JSON.stringify(parsed.review_decisions).includes("packet policy metadata must not leak"), false);
+  assert.equal(JSON.stringify(parsed.review_decisions).includes("packet contract transcript must not leak"), false);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
+test("official blog review-decisions CLI always uses the explicit packet path", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-decisions-packet-source-"));
+  const packetPath = path.join(tmp, "official-blog-review-packet.json");
+  const inputPath = path.join(tmp, "official-blog-ai-decisions.json");
+  const outputPath = path.join(tmp, "official-blog-review-decisions.json");
+  await fs.writeFile(packetPath, `${JSON.stringify({
+    kind: "official_blog_review_packet",
+    visibility: "internal",
+    admission_policy: {
+      version: "official-blog-admission-v1",
+      include_criteria: [{ id: "new_model" }]
+    },
+    review_items: [
+      {
+        intake_id: "packet-path-intake",
+        company: "openai",
+        canonical_url: "https://openai.com/index/packet-path-intake",
+        title_original: "Introducing packet path model",
+        opening_preview: "This new model release includes evals and deployment guidance.",
+        deterministic_triage: {
+          decision: "include",
+          matched_criteria: ["new_model"]
+        }
+      }
+    ]
+  })}\n`, "utf8");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    review_packet: {
+      kind: "official_blog_review_packet",
+      visibility: "internal",
+      admission_policy: {
+        version: "official-blog-admission-v1",
+        include_criteria: [{ id: "new_model" }]
+      },
+      review_items: [
+        {
+          intake_id: "embedded-spoof-intake",
+          company: "openai",
+          canonical_url: "https://openai.com/index/spoofed-intake",
+          title_original: "Spoofed embedded packet",
+          opening_preview: "This embedded packet must not be used by the CLI.",
+          deterministic_triage: {
+            decision: "include",
+            matched_criteria: ["new_model"]
+          }
+        }
+      ]
+    },
+    decisions: [
+      {
+        intake_id: "embedded-spoof-intake",
+        decision: "include",
+        matched_criteria: ["new_model"],
+        rationale: "This should be unknown because --packet must win.",
+        confidence: 0.9
+      }
+    ]
+  })}\n`, "utf8");
+
+  await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-decisions",
+    "--packet",
+    packetPath,
+    "--input",
+    inputPath,
+    "--output",
+    outputPath
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  const parsed = JSON.parse(await fs.readFile(outputPath, "utf8"));
+  assert.equal(parsed.review_decisions.stats.accepted_for_authoring, 0);
+  assert.equal(parsed.review_decisions.stats.invalid_decisions, 2);
+  assert(parsed.review_decisions.invalid_decisions.some((item) => item.reason.includes("unknown intake_id: embedded-spoof-intake")));
+  assert(parsed.review_decisions.invalid_decisions.some((item) => item.reason.includes("missing AI decision for intake_id: packet-path-intake")));
+  assert.equal(JSON.stringify(parsed.review_decisions).includes("Spoofed embedded packet"), false);
+});
+
+test("official blog review-decisions CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-decisions-public-"));
+  const packetPath = path.join(tmp, "official-blog-review-packet.json");
+  const inputPath = path.join(tmp, "official-blog-ai-decisions.json");
+  const publicOutputPaths = [
+    path.join(tmp, "docs", "data", "official-blog-review-decisions.json"),
+    path.join(tmp, "docs", "official-blogs", "review-decisions.json"),
+    path.join(tmp, "docs", "official-blog-review-decisions.html"),
+    path.join(tmp, "docs", "reports", "official-blog-review-decisions.html")
+  ];
+  await fs.writeFile(packetPath, `${JSON.stringify({
+    kind: "official_blog_review_packet",
+    visibility: "internal",
+    admission_policy: {
+      version: "official-blog-admission-v1",
+      include_criteria: [{ id: "new_model" }]
+    },
+    review_items: [
+      {
+        intake_id: "openai-examplemodel-8",
+        company: "openai",
+        canonical_url: "https://openai.com/index/examplemodel-8",
+        title_original: "Introducing ExampleModel 8",
+        opening_preview: "This new model release explains evals and safety mitigations.",
+        deterministic_triage: {
+          decision: "include",
+          matched_criteria: ["new_model"]
+        }
+      }
+    ]
+  })}\n`, "utf8");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    decisions: [
+      {
+        intake_id: "openai-examplemodel-8",
+        decision: "include",
+        matched_criteria: ["new_model"],
+        rationale: "Include this model release.",
+        confidence: 0.9
+      }
+    ]
+  })}\n`, "utf8");
+
+  for (const publicOutputPath of publicOutputPaths) {
+    await assert.rejects(
+      () => execFileAsync(process.execPath, [
+        path.join(rootDir, "src/cli.js"),
+        "official-blog:review-decisions",
+        "--packet",
+        packetPath,
+        "--input",
+        inputPath,
+        "--output",
+        publicOutputPath,
+        "--repo-root",
+        tmp
+      ], {
+        cwd: rootDir,
+        maxBuffer: 1024 * 1024
+      }),
+      (error) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stdout, /official_blog_review_decisions_public_output_forbidden/);
+        return true;
+      }
+    );
+    await assert.rejects(
+      () => fs.stat(publicOutputPath),
+      /ENOENT/
+    );
+  }
+});
+
+test("official blog authoring-brief CLI writes clean internal authoring packet", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-authoring-brief-"));
+  const inputPath = path.join(tmp, "official-blog-review-decisions.json");
+  const relationsPath = path.join(tmp, "official-blog-relations.json");
+  const outputPath = path.join(tmp, "official-blog-authoring-brief.json");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    review_decisions: {
+      kind: "official_blog_review_decisions",
+      visibility: "internal",
+      report_date: "2026-07-01",
+      admission_policy: {
+        version: "official-blog-admission-v1",
+        include_criteria: [{ id: "new_model" }]
+      },
+      accepted_for_authoring: [
+        {
+          intake_id: "openai-examplemodel-brief",
+          company: "openai",
+          company_label: "OpenAI",
+          canonical_url: "https://openai.com/index/examplemodel-brief",
+          normalized_url: "https://openai.com/index/examplemodel-brief",
+          published_at: "2026-07-01",
+          title_original: "Introducing ExampleModel Brief",
+          opening_preview: "This new model release explains evals and safety mitigations.",
+          deterministic_triage: {
+            decision: "include",
+            reason: "new model",
+            matched_criteria: ["new_model"]
+          },
+          ai_review: {
+            decision: "include",
+            matched_criteria: ["new_model"],
+            suggested_topics: ["model_release_context"],
+            rationale: "Model release with reusable eval detail.",
+            confidence: 0.91
+          },
+          final_decision: "include",
+          final_action: "ready_for_manual_authoring",
+          body: "This full body must not leak."
+        }
+      ],
+      needs_manual_review: [
+        {
+          intake_id: "anthropic-customer-brief",
+          company: "anthropic",
+          canonical_url: "https://www.anthropic.com/news/customer-brief",
+          normalized_url: "https://www.anthropic.com/news/customer-brief",
+          published_at: "2026-07-01",
+          title_original: "How a customer built with Claude",
+          opening_preview: "Customer story with architecture hints.",
+          deterministic_triage: {
+            decision: "needs_review",
+            matched_criteria: ["agent_workflow"]
+          },
+          ai_review: {
+            decision: "include",
+            matched_criteria: ["agent_workflow"],
+            rationale: "Still needs manual reading.",
+            raw_transcript: "This raw transcript must not leak."
+          },
+          final_decision: "needs_review",
+          final_action: "manual_review_required"
+        }
+      ],
+      excluded: [],
+      invalid_decisions: []
+    },
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, null, 2)}\n`, "utf8");
+  await fs.writeFile(relationsPath, `${JSON.stringify({
+    relationship_suggestions: {
+      kind: "official_blog_relationship_suggestions",
+      suggestions: [
+        {
+          canonical_url: "https://openai.com/index/examplemodel-brief",
+          normalized_url: "https://openai.com/index/examplemodel-brief",
+          suggested_related_blog_ids: [
+            { id: "openai-new-tools-building-agents-2025-03-11", score: 12 }
+          ]
+        }
+      ]
+    }
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:authoring-brief",
+    "--input",
+    inputPath,
+    "--relations",
+    relationsPath,
+    "--output",
+    outputPath,
+    "--date",
+    "2026-07-01",
+    "--generated-at",
+    "2026-07-01T08:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.authoring_brief.kind, "official_blog_authoring_brief");
+  assert.equal(parsed.authoring_brief.visibility, "internal");
+  assert.equal(parsed.authoring_brief.stats.authoring_items, 1);
+  assert.equal(parsed.authoring_brief.stats.manual_review_required, 1);
+  assert.equal(parsed.authoring_brief.authoring_items[0].reviewed_entry_template.review_decision, "include");
+  assert.equal(parsed.authoring_brief.authoring_items[0].reviewed_entry_template.title_zh, "");
+  assert.deepEqual(parsed.authoring_brief.authoring_items[0].suggested_fields.related_blog_ids, ["openai-new-tools-building-agents-2025-03-11"]);
+  assert.equal(JSON.stringify(parsed.authoring_brief).includes("This full body must not leak"), false);
+  assert.equal(JSON.stringify(parsed.authoring_brief).includes("raw transcript"), false);
+  assert.equal(JSON.stringify(parsed.authoring_brief).includes("should_not_leak"), false);
+  assert.equal(JSON.stringify(parsed.authoring_brief).includes("candidate_pool"), false);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
+test("official blog authoring-brief CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-authoring-brief-public-"));
+  const inputPath = path.join(tmp, "official-blog-review-decisions.json");
+  const publicOutputPaths = [
+    path.join(tmp, "docs", "data", "official-blog-authoring-brief.json"),
+    path.join(tmp, "docs", "official-blogs", "authoring-brief.json"),
+    path.join(tmp, "docs", "official-blog-authoring-brief.html"),
+    path.join(tmp, "docs", "reports", "official-blog-authoring-brief.html")
+  ];
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    kind: "official_blog_review_decisions",
+    visibility: "internal",
+    accepted_for_authoring: [],
+    needs_manual_review: [],
+    excluded: [],
+    invalid_decisions: []
+  })}\n`, "utf8");
+
+  for (const publicOutputPath of publicOutputPaths) {
+    await assert.rejects(
+      () => execFileAsync(process.execPath, [
+        path.join(rootDir, "src/cli.js"),
+        "official-blog:authoring-brief",
+        "--input",
+        inputPath,
+        "--output",
+        publicOutputPath,
+        "--repo-root",
+        tmp
+      ], {
+        cwd: rootDir,
+        maxBuffer: 1024 * 1024
+      }),
+      (error) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stdout, /official_blog_authoring_brief_public_output_forbidden/);
+        return true;
+      }
+    );
+    await assert.rejects(
+      () => fs.stat(publicOutputPath),
+      /ENOENT/
+    );
+  }
+});
+
 test("publish:verify-pages emits structured retryable misses without nonzero exit", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-pages-verify-"));
   const preloadPath = path.join(tmp, "fake-fetch.mjs");

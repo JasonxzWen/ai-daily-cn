@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-review-decisions-stage13",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog review decisions stage 13",
+  "slug": "official-blog-review-decisions-stage13",
+  "status": "completed",
+  "summary": "This iteration adds an internal AI review decision normalizer for OpenAI and Anthropic official-blog review packets. It validates AI responses against packet intake ids and the admission policy, keeps raw AI output and queue internals out of the artifact, and ensures deterministic needs_review customer or partnership stories cannot be auto-promoted to authoring without manual review.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog review decisions|official-blog:review-decisions\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "AI review output needs its own normalized boundary before any authoring step.",
+      "evidence": "Stage 13 adds `official_blog_review_decisions` with accepted, manual-review, excluded, and invalid decision buckets keyed by packet `intake_id`.",
+      "scope": "official_blog_review_decisions",
+      "persistence": "implemented",
+      "recommended_action": "Use the decision artifact, not raw AI output, when moving official-blog candidates toward manual authoring."
+    },
+    {
+      "lesson": "Customer or partnership stories with implementation hints still need manual reading.",
+      "evidence": "Deterministic `needs_review` packet items remain under `needs_manual_review` even when the AI returns `include`.",
+      "scope": "official_blog_admission_review",
+      "persistence": "implemented",
+      "recommended_action": "Do not turn customer or partnership stories into curated records until a human confirms reusable implementation value beyond the preview."
+    },
+    {
+      "lesson": "Decision artifacts must not preserve raw AI transcripts or private source context.",
+      "evidence": "Tests prove raw body text, raw transcript text, source audit, candidate pool fields, and public-rendering internals do not appear in decision payloads.",
+      "scope": "official_blog_public_minimization",
+      "persistence": "implemented",
+      "recommended_action": "Keep decision output compact and internal; public pages should only consume reviewed curated records."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Review packets could be sent to AI, but there was no safe, schema-like return boundary for AI decisions before authoring.",
+      "evidence": "Stage 13 adds `createOfficialBlogReviewDecisions` and `official-blog:review-decisions`, plus tests for auto-promotion blocking, duplicate/unknown/missing decisions, policy-invalid criteria, and public output guards.",
+      "module": "src/official-blog-knowledge.js, src/cli.js, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Require all AI review responses to pass through the review-decision normalizer before any manual translation or curated-record drafting.",
+      "expected_benefit": "The official-blog workflow can accept high-value model/product/engineering posts while preventing low-signal company news and borderline customer stories from bypassing review.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through pure function and CLI coverage, with public output guards and internal payload sanitization.",
+      "ledger_links": [
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-daily-not-machine-log",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog review decisions normalize AI output without auto-promoting manual review",
+        "official blog review decisions reject policy-invalid criteria and missing decisions",
+        "official blog review-decisions CLI writes clean internal AI review decisions",
+        "official blog review-decisions CLI refuses public output paths"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-main-stream-blacklist-refill",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add a manual authoring handoff schema that turns accepted decision items into translation/summary tasks without copying AI decision internals into curated records.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Wire live official-blog discovery to feed preview packets and decision artifacts once the source-fetch stage is implemented.",
+      "owner": "project"
+    }
+  ]
+}
