@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-workflow-runbook-stage17",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog workflow runbook stage 17",
+  "slug": "official-blog-workflow-runbook-stage17",
+  "status": "completed",
+  "summary": "This iteration adds an operator runbook for the official-blog knowledge workflow. It sequences preview feed parsing, preview-only intake, AI review packet creation, AI decision normalization, human authoring, reviewed-authoring validation, author-record dry-run, final curated-record writes, and separate public projection validation.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog workflow runbook\" tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The official-blog ingestion path needs an explicit operator sequence after the CLI stages exist.",
+      "evidence": "Stage 17 adds `tasks/official-blog-workflow-runbook.md` with ordered commands from `official-blog:parse-feed` through final `official-blog:author-records` writes.",
+      "scope": "official_blog_workflow",
+      "persistence": "implemented",
+      "recommended_action": "Use the runbook when adding new OpenAI or Anthropic official-blog records."
+    },
+    {
+      "lesson": "The user-approved admission standard should remain visible at operation time, not only in code tests.",
+      "evidence": "The runbook documents include/exclude rules for product, model, engineering-practice, harness, and multi-agent workflow posts while excluding ordinary partnerships and customer adoption news.",
+      "scope": "official_blog_admission",
+      "persistence": "implemented",
+      "recommended_action": "Review every new candidate against the runbook admission standard before authoring."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The workflow still relies on manually prepared feed/export and AI decision artifacts.",
+      "evidence": "The runbook intentionally sequences local CLI steps but does not add a single orchestrating command.",
+      "module": "tasks/official-blog-workflow-runbook.md",
+      "suggestion": "Add fixture-backed examples for one OpenAI and one Anthropic end-to-end run before introducing orchestration.",
+      "expected_benefit": "Examples will make the runbook easier to execute and give future orchestration a stable contract.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Future project iteration with tests that replay local fixtures.",
+      "ledger_links": [
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog workflow runbook is executable and safety-backed"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add local fixture-backed OpenAI and Anthropic examples that exercise the complete runbook without live network access.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "After fixture examples are stable, consider a single orchestrator command that calls the runbook steps with explicit checkpoints.",
+      "owner": "project"
+    }
+  ]
+}

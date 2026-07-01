@@ -1766,3 +1766,60 @@ test("repository seed knowledge includes curated OpenAI and Anthropic records", 
   assert(index.records.some((record) => record.topics.includes("harness_engineering")));
   assert(index.records.some((record) => record.topics.includes("structured_outputs")));
 });
+
+test("official blog workflow runbook is executable and safety-backed", async () => {
+  const runbookPath = path.join(rootDir, "tasks", "official-blog-workflow-runbook.md");
+  const planPath = path.join(rootDir, "docs", "official-blog-knowledge-plan.md");
+  const runbook = await fs.readFile(runbookPath, "utf8");
+  const plan = await fs.readFile(planPath, "utf8");
+
+  assert(plan.includes("tasks/official-blog-workflow-runbook.md"));
+
+  const orderedCommands = [
+    "official-blog:parse-feed",
+    "official-blog:intake",
+    "official-blog:review-packet",
+    "official-blog:review-decisions",
+    "official-blog:authoring-brief",
+    "official-blog:reviewed-authoring",
+    "official-blog:author-records --dry-run",
+    "official-blog:author-records --output-dir knowledge/official-blogs"
+  ];
+  let previousIndex = -1;
+  for (const command of orderedCommands) {
+    const nextIndex = runbook.indexOf(command);
+    assert(nextIndex > previousIndex, `${command} must appear in workflow order`);
+    previousIndex = nextIndex;
+  }
+
+  for (const requiredText of [
+    "title + opening preview",
+    "must not read full article text for first-pass admission",
+    "new products",
+    "new models",
+    "harness engineering",
+    "multi-agent workflows",
+    "ordinary partnerships",
+    "customer adoption",
+    "needs_review",
+    "human resolution checkpoint",
+    "full article",
+    "explicit `include` or `exclude` decision",
+    "records_planned",
+    "records_written: []",
+    "does not create directories or record files",
+    "docs/data",
+    "docs/official-blogs",
+    "public .html",
+    "official_blog_preview_feed",
+    "official_blog_intake_queue",
+    "official_blog_review_packet",
+    "official_blog_review_decisions",
+    "official_blog_authoring_brief",
+    "official_blog_reviewed_authoring",
+    "official_blog_knowledge_drafts",
+    "npm run validate"
+  ]) {
+    assert(runbook.includes(requiredText), `runbook must include ${requiredText}`);
+  }
+});

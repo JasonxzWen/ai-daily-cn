@@ -4,6 +4,8 @@
 
 The official blog knowledge base turns selected OpenAI and Anthropic official posts into durable Chinese digests that can be reused by the homepage, daily reports, and future report-generation context. It is not a company-news archive and it does not publish full article translations.
 
+Operator workflow: `tasks/official-blog-workflow-runbook.md`.
+
 ## Stage 1 Scope
 
 Stage 1 implements only the validated data layer:
