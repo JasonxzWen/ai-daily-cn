@@ -1,11 +1,17 @@
+always respond in 中文
+始终使用中文回复用户。
+
 # AGENTS.md
 
-## Codex Harness
+## Codex / Claude Code Harness
 
 - Treat this repository as the active Codex worktree for AI daily publishing work.
+- `AGENTS.md` and `CLAUDE.md` are the same project contract for Codex and Claude Code; when one changes, update the other in the same change.
 - After creating or switching to a fresh worktree, run `npm run harness:init` to seed local task-state files.
 - Keep task state in `tasks/current-task.md`, `progress.md`, and `session-handoff.md` when work is non-trivial.
-- These task-state files are per-worktree local state seeded from `*.example.md` files and are ignored by Git to avoid merge conflicts.
+- Host-neutral harness state lives under ignored `.harness-hub/state/`, seeded from tracked `.harness-hub/state-templates/`.
+- Context engineering resources live under `.harness-hub/context/`; stable wiki knowledge must not duplicate raw sources, credentials, current task progress, or native agent memory.
+- Loop engineering resources live under `.harness-hub/loop/`; follow the interrupt policy and record auditable loop decisions in `.harness-hub/state/*.jsonl` when such loops are used.
 - Run `node scripts/harness-validate.mjs` before handoff when harness files change.
 - For daily publish runs, follow `tasks/daily-publish-runbook.md`; capture `publish:dry-run` before any real publish.
 
@@ -27,10 +33,6 @@
 - `config/feedback-ledger.json` 是机器可验证 buglist；`docs/feedback-buglist-quick-reference.md` 是开始工作前的人读速查表。
 - 用户确认需要长期生效的问题默认按 P1 处理，必须写入 ledger，并绑定真实存在的 scope 文件、`npm run validate` 覆盖的验证命令和真实测试断言或运行时质量门；否则只能作为本会话建议，不能声称已固化。
 - 后续每次生成、修改、发布或交付，都要把用户曾指出的问题作为自检清单回放；发现新复发风险时，先更新 `Feedback Ledger Review` / `Regression Self-Check`，再交付。
-
-## 语言
-
-始终使用中文回复用户。技术标识符、命令、路径、schema 字段名和 URL 保持原文。
 
 ## 当前仓库边界
 

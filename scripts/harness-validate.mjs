@@ -5,13 +5,43 @@ import path from 'node:path';
 const root = process.cwd();
 const requiredFiles = [
   'AGENTS.md',
+  'CLAUDE.md',
   'feature_list.json',
+  '.harness-hub/.gitignore',
+  '.harness-hub/state-templates/current-task.md',
+  '.harness-hub/state-templates/decisions.md',
+  '.harness-hub/state-templates/progress.md',
+  '.harness-hub/state-templates/session-handoff.md',
+  '.harness-hub/state-templates/loop-runs.jsonl',
+  '.harness-hub/state-templates/interrupt-decisions.jsonl',
+  '.harness-hub/state-templates/capability-events.jsonl',
+  '.harness-hub/loop/policies/interrupt-policy.md',
+  '.harness-hub/loop/policies/action-audit-schema.md',
+  '.harness-hub/loop/evals/interrupt-policy/good-cases.jsonl',
+  '.harness-hub/loop/evals/interrupt-policy/bad-cases.jsonl',
+  '.harness-hub/loop/evals/interrupt-policy/regression-cases.jsonl',
+  '.harness-hub/context/AGENTS.md',
+  '.harness-hub/context/README.md',
+  '.harness-hub/context/llm-wiki-schema.md',
+  '.harness-hub/context/wiki/index.md',
+  '.harness-hub/context/wiki/sources/README.md',
+  '.harness-hub/context/wiki/concepts/README.md',
+  '.harness-hub/context/wiki/topics/README.md',
+  '.harness-hub/context/wiki/people/README.md',
+  '.harness-hub/context/wiki/contradictions.md',
+  '.harness-hub/context/wiki/update-log.md',
+  '.harness-hub/context/wiki/templates/wiki-page.md',
+  '.harness-hub/context/wiki/.obsidian/app.json',
+  '.harness-hub/context/wiki/.obsidian/core-plugins.json',
+  '.harness-hub/context/wiki/.obsidian/graph.json',
   'config/feedback-ledger.json',
   'docs/feedback-buglist-quick-reference.md',
   'progress.example.md',
   'session-handoff.example.md',
   'clean-state-checklist.md',
   'definition-of-done.md',
+  'evaluator-rubric.md',
+  'quality-document.md',
   'tasks/current-task.example.md',
   'tasks/daily-publish-runbook.md',
   'tasks/templates/daily-publish-task.md',
@@ -28,6 +58,13 @@ const requiredLocalStateFiles = [
   'progress.md',
   'session-handoff.md',
   'tasks/current-task.md',
+  '.harness-hub/state/current-task.md',
+  '.harness-hub/state/decisions.md',
+  '.harness-hub/state/progress.md',
+  '.harness-hub/state/session-handoff.md',
+  '.harness-hub/state/loop-runs.jsonl',
+  '.harness-hub/state/interrupt-decisions.jsonl',
+  '.harness-hub/state/capability-events.jsonl',
 ];
 const forbiddenPaths = [
   { path: 'openspec', reason: 'OpenSpec workflow artifacts must be removed from the active repository' },
@@ -39,6 +76,13 @@ const sizeLimits = {
   'progress.md': 16 * 1024,
   'session-handoff.md': 16 * 1024,
   'tasks/current-task.md': 16 * 1024,
+  '.harness-hub/state/decisions.md': 16 * 1024,
+  '.harness-hub/state/progress.md': 16 * 1024,
+  '.harness-hub/state/session-handoff.md': 16 * 1024,
+  '.harness-hub/state/current-task.md': 16 * 1024,
+  '.harness-hub/state/loop-runs.jsonl': 64 * 1024,
+  '.harness-hub/state/interrupt-decisions.jsonl': 64 * 1024,
+  '.harness-hub/state/capability-events.jsonl': 64 * 1024,
 };
 const requiredMarkers = {
   'AGENTS.md': [
@@ -74,6 +118,21 @@ const requiredMarkers = {
     'Retrospective Plan',
     'Handoff Requirements',
   ],
+  '.harness-hub/.gitignore': ['state/', 'reports/'],
+  '.harness-hub/context/AGENTS.md': ['LLM Wiki', 'Raw sources', 'No Redundant Facts', 'human confirmation', 'Contradiction Register'],
+  '.harness-hub/context/README.md': ['Agent Context Pack', 'Raw sources', 'Wiki pages', 'Obsidian', 'Update Flow'],
+  '.harness-hub/context/llm-wiki-schema.md': ['LLM Wiki Schema', 'Raw sources', 'Wiki', 'Stable Knowledge Boundary', 'Update Protocol', 'Contradictions'],
+  '.harness-hub/context/wiki/index.md': ['LLM Wiki Index', 'Raw sources', 'Stable Knowledge Map'],
+  '.harness-hub/context/wiki/contradictions.md': ['Contradiction Register', 'Resolution status', 'Next action'],
+  '.harness-hub/context/wiki/update-log.md': ['Update Log', 'Human confirmation', 'Sources consulted'],
+  '.harness-hub/loop/policies/interrupt-policy.md': ['Interrupt Policy', 'standalone', 'composable', 'loop-participant', 'Continue By Default', 'Interrupt', 'Audit Requirement'],
+  '.harness-hub/loop/policies/action-audit-schema.md': ['Runtime Ledgers', 'loop-runs.jsonl', 'interrupt-decisions.jsonl', 'capability-events.jsonl', 'continue|interrupt'],
+  '.harness-hub/state-templates/decisions.md': ['Active Decisions', 'Resolved Decisions', 'Decision', 'Rationale', 'Status', 'Follow-up'],
+  '.harness-hub/state-templates/progress.md': ['Recent Validation', 'Validation Records', 'Command', 'Status', 'Exit code', 'Runtime Signals', 'Agentic Loop Records', 'Finish Closeout', 'Insight Recommendations'],
+  '.harness-hub/state-templates/session-handoff.md': ['Validation Evidence', 'Validation Records', 'Command', 'Status', 'Exit code', 'Runtime Signals', 'Agentic Loop Records', 'Finish Closeout', 'Insight Recommendations'],
+  '.harness-hub/state-templates/current-task.md': ['Goal', 'Assumptions', 'Non-goals', 'Allowed paths', 'Forbidden paths', 'Acceptance criteria', 'Validation commands', 'P0', 'P1', 'P2', 'Agentic loops', 'Finish closeout', 'Parallel writes', 'Handoff requirements'],
+  'evaluator-rubric.md': ['Correctness', 'Verification', 'Scope discipline', 'Runtime reliability', 'Agentic loops', 'Finish closeout', 'Insight recommendations', 'Handoff readiness', 'Verdict'],
+  'quality-document.md': ['Quality Snapshot', 'Rating Standard', 'Product Areas', 'P0/P1/P2 validation status', 'Browser acceptance status', 'Architecture Layers', 'Change History'],
   'tasks/daily-publish-runbook.md': [
     'Preflight',
     'Source Discovery',
@@ -155,8 +214,13 @@ const requiredFeatureIds = [
 ];
 
 const failures = [];
+const harnessHubEnabled = fs.existsSync(path.join(root, '.harness-hub'));
+const enhancedHarnessFiles = new Set(['CLAUDE.md', 'evaluator-rubric.md', 'quality-document.md']);
 
 for (const file of requiredFiles) {
+  if (!harnessHubEnabled && (file.startsWith('.harness-hub/') || enhancedHarnessFiles.has(file))) {
+    continue;
+  }
   const filePath = path.join(root, file);
   if (!fs.existsSync(filePath)) {
     failures.push(`${file}: missing required harness file`);
@@ -164,6 +228,9 @@ for (const file of requiredFiles) {
 }
 
 for (const file of requiredLocalStateFiles) {
+  if (!harnessHubEnabled && file.startsWith('.harness-hub/')) {
+    continue;
+  }
   const filePath = path.join(root, file);
   if (!fs.existsSync(filePath)) {
     failures.push(`${file}: missing local harness state; run npm run harness:init`);
@@ -206,6 +273,30 @@ if (fs.existsSync(featureStatePath)) {
     if (!isRecord(featureState) || !Array.isArray(featureState.features)) {
       missing.push('features array');
     }
+    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.feature_state_policy))) {
+      missing.push('feature_state_policy object');
+    }
+    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.validation_priority_policy))) {
+      missing.push('validation_priority_policy object');
+    }
+    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.web_acceptance_policy))) {
+      missing.push('web_acceptance_policy object');
+    }
+    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.pr_closeout_policy))) {
+      missing.push('pr_closeout_policy object');
+    }
+    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.finish_closeout_policy))) {
+      missing.push('finish_closeout_policy object');
+    }
+    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.agentic_loop_policy))) {
+      missing.push('agentic_loop_policy object');
+    }
+    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.loop_control_policy))) {
+      missing.push('loop_control_policy object');
+    }
+    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.context_engineering_policy))) {
+      missing.push('context_engineering_policy object');
+    }
     if (!isRecord(featureState) || !isRecord(featureState.parallel_write_policy)) {
       missing.push('parallel_write_policy object');
     }
@@ -217,6 +308,38 @@ if (fs.existsSync(featureStatePath)) {
     }
   } catch {
     failures.push('feature_list.json: must be valid JSON');
+  }
+}
+
+if (harnessHubEnabled) {
+  for (const file of [
+    '.harness-hub/state-templates/loop-runs.jsonl',
+    '.harness-hub/state-templates/interrupt-decisions.jsonl',
+    '.harness-hub/state-templates/capability-events.jsonl',
+    '.harness-hub/state/loop-runs.jsonl',
+    '.harness-hub/state/interrupt-decisions.jsonl',
+    '.harness-hub/state/capability-events.jsonl',
+  ]) {
+    const issues = parseJsonlIssues(file);
+    if (issues.length > 0) {
+      failures.push(`${file}: invalid JSONL ${issues.join(', ')}`);
+    }
+  }
+
+  for (const evalCase of [
+    { file: '.harness-hub/loop/evals/interrupt-policy/good-cases.jsonl', expectedDecision: 'continue' },
+    { file: '.harness-hub/loop/evals/interrupt-policy/bad-cases.jsonl', expectedDecision: 'interrupt' },
+    { file: '.harness-hub/loop/evals/interrupt-policy/regression-cases.jsonl' },
+  ]) {
+    const issues = validateInterruptEvalFile(evalCase.file, evalCase.expectedDecision);
+    if (issues.length > 0) {
+      failures.push(`${evalCase.file}: interrupt policy eval issues ${issues.slice(0, 6).join('; ')}${issues.length > 6 ? `; +${issues.length - 6} more` : ''}`);
+    }
+  }
+
+  const obsidianIssues = validateObsidianPortableProfile();
+  if (obsidianIssues.length > 0) {
+    failures.push(`.harness-hub/context/wiki/.obsidian: ${obsidianIssues.join('; ')}`);
   }
 }
 
@@ -277,6 +400,97 @@ function validateFeatureList(features, failures) {
       failures.push(`feature_list.json: ${id} must include stop conditions`);
     }
   }
+}
+
+function parseJsonlIssues(relativePath) {
+  const filePath = path.join(root, relativePath);
+  if (!fs.existsSync(filePath)) {
+    return ['missing'];
+  }
+  const lines = fs.readFileSync(filePath, 'utf8')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const issues = [];
+  lines.forEach((line, index) => {
+    try {
+      JSON.parse(line);
+    } catch {
+      issues.push(`line ${index + 1}`);
+    }
+  });
+  return issues;
+}
+
+function validateInterruptEvalFile(relativePath, expectedDecision) {
+  const parseIssues = parseJsonlIssues(relativePath);
+  if (parseIssues.length > 0) {
+    return parseIssues;
+  }
+  const records = fs.readFileSync(path.join(root, relativePath), 'utf8')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+  const issues = [];
+  if (records.length === 0) {
+    issues.push('file must contain at least one eval case');
+  }
+  records.forEach((record, index) => {
+    const prefix = `line ${index + 1}`;
+    if (!isRecord(record)) {
+      issues.push(`${prefix}: record must be an object`);
+      return;
+    }
+    if (typeof record.id !== 'string' || record.id.trim().length === 0) {
+      issues.push(`${prefix}: missing id`);
+    }
+    if (typeof record.summary !== 'string' || record.summary.trim().length === 0) {
+      issues.push(`${prefix}: missing summary`);
+    }
+    if (record.expectedDecision !== 'continue' && record.expectedDecision !== 'interrupt') {
+      issues.push(`${prefix}: expectedDecision must be continue or interrupt`);
+    }
+    if (expectedDecision && record.expectedDecision !== expectedDecision) {
+      issues.push(`${prefix}: expectedDecision must be ${expectedDecision}`);
+    }
+    if (!Array.isArray(record.riskSignals) || record.riskSignals.length === 0) {
+      issues.push(`${prefix}: missing riskSignals`);
+    }
+    if (!Array.isArray(record.requiredEvidence) || record.requiredEvidence.length === 0) {
+      issues.push(`${prefix}: missing requiredEvidence`);
+    }
+  });
+  return issues;
+}
+
+function validateObsidianPortableProfile() {
+  const profileDir = '.harness-hub/context/wiki/.obsidian';
+  const files = [
+    `${profileDir}/app.json`,
+    `${profileDir}/core-plugins.json`,
+    `${profileDir}/graph.json`,
+  ];
+  const issues = [];
+  for (const file of files) {
+    const filePath = path.join(root, file);
+    if (!fs.existsSync(filePath)) {
+      issues.push(`${file}: missing`);
+      continue;
+    }
+    let parsed;
+    try {
+      parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch {
+      issues.push(`${file}: invalid JSON`);
+      continue;
+    }
+    const jsonText = JSON.stringify(parsed);
+    if (/[A-Za-z]:\\\\|[A-Za-z]:\/|"\/Users\/|"\/home\/|sync|community-plugins|workspace/i.test(jsonText)) {
+      issues.push(`${file}: contains non-portable local state marker`);
+    }
+  }
+  return issues;
 }
 
 function validatePackageScripts(failures) {
