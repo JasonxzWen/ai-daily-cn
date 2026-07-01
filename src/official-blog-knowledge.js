@@ -576,6 +576,46 @@ export function createOfficialBlogKnowledgeContext(input = {}, options = {}) {
   };
 }
 
+export function createOfficialBlogReviewPacket(input = {}, options = {}) {
+  const queue = officialBlogReviewPacketQueue(input, options);
+  const feedInvalidCandidates = officialBlogReviewPacketFeedInvalidCandidates(input);
+  const queueInvalidCandidates = (Array.isArray(queue.invalid_candidates) ? queue.invalid_candidates : [])
+    .map(officialBlogReviewPacketInvalidCandidate);
+  const invalidCandidates = [
+    ...feedInvalidCandidates,
+    ...queueInvalidCandidates
+  ];
+  const reviewItems = (Array.isArray(queue.review_queue) ? queue.review_queue : [])
+    .map(officialBlogReviewPacketItem);
+  const excludedItems = (Array.isArray(queue.excluded) ? queue.excluded : [])
+    .map(officialBlogReviewPacketExcludedItem);
+  const duplicates = (Array.isArray(queue.duplicates) ? queue.duplicates : [])
+    .map(officialBlogReviewPacketDuplicateItem);
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_review_packet",
+    visibility: "internal",
+    report_date: String(options.reportDate || options.report_date || queue.report_date || ""),
+    generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
+    ai_review_contract: officialBlogAiReviewContract(),
+    stats: {
+      total_candidates: Number(queue.stats?.total_candidates || 0),
+      review_items: reviewItems.length,
+      included: reviewItems.filter((item) => item.deterministic_triage.decision === "include").length,
+      needs_review: reviewItems.filter((item) => item.deterministic_triage.decision === "needs_review").length,
+      excluded_items: excludedItems.length,
+      duplicates: duplicates.length,
+      invalid_candidates: invalidCandidates.length
+    },
+    review_items: reviewItems,
+    excluded_items: excludedItems,
+    duplicates,
+    invalid_candidates: invalidCandidates
+  };
+}
+
 export function createOfficialBlogIntakeQueue(input = {}, options = {}) {
   const candidates = officialBlogIntakeCandidates(input);
   const existingByUrl = existingOfficialBlogRecordByUrl(options.existingIndex);
@@ -1047,6 +1087,12 @@ function officialBlogIntakeCandidates(input = {}) {
   if (Array.isArray(input)) {
     return input;
   }
+  if (input?.kind === "official_blog_preview_feed" && Array.isArray(input.candidates)) {
+    return input.candidates;
+  }
+  if (input?.feed && typeof input.feed === "object" && Array.isArray(input.feed.candidates)) {
+    return input.feed.candidates;
+  }
   if (Array.isArray(input.candidates)) {
     return input.candidates;
   }
@@ -1054,6 +1100,116 @@ function officialBlogIntakeCandidates(input = {}) {
     return input.items;
   }
   return [];
+}
+
+function officialBlogReviewPacketQueue(input = {}, options = {}) {
+  const queue = officialBlogReviewPacketExistingQueue(input);
+  if (queue) {
+    return queue;
+  }
+  return createOfficialBlogIntakeQueue(officialBlogReviewPacketCandidateInput(input), {
+    existingIndex: options.existingIndex,
+    reportDate: options.reportDate || options.report_date,
+    generatedAt: options.generatedAt || options.generated_at
+  });
+}
+
+function officialBlogReviewPacketExistingQueue(input = {}) {
+  if (input?.kind === "official_blog_intake_queue") {
+    return input;
+  }
+  if (input?.queue?.kind === "official_blog_intake_queue") {
+    return input.queue;
+  }
+  if (input?.review_packet_source?.kind === "official_blog_intake_queue") {
+    return input.review_packet_source;
+  }
+  return null;
+}
+
+function officialBlogReviewPacketCandidateInput(input = {}) {
+  if (input?.kind === "official_blog_preview_feed" || input?.feed?.kind === "official_blog_preview_feed") {
+    return {
+      candidates: officialBlogIntakeCandidates(input)
+    };
+  }
+  return input;
+}
+
+function officialBlogReviewPacketFeedInvalidCandidates(input = {}) {
+  const feed = input?.kind === "official_blog_preview_feed"
+    ? input
+    : input?.feed?.kind === "official_blog_preview_feed"
+      ? input.feed
+      : null;
+  return (Array.isArray(feed?.invalid_entries) ? feed.invalid_entries : [])
+    .map((entry) => officialBlogReviewPacketInvalidCandidate(entry, "invalid preview feed entry"));
+}
+
+function officialBlogReviewPacketInvalidCandidate(entry = {}, fallbackReason = "invalid candidate") {
+  return {
+    index: entry.index,
+    title_original: String(entry.title_original || entry.title || "").trim(),
+    canonical_url: String(entry.canonical_url || entry.url || "").trim(),
+    reason: String(entry.reason || fallbackReason).trim()
+  };
+}
+
+function officialBlogReviewPacketItem(candidate = {}) {
+  return {
+    ...officialBlogReviewPacketCandidateBase(candidate),
+    deterministic_triage: {
+      decision: String(candidate.admission?.decision || ""),
+      reason: String(candidate.admission?.reason || ""),
+      matched_criteria: uniqueSorted(candidate.admission?.matched_criteria || [])
+    },
+    suggested_topics: uniqueSorted(candidate.suggested_topics || []),
+    knowledge_value: String(candidate.knowledge_value || ""),
+    next_action: String(candidate.next_action || "")
+  };
+}
+
+function officialBlogReviewPacketExcludedItem(candidate = {}) {
+  return {
+    ...officialBlogReviewPacketCandidateBase(candidate),
+    deterministic_triage: {
+      decision: String(candidate.admission?.decision || "exclude"),
+      reason: String(candidate.admission?.reason || ""),
+      matched_criteria: uniqueSorted(candidate.admission?.matched_criteria || [])
+    },
+    excluded_as: String(candidate.excluded_as || ""),
+    suggested_topics: uniqueSorted(candidate.suggested_topics || []),
+    knowledge_value: String(candidate.knowledge_value || "")
+  };
+}
+
+function officialBlogReviewPacketDuplicateItem(candidate = {}) {
+  return {
+    ...officialBlogReviewPacketCandidateBase(candidate),
+    duplicate_source: String(candidate.duplicate_source || ""),
+    duplicate_of: String(candidate.duplicate_of || "")
+  };
+}
+
+function officialBlogReviewPacketCandidateBase(candidate = {}) {
+  return {
+    intake_id: String(candidate.intake_id || ""),
+    company: String(candidate.company || ""),
+    company_label: String(candidate.company_label || (candidate.company === "anthropic" ? "Anthropic" : candidate.company === "openai" ? "OpenAI" : "")),
+    canonical_url: String(candidate.canonical_url || ""),
+    normalized_url: String(candidate.normalized_url || safeNormalizeOfficialBlogUrl(candidate.canonical_url) || ""),
+    published_at: String(candidate.published_at || ""),
+    title_original: String(candidate.title_original || ""),
+    opening_preview: String(candidate.opening_preview || ""),
+    opening_paragraph_count: Number.isFinite(Number(candidate.opening_paragraph_count))
+      ? Number(candidate.opening_paragraph_count)
+      : officialBlogPreviewParagraphCount(candidate.opening_preview),
+    source_label: String(candidate.source_label || "")
+  };
+}
+
+function officialBlogPreviewParagraphCount(value) {
+  return String(value || "").trim() ? 1 : 0;
 }
 
 function existingOfficialBlogRecordByUrl(index = {}) {
@@ -1696,6 +1852,7 @@ function normalizeOfficialBlogIntakeCandidate(rawCandidate = {}, context = {}) {
     throw new Error(`official blog intake candidate missing title at index ${context.index}`);
   }
 
+  const openingParagraphCount = cappedOfficialBlogPreviewEntryParagraphs(rawCandidate).length;
   const openingPreview = officialBlogOpeningPreview(rawCandidate);
   const publishedAt = String(rawCandidate.published_at || rawCandidate.publishedAt || "").trim();
   const candidate = {
@@ -1705,6 +1862,7 @@ function normalizeOfficialBlogIntakeCandidate(rawCandidate = {}, context = {}) {
     published_at: publishedAt,
     title_original: title,
     opening_preview: openingPreview,
+    opening_paragraph_count: openingParagraphCount,
     source_label: String(rawCandidate.source_label || rawCandidate.source || "").trim()
   };
   candidate.intake_id = officialBlogIntakeId(candidate, context);
@@ -1747,6 +1905,7 @@ function officialBlogIntakeCandidateBase(candidate) {
     published_at: candidate.published_at,
     title_original: candidate.title_original,
     opening_preview: candidate.opening_preview,
+    opening_paragraph_count: candidate.opening_paragraph_count,
     source_label: candidate.source_label
   };
 }
@@ -1839,6 +1998,44 @@ function buildOfficialBlogKnowledgeIndex(records) {
 
 function officialBlogAdmissionPolicyArtifact() {
   return structuredClone(OFFICIAL_BLOG_ADMISSION_POLICY);
+}
+
+function officialBlogAiReviewContract() {
+  return {
+    version: "official-blog-ai-review-v1",
+    review_basis: "title_and_opening_preview_only",
+    instructions: [
+      "Review every item using only title_original and opening_preview.",
+      "Do not use full article bodies, source audit, candidate pools, or external browsing for first-pass admission.",
+      "Return one decision per review item: include, needs_review, or exclude.",
+      "Use include only for durable product, model, engineering, harness, agent workflow, eval, or safety-engineering knowledge value visible in the opening preview.",
+      "Use needs_review for customer or partnership stories that hint at concrete reusable implementation detail but need manual reading before curation.",
+      "Use exclude for ordinary partnership, customer adoption, company news, event, hiring, sales, regional, or broad enterprise workflow updates."
+    ],
+    decision_values: ["include", "needs_review", "exclude"],
+    required_output_fields: [
+      "intake_id",
+      "decision",
+      "matched_criteria",
+      "suggested_topics",
+      "rationale",
+      "confidence"
+    ],
+    allowed_matched_criteria: [...OFFICIAL_BLOG_MATCHED_CRITERIA].sort(),
+    forbidden_inputs: [
+      "full_article_body",
+      "body",
+      "content_html",
+      "source_audit",
+      "candidate_pool",
+      "public_rendering_html"
+    ],
+    manual_approval_required_for: [
+      "needs_review_customer_or_partnership_story",
+      "curated_record_authoring",
+      "translation_or_summary_publication"
+    ]
+  };
 }
 
 async function collectJsonFiles(dir) {

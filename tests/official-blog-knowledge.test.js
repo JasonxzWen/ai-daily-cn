@@ -11,6 +11,7 @@ import {
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
+  createOfficialBlogReviewPacket,
   loadOfficialBlogKnowledge,
   normalizeOfficialBlogUrl,
   toPublicOfficialBlogKnowledge,
@@ -611,6 +612,177 @@ test("official blog admission policy schema rejects missing required criteria", 
     assert.equal(excludeValidation.valid, false);
     assert(excludeValidation.errors.some((error) => error.path.includes("/admission_policy/exclude_categories")));
   });
+});
+
+test("official blog review packet packages preview-only AI review items without leaking internals", async () => {
+  const existingIndex = await loadOfficialBlogKnowledge({ rootDir });
+  const feed = createOfficialBlogPreviewFeed({
+    items: [
+      {
+        company: "openai",
+        url: "https://openai.com/index/introducing-examplemodel-7?utm_source=rss",
+        date: "2026-07-01",
+        title: "Introducing ExampleModel 7",
+        content_html: [
+          "<p>This new model release explains benchmark results, evals, safety mitigations, and integration guidance.</p>",
+          "<p>The opening segment includes developer deployment constraints.</p>",
+          "<p>Full article body should not enter the review packet.</p>"
+        ].join("")
+      },
+      {
+        company: "openai",
+        url: "https://openai.com/news/examplecorp-partnership",
+        date: "2026-07-01",
+        title: "OpenAI and ExampleCorp expand enterprise partnership",
+        summary: "The companies will bring AI tools to more employees and improve business workflows."
+      },
+      {
+        company: "anthropic",
+        url: "https://www.anthropic.com/news/examplebank-claude-support",
+        date: "2026-07-01",
+        title: "How ExampleBank built a Claude support workflow",
+        summary: "The opening preview describes routing architecture, tool permissions, evaluation harnesses, observability, and rollout controls for production agents."
+      },
+      {
+        company: "openai",
+        url: "https://openai.com/index/introducing-structured-outputs-in-the-api/?ref=packet",
+        date: "2024-08-06",
+        title: "Introducing structured outputs in the API",
+        summary: "Existing knowledge should be treated as duplicate."
+      },
+      {
+        company: "openai",
+        url: "https://openai.com/index/introducing-examplemodel-7#duplicate",
+        date: "2026-07-01",
+        title: "Introducing ExampleModel 7 duplicate",
+        summary: "Duplicate candidate should not be reviewed twice."
+      }
+    ]
+  }, {
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+
+  const packet = createOfficialBlogReviewPacket({
+    feed,
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, {
+    existingIndex,
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+
+  assert.equal(packet.kind, "official_blog_review_packet");
+  assert.equal(packet.visibility, "internal");
+  assert.equal(packet.admission_policy.version, "official-blog-admission-v1");
+  assert.equal(packet.ai_review_contract.review_basis, "title_and_opening_preview_only");
+  assert(packet.ai_review_contract.forbidden_inputs.includes("full_article_body"));
+  assert(packet.ai_review_contract.decision_values.includes("needs_review"));
+  assert.equal(packet.stats.total_candidates, 5);
+  assert.equal(packet.stats.review_items, 2);
+  assert.equal(packet.stats.excluded_items, 1);
+  assert.equal(packet.stats.duplicates, 2);
+  assert.equal(packet.stats.invalid_candidates, 0);
+
+  const model = packet.review_items.find((item) => item.title_original === "Introducing ExampleModel 7");
+  assert(model);
+  assert.equal(model.deterministic_triage.decision, "include");
+  assert(model.deterministic_triage.matched_criteria.includes("new_model"));
+  assert.equal(model.opening_preview.includes("Full article body"), false);
+  assert.equal(model.opening_paragraph_count, 2);
+  assert.equal(Object.hasOwn(model, "opening_paragraphs"), false);
+
+  const customer = packet.review_items.find((item) => item.company === "anthropic");
+  assert(customer);
+  assert.equal(customer.deterministic_triage.decision, "needs_review");
+  assert.equal(customer.next_action, "manual_review_required");
+
+  assert(packet.excluded_items.some((item) => item.excluded_as === "company_news" && item.title_original.includes("enterprise partnership")));
+  assert(packet.duplicates.some((item) => item.duplicate_source === "existing_knowledge"));
+  assert(packet.duplicates.some((item) => item.duplicate_source === "same_batch"));
+
+  const reviewPayload = JSON.stringify({
+    review_items: packet.review_items,
+    excluded_items: packet.excluded_items,
+    duplicates: packet.duplicates,
+    invalid_candidates: packet.invalid_candidates
+  });
+  assert.equal(reviewPayload.includes("should_not_leak"), false);
+  assert.equal(reviewPayload.includes("Full article body should not enter"), false);
+  assert.equal(reviewPayload.includes("content_html"), false);
+  assert.equal(reviewPayload.includes("candidate_pool"), false);
+});
+
+test("official blog review packet accepts existing intake queues", async () => {
+  const existingIndex = await loadOfficialBlogKnowledge({ rootDir });
+  const queue = createOfficialBlogIntakeQueue({
+    candidates: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/agents-api-production-review-packet",
+        published_at: "2026-07-01",
+        title: "Launching a new developer product for production agent workflows",
+        opening_preview: "This new developer product adds a developer platform primitive for tool permissions, orchestration, deployment constraints, and eval harnesses."
+      }
+    ]
+  }, {
+    existingIndex,
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+  const packet = createOfficialBlogReviewPacket({ queue }, {
+    existingIndex,
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+
+  assert.equal(packet.stats.total_candidates, 1);
+  assert.equal(packet.review_items.length, 1);
+  assert.equal(packet.review_items[0].intake_id, queue.review_queue[0].intake_id);
+  assert.equal(packet.review_items[0].deterministic_triage.decision, "include");
+});
+
+test("official blog review packet sanitizes invalid candidates from existing queues", async () => {
+  const packet = createOfficialBlogReviewPacket({
+    queue: {
+      kind: "official_blog_intake_queue",
+      report_date: "2026-07-01",
+      stats: { total_candidates: 1 },
+      review_queue: [],
+      excluded: [],
+      duplicates: [],
+      invalid_candidates: [
+        {
+          index: 0,
+          title: "Invalid queue entry with raw internals",
+          url: "https://openai.com/index/raw-invalid-entry",
+          reason: "missing required company",
+          body: "This full body must not leak.",
+          content_html: "<p>This HTML must not leak.</p>",
+          source_audit: { should_not_leak: true },
+          candidate_pool: { should_not_leak: true },
+          raw_logs: ["raw crawler log must not leak"]
+        }
+      ]
+    }
+  }, {
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+
+  assert.equal(packet.stats.invalid_candidates, 1);
+  assert.deepEqual(packet.invalid_candidates[0], {
+    index: 0,
+    title_original: "Invalid queue entry with raw internals",
+    canonical_url: "https://openai.com/index/raw-invalid-entry",
+    reason: "missing required company"
+  });
+  const serialized = JSON.stringify(packet.invalid_candidates);
+  assert.equal(serialized.includes("This full body must not leak"), false);
+  assert.equal(serialized.includes("content_html"), false);
+  assert.equal(serialized.includes("should_not_leak"), false);
+  assert.equal(serialized.includes("raw crawler log"), false);
 });
 
 test("official blog knowledge drafts require reviewed authoring fields and omit queue internals", async () => {

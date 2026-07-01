@@ -47,6 +47,7 @@ import {
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
+  createOfficialBlogReviewPacket,
   loadOfficialBlogKnowledge
 } from "./official-blog-knowledge.js";
 
@@ -308,6 +309,31 @@ try {
       ok: true,
       input_path: resolvedInputPath,
       context
+    }, outputPath);
+  } else if (command === "official-blog:review-packet") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_review_packet_input_required", "official-blog:review-packet requires --input <candidate-previews-or-intake.json>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogReviewPacketOutputPath({ outputPath, rootDir });
+    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const existingIndex = await loadOfficialBlogKnowledge({
+      rootDir,
+      knowledgeDir: args["knowledge-dir"] ? path.resolve(args["knowledge-dir"]) : undefined
+    });
+    const reviewPacket = createOfficialBlogReviewPacket(input, {
+      existingIndex,
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"]
+    });
+    printJson({
+      ok: true,
+      input_path: resolvedInputPath,
+      review_packet: reviewPacket
     }, outputPath);
   } else if (command === "preflight:worktree") {
     const args = parseArgs(argv);
@@ -1088,6 +1114,14 @@ function assertOfficialBlogContextOutputPath(options = {}) {
   });
 }
 
+function assertOfficialBlogReviewPacketOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_review_packet_public_output_forbidden",
+    message: "official-blog:review-packet writes internal AI review packet data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
 function assertOfficialBlogInternalOutputPath(options = {}) {
   const outputPath = String(options.outputPath || "").trim();
   if (!outputPath) {
@@ -1111,7 +1145,8 @@ function isOfficialBlogInternalCommand(value) {
     value === "official-blog:parse-feed" ||
     value === "official-blog:author-records" ||
     value === "official-blog:suggest-relations" ||
-    value === "official-blog:context";
+    value === "official-blog:context" ||
+    value === "official-blog:review-packet";
 }
 
 function isOfficialBlogInternalPublicOutputPath(outputPath, rootDir) {

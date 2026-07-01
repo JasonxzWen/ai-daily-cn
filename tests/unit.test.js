@@ -6538,6 +6538,115 @@ test("official blog context CLI refuses public output paths", async () => {
   }
 });
 
+test("official blog review-packet CLI writes a clean internal AI review packet", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-packet-"));
+  const inputPath = path.join(tmp, "official-blog-previews.json");
+  const outputPath = path.join(tmp, "official-blog-review-packet.json");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    candidates: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/introducing-examplemodel-7",
+        published_at: "2026-07-01",
+        title: "Introducing ExampleModel 7",
+        opening_paragraphs: [
+          "This new model release explains benchmark results, evals, safety mitigations, and integration guidance.",
+          "The opening segment includes developer deployment constraints."
+        ],
+        body: "This full body must not be copied into the AI review packet."
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/news/examplecorp-partnership",
+        published_at: "2026-07-01",
+        title: "OpenAI and ExampleCorp expand enterprise partnership",
+        opening_preview: "The companies will bring AI tools to more employees and improve business workflows."
+      }
+    ],
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-packet",
+    "--input",
+    inputPath,
+    "--output",
+    outputPath,
+    "--date",
+    "2026-07-01",
+    "--generated-at",
+    "2026-07-01T08:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.review_packet.kind, "official_blog_review_packet");
+  assert.equal(parsed.review_packet.visibility, "internal");
+  assert.equal(parsed.review_packet.ai_review_contract.review_basis, "title_and_opening_preview_only");
+  assert.equal(parsed.review_packet.review_items.length, 1);
+  assert.equal(parsed.review_packet.excluded_items.length, 1);
+  assert.equal(parsed.review_packet.review_items[0].opening_preview.includes("developer deployment constraints"), true);
+  assert.equal(JSON.stringify(parsed.review_packet).includes("This full body must not be copied"), false);
+  assert.equal(JSON.stringify(parsed.review_packet).includes("should_not_leak"), false);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
+test("official blog review-packet CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-packet-public-"));
+  const inputPath = path.join(tmp, "official-blog-previews.json");
+  const publicOutputPaths = [
+    path.join(tmp, "docs", "data", "official-blog-review-packet.json"),
+    path.join(tmp, "docs", "official-blogs", "review-packet.json"),
+    path.join(tmp, "docs", "official-blog-review-packet.html"),
+    path.join(tmp, "docs", "reports", "official-blog-review-packet.html")
+  ];
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    candidates: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/introducing-examplemodel-7",
+        published_at: "2026-07-01",
+        title: "Introducing ExampleModel 7",
+        opening_preview: "This new model release explains benchmark results, evals, safety mitigations, and integration guidance."
+      }
+    ]
+  })}\n`, "utf8");
+
+  for (const publicOutputPath of publicOutputPaths) {
+    await assert.rejects(
+      () => execFileAsync(process.execPath, [
+        path.join(rootDir, "src/cli.js"),
+        "official-blog:review-packet",
+        "--input",
+        inputPath,
+        "--output",
+        publicOutputPath,
+        "--repo-root",
+        tmp
+      ], {
+        cwd: rootDir,
+        maxBuffer: 1024 * 1024
+      }),
+      (error) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stdout, /official_blog_review_packet_public_output_forbidden/);
+        return true;
+      }
+    );
+    await assert.rejects(
+      () => fs.stat(publicOutputPath),
+      /ENOENT/
+    );
+  }
+});
+
 test("publish:verify-pages emits structured retryable misses without nonzero exit", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-pages-verify-"));
   const preloadPath = path.join(tmp, "fake-fetch.mjs");

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-review-packet-stage12",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog review packet stage 12",
+  "slug": "official-blog-review-packet-stage12",
+  "status": "completed",
+  "summary": "This iteration adds an internal AI review packet for OpenAI and Anthropic official-blog intake. The packet converts preview feeds or existing intake queues into a minimal review contract: AI reviewers receive only the title, capped opening preview, deterministic triage, and suggested metadata needed to decide include, needs_review, or exclude. Ordinary company news remains excluded, durable product/model/engineering-practice posts can be included, and implementation-heavy customer or partnership stories are routed to manual review before curation.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog review packet|official-blog:review-packet\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "AI admission review needs a packet format that makes the preview-only rule enforceable.",
+      "evidence": "Stage 12 adds `official_blog_review_packet` with `ai_review_contract.review_basis` set to `title_and_opening_preview_only` and explicit forbidden inputs for full body, source audit, candidate pool, and public HTML.",
+      "scope": "official_blog_review_packet",
+      "persistence": "implemented",
+      "recommended_action": "Use the review packet, not raw crawl output, when asking AI to make the first-pass official-blog admission decision."
+    },
+    {
+      "lesson": "Borderline customer or partnership stories should not be auto-curated just because they mention AI workflows.",
+      "evidence": "The packet keeps deterministic `needs_review` decisions and marks those items with `manual_review_required` before any translation or knowledge record authoring.",
+      "scope": "official_blog_admission_review",
+      "persistence": "implemented",
+      "recommended_action": "Require human review for customer or partnership articles unless the opening preview clearly shows reusable engineering implementation detail."
+    },
+    {
+      "lesson": "Internal review artifacts must stay out of the public site tree.",
+      "evidence": "The `official-blog:review-packet` CLI refuses `docs/data`, `docs/official-blogs`, and public HTML output paths with `official_blog_review_packet_public_output_forbidden`.",
+      "scope": "official_blog_public_minimization",
+      "persistence": "implemented",
+      "recommended_action": "Keep review packets in ignored local or internal workflow paths; only reviewed curated records should enter public data."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "After defining the official-blog admission policy, there was still no stable artifact for giving AI only the minimal first-pass inputs needed to apply it.",
+      "evidence": "Stage 12 adds `createOfficialBlogReviewPacket` and `official-blog:review-packet`, plus tests proving raw body text, source audit, and candidate pool internals do not leak into review items.",
+      "module": "src/official-blog-knowledge.js, src/cli.js, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Route new OpenAI and Anthropic blog candidates through the internal review packet before translation, summary authoring, or knowledge graph insertion.",
+      "expected_benefit": "Daily generation and later blog curation can consistently link high-value product, model, and engineering-practice posts while excluding low-signal company news.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through pure function and CLI coverage, with public output guards for the internal artifact.",
+      "ledger_links": [
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-daily-not-machine-log",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog review packet packages preview-only AI review items without leaking internals",
+        "official blog review packet accepts existing intake queues",
+        "official blog review-packet CLI writes a clean internal AI review packet",
+        "official blog review-packet CLI refuses public output paths"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-main-stream-blacklist-refill",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Wire live official-blog discovery to emit preview feeds into `official-blog:review-packet` once the source-fetch stage is implemented.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add the reviewed AI decision output schema in a later stage so accepted review-packet items can become draft curated records without carrying queue internals forward.",
+      "owner": "project"
+    }
+  ]
+}
