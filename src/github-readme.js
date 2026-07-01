@@ -39,11 +39,11 @@ export function summarizeGithubReadme(input = {}) {
   const source = signal || readme;
   const subject = pickCapability(source);
   const deliverables = pickMaturity(source);
-  const checkpoints = pickReadmeCheckpoints(source);
   const label = repoDisplayName(repo);
   const projectLabel = label ? `${label} 是` : "该仓库是";
   const audience = pickAudience(source);
-  const summary = `${projectLabel}面向${audience}的开源项目，README 显示核心能力包括${subject}，并给出${deliverables}。读者应先确认${withMaintenanceCheckpoint(checkpoints)}，再判断是否适合团队试用或接入。`;
+  const usage = pickProjectUsage(source, subject);
+  const summary = `${projectLabel}面向${audience}的开源项目，核心能力是${subject}；项目提供${deliverables}，主要用于${usage}。`;
   return finalizeGithubSummary(summary, maxChars);
 }
 
@@ -84,15 +84,14 @@ export function normalizeGithubReadmeSummary(value, repo = "", maxChars = DEFAUL
   const parsed = parseLegacyGithubSummary(text);
   const subject = parsed.subject || ZH.projectFramework;
   const deliverables = parsed.deliverables || ZH.readmeUsage;
-  const checkpoints = parsed.checkpoints || ZH.defaultChecks;
   const label = repoDisplayName(repo || parsed.label);
   const projectLabel = label ? `${label} 是` : "该仓库是";
   const audience = pickAudienceFromChinese(subject);
-  return finalizeGithubSummary(`${projectLabel}面向${audience}的开源项目，README 显示核心能力包括${subject}，并给出${deliverables}。读者应先确认${withMaintenanceCheckpoint(checkpoints)}，再判断是否适合团队试用或接入。`, maxChars);
+  return finalizeGithubSummary(`${projectLabel}面向${audience}的开源项目，核心能力是${subject}；项目提供${deliverables}，主要用于${pickProjectUsageFromChinese(subject)}。`, maxChars);
 }
 
 function isLegacyGithubSummary(value) {
-  return /README\s*主要围绕|阅读时先看|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时/u.test(String(value || ""));
+  return /README\s*主要围绕|阅读时先看|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时|README\s*显示核心能力|读者应先确认|适合先从/u.test(String(value || ""));
 }
 
 function parseLegacyGithubSummary(value) {
@@ -113,6 +112,15 @@ function parseLegacyGithubSummary(value) {
       subject: positioned[2] || positioned[1] || "",
       deliverables: positioned[3] || "",
       checkpoints: ZH.defaultChecks
+    };
+  }
+  const generated = text.match(/^(?:(.*?)\s+)?(?:是)?面向(.+?)的开源项目，README\s*显示核心能力包括(.+?)，并给出(.+?)。读者应先确认(.+?)(?:，|。)/u);
+  if (generated) {
+    return {
+      label: generated[1] || "",
+      subject: generated[3] || "",
+      deliverables: generated[4] || "",
+      checkpoints: generated[5] || ""
     };
   }
   return {
@@ -223,19 +231,54 @@ function pickMaturity(text) {
   return unique(parts).join("\u3001") || ZH.readmeUsage;
 }
 
-function withMaintenanceCheckpoint(value) {
-  const text = String(value || "").trim() || ZH.defaultChecks;
-  return /近期维护/u.test(text) ? text : `${text}、近期维护`;
+function pickProjectUsage(text, subject = "") {
+  const value = `${text || ""} ${subject || ""}`.toLowerCase();
+  if (/agent|workflow|runner|browser/.test(value)) {
+    return "构建、调试和编排 agent 工作流";
+  }
+  if (/evaluat|benchmark|test|ci/.test(value)) {
+    return "搭建模型评测、回归验证和工程质量检查流程";
+  }
+  if (/memory|rag|retrieval|knowledge/.test(value)) {
+    return "组织知识检索、上下文记忆和 RAG 应用";
+  }
+  if (/api|sdk|adapter|package/.test(value)) {
+    return "接入开发者工具、SDK 或平台适配层";
+  }
+  if (/model|llm|inference|prompt/.test(value)) {
+    return "串联模型调用、推理服务和提示词工程";
+  }
+  return "理解项目能力边界、代码入口和可复用组件";
+}
+
+function pickProjectUsageFromChinese(subject) {
+  const text = String(subject || "");
+  if (/Agent|工具调用|工作流/u.test(text)) {
+    return "构建、调试和编排 agent 工作流";
+  }
+  if (/评测|回归|测试/u.test(text)) {
+    return "搭建模型评测、回归验证和工程质量检查流程";
+  }
+  if (/记忆|知识检索|RAG/u.test(text)) {
+    return "组织知识检索、上下文记忆和 RAG 应用";
+  }
+  if (/API|SDK|适配/u.test(text)) {
+    return "接入开发者工具、SDK 或平台适配层";
+  }
+  return "理解项目能力边界、代码入口和可复用组件";
 }
 
 function finalizeGithubSummary(value, maxChars) {
   let summary = String(value || "")
     .replace(/和近期维护和近期维护/g, "和近期维护")
     .replace(/、近期维护、近期维护/g, "、近期维护")
+    .replace(/README\s*显示核心能力包括/g, "核心能力是")
+    .replace(/读者应先确认[^。]*。?/g, "")
+    .replace(/这类项目适合先从[^。]*。?/g, "")
     .replace(/\s+/g, " ")
     .trim();
   if (chineseCharCount(summary) < 80) {
-    summary = `${summary} 这类项目适合先从最小示例复现，再检查依赖、权限边界和与现有工程流程的衔接成本。`;
+    summary = `${summary} 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。`;
   }
   return clampChineseSummary(summary, maxChars);
 }

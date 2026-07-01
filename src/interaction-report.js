@@ -1572,7 +1572,7 @@ function stripGithubRepoLead(value, repo) {
 }
 
 function isGenericGithubTrendDescription(value) {
-  return /(?:GitHub Trending Top 10|appeared on GitHub Trending|Today entered|rank #|stars today|stars this week|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README)/i.test(String(value || ""));
+  return /(?:GitHub Trending Top 10|appeared on GitHub Trending|Today entered|rank #|stars today|stars this week|公开描述指向|关键词包括|ranked\s+(?:model|repo|repository)\s+entry|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|README\s*显示核心能力|读者应先确认|适合先从|优先核对|重点看 README|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README)/i.test(String(value || ""));
 }
 
 function formatHuggingFaceTrending(items, context = {}) {
@@ -1586,13 +1586,43 @@ function formatHuggingFaceTrending(items, context = {}) {
       ...trendTagsFor(context.trendAnnotations, "huggingface_trending", index)
     ].filter(Boolean));
     const details = [
-      trimText(item.description || item.evidence || "", 120),
+      trimText(huggingFaceTrendingDescription(item), 120),
       Number(item.likes) > 0 ? `likes ${item.likes}` : "",
       Number(item.downloads) > 0 ? `downloads ${item.downloads}` : ""
     ].filter(Boolean).join(" / ");
     return `${Number(item.rank || index + 1)}. **${markdownLink(item.url, item.name || item.repo)}**${tagText}${details ? `: ${details}` : ""}`;
   });
   return rows.join("\n");
+}
+
+function huggingFaceTrendingDescription(item = {}) {
+  const raw = String(item.description || item.summary || "").replace(/\s+/g, " ").trim();
+  if (raw && !isGenericHuggingFaceTrendingDescription(raw)) {
+    return raw;
+  }
+  const name = String(item.name || item.repo || "该模型").trim();
+  const task = String(item.task || "").trim();
+  const taskLabel = huggingFaceTaskLabel(task);
+  const metrics = [
+    Number(item.downloads) > 0 ? `${Number(item.downloads)} downloads` : "",
+    Number(item.likes) > 0 ? `${Number(item.likes)} likes` : ""
+  ].filter(Boolean).join("、");
+  return `${name} 是 Hugging Face 上的${taskLabel}${metrics ? `，当前热度指标是 ${metrics}` : ""}。`;
+}
+
+function isGenericHuggingFaceTrendingDescription(value) {
+  return /trending entry|verify model card|discovery lead|before factual inclusion|ranked\s+model\s+entry|README|公开描述指向|关键词包括|优先核对|准入|复现门槛|只记录排名|公开描述暂未给出足够功能细节/i.test(String(value || ""));
+}
+
+function huggingFaceTaskLabel(task) {
+  const text = String(task || "").toLowerCase();
+  if (/text-generation|conversational|chat/.test(text)) return "文本生成模型";
+  if (/image-to-text|vision|visual-question-answering/.test(text)) return "视觉语言模型";
+  if (/text-to-image|image-generation|diffusion/.test(text)) return "图像生成模型";
+  if (/automatic-speech-recognition|speech|audio/.test(text)) return "语音或音频模型";
+  if (/sentence-similarity|feature-extraction|embedding/.test(text)) return "嵌入或语义检索模型";
+  if (text) return `${task} 任务模型`;
+  return "模型资源";
 }
 
 function githubTrendDetails(item, project) {
@@ -1821,37 +1851,24 @@ function formatDailyTrackingCards(items, context = {}) {
     const invalidOfficialSnapshot = hasInvalidOfficialTrackingSnapshot(item);
     const unavailable = isDailyTrackingSourceUnavailable(item) || invalidOfficialSnapshot;
     const entries = unavailable ? [] : dailyTrackingLeaderboardEntries(item);
-    const publicComponent = unavailable ? null : dailyTrackingPublicComponent(component, entries);
-    const stats = unavailable ? [] : dailyTrackingStats(item, entries);
-    const bars = unavailable ? { rows: [] } : dailyTrackingProviderBars(entries);
-    const table = unavailable ? { rows: [] } : dailyTrackingTable(item, entries);
-    const trendState = unavailable
-      ? { curve: null, status: "unavailable", pointCount: 0 }
-      : dailyTrackingTrendState(item, context.trackingHistoryById);
-    const media = formatCardMedia(context.report, evidenceForUrl(context.evidenceByUrl, item.url), {
-      limit: 5,
-      ...(context.mediaOptions || {})
-    });
+    const publicComponent = unavailable ? null : dailyTrackingPublicComponent(component, entries, item, context.trackingHistoryById);
+    const trendState = dailyTrackingTrendState(item, context.trackingHistoryById);
+    const fallbackStats = !unavailable && !publicComponent ? dailyTrackingStats(item, entries) : [];
+    const fallbackTable = !unavailable && !publicComponent ? dailyTrackingTable(item, entries) : { rows: [] };
     return {
       group: dailyTrackingSourceLabel(item),
       title: item.name,
       href: item.url,
       titleIcon: siteIconForUrl(item.url, item.source || item.name),
-      body: unavailable ? dailyTrackingUnavailableNote(item, invalidOfficialSnapshot) : formatDailyTrackingBody(item, entries),
-      showGroup: true,
-      tags: [
-        cardTag(importanceTagFor("daily_tracking", item)),
-        cardTag(dailyTrackingCategoryLabel(item.category), "topic"),
-        item.event_date ? cardTag(item.event_date, "date") : ""
-      ].filter(Boolean),
+      body: unavailable ? dailyTrackingUnavailableNote(item, invalidOfficialSnapshot) : publicComponent ? "" : formatDailyTrackingBody(item, entries),
+      showGroup: false,
+      tags: [],
       points: [],
-      ...(media.length > 0 ? { media } : {}),
+      trendStatus: trendState.status,
+      trendPointCount: trendState.pointCount,
       ...(publicComponent ? { component: publicComponent } : {}),
-      ...(trendState.status ? { trendStatus: trendState.status, trendPointCount: trendState.pointCount } : {}),
-      ...(trendState.curve ? { trendCurve: trendState.curve } : {}),
-      ...(stats.length > 0 ? { stats } : {}),
-      ...(bars.rows.length > 0 ? { bars } : {}),
-      ...(table.rows.length > 0 ? { table } : {})
+      ...(fallbackStats.length > 0 ? { stats: fallbackStats } : {}),
+      ...(fallbackTable.rows.length > 0 ? { table: fallbackTable } : {})
     };
   });
 }
@@ -1905,7 +1922,7 @@ function dailyTrackingTrendMetricLabel(item = {}) {
   return "榜首指标";
 }
 
-function dailyTrackingPublicComponent(component, entries) {
+function dailyTrackingPublicComponent(component, entries, item = {}, trackingHistoryById = {}) {
   if (!component || typeof component !== "object") {
     return null;
   }
@@ -1915,7 +1932,72 @@ function dailyTrackingPublicComponent(component, entries) {
   const sanitized = { ...component };
   delete sanitized.officialSnapshot;
   delete sanitized.official_component_snapshot;
-  return sanitized;
+  delete sanitized.trace;
+  const sourceId = dailyTrackingSourceId(item);
+  sanitized.sourceId = sourceId;
+  const historyRows = dailyTrackingHistoryRowsForComponent(item, trackingHistoryById);
+  return historyRows.length > 0
+    ? withDailyTrackingLineSeries(sanitized, historyRows)
+    : sanitized;
+}
+
+function dailyTrackingSourceId(item = {}) {
+  return String(item?.id || item?.name || item?.source || item?.url || "").trim();
+}
+
+function dailyTrackingHistoryRowsForComponent(item, trackingHistoryById = {}) {
+  const sourceId = dailyTrackingSourceId(item);
+  if (!sourceId || !trackingHistoryById || typeof trackingHistoryById !== "object") {
+    return [];
+  }
+  const points = Array.isArray(trackingHistoryById[sourceId]) ? trackingHistoryById[sourceId] : [];
+  return points
+    .flatMap((point) => {
+      const rows = Array.isArray(point?.rows) ? point.rows : [];
+      return rows.map((row) => ({
+        rank: Number(row?.rank) || 1,
+        model: String(row?.model || row?.label || "").trim(),
+        provider: String(row?.provider || "").trim(),
+        value: Number(row?.value),
+        valueLabel: String(row?.valueLabel || row?.value_label || row?.tokens || "").trim(),
+        change: String(row?.change || "").trim(),
+        metric: String(point?.date || row?.metric || "").trim()
+      }));
+    })
+    .filter((row) => row.model && row.metric && Number.isFinite(row.value))
+    .slice(-90);
+}
+
+function withDailyTrackingLineSeries(component, historyRows) {
+  const tabs = Array.isArray(component.tabs) ? component.tabs.slice() : [];
+  const series = Array.isArray(component.series) ? component.series.slice() : [];
+  const trendTab = {
+    id: component.kind === "openrouter_rankings" ? "top-models" : "trend",
+    label: "七日排名",
+    view: "line_multi",
+    status: "complete",
+    fallbackReason: ""
+  };
+  const existingTabIndex = tabs.findIndex((tab) => tab.id === trendTab.id);
+  if (existingTabIndex >= 0) {
+    tabs[existingTabIndex] = { ...tabs[existingTabIndex], ...trendTab };
+  } else {
+    tabs.unshift(trendTab);
+  }
+  const trendSeries = {
+    id: `${component.kind || "tracking"}-seven-day-rank`,
+    tabId: trendTab.id,
+    label: "七日排名",
+    chart: "line_multi",
+    rows: historyRows,
+    fallbackReason: ""
+  };
+  const withoutOldTrend = series.filter((entry) => (entry.tabId || entry.tab_id) !== trendTab.id);
+  return {
+    ...component,
+    tabs,
+    series: [trendSeries, ...withoutOldTrend]
+  };
 }
 
 function dailyTrackingLeaderboardEntries(item) {

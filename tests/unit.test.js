@@ -1707,9 +1707,10 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.match(trackingSection.items[0].titleIcon, /^data:image\/png;base64,/);
   assert(!trackingSection.items[0].titleIcon.includes("PHN2Zy"));
   assert(trackingSection.items[0].body.includes("OpenRouter"));
-  assert(trackingSection.items[0].tags.includes("topic|模型使用"));
+  assert.deepEqual(trackingSection.items[0].tags, []);
   assert.equal(trackingSection.items[0].points.length, 0);
-  assert.equal(trackingSection.items[0].media.length, 3);
+  assert.equal(trackingSection.items[0].media, undefined);
+  assert.equal(trackingSection.items[0].component, undefined);
   assert.equal(trackingSection.items[0].table.rows.length, 1);
   assert.equal(trackingSection.items[0].table.rows[0].label, "核心指标");
   assert(trackingSection.items[0].stats.some((stat) => stat.label === "核心指标"));
@@ -1955,7 +1956,7 @@ test("GitHub Trending descriptions prefer concrete README or project context ove
     {
       name: "example/browser-agent",
       repo: "example/browser-agent",
-      description: "example/browser-agent：进入 GitHub Trending Top 10，可作为 agent 工具方向的实现线索。优先核对 README 示例、许可证、近期维护和本地复现门槛。",
+      description: "example/browser-agent：公开描述指向浏览器 agent，关键词包括 browser、agent、workflow。",
       readme_summary: "Browser Agent 是面向浏览器自动化和 Web 任务执行的开源项目，README 展示了 Playwright 驱动、任务回放、失败截图和本地调试入口，适合先复现实例再评估接入。",
       url: "https://github.com/example/browser-agent",
       event_date: "2026-05-15",
@@ -1988,6 +1989,8 @@ test("GitHub Trending descriptions prefer concrete README or project context ove
   assert(!section.content.includes("进入 GitHub Trending Top 10"));
   assert(!section.content.includes("优先核对 README"));
   assert(!section.content.includes("实现线索"));
+  assert(!section.content.includes("公开描述指向"));
+  assert(!section.content.includes("关键词包括"));
 });
 
 test("interaction input rewrites generation-log summaries into editorial summaries", async () => {
@@ -3327,7 +3330,9 @@ test("huggingface trending discovery and public section", async () => {
     name: candidate.title,
     repo: candidate.title,
     candidate_id: candidate.id,
-    description: candidate.evidence,
+    description: index === 0
+      ? `公开描述指向模型调用和推理工程，关键词包括 Hugging、Face、ranked、model、entry、task、${candidate.task}、likes。`
+      : `Hugging Face trending entry for ${candidate.title}; verify model card before inclusion.`,
     url: candidate.url,
     event_date: candidate.event_date,
     source: candidate.source,
@@ -3347,6 +3352,60 @@ test("huggingface trending discovery and public section", async () => {
   assert(section);
   assert.match(section.content, /Qwen\/Qwen3-235B-A22B/);
   assert.match(section.content, /likes 678/);
+  assert.match(section.content, /text-generation|文本生成/);
+  assert.match(section.content, /downloads 12345/);
+  assert.doesNotMatch(section.content, /trending entry|verify model card|公开描述指向|关键词包括|ranked model entry|README|优先核对|准入|复现门槛/i);
+});
+
+test("public data rewrites generic Hugging Face Trending machine descriptions", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.huggingface_trending = [
+    {
+      candidate_id: "huggingface-trending-deepseek-r1",
+      name: "deepseek-ai/DeepSeek-R1",
+      repo: "deepseek-ai/DeepSeek-R1",
+      description: "deepseek-ai/DeepSeek-R1：公开描述指向模型调用和推理工程，关键词包括 Hugging、Face、ranked、model、entry、task、text-generation、likes。",
+      url: "https://huggingface.co/deepseek-ai/DeepSeek-R1",
+      event_date: report.report_date,
+      source: "Hugging Face Trending Models",
+      task: "text-generation",
+      downloads: 4053657,
+      likes: 4917,
+      rank: 1,
+      trend: "trending",
+      evidence: "Hugging Face trending models list shows deepseek-ai/DeepSeek-R1 ranked model entry with 4917 likes.",
+      editorial_category: "open_source",
+      source_level: "model_registry",
+      verification_status: "primary_confirmed"
+    }
+  ];
+
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-hf-template-public-data-"));
+  const [year, month] = report.report_date.split("-");
+  const dataInputDir = path.join(tmp, "reports-data", year, month);
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(dataInputDir, { recursive: true });
+  await fs.writeFile(path.join(dataInputDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir: path.join(tmp, "reports-data"),
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath,
+    fetchImpl: async () => new Response("", { status: 404 })
+  });
+
+  const publicJson = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
+  const description = publicJson.huggingface_trending?.[0]?.description || "";
+  const serialized = JSON.stringify(publicJson.huggingface_trending);
+
+  assert.doesNotMatch(serialized, /公开描述指向|关键词包括|ranked model entry|verify model card|trending entry/i);
+  assert.match(description, /Hugging Face 上的文本生成模型/);
+  assert.match(description, /4053657 downloads/);
+  assert.match(description, /4917 likes/);
 });
 
 test("GitHub trending discovery retries transient fetch failures and records retry notes", async () => {
@@ -4339,9 +4398,11 @@ test("collectContentSources stores sanitized OpenRouter official DOM/CSS compone
   const card = trackingSection.items.find((item) => item.title === "OpenRouter");
   assert.equal(card.component.kind, "openrouter_rankings");
   assert.equal(card.component.officialSnapshot, undefined);
-  assert.equal(card.table.rows.length, 10);
-  assert(card.bars.rows.length > 0);
-  assert(card.stats.length > 0);
+  assert.equal(card.table, undefined);
+  assert.equal(card.bars, undefined);
+  assert.equal(card.stats, undefined);
+  assert(card.component.tabs.some((tab) => tab.id === "top-models" && tab.view === "line_multi"));
+  assert(card.component.tabs.some((tab) => tab.id === "leaderboard" && tab.view === "leaderboard"));
 });
 
 test("collectContentSources degrades OpenRouter snapshot when Top 10 is incomplete", async () => {
@@ -4642,13 +4703,18 @@ test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking
   assert.equal(trackingSection.items.length, 1);
   assert.equal(trackingSection.items[0].title, "OpenRouter");
   assert.equal(trackingSection.items[0].points.length, 0);
-  assert.equal(trackingSection.items[0].table.rows.length, 10);
+  assert.equal(trackingSection.items[0].body, "");
+  assert.deepEqual(trackingSection.items[0].tags, []);
+  assert.equal(trackingSection.items[0].table, undefined);
+  assert.equal(trackingSection.items[0].bars, undefined);
+  assert.equal(trackingSection.items[0].stats, undefined);
   assert.equal(trackingSection.items[0].component.kind, "openrouter_rankings");
   assert.equal(trackingSection.items[0].component.tabs.length, 2);
-  assert(trackingSection.items[0].table.rows.some((row) => row.rank === "#1" && row.tokens.includes("2.9T tokens")));
-  assert(trackingSection.items[0].table.rows.some((row) => row.rank === "#10" && row.tokens.includes("1.11T tokens")));
-  assert(trackingSection.items[0].bars.rows.some((row) => row.label === "deepseek" && row.value === 3));
-  assert(trackingSection.items[0].stats.some((stat) => stat.label === "榜首" && stat.value === "DeepSeek V4 Flash"));
+  assert(trackingSection.items[0].component.tabs.some((tab) => tab.id === "top-models" && tab.view === "line_multi"));
+  assert(trackingSection.items[0].component.tabs.some((tab) => tab.id === "leaderboard" && tab.view === "leaderboard"));
+  assert(trackingSection.items[0].component.series.some((series) => series.tabId === "top-models" && series.chart === "line_multi"));
+  assert(!JSON.stringify(trackingSection).includes("公开榜单已解析"));
+  assert(!JSON.stringify(trackingSection).includes("Top 10 榜单"));
   assert(!JSON.stringify(trackingSection).includes("Playwright"));
   assert(!JSON.stringify(trackingSection).includes("DOM"));
 });
@@ -4711,9 +4777,11 @@ test("report:draft publishes Artificial Analysis snapshot as reader-facing daily
   assert.equal(card.component.tabs.length, 1);
   assert.deepEqual(card.component.tabs.map((tab) => tab.label), ["Score"]);
   assert.equal(card.component.officialSnapshot, undefined);
-  assert.equal(card.table.rows.length, 10);
-  assert(card.bars.rows.length > 0);
-  assert(card.stats.length > 0);
+  assert.equal(card.body, "");
+  assert.deepEqual(card.tags, []);
+  assert.equal(card.table, undefined);
+  assert.equal(card.bars, undefined);
+  assert.equal(card.stats, undefined);
 });
 
 test("report:draft publishes partial SWE-bench Pro official snapshot as reader-facing daily tracking card", async () => {
@@ -4766,9 +4834,11 @@ test("report:draft publishes partial SWE-bench Pro official snapshot as reader-f
   assert.equal(card.component.kind, "swe_bench_pro");
   assert.equal(card.component.tabs.length, 1);
   assert.equal(card.component.officialSnapshot, undefined);
-  assert.equal(card.table.rows.length, 7);
-  assert(card.bars.rows.length > 0);
-  assert(card.stats.length > 0);
+  assert.equal(card.body, "");
+  assert.deepEqual(card.tags, []);
+  assert.equal(card.table, undefined);
+  assert.equal(card.bars, undefined);
+  assert.equal(card.stats, undefined);
   assert(!JSON.stringify(card).includes("HTTP 403"));
 });
 
@@ -11131,7 +11201,7 @@ test("public artifacts omit removed community sources", async () => {
   assert.deepEqual(publicData.source_effectiveness.map((row) => row.id), ["meta-ai"]);
 });
 
-test("daily tracking renders seven day trend curves", async () => {
+test("daily tracking renders multi-entity seven day trend lines", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-tracking-trend-curves-"));
   const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
   const outDir = path.join(tmp, "docs");
@@ -11159,7 +11229,12 @@ test("daily tracking renders seven day trend curves", async () => {
   const curveCount = (html.match(/data-tracking-trend-curve/g) || []).length;
 
   assert.equal(curveCount, 3);
-  assert.match(html, /data-tracking-source="openrouter-rankings"[^>]+data-trend-points="7"/);
+  assert.match(html, /data-tracking-line-chart[^>]+data-tracking-source="openrouter-rankings"[^>]+data-trend-points="7"/);
+  assert.match(html, /data-tracking-line-chart[^>]+data-tracking-source="openrouter-rankings"[^>]+data-trend-lines="1[0-2]"/);
+  assert.match(html, /data-tracking-line-model="DeepSeek V4 Flash"/);
+  assert.match(html, /data-tracking-line-model="Legacy Llama 2"/);
+  assert.match(html, /data-tracking-line-label="DeepSeek V4 Flash"/);
+  assert.doesNotMatch(html, /tracking-line-legend-item/);
   assert.match(html, /data-tracking-source="artificial-analysis-intelligence-index"[^>]+data-trend-points="7"/);
   assert.match(html, /data-tracking-source="swe-bench-pro-public"[^>]+data-trend-points="7"/);
   assert.match(html, /OpenRouter/);
@@ -11179,6 +11254,7 @@ test("daily tracking renders seven day trend curves", async () => {
   assert.match(buttons[0], /data-filter-value="OpenRouter"[^>]+aria-pressed="true"/);
   assert.match(buttons[1], /data-filter-value="Artificial Analysis"[^>]+aria-pressed="false"/);
   assert.match(buttons[2], /data-filter-value="SWE-bench"[^>]+aria-pressed="false"/);
+  assert.doesNotMatch(trendSection, /公开榜单已解析|公开榜单部分解析|供应商分布|Top 10 榜单|覆盖<\/span>|最大变化|模型使用|值得关注/);
 
   const trendCards = trendSection.match(/<article\b[\s\S]*?<\/article>/g) || [];
   const cardOpenTagFor = (value) => (
@@ -14569,9 +14645,14 @@ test("public daily IA reset enforces stories original X compact tracking hover a
   const card = section?.items?.find((current) => current.title === "OpenRouter");
 
   assert(card, "OpenRouter tracking card should render");
-  assert.equal(card.table?.rows?.length, 10);
-  assert(card.bars?.rows?.length > 0);
-  assert(card.stats?.length > 0);
+  assert.equal(card.body, "");
+  assert.deepEqual(card.tags, []);
+  assert.equal(card.table, undefined);
+  assert.equal(card.bars, undefined);
+  assert.equal(card.stats, undefined);
+  assert.equal(card.component?.kind, "openrouter_rankings");
+  assert(card.component?.tabs?.some((tab) => tab.id === "top-models" && tab.view === "line_multi"));
+  assert(card.component?.tabs?.some((tab) => tab.id === "leaderboard" && tab.view === "leaderboard"));
   assert.equal(card.component?.officialSnapshot, undefined);
   assert.doesNotMatch(card.body, /不等同模型能力评测|公开榜单信号|继续核对/);
 });
@@ -21000,7 +21081,7 @@ test("public daily contract rejects invalid public media but allows missing medi
   );
 });
 
-test("public daily contract renders tables instead of screenshots and hides audit appendices", () => {
+test("public daily contract renders structured tracking components instead of screenshots and hides audit appendices", () => {
   const report = strictPublishReportFixture();
   report.daily_tracking = [
     {
@@ -21053,7 +21134,14 @@ test("public daily contract renders tables instead of screenshots and hides audi
 
   assert(tracking);
   assert.equal(tracking.items[0].media, undefined);
-  assert.equal(tracking.items[0].table.rows.length, 10);
+  assert.equal(tracking.items[0].table, undefined);
+  assert.equal(tracking.items[0].bars, undefined);
+  assert.equal(tracking.items[0].stats, undefined);
+  assert.equal(tracking.items[0].tags.length, 0);
+  assert.equal(tracking.items[0].body, "");
+  assert.equal(tracking.items[0].component.kind, "openrouter_rankings");
+  assert(tracking.items[0].component.tabs.some((tab) => tab.id === "top-models" && tab.view === "line_multi"));
+  assert(tracking.items[0].component.tabs.some((tab) => tab.id === "leaderboard" && tab.view === "leaderboard"));
   assert(hotBlogs.items.every((item) => !item.media));
   assert(!input.sections.some((section) => ["信源审计", "自检与产物", "发布质量说明"].includes(section.title)));
   assert(!serialized.includes("source_audit"));
@@ -21061,7 +21149,7 @@ test("public daily contract renders tables instead of screenshots and hides audi
   assert(!serialized.includes("why_it_matters"));
 });
 
-test("tracking visual tables render OpenRouter and Artificial Analysis without screenshots", () => {
+test("tracking visual components render OpenRouter and Artificial Analysis without screenshots or summary log cards", () => {
   const report = strictPublishReportFixture();
   report.daily_tracking = [
     {
@@ -21094,7 +21182,15 @@ test("tracking visual tables render OpenRouter and Artificial Analysis without s
       publish_to_public: true,
       summary: "Artificial Analysis parsed Top 10 intelligence index rows.",
       metrics: [],
-      snapshot: artificialAnalysisSnapshotFixture()
+      snapshot: {
+        ...artificialAnalysisSnapshotFixture(),
+        official_component_snapshot: officialComponentSnapshotFixture({
+          componentKind: "artificial_analysis_index",
+          sourceUrl: "https://artificialanalysis.ai/models",
+          selectorVersion: "artificial-analysis-index-v1",
+          fixture: artificialAnalysisOfficialComponentFixture()
+        })
+      }
     }
   ];
   report.evidence_assets = [
@@ -21116,7 +21212,15 @@ test("tracking visual tables render OpenRouter and Artificial Analysis without s
 
   assert(section);
   assert.equal(section.items.length, 2);
-  assert(section.items.every((item) => item.table?.rows?.length === 10));
+  assert(section.items.every((item) => item.media === undefined));
+  assert(section.items.every((item) => item.table === undefined));
+  assert(section.items.every((item) => item.bars === undefined));
+  assert(section.items.every((item) => item.stats === undefined));
+  assert(section.items.every((item) => item.body === ""));
+  assert(section.items.every((item) => Array.isArray(item.tags) && item.tags.length === 0));
+  assert.equal(section.items[0].component.kind, "openrouter_rankings");
+  assert(section.items[0].component.tabs.some((tab) => tab.id === "top-models" && tab.view === "line_multi"));
+  assert.equal(section.items[1].component.kind, "artificial_analysis_index");
   assert(section.items.every((item) => item.media === undefined));
 });
 
@@ -21222,8 +21326,9 @@ test("tracking component snapshot exposes OpenRouter and Artificial Analysis tra
   const openRouter = validation.value.daily_tracking.find((item) => item.id === "openrouter-rankings");
   const artificialAnalysis = validation.value.daily_tracking.find((item) => item.id === "artificial-analysis-intelligence-index");
   assert.equal(openRouter.tracking_component_snapshot.component_kind, "openrouter_rankings");
-  assert(openRouter.tracking_component_snapshot.tabs.some((tab) => tab.id === "top-models" && tab.view === "stacked_bar"));
+  assert(openRouter.tracking_component_snapshot.tabs.some((tab) => tab.id === "top-models" && tab.view === "line_multi"));
   assert(openRouter.tracking_component_snapshot.tabs.some((tab) => tab.id === "leaderboard" && tab.view === "leaderboard"));
+  assert(openRouter.tracking_component_snapshot.series.some((series) => series.tab_id === "top-models" && series.chart === "line_multi"));
   assert.match(openRouter.tracking_component_snapshot.raw_dom_hash, /^sha256:[a-f0-9]{64}$/);
   assert.match(openRouter.tracking_component_snapshot.data_hash, /^sha256:[a-f0-9]{64}$/);
   assert.equal(openRouter.tracking_component_snapshot.public_trace.selector_version, "openrouter-rankings-v1");
@@ -21241,8 +21346,14 @@ test("tracking component snapshot exposes OpenRouter and Artificial Analysis tra
   const trackingSection = input.sections.find((section) => section.cardClass === "tracking-card");
   const openRouterCard = trackingSection.items.find((item) => item.title === "OpenRouter");
   const aaCard = trackingSection.items.find((item) => item.title === "Artificial Analysis");
+  assert.equal(openRouterCard.body, "");
+  assert.deepEqual(openRouterCard.tags, []);
+  assert.equal(openRouterCard.stats, undefined);
+  assert.equal(openRouterCard.bars, undefined);
+  assert.equal(openRouterCard.table, undefined);
   assert.equal(openRouterCard.component.kind, "openrouter_rankings");
   assert.equal(openRouterCard.component.tabs.length, 2);
+  assert(openRouterCard.component.tabs.some((tab) => tab.id === "top-models" && tab.view === "line_multi"));
   assert.equal(openRouterCard.component.trace, undefined);
   assert.equal(aaCard.component.kind, "artificial_analysis_index");
   assert.equal(aaCard.component.tabs.length, 1);
@@ -21437,7 +21548,9 @@ test("public daily contract replays 2026-06-09 bad media and short-main regressi
 
   assert(openRouterCard);
   assert.equal(openRouterCard.media, undefined);
-  assert.equal(openRouterCard.table.rows.length, 10);
+  assert.equal(openRouterCard.table, undefined);
+  assert.equal(openRouterCard.component.kind, "openrouter_rankings");
+  assert(openRouterCard.component.tabs.some((tab) => tab.id === "leaderboard" && tab.view === "leaderboard"));
   assert(!serialized.includes("source_audit"));
   assert(!serialized.includes("why_it_matters"));
   assert(!serialized.includes("full-page browser screenshot"));
@@ -22327,8 +22440,9 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   });
   assert(summary.length >= 80, summary);
   assert(summary.length <= 130, summary);
-  assert.doesNotMatch(summary, /README 将|主要围绕|阅读时先看|它的价值在于|具体阅读时/);
-  assert.match(summary, /README 显示核心能力包括/);
+  assert.doesNotMatch(summary, /README 将|主要围绕|阅读时先看|它的价值在于|具体阅读时|README 显示|读者应先|优先核对|适合先|准入|复现门槛/);
+  assert.match(summary, /agent-workbench 是面向/);
+  assert.match(summary, /包含|覆盖|提供/);
   assert.match(summary, /Agent 构建|评测|调试|工具调用/);
   assert.doesNotMatch(summary, /[A-Za-z](?:[A-Za-z0-9 ,;:'"()[\]/.!?+~#-]){45,}/);
 
@@ -22361,7 +22475,7 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   );
   assert(item.description.startsWith(summary));
   assert(item.readme_summary.startsWith(summary));
-  assert.match(item.readme_summary, /README 显示核心能力包括/);
+  assert.doesNotMatch(item.readme_summary, /README 显示|读者应先|优先核对|适合先|准入|复现门槛/);
   assert.equal(item.readme_cache.key, key);
   assert.equal(item.readme_cache.hit, true);
   assert.equal(item.readme_cache.sha, sha);
@@ -22373,7 +22487,8 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
     }
   );
   assert.doesNotMatch(legacyItem.readme_summary, /主要围绕|阅读时先看/);
-  assert.match(legacyItem.readme_summary, /README 显示核心能力包括/);
+  assert.doesNotMatch(legacyItem.readme_summary, /README 显示|读者应先|优先核对|适合先|准入|复现门槛/);
+  assert.match(legacyItem.readme_summary, /agent-workbench 是面向|Agent 构建/);
 });
 
 test("Chinese media dynamics include all in-window QbitAI SSPAI and Machine Heart entries", () => {
@@ -23472,14 +23587,49 @@ function trackingTrendCurveFixtureItems(reportDate, index) {
   const openRouterSnapshot = openRouterSnapshotFixture();
   openRouterSnapshot.snapshot_as_of = `${reportDate}T00:00:00.000Z`;
   openRouterSnapshot.top_entries[0].tokens = `${(2.2 + index * 0.18).toFixed(2)}T tokens`;
+  openRouterSnapshot.top_entries = openRouterSnapshot.top_entries.map((entry, entryIndex) => ({
+    ...entry,
+    rank: entryIndex + 1,
+    tokens: entryIndex === 0 ? entry.tokens : `${(1.6 - entryIndex * 0.09 + index * 0.03).toFixed(2)}T tokens`
+  }));
+  if (index < 3) {
+    openRouterSnapshot.top_entries[9] = {
+      rank: 10,
+      model: "Legacy Llama 2",
+      provider: "meta",
+      tokens: `${(0.55 + index * 0.02).toFixed(2)}T tokens`,
+      change: "-4%"
+    };
+  }
+  if (index >= 4) {
+    openRouterSnapshot.top_entries[8] = {
+      rank: 9,
+      model: "Newcomer Nova",
+      provider: "example-ai",
+      tokens: `${(0.74 + index * 0.03).toFixed(2)}T tokens`,
+      change: "+18%"
+    };
+  }
 
   const artificialAnalysisSnapshot = artificialAnalysisSnapshotFixture();
   artificialAnalysisSnapshot.snapshot_as_of = `${reportDate}T00:00:00.000Z`;
   artificialAnalysisSnapshot.top_entries[0].tokens = String(55 + index);
+  artificialAnalysisSnapshot.official_component_snapshot = officialComponentSnapshotFixture({
+    componentKind: "artificial_analysis_index",
+    sourceUrl: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+    selectorVersion: "artificial-analysis-index-v1",
+    fixture: artificialAnalysisOfficialComponentFixture()
+  });
 
   const sweBenchSnapshot = sweBenchProSnapshotFixture(7);
   sweBenchSnapshot.snapshot_as_of = `${reportDate}T00:00:00.000Z`;
   sweBenchSnapshot.top_entries[0].tokens = `${(52 + index * 0.8).toFixed(2)}%`;
+  sweBenchSnapshot.official_component_snapshot = officialComponentSnapshotFixture({
+    componentKind: "swe_bench_pro",
+    sourceUrl: "https://scaleapi.github.io/SWE-bench_Pro-os/",
+    selectorVersion: "swe-bench-pro-v1",
+    fixture: sweBenchProOfficialComponentFixture()
+  });
 
   return [
     trackingTrendCurveFixtureItem({

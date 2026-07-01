@@ -288,6 +288,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
           card.querySelector("[data-card-data-table]") ||
           card.querySelector("[data-card-bars]") ||
           card.querySelector("[data-tracking-trend-curve]") ||
+          card.querySelector("[data-tracking-component]") ||
           card.querySelector("[data-official-component-snapshot]") ||
           card.querySelector(".card-media-grid img")
         );
@@ -324,6 +325,8 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         const hasStructuredTracking = Boolean(
           card.querySelector("[data-card-data-table]") ||
           card.querySelector("[data-card-bars]") ||
+          card.querySelector("[data-tracking-line-chart]") ||
+          card.querySelector(".tracking-data-table tbody tr") ||
           card.querySelector("[data-official-component-snapshot]")
         );
         if (!hasStructuredTracking) {
@@ -357,13 +360,15 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
           return null;
         }
         const hasOfficialSnapshot = Boolean(card.querySelector("[data-official-component-snapshot]"));
-        const tableRows = card.querySelectorAll("[data-card-data-table] tbody tr").length + officialTrackingSnapshotRows(card);
+        const tableRows = card.querySelectorAll("[data-card-data-table] tbody tr, .tracking-data-table tbody tr").length + officialTrackingSnapshotRows(card);
+        const lineCount = card.querySelectorAll("[data-tracking-line]").length;
         const imageCount = card.querySelectorAll(".card-media-grid img").length;
-        return ((hasOfficialSnapshot && imageCount === 0) || (tableRows >= 3 && imageCount === 0))
+        return ((hasOfficialSnapshot && imageCount === 0) || (tableRows >= 3 && imageCount === 0) || (lineCount >= 3 && imageCount === 0))
           ? null
           : {
               title,
               table_rows: tableRows,
+              line_count: lineCount,
               official_snapshot: hasOfficialSnapshot,
               image_count: imageCount
             };
