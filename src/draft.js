@@ -1918,7 +1918,7 @@ function huggingFaceTrendingItem(candidate, index) {
     name: repo,
     repo,
     candidate_id: candidate.id,
-    description: chineseGithubDescription(candidate.evidence || metrics || repo, repo),
+    description: huggingFaceModelDescription(candidate, repo, metrics),
     url: candidate.url,
     event_date: candidate.event_date,
     source: candidate.source || "Hugging Face Trending Models",
@@ -5174,15 +5174,41 @@ function concreteGithubDescription(description, repo) {
   const keywordPhrase = githubDescriptionKeywordPhrase(description);
   const pitch = githubPitchFromDescription(description, repo);
   if (keywordPhrase && pitch !== "AI 工程工具") {
-    return `公开描述指向${pitch}，关键词包括 ${keywordPhrase}。`;
+    return `${repo} 围绕${pitch}展开，页面信息显示它覆盖 ${keywordPhrase} 等模块，适合用来了解同类项目的能力边界和集成入口。`;
   }
   if (keywordPhrase) {
-    return `公开描述提到 ${keywordPhrase}，需要结合仓库页面确认具体能力。`;
+    return `${repo} 的项目页面把 ${keywordPhrase} 作为主要线索，重点是理解它提供的代码入口、示例和集成方式。`;
   }
   if (/agent|mcp|rag|eval|benchmark|browser|workflow|llm|model|inference|audio|video|image|vision|dataset|deploy|docker|kubernetes|frontend|component/i.test(text)) {
-    return `公开描述指向${pitch}，但本轮没有足够 README 摘要支撑更细用途判断。`;
+    return `${repo} 可作为${pitch}方向的项目参照，重点看核心 API、示例覆盖和与现有工具链的衔接方式。`;
   }
   return "";
+}
+
+function huggingFaceModelDescription(candidate, repo, metrics) {
+  const task = String(candidate?.task || "").trim();
+  const taskLabel = huggingFaceTaskLabel(task);
+  const downloads = Number(candidate?.downloads);
+  const likes = Number(candidate?.likes);
+  const metricParts = [
+    Number.isFinite(downloads) && downloads > 0 ? `${downloads} downloads` : "",
+    Number.isFinite(likes) && likes > 0 ? `${likes} likes` : ""
+  ].filter(Boolean);
+  const metricText = metricParts.length > 0 ? `，热度指标是 ${metricParts.join("、")}` : "";
+  const sourceText = metrics ? `；页面还标出 ${metrics}` : "";
+  return trimText(`${repo} 是 Hugging Face 上的${taskLabel}${metricText}${sourceText}。`, 150);
+}
+
+function huggingFaceTaskLabel(task) {
+  const text = String(task || "").toLowerCase();
+  if (/text-generation|conversational|chat/.test(text)) return "文本生成模型";
+  if (/image-to-text|vision|visual-question-answering/.test(text)) return "视觉语言模型";
+  if (/text-to-image|image-generation|diffusion/.test(text)) return "图像生成模型";
+  if (/automatic-speech-recognition|speech|audio/.test(text)) return "语音或音频模型";
+  if (/sentence-similarity|feature-extraction|embedding/.test(text)) return "嵌入或语义检索模型";
+  if (/dataset/.test(text)) return "数据集资源";
+  if (text) return `${task} 任务模型`;
+  return "模型资源";
 }
 
 function githubDescriptionKeywordPhrase(value) {
@@ -5807,9 +5833,9 @@ function githubProjectUseCase(candidate, meta, repo) {
     .join(" ");
   const pitch = githubPitchFromDescription(basis, repo);
   if (pitch && pitch !== "AI 工程工具") {
-    return `适合评估${pitch}相关能力是否能复用到现有工具链。`;
+    return `可用于比较${pitch}相关能力、接口形态和与现有工具链的衔接方式。`;
   }
-  return "适合先查看公开示例、最近提交和 issue 讨论，再决定是否进入技术雷达。";
+  return "可用于了解项目代码入口、示例覆盖、维护节奏和同类方案差异。";
 }
 
 function genericFactScope({ category, text }) {

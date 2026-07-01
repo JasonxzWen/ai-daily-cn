@@ -1816,7 +1816,7 @@
           "minLength": 1
         },
         "view": {
-          "enum": ["stacked_bar", "leaderboard", "score_table", "scatter"]
+          "enum": ["stacked_bar", "leaderboard", "score_table", "scatter", "line_multi"]
         },
         "status": {
           "enum": ["complete", "partial", "fallback", "blocked"]
@@ -1844,7 +1844,7 @@
           "minLength": 1
         },
         "chart": {
-          "enum": ["stacked_bar", "leaderboard", "score_table", "scatter"]
+          "enum": ["stacked_bar", "leaderboard", "score_table", "scatter", "line_multi"]
         },
         "rows": {
           "type": "array",

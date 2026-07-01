@@ -408,7 +408,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "tracking visual tables render OpenRouter and Artificial Analysis without screenshots",
+        "test_name": "tracking visual components render OpenRouter and Artificial Analysis without screenshots or summary log cards",
         "gate": "npm run validate"
       }
     },
@@ -518,7 +518,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "public daily contract renders tables instead of screenshots and hides audit appendices",
+        "test_name": "public daily contract renders structured tracking components instead of screenshots and hides audit appendices",
         "gate": "npm run validate"
       }
     },
@@ -684,7 +684,7 @@
         "docs/ai-daily-cross-agent-iteration-roadmap.md",
         "docs/ai-daily-requirements-reconciliation.md",
         "tests/unit.test.js",
-        "tasks/current-task.md"
+        "tasks/current-task.example.md"
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
@@ -939,7 +939,7 @@
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
-        "tasks/current-task.md",
+        "tasks/current-task.example.md",
         "schemas/report.schema.json",
         "src/draft.js",
         "src/story-first.js",

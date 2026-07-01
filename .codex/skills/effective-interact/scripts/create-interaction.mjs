@@ -1414,17 +1414,15 @@ function renderTrackingComponent(component) {
       ${renderTrackingComponentPanel(component, tab)}
     </div>`;
   }).join("");
-  return `<div class="tracking-component" data-tracking-component data-component-kind="${escapeAttr(component.kind || "")}" data-scale="linear">
-    <div class="tracking-component-header">
-      <div>
-        <div class="card-visual-title">${escapeHtml(component.source || "Tracking component")}</div>
-        ${component.collectedAt ? `<span class="tracking-component-meta">${escapeHtml(component.collectedAt)}</span>` : ""}
-      </div>
+  const hasScaleToggle = tabs.some((tab) => ["bar", "stacked_bar"].includes(String(tab.view || "")));
+  const header = hasScaleToggle ? `<div class="tracking-component-header">
       <div class="tracking-scale-toggle" role="group" aria-label="Scale">
         <button type="button" data-scale-mode="linear" aria-pressed="true">Linear</button>
         <button type="button" data-scale-mode="log" aria-pressed="false">Log</button>
       </div>
-    </div>
+    </div>` : "";
+  return `<div class="tracking-component" data-tracking-component data-component-kind="${escapeAttr(component.kind || "")}" data-scale="linear">
+    ${header}
     <div class="toolbar tracking-component-tabs" role="tablist" aria-label="${escapeAttr(component.source || "Tracking component")} tabs">${buttons}</div>
     ${panels}
     ${renderTrackingTrace(component.trace)}
@@ -1484,6 +1482,9 @@ function renderTrackingComponentPanel(component, tab) {
   }
   if (tab.view === "leaderboard" || tab.view === "score_table") {
     return renderTrackingLeaderboard(rows, tab);
+  }
+  if (tab.view === "line_multi") {
+    return renderTrackingLineChart(rows, tab, component);
   }
   if (tab.view === "scatter") {
     return renderTrackingScatterFallback(rows, tab);
@@ -1591,6 +1592,180 @@ function trackingTooltip(row) {
     row.secondaryValueLabel || row.secondary_value_label ? `x: ${row.secondaryValueLabel || row.secondary_value_label}` : "",
     row.change ? `change: ${row.change}` : ""
   ].filter(Boolean).join(" | ");
+}
+
+function renderTrackingLineChart(rows, tab, component = {}) {
+  const points = normalizeTrackingLinePoints(rows);
+  if (points.length === 0) {
+    return `<div class="tracking-component-fallback">${escapeHtml(tab.fallbackReason || "trend data unavailable")}</div>`;
+  }
+  const dates = [...new Set(points.map((point) => point.date))]
+    .sort((left, right) => left.localeCompare(right))
+    .slice(-7);
+  const dateSet = new Set(dates);
+  const inWindow = points.filter((point) => dateSet.has(point.date));
+  const groups = trackingLineGroups(inWindow, dates).slice(0, 24);
+  if (groups.length === 0) {
+    return `<div class="tracking-component-fallback">${escapeHtml(tab.fallbackReason || "trend data unavailable")}</div>`;
+  }
+
+  const width = 920;
+  const height = 300;
+  const padLeft = 44;
+  const padRight = 178;
+  const padTop = 22;
+  const padBottom = 34;
+  const plotWidth = width - padLeft - padRight;
+  const plotHeight = height - padTop - padBottom;
+  const maxRank = Math.max(10, ...groups.flatMap((group) => group.points.map((point) => point.rank)));
+  const rankSpan = Math.max(1, maxRank - 1);
+  const xForDate = (date) => {
+    const index = dates.indexOf(date);
+    if (dates.length <= 1) return padLeft + plotWidth / 2;
+    return padLeft + (plotWidth * index) / (dates.length - 1);
+  };
+  const yForRank = (rank) => padTop + ((Math.max(1, rank) - 1) / rankSpan) * plotHeight;
+  const gridDates = dates.map((date, index) => {
+    const x = xForDate(date);
+    return `<line class="tracking-line-grid tracking-line-grid-date" x1="${x.toFixed(1)}" y1="${padTop}" x2="${x.toFixed(1)}" y2="${height - padBottom}"></line>
+      ${index === 0 || index === dates.length - 1 ? `<text class="tracking-line-axis-label" x="${x.toFixed(1)}" y="${height - 8}" text-anchor="${index === 0 ? "start" : "end"}">${escapeHtml(shortDateLabel(date))}</text>` : ""}`;
+  }).join("");
+  const rankTicks = [1, Math.max(2, Math.ceil(maxRank / 2)), maxRank]
+    .filter((rank, index, all) => all.indexOf(rank) === index)
+    .map((rank) => {
+      const y = yForRank(rank);
+      return `<line class="tracking-line-grid" x1="${padLeft}" y1="${y.toFixed(1)}" x2="${width - padRight}" y2="${y.toFixed(1)}"></line>
+        <text class="tracking-line-rank-label" x="8" y="${(y + 4).toFixed(1)}">#${rank}</text>`;
+    }).join("");
+  const renderedGroups = groups.map((group, index) => {
+    const color = trackingLineColor(index);
+    const coordinates = group.points.map((point) => ({
+      ...point,
+      x: xForDate(point.date),
+      y: yForRank(point.rank),
+      dateIndex: dates.indexOf(point.date)
+    }));
+    const segments = contiguousTrackingLineSegments(coordinates)
+      .filter((segment) => segment.length >= 2)
+      .map((segment) => `<polyline class="tracking-line-path" points="${escapeAttr(segment.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(" "))}"></polyline>`)
+      .join("");
+    const circles = coordinates.map((point) => {
+      const tooltip = `${point.model} | ${point.date} | #${point.rank}${point.valueLabel ? ` | ${point.valueLabel}` : ""}${point.change ? ` | ${point.change}` : ""}`;
+      return `<circle class="tracking-line-point" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="3.1" data-tracking-tooltip="${escapeAttr(tooltip)}"><title>${escapeHtml(tooltip)}</title></circle>`;
+    }).join("");
+    const lastPoint = coordinates.at(-1);
+    const label = lastPoint
+      ? `<text class="tracking-line-label" data-tracking-line-label="${escapeAttr(group.model)}" x="${(lastPoint.x + 9).toFixed(1)}" y="${lastPoint.y.toFixed(1)}" dominant-baseline="middle">${escapeHtml(shortTrackingLineLabel(group.model))}</text>`
+      : "";
+    return `<g class="tracking-line-series" data-tracking-line data-tracking-line-model="${escapeAttr(group.model)}" style="--line-color:${escapeAttr(color)}">${segments}${circles}${label}</g>`;
+  }).join("");
+  const legend = "";
+  const sourceId = component.sourceId || component.source_id || component.kind || "";
+  const ariaLabel = `${tab.label || "七日排名"}：${groups.length} 条实体曲线，${dates.length} 个日期点`;
+  return `<div class="tracking-line-chart" data-tracking-trend-curve data-tracking-line-chart data-tracking-source="${escapeAttr(sourceId)}" data-trend-points="${dates.length}" data-trend-lines="${groups.length}" aria-label="${escapeAttr(ariaLabel)}">
+    <svg class="tracking-line-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeAttr(ariaLabel)}" focusable="false">
+      ${gridDates}
+      ${rankTicks}
+      ${renderedGroups}
+    </svg>
+    <div class="tracking-line-legend" aria-label="实体图例">${legend}</div>
+  </div>`;
+}
+
+function normalizeTrackingLinePoints(rows) {
+  return rows
+    .map((row) => {
+      const date = String(row.metric || row.date || row.label || "").match(/\d{4}-\d{2}-\d{2}/)?.[0] || String(row.metric || row.date || row.label || "").trim();
+      const rank = Number(row.rank);
+      const model = String(row.model || row.label || "").trim();
+      if (!date || !model || !Number.isFinite(rank) || rank <= 0) {
+        return null;
+      }
+      return {
+        date,
+        rank,
+        model,
+        provider: String(row.provider || "").trim(),
+        value: Number(row.value),
+        valueLabel: String(row.valueLabel || row.value_label || "").trim(),
+        change: String(row.change || "").trim()
+      };
+    })
+    .filter(Boolean);
+}
+
+function trackingLineGroups(points, dates) {
+  const dateOrder = new Map(dates.map((date, index) => [date, index]));
+  const groups = new Map();
+  for (const point of points) {
+    const key = trackingModelKey(point.model);
+    if (!key) continue;
+    if (!groups.has(key)) {
+      groups.set(key, { key, model: point.model, points: [] });
+    }
+    groups.get(key).points.push(point);
+  }
+  return [...groups.values()]
+    .map((group) => ({
+      ...group,
+      points: group.points
+        .sort((left, right) => (dateOrder.get(left.date) ?? 0) - (dateOrder.get(right.date) ?? 0))
+        .filter((point, index, all) => all.findIndex((candidate) => candidate.date === point.date) === index)
+    }))
+    .sort((left, right) => {
+      const latestDate = dates[dates.length - 1] || "";
+      const leftLatest = left.points.find((point) => point.date === latestDate);
+      const rightLatest = right.points.find((point) => point.date === latestDate);
+      const leftRank = leftLatest?.rank ?? 999;
+      const rightRank = rightLatest?.rank ?? 999;
+      return leftRank - rightRank || bestTrackingRank(left) - bestTrackingRank(right) || left.model.localeCompare(right.model);
+    });
+}
+
+function contiguousTrackingLineSegments(points) {
+  const segments = [];
+  let current = [];
+  for (const point of points) {
+    if (current.length === 0 || point.dateIndex === current.at(-1)?.dateIndex + 1) {
+      current.push(point);
+    } else {
+      segments.push(current);
+      current = [point];
+    }
+  }
+  if (current.length > 0) {
+    segments.push(current);
+  }
+  return segments;
+}
+
+function bestTrackingRank(group) {
+  return Math.min(...group.points.map((point) => point.rank));
+}
+
+function trackingModelKey(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/gu, " ").trim();
+}
+
+function trackingLineColor(index) {
+  const colors = [
+    "#0f766e", "#d97757", "#2563eb", "#9333ea", "#16a34a", "#dc2626",
+    "#0891b2", "#ca8a04", "#be185d", "#4f46e5", "#047857", "#b45309",
+    "#7c3aed", "#0369a1", "#65a30d", "#b91c1c", "#0e7490", "#a16207",
+    "#c026d3", "#1d4ed8", "#15803d", "#c2410c", "#4338ca", "#be123c"
+  ];
+  return colors[index % colors.length];
+}
+
+function shortTrackingLineLabel(value) {
+  const text = String(value || "").trim();
+  const maxLength = 24;
+  return text.length > maxLength ? `${text.slice(0, maxLength - 3)}...` : text;
+}
+
+function shortDateLabel(value) {
+  const text = String(value || "");
+  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text.slice(5) : text;
 }
 
 function renderTrackingBars(rows, tab) {

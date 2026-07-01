@@ -1007,7 +1007,7 @@ test("effective-interact filterable cards render card stats, bars, and tables", 
   assert.equal(validation.status, 0, validation.stderr || validation.stdout);
 });
 
-test("effective-interact filterable cards render local tracking components and public trace", async () => {
+test("effective-interact filterable cards render local tracking components with multi-entity lines and public trace", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-tracking-component-"));
   const inputPath = path.join(tmp, "tracking-component.json");
   await fsp.writeFile(
@@ -1037,14 +1037,14 @@ test("effective-interact filterable cards render local tracking components and p
                 sourceUrl: "https://openrouter.ai/rankings",
                 collectedAt: "2026-06-12T02:00:00+08:00",
                 tabs: [
-                  { id: "top-models", label: "Top Models", view: "stacked_bar", status: "complete" },
-                  { id: "leaderboard", label: "LLM Leaderboard", view: "leaderboard", status: "complete" }
+                  { id: "top-models", label: "七日排名", view: "line_multi", status: "complete" },
+                  { id: "leaderboard", label: "当前榜单", view: "leaderboard", status: "complete" }
                 ],
                 series: [
                   {
                     id: "top-models",
                     tabId: "top-models",
-                    chart: "stacked_bar",
+                    chart: "line_multi",
                     rows: [
                       {
                         rank: 1,
@@ -1058,9 +1058,11 @@ test("effective-interact filterable cards render local tracking components and p
                       },
                       { rank: 2, model: "Claude Sonnet 4.6", provider: "anthropic", value: 1770000000000, valueLabel: "1.77T tokens", change: "", metric: "2026-06-12" },
                       { rank: 3, model: "MiniMax M3", provider: "minimax", value: 1220000000000, valueLabel: "1.22T tokens", change: "", metric: "2026-06-12" },
+                      { rank: 4, model: "Newcomer Nova", provider: "example-ai", value: 1040000000000, valueLabel: "1.04T tokens", change: "NEW", metric: "2026-06-12" },
                       { rank: 1, model: "DeepSeek V4 Flash", provider: "deepseek", value: 2900000000000, valueLabel: "2.9T tokens", change: "", metric: "2026-06-05" },
                       { rank: 2, model: "Claude Sonnet 4.6", provider: "anthropic", value: 1410000000000, valueLabel: "1.41T tokens", change: "", metric: "2026-06-05" },
                       { rank: 3, model: "MiniMax M3", provider: "minimax", value: 910000000000, valueLabel: "910B tokens", change: "", metric: "2026-06-05" },
+                      { rank: 4, model: "Legacy Llama 2", provider: "meta", value: 720000000000, valueLabel: "720B tokens", change: "", metric: "2026-06-05" },
                       { rank: 1, model: "DeepSeek V4 Flash", provider: "deepseek", value: 2400000000000, valueLabel: "2.4T tokens", change: "", metric: "2026-05-29" }
                     ]
                   }
@@ -1105,10 +1107,17 @@ test("effective-interact filterable cards render local tracking components and p
   const html = await fsp.readFile(payload.outputPath, "utf8");
   assert.match(html, /data-tracking-component/);
   assert.match(html, /data-component-kind="openrouter_rankings"/);
-  assert.match(html, /data-scale-mode="linear"/);
-  assert.match(html, /data-scale-mode="log"/);
+  assert.doesNotMatch(html, /data-scale-mode="linear"/);
+  assert.doesNotMatch(html, /data-scale-mode="log"/);
+  assert.match(html, /data-tracking-line-chart/);
+  assert.match(html, /data-trend-lines="5"/);
+  assert.match(html, /data-tracking-line-model="DeepSeek V4 Flash"/);
+  assert.match(html, /data-tracking-line-model="Legacy Llama 2"/);
+  assert.match(html, /data-tracking-line-model="Newcomer Nova"/);
+  assert.match(html, /data-tracking-line-label="DeepSeek V4 Flash"/);
+  assert.doesNotMatch(html, /tracking-line-legend-item/);
   assert.match(html, /data-tracking-tooltip/);
-  assert.match(html, /data-tracking-stack/);
+  assert.doesNotMatch(html, /data-tracking-stack/);
   assert.match(html, /2026-06-12/);
   assert.match(html, /data-tracking-trace/);
   assert.match(html, /sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/);

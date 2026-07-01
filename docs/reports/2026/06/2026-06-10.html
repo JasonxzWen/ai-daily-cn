@@ -1553,6 +1553,90 @@ body.lightbox-open {
 .tracking-stack-segment[data-segment="6"] { background: #0891b2; }
 .tracking-stack-segment[data-segment="7"] { background: #ca8a04; }
 
+.tracking-line-chart {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tracking-line-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 210px;
+  border: 1px solid rgba(209, 207, 197, 0.72);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.tracking-line-grid {
+  stroke: rgba(95, 93, 87, 0.18);
+  stroke-width: 1;
+}
+
+.tracking-line-grid-date {
+  stroke-dasharray: 3 5;
+}
+
+.tracking-line-rank-label,
+.tracking-line-axis-label {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 780;
+}
+
+.tracking-line-series {
+  color: var(--line-color);
+}
+
+.tracking-line-path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.tracking-line-point {
+  fill: #ffffff;
+  stroke: currentColor;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.tracking-line-label {
+  fill: currentColor;
+  stroke: #fbfaf5;
+  stroke-linejoin: round;
+  stroke-width: 4px;
+  paint-order: stroke;
+  font-size: 11px;
+  font-weight: 820;
+}
+
+@media (max-width: 520px) {
+  .tracking-line-label {
+    stroke-width: 5px;
+    font-size: 18px;
+  }
+}
+
+.tracking-line-series:hover .tracking-line-path,
+.tracking-line-series:focus-within .tracking-line-path {
+  stroke-width: 3;
+}
+
+.tracking-line-legend {
+  display: none;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  max-height: 86px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
 .tracking-bar-row[data-tracking-tooltip]:hover::after,
 .tracking-bar-row[data-tracking-tooltip]:focus-within::after,
 .tracking-stack-row[data-tracking-tooltip]:hover::after,
@@ -3504,87 +3588,34 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
     <div class="evidence-grid focus-field tracking-card-grid" data-focus-field="section-trend-tracking">
       <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="section-trend-tracking" data-filter-value="OpenRouter" data-search-target="section-trend-tracking" data-trend-status="available" data-trend-history-points="6">
-    <div class="meta">OpenRouter</div>
+
     <h3><a class="card-title-link" href="https://openrouter.ai/rankings" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/png;base64,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" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>OpenRouter</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型使用</span><span class="chip chip-date">2026-06-10</span></div>
+
 
     <div class="tracking-component" data-tracking-component data-component-kind="openrouter_rankings" data-scale="linear">
-    <div class="tracking-component-header">
-      <div>
-        <div class="card-visual-title">OpenRouter</div>
-        <span class="tracking-component-meta">2026-06-10T09:49:06.353Z</span>
-      </div>
-      <div class="tracking-scale-toggle" role="group" aria-label="Scale">
-        <button type="button" data-scale-mode="linear" aria-pressed="true">Linear</button>
-        <button type="button" data-scale-mode="log" aria-pressed="false">Log</button>
-      </div>
-    </div>
-    <div class="toolbar tracking-component-tabs" role="tablist" aria-label="OpenRouter tabs"><button type="button" data-tab-group="tracking-openrouter-rankings" data-tab="tracking-openrouter-rankings-top-models" aria-selected="true">Top Models</button><button type="button" data-tab-group="tracking-openrouter-rankings" data-tab="tracking-openrouter-rankings-leaderboard" aria-selected="false">LLM Leaderboard</button></div>
+
+    <div class="toolbar tracking-component-tabs" role="tablist" aria-label="OpenRouter tabs"><button type="button" data-tab-group="tracking-openrouter-rankings" data-tab="tracking-openrouter-rankings-top-models" aria-selected="true">七日排名</button><button type="button" data-tab-group="tracking-openrouter-rankings" data-tab="tracking-openrouter-rankings-leaderboard" aria-selected="false">当前榜单</button></div>
     <div class="tracking-component-panel" id="tracking-openrouter-rankings-top-models" data-tab-panel-group="tracking-openrouter-rankings" >
-      <div class="tracking-bars" aria-label="Top Models"><div class="tracking-bar-row" data-tracking-tooltip="#1 DeepSeek V4 Flash | provider: deepseek | 4.23T tokens | change: 55%" title="#1 DeepSeek V4 Flash | provider: deepseek | 4.23T tokens | change: 55%">
-      <span class="tracking-rank">#1</span>
-      <span class="tracking-name">DeepSeek V4 Flash<small>deepseek</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:100%;--bar-width-log:100%"></span></span>
-      <span class="tracking-value">4.23T tokens</span>
-      <span class="tracking-change">55%</span>
-    </div><div class="tracking-bar-row" data-tracking-tooltip="#2 Hy3 preview | provider: tencent | 3.53T tokens | change: 25%" title="#2 Hy3 preview | provider: tencent | 3.53T tokens | change: 25%">
-      <span class="tracking-rank">#2</span>
-      <span class="tracking-name">Hy3 preview<small>tencent</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:83%;--bar-width-log:99%"></span></span>
-      <span class="tracking-value">3.53T tokens</span>
-      <span class="tracking-change">25%</span>
-    </div><div class="tracking-bar-row" data-tracking-tooltip="#3 MiniMax M3 | provider: minimax | 3.22T tokens | change: &gt;999%" title="#3 MiniMax M3 | provider: minimax | 3.22T tokens | change: &gt;999%">
-      <span class="tracking-rank">#3</span>
-      <span class="tracking-name">MiniMax M3<small>minimax</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:76%;--bar-width-log:99%"></span></span>
-      <span class="tracking-value">3.22T tokens</span>
-      <span class="tracking-change">&gt;999%</span>
-    </div><div class="tracking-bar-row" data-tracking-tooltip="#4 MiMo-V2.5 | provider: xiaomi | 2.73T tokens | change: 40%" title="#4 MiMo-V2.5 | provider: xiaomi | 2.73T tokens | change: 40%">
-      <span class="tracking-rank">#4</span>
-      <span class="tracking-name">MiMo-V2.5<small>xiaomi</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:65%;--bar-width-log:98%"></span></span>
-      <span class="tracking-value">2.73T tokens</span>
-      <span class="tracking-change">40%</span>
-    </div><div class="tracking-bar-row" data-tracking-tooltip="#5 DeepSeek V4 Pro | provider: deepseek | 2.03T tokens | change: 59%" title="#5 DeepSeek V4 Pro | provider: deepseek | 2.03T tokens | change: 59%">
-      <span class="tracking-rank">#5</span>
-      <span class="tracking-name">DeepSeek V4 Pro<small>deepseek</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:48%;--bar-width-log:97%"></span></span>
-      <span class="tracking-value">2.03T tokens</span>
-      <span class="tracking-change">59%</span>
-    </div><div class="tracking-bar-row" data-tracking-tooltip="#6 Owl Alpha | provider: openrouter | 2.01T tokens | change: 9%" title="#6 Owl Alpha | provider: openrouter | 2.01T tokens | change: 9%">
-      <span class="tracking-rank">#6</span>
-      <span class="tracking-name">Owl Alpha<small>openrouter</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:48%;--bar-width-log:97%"></span></span>
-      <span class="tracking-value">2.01T tokens</span>
-      <span class="tracking-change">9%</span>
-    </div><div class="tracking-bar-row" data-tracking-tooltip="#7 Claude Sonnet 4.6 | provider: anthropic | 1.96T tokens | change: 5%" title="#7 Claude Sonnet 4.6 | provider: anthropic | 1.96T tokens | change: 5%">
-      <span class="tracking-rank">#7</span>
-      <span class="tracking-name">Claude Sonnet 4.6<small>anthropic</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:46%;--bar-width-log:97%"></span></span>
-      <span class="tracking-value">1.96T tokens</span>
-      <span class="tracking-change">5%</span>
-    </div><div class="tracking-bar-row" data-tracking-tooltip="#8 Claude Opus 4.7 | provider: anthropic | 1.61T tokens | change: 4%" title="#8 Claude Opus 4.7 | provider: anthropic | 1.61T tokens | change: 4%">
-      <span class="tracking-rank">#8</span>
-      <span class="tracking-name">Claude Opus 4.7<small>anthropic</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:38%;--bar-width-log:97%"></span></span>
-      <span class="tracking-value">1.61T tokens</span>
-      <span class="tracking-change">4%</span>
-    </div><div class="tracking-bar-row" data-tracking-tooltip="#9 Claude Opus 4.8 | provider: anthropic | 1.33T tokens | change: 140%" title="#9 Claude Opus 4.8 | provider: anthropic | 1.33T tokens | change: 140%">
-      <span class="tracking-rank">#9</span>
-      <span class="tracking-name">Claude Opus 4.8<small>anthropic</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:31%;--bar-width-log:96%"></span></span>
-      <span class="tracking-value">1.33T tokens</span>
-      <span class="tracking-change">140%</span>
-    </div><div class="tracking-bar-row" data-tracking-tooltip="#10 DeepSeek V3.2 | provider: deepseek | 1.18T tokens | change: 7%" title="#10 DeepSeek V3.2 | provider: deepseek | 1.18T tokens | change: 7%">
-      <span class="tracking-rank">#10</span>
-      <span class="tracking-name">DeepSeek V3.2<small>deepseek</small></span>
-      <span class="tracking-bar-track"><span class="tracking-bar-fill" style="--bar-width-linear:28%;--bar-width-log:96%"></span></span>
-      <span class="tracking-value">1.18T tokens</span>
-      <span class="tracking-change">7%</span>
-    </div></div>
+      <div class="tracking-line-chart" data-tracking-trend-curve data-tracking-line-chart data-tracking-source="openrouter-rankings" data-trend-points="6" data-trend-lines="11" aria-label="七日排名：11 条实体曲线，6 个日期点">
+    <svg class="tracking-line-svg" viewBox="0 0 920 300" role="img" aria-label="七日排名：11 条实体曲线，6 个日期点" focusable="false">
+      <line class="tracking-line-grid tracking-line-grid-date" x1="44.0" y1="22" x2="44.0" y2="266"></line>
+      <text class="tracking-line-axis-label" x="44.0" y="292" text-anchor="start">06-05</text><line class="tracking-line-grid tracking-line-grid-date" x1="183.6" y1="22" x2="183.6" y2="266"></line>
+      <line class="tracking-line-grid tracking-line-grid-date" x1="323.2" y1="22" x2="323.2" y2="266"></line>
+      <line class="tracking-line-grid tracking-line-grid-date" x1="462.8" y1="22" x2="462.8" y2="266"></line>
+      <line class="tracking-line-grid tracking-line-grid-date" x1="602.4" y1="22" x2="602.4" y2="266"></line>
+      <line class="tracking-line-grid tracking-line-grid-date" x1="742.0" y1="22" x2="742.0" y2="266"></line>
+      <text class="tracking-line-axis-label" x="742.0" y="292" text-anchor="end">06-10</text>
+      <line class="tracking-line-grid" x1="44" y1="22.0" x2="742" y2="22.0"></line>
+        <text class="tracking-line-rank-label" x="8" y="26.0">#1</text><line class="tracking-line-grid" x1="44" y1="130.4" x2="742" y2="130.4"></line>
+        <text class="tracking-line-rank-label" x="8" y="134.4">#5</text><line class="tracking-line-grid" x1="44" y1="266.0" x2="742" y2="266.0"></line>
+        <text class="tracking-line-rank-label" x="8" y="270.0">#10</text>
+      <g class="tracking-line-series" data-tracking-line data-tracking-line-model="DeepSeek V4 Flash" style="--line-color:#0f766e"><polyline class="tracking-line-path" points="44.0,22.0 183.6,22.0 323.2,22.0 462.8,22.0 602.4,22.0 742.0,22.0"></polyline><circle class="tracking-line-point" cx="44.0" cy="22.0" r="3.1" data-tracking-tooltip="DeepSeek V4 Flash | 2026-06-05 | #1 | 2.9T tokens | 18%"><title>DeepSeek V4 Flash | 2026-06-05 | #1 | 2.9T tokens | 18%</title></circle><circle class="tracking-line-point" cx="183.6" cy="22.0" r="3.1" data-tracking-tooltip="DeepSeek V4 Flash | 2026-06-06 | #1 | 3.69T tokens | 19%"><title>DeepSeek V4 Flash | 2026-06-06 | #1 | 3.69T tokens | 19%</title></circle><circle class="tracking-line-point" cx="323.2" cy="22.0" r="3.1" data-tracking-tooltip="DeepSeek V4 Flash | 2026-06-07 | #1 | 3.69T tokens | 19%"><title>DeepSeek V4 Flash | 2026-06-07 | #1 | 3.69T tokens | 19%</title></circle><circle class="tracking-line-point" cx="462.8" cy="22.0" r="3.1" data-tracking-tooltip="DeepSeek V4 Flash | 2026-06-08 | #1 | 3.69T tokens | 19%"><title>DeepSeek V4 Flash | 2026-06-08 | #1 | 3.69T tokens | 19%</title></circle><circle class="tracking-line-point" cx="602.4" cy="22.0" r="3.1" data-tracking-tooltip="DeepSeek V4 Flash | 2026-06-09 | #1 | 4.07T tokens | 41%"><title>DeepSeek V4 Flash | 2026-06-09 | #1 | 4.07T tokens | 41%</title></circle><circle class="tracking-line-point" cx="742.0" cy="22.0" r="3.1" data-tracking-tooltip="DeepSeek V4 Flash | 2026-06-10 | #1 | 4.23T tokens | 55%"><title>DeepSeek V4 Flash | 2026-06-10 | #1 | 4.23T tokens | 55%</title></circle><text class="tracking-line-label" data-tracking-line-label="DeepSeek V4 Flash" x="751.0" y="22.0" dominant-baseline="middle">DeepSeek V4 Flash</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="Hy3 preview" style="--line-color:#d97757"><polyline class="tracking-line-path" points="44.0,49.1 183.6,49.1 323.2,49.1 462.8,49.1 602.4,49.1 742.0,49.1"></polyline><circle class="tracking-line-point" cx="44.0" cy="49.1" r="3.1" data-tracking-tooltip="Hy3 preview | 2026-06-05 | #2 | 2.7T tokens | 13%"><title>Hy3 preview | 2026-06-05 | #2 | 2.7T tokens | 13%</title></circle><circle class="tracking-line-point" cx="183.6" cy="49.1" r="3.1" data-tracking-tooltip="Hy3 preview | 2026-06-06 | #2 | 2.94T tokens | 3%"><title>Hy3 preview | 2026-06-06 | #2 | 2.94T tokens | 3%</title></circle><circle class="tracking-line-point" cx="323.2" cy="49.1" r="3.1" data-tracking-tooltip="Hy3 preview | 2026-06-07 | #2 | 2.94T tokens | 3%"><title>Hy3 preview | 2026-06-07 | #2 | 2.94T tokens | 3%</title></circle><circle class="tracking-line-point" cx="462.8" cy="49.1" r="3.1" data-tracking-tooltip="Hy3 preview | 2026-06-08 | #2 | 2.94T tokens | 3%"><title>Hy3 preview | 2026-06-08 | #2 | 2.94T tokens | 3%</title></circle><circle class="tracking-line-point" cx="602.4" cy="49.1" r="3.1" data-tracking-tooltip="Hy3 preview | 2026-06-09 | #2 | 3.3T tokens | 12%"><title>Hy3 preview | 2026-06-09 | #2 | 3.3T tokens | 12%</title></circle><circle class="tracking-line-point" cx="742.0" cy="49.1" r="3.1" data-tracking-tooltip="Hy3 preview | 2026-06-10 | #2 | 3.53T tokens | 25%"><title>Hy3 preview | 2026-06-10 | #2 | 3.53T tokens | 25%</title></circle><text class="tracking-line-label" data-tracking-line-label="Hy3 preview" x="751.0" y="49.1" dominant-baseline="middle">Hy3 preview</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="MiniMax M3" style="--line-color:#2563eb"><polyline class="tracking-line-path" points="44.0,211.8 183.6,76.2 323.2,76.2 462.8,76.2 602.4,76.2 742.0,76.2"></polyline><circle class="tracking-line-point" cx="44.0" cy="211.8" r="3.1" data-tracking-tooltip="MiniMax M3 | 2026-06-05 | #8 | 1.22T tokens | new"><title>MiniMax M3 | 2026-06-05 | #8 | 1.22T tokens | new</title></circle><circle class="tracking-line-point" cx="183.6" cy="76.2" r="3.1" data-tracking-tooltip="MiniMax M3 | 2026-06-06 | #3 | 2.5T tokens | new"><title>MiniMax M3 | 2026-06-06 | #3 | 2.5T tokens | new</title></circle><circle class="tracking-line-point" cx="323.2" cy="76.2" r="3.1" data-tracking-tooltip="MiniMax M3 | 2026-06-07 | #3 | 2.5T tokens | new"><title>MiniMax M3 | 2026-06-07 | #3 | 2.5T tokens | new</title></circle><circle class="tracking-line-point" cx="462.8" cy="76.2" r="3.1" data-tracking-tooltip="MiniMax M3 | 2026-06-08 | #3 | 2.5T tokens | new"><title>MiniMax M3 | 2026-06-08 | #3 | 2.5T tokens | new</title></circle><circle class="tracking-line-point" cx="602.4" cy="76.2" r="3.1" data-tracking-tooltip="MiniMax M3 | 2026-06-09 | #3 | 2.89T tokens | &gt;999%"><title>MiniMax M3 | 2026-06-09 | #3 | 2.89T tokens | &gt;999%</title></circle><circle class="tracking-line-point" cx="742.0" cy="76.2" r="3.1" data-tracking-tooltip="MiniMax M3 | 2026-06-10 | #3 | 3.22T tokens | &gt;999%"><title>MiniMax M3 | 2026-06-10 | #3 | 3.22T tokens | &gt;999%</title></circle><text class="tracking-line-label" data-tracking-line-label="MiniMax M3" x="751.0" y="76.2" dominant-baseline="middle">MiniMax M3</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="MiMo-V2.5" style="--line-color:#9333ea"><polyline class="tracking-line-path" points="44.0,76.2 183.6,103.3 323.2,103.3 462.8,103.3 602.4,103.3 742.0,103.3"></polyline><circle class="tracking-line-point" cx="44.0" cy="76.2" r="3.1" data-tracking-tooltip="MiMo-V2.5 | 2026-06-05 | #3 | 2.31T tokens | 450%"><title>MiMo-V2.5 | 2026-06-05 | #3 | 2.31T tokens | 450%</title></circle><circle class="tracking-line-point" cx="183.6" cy="103.3" r="3.1" data-tracking-tooltip="MiMo-V2.5 | 2026-06-06 | #4 | 2.19T tokens | 50%"><title>MiMo-V2.5 | 2026-06-06 | #4 | 2.19T tokens | 50%</title></circle><circle class="tracking-line-point" cx="323.2" cy="103.3" r="3.1" data-tracking-tooltip="MiMo-V2.5 | 2026-06-07 | #4 | 2.19T tokens | 50%"><title>MiMo-V2.5 | 2026-06-07 | #4 | 2.19T tokens | 50%</title></circle><circle class="tracking-line-point" cx="462.8" cy="103.3" r="3.1" data-tracking-tooltip="MiMo-V2.5 | 2026-06-08 | #4 | 2.19T tokens | 50%"><title>MiMo-V2.5 | 2026-06-08 | #4 | 2.19T tokens | 50%</title></circle><circle class="tracking-line-point" cx="602.4" cy="103.3" r="3.1" data-tracking-tooltip="MiMo-V2.5 | 2026-06-09 | #4 | 2.44T tokens | 43%"><title>MiMo-V2.5 | 2026-06-09 | #4 | 2.44T tokens | 43%</title></circle><circle class="tracking-line-point" cx="742.0" cy="103.3" r="3.1" data-tracking-tooltip="MiMo-V2.5 | 2026-06-10 | #4 | 2.73T tokens | 40%"><title>MiMo-V2.5 | 2026-06-10 | #4 | 2.73T tokens | 40%</title></circle><text class="tracking-line-label" data-tracking-line-label="MiMo-V2.5" x="751.0" y="103.3" dominant-baseline="middle">MiMo-V2.5</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="DeepSeek V4 Pro" style="--line-color:#16a34a"><polyline class="tracking-line-path" points="44.0,184.7 183.6,184.7 323.2,184.7 462.8,184.7 602.4,157.6 742.0,130.4"></polyline><circle class="tracking-line-point" cx="44.0" cy="184.7" r="3.1" data-tracking-tooltip="DeepSeek V4 Pro | 2026-06-05 | #7 | 1.34T tokens | 11%"><title>DeepSeek V4 Pro | 2026-06-05 | #7 | 1.34T tokens | 11%</title></circle><circle class="tracking-line-point" cx="183.6" cy="184.7" r="3.1" data-tracking-tooltip="DeepSeek V4 Pro | 2026-06-06 | #7 | 1.7T tokens | 35%"><title>DeepSeek V4 Pro | 2026-06-06 | #7 | 1.7T tokens | 35%</title></circle><circle class="tracking-line-point" cx="323.2" cy="184.7" r="3.1" data-tracking-tooltip="DeepSeek V4 Pro | 2026-06-07 | #7 | 1.7T tokens | 35%"><title>DeepSeek V4 Pro | 2026-06-07 | #7 | 1.7T tokens | 35%</title></circle><circle class="tracking-line-point" cx="462.8" cy="184.7" r="3.1" data-tracking-tooltip="DeepSeek V4 Pro | 2026-06-08 | #7 | 1.7T tokens | 35%"><title>DeepSeek V4 Pro | 2026-06-08 | #7 | 1.7T tokens | 35%</title></circle><circle class="tracking-line-point" cx="602.4" cy="157.6" r="3.1" data-tracking-tooltip="DeepSeek V4 Pro | 2026-06-09 | #6 | 1.86T tokens | 48%"><title>DeepSeek V4 Pro | 2026-06-09 | #6 | 1.86T tokens | 48%</title></circle><circle class="tracking-line-point" cx="742.0" cy="130.4" r="3.1" data-tracking-tooltip="DeepSeek V4 Pro | 2026-06-10 | #5 | 2.03T tokens | 59%"><title>DeepSeek V4 Pro | 2026-06-10 | #5 | 2.03T tokens | 59%</title></circle><text class="tracking-line-label" data-tracking-line-label="DeepSeek V4 Pro" x="751.0" y="130.4" dominant-baseline="middle">DeepSeek V4 Pro</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="Owl Alpha" style="--line-color:#dc2626"><polyline class="tracking-line-path" points="44.0,103.3 183.6,130.4 323.2,130.4 462.8,130.4 602.4,130.4 742.0,157.6"></polyline><circle class="tracking-line-point" cx="44.0" cy="103.3" r="3.1" data-tracking-tooltip="Owl Alpha | 2026-06-05 | #4 | 1.99T tokens | 44%"><title>Owl Alpha | 2026-06-05 | #4 | 1.99T tokens | 44%</title></circle><circle class="tracking-line-point" cx="183.6" cy="130.4" r="3.1" data-tracking-tooltip="Owl Alpha | 2026-06-06 | #5 | 1.95T tokens | 17%"><title>Owl Alpha | 2026-06-06 | #5 | 1.95T tokens | 17%</title></circle><circle class="tracking-line-point" cx="323.2" cy="130.4" r="3.1" data-tracking-tooltip="Owl Alpha | 2026-06-07 | #5 | 1.95T tokens | 17%"><title>Owl Alpha | 2026-06-07 | #5 | 1.95T tokens | 17%</title></circle><circle class="tracking-line-point" cx="462.8" cy="130.4" r="3.1" data-tracking-tooltip="Owl Alpha | 2026-06-08 | #5 | 1.95T tokens | 17%"><title>Owl Alpha | 2026-06-08 | #5 | 1.95T tokens | 17%</title></circle><circle class="tracking-line-point" cx="602.4" cy="130.4" r="3.1" data-tracking-tooltip="Owl Alpha | 2026-06-09 | #5 | 1.98T tokens | 13%"><title>Owl Alpha | 2026-06-09 | #5 | 1.98T tokens | 13%</title></circle><circle class="tracking-line-point" cx="742.0" cy="157.6" r="3.1" data-tracking-tooltip="Owl Alpha | 2026-06-10 | #6 | 2.01T tokens | 9%"><title>Owl Alpha | 2026-06-10 | #6 | 2.01T tokens | 9%</title></circle><text class="tracking-line-label" data-tracking-line-label="Owl Alpha" x="751.0" y="157.6" dominant-baseline="middle">Owl Alpha</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="Claude Sonnet 4.6" style="--line-color:#0891b2"><polyline class="tracking-line-path" points="44.0,130.4 183.6,157.6 323.2,157.6 462.8,157.6 602.4,184.7 742.0,184.7"></polyline><circle class="tracking-line-point" cx="44.0" cy="130.4" r="3.1" data-tracking-tooltip="Claude Sonnet 4.6 | 2026-06-05 | #5 | 1.77T tokens | 14%"><title>Claude Sonnet 4.6 | 2026-06-05 | #5 | 1.77T tokens | 14%</title></circle><circle class="tracking-line-point" cx="183.6" cy="157.6" r="3.1" data-tracking-tooltip="Claude Sonnet 4.6 | 2026-06-06 | #6 | 1.76T tokens | 9%"><title>Claude Sonnet 4.6 | 2026-06-06 | #6 | 1.76T tokens | 9%</title></circle><circle class="tracking-line-point" cx="323.2" cy="157.6" r="3.1" data-tracking-tooltip="Claude Sonnet 4.6 | 2026-06-07 | #6 | 1.76T tokens | 9%"><title>Claude Sonnet 4.6 | 2026-06-07 | #6 | 1.76T tokens | 9%</title></circle><circle class="tracking-line-point" cx="462.8" cy="157.6" r="3.1" data-tracking-tooltip="Claude Sonnet 4.6 | 2026-06-08 | #6 | 1.76T tokens | 9%"><title>Claude Sonnet 4.6 | 2026-06-08 | #6 | 1.76T tokens | 9%</title></circle><circle class="tracking-line-point" cx="602.4" cy="184.7" r="3.1" data-tracking-tooltip="Claude Sonnet 4.6 | 2026-06-09 | #7 | 1.85T tokens | 4%"><title>Claude Sonnet 4.6 | 2026-06-09 | #7 | 1.85T tokens | 4%</title></circle><circle class="tracking-line-point" cx="742.0" cy="184.7" r="3.1" data-tracking-tooltip="Claude Sonnet 4.6 | 2026-06-10 | #7 | 1.96T tokens | 5%"><title>Claude Sonnet 4.6 | 2026-06-10 | #7 | 1.96T tokens | 5%</title></circle><text class="tracking-line-label" data-tracking-line-label="Claude Sonnet 4.6" x="751.0" y="184.7" dominant-baseline="middle">Claude Sonnet 4.6</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="Claude Opus 4.7" style="--line-color:#ca8a04"><polyline class="tracking-line-path" points="44.0,157.6 183.6,211.8 323.2,211.8 462.8,211.8 602.4,211.8 742.0,211.8"></polyline><circle class="tracking-line-point" cx="44.0" cy="157.6" r="3.1" data-tracking-tooltip="Claude Opus 4.7 | 2026-06-05 | #6 | 1.41T tokens | 47%"><title>Claude Opus 4.7 | 2026-06-05 | #6 | 1.41T tokens | 47%</title></circle><circle class="tracking-line-point" cx="183.6" cy="211.8" r="3.1" data-tracking-tooltip="Claude Opus 4.7 | 2026-06-06 | #8 | 1.44T tokens | 38%"><title>Claude Opus 4.7 | 2026-06-06 | #8 | 1.44T tokens | 38%</title></circle><circle class="tracking-line-point" cx="323.2" cy="211.8" r="3.1" data-tracking-tooltip="Claude Opus 4.7 | 2026-06-07 | #8 | 1.44T tokens | 38%"><title>Claude Opus 4.7 | 2026-06-07 | #8 | 1.44T tokens | 38%</title></circle><circle class="tracking-line-point" cx="462.8" cy="211.8" r="3.1" data-tracking-tooltip="Claude Opus 4.7 | 2026-06-08 | #8 | 1.44T tokens | 38%"><title>Claude Opus 4.7 | 2026-06-08 | #8 | 1.44T tokens | 38%</title></circle><circle class="tracking-line-point" cx="602.4" cy="211.8" r="3.1" data-tracking-tooltip="Claude Opus 4.7 | 2026-06-09 | #8 | 1.5T tokens | 32%"><title>Claude Opus 4.7 | 2026-06-09 | #8 | 1.5T tokens | 32%</title></circle><circle class="tracking-line-point" cx="742.0" cy="211.8" r="3.1" data-tracking-tooltip="Claude Opus 4.7 | 2026-06-10 | #8 | 1.61T tokens | 4%"><title>Claude Opus 4.7 | 2026-06-10 | #8 | 1.61T tokens | 4%</title></circle><text class="tracking-line-label" data-tracking-line-label="Claude Opus 4.7" x="751.0" y="211.8" dominant-baseline="middle">Claude Opus 4.7</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="Claude Opus 4.8" style="--line-color:#be185d"><polyline class="tracking-line-path" points="183.6,266.0 323.2,266.0 462.8,266.0 602.4,238.9 742.0,238.9"></polyline><circle class="tracking-line-point" cx="183.6" cy="266.0" r="3.1" data-tracking-tooltip="Claude Opus 4.8 | 2026-06-06 | #10 | 1.16T tokens | 300%"><title>Claude Opus 4.8 | 2026-06-06 | #10 | 1.16T tokens | 300%</title></circle><circle class="tracking-line-point" cx="323.2" cy="266.0" r="3.1" data-tracking-tooltip="Claude Opus 4.8 | 2026-06-07 | #10 | 1.16T tokens | 300%"><title>Claude Opus 4.8 | 2026-06-07 | #10 | 1.16T tokens | 300%</title></circle><circle class="tracking-line-point" cx="462.8" cy="266.0" r="3.1" data-tracking-tooltip="Claude Opus 4.8 | 2026-06-08 | #10 | 1.16T tokens | 300%"><title>Claude Opus 4.8 | 2026-06-08 | #10 | 1.16T tokens | 300%</title></circle><circle class="tracking-line-point" cx="602.4" cy="238.9" r="3.1" data-tracking-tooltip="Claude Opus 4.8 | 2026-06-09 | #9 | 1.26T tokens | 199%"><title>Claude Opus 4.8 | 2026-06-09 | #9 | 1.26T tokens | 199%</title></circle><circle class="tracking-line-point" cx="742.0" cy="238.9" r="3.1" data-tracking-tooltip="Claude Opus 4.8 | 2026-06-10 | #9 | 1.33T tokens | 140%"><title>Claude Opus 4.8 | 2026-06-10 | #9 | 1.33T tokens | 140%</title></circle><text class="tracking-line-label" data-tracking-line-label="Claude Opus 4.8" x="751.0" y="238.9" dominant-baseline="middle">Claude Opus 4.8</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="DeepSeek V3.2" style="--line-color:#4f46e5"><polyline class="tracking-line-path" points="44.0,266.0 183.6,238.9 323.2,238.9 462.8,238.9 602.4,266.0 742.0,266.0"></polyline><circle class="tracking-line-point" cx="44.0" cy="266.0" r="3.1" data-tracking-tooltip="DeepSeek V3.2 | 2026-06-05 | #10 | 1.11T tokens | 15%"><title>DeepSeek V3.2 | 2026-06-05 | #10 | 1.11T tokens | 15%</title></circle><circle class="tracking-line-point" cx="183.6" cy="238.9" r="3.1" data-tracking-tooltip="DeepSeek V3.2 | 2026-06-06 | #9 | 1.17T tokens | 12%"><title>DeepSeek V3.2 | 2026-06-06 | #9 | 1.17T tokens | 12%</title></circle><circle class="tracking-line-point" cx="323.2" cy="238.9" r="3.1" data-tracking-tooltip="DeepSeek V3.2 | 2026-06-07 | #9 | 1.17T tokens | 12%"><title>DeepSeek V3.2 | 2026-06-07 | #9 | 1.17T tokens | 12%</title></circle><circle class="tracking-line-point" cx="462.8" cy="238.9" r="3.1" data-tracking-tooltip="DeepSeek V3.2 | 2026-06-08 | #9 | 1.17T tokens | 12%"><title>DeepSeek V3.2 | 2026-06-08 | #9 | 1.17T tokens | 12%</title></circle><circle class="tracking-line-point" cx="602.4" cy="266.0" r="3.1" data-tracking-tooltip="DeepSeek V3.2 | 2026-06-09 | #10 | 1.18T tokens | 8%"><title>DeepSeek V3.2 | 2026-06-09 | #10 | 1.18T tokens | 8%</title></circle><circle class="tracking-line-point" cx="742.0" cy="266.0" r="3.1" data-tracking-tooltip="DeepSeek V3.2 | 2026-06-10 | #10 | 1.18T tokens | 7%"><title>DeepSeek V3.2 | 2026-06-10 | #10 | 1.18T tokens | 7%</title></circle><text class="tracking-line-label" data-tracking-line-label="DeepSeek V3.2" x="751.0" y="266.0" dominant-baseline="middle">DeepSeek V3.2</text></g><g class="tracking-line-series" data-tracking-line data-tracking-line-model="MiMo-V2.5-Pro" style="--line-color:#047857"><circle class="tracking-line-point" cx="44.0" cy="238.9" r="3.1" data-tracking-tooltip="MiMo-V2.5-Pro | 2026-06-05 | #9 | 1.12T tokens | 37%"><title>MiMo-V2.5-Pro | 2026-06-05 | #9 | 1.12T tokens | 37%</title></circle><text class="tracking-line-label" data-tracking-line-label="MiMo-V2.5-Pro" x="53.0" y="238.9" dominant-baseline="middle">MiMo-V2.5-Pro</text></g>
+    </svg>
+    <div class="tracking-line-legend" aria-label="实体图例"></div>
+  </div>
     </div><div class="tracking-component-panel" id="tracking-openrouter-rankings-leaderboard" data-tab-panel-group="tracking-openrouter-rankings" hidden>
       <div class="table-scroll tracking-table-scroll" data-table-wrap>
-    <table class="report-data-table tracking-data-table" data-report-data-table aria-label="LLM Leaderboard">
+    <table class="report-data-table tracking-data-table" data-report-data-table aria-label="当前榜单">
       <thead><tr>
         <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0">Rank</th>
         <th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1">Model</th>
@@ -3657,101 +3688,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   </div>
     </div>
 
-  </div><div class="card-stat-grid" data-card-stats>
-    <div class="card-stat">
-      <span class="card-stat-label">覆盖</span>
-      <strong>Top 10</strong>
-      <span class="card-stat-detail">公开榜单已解析</span>
-    </div>
-    <div class="card-stat">
-      <span class="card-stat-label">榜首</span>
-      <strong>DeepSeek V4 Flash</strong>
-      <span class="card-stat-detail">deepseek / 4.23T tokens / +55%</span>
-    </div>
-    <div class="card-stat">
-      <span class="card-stat-label">最大变化</span>
-      <strong>MiniMax M3</strong>
-      <span class="card-stat-detail">+999%</span>
-    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="openrouter-rankings" data-trend-points="6" aria-label="7日趋势 榜首周用量: 06-05 2.9T tokens to 06-10 4.23T tokens">
-    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首周用量</span></div>
-    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首周用量: 06-05 2.9T tokens to 06-10 4.23T tokens" focusable="false">
-      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
-      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
-      <polyline class="card-trend-line" points="28.0,90.0 88.8,47.2 149.6,47.2 210.4,47.2 271.2,26.7 332.0,18.0"></polyline>
-      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-05: 2.9T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="88.8" cy="47.2" r="3.2"><title>06-06: 3.69T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="149.6" cy="47.2" r="3.2"><title>06-07: 3.69T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="210.4" cy="47.2" r="3.2"><title>06-08: 3.69T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="271.2" cy="26.7" r="3.2"><title>06-09: 4.07T tokens | DeepSeek V4 Flash</title></circle><circle class="card-trend-point" cx="332.0" cy="18.0" r="3.2"><title>06-10: 4.23T tokens | DeepSeek V4 Flash</title></circle>
-      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-05</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-10</text>
-    </svg>
-    <div class="card-trend-summary">
-      <span>2.9T tokens</span>
-      <span>4.23T tokens</span>
-    </div>
-  </div><div class="card-visual card-bars" data-card-bars>
-    <div class="card-visual-title">供应商分布</div>
-    <div class="chart-bars" aria-hidden="true">
-    <div class="chart-bar-row">
-        <span class="chart-bar-label">anthropic</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:100%"></span></span>
-        <span class="chart-bar-value">3</span>
-        <span class="chart-bar-status">3/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">deepseek</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:100%"></span></span>
-        <span class="chart-bar-value">3</span>
-        <span class="chart-bar-status">3/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">minimax</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
-        <span class="chart-bar-value">1</span>
-        <span class="chart-bar-status">1/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">openrouter</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
-        <span class="chart-bar-value">1</span>
-        <span class="chart-bar-status">1/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">tencent</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
-        <span class="chart-bar-value">1</span>
-        <span class="chart-bar-status">1/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">xiaomi</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
-        <span class="chart-bar-value">1</span>
-        <span class="chart-bar-status">1/10</span>
-      </div>
   </div>
-  </div><div class="card-visual card-table" data-card-table>
-    <div class="card-visual-title">Top 10 榜单</div>
 
-    <div class="table-scroll card-table-scroll" data-table-wrap>
-      <table class="report-data-table card-data-table" data-report-data-table data-card-data-table>
-        <colgroup><col style="width:64px"><col><col style="width:120px"><col style="width:130px"><col style="width:96px"></colgroup>
-        <thead><tr><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="0" data-align="center">排名</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="1" data-align="left">模型</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="2" data-align="left">供应商</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="3" data-align="right">调用量</th><th scope="col" tabindex="0" data-table-cell data-table-row="0" data-table-column="4" data-align="right">周变化</th></tr></thead>
-        <tbody><tr><td tabindex="0" data-table-cell data-table-row="1" data-table-column="0" data-align="center">#1</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="1" data-align="left">DeepSeek V4 Flash</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="2" data-align="left">deepseek</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="3" data-align="right">4.23T tokens</td><td tabindex="0" data-table-cell data-table-row="1" data-table-column="4" data-align="right">+55%</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="2" data-table-column="0" data-align="center">#2</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="1" data-align="left">Hy3 preview</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="2" data-align="left">tencent</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="3" data-align="right">3.53T tokens</td><td tabindex="0" data-table-cell data-table-row="2" data-table-column="4" data-align="right">+25%</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="3" data-table-column="0" data-align="center">#3</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="1" data-align="left">MiniMax M3</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="2" data-align="left">minimax</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="3" data-align="right">3.22T tokens</td><td tabindex="0" data-table-cell data-table-row="3" data-table-column="4" data-align="right">+999%</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="4" data-table-column="0" data-align="center">#4</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="1" data-align="left">MiMo-V2.5</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="2" data-align="left">xiaomi</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="3" data-align="right">2.73T tokens</td><td tabindex="0" data-table-cell data-table-row="4" data-table-column="4" data-align="right">+40%</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="5" data-table-column="0" data-align="center">#5</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="1" data-align="left">DeepSeek V4 Pro</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="2" data-align="left">deepseek</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="3" data-align="right">2.03T tokens</td><td tabindex="0" data-table-cell data-table-row="5" data-table-column="4" data-align="right">+59%</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="6" data-table-column="0" data-align="center">#6</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="1" data-align="left">Owl Alpha</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="2" data-align="left">openrouter</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="3" data-align="right">2.01T tokens</td><td tabindex="0" data-table-cell data-table-row="6" data-table-column="4" data-align="right">+9%</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="7" data-table-column="0" data-align="center">#7</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="1" data-align="left">Claude Sonnet 4.6</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="3" data-align="right">1.96T tokens</td><td tabindex="0" data-table-cell data-table-row="7" data-table-column="4" data-align="right">+5%</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="8" data-table-column="0" data-align="center">#8</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="1" data-align="left">Claude Opus 4.7</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="3" data-align="right">1.61T tokens</td><td tabindex="0" data-table-cell data-table-row="8" data-table-column="4" data-align="right">+4%</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="9" data-table-column="0" data-align="center">#9</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="1" data-align="left">Claude Opus 4.8</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="2" data-align="left">anthropic</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="3" data-align="right">1.33T tokens</td><td tabindex="0" data-table-cell data-table-row="9" data-table-column="4" data-align="right">+140%</td></tr>
-<tr><td tabindex="0" data-table-cell data-table-row="10" data-table-column="0" data-align="center">#10</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="1" data-align="left">DeepSeek V3.2</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="2" data-align="left">deepseek</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="3" data-align="right">1.18T tokens</td><td tabindex="0" data-table-cell data-table-row="10" data-table-column="4" data-align="right">+7%</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-    <p>榜首 DeepSeek V4 Flash（deepseek），4.23T tokens，+55%；最大周变化是 MiniMax M3（+999%）。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight tracking-card" data-evidence-spotlight data-filter-target="section-trend-tracking" data-filter-value="Artificial Analysis" data-search-target="section-trend-tracking" data-trend-status="available" data-trend-history-points="6" hidden>
-    <div class="meta">Artificial Analysis</div>
+
     <h3><a class="card-title-link" href="https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index" rel="noopener noreferrer" target="_blank"><img class="inline-site-icon card-title-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkFBPC90ZXh0Pjwvc3ZnPg==" alt="" loading="lazy" decoding="async"><span class="card-title-text"><span>Artificial Analysis</span></span></a></h3>
-    <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">模型基准</span><span class="chip chip-date">2026-06-10</span></div>
+
 
     <div class="card-stat-grid" data-card-stats>
     <div class="card-stat">
@@ -3763,60 +3707,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <span class="card-stat-label">榜首</span>
       <strong>Claude Fable 5 (with fallback)</strong>
       <span class="card-stat-detail">anthropic / 65 分 / AA Index</span>
-    </div></div><div class="card-visual card-trend-curve" data-tracking-trend-curve data-tracking-source="artificial-analysis-intelligence-index" data-trend-points="6" aria-label="7日趋势 榜首分数: 06-05 61 分 to 06-10 65 分">
-    <div class="card-visual-title"><span>7日趋势</span><span class="card-trend-metric">榜首分数</span></div>
-    <svg class="card-trend-svg" viewBox="0 0 360 118" role="img" aria-label="7日趋势 榜首分数: 06-05 61 分 to 06-10 65 分" focusable="false">
-      <line class="card-trend-grid" x1="28" y1="18" x2="332" y2="18"></line>
-      <line class="card-trend-grid" x1="28" y1="90" x2="332" y2="90"></line>
-      <polyline class="card-trend-line" points="28.0,90.0 88.8,90.0 149.6,90.0 210.4,90.0 271.2,90.0 332.0,18.0"></polyline>
-      <circle class="card-trend-point" cx="28.0" cy="90.0" r="3.2"><title>06-05: 61 分 | Claude Opus4.8 (max)</title></circle><circle class="card-trend-point" cx="88.8" cy="90.0" r="3.2"><title>06-06: 61 分 | Claude Opus4.8 (max)</title></circle><circle class="card-trend-point" cx="149.6" cy="90.0" r="3.2"><title>06-07: 61 分 | Claude Opus4.8 (max)</title></circle><circle class="card-trend-point" cx="210.4" cy="90.0" r="3.2"><title>06-08: 61 分 | Claude Opus4.8 (max)</title></circle><circle class="card-trend-point" cx="271.2" cy="90.0" r="3.2"><title>06-09: 61 分 | Claude Opus 4.8 (max)</title></circle><circle class="card-trend-point" cx="332.0" cy="18.0" r="3.2"><title>06-10: 65 分 | Claude Fable 5 (with fallback)</title></circle>
-      <text class="card-trend-axis-label" x="28.0" y="110" text-anchor="start">06-05</text><text class="card-trend-axis-label" x="332.0" y="110" text-anchor="end">06-10</text>
-    </svg>
-    <div class="card-trend-summary">
-      <span>61 分</span>
-      <span>65 分</span>
-    </div>
-  </div><div class="card-visual card-bars" data-card-bars>
-    <div class="card-visual-title">供应商分布</div>
-    <div class="chart-bars" aria-hidden="true">
-    <div class="chart-bar-row">
-        <span class="chart-bar-label">anthropic</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:100%"></span></span>
-        <span class="chart-bar-value">3</span>
-        <span class="chart-bar-status">3/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">google</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:67%"></span></span>
-        <span class="chart-bar-value">2</span>
-        <span class="chart-bar-status">2/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">openai</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:67%"></span></span>
-        <span class="chart-bar-value">2</span>
-        <span class="chart-bar-status">2/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">alibaba</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
-        <span class="chart-bar-value">1</span>
-        <span class="chart-bar-status">1/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">minimax</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
-        <span class="chart-bar-value">1</span>
-        <span class="chart-bar-status">1/10</span>
-      </div>
-<div class="chart-bar-row">
-        <span class="chart-bar-label">moonshot</span>
-        <span class="chart-bar-track"><span class="chart-bar-fill" style="width:33%"></span></span>
-        <span class="chart-bar-value">1</span>
-        <span class="chart-bar-status">1/10</span>
-      </div>
-  </div>
-  </div><div class="card-visual card-table" data-card-table>
+    </div></div><div class="card-visual card-table" data-card-table>
     <div class="card-visual-title">Top 10 榜单</div>
 
     <div class="table-scroll card-table-scroll" data-table-wrap>

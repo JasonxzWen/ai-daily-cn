@@ -138,17 +138,18 @@ function buildOpenRouterSnapshot(item, snapshot, options) {
   });
   const status = rows.length >= 10 && snapshot.snapshot_status === "complete" ? "complete" : rows.length > 0 ? "partial" : "fallback";
   const fallbackReason = rows.length > 0 ? "" : "openrouter_rows_missing";
+  const trendRows = openRouterTrendRows(rows, historyRows, snapshot.snapshot_as_of);
   const tabs = [
-    tab("top-models", "Top Models", "stacked_bar", historyRows.length > 0 ? "complete" : status, fallbackReason),
-    tab("leaderboard", "LLM Leaderboard", "leaderboard", status, fallbackReason)
+    tab("top-models", "七日排名", "line_multi", trendRows.length > 0 ? "complete" : status, fallbackReason),
+    tab("leaderboard", "当前榜单", "leaderboard", status, fallbackReason)
   ];
   const series = [
     {
       id: "openrouter-top-models-weekly-usage",
       tab_id: "top-models",
-      label: "Weekly usage across OpenRouter",
-      chart: "stacked_bar",
-      rows: (historyRows.length > 0 ? historyRows : rows).map((row) => ({
+      label: "OpenRouter Top models rank trend",
+      chart: "line_multi",
+      rows: trendRows.map((row) => ({
         ...row,
         label: row.model,
         value_label: row.value_label || row.tokens
@@ -395,6 +396,41 @@ function normalizedOpenRouterHistoryRows(snapshot) {
       metric: String(entry?.week || entry?.date || "").trim()
     }))
     .filter(Boolean);
+}
+
+function openRouterTrendRows(rows, historyRows, collectedAt) {
+  const currentMetric = dateMetricLabel(collectedAt);
+  const merged = new Map();
+  for (const row of historyRows) {
+    const metric = String(row.metric || "").trim();
+    if (!metric) {
+      continue;
+    }
+    merged.set(`${metric}\u0000${normalizeModelKey(row.model)}`, row);
+  }
+  for (const row of rows) {
+    const metric = currentMetric || String(row.metric || "").trim();
+    if (!metric) {
+      continue;
+    }
+    merged.set(`${metric}\u0000${normalizeModelKey(row.model)}`, {
+      ...row,
+      metric,
+      label: row.model,
+      value_label: row.value_label || row.tokens
+    });
+  }
+  return [...merged.values()]
+    .sort((left, right) => {
+      const dateOrder = String(left.metric || "").localeCompare(String(right.metric || ""));
+      return dateOrder || Number(left.rank || 0) - Number(right.rank || 0);
+    })
+    .slice(-90);
+}
+
+function dateMetricLabel(value) {
+  const match = String(value || "").match(/\d{4}-\d{2}-\d{2}/);
+  return match ? match[0] : "";
 }
 
 function normalizeArtificialAnalysisSourceTabs(componentTabs, scoreRows) {

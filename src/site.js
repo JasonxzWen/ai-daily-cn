@@ -19,6 +19,7 @@ import { normalizeStoryFirstReport } from "./story-first.js";
 import { sanitizeTrackingComponentSnapshot } from "./tracking-components.js";
 import { sanitizePublicDegradationEvent } from "./degradation-events.js";
 import { loadOfficialBlogKnowledge, toPublicOfficialBlogKnowledge } from "./official-blog-knowledge.js";
+import { normalizeGithubReadmeSummary } from "./github-readme.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
@@ -788,6 +789,7 @@ function dailyTrackingHistoryPoint(reportDate, item) {
     return null;
   }
   const entry = firstTrackingHistoryEntry(item);
+  const rows = dailyTrackingHistoryRows(item);
   const valueLabel = firstNonEmpty(entry?.tokens, entry?.value_label, entry?.value, entry?.score, entry?.metric);
   const value = parseTrackingHistoryNumericValue(valueLabel);
   if (!Number.isFinite(value)) {
@@ -800,8 +802,35 @@ function dailyTrackingHistoryPoint(reportDate, item) {
     value,
     valueLabel: String(valueLabel || ""),
     topLabel: firstNonEmpty(entry?.model, entry?.name, entry?.title, item.name),
-    rank: Number.isFinite(Number(entry?.rank)) ? Number(entry.rank) : 1
+    rank: Number.isFinite(Number(entry?.rank)) ? Number(entry.rank) : 1,
+    rows
   };
+}
+
+function dailyTrackingHistoryRows(item) {
+  const snapshotEntries = arrayValue(item?.snapshot?.top_entries);
+  const sourceRows = snapshotEntries.length > 0
+    ? snapshotEntries
+    : arrayValue(item?.tracking_component_snapshot?.rows);
+  return sourceRows
+    .map((entry, index) => {
+      const valueLabel = firstNonEmpty(entry?.tokens, entry?.value_label, entry?.value, entry?.score, entry?.metric);
+      const value = parseTrackingHistoryNumericValue(valueLabel);
+      const model = firstNonEmpty(entry?.model, entry?.name, entry?.title, entry?.label);
+      if (!model || !Number.isFinite(value)) {
+        return null;
+      }
+      return {
+        rank: Number.isFinite(Number(entry?.rank)) ? Number(entry.rank) : index + 1,
+        model,
+        provider: firstNonEmpty(entry?.provider, entry?.vendor, entry?.source),
+        value,
+        valueLabel: String(valueLabel || ""),
+        change: firstNonEmpty(entry?.change, entry?.weekly_change, entry?.delta)
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 10);
 }
 
 function firstTrackingHistoryEntry(item) {
@@ -1019,6 +1048,7 @@ function publicReportData(report) {
     .filter((item) => publicReport?.daily_tracking?.find((source) => source?.id === item?.id || source?.url === item?.url)?.publish_to_public !== false)
     .map(stripUnpublishableOfficialSnapshots);
   result.github_trending = publicGithubTrending(publicReport?.github_trending);
+  result.huggingface_trending = publicHuggingFaceTrending(publicReport?.huggingface_trending);
   result.projects = publicGithubProjects(publicReport?.projects);
   result.source_effectiveness = publicSourceEffectiveness(publicReport?.source_effectiveness);
   result.evidence_assets = publicEvidenceAssets(publicReport?.evidence_assets);
@@ -1028,10 +1058,17 @@ function publicReportData(report) {
 function publicGithubTrending(items = []) {
   return arrayValue(items).map((item) => {
     const result = sanitizePublicValue(item);
+    const normalizedSummary = normalizeGithubReadmeSummary(
+      firstNonEmpty(result.readme_summary, result.github_readme_summary, result.description),
+      result.repo || result.name || ""
+    );
     for (const key of ["readme_summary", "github_readme_summary", "description", "use_case"]) {
       if (isGenericGithubPublicText(result[key])) {
         delete result[key];
       }
+    }
+    if (normalizedSummary && !isGenericGithubPublicText(normalizedSummary)) {
+      result.description = normalizedSummary;
     }
     if (!String(result.description || "").trim()) {
       result.description = githubTrendingFactSummary(item);
@@ -1054,8 +1091,46 @@ function publicGithubProjects(items = []) {
   });
 }
 
+function publicHuggingFaceTrending(items = []) {
+  return arrayValue(items).map((item) => {
+    const result = sanitizePublicValue(item);
+    const raw = firstNonEmpty(result.description, result.summary);
+    if (!raw || isGenericHuggingFacePublicText(raw)) {
+      result.description = huggingFacePublicDescription(result);
+    }
+    return result;
+  });
+}
+
+function huggingFacePublicDescription(item = {}) {
+  const name = firstNonEmpty(item.name, item.repo, "该模型");
+  const taskLabel = huggingFaceTaskLabel(item.task);
+  const metricParts = [
+    Number(item.downloads) > 0 ? `${Number(item.downloads)} downloads` : "",
+    Number(item.likes) > 0 ? `${Number(item.likes)} likes` : ""
+  ].filter(Boolean);
+  const metricText = metricParts.length > 0 ? `，当前热度指标是 ${metricParts.join("、")}` : "";
+  return `${name} 是 Hugging Face 上的${taskLabel}${metricText}。`;
+}
+
+function huggingFaceTaskLabel(task) {
+  const text = String(task || "").toLowerCase();
+  if (/text-generation|conversational|chat/.test(text)) return "文本生成模型";
+  if (/image-to-text|vision|visual-question-answering/.test(text)) return "视觉语言模型";
+  if (/text-to-image|image-generation|diffusion/.test(text)) return "图像生成模型";
+  if (/automatic-speech-recognition|text-to-speech|speech|audio/.test(text)) return "语音或音频模型";
+  if (/sentence-similarity|feature-extraction|embedding/.test(text)) return "嵌入或语义检索模型";
+  if (/dataset/.test(text)) return "数据集资源";
+  if (text) return `${task} 任务模型`;
+  return "模型资源";
+}
+
+function isGenericHuggingFacePublicText(value) {
+  return /(?:trending entry|verify model card|discovery lead|before factual inclusion|ranked\s+model\s+entry|公开描述指向|关键词包括|优先核对|准入|复现门槛|只记录排名|公开描述暂未给出足够功能细节)/iu.test(String(value || ""));
+}
+
 function isGenericGithubPublicText(value) {
-  return /(?:README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README)/u.test(String(value || ""));
+  return /(?:公开描述指向|关键词包括|ranked\s+(?:model|repo|repository)\s+entry|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|README\s*显示核心能力|读者应先确认|适合先从|优先核对|重点看 README|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README)/iu.test(String(value || ""));
 }
 
 function githubTrendingFactSummary(item = {}) {
@@ -1064,7 +1139,9 @@ function githubTrendingFactSummary(item = {}) {
   const evidence = String(item.evidence || "");
   const stars = evidence.match(/with\s+([0-9,]+)\s+stars\s+(today|this week)/i);
   const starsText = stars ? `${stars[2].toLowerCase() === "today" ? "今日" : "本周"} +${stars[1]} stars` : "";
-  return [source, rank, starsText].filter(Boolean).join(" / ");
+  const repo = firstNonEmpty(item.repo, item.name, "该项目");
+  const rankText = rank ? `${source} ${rank}` : source;
+  return `${repo} 当前进入 ${rankText}${starsText ? `，${starsText}` : ""}。`;
 }
 
 function publicStories(stories = []) {

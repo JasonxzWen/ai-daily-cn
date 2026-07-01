@@ -626,10 +626,14 @@ try {
   assert.doesNotMatch(builderCardsText, /Original X status URL was collected/);
   const trackingComponent = page.locator("[data-tracking-component][data-component-kind='openrouter_rankings']");
   assert.equal(await trackingComponent.count(), 1);
-  assert.equal(await trackingComponent.locator("[data-scale-mode='linear']").count(), 1);
-  assert.equal(await trackingComponent.locator("[data-scale-mode='log']").count(), 1);
-  await trackingComponent.locator("[data-scale-mode='log']").click();
-  assert.equal(await trackingComponent.getAttribute("data-scale"), "log");
+  assert.equal(await trackingComponent.locator("[data-scale-mode='linear']").count(), 0);
+  assert.equal(await trackingComponent.locator("[data-scale-mode='log']").count(), 0);
+  const trackingLineChart = trackingComponent.locator("[data-tracking-line-chart]");
+  assert.equal(await trackingLineChart.count(), 1);
+  assert(Number(await trackingLineChart.getAttribute("data-trend-lines")) >= 10);
+  assert(Number(await trackingComponent.locator("[data-tracking-line]").count()) >= 10);
+  assert(Number(await trackingComponent.locator("[data-tracking-line-label]").count()) >= 10);
+  assert.equal(await trackingComponent.locator(".tracking-line-legend-item").count(), 0);
   await trackingComponent.locator("[data-tab]").nth(1).click();
   assert.equal(await trackingComponent.locator("[data-tab]").nth(1).getAttribute("aria-selected"), "true");
   const trackingTooltip = await trackingComponent.locator("[data-tracking-tooltip]").first().getAttribute("data-tracking-tooltip");

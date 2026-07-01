@@ -1553,6 +1553,90 @@ body.lightbox-open {
 .tracking-stack-segment[data-segment="6"] { background: #0891b2; }
 .tracking-stack-segment[data-segment="7"] { background: #ca8a04; }
 
+.tracking-line-chart {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tracking-line-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 210px;
+  border: 1px solid rgba(209, 207, 197, 0.72);
+  border-radius: 8px;
+  background: #fbfaf5;
+}
+
+.tracking-line-grid {
+  stroke: rgba(95, 93, 87, 0.18);
+  stroke-width: 1;
+}
+
+.tracking-line-grid-date {
+  stroke-dasharray: 3 5;
+}
+
+.tracking-line-rank-label,
+.tracking-line-axis-label {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 780;
+}
+
+.tracking-line-series {
+  color: var(--line-color);
+}
+
+.tracking-line-path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.tracking-line-point {
+  fill: #ffffff;
+  stroke: currentColor;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.tracking-line-label {
+  fill: currentColor;
+  stroke: #fbfaf5;
+  stroke-linejoin: round;
+  stroke-width: 4px;
+  paint-order: stroke;
+  font-size: 11px;
+  font-weight: 820;
+}
+
+@media (max-width: 520px) {
+  .tracking-line-label {
+    stroke-width: 5px;
+    font-size: 18px;
+  }
+}
+
+.tracking-line-series:hover .tracking-line-path,
+.tracking-line-series:focus-within .tracking-line-path {
+  stroke-width: 3;
+}
+
+.tracking-line-legend {
+  display: none;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  max-height: 86px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
 .tracking-bar-row[data-tracking-tooltip]:hover::after,
 .tracking-bar-row[data-tracking-tooltip]:focus-within::after,
 .tracking-stack-row[data-tracking-tooltip]:hover::after,
