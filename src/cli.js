@@ -45,6 +45,7 @@ import {
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
+  createOfficialBlogRelationshipSuggestions,
   loadOfficialBlogKnowledge
 } from "./official-blog-knowledge.js";
 
@@ -256,6 +257,31 @@ try {
       output_dir: resolvedOutputDir,
       drafts,
       records_written: recordsWritten
+    }, outputPath);
+  } else if (command === "official-blog:suggest-relations") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_suggest_relations_input_required", "official-blog:suggest-relations requires --input <reviewed-or-queue-official-blogs.json>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogSuggestRelationsOutputPath({ outputPath, rootDir });
+    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const existingIndex = await loadOfficialBlogKnowledge({
+      rootDir,
+      knowledgeDir: args["knowledge-dir"] ? path.resolve(args["knowledge-dir"]) : undefined
+    });
+    const relationshipSuggestions = createOfficialBlogRelationshipSuggestions(input, {
+      existingIndex,
+      generatedAt: args["generated-at"],
+      maxSuggestions: args.limit || args["max-suggestions"]
+    });
+    printJson({
+      ok: true,
+      input_path: resolvedInputPath,
+      relationship_suggestions: relationshipSuggestions
     }, outputPath);
   } else if (command === "preflight:worktree") {
     const args = parseArgs(argv);
@@ -1020,6 +1046,14 @@ function assertOfficialBlogAuthorRecordsOutputPath(options = {}) {
   });
 }
 
+function assertOfficialBlogSuggestRelationsOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_suggest_relations_public_output_forbidden",
+    message: "official-blog:suggest-relations writes internal relationship suggestion data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
 function assertOfficialBlogInternalOutputPath(options = {}) {
   const outputPath = String(options.outputPath || "").trim();
   if (!outputPath) {
@@ -1039,7 +1073,10 @@ function isOfficialBlogIntakePublicOutputPath(outputPath, rootDir) {
 }
 
 function isOfficialBlogInternalCommand(value) {
-  return value === "official-blog:intake" || value === "official-blog:parse-feed" || value === "official-blog:author-records";
+  return value === "official-blog:intake" ||
+    value === "official-blog:parse-feed" ||
+    value === "official-blog:author-records" ||
+    value === "official-blog:suggest-relations";
 }
 
 function isOfficialBlogInternalPublicOutputPath(outputPath, rootDir) {

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "id": "2026-06-30.project_iteration.official-blog-knowledge-stage9",
+  "run_type": "project_iteration",
+  "date": "2026-06-30",
+  "title": "Official blog knowledge stage 9",
+  "slug": "official-blog-knowledge-stage9",
+  "status": "completed",
+  "summary": "This iteration adds an internal relationship suggestion step for OpenAI and Anthropic official blog knowledge. Reviewed or intake-style candidates can now be compared against existing curated records by topics and admission criteria before final authoring, producing advisory related-blog suggestions without mutating knowledge records, fetching live pages, translating content, or writing public docs output.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog relationship suggestions|official blog suggest-relations\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run content:contract",
+      "npm run test",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Official blog graph links should be suggested before authoring, not silently auto-written into curated records.",
+      "evidence": "Stage 9 produces `official_blog_relationship_suggestions` as an internal advisory artifact and does not mutate `knowledge/official-blogs/**`.",
+      "scope": "official_blog_relationship_suggestions",
+      "persistence": "implemented",
+      "recommended_action": "Review suggested related blog ids during authoring and copy only accepted links into Stage 8 reviewed authoring fields."
+    },
+    {
+      "lesson": "Company identity alone is too weak for knowledge graph edges.",
+      "evidence": "Stage 9 scores only records with shared topics, shared matched criteria, or existing reverse links; same-company context is only a bonus on top of substantive overlap.",
+      "scope": "official_blog_relationship_scoring",
+      "persistence": "implemented",
+      "recommended_action": "Keep relation scoring tied to durable product, model, engineering, eval, safety, or agent workflow overlap."
+    },
+    {
+      "lesson": "Relationship diagnostics remain internal candidate metadata.",
+      "evidence": "Stage 9 CLI `official-blog:suggest-relations` rejects public `docs/data`, `docs/official-blogs`, and public HTML output paths.",
+      "scope": "official_blog_internal_output_boundary",
+      "persistence": "implemented",
+      "recommended_action": "Expose only accepted curated relations through public knowledge records and keep scoring details out of public artifacts."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Reviewed official blog candidates had no deterministic way to discover related existing records before authoring `related_blog_ids`.",
+      "evidence": "Stage 9 adds `createOfficialBlogRelationshipSuggestions`, CLI command `official-blog:suggest-relations`, deterministic scoring by shared topics and matched criteria, duplicate reporting, invalid entry isolation, clean `--output` behavior, and public-output path rejection.",
+      "module": "src/official-blog-knowledge.js, src/cli.js, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Use internal relationship suggestions as the reviewer handoff before final official blog authoring.",
+      "expected_benefit": "New OpenAI and Anthropic blog records can be linked into a reusable knowledge graph while preserving manual review and public-data minimization boundaries.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through deterministic relationship suggestion and CLI tests.",
+      "ledger_links": [
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-editorial-importance-density-source-visibility",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog relationship suggestions rank shared topics and criteria without mutating records",
+        "official blog relationship suggestions report duplicates and suppress company-only matches",
+        "official blog suggest-relations CLI writes clean internal suggestions",
+        "official blog suggest-relations CLI refuses public output paths"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Let daily generation consume a compact official blog knowledge context capped by relationship suggestions and topic overlap.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add optional live fetching only after it writes the Stage 7 preview feed artifact and remains separated from reviewed authoring and relation suggestions.",
+      "owner": "project"
+    }
+  ]
+}

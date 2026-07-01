@@ -6284,6 +6284,106 @@ test("official blog author records CLI refuses public output paths", async () =>
   );
 });
 
+test("official blog suggest-relations CLI writes clean internal suggestions", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-suggest-relations-"));
+  const inputPath = path.join(tmp, "reviewed-official-blogs.json");
+  const outputPath = path.join(tmp, "official-blog-relationship-suggestions.json");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    reviewed_entries: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/agent-harness-patterns",
+        published_at: "2026-06-30",
+        title_original: "Agent harness patterns for production workflows",
+        review_decision: "include",
+        topics: ["agent", "harness_engineering", "workflow_orchestration"],
+        admission: {
+          decision: "include",
+          matched_criteria: ["engineering_practice", "harness_engineering", "agent_workflow"]
+        },
+        opening_preview: "This internal preview should not be copied into suggestion records."
+      }
+    ]
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:suggest-relations",
+    "--input",
+    inputPath,
+    "--output",
+    outputPath,
+    "--generated-at",
+    "2026-06-30T08:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.relationship_suggestions.kind, "official_blog_relationship_suggestions");
+  assert.equal(parsed.relationship_suggestions.visibility, "internal");
+  assert.equal(parsed.relationship_suggestions.suggestions.length, 1);
+  assert(parsed.relationship_suggestions.suggestions[0].suggested_related_blog_ids.some((item) => item.id === "anthropic-building-effective-agents-2024-12-19"));
+  assert.equal(Object.hasOwn(parsed.relationship_suggestions.suggestions[0], "opening_preview"), false);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
+test("official blog suggest-relations CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-suggest-relations-public-"));
+  const inputPath = path.join(tmp, "reviewed-official-blogs.json");
+  const publicOutputPaths = [
+    path.join(tmp, "docs", "data", "official-blog-relationship-suggestions.json"),
+    path.join(tmp, "docs", "official-blogs", "relationship-suggestions.json"),
+    path.join(tmp, "docs", "official-blog-relationship-suggestions.html")
+  ];
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    reviewed_entries: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/agent-harness-patterns",
+        published_at: "2026-06-30",
+        title_original: "Agent harness patterns for production workflows",
+        topics: ["agent"],
+        admission: {
+          decision: "include",
+          matched_criteria: ["engineering_practice"]
+        }
+      }
+    ]
+  })}\n`, "utf8");
+
+  for (const publicOutputPath of publicOutputPaths) {
+    await assert.rejects(
+      () => execFileAsync(process.execPath, [
+        path.join(rootDir, "src/cli.js"),
+        "official-blog:suggest-relations",
+        "--input",
+        inputPath,
+        "--output",
+        publicOutputPath,
+        "--repo-root",
+        tmp
+      ], {
+        cwd: rootDir,
+        maxBuffer: 1024 * 1024
+      }),
+      (error) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stdout, /official_blog_suggest_relations_public_output_forbidden/);
+        return true;
+      }
+    );
+    await assert.rejects(
+      () => fs.stat(publicOutputPath),
+      /ENOENT/
+    );
+  }
+});
+
 test("publish:verify-pages emits structured retryable misses without nonzero exit", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-pages-verify-"));
   const preloadPath = path.join(tmp, "fake-fetch.mjs");
