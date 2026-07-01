@@ -43,6 +43,7 @@ import { runDailyWorkflow } from "./daily-runner.js";
 import { runStatusSelfCheck } from "./status-self-check.js";
 import {
   createOfficialBlogKnowledgeContext,
+  createOfficialBlogAuthoringBrief,
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
@@ -368,6 +369,38 @@ try {
       packet_path: resolvedPacketPath,
       input_path: resolvedInputPath,
       review_decisions: reviewDecisions
+    }, outputPath);
+  } else if (command === "official-blog:authoring-brief") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || args.decisions || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_authoring_brief_input_required", "official-blog:authoring-brief requires --input <official-blog-review-decisions.json>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const relationsPath = args.relations || args["relationship-suggestions"] || args["relationship-suggestions-input"];
+    const resolvedRelationsPath = relationsPath ? path.resolve(relationsPath) : "";
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogAuthoringBriefOutputPath({ outputPath, rootDir });
+    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const relationshipSuggestions = resolvedRelationsPath
+      ? officialBlogAuthoringBriefRelationshipInput(JSON.parse(fs.readFileSync(resolvedRelationsPath, "utf8")))
+      : null;
+    const authoringBriefInput = input?.kind === "official_blog_review_decisions"
+      ? { review_decisions: input }
+      : { ...input };
+    if (relationshipSuggestions) {
+      authoringBriefInput.relationship_suggestions = relationshipSuggestions;
+    }
+    const authoringBrief = createOfficialBlogAuthoringBrief(authoringBriefInput, {
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"]
+    });
+    printJson({
+      ok: true,
+      input_path: resolvedInputPath,
+      relations_path: resolvedRelationsPath,
+      authoring_brief: authoringBrief
     }, outputPath);
   } else if (command === "preflight:worktree") {
     const args = parseArgs(argv);
@@ -1164,6 +1197,27 @@ function assertOfficialBlogReviewDecisionsOutputPath(options = {}) {
   });
 }
 
+function officialBlogAuthoringBriefRelationshipInput(input = {}) {
+  if (input?.kind === "official_blog_relationship_suggestions") {
+    return input;
+  }
+  if (input?.relationship_suggestions?.kind === "official_blog_relationship_suggestions") {
+    return input.relationship_suggestions;
+  }
+  if (input?.relationshipSuggestions?.kind === "official_blog_relationship_suggestions") {
+    return input.relationshipSuggestions;
+  }
+  return input;
+}
+
+function assertOfficialBlogAuthoringBriefOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_authoring_brief_public_output_forbidden",
+    message: "official-blog:authoring-brief writes internal authoring handoff data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
 function assertOfficialBlogInternalOutputPath(options = {}) {
   const outputPath = String(options.outputPath || "").trim();
   if (!outputPath) {
@@ -1189,7 +1243,8 @@ function isOfficialBlogInternalCommand(value) {
     value === "official-blog:suggest-relations" ||
     value === "official-blog:context" ||
     value === "official-blog:review-packet" ||
-    value === "official-blog:review-decisions";
+    value === "official-blog:review-decisions" ||
+    value === "official-blog:authoring-brief";
 }
 
 function isOfficialBlogInternalPublicOutputPath(outputPath, rootDir) {

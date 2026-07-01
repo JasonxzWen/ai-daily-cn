@@ -6924,6 +6924,173 @@ test("official blog review-decisions CLI refuses public output paths", async () 
   }
 });
 
+test("official blog authoring-brief CLI writes clean internal authoring packet", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-authoring-brief-"));
+  const inputPath = path.join(tmp, "official-blog-review-decisions.json");
+  const relationsPath = path.join(tmp, "official-blog-relations.json");
+  const outputPath = path.join(tmp, "official-blog-authoring-brief.json");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    review_decisions: {
+      kind: "official_blog_review_decisions",
+      visibility: "internal",
+      report_date: "2026-07-01",
+      admission_policy: {
+        version: "official-blog-admission-v1",
+        include_criteria: [{ id: "new_model" }]
+      },
+      accepted_for_authoring: [
+        {
+          intake_id: "openai-examplemodel-brief",
+          company: "openai",
+          company_label: "OpenAI",
+          canonical_url: "https://openai.com/index/examplemodel-brief",
+          normalized_url: "https://openai.com/index/examplemodel-brief",
+          published_at: "2026-07-01",
+          title_original: "Introducing ExampleModel Brief",
+          opening_preview: "This new model release explains evals and safety mitigations.",
+          deterministic_triage: {
+            decision: "include",
+            reason: "new model",
+            matched_criteria: ["new_model"]
+          },
+          ai_review: {
+            decision: "include",
+            matched_criteria: ["new_model"],
+            suggested_topics: ["model_release_context"],
+            rationale: "Model release with reusable eval detail.",
+            confidence: 0.91
+          },
+          final_decision: "include",
+          final_action: "ready_for_manual_authoring",
+          body: "This full body must not leak."
+        }
+      ],
+      needs_manual_review: [
+        {
+          intake_id: "anthropic-customer-brief",
+          company: "anthropic",
+          canonical_url: "https://www.anthropic.com/news/customer-brief",
+          normalized_url: "https://www.anthropic.com/news/customer-brief",
+          published_at: "2026-07-01",
+          title_original: "How a customer built with Claude",
+          opening_preview: "Customer story with architecture hints.",
+          deterministic_triage: {
+            decision: "needs_review",
+            matched_criteria: ["agent_workflow"]
+          },
+          ai_review: {
+            decision: "include",
+            matched_criteria: ["agent_workflow"],
+            rationale: "Still needs manual reading.",
+            raw_transcript: "This raw transcript must not leak."
+          },
+          final_decision: "needs_review",
+          final_action: "manual_review_required"
+        }
+      ],
+      excluded: [],
+      invalid_decisions: []
+    },
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, null, 2)}\n`, "utf8");
+  await fs.writeFile(relationsPath, `${JSON.stringify({
+    relationship_suggestions: {
+      kind: "official_blog_relationship_suggestions",
+      suggestions: [
+        {
+          canonical_url: "https://openai.com/index/examplemodel-brief",
+          normalized_url: "https://openai.com/index/examplemodel-brief",
+          suggested_related_blog_ids: [
+            { id: "openai-new-tools-building-agents-2025-03-11", score: 12 }
+          ]
+        }
+      ]
+    }
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:authoring-brief",
+    "--input",
+    inputPath,
+    "--relations",
+    relationsPath,
+    "--output",
+    outputPath,
+    "--date",
+    "2026-07-01",
+    "--generated-at",
+    "2026-07-01T08:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.authoring_brief.kind, "official_blog_authoring_brief");
+  assert.equal(parsed.authoring_brief.visibility, "internal");
+  assert.equal(parsed.authoring_brief.stats.authoring_items, 1);
+  assert.equal(parsed.authoring_brief.stats.manual_review_required, 1);
+  assert.equal(parsed.authoring_brief.authoring_items[0].reviewed_entry_template.review_decision, "include");
+  assert.equal(parsed.authoring_brief.authoring_items[0].reviewed_entry_template.title_zh, "");
+  assert.deepEqual(parsed.authoring_brief.authoring_items[0].suggested_fields.related_blog_ids, ["openai-new-tools-building-agents-2025-03-11"]);
+  assert.equal(JSON.stringify(parsed.authoring_brief).includes("This full body must not leak"), false);
+  assert.equal(JSON.stringify(parsed.authoring_brief).includes("raw transcript"), false);
+  assert.equal(JSON.stringify(parsed.authoring_brief).includes("should_not_leak"), false);
+  assert.equal(JSON.stringify(parsed.authoring_brief).includes("candidate_pool"), false);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
+test("official blog authoring-brief CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-authoring-brief-public-"));
+  const inputPath = path.join(tmp, "official-blog-review-decisions.json");
+  const publicOutputPaths = [
+    path.join(tmp, "docs", "data", "official-blog-authoring-brief.json"),
+    path.join(tmp, "docs", "official-blogs", "authoring-brief.json"),
+    path.join(tmp, "docs", "official-blog-authoring-brief.html"),
+    path.join(tmp, "docs", "reports", "official-blog-authoring-brief.html")
+  ];
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    kind: "official_blog_review_decisions",
+    visibility: "internal",
+    accepted_for_authoring: [],
+    needs_manual_review: [],
+    excluded: [],
+    invalid_decisions: []
+  })}\n`, "utf8");
+
+  for (const publicOutputPath of publicOutputPaths) {
+    await assert.rejects(
+      () => execFileAsync(process.execPath, [
+        path.join(rootDir, "src/cli.js"),
+        "official-blog:authoring-brief",
+        "--input",
+        inputPath,
+        "--output",
+        publicOutputPath,
+        "--repo-root",
+        tmp
+      ], {
+        cwd: rootDir,
+        maxBuffer: 1024 * 1024
+      }),
+      (error) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stdout, /official_blog_authoring_brief_public_output_forbidden/);
+        return true;
+      }
+    );
+    await assert.rejects(
+      () => fs.stat(publicOutputPath),
+      /ENOENT/
+    );
+  }
+});
+
 test("publish:verify-pages emits structured retryable misses without nonzero exit", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-pages-verify-"));
   const preloadPath = path.join(tmp, "fake-fetch.mjs");

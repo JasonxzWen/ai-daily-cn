@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-authoring-brief-stage14",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog authoring brief stage 14",
+  "slug": "official-blog-authoring-brief-stage14",
+  "status": "completed",
+  "summary": "This iteration adds an internal authoring brief for OpenAI and Anthropic official-blog review decisions. It turns accepted review decisions into human-completion templates, keeps needs_review customer or partnership stories in a manual-review bucket, carries deterministic field suggestions and related-blog hints, and avoids generating translations, summaries, curated records, or public artifacts.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog authoring[- ]brief|official-blog:authoring-brief\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Accepted AI review decisions still need a human authoring boundary before curated records are written.",
+      "evidence": "Stage 14 produces `official_blog_authoring_brief` with `reviewed_entry_template` placeholders instead of completed Chinese authoring fields.",
+      "scope": "official_blog_authoring_brief",
+      "persistence": "implemented",
+      "recommended_action": "Use the authoring brief as the handoff to manual translation and synthesis, then pass completed reviewed entries into `official-blog:author-records`."
+    },
+    {
+      "lesson": "Manual-review items must stay visible but outside authoring templates.",
+      "evidence": "The authoring brief maps Stage 13 `needs_manual_review` into `manual_review_required` and never creates a `reviewed_entry_template` for those items.",
+      "scope": "official_blog_manual_review",
+      "persistence": "implemented",
+      "recommended_action": "Read customer or partnership stories fully before promoting them into reviewed entries."
+    },
+    {
+      "lesson": "Relationship suggestions are useful as authoring hints, not automatic graph mutations.",
+      "evidence": "Stage 14 can attach suggested related blog ids by normalized URL, but only inside `suggested_fields` and template placeholders.",
+      "scope": "official_blog_graph_authoring",
+      "persistence": "implemented",
+      "recommended_action": "Keep suggested related ids reviewable during authoring before they become public curated graph edges."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Accepted review decisions had no compact human handoff before the reviewed author-record stage.",
+      "evidence": "Stage 14 adds `createOfficialBlogAuthoringBrief` and `official-blog:authoring-brief`, plus tests for accepted-only authoring templates, manual-review preservation, clean JSON output, relationship suggestions, and public output guards.",
+      "module": "src/official-blog-knowledge.js, src/cli.js, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Generate an internal authoring brief after AI review decisions and before manually completed curated records.",
+      "expected_benefit": "The official-blog workflow can move high-value product, model, and engineering posts toward translation and synthesis without auto-publishing AI decisions or borderline customer stories.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through pure function and CLI coverage, with public output guards and internal payload sanitization.",
+      "ledger_links": [
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-daily-not-machine-log",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog authoring brief creates human templates from accepted decisions only",
+        "official blog authoring-brief CLI writes clean internal authoring packet",
+        "official blog authoring-brief CLI refuses public output paths"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add an optional command that validates completed authoring brief templates before passing them to `official-blog:author-records`.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add live official-blog discovery only after it writes preview feed, review packet, decision, and authoring-brief artifacts as separate internal steps.",
+      "owner": "project"
+    }
+  ]
+}

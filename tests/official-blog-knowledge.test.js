@@ -6,6 +6,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   OFFICIAL_BLOG_ADMISSION_POLICY,
+  createOfficialBlogAuthoringBrief,
   createOfficialBlogKnowledgeContext,
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
@@ -955,6 +956,143 @@ test("official blog review decisions reject policy-invalid criteria and missing 
   assert.equal(decisions.stats.invalid_decisions, 2);
   assert(decisions.invalid_decisions.some((item) => item.reason.includes("matched_criteria outside admission policy")));
   assert(decisions.invalid_decisions.some((item) => item.reason.includes("missing AI decision")));
+});
+
+test("official blog authoring brief creates human templates from accepted decisions only", async () => {
+  const existingIndex = await loadOfficialBlogKnowledge({ rootDir });
+  const packet = createOfficialBlogReviewPacket({
+    candidates: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/examplemodel-9-authoring-brief",
+        published_at: "2026-07-01",
+        title: "Introducing ExampleModel 9",
+        opening_preview: "This new model release explains evals, safety mitigations, deployment constraints, and developer integration guidance."
+      },
+      {
+        company: "anthropic",
+        canonical_url: "https://www.anthropic.com/news/examplebank-agent-routing-authoring-brief",
+        published_at: "2026-07-01",
+        title: "How ExampleBank built a Claude support workflow",
+        opening_preview: "The opening preview describes routing architecture, tool permissions, evaluation harnesses, observability, and rollout controls for production agents."
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/internal-agent-eval-playbook-authoring-brief",
+        published_at: "2026-07-01",
+        title: "A production agent eval playbook",
+        opening_preview: "This engineering practice note explains eval harness design, regression checks, failure triage, and observability for agent workflows."
+      }
+    ]
+  }, {
+    existingIndex,
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+  const model = packet.review_items.find((item) => item.title_original.includes("ExampleModel 9"));
+  const customer = packet.review_items.find((item) => item.company === "anthropic");
+  const practice = packet.review_items.find((item) => item.title_original.includes("eval playbook"));
+  assert(model);
+  assert(customer);
+  assert(practice);
+
+  const decisions = createOfficialBlogReviewDecisions({
+    review_packet: packet,
+    decisions: [
+      {
+        intake_id: model.intake_id,
+        decision: "include",
+        matched_criteria: ["new_model"],
+        suggested_topics: ["model_release_context", "evals"],
+        rationale: "The preview shows a durable model release with evals, safety notes, and developer integration guidance.",
+        confidence: 0.94,
+        body: "This full body must not leak."
+      },
+      {
+        intake_id: customer.intake_id,
+        decision: "include",
+        matched_criteria: ["agent_workflow"],
+        suggested_topics: ["agent_workflow"],
+        rationale: "The preview hints at implementation detail, but it is still a customer story and needs manual reading.",
+        confidence: "high",
+        raw_transcript: "This raw transcript must not leak."
+      },
+      {
+        intake_id: practice.intake_id,
+        decision: "exclude",
+        matched_criteria: [],
+        suggested_topics: ["evals"],
+        rationale: "The reviewer did not find enough reusable detail in the preview.",
+        confidence: 0.61
+      }
+    ],
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, {
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+  const brief = createOfficialBlogAuthoringBrief({
+    review_decisions: decisions,
+    relationship_suggestions: {
+      kind: "official_blog_relationship_suggestions",
+      suggestions: [
+        {
+          canonical_url: model.canonical_url,
+          normalized_url: model.normalized_url,
+          suggested_related_blog_ids: [
+            { id: "openai-new-tools-building-agents-2025-03-11", score: 11 },
+            "anthropic-building-effective-agents-2024-12-19"
+          ]
+        }
+      ]
+    },
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, {
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+
+  assert.equal(brief.kind, "official_blog_authoring_brief");
+  assert.equal(brief.visibility, "internal");
+  assert.equal(brief.admission_policy.version, "official-blog-admission-v1");
+  assert.equal(brief.stats.accepted_for_authoring, 1);
+  assert.equal(brief.stats.authoring_items, 1);
+  assert.equal(brief.stats.manual_review_required, 1);
+  assert.equal(brief.stats.excluded, 1);
+  assert.equal(brief.authoring_items[0].intake_id, model.intake_id);
+  assert.equal(brief.manual_review_required[0].intake_id, customer.intake_id);
+  assert.equal(brief.excluded[0].intake_id, practice.intake_id);
+
+  const item = brief.authoring_items[0];
+  assert.deepEqual(item.authoring_required_fields, [
+    "title_zh",
+    "summary_zh",
+    "key_ideas",
+    "practice_checklist"
+  ]);
+  assert.equal(item.suggested_fields.importance, "major");
+  assert.equal(item.suggested_fields.content_type, "model_release_context");
+  assert.deepEqual(item.suggested_fields.topics, ["evals", "model_release_context", "safety_engineering"]);
+  assert.deepEqual(item.suggested_fields.related_blog_ids, [
+    "anthropic-building-effective-agents-2024-12-19",
+    "openai-new-tools-building-agents-2025-03-11"
+  ]);
+  assert.equal(item.reviewed_entry_template.review_decision, "include");
+  assert.equal(item.reviewed_entry_template.title_zh, "");
+  assert.equal(item.reviewed_entry_template.summary_zh, "");
+  assert.deepEqual(item.reviewed_entry_template.key_ideas, []);
+  assert.deepEqual(item.reviewed_entry_template.practice_checklist, []);
+  assert.equal(Object.hasOwn(item.reviewed_entry_template, "opening_preview"), false);
+  assert.deepEqual(item.reviewed_entry_template.related_blog_ids, item.suggested_fields.related_blog_ids);
+
+  const briefPayload = JSON.stringify(brief);
+  assert.equal(briefPayload.includes("This full body must not leak"), false);
+  assert.equal(briefPayload.includes("raw transcript"), false);
+  assert.equal(briefPayload.includes("should_not_leak"), false);
+  assert.equal(briefPayload.includes("candidate_pool"), false);
+  assert.equal(briefPayload.includes("content_html"), false);
 });
 
 test("official blog knowledge drafts require reviewed authoring fields and omit queue internals", async () => {

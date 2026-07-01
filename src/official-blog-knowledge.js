@@ -695,6 +695,44 @@ export function createOfficialBlogReviewDecisions(input = {}, options = {}) {
   };
 }
 
+export function createOfficialBlogAuthoringBrief(input = {}, options = {}) {
+  const reviewDecisions = officialBlogAuthoringBriefReviewDecisions(input);
+  const relationshipSuggestions = officialBlogAuthoringBriefRelationshipSuggestions(input, options);
+  const relationsByUrl = officialBlogAuthoringBriefRelationsByUrl(relationshipSuggestions);
+  const accepted = Array.isArray(reviewDecisions.accepted_for_authoring) ? reviewDecisions.accepted_for_authoring : [];
+  const manualReview = Array.isArray(reviewDecisions.needs_manual_review) ? reviewDecisions.needs_manual_review : [];
+  const excluded = Array.isArray(reviewDecisions.excluded) ? reviewDecisions.excluded : [];
+  const invalidDecisions = Array.isArray(reviewDecisions.invalid_decisions) ? reviewDecisions.invalid_decisions : [];
+  const reportDate = String(options.reportDate || options.report_date || reviewDecisions.report_date || "");
+  const authoringItems = accepted
+    .filter((item) => normalizeOfficialBlogReviewDecision(item.final_decision) === "include")
+    .map((item) => officialBlogAuthoringBriefItem(item, {
+      relationsByUrl,
+      reportDate
+    }));
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_authoring_brief",
+    visibility: "internal",
+    report_date: reportDate,
+    generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
+    stats: {
+      accepted_for_authoring: accepted.length,
+      authoring_items: authoringItems.length,
+      manual_review_required: manualReview.length,
+      excluded: excluded.length,
+      invalid_decisions: invalidDecisions.length
+    },
+    authoring_required_fields: officialBlogAuthoringRequiredFields(),
+    authoring_items: authoringItems,
+    manual_review_required: manualReview.map(officialBlogAuthoringBriefDecisionSummary),
+    excluded: excluded.map(officialBlogAuthoringBriefDecisionSummary),
+    invalid_decisions: invalidDecisions.map(officialBlogAuthoringBriefInvalidDecision)
+  };
+}
+
 export function createOfficialBlogIntakeQueue(input = {}, options = {}) {
   const candidates = officialBlogIntakeCandidates(input);
   const existingByUrl = existingOfficialBlogRecordByUrl(options.existingIndex);
@@ -1411,6 +1449,232 @@ function officialBlogReviewDecisionConfidence(value) {
   }
   const bucket = normalizeOfficialBlogReviewDecision(value);
   return ["high", "medium", "low"].includes(bucket) ? bucket : "";
+}
+
+function officialBlogAuthoringBriefReviewDecisions(input = {}) {
+  const decisions = input?.kind === "official_blog_review_decisions"
+    ? input
+    : input?.review_decisions?.kind === "official_blog_review_decisions"
+      ? input.review_decisions
+      : input?.reviewDecisions?.kind === "official_blog_review_decisions"
+        ? input.reviewDecisions
+        : input?.decisions?.kind === "official_blog_review_decisions"
+          ? input.decisions
+          : null;
+  if (!decisions) {
+    throw new Error("official blog authoring brief requires review_decisions");
+  }
+  return decisions;
+}
+
+function officialBlogAuthoringBriefRelationshipSuggestions(input = {}, options = {}) {
+  const fromOptions =
+    options.relationshipSuggestions ||
+    options.relationship_suggestions ||
+    options.relations;
+  const source =
+    fromOptions ||
+    input.relationship_suggestions ||
+    input.relationshipSuggestions ||
+    input.relations ||
+    input.suggested_relations ||
+    input.suggestedRelations;
+  if (!source) {
+    return { suggestions: [] };
+  }
+  if (source.kind === "official_blog_relationship_suggestions") {
+    return source;
+  }
+  if (source.relationship_suggestions?.kind === "official_blog_relationship_suggestions") {
+    return source.relationship_suggestions;
+  }
+  if (source.relationshipSuggestions?.kind === "official_blog_relationship_suggestions") {
+    return source.relationshipSuggestions;
+  }
+  if (Array.isArray(source.suggestions)) {
+    return { suggestions: source.suggestions };
+  }
+  return { suggestions: [] };
+}
+
+function officialBlogAuthoringBriefRelationsByUrl(relationshipSuggestions = {}) {
+  const relationsByUrl = new Map();
+  for (const suggestion of Array.isArray(relationshipSuggestions.suggestions) ? relationshipSuggestions.suggestions : []) {
+    const normalizedUrl = safeNormalizeOfficialBlogUrl(suggestion.normalized_url || suggestion.canonical_url);
+    if (!normalizedUrl) {
+      continue;
+    }
+    const relatedIds = officialBlogAuthoringBriefRelatedBlogIds(suggestion.suggested_related_blog_ids || suggestion.suggestedRelatedBlogIds);
+    if (relatedIds.length > 0) {
+      relationsByUrl.set(normalizedUrl, relatedIds);
+    }
+  }
+  return relationsByUrl;
+}
+
+function officialBlogAuthoringBriefRelatedBlogIds(value) {
+  const ids = [];
+  for (const item of Array.isArray(value) ? value : []) {
+    if (typeof item === "string") {
+      ids.push(item);
+    } else if (item && typeof item === "object") {
+      ids.push(item.id || item.record_id || item.recordId || "");
+    }
+  }
+  return uniqueSorted(ids.filter((id) => OFFICIAL_BLOG_RECORD_ID_RE.test(String(id || ""))));
+}
+
+function officialBlogAuthoringBriefItem(item = {}, context = {}) {
+  const base = officialBlogReviewDecisionPacketItemBase(item);
+  const matchedCriteria = officialBlogAuthoringMatchedCriteria(item);
+  const suggestedTopics = officialBlogAuthoringSuggestedTopics(item, matchedCriteria);
+  const relatedBlogIds = context.relationsByUrl?.get(base.normalized_url) || [];
+  const relatedReportDates = officialBlogAuthoringRelatedReportDates(item, context.reportDate);
+  const suggestedFields = {
+    importance: officialBlogAuthoringImportance(matchedCriteria),
+    content_type: officialBlogAuthoringContentType(matchedCriteria),
+    topics: suggestedTopics,
+    related_blog_ids: relatedBlogIds,
+    related_report_dates: relatedReportDates
+  };
+  const admissionReason = officialBlogAuthoringAdmissionReason(item);
+
+  return {
+    ...base,
+    ai_review: officialBlogAuthoringAiReview(item.ai_review),
+    final_decision: "include",
+    final_action: "human_authoring_required",
+    authoring_required_fields: officialBlogAuthoringRequiredFields(),
+    suggested_fields: suggestedFields,
+    reviewed_entry_template: {
+      intake_id: base.intake_id,
+      company: base.company,
+      canonical_url: base.canonical_url,
+      published_at: base.published_at,
+      title_original: base.title_original,
+      review_decision: "include",
+      admission: {
+        decision: "include",
+        reason: admissionReason,
+        matched_criteria: matchedCriteria
+      },
+      title_zh: "",
+      summary_zh: "",
+      key_ideas: [],
+      practice_checklist: [],
+      importance: suggestedFields.importance,
+      content_type: suggestedFields.content_type,
+      topics: suggestedFields.topics,
+      related_blog_ids: suggestedFields.related_blog_ids,
+      related_report_dates: suggestedFields.related_report_dates
+    }
+  };
+}
+
+function officialBlogAuthoringBriefDecisionSummary(item = {}) {
+  return {
+    ...officialBlogReviewDecisionPacketItemBase(item),
+    ai_review: officialBlogAuthoringAiReview(item.ai_review),
+    final_decision: String(item.final_decision || ""),
+    final_action: String(item.final_action || "")
+  };
+}
+
+function officialBlogAuthoringBriefInvalidDecision(item = {}) {
+  return {
+    index: item.index ?? null,
+    intake_id: String(item.intake_id || ""),
+    reason: String(item.reason || "")
+  };
+}
+
+function officialBlogAuthoringRequiredFields() {
+  return [
+    "title_zh",
+    "summary_zh",
+    "key_ideas",
+    "practice_checklist"
+  ];
+}
+
+function officialBlogAuthoringAiReview(aiReview = {}) {
+  return {
+    decision: normalizeOfficialBlogReviewDecision(aiReview.decision),
+    matched_criteria: uniqueSorted(aiReview.matched_criteria || []).filter((criterion) => OFFICIAL_BLOG_MATCHED_CRITERIA.has(criterion)),
+    suggested_topics: officialBlogAuthoringTopicIds(aiReview.suggested_topics || []),
+    rationale: officialBlogReviewDecisionRationale(aiReview.rationale || aiReview.reason),
+    confidence: officialBlogReviewDecisionConfidence(aiReview.confidence)
+  };
+}
+
+function officialBlogAuthoringMatchedCriteria(item = {}) {
+  return uniqueSorted([
+    ...(Array.isArray(item.deterministic_triage?.matched_criteria) ? item.deterministic_triage.matched_criteria : []),
+    ...(Array.isArray(item.ai_review?.matched_criteria) ? item.ai_review.matched_criteria : [])
+  ]).filter((criterion) => OFFICIAL_BLOG_MATCHED_CRITERIA.has(criterion));
+}
+
+function officialBlogAuthoringSuggestedTopics(item = {}, matchedCriteria = []) {
+  const values = [
+    ...(Array.isArray(item.ai_review?.suggested_topics) ? item.ai_review.suggested_topics : []),
+    ...(Array.isArray(item.suggested_topics) ? item.suggested_topics : []),
+    ...matchedCriteria.map(officialBlogAuthoringTopicForCriterion)
+  ].filter(Boolean);
+  return officialBlogAuthoringTopicIds(values).slice(0, 12);
+}
+
+function officialBlogAuthoringTopicIds(value) {
+  return uniqueSorted(officialBlogArrayLike(value))
+    .filter((topic) => OFFICIAL_BLOG_TOPIC_ID_RE.test(topic))
+    .slice(0, 12);
+}
+
+function officialBlogAuthoringTopicForCriterion(criterion) {
+  if (criterion === "new_model") return "model_release_context";
+  if (criterion === "new_product") return "product_practice";
+  if (criterion === "harness_engineering") return "harness_engineering";
+  if (criterion === "agent_workflow") return "agent";
+  if (criterion === "eval_methodology") return "evals";
+  if (criterion === "safety_engineering") return "safety_engineering";
+  if (criterion === "engineering_practice") return "engineering_practice";
+  return "";
+}
+
+function officialBlogAuthoringImportance(matchedCriteria = []) {
+  if (matchedCriteria.some((criterion) => ["new_model", "new_product", "harness_engineering", "agent_workflow"].includes(criterion))) {
+    return "major";
+  }
+  if (matchedCriteria.some((criterion) => ["engineering_practice", "eval_methodology", "safety_engineering"].includes(criterion))) {
+    return "notable";
+  }
+  return "reference";
+}
+
+function officialBlogAuthoringContentType(matchedCriteria = []) {
+  if (matchedCriteria.includes("new_model")) return "model_release_context";
+  if (matchedCriteria.includes("new_product")) return "product_practice";
+  if (matchedCriteria.includes("safety_engineering")) return "safety_policy";
+  if (matchedCriteria.includes("eval_methodology")) return "best_practice";
+  if (matchedCriteria.some((criterion) => ["harness_engineering", "agent_workflow", "engineering_practice"].includes(criterion))) {
+    return "engineering_note";
+  }
+  return "best_practice";
+}
+
+function officialBlogAuthoringRelatedReportDates(item = {}, reportDate = "") {
+  return uniqueSorted([
+    ...(Array.isArray(item.related_report_dates) ? item.related_report_dates : []),
+    String(reportDate || "")
+  ].filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date)));
+}
+
+function officialBlogAuthoringAdmissionReason(item = {}) {
+  const deterministicReason = String(item.deterministic_triage?.reason || "").trim();
+  const aiRationale = officialBlogReviewDecisionRationale(item.ai_review?.rationale || item.ai_review?.reason);
+  return [deterministicReason, aiRationale]
+    .filter(Boolean)
+    .join(" / ")
+    .slice(0, 600);
 }
 
 function officialBlogReviewPacketItem(candidate = {}) {
