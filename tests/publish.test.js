@@ -111,6 +111,56 @@ test("daily dry-run stages sanitized retrospective records for the selected date
   assert(plan.will_stage_files.includes("retrospectives/2026/05/2026-05-13.daily_publish.daily-run.json"));
 });
 
+test("daily dry-run expands folded untracked retrospective directories", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeRetrospectiveFixture(repoRoot, "2026-05-13");
+
+  const plan = await createDailyPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate: "2026-05-13",
+    git: fakeGit({
+      status: [
+        " M retrospectives/index.json",
+        "?? retrospectives/2026/05/"
+      ].join("\n")
+    })
+  });
+
+  assert(plan.will_stage_files.includes("retrospectives/index.json"));
+  assert(plan.will_stage_files.includes("retrospectives/2026/05/2026-05-13.daily_publish.daily-run.json"));
+});
+
+test("daily dry-run rejects folded retrospective directories with other dates", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeRetrospectiveFixture(repoRoot, "2026-05-13");
+  await writeRetrospectiveFixture(repoRoot, "2026-05-14");
+
+  await assert.rejects(
+    createDailyPublishPlan({
+      repoRoot,
+      inputDir: "reports-source",
+      dataInputDir: "reports-data",
+      outDir: "docs",
+      generatedAt: fixedGeneratedAt,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: [
+          " M retrospectives/index.json",
+          "?? retrospectives/2026/05/"
+        ].join("\n")
+      })
+    }),
+    (error) =>
+      error instanceof PublisherError &&
+      error.code === "publisher_dirty_outside_publish_plan" &&
+      error.details.files.includes("retrospectives/2026/05/2026-05-14.daily_publish.daily-run.json")
+  );
+});
+
 test("daily dry-run stages selected-date rollup correction retrospective records", async () => {
   const repoRoot = await tempRepoWithFixture();
   await writeRetrospectiveFixture(repoRoot, "2026-05-13", {

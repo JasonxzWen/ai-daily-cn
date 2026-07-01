@@ -42,7 +42,7 @@ export async function checkPublishPreflight(options = {}) {
     currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
   });
 
-  const statusEntries = parsePorcelain(await git.status());
+  const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，发布预检已停止。", {
@@ -72,7 +72,7 @@ export async function preparePublishWorktree(options = {}) {
   const git = options.git || createGitAdapter(repoRoot);
 
   const startingBranch = await git.branch();
-  const statusEntries = parsePorcelain(await git.status());
+  const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const commitMessage =
     options.commitMessage || `chore: save local changes before AI daily publish`;
   let commitOutput = "";
@@ -318,7 +318,7 @@ export async function createPublishPlan(options = {}) {
     throw new PublisherError("no_reports", "未发现可发布的结构化日报 JSON 或兼容 Markdown 日报。");
   }
 
-  const statusEntries = parsePorcelain(await git.status());
+  const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，dry-run 已停止。", {
@@ -434,7 +434,7 @@ export async function publishGeneratedArtifacts(options = {}) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续发布。`, remote);
   }
 
-  const statusEntries = parsePorcelain(await git.status());
+  const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const publishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate);
   const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
 
@@ -529,7 +529,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   const git = options.git || createGitAdapter(repoRoot);
   const sourceBranch = await git.branch();
 
-  const statusEntries = parsePorcelain(await git.status());
+  const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const hasPublisherDirtyFiles = statusEntries.some((entry) => isPublisherOwnedPath(entry.path));
   const dirtyPublishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate);
   const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
@@ -689,7 +689,7 @@ export async function resumePublishPush(options = {}) {
     });
   }
 
-  const statusEntries = parsePorcelain(await git.status());
+  const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   if (statusEntries.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树仍有未提交改动，不能直接续推已有发布提交。", {
       status: statusEntries.map((entry) => `${entry.code} ${entry.path}`)
@@ -1005,6 +1005,52 @@ function dirtyRetrospectiveFiles(statusEntries, dates) {
     });
 }
 
+async function expandedStatusEntries(repoRoot, statusEntries) {
+  const expanded = [];
+  for (const entry of statusEntries) {
+    if (entry.code !== "??" || !entry.path.endsWith("/")) {
+      expanded.push(entry);
+      continue;
+    }
+    const files = await listUntrackedDirectoryFiles(repoRoot, entry.path);
+    if (files.length === 0) {
+      expanded.push(entry);
+      continue;
+    }
+    expanded.push(...files.map((filePath) => ({ ...entry, path: filePath })));
+  }
+  return expanded;
+}
+
+async function listUntrackedDirectoryFiles(repoRoot, repoDir) {
+  const absoluteDir = path.join(repoRoot, ...repoDir.replace(/\/+$/, "").split("/"));
+  const files = [];
+  async function visit(currentDir) {
+    let entries = [];
+    try {
+      entries = await fs.readdir(currentDir, { withFileTypes: true });
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        return;
+      }
+      throw error;
+    }
+    for (const entry of entries) {
+      const absolutePath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        await visit(absolutePath);
+        continue;
+      }
+      if (!entry.isFile()) {
+        continue;
+      }
+      files.push(path.relative(repoRoot, absolutePath).replaceAll("\\", "/"));
+    }
+  }
+  await visit(absoluteDir);
+  return uniqueSorted(files);
+}
+
 async function exists(filePath) {
   try {
     await fs.access(filePath);
@@ -1017,7 +1063,7 @@ async function exists(filePath) {
 export function createGitAdapter(repoRoot) {
   return {
     async status() {
-      return runGit(repoRoot, ["status", "--porcelain=v1"], { trim: false });
+      return runGit(repoRoot, ["status", "--porcelain=v1", "-uall"], { trim: false });
     },
     async branch() {
       return runGit(repoRoot, ["branch", "--show-current"]);
