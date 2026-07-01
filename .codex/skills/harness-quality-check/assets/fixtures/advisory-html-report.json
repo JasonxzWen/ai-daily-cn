@@ -2,9 +2,12 @@
   "title": "Harness quality check advisory report",
   "summary": "Advisory-only audit orchestration smoke: existing Harness Hub checks are composed into a local HTML report without remote side effects.",
   "status": "review",
-  "template": "review-findings",
   "renderMode": "pre-rendered",
   "generatedAt": "2026-06-12T00:00:00.000Z",
+  "presentation": {
+    "showEvidence": true,
+    "showVerification": true
+  },
   "intent": {
     "audience": "Harness Hub maintainer",
     "primaryQuestion": "Can the harness-quality-check skill compose existing checks into an advisory HTML report?",

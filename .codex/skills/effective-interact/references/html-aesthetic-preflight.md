@@ -20,4 +20,4 @@ The useful transfer is the pre-flight discipline, not the whole frontend framewo
 
 ## Boundary
 
-This preflight is intentionally stricter than ordinary report writing and narrower than frontend design. It should improve generated HTML reports without changing how Skill Hub routes normal UI creation, code explanation, Chinese answers, or plain Markdown handoffs.
+This preflight is intentionally stricter than ordinary report writing and narrower than frontend design. It should improve generated HTML reports without changing how Harness Hub routes normal UI creation, code explanation, Chinese answers, or plain Markdown handoffs.

@@ -59,41 +59,6 @@ const runtimeLibraries = [
 
 const supportedChartTypes = ["bar", "line", "sparkline", "bullet", "slope", "matrix"];
 
-const templateMeta = {
-  "implementation-handoff": {
-    label: "实现交付",
-    useCase: "已完成实现、验证门禁、文件证据、风险和下一步"
-  },
-  "conclusion-dashboard": {
-    label: "\u7ed3\u8bba\u4eea\u8868\u76d8",
-    useCase: "\u5df2\u5b8c\u6210\u4efb\u52a1\u7684\u7ed3\u8bba\u3001\u6587\u4ef6\u3001\u9a8c\u8bc1\u548c\u4e0b\u4e00\u6b65"
-  },
-  "review-findings": {
-    label: "审查发现",
-    useCase: "代码或文档审查、严重级别筛选、证据片段、负责人和行动导出"
-  },
-  "research-explainer": {
-    label: "研究解释",
-    useCase: "研究综合、架构 walkthrough、有来源支撑的解释和图表"
-  },
-  "decision-matrix": {
-    label: "决策矩阵",
-    useCase: "选项比较、建议、取舍、风险和待确认问题"
-  },
-  "implementation-plan": {
-    label: "实施计划",
-    useCase: "里程碑、依赖、验收门槛、风险和开放问题"
-  },
-  "visual-exploration": {
-    label: "视觉探索",
-    useCase: "视觉方向、设计系统、组件变体或插图方案审批"
-  },
-  "editor-workbench": {
-    label: "编辑工作台",
-    useCase: "本地筛选、调参、预览和可见文本导出"
-  }
-};
-
 const groupLabels = {
   claims: "判断",
   summary: "摘要",
@@ -245,9 +210,6 @@ function safeLink(rawHref) {
   const href = String(rawHref ?? "").trim();
   if (!href) return "";
   if (href.startsWith("#")) return href;
-  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(href) && !href.startsWith("//") && !/[\u0000-\u001f<>"']/u.test(href)) {
-    return href;
-  }
 
   try {
     const parsed = new URL(href);
@@ -255,6 +217,66 @@ function safeLink(rawHref) {
   } catch {
     return "";
   }
+}
+
+function safeMediaSrc(rawSrc) {
+  const src = String(rawSrc ?? "").trim();
+  if (!src || /[\u0000-\u001f<>]/.test(src) || hasHostLocalPath(src)) return "";
+  if (/^data:image\/(?:png|jpe?g|gif|webp|svg\+xml);base64,/i.test(src)) return src;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(src)) {
+    try {
+      const parsed = new URL(src);
+      return ["http:", "https:"].includes(parsed.protocol) ? src : "";
+    } catch {
+      return "";
+    }
+  }
+  if (src.startsWith("//") || src.includes("\\")) return "";
+  return src;
+}
+
+function linkAttrs(rawHref) {
+  const href = safeLink(rawHref);
+  if (!href) return "";
+  if (/^https?:\/\//i.test(href)) {
+    return `href="${escapeAttr(href)}" target="_blank" rel="noopener noreferrer"`;
+  }
+  if (/^mailto:/i.test(href)) {
+    return `href="${escapeAttr(href)}" rel="noreferrer"`;
+  }
+  return `href="${escapeAttr(href)}"`;
+}
+
+function hasHostLocalPath(value) {
+  return /file:\/\/\/|[A-Za-z]:[\\/]|\/(?:Users|home)\//i.test(String(value ?? ""));
+}
+
+function normalizeHandoffMetadata(handoff) {
+  if (!handoff || typeof handoff !== "object") return { sourcePath: "", regenerationCommand: "" };
+  return {
+    sourcePath: String(handoff.sourcePath || "").trim().replaceAll("\\", "/"),
+    regenerationCommand: String(handoff.regenerationCommand || "").trim()
+  };
+}
+
+function hasParentPathSegment(value) {
+  return String(value || "").split("/").includes("..");
+}
+
+function renderHandoffAttributes(handoff) {
+  const normalized = normalizeHandoffMetadata(handoff);
+  const attrs = [];
+  if (normalized.sourcePath) attrs.push(`data-handoff-source-path="${escapeAttr(normalized.sourcePath)}"`);
+  if (normalized.regenerationCommand) attrs.push(`data-handoff-regeneration-command="${escapeAttr(normalized.regenerationCommand)}"`);
+  return attrs.length ? ` ${attrs.join(" ")}` : "";
+}
+
+function renderHandoffMetaTags(handoff) {
+  const normalized = normalizeHandoffMetadata(handoff);
+  const tags = [];
+  if (normalized.sourcePath) tags.push(`  <meta name="handoff-source-path" content="${escapeAttr(normalized.sourcePath)}">`);
+  if (normalized.regenerationCommand) tags.push(`  <meta name="handoff-regeneration-command" content="${escapeAttr(normalized.regenerationCommand)}">`);
+  return tags.length ? `${tags.join("\n")}\n` : "";
 }
 
 function normalizeRenderMode(mode) {
@@ -292,15 +314,15 @@ function normalizeTrustLevel(value) {
   return ["trusted-generated", "mixed-trust", "untrusted"].includes(value) ? value : "mixed-trust";
 }
 
-function inferReportIntent(input, template, mode) {
+function inferReportIntent(input, mode) {
   const explicit = input.intent && typeof input.intent === "object" ? input.intent : {};
   const hasEvidence = (input.evidence || []).length > 0;
   const hasClaims = (input.claims || []).length > 0;
   const hasCharts = (input.sections || []).some((section) => section.type === "chart");
   const artifactKind = explicit.artifactKind
-    || (template === "decision-matrix" ? "decision" : "")
-    || (template === "research-explainer" ? "research" : "")
-    || (template === "review-findings" ? "review" : "")
+    || (hasCharts ? "research" : "")
+    || (hasClaims ? "review" : "")
+    || (hasEvidence ? "status" : "")
     || "handoff";
 
   return {
@@ -362,12 +384,20 @@ function renderSourceLink(section, fallbackId) {
   return `<span class="source-link" data-source-link data-file-path="${escapeAttr(section.filePath || "")}" data-source-ref="${escapeAttr(fallbackId || "")}">${escapeHtml(label)}</span>`;
 }
 
+function visibleGroupLabel(section) {
+  const label = groupLabels[section.group] || section.group || "";
+  const title = String(section.title || "");
+  if (!label || title.includes(label)) return "";
+  return `<p class="meta">${escapeHtml(label)}</p>`;
+}
+
 function renderSectionHeader(section, statusText = "") {
   const summary = section.summary ? `<p class="section-summary">${escapeHtml(section.summary)}</p>` : "";
   const status = statusText || section.status || "info";
   const pill = showSectionStatus(status) ? `<span class="status-pill ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>` : "";
   return `<div class="section-heading split-row">
     <div>
+      ${visibleGroupLabel(section)}
       <h2>${escapeHtml(section.title)}</h2>
       ${summary}
     </div>
@@ -379,32 +409,69 @@ function renderSupplementalHeading({ group, title, summary, status = "info" }) {
   return renderSectionHeader({ group, title, summary, status }, status);
 }
 
-function renderInlineEmphasis(escaped) {
-  return String(escaped ?? "")
-    .replace(/==([^=\n]+)==/g, (_match, value) => renderHighlight(value))
-    .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/(^|[^\*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+function plainTextExcerpt(value, limit = 150) {
+  const text = stripRawHtml(value)
+    .replace(/!\[[^\]\n]*\]\([^)]+\)/g, "")
+    .replace(/\[([^\]\n]+)\]\([^)]+\)/g, "$1")
+    .replace(/==[^|\]\n]+\|([^=\n]+)==/g, "$1")
+    .replace(/[*_`#>-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return "";
+  return text.length > limit ? `${text.slice(0, limit - 1).trim()}...` : text;
 }
 
-function renderHighlight(value) {
-  const text = String(value || "");
-  const keyword = text.match(/^keyword-(major|notable|general)\|(.+)$/);
-  if (keyword) {
-    return `<strong class="text-keyword keyword-${keyword[1]}">${keyword[2]}</strong>`;
+function storySectionTeaser(section) {
+  const direct = plainTextExcerpt(section.summary || section.subtitle || "");
+  if (direct) return direct;
+  const lines = stripRawHtml(section.content || "").replace(/\r\n/g, "\n").split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || /^(#{1,3})\s+/.test(trimmed)) continue;
+    const candidate = plainTextExcerpt(trimmed.replace(/^\s*(?:[-*]|\d+\.)\s+/, ""));
+    if (candidate) return candidate;
   }
-  const dailyTag = text.match(/^tag-([a-z0-9-]+)\|(.+)$/);
-  if (dailyTag) {
-    return `<mark class="text-highlight daily-tag daily-tag-${safeHighlightClass(dailyTag[1])}">${dailyTag[2]}</mark>`;
-  }
-  const trend = text.match(/^trend-(new|up|down|same)\|(.+)$/);
-  if (trend) {
-    return `<mark class="text-highlight daily-tag trend-status trend-status-${trend[1]}">${trend[2]}</mark>`;
-  }
-  return `<mark class="text-highlight">${text}</mark>`;
+  return "Open story details.";
+}
+
+function renderCollapsibleStorySummary(section, statusText = "") {
+  const label = groupLabels[section.group] || section.group || "";
+  const status = statusText || section.status || "info";
+  const pill = showSectionStatus(status) ? `<span class="status-pill ${statusClass(status)}">${escapeHtml(statusLabel(status))}</span>` : "";
+  return `<summary class="collapsible-summary">
+    <span>
+      ${label && !String(section.title || "").includes(label) ? `<span class="meta">${escapeHtml(label)}</span>` : ""}
+      <span class="collapsible-title">${escapeHtml(section.title)}</span>
+      <span class="collapsible-subtitle">${escapeHtml(storySectionTeaser(section))}</span>
+    </span>
+    ${pill}
+  </summary>`;
+}
+
+function renderHighlightMarker(marker) {
+  const text = String(marker ?? "").trim();
+  const match = text.match(/^([a-z0-9-]+)\|(.+)$/i);
+  if (!match) return `<mark class="text-highlight">${text}</mark>`;
+  const kind = slugify(match[1]);
+  return `<mark class="text-highlight text-highlight-${escapeAttr(kind)}" data-highlight-kind="${escapeAttr(kind)}">${match[2]}</mark>`;
 }
 
 function safeHighlightClass(value) {
   return String(value || "").replace(/[^a-z0-9-]/gi, "").toLowerCase() || "topic";
+}
+
+function stashInlineToken(tokens, html) {
+  const token = `\u0000HTML_WORK_REPORT_INLINE_${tokens.length}\u0000`;
+  tokens.push(html);
+  return token;
+}
+
+function restoreInlineTokens(tokens, html) {
+  let restored = String(html || "");
+  for (let pass = 0; pass < 4 && restored.includes("\u0000HTML_WORK_REPORT_INLINE_"); pass += 1) {
+    restored = restored.replace(/\u0000HTML_WORK_REPORT_INLINE_(\d+)\u0000/g, (_match, index) => tokens[Number(index)] || "");
+  }
+  return restored;
 }
 
 function lightboxImageAttrs(label) {
@@ -413,109 +480,37 @@ function lightboxImageAttrs(label) {
   return ` data-lightbox-image="true" data-lightbox-caption="${escapeAttr(caption)}" role="button" tabindex="0" aria-label="${escapeAttr(ariaLabel)}"`;
 }
 
+function renderInlineImage(label, src) {
+  const safe = safeMediaSrc(src);
+  if (!safe) return `<span class="unsafe-link">${renderInlineEmphasis(label)}</span>`;
+  if (/^data:image\//i.test(safe)) {
+    return `<img class="inline-site-icon" src="${escapeAttr(safe)}" alt="${escapeAttr(label)}" loading="lazy">`;
+  }
+  return `<img class="markdown-image inline-image lightbox-trigger" data-lightbox-image src="${escapeAttr(safe)}" alt="${escapeAttr(label)}" loading="lazy">`;
+}
+
+function renderInlineEmphasis(escaped) {
+  return String(escaped ?? "")
+    .replace(/==([^=\n]+)==/g, (_match, marker) => renderHighlightMarker(marker))
+    .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^\*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+}
+
 function inlineMarkdown(text) {
   const escaped = escapeHtml(stripRawHtml(text));
-  const links = [];
-  const images = [];
-  const withImageTokens = escaped.replace(/!\[([^\]\n]*)\]\(([^)\n]+)\)/g, (_match, label, src) => {
-    const dataImage = safeDataImage(src);
-    const safe = dataImage || safeLink(src);
-    const className = dataImage ? "inline-site-icon" : "markdown-image";
-    const loadingAttr = dataImage ? "" : ' loading="lazy"';
-    const lightboxAttrs = dataImage ? "" : lightboxImageAttrs(label);
-    const html = safe
-      ? `<img class="${className}" src="${escapeAttr(safe)}" alt="${escapeAttr(label)}"${loadingAttr}${lightboxAttrs} decoding="async">`
-      : "";
-    const token = `\u0000HTML_WORK_REPORT_IMAGE_${images.length}\u0000`;
-    images.push(html);
-    return token;
-  });
+  const tokens = [];
+  const withImageTokens = escaped.replace(/!\[([^\]\n]*)\]\(([^)\n]+)\)/g, (_match, label, src) => (
+    stashInlineToken(tokens, renderInlineImage(label, src))
+  ));
   const withLinkTokens = withImageTokens.replace(/\[([^\]\n]+)\]\(([^)\n]+)\)/g, (_match, label, href) => {
-    const safe = safeLink(href);
+    const attrs = linkAttrs(href);
     const renderedLabel = renderInlineEmphasis(label);
-    const html = safe
-      ? `<a href="${escapeAttr(safe)}" rel="noreferrer">${renderedLabel}</a>`
+    const html = attrs
+      ? `<a ${attrs}>${renderedLabel}</a>`
       : `<span class="unsafe-link">${renderedLabel}</span>`;
-    const token = `\u0000HTML_WORK_REPORT_LINK_${links.length}\u0000`;
-    links.push(html);
-    return token;
+    return stashInlineToken(tokens, html);
   });
-  return renderInlineEmphasis(withLinkTokens)
-    .replace(/\u0000HTML_WORK_REPORT_LINK_(\d+)\u0000/g, (_match, index) => links[Number(index)] || "")
-    .replace(/\u0000HTML_WORK_REPORT_IMAGE_(\d+)\u0000/g, (_match, index) => images[Number(index)] || "");
-}
-
-function parseHeroSummaryItems(value) {
-  const text = String(value || "").replace(/\r\n/g, "\n").trim();
-  const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
-  const bulletLines = lines
-    .filter((line) => /^\s*[-*]\s+/.test(line))
-    .map((line) => line.replace(/^\s*[-*]\s+/, "").trim())
-    .filter(Boolean);
-  if (bulletLines.length >= 2) {
-    return bulletLines;
-  }
-
-  const withoutLabel = trimLeadingConclusion(text).replace(/^\s*(?:重点|Focus)\s*[：:]\s*/i, "").trim();
-  if (withoutLabel.length < 110) {
-    return [];
-  }
-
-  return withoutLabel
-    .split(/[；;。]\s*/)
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .slice(0, 4);
-}
-
-function parseHeroHighlights(value) {
-  const lines = String(value || "")
-    .replace(/\r\n/g, "\n")
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-  if (lines.length === 0) {
-    return [];
-  }
-
-  const highlights = lines.map((line) => {
-    const match = line.match(/^\s*[-*]\s+\*\*\[([^\]\n]+)\]\(([^)\n]+)\)\*\*\s*[:\uFF1A]\s*(.+)$/);
-    if (!match) {
-      return null;
-    }
-    return {
-      label: match[1].trim(),
-      href: match[2].trim(),
-      reason: match[3].trim()
-    };
-  });
-
-  return highlights.every(Boolean) ? highlights : [];
-}
-
-function renderHeroHighlights(items) {
-  return `<ul class="hero-summary-text hero-summary-list hero-highlight-list">${items.map((item) => {
-    const safe = safeLink(item.href);
-    const label = renderInlineEmphasis(escapeHtml(stripRawHtml(item.label)));
-    const link = safe
-      ? `<a class="hero-highlight-link" href="${escapeAttr(safe)}" rel="noreferrer">${label}</a>`
-      : `<span class="hero-highlight-link unsafe-link">${label}</span>`;
-    return `<li>${link}<span class="hero-highlight-reason">${inlineMarkdown(item.reason)}</span></li>`;
-  }).join("")}</ul>`;
-}
-
-function renderHeroSummary(value) {
-  const conclusion = trimLeadingConclusion(value);
-  const highlights = parseHeroHighlights(conclusion);
-  if (highlights.length > 0) {
-    return renderHeroHighlights(highlights);
-  }
-
-  const items = parseHeroSummaryItems(conclusion);
-  if (items.length >= 2) {
-    return `<ul class="hero-summary-text hero-summary-list">${items.map((item) => `<li>${inlineMarkdown(item)}</li>`).join("")}</ul>`;
-  }
-  return `<p class="hero-summary-text">${inlineMarkdown(conclusion.replace(/^\s*(?:重点|Focus)\s*[：:]\s*/i, ""))}</p>`;
+  return restoreInlineTokens(tokens, renderInlineEmphasis(withLinkTokens));
 }
 
 function renderMarkdown(source) {
@@ -548,16 +543,13 @@ function renderMarkdown(source) {
       continue;
     }
 
-    const orderedStart = line.match(/^\s*(\d+)[.)]\s+/);
-    if (orderedStart) {
+    if (/^\s*\d+\.\s+/.test(line)) {
       const items = [];
-      const start = Number(orderedStart[1]);
-      while (index < lines.length && /^\s*\d+[.)]\s+/.test(lines[index])) {
-        items.push(`<li>${inlineMarkdown(lines[index].replace(/^\s*\d+[.)]\s+/, ""))}</li>`);
+      while (index < lines.length && /^\s*\d+\.\s+/.test(lines[index])) {
+        items.push(`<li>${inlineMarkdown(lines[index].replace(/^\s*\d+\.\s+/, ""))}</li>`);
         index += 1;
       }
-      const startAttr = start > 1 ? ` start="${start}"` : "";
-      html.push(`<ol${startAttr}>${items.join("")}</ol>`);
+      html.push(`<ol>${items.join("")}</ol>`);
       continue;
     }
 
@@ -579,7 +571,7 @@ function renderMarkdown(source) {
       lines[index].trim() &&
       !/^(#{1,3})\s+/.test(lines[index]) &&
       !/^\s*[-*]\s+/.test(lines[index]) &&
-      !/^\s*\d+[.)]\s+/.test(lines[index]) &&
+      !/^\s*\d+\.\s+/.test(lines[index]) &&
       !(lines[index].includes("|") && index + 1 < lines.length && /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(lines[index + 1]))
     ) {
       paragraph.push(lines[index]);
@@ -605,7 +597,7 @@ function renderTable(headers, rows) {
   const body = rows
     .map((row) => `<tr>${row.map((cell) => `<td>${inlineMarkdown(cell)}</td>`).join("")}</tr>`)
     .join("");
-  return `<div class="markdown-table-scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+  return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
 }
 
 function safeCssWidth(value) {
@@ -922,6 +914,13 @@ function highlightLine(line, language) {
     html = stashHighlightToken(tokens, html, /(^|\s)(#.*)$/g, (_match, prefix, comment) => `${prefix}<span class="hljs-comment">${comment}</span>`);
     stashClass(/(--?[A-Za-z][A-Za-z0-9-]*)/g, "hljs-attr");
     stashClass(/\b(bun|node|npm|pnpm|yarn|git|gh|openspec|powershell|pwsh|cd|dir|ls|rg|curl|docker)\b/g, "hljs-built_in");
+  } else if (["css"].includes(language)) {
+    stashClass(/(\/\*.*?\*\/)/g, "hljs-comment");
+    stashClass(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;)/g, "hljs-string");
+    stashClass(/(#[0-9a-fA-F]{3,8})\b/g, "hljs-number");
+    stashClass(/\b(\d+(?:\.\d+)?(?:px|rem|em|%|vh|vw|s|ms)?)\b/g, "hljs-number");
+    html = stashHighlightToken(tokens, html, /(^|\s|;)(--?[A-Za-z_][\w-]*)(\s*:)/g, (_match, prefix, property, colon) => `${prefix}<span class="hljs-attr">${property}</span>${colon}`);
+    stashClass(/\b(display|grid|flex|block|inline|none|relative|absolute|sticky|fixed|repeat|minmax|var|calc|color-mix)\b/g, "hljs-built_in");
   }
   return restoreHighlightTokens(tokens, html);
 }
@@ -995,39 +994,7 @@ function fallbackMermaidSvg(source, title, message) {
 }
 
 function sectionAttrs(section) {
-  const collapsed = isCollapsedSection(section) ? ' data-section-collapsed="true"' : "";
-  const appendix = section.appendix === true ? ' data-section-appendix="true"' : "";
-  return `id="${escapeAttr(section.id)}" data-section-type="${escapeAttr(section.type)}" data-section-group="${escapeAttr(section.group)}" data-section-status="${escapeAttr(section.status)}" data-trust-level="${escapeAttr(normalizeTrustLevel(section.trustLevel))}"${collapsed}${appendix}`;
-}
-
-function isCollapsedSection(section) {
-  return section.collapsed === true || section.defaultCollapsed === true;
-}
-
-function collapsedSectionLabel(section) {
-  if (section.appendixLabel) return section.appendixLabel;
-  if (section.appendix === true) return "附录";
-  return groupLabels[section.group] || section.group || "详情";
-}
-
-function renderCollapsiblePanel(section, className, attrs, contentHtml) {
-  const summary = section.summary ? `<span class="collapsible-subtitle">${escapeHtml(section.summary)}</span>` : "";
-  const status = showSectionStatus(section.status)
-    ? `<span class="status-pill ${statusClass(section.status)}">${escapeHtml(statusLabel(section.status))}</span>`
-    : "";
-  const openAttr = section.open === true ? " open" : "";
-  const panelClass = `${className} collapsible-panel${section.appendix === true ? " appendix-panel" : ""}`;
-  return `<details class="${panelClass}" ${sectionAttrs(section)} ${attrs} data-collapsed-section${openAttr}>
-    <summary class="collapsible-summary">
-      <span class="collapsible-summary-main">
-        <span class="meta">${escapeHtml(collapsedSectionLabel(section))}</span>
-        <span class="collapsible-title">${escapeHtml(section.title)}</span>
-        ${summary}
-      </span>
-      <span class="collapsible-summary-side">${status}<span class="collapsible-hint" aria-hidden="true"></span></span>
-    </summary>
-    <div class="collapsible-content">${contentHtml}</div>
-  </details>`;
+  return `id="${escapeAttr(section.id)}" data-section-type="${escapeAttr(section.type)}" data-section-group="${escapeAttr(section.group)}" data-section-status="${escapeAttr(section.status)}" data-trust-level="${escapeAttr(normalizeTrustLevel(section.trustLevel))}"`;
 }
 
 function renderSummaryCards(section) {
@@ -1045,57 +1012,29 @@ function renderRuntimeMarkdown(section, index) {
   const statusId = `markdown-status-${index}`;
   const trustLevel = normalizeTrustLevel(section.trustLevel);
   const trustedAttr = trustLevel === "trusted-generated" ? ' data-trusted="true"' : "";
-  const attrs = `data-rich-section data-rich-kind="markdown" data-render-state="pending" data-source-fallback`;
-  const inventoryFinder = renderSourceInventoryFinder(section);
-  if (isCollapsedSection(section)) {
-    return renderCollapsiblePanel(section, "panel rich-section", attrs, `
-      ${inventoryFinder}
-      <div class="rich-target" data-rich-markdown data-rich-status-id="${statusId}" data-rich-section-id="${escapeAttr(section.id)}"${trustedAttr}>${escapeHtml(safeAuditText(section.content || ""))}</div>
-      <template id="${sourceId}" data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>`);
-  }
-  return `<section class="panel rich-section" ${sectionAttrs(section)} ${attrs}>
+  return `<section class="panel rich-section" ${sectionAttrs(section)} data-rich-section data-rich-kind="markdown" data-render-state="pending" data-source-fallback>
     ${renderSectionHeader(section)}
-    ${inventoryFinder}
     <div class="rich-target" data-rich-markdown data-rich-status-id="${statusId}" data-rich-section-id="${escapeAttr(section.id)}"${trustedAttr}>${escapeHtml(safeAuditText(section.content || ""))}</div>
     <template id="${sourceId}" data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>
   </section>`;
 }
 
-function renderSourceInventoryFinder(section) {
-  if (section.sourceInventoryFinder !== true) return "";
-  const totalValue = Number(section.sourceInventoryFinderTotal);
-  const total = Number.isFinite(totalValue) && totalValue >= 0 ? Math.trunc(totalValue) : "";
-  const totalAttr = total === "" ? "" : ` data-source-inventory-total="${escapeAttr(total)}"`;
-  const totalLabel = total === "" ? "全部信源" : `全部 ${total} 条`;
-  const baseId = section.id || "section-source-inventory";
-  const inputId = `${baseId}-finder-search`;
-  const statusId = `${baseId}-finder-status`;
-  return `<div class="source-inventory-finder" data-source-inventory-finder data-source-inventory-target-prefix="section-source-inventory-group-"${totalAttr}>
-    <label class="source-inventory-finder__label" for="${escapeAttr(inputId)}">查找信源</label>
-    <div class="source-inventory-finder__row">
-      <input id="${escapeAttr(inputId)}" type="search" autocomplete="off" spellcheck="false" data-source-inventory-search aria-describedby="${escapeAttr(statusId)}" placeholder="OpenAI / rsshub / platform:wechat / manual">
-      <button type="button" data-source-inventory-next disabled>下一个</button>
-      <button type="button" data-source-inventory-clear disabled>清除</button>
-    </div>
-    <p class="source-inventory-finder__status" id="${escapeAttr(statusId)}" data-source-inventory-status aria-live="polite">输入关键词后只高亮匹配项，${escapeHtml(totalLabel)}仍保留在页面中。</p>
-  </div>`;
-}
-
 async function renderMarkdownSection(section, mode, index) {
   if (isRuntimeMode(mode)) return renderRuntimeMarkdown(section, index);
   const rendered = mode === "pre-rendered";
-  const attrs = `data-rich-section data-rich-kind="markdown" data-render-state="${richStateForMode(mode, rendered)}" data-source-fallback`;
-  const inventoryFinder = renderSourceInventoryFinder(section);
-  const contentHtml = `
-    ${inventoryFinder}
-    ${rendered ? renderMarkdown(section.content || "") : `<pre class="fallback-source-block">${escapeHtml(safeAuditText(section.content || ""))}</pre>`}
-    <template data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>`;
-  if (isCollapsedSection(section)) {
-    return renderCollapsiblePanel(section, "panel rich-section", attrs, contentHtml);
+  if (String(section.id || "").startsWith("section-story-")) {
+    return `<details class="panel rich-section collapsible-panel" ${sectionAttrs(section)} data-rich-section data-rich-kind="markdown" data-render-state="${richStateForMode(mode, rendered)}" data-source-fallback>
+    ${renderCollapsibleStorySummary(section, rendered ? "ready" : "degraded")}
+    <div class="collapsible-content" data-collapsible-content>
+      ${rendered ? renderMarkdown(section.content || "") : `<pre class="fallback-source-block">${escapeHtml(safeAuditText(section.content || ""))}</pre>`}
+    </div>
+    <template data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>
+  </details>`;
   }
-  return `<section class="panel rich-section" ${sectionAttrs(section)} ${attrs}>
+  return `<section class="panel rich-section" ${sectionAttrs(section)} data-rich-section data-rich-kind="markdown" data-render-state="${richStateForMode(mode, rendered)}" data-source-fallback>
     ${renderSectionHeader(section, rendered ? "ready" : "degraded")}
-    ${contentHtml}
+    ${rendered ? renderMarkdown(section.content || "") : `<pre class="fallback-source-block">${escapeHtml(safeAuditText(section.content || ""))}</pre>`}
+    <template data-rich-source data-source-fallback>${escapeHtml(safeAuditText(section.content || ""))}</template>
   </section>`;
 }
 
@@ -1171,6 +1110,26 @@ function renderDiffSection(section, index) {
     <header><div><h2>${escapeHtml(section.title)}</h2>${renderSourceLink(section, sourceId)}</div><button data-copy-from="#${sourceId}">复制 diff</button></header>
     <pre id="${sourceId}" data-line-numbered><code>${highlightDiff(section.content || "")}</code></pre>
   </section>`;
+}
+
+function renderSourceInventoryFinder(section) {
+  if (section.sourceInventoryFinder !== true) return "";
+  const totalValue = Number(section.sourceInventoryFinderTotal);
+  const total = Number.isFinite(totalValue) && totalValue >= 0 ? Math.trunc(totalValue) : "";
+  const totalAttr = total === "" ? "" : ` data-source-inventory-total="${escapeAttr(total)}"`;
+  const totalLabel = total === "" ? "全部信源" : `全部 ${total} 条`;
+  const baseId = section.id || "section-source-inventory";
+  const inputId = `${baseId}-finder-search`;
+  const statusId = `${baseId}-finder-status`;
+  return `<div class="source-inventory-finder" data-source-inventory-finder data-source-inventory-target-prefix="section-source-inventory-group-"${totalAttr}>
+    <label class="source-inventory-finder__label" for="${escapeAttr(inputId)}">查找信源</label>
+    <div class="source-inventory-finder__row">
+      <input id="${escapeAttr(inputId)}" type="search" autocomplete="off" spellcheck="false" data-source-inventory-search aria-describedby="${escapeAttr(statusId)}" placeholder="OpenAI / rsshub / platform:wechat / manual">
+      <button type="button" data-source-inventory-next disabled>下一个</button>
+      <button type="button" data-source-inventory-clear disabled>清除</button>
+    </div>
+    <p class="source-inventory-finder__status" id="${escapeAttr(statusId)}" data-source-inventory-status aria-live="polite">输入关键词后只高亮匹配项，${escapeHtml(totalLabel)}仍保留在页面中。</p>
+  </div>`;
 }
 
 function safeClassList(value) {
@@ -1908,7 +1867,7 @@ function renderCardMedia(media) {
   }
 
   return `<div class="card-media-grid" data-count="${items.length}">${items.map((item) => {
-    const src = safeDataImage(item.src) || safeLink(item.src);
+    const src = safeMediaSrc(item.src);
     if (!src) {
       return "";
     }
@@ -1964,7 +1923,8 @@ function renderFilterableCards(section) {
     ? requestedDefaultFilterValue
     : groups[0] || "all";
   const cardClass = safeClassList(section.cardClass);
-  const gridClass = ["evidence-grid", "focus-field", cardClass ? `${cardClass}-grid` : ""].filter(Boolean).join(" ");
+  const cardClassGrid = cardClass.split(/\s+/).filter(Boolean).map((token) => `${token}-grid`);
+  const gridClass = ["evidence-grid", "focus-field", ...cardClassGrid, safeClassList(section.gridClass)].filter(Boolean).join(" ");
   const showFilters = section.showFilters !== false && (includeAllFilter ? groups.length > 2 : groups.length > 1);
   const activeFilter = showFilters ? defaultFilterValue : "all";
   return `<section class="panel" ${sectionAttrs(section)}>
@@ -2178,26 +2138,39 @@ function renderGroupedNav(sections) {
   </nav>`;
 }
 
+function presentationOptions(input) {
+  const source = input && typeof input.presentation === "object" && !Array.isArray(input.presentation)
+    ? input.presentation
+    : {};
+  return {
+    showHeroStats: source.showHeroStats === true,
+    showSuccessCriteria: source.showSuccessCriteria === true,
+    showClaims: source.showClaims === true,
+    showEvidence: source.showEvidence === true,
+    showVerification: source.showVerification === true,
+    showNextActions: source.showNextActions === true
+  };
+}
+
 function trimLeadingConclusion(value) {
   return String(value || "").replace(/^\s*(?:结论|Conclusion)\s*[：:]\s*/i, "").trim();
 }
 
 function renderHeroStats(input, sectionCount) {
-  const customStats = Array.isArray(input.heroStats)
+  const providedStats = Array.isArray(input.heroStats)
     ? input.heroStats
       .map((item) => ({
-        label: String(item?.label || "").trim(),
-        value: String(item?.value || "").trim(),
-        detail: String(item?.detail || "").trim()
+        label: item?.label,
+        value: item?.value,
+        detail: item?.detail
       }))
-      .filter((item) => item.label && item.value)
+      .filter((item) => item.label && item.value !== undefined && item.value !== null && String(item.value).trim())
     : [];
-  if (customStats.length > 0) {
+  if (providedStats.length > 0) {
     return `<div class="hero-stat-grid" aria-label="报告摘要指标">
-    ${customStats.map((item) => `<div class="hero-stat"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.value)}</strong><small>${escapeHtml(item.detail)}</small></div>`).join("\n")}
+    ${providedStats.map((item) => `<div class="hero-stat"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.value)}</strong><small>${escapeHtml(item.detail || "")}</small></div>`).join("\n")}
   </div>`;
   }
-
   const verification = input.verification || [];
   const passed = verification.filter((item) => item.status === "pass").length;
   const stats = [
@@ -2214,68 +2187,185 @@ function renderHeroStats(input, sectionCount) {
 
 function renderHeroLinks(input) {
   const links = Array.isArray(input.heroLinks) ? input.heroLinks : [];
-  return links
-    .map((item) => {
-      const href = safeLink(item?.href || "");
-      const label = String(item?.label || "").trim();
-      if (!href || !label) return "";
-      const icon = safeDataImage(item.icon || item.iconDataUri || item.icon_data_uri || "");
-      const iconHtml = icon ? `<img class="inline-site-icon hero-link-icon" src="${escapeAttr(icon)}" alt="${escapeAttr(label)}" loading="lazy" decoding="async">` : "";
-      return `${iconHtml}<a class="button hero-link" href="${escapeAttr(href)}" rel="noreferrer">${escapeHtml(label)}</a>`;
+  const rendered = links
+    .map((link) => {
+      const attrs = linkAttrs(link?.href);
+      if (!attrs) return "";
+      const iconSrc = safeMediaSrc(link.icon || link.iconSrc || "");
+      const icon = iconSrc ? `<img src="${escapeAttr(iconSrc)}" alt="" aria-hidden="true" loading="lazy">` : "";
+      return `<a class="hero-link" ${attrs}>${icon}<span>${escapeHtml(link.label || link.href || "")}</span></a>`;
     })
-    .filter(Boolean)
-    .join("\n");
+    .filter(Boolean);
+  return rendered.length ? `<div class="hero-link-row" data-hero-links>${rendered.join("")}</div>` : "";
 }
 
-function renderDailyReportHero({ input, heroTitle, heroSummary, heroStats, compatibilityBadge, intent }) {
-  const heroLinks = renderHeroLinks(input);
-  const heroBrief = heroSummary || heroStats
-    ? `<div class="hero-brief hero-brief-single">
-        ${heroSummary}
-        ${heroStats}
-      </div>`
-    : "";
-  return `<header id="report-top" class="report-hero report-hero-daily" data-report-region="hero" data-hero-mode="daily-report" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">${escapeHtml(input.heroEyebrow || "AI 日报")}</div>
-          <h1 class="report-title report-date-title">${escapeHtml(heroTitle)}</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill ${statusClass(input.status)}">${escapeHtml(dailyHeroStatusLabel(input.status))}</span>${compatibilityBadge}${heroLinks}</div>
-      </div>
-      ${heroBrief}
-    </header>`;
-}
-
-function dailyHeroStatusLabel(status) {
-  if (["complete", "ready", "pass"].includes(status)) return "已验证";
-  return statusLabel(status);
-}
-
-function renderHeroDecisionGrid(intent) {
+function renderHeroDecisionGrid(intent, presentation = {}, input = {}) {
+  if (input.heroMode === "daily-report" || presentation.showHeroDecisionGrid === false) return "";
   const criteria = (intent.successCriteria || []).slice(0, 3);
   const criteriaHtml = criteria.length > 0
     ? `<ul class="hero-criteria-list">${criteria.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
     : "";
-  return `<div class="hero-decision-grid" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
-    <article class="hero-decision-card">
-      <div class="meta">关注点</div>
+  const cards = [
+    `<article class="hero-decision-card">
+      <div class="meta">读者问题</div>
       <strong>${escapeHtml(intent.primaryQuestion)}</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">处理原则</div>
+    </article>`,
+    `<article class="hero-decision-card">
+      <div class="meta">本文结论</div>
       <strong>${escapeHtml(intent.decision)}</strong>
-    </article>
-    <article class="hero-decision-card">
-      <div class="meta">收录标准</div>
+    </article>`
+  ];
+  if (presentation.showSuccessCriteria === true && criteriaHtml) {
+    cards.push(`<article class="hero-decision-card">
+      <div class="meta">验收口径</div>
       ${criteriaHtml}
-    </article>
+    </article>`);
+  }
+  return `<div class="hero-decision-grid" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
+    ${cards.join("\n")}
   </div>`;
+}
+
+function visibleText(value) {
+  if (value === null || value === undefined) return "";
+  if (Array.isArray(value)) return value.map(visibleText).join(" ").trim();
+  if (typeof value === "object") return Object.values(value).map(visibleText).join(" ").trim();
+  return String(value).replace(/\s+/g, " ").trim();
+}
+
+function isBlank(value) {
+  return visibleText(value).length === 0;
+}
+
+function hasVisibleTableBody(section) {
+  const columns = normalizeTableColumns(section);
+  const rows = Array.isArray(section.rows) ? section.rows : [];
+  return rows.some((row) => columns.some((column, columnIndex) => !isBlank(tableCellValue(row, column, columnIndex))));
+}
+
+function hasRenderableFilterableCardContent(item) {
+  if (!item || typeof item !== "object" || Array.isArray(item)) return false;
+  if (!isBlank(item.body) || !isBlank(item.subtitle) || !isBlank(item.href)) return true;
+  if (Array.isArray(item.tags) && item.tags.some((tag) => !isBlank(tag))) return true;
+  if (Array.isArray(item.points) && item.points.some((point) => !isBlank(point))) return true;
+  if (Array.isArray(item.media) && item.media.some((media) => !isBlank(media?.src))) return true;
+  return [
+    "component",
+    "trackingComponent",
+    "tracking_component",
+    "stats",
+    "summaryStats",
+    "summary_stats",
+    "trendCurve",
+    "trend_curve",
+    "trend",
+    "bars",
+    "barChart",
+    "bar_chart",
+    "table",
+    "dataTable",
+    "data_table"
+  ].some((key) => !isBlank(item[key]));
+}
+
+function sectionShapeErrors(section, index, input) {
+  const errors = [];
+  const prefix = `sections[${index}]`;
+  if (!section || typeof section !== "object" || Array.isArray(section)) return [`${prefix} must be an object.`];
+  if (isBlank(section.type)) errors.push(`${prefix}.type is required.`);
+  if (isBlank(section.title)) errors.push(`${prefix}.title is required.`);
+
+  if (section.type === "summary-cards") {
+    const cards = Array.isArray(section.cards) ? section.cards : [];
+    if (cards.length === 0) errors.push(`${prefix}.cards must contain at least one card.`);
+    cards.forEach((card, cardIndex) => {
+      if (isBlank(card?.label)) errors.push(`${prefix}.cards[${cardIndex}].label is required.`);
+      if (isBlank(card?.value)) errors.push(`${prefix}.cards[${cardIndex}].value is required.`);
+    });
+  } else if (section.type === "data-table") {
+    const columns = normalizeTableColumns(section);
+    const rows = Array.isArray(section.rows) ? section.rows : [];
+    if (columns.length === 0) errors.push(`${prefix}.columns must contain at least one column or inferable object row key.`);
+    if (rows.length === 0) errors.push(`${prefix}.rows must contain at least one row.`);
+    if (columns.length > 0 && rows.length > 0 && !hasVisibleTableBody(section)) errors.push(`${prefix}.rows must contain at least one visible body cell.`);
+  } else if (["markdown", "mermaid", "code", "diff"].includes(section.type)) {
+    if (isBlank(section.content)) errors.push(`${prefix}.content is required for ${section.type}.`);
+    if (section.type === "code") {
+      if (isBlank(section.language)) errors.push(`${prefix}.language is required for code.`);
+      if (isBlank(section.filePath) && isBlank(section.sourceHref)) errors.push(`${prefix}.filePath or sourceHref is required for source-linked code.`);
+    }
+    if (section.type === "diff" && !/[+-]/.test(String(section.content || ""))) errors.push(`${prefix}.content must include added or removed diff lines.`);
+  } else if (section.type === "timeline") {
+    const items = Array.isArray(section.items) ? section.items : [];
+    if (items.length === 0) errors.push(`${prefix}.items must contain at least one timeline item.`);
+    items.forEach((item, itemIndex) => {
+      if (isBlank(item?.label || item?.when)) errors.push(`${prefix}.items[${itemIndex}].label is required.`);
+      if (isBlank(item?.detail || item?.body)) errors.push(`${prefix}.items[${itemIndex}].detail is required.`);
+    });
+  } else if (section.type === "decision-matrix") {
+    const options = Array.isArray(section.options) ? section.options : [];
+    if (options.length === 0) errors.push(`${prefix}.options must contain at least one option.`);
+    options.forEach((option, optionIndex) => {
+      if (isBlank(option?.name)) errors.push(`${prefix}.options[${optionIndex}].name is required.`);
+      if (!Array.isArray(option?.points) || option.points.length === 0 || option.points.some(isBlank)) errors.push(`${prefix}.options[${optionIndex}].points must contain visible tradeoff text.`);
+    });
+  } else if (section.type === "actions") {
+    const items = Array.isArray(section.items) ? section.items : [];
+    if (items.length === 0 || items.some(isBlank)) errors.push(`${prefix}.items must contain visible actions.`);
+  } else if (section.type === "tabs") {
+    const tabs = Array.isArray(section.tabs) ? section.tabs : [];
+    if (tabs.length === 0) errors.push(`${prefix}.tabs must contain at least one tab.`);
+    tabs.forEach((tab, tabIndex) => {
+      if (isBlank(tab?.label)) errors.push(`${prefix}.tabs[${tabIndex}].label is required.`);
+      if (isBlank(tab?.content)) errors.push(`${prefix}.tabs[${tabIndex}].content is required.`);
+    });
+  } else if (section.type === "filterable-cards") {
+    const items = Array.isArray(section.items) ? section.items : [];
+    if (items.length === 0) errors.push(`${prefix}.items must contain at least one card.`);
+    items.forEach((item, itemIndex) => {
+      if (isBlank(item?.title)) errors.push(`${prefix}.items[${itemIndex}].title is required.`);
+      if (!hasRenderableFilterableCardContent(item)) errors.push(`${prefix}.items[${itemIndex}] must include body, link, media, tracking component, or another visible card detail.`);
+    });
+  } else if (section.type === "chart") {
+    const chart = chartSpecFromSection(section);
+    if (isBlank(chart.title || section.title)) errors.push(`${prefix}.chart.title is required.`);
+    if (isBlank(chart.takeaway)) errors.push(`${prefix}.chart.takeaway is required.`);
+    if (isBlank(chart.altText)) errors.push(`${prefix}.chart.altText is required.`);
+    if (!Array.isArray(chartDataRows(chart)) || chartDataRows(chart).length === 0) errors.push(`${prefix}.chart.data or tableFallback.rows must contain visible rows.`);
+  } else if (section.type === "evidence" && (!Array.isArray(input.evidence) || input.evidence.length === 0)) {
+    errors.push(`${prefix} uses evidence component but input.evidence is empty.`);
+  }
+
+  return errors;
+}
+
+function statusConsistencyErrors(input) {
+  if (input.status !== "complete") return [];
+  const errors = [];
+  const unsettledStatuses = new Set(["pending", "draft", "review", "blocked", "failed", "fail", "not-run"]);
+  const unsettledSections = Array.isArray(input.sections)
+    ? input.sections
+      .map((section, index) => ({ index, status: section?.status }))
+      .filter((item) => unsettledStatuses.has(item.status))
+    : [];
+  const failedVerification = Array.isArray(input.verification)
+    ? input.verification
+      .map((item, index) => ({ index, status: item?.status }))
+      .filter((item) => ["fail", "not-run"].includes(item.status))
+    : [];
+
+  if (unsettledSections.length > 0) {
+    errors.push(`status complete conflicts with unsettled section status: ${unsettledSections.map((item) => `sections[${item.index}]=${item.status}`).join(", ")}.`);
+  }
+  if (failedVerification.length > 0) {
+    errors.push(`status complete conflicts with verification status: ${failedVerification.map((item) => `verification[${item.index}]=${item.status}`).join(", ")}.`);
+  }
+  return errors;
 }
 
 function validateInput(input) {
   const errors = [];
-  if (!input || typeof input !== "object") errors.push("Input must be an object.");
+  if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Input must be an object.");
   if (!input.title) errors.push("Missing title.");
   if (!input.summary) errors.push("Missing summary.");
   if (!input.status) errors.push("Missing status.");
@@ -2284,85 +2374,56 @@ function validateInput(input) {
   if (input.evidence !== undefined && !Array.isArray(input.evidence)) errors.push("evidence must be an array when provided.");
   if (input.verification !== undefined && !Array.isArray(input.verification)) errors.push("verification must be an array when provided.");
   if (input.nextActions !== undefined && !Array.isArray(input.nextActions)) errors.push("nextActions must be an array when provided.");
+  if (input.presentation !== undefined && (!input.presentation || typeof input.presentation !== "object" || Array.isArray(input.presentation))) errors.push("presentation must be an object when provided.");
+  if (input.presentation && typeof input.presentation === "object" && !Array.isArray(input.presentation)) {
+    for (const key of ["showHeroStats", "showSuccessCriteria", "showClaims", "showEvidence", "showVerification", "showNextActions"]) {
+      if (input.presentation[key] !== undefined && typeof input.presentation[key] !== "boolean") errors.push(`presentation.${key} must be boolean when provided.`);
+    }
+  }
+  if (input.handoff !== undefined && (!input.handoff || typeof input.handoff !== "object" || Array.isArray(input.handoff))) errors.push("handoff must be an object when provided.");
+  if (input.handoff !== undefined) {
+    const { sourcePath, regenerationCommand } = normalizeHandoffMetadata(input.handoff);
+    if (sourcePath && (path.isAbsolute(sourcePath) || hasParentPathSegment(sourcePath) || hasHostLocalPath(sourcePath))) {
+      errors.push("handoff.sourcePath must be a repo-relative path without host-local or parent-directory segments.");
+    }
+    if (regenerationCommand && hasHostLocalPath(regenerationCommand)) {
+      errors.push("handoff.regenerationCommand must not contain host-local absolute paths or file URLs.");
+    }
+  }
   if (input.renderMode && !renderModes.includes(input.renderMode)) errors.push("renderMode must be runtime-cdn, pre-rendered, fallback-only, or runtime alias.");
-  if (input.template && !templateMeta[input.template]) errors.push(`Unknown template: ${input.template}`);
+  if (Object.prototype.hasOwnProperty.call(input, "template")) errors.push("template is no longer supported; use intent.artifactKind and component sections.");
+  if (Array.isArray(input.sections)) {
+    input.sections.forEach((section, index) => errors.push(...sectionShapeErrors(section, index, input)));
+  }
+  errors.push(...statusConsistencyErrors(input));
   if (hasLikelyMojibakeInValue(input)) errors.push("Input contains likely mojibake. Write report JSON as UTF-8 and regenerate; continuous half-width question marks are not acceptable.");
   if (errors.length) throw new Error(errors.join(" "));
 }
 
-function supplementalSections(input, mode) {
+function supplementalSections(input, mode, presentation = presentationOptions(input)) {
   const sections = [];
   if (isRuntimeMode(mode) && input.showRuntimeDependencies === true) {
     sections.push({ id: "runtime-dependencies", title: "运行时依赖", group: "verification", status: "pending", priority: 880 });
   }
-  if ((input.claims || []).length > 0) {
+  if (presentation.showClaims === true && (input.claims || []).length > 0) {
     sections.push({ id: "claims", title: "关键判断", group: "claims", status: "info", priority: 890 });
   }
-  if ((input.evidence || []).length > 0) {
+  if (presentation.showEvidence === true && (input.evidence || []).length > 0) {
     sections.push({ id: "evidence", title: "证据", group: "evidence", status: "info", priority: 900 });
   }
-  if ((input.verification || []).length > 0) {
+  if (presentation.showVerification === true && (input.verification || []).length > 0) {
     sections.push({ id: "verification", title: "验证", group: "verification", status: "info", priority: 901 });
   }
-  if ((input.nextActions || []).length > 0) {
+  if (presentation.showNextActions === true && (input.nextActions || []).length > 0) {
     sections.push({ id: "next-actions", title: "下一步", group: "next", status: "info", priority: 902 });
   }
   return sections;
 }
 
-function renderNextActionsSection(input) {
-  const actions = input.nextActions || [];
-  if (actions.length === 0) {
-    return "";
-  }
-
-  const summary = "只保留后续会真正改变行为的动作。";
-  const list = `<ul id="next-action-list" class="action-list">${actions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
-  if (input.nextActionsCollapsed === true) {
-    return renderCollapsiblePanel(
-      {
-        id: "next-actions",
-        type: "actions",
-        title: "下一步",
-        group: "next",
-        status: "info",
-        summary,
-        appendix: true,
-        appendixLabel: "附录",
-        collapsed: true
-      },
-      "panel supplemental-panel",
-      'data-report-region="actions"',
-      `<div class="appendix-actions-toolbar"><button data-copy-from="#next-action-list">复制行动项</button></div>${list}`
-    );
-  }
-
-  return `<section class="panel supplemental-panel" id="next-actions" data-section-type="actions" data-section-group="next" data-report-region="actions"><div class="section-heading split-row"><div><h2>下一步</h2><p class="section-summary">${summary}</p></div><button data-copy-from="#next-action-list">复制行动项</button></div>${list}</section>`;
-}
-
-function hasSourceInventoryFinder(sections = []) {
-  return sections.some((section) => section?.sourceInventoryFinder === true);
-}
-
-function maybeStripSourceInventoryCss(css, includeSourceInventoryRuntime) {
-  if (includeSourceInventoryRuntime) return css;
-  return css.replace(/\n\.source-inventory-finder \{[\s\S]*?\n(?=\.chip,)/, "\n");
-}
-
-function maybeStripSourceInventoryJs(js, includeSourceInventoryRuntime) {
-  if (includeSourceInventoryRuntime) return js;
-  return js
-    .replace(/\n  function sourceInventoryRows\(root\) \{[\s\S]*?\n  function updateEvidenceSpotlight/, "\n  function updateEvidenceSpotlight")
-    .replace(/\n    if \(button\.matches\("\[data-source-inventory-next\]"\)\) \{[\s\S]*?\n    if \(button\.matches\("\[data-copy-text\]"\)\) \{/, "\n    if (button.matches(\"[data-copy-text]\")) {")
-    .replace(/\n    if \(event\.target\.matches\("\[data-source-inventory-search\]"\)\) \{[\s\S]*?\n    if \(event\.target\.matches\("\[data-search-for\]"\)\) \{/, "\n    if (event.target.matches(\"[data-search-for]\")) {");
-}
-
 async function createInteraction(input, options = {}) {
   validateInput(input);
   const { mode, compatibility } = normalizeRenderMode(input.renderMode);
-  const template = input.template || "implementation-handoff";
-  const meta = templateMeta[template];
-  const intent = inferReportIntent(input, template, mode);
+  const intent = inferReportIntent(input, mode);
   const generatedAt = input.generatedAt || new Date().toISOString();
   const normalizedSections = input.sections.map(normalizeSection);
   const sections = [];
@@ -2371,87 +2432,71 @@ async function createInteraction(input, options = {}) {
     sections.push(await renderSection(normalizedSections[index], mode, index, input, options));
   }
 
-  const includeSourceInventoryRuntime = hasSourceInventoryFinder(normalizedSections);
-  const reportUiCss = maybeStripSourceInventoryCss(
-    fs.readFileSync(reportUiCssPath, "utf8"),
-    includeSourceInventoryRuntime
-  );
-  const reportUiJs = maybeStripSourceInventoryJs(
-    fs.readFileSync(reportUiJsPath, "utf8"),
-    includeSourceInventoryRuntime
-  );
   const css = [
-    reportUiCss,
+    fs.readFileSync(reportUiCssPath, "utf8"),
     isRuntimeMode(mode) ? fs.readFileSync(richRuntimeCssPath, "utf8") : "",
-    "table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.markdown-table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0 4px}.markdown-table-scroll table{margin:0}.markdown-image{display:block;width:auto;max-width:min(100%,760px);max-height:420px;height:auto;margin:10px auto 6px;border:1px solid var(--line);border-radius:8px;background:#fff;object-fit:contain}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}.markdown-table-scroll table{min-width:100%;font-size:12.5px}.markdown-table-scroll th,.markdown-table-scroll td{padding:7px 8px;word-break:break-word}}"
+    "table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}"
   ].join("\n");
 
   const js = [
-    reportUiJs,
+    fs.readFileSync(reportUiJsPath, "utf8"),
     isRuntimeMode(mode) ? fs.readFileSync(richRuntimeJsPath, "utf8") : ""
   ].join("\n");
 
-  const extras = supplementalSections(input, mode);
-  const showNavigation = input.hideNavigation !== true;
-  const nav = showNavigation ? renderGroupedNav([...normalizedSections, ...extras]) : "";
-  const heroMode = input.heroMode || "";
-  const showDateOnlyHero = heroMode === "date-only";
-  const showDailyReportHero = heroMode === "daily-report";
+  const presentation = presentationOptions(input);
+  const extras = supplementalSections(input, mode, presentation);
+  const nav = renderGroupedNav([...normalizedSections, ...extras]);
+  const conclusion = trimLeadingConclusion(input.summary);
+  const hasProvidedHeroStats = Array.isArray(input.heroStats) && input.heroStats.length > 0;
+  const heroStats = presentation.showHeroStats === true || hasProvidedHeroStats ? renderHeroStats(input, normalizedSections.length + extras.length) : "";
+  const heroLinks = renderHeroLinks(input);
   const heroTitle = input.heroTitle || input.title;
-  const showHeroSummary = !showDateOnlyHero && input.hideHeroSummary !== true;
-  const heroSummary = showHeroSummary ? renderHeroSummary(input.summary) : "";
-  const heroStats = showDateOnlyHero ? "" : renderHeroStats(input, normalizedSections.length + extras.length);
-  const heroBriefClass = heroStats && showHeroSummary ? "hero-brief" : "hero-brief hero-brief-single";
-  const heroBrief = heroSummary || heroStats
-    ? `<div class="${heroBriefClass}">
-        ${heroSummary}
-        ${heroStats}
-      </div>`
-    : "";
-  const heroDecisionGrid = showDateOnlyHero || showDailyReportHero ? "" : renderHeroDecisionGrid(intent);
+  const heroEyebrow = input.heroEyebrow || `Component report | ${intent.artifactKind}`;
+  const heroDecisionGrid = renderHeroDecisionGrid(intent, presentation, input);
   const compatibilityBadge = compatibility ? `<span class="status-pill status-warn" data-render-compatibility="${escapeAttr(compatibility)}">${escapeHtml(compatibility)}</span>` : "";
-  const heroMarkup = showDateOnlyHero
-    ? `<header id="report-top" class="report-hero report-hero-minimal" data-report-region="hero" data-hero-mode="date-only">
-      <h1 class="report-title report-date-title">${escapeHtml(heroTitle)}</h1>
-    </header>`
-    : showDailyReportHero
-      ? renderDailyReportHero({ input, heroTitle, heroSummary, heroStats, compatibilityBadge, intent })
-    : `<header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
-      <div class="title-row">
-        <div>
-          <div class="eyebrow">${escapeHtml(meta.label)} | ${escapeHtml(meta.useCase)}</div>
-          <h1 class="report-title">${escapeHtml(input.title)}</h1>
-        </div>
-        <div class="toolbar"><span class="status-pill ${statusClass(input.status)}">状态：${escapeHtml(statusLabel(input.status))}</span>${compatibilityBadge}</div>
-      </div>
-      ${heroBrief}
-      ${heroDecisionGrid}
-    </header>`;
-  const claimsSection = (input.claims || []).length > 0
+  const handoffAttributes = renderHandoffAttributes(input.handoff);
+  const handoffMetaTags = renderHandoffMetaTags(input.handoff);
+  const claimsSection = presentation.showClaims === true && (input.claims || []).length > 0
     ? `<section class="panel supplemental-panel" id="claims" data-section-type="claims" data-section-group="claims" data-report-region="claims">${renderSupplementalHeading({ group: "claims", title: "关键判断", summary: "每条判断都保留证据入口和可信度。", status: "info" })}${renderClaims(input.claims || [])}</section>`
     : "";
-  const evidenceSection = (input.evidence || []).length > 0
+  const evidenceSection = presentation.showEvidence === true && (input.evidence || []).length > 0
     ? `<section class="panel supplemental-panel" id="evidence" data-section-type="evidence" data-section-group="evidence" data-report-region="evidence">${renderSupplementalHeading({ group: "evidence", title: "证据", summary: "文件、命令和验证来源集中在这里。", status: "info" })}${renderEvidence(input.evidence || [])}</section>`
     : "";
-  const verificationSection = (input.verification || []).length > 0
+  const verificationSection = presentation.showVerification === true && (input.verification || []).length > 0
     ? `<section class="panel supplemental-panel" id="verification" data-section-type="verification" data-section-group="verification" data-report-region="verification">${renderSupplementalHeading({ group: "verification", title: "验证", summary: "命令级验收和降级项。", status: "info" })}${renderVerification(input.verification || [])}</section>`
     : "";
-  const nextActionsSection = renderNextActionsSection(input);
+  const nextActionsSection = presentation.showNextActions === true && (input.nextActions || []).length > 0
+    ? `<section class="panel supplemental-panel" id="next-actions" data-section-type="actions" data-section-group="next" data-report-region="actions"><div class="section-heading split-row"><div><h2>下一步</h2><p class="section-summary">只保留后续会真正改变行为的动作。</p></div><button data-copy-from="#next-action-list">复制行动项</button></div><ul id="next-action-list" class="action-list">${(input.nextActions || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`
+    : "";
 
   return stripTrailingWhitespace(`<!doctype html>
-<html lang="zh-CN" data-html-work-report data-render-mode="${escapeAttr(mode)}" data-template="${escapeAttr(template)}" data-runtime-state="${isRuntimeMode(mode) ? "pending" : "not-runtime"}">
+<html lang="zh-CN" data-html-work-report data-render-mode="${escapeAttr(mode)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}" data-status="${escapeAttr(input.status)}"${handoffAttributes} data-runtime-state="${isRuntimeMode(mode) ? "pending" : "not-runtime"}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="effective-interact create-interaction.mjs">
   <meta name="generated-at" content="${escapeAttr(generatedAt)}">
   <meta name="render-mode" content="${escapeAttr(mode)}">
-  <title>${escapeHtml(input.title)}</title>
+${handoffMetaTags}  <title>${escapeHtml(input.title)}</title>
   <style>${css}</style>
 </head>
 <body>
   <main class="report-shell">
-    ${heroMarkup}
+    <header id="report-top" class="report-hero" data-report-region="hero" data-report-intent data-hero-mode="${escapeAttr(input.heroMode || "report")}" data-primary-question="${escapeAttr(intent.primaryQuestion)}" data-time-budget="${escapeAttr(intent.timeBudget)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}">
+      <div class="title-row">
+        <div>
+          <div class="eyebrow">${escapeHtml(heroEyebrow)}</div>
+          <h1 class="report-title">${escapeHtml(heroTitle)}</h1>
+        </div>
+        <div class="toolbar"><span class="status-pill ${statusClass(input.status)}">状态：${escapeHtml(statusLabel(input.status))}</span>${compatibilityBadge}</div>
+      </div>
+      <div class="hero-brief">
+        <p class="hero-summary-text">${inlineMarkdown(conclusion)}</p>
+        ${heroStats}
+        ${heroLinks}
+      </div>
+      ${heroDecisionGrid}
+    </header>
 
     <div class="report-layout">
       ${nav}
@@ -2491,7 +2536,7 @@ async function main() {
     const normalized = normalizeRenderMode(input.renderMode);
 
     if (args.json) {
-      console.log(JSON.stringify({ ok: true, outputPath, renderMode: normalized.mode, template: input.template || "implementation-handoff" }, null, 2));
+      console.log(JSON.stringify({ ok: true, outputPath, renderMode: normalized.mode, artifactKind: inferReportIntent(input, normalized.mode).artifactKind }, null, 2));
     } else {
       console.log(outputPath);
     }

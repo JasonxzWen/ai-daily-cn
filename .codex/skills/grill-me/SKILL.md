@@ -1,11 +1,10 @@
 ---
 name: grill-me
-description: Stress-test a plan or design through a one-question-at-a-time interview before implementation. Use when the user says "grill me", asks to be challenged, wants assumptions surfaced, or wants a plan/design pressure-tested; do not use for routine implementation once requirements are already clear.
+description: Load when a workflow-router-selected owner workflow needs cases where the user says grill me, asks to be challenged, or wants assumptions surfaced through a one-question-at-a-time interview; do not use for routine implementation.
 license: MIT
 metadata:
   source: "mattpocock/skills skills/productivity/grill-me"
   upstream_commit: "9fecab929abb904c68ce3366a1781df31ab22832"
-  adapted_for: "Codex Skill Hub"
 ---
 
 # Grill Me

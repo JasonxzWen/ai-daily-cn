@@ -1,11 +1,10 @@
 ---
 name: prototype
-description: Build a clearly marked throwaway prototype to answer one design question before committing to production implementation. Use when the user asks to prototype, sanity-check a state model, try UI variants, mock up an interaction, or says "let me play with it"; do not use for production feature work.
+description: Load when a workflow-router-selected owner workflow needs a throwaway prototype, state-model sanity check, UI variant, mock interaction, or playable design; do not use for production feature work.
 license: MIT
 metadata:
   source: "mattpocock/skills skills/engineering/prototype"
   upstream_commit: "9fecab929abb904c68ce3366a1781df31ab22832"
-  adapted_for: "Codex Skill Hub"
 ---
 
 # Prototype

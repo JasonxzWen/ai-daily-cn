@@ -1,19 +1,20 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-29T10:15:48.849Z",
+  "generatedAt": "2026-07-01T03:51:38.122Z",
   "source": {
     "path": "D:/harness-hub",
     "branch": "main",
-    "commit": "27cc200d1108e8f382d5c49c64312c6b4561da85",
+    "commit": "c603b2ac333d2071a394a29c2dfe90d02e1197aa",
     "status": "## main...origin/main"
   },
   "target": {
-    "path": "C:/Users/Admin/.codex/worktrees/3d23/ai-daily-cn",
+    "path": "C:/Users/Admin/.codex/worktrees/f5f1/ai-daily-cn",
     "skillsRoot": ".codex/skills"
   },
   "policy": {
+    "syncMode": "full-overwrite",
     "importedSkills": "Hub-only skills are copied into .codex/skills.",
-    "overlappingSkills": "Existing local skill files remain active. Hub-only files are added. Same-path Hub conflicts are preserved under _harness-hub/ inside the same skill.",
+    "overlappingSkills": "Existing local skill files with the same skill name are overwritten from Harness Hub; conflict copies under _harness-hub are removed.",
     "localOnlySkills": "Local-only skills are left untouched.",
     "skippedTopLevelSourceDirs": [
       "artifacts"
@@ -26,10 +27,11 @@
     "importedSkills": 35,
     "overlappingSkills": 12,
     "localOnlySkills": 1,
-    "copiedFiles": 108,
-    "preservedConflicts": 29,
-    "identicalFiles": 46,
-    "localOnlyFilesKept": 10
+    "copiedFiles": 190,
+    "preservedConflicts": 0,
+    "identicalFiles": 0,
+    "localOnlyFilesKept": 0,
+    "removedHarnessHubCopies": 0
   },
   "importedSkills": [
     "answer-workflow",
@@ -69,6 +71,20 @@
     "webapp-testing"
   ],
   "overlappingSkills": [
+    "agent-introspection-debugging",
+    "coding-standards",
+    "compound-code-review",
+    "diagnose",
+    "documentation-lookup",
+    "effective-interact",
+    "grill-me",
+    "prototype",
+    "security-review",
+    "tdd-workflow",
+    "verification-loop",
+    "workflow-router"
+  ],
+  "overwrittenSkills": [
     "agent-introspection-debugging",
     "coding-standards",
     "compound-code-review",
@@ -625,507 +641,419 @@
       "skill": "webapp-testing",
       "path": "scripts/with_server.py",
       "strategy": "imported-skill"
-    }
-  ],
-  "preservedConflicts": [
+    },
     {
       "skill": "agent-introspection-debugging",
       "path": "SKILL.md",
-      "active": ".codex/skills/agent-introspection-debugging/SKILL.md",
-      "harnessHubCopy": ".codex/skills/agent-introspection-debugging/_harness-hub/SKILL.md",
-      "sourceSha256": "b8ea001e166a326236f61ffa458ae12bd2fa069aa47e269c1aa550c5176e1a33",
-      "activeSha256": "1c2125c955ddc950ee9faafa198568031c07beaf08a97412b90dccc23405615d",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "coding-standards",
       "path": "SKILL.md",
-      "active": ".codex/skills/coding-standards/SKILL.md",
-      "harnessHubCopy": ".codex/skills/coding-standards/_harness-hub/SKILL.md",
-      "sourceSha256": "d575fc4953bb2ebee0fc7c1637a02ba53f84391e68907821341e572d0d859fc3",
-      "activeSha256": "89e1d5f295d36683db87951692552cbde686a32eebd83a4a79c0cf478c60d1ff",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "coding-standards",
+      "path": "references/review-checklist.md",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "compound-code-review",
       "path": "SKILL.md",
-      "active": ".codex/skills/compound-code-review/SKILL.md",
-      "harnessHubCopy": ".codex/skills/compound-code-review/_harness-hub/SKILL.md",
-      "sourceSha256": "2fdf1be0de85b5087fc1c2d43390d75833b92dd95657b09bd1fc23f1736e3d1e",
-      "activeSha256": "d0b80f07180284166bd6b87b7af4c697319447a9df61d60985c29b71c7a6966e",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "compound-code-review",
+      "path": "references/findings-schema.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "compound-code-review",
+      "path": "references/persona-catalog.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "compound-code-review",
+      "path": "references/review-output-template.md",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "diagnose",
       "path": "SKILL.md",
-      "active": ".codex/skills/diagnose/SKILL.md",
-      "harnessHubCopy": ".codex/skills/diagnose/_harness-hub/SKILL.md",
-      "sourceSha256": "3fe957932653eced8667f1e3629fb978645628a02dd5f8ab0368660925b55fda",
-      "activeSha256": "619e9d4d7825c92cc7a70a53f1c2dbb031ac8e33aa8dc92f7064e10c79fb9ce5",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "diagnose",
+      "path": "scripts/hitl-loop.template.ps1",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "documentation-lookup",
       "path": "SKILL.md",
-      "active": ".codex/skills/documentation-lookup/SKILL.md",
-      "harnessHubCopy": ".codex/skills/documentation-lookup/_harness-hub/SKILL.md",
-      "sourceSha256": "beaede84eea6ad052afdbcbd965459d468f4673f1a7f421cb79ead1a96bd42f8",
-      "activeSha256": "142fbfdffbcb6eb80c47afa5705a2a8130387bab2500bb0930f557de08640b9a",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": ".gitignore",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "DESIGN.md",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "SKILL.md",
-      "active": ".codex/skills/effective-interact/SKILL.md",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/SKILL.md",
-      "sourceSha256": "f183c6ad5cbe338a63220e12046fcb1d46f36ee98943a61e47091743cf9a2f1f",
-      "activeSha256": "e150ce3c0fff75e2f0d81952e21ec1acaa9617da4a60f095dda09dfc374a6916",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "assets/components/interaction-ui.css",
-      "active": ".codex/skills/effective-interact/assets/components/interaction-ui.css",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.css",
-      "sourceSha256": "57b744136c24fe5e457b9549fdb7f128976334596291c97fac51cacd331723ba",
-      "activeSha256": "e934c6817014864aa3ffc2b92c5badcee568d4b0354355a11ce024ed4217debb",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "assets/components/interaction-ui.js",
-      "active": ".codex/skills/effective-interact/assets/components/interaction-ui.js",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.js",
-      "sourceSha256": "c3072948eb9275b730f50a8be5b1f38f60586d1b8e61393b6c7019008fdf7c31",
-      "activeSha256": "6b28e2aa299087ca5d94a76da402aee8ad38d400a98809e03c41a6954a392594",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/components/rich-render-runtime.css",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "assets/components/rich-render-runtime.js",
-      "active": ".codex/skills/effective-interact/assets/components/rich-render-runtime.js",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/components/rich-render-runtime.js",
-      "sourceSha256": "0853cea9fdc1e2fb2d38c25f4bd1195a70216bbdb69ea3f754cd389f1cc11adf",
-      "activeSha256": "d3f94e12314bd2a5e903e0dc756021f87b5054fad15f6fea1acfe9f055b072f5",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "assets/fixtures/chart-accessibility-stress-report.json",
-      "active": ".codex/skills/effective-interact/assets/fixtures/chart-accessibility-stress-report.json",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/chart-accessibility-stress-report.json",
-      "sourceSha256": "0d8d28da824af5aeea94253526e12b7a4d6a8c6ff2035503e89549639bca7d8f",
-      "activeSha256": "0316372467744a1e46cd972e20788e31fbc79f9136e55b6be6596500942ba1e2",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "assets/fixtures/communication-mode-cases.json",
-      "active": ".codex/skills/effective-interact/assets/fixtures/communication-mode-cases.json",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/communication-mode-cases.json",
-      "sourceSha256": "2d8f6fe4fa8319e47a773c71adf372084d6275989f10355167af9afb08ffd48a",
-      "activeSha256": "297c65447173984c23e3c52466a0b8dfebd2519b9f008fc50903f9233d9b856b",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/concise-handoff-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/content-first-change-report.json",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "assets/fixtures/decision-brief-self-check-report.json",
-      "active": ".codex/skills/effective-interact/assets/fixtures/decision-brief-self-check-report.json",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/decision-brief-self-check-report.json",
-      "sourceSha256": "bbff7a8f45b57d4282d809a93534ad5b69590e14615398221de6b9570feb8961",
-      "activeSha256": "1474baf587c2e2a00d6bbcff1537f88c2b6e339895625b16be1caa0aec4434fd",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/decision-quality-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/disposable-export-editor-report.json",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "assets/fixtures/harness-vocabulary-explainer-report.json",
-      "active": ".codex/skills/effective-interact/assets/fixtures/harness-vocabulary-explainer-report.json",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/harness-vocabulary-explainer-report.json",
-      "sourceSha256": "661ef1f04f1a34345e7434ec370a1c5e93b6574b7bc2ad01c404966ab4d4377d",
-      "activeSha256": "3b19df5fb4b0e127680474427af3f80e48461298b71d1d7bcd92b9f783ad183f",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/html-effectiveness-pattern-library-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/mode-structure-cases.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/option-gallery-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/pre-rendered-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/runtime-cdn-stress-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/runtime-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/session-ledger-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/skill-research-report-readable.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/skill-structure-map-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/source-post-report.json",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/fixtures/table-component-report.json",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "assets/fixtures/trigger-scope-retro-report.json",
-      "active": ".codex/skills/effective-interact/assets/fixtures/trigger-scope-retro-report.json",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/fixtures/trigger-scope-retro-report.json",
-      "sourceSha256": "643d8c79bf7f7617a9579cd96e4e01d76eda928717f76960f5a463632b12cc54",
-      "activeSha256": "2690381e66b0e7aaa3d1d930e11c40906b8e67183d5f860e31a97fc3d4d0b4c6",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/templates/conclusion-dashboard.html",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/templates/decision-matrix.html",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/templates/editor-workbench.html",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/templates/implementation-handoff.html",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/templates/implementation-plan.html",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "assets/templates/research-explainer.html",
-      "active": ".codex/skills/effective-interact/assets/templates/research-explainer.html",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/assets/templates/research-explainer.html",
-      "sourceSha256": "0917337b93f876018a85f0f35f2d0483da07192773b06ece4a9dd6d544f5b95d",
-      "activeSha256": "419c28f2544c54ce595966be3f69b951ed43e54b0fe202cb49407adc7fac8d31",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/templates/review-findings.html",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "assets/templates/visual-exploration.html",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "evals/routing-cases.json",
-      "active": ".codex/skills/effective-interact/evals/routing-cases.json",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/evals/routing-cases.json",
-      "sourceSha256": "53ce9639f0d4bdb24ffbace3864565e1f370f61fbfbf843bed56282762ac4311",
-      "activeSha256": "b4158f0d38a9de553890f0002802af43a1b896ee038ba571fa8f7cb05ec63d1d",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "references/component-contracts.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "references/generator-validation-contract.md",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "references/html-aesthetic-preflight.md",
-      "active": ".codex/skills/effective-interact/references/html-aesthetic-preflight.md",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/references/html-aesthetic-preflight.md",
-      "sourceSha256": "a52f01ed65a12fa3f1b576cef8d6e963a9df197f067f920b0671d2094af09cae",
-      "activeSha256": "2e0c7eaa0156408f8ce7fcf947b79a3022af9c25c00818c4ce5c14a1887d9789",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "references/html-effectiveness-patterns.md",
-      "active": ".codex/skills/effective-interact/references/html-effectiveness-patterns.md",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/references/html-effectiveness-patterns.md",
-      "sourceSha256": "37f0cb3790826dd2bc0b50a7916969f84c90ef624788aea6e5104625e9fc73bd",
-      "activeSha256": "cb48e794d5c95779ac5ac6044e7305f6a4fd8de76a470be0839b5a78118cabee",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "references/interaction-input-schema.json",
-      "active": ".codex/skills/effective-interact/references/interaction-input-schema.json",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/references/interaction-input-schema.json",
-      "sourceSha256": "ce47ea5c47bd801043f4f34bee26277e06691f9a50916531ddcf746a7907dca1",
-      "activeSha256": "2692360e72d72564ac8c8abd157b117c35c1d0f84f07d428ad139d87231fe7ed",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "references/interaction-patterns.md",
-      "active": ".codex/skills/effective-interact/references/interaction-patterns.md",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/references/interaction-patterns.md",
-      "sourceSha256": "8ec468a18756c843873baf88d21a71401253c1841446708983288823d048daff",
-      "activeSha256": "553bbccd1281297f4ad767388740971b13fc493131313ec7f6edae4e5ec8bc76",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "references/report-ia.md",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "references/session-ledger-schema.json",
-      "active": ".codex/skills/effective-interact/references/session-ledger-schema.json",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/references/session-ledger-schema.json",
-      "sourceSha256": "bc7d747809385d3e2284bbb69dbb33cc69b5aef1ccfc69b27c9f8244259cec9f",
-      "activeSha256": "e6e53f3646182cbc6410092a8b4082d66859201c3046dd8be8b63ba54dfad573",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "references/visual-language.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "scripts/check-mode-structure.mjs",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "scripts/create-interaction.mjs",
-      "active": ".codex/skills/effective-interact/scripts/create-interaction.mjs",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/scripts/create-interaction.mjs",
-      "sourceSha256": "07546ba8fc14e626aa7275c632bd59abfc91e6d8e5c41dd4a0c7987938c50eba",
-      "activeSha256": "0a81222fb62bb3fb0e04d209b8b700c34acdc720c0af4b4699bad11b7eab6698",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "effective-interact",
+      "path": "scripts/serve-artifact.mjs",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "effective-interact",
       "path": "scripts/validate-interaction.mjs",
-      "active": ".codex/skills/effective-interact/scripts/validate-interaction.mjs",
-      "harnessHubCopy": ".codex/skills/effective-interact/_harness-hub/scripts/validate-interaction.mjs",
-      "sourceSha256": "962dcf6f601e7e221bef5d6884730e6ac1d275e3119be08e6f511a740340cc35",
-      "activeSha256": "da4a19671ebd9c6b03a48157b8beb9f20c95a675b2dec15b68cacb533c5f4444",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "grill-me",
       "path": "SKILL.md",
-      "active": ".codex/skills/grill-me/SKILL.md",
-      "harnessHubCopy": ".codex/skills/grill-me/_harness-hub/SKILL.md",
-      "sourceSha256": "1d46ffb7c82e2029e4210f671deda86dbdb8e369fa329b58bc1feb5d956abbb9",
-      "activeSha256": "10c2734bc58bc1d0a7651adaaf4005abb7f35c924120dbf3660dbd303f2ce219",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "prototype",
       "path": "SKILL.md",
-      "active": ".codex/skills/prototype/SKILL.md",
-      "harnessHubCopy": ".codex/skills/prototype/_harness-hub/SKILL.md",
-      "sourceSha256": "28eb7dfe6063b72539726a885cc1af633bccc218a04dad6e8d4bd5ec416ed9b6",
-      "activeSha256": "178f3e9b4152b0337f02c36b1d8cf611a96d6f64dd75fbf2040486dd0f3faad6",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "prototype",
+      "path": "references/logic-prototype.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "prototype",
+      "path": "references/ui-prototype.md",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "security-review",
       "path": "SKILL.md",
-      "active": ".codex/skills/security-review/SKILL.md",
-      "harnessHubCopy": ".codex/skills/security-review/_harness-hub/SKILL.md",
-      "sourceSha256": "a432b79dcf4b36c37663ea243ee3b912b4402c8cc47de5a49410bdef9327eee7",
-      "activeSha256": "e60a179eac26386cfc72d4bdebbe280f94a2d94ed889d6e221edbf1939f944d4",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "tdd-workflow",
       "path": "SKILL.md",
-      "active": ".codex/skills/tdd-workflow/SKILL.md",
-      "harnessHubCopy": ".codex/skills/tdd-workflow/_harness-hub/SKILL.md",
-      "sourceSha256": "4a2d6899c2886f4d0f5f1730bda7f434fe7e5352677db7ddc3e0a39cb4b30e3f",
-      "activeSha256": "27cfe7148aeb4385153236aded47ef3c5b2b7a2579ea1fc4b948ff987ce4e2ae",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "tdd-workflow",
+      "path": "references/interface-design.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "tdd-workflow",
+      "path": "references/mocking.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "tdd-workflow",
+      "path": "references/refactoring.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "tdd-workflow",
+      "path": "references/tests.md",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "verification-loop",
       "path": "SKILL.md",
-      "active": ".codex/skills/verification-loop/SKILL.md",
-      "harnessHubCopy": ".codex/skills/verification-loop/_harness-hub/SKILL.md",
-      "sourceSha256": "580a4ef2a8cc7d76f94d28a02d346a5cbb444115b19afe2017c5fb5bf6fae844",
-      "activeSha256": "abe40a95fc1fe7d5ff47ed2bab27600f160871e487fb1698546b0c80e45b1fbb",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "SKILL.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "references/agentic-loops.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "references/intent-taxonomy.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "references/orchestration-policy.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "references/state-handoff.md",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/advisory-check.mjs",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/agentic-loop-check.mjs",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/helper-contract-check.mjs",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/owner-contract-check.mjs",
+      "strategy": "overwritten-skill"
     },
     {
       "skill": "workflow-router",
       "path": "scripts/route-intent.mjs",
-      "active": ".codex/skills/workflow-router/scripts/route-intent.mjs",
-      "harnessHubCopy": ".codex/skills/workflow-router/_harness-hub/scripts/route-intent.mjs",
-      "sourceSha256": "6c7fbd6d1b4f8706d44576be7b1b02fe20e3856fdb9a67b4a3bb4702e7df8cd8",
-      "activeSha256": "f1cc2de06d8e3ced6917978b5cc3bc86c2cf9cca77233fa0ca7836fcc0d8a4ba",
-      "strategy": "active-local-kept-hub-copy-preserved"
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/skill-activation-check.mjs",
+      "strategy": "overwritten-skill"
+    },
+    {
+      "skill": "workflow-router",
+      "path": "scripts/workflow-check.mjs",
+      "strategy": "overwritten-skill"
     }
   ],
-  "identicalFiles": [
-    {
-      "skill": "coding-standards",
-      "path": "references/review-checklist.md"
-    },
-    {
-      "skill": "compound-code-review",
-      "path": "references/findings-schema.json"
-    },
-    {
-      "skill": "compound-code-review",
-      "path": "references/persona-catalog.md"
-    },
-    {
-      "skill": "compound-code-review",
-      "path": "references/review-output-template.md"
-    },
-    {
-      "skill": "diagnose",
-      "path": "scripts/hitl-loop.template.ps1"
-    },
-    {
-      "skill": "effective-interact",
-      "path": ".gitignore"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/components/rich-render-runtime.css"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/concise-handoff-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/content-first-change-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/decision-quality-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/disposable-export-editor-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/html-effectiveness-pattern-library-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/mode-structure-cases.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/option-gallery-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/pre-rendered-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/runtime-cdn-stress-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/runtime-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/session-ledger-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/skill-research-report-readable.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/skill-structure-map-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/source-post-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/fixtures/table-component-report.json"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/templates/conclusion-dashboard.html"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/templates/decision-matrix.html"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/templates/editor-workbench.html"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/templates/implementation-handoff.html"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/templates/implementation-plan.html"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/templates/review-findings.html"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "assets/templates/visual-exploration.html"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "scripts/check-mode-structure.mjs"
-    },
-    {
-      "skill": "effective-interact",
-      "path": "scripts/serve-artifact.mjs"
-    },
-    {
-      "skill": "prototype",
-      "path": "references/logic-prototype.md"
-    },
-    {
-      "skill": "prototype",
-      "path": "references/ui-prototype.md"
-    },
-    {
-      "skill": "tdd-workflow",
-      "path": "references/interface-design.md"
-    },
-    {
-      "skill": "tdd-workflow",
-      "path": "references/mocking.md"
-    },
-    {
-      "skill": "tdd-workflow",
-      "path": "references/refactoring.md"
-    },
-    {
-      "skill": "tdd-workflow",
-      "path": "references/tests.md"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "SKILL.md"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "references/intent-taxonomy.md"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "references/orchestration-policy.md"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "references/state-handoff.md"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/advisory-check.mjs"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/helper-contract-check.mjs"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/owner-contract-check.mjs"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/skill-activation-check.mjs"
-    },
-    {
-      "skill": "workflow-router",
-      "path": "scripts/workflow-check.mjs"
-    }
-  ],
-  "localOnlyFilesKept": [
-    {
-      "skill": "agent-introspection-debugging",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    },
-    {
-      "skill": "coding-standards",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    },
-    {
-      "skill": "compound-code-review",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    },
-    {
-      "skill": "diagnose",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    },
-    {
-      "skill": "documentation-lookup",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    },
-    {
-      "skill": "grill-me",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    },
-    {
-      "skill": "prototype",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    },
-    {
-      "skill": "security-review",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    },
-    {
-      "skill": "tdd-workflow",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    },
-    {
-      "skill": "verification-loop",
-      "path": "agents/openai.yaml",
-      "strategy": "local-only-kept"
-    }
-  ]
+  "preservedConflicts": [],
+  "identicalFiles": [],
+  "localOnlyFilesKept": []
 }

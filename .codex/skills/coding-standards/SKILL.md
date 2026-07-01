@@ -1,6 +1,7 @@
 ---
 name: coding-standards
-description: Baseline cross-project coding conventions for naming, readability, immutability, and code-quality review. Use detailed frontend or backend skills for framework-specific patterns.
+description: Load when a workflow-router-selected owner workflow needs cross-project code quality conventions; use frontend-patterns or security-review for narrower framework or risk guidance.
+license: MIT
 ---
 
 # Coding Standards & Best Practices
@@ -10,7 +11,7 @@ Baseline coding conventions applicable across projects.
 This skill is the shared floor, not the detailed framework playbook.
 
 - Use `frontend-patterns` for React, state, forms, rendering, and UI architecture.
-- Use `backend-patterns` or `api-design` for repository/service layers, endpoint design, validation, and server-specific concerns.
+- Use `sdd-workflow` for accepted implementation scope and `product-capability` for API or service behavior contracts before coding.
 - Use `rules/common/coding-style.md` when you need the shortest reusable rule layer instead of a full skill walkthrough.
 
 ## When to Activate

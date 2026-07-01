@@ -22,11 +22,6 @@
       "type": "string",
       "description": "ISO-8601 timestamp. The generator fills this when omitted."
     },
-    "template": {
-      "type": "string",
-      "enum": ["implementation-handoff", "conclusion-dashboard", "review-findings", "research-explainer", "decision-matrix", "implementation-plan", "visual-exploration", "editor-workbench"],
-      "default": "implementation-handoff"
-    },
     "renderMode": {
       "type": "string",
       "enum": ["runtime-cdn", "pre-rendered", "fallback-only", "runtime"],
@@ -38,56 +33,55 @@
       "default": false,
       "description": "When true, expose the runtime dependency manifest as a visible report section. The manifest remains machine-readable but hidden by default."
     },
-    "hideHeroSummary": {
-      "type": "boolean",
-      "default": false,
-      "description": "When true, suppress the hero summary block."
-    },
-    "hideNavigation": {
-      "type": "boolean",
-      "default": false,
-      "description": "When true, suppress the generated in-page navigation."
-    },
-    "heroMode": {
-      "type": "string",
-      "enum": ["date-only", "daily-report"],
-      "description": "Optional specialized hero layout. date-only renders only the heroTitle or title; daily-report renders a compact report header with summary metrics."
-    },
-    "heroTitle": {
-      "type": "string",
-      "description": "Visible title used by specialized hero modes."
-    },
-    "heroEyebrow": {
-      "type": "string",
-      "description": "Short label shown above heroTitle in specialized hero modes."
-    },
-    "heroStats": {
-      "type": "array",
-      "description": "Compact metrics shown in specialized hero modes.",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["label", "value"],
-        "properties": {
-          "label": { "type": "string" },
-          "value": { "type": "string" },
-          "detail": { "type": "string" }
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Human-visible presentation toggles. Root audit data stays machine-available but hidden unless the report explicitly opts in.",
+      "properties": {
+        "showHeroStats": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, show hero counters derived from verification, evidence, and nextActions."
+        },
+        "showSuccessCriteria": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, show intent.successCriteria as a visible hero card."
+        },
+        "showClaims": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, render root claims as a visible supplemental section."
+        },
+        "showEvidence": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, render root evidence as a visible supplemental section."
+        },
+        "showVerification": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, render root verification as a visible supplemental section."
+        },
+        "showNextActions": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, render root nextActions as a visible supplemental section."
         }
       }
     },
-    "heroLinks": {
-      "type": "array",
-      "description": "Compact hero action links.",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["label", "href"],
-        "properties": {
-          "label": { "type": "string" },
-          "href": { "type": "string" },
-          "icon": { "type": "string" },
-          "iconDataUri": { "type": "string" },
-          "icon_data_uri": { "type": "string" }
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional durability metadata for HTML handoffs. Use repo-relative paths and commands so generated reports can be regenerated without leaking host-local paths.",
+      "properties": {
+        "sourcePath": {
+          "type": "string",
+          "description": "Repo-relative durable JSON input path used to regenerate the artifact."
+        },
+        "regenerationCommand": {
+          "type": "string",
+          "description": "Exact repo-root command that regenerates the artifact from sourcePath."
         }
       }
     },
@@ -150,30 +144,6 @@
           "summary": {
             "type": "string",
             "description": "Optional one-line section summary used in grouped navigation or section headers."
-          },
-          "collapsed": {
-            "type": "boolean",
-            "default": false,
-            "description": "When true, render the section as a closed details panel by default."
-          },
-          "defaultCollapsed": {
-            "type": "boolean",
-            "default": false,
-            "description": "Legacy alias for collapsed."
-          },
-          "open": {
-            "type": "boolean",
-            "default": false,
-            "description": "When used with collapsed/defaultCollapsed, render the details panel initially open."
-          },
-          "appendix": {
-            "type": "boolean",
-            "default": false,
-            "description": "When true, style the collapsed section as low-priority appendix material."
-          },
-          "appendixLabel": {
-            "type": "string",
-            "description": "Visible label shown above a collapsed appendix section title."
           },
           "status": {
             "type": "string",
@@ -458,11 +428,6 @@
       "items": {
         "type": "string"
       }
-    },
-    "nextActionsCollapsed": {
-      "type": "boolean",
-      "default": false,
-      "description": "When true, render nextActions as a collapsed appendix panel."
     }
   }
 }

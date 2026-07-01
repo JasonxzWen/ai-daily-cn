@@ -29,6 +29,8 @@ Use this owner for review-only work.
 
 For parallel review lenses, follow `workflow-router/references/orchestration-policy.md`: subagents can run independent read-only passes, but the main agent owns severity, synthesis, and final conclusions.
 
+Use agentic loops from `workflow-router/references/agentic-loops.md` for material reviews: delegated-agent lenses may act as verifiers, a read-only arbiter deduplicates and ranks evidence, and the main agent owns the final findings-first report.
+
 ## Output
 
 Findings first. Then open questions, residual risk, and a short summary if useful.

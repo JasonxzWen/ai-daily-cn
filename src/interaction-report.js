@@ -485,7 +485,6 @@ export function reportToInteractionInput(report, options = {}) {
     hideNavigation: false,
     hideHeroSummary: false,
     status: "complete",
-    template: "research-explainer",
     renderMode: "pre-rendered",
     generatedAt: report.generated_at,
     sourceFirstPresentationContract: sourceFirstPresentation,

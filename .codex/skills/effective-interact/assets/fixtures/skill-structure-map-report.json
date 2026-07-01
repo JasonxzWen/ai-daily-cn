@@ -2,7 +2,6 @@
   "title": "effective-interact 结构地图",
   "summary": "状态：effective-interact 由触发合同、eval、生成、验证、参考和资产六层组成。",
   "status": "review",
-  "template": "research-explainer",
   "renderMode": "runtime-cdn",
   "generatedAt": "2026-05-21T00:00:00.000Z",
   "intent": {
@@ -46,7 +45,7 @@
       "priority": 1,
       "status": "ready",
       "summary": "从根目录到触发、eval、生成、验证和资产层的关系。",
-    "content": "flowchart TB\n  root[\"effective-interact/\"] --> skill[\"SKILL.md\\n触发合同、模式阶梯、HTML 升级规则\"]\n  root --> gitignore[\".gitignore\\n忽略本地 artifacts 输出\"]\n  root --> evals[\"evals/routing-cases.json\\n正例、反例、禁止加载、HTML 时机\"]\n  root --> refs[\"references/\\n详细模式与输入 schema\"]\n  refs --> patterns[\"interaction-patterns.md\\n第一性原理编排、模式选择、运行时边界\"]\n  refs --> schema[\"interaction-input-schema.json\\n生成器输入结构\"]\n  root --> scripts[\"scripts/\\n生成和验证执行层\"]\n  scripts --> create[\"create-interaction.mjs\\nJSON -> 单文件 HTML\"]\n  scripts --> validate[\"validate-interaction.mjs\\n静态 + 浏览器校验\"]\n  root --> assets[\"assets/\\n模板、组件、fixtures\"]\n  assets --> templates[\"templates/\\n报告页面形态\"]\n  assets --> components[\"components/\\n交互和 rich render 运行时\"]\n  assets --> fixtures[\"fixtures/\\n生成器和触发场景回归输入\"]\n  fixtures --> structure[\"skill-structure-map-report.json\\n本结构地图输入\"]"
+      "content": "flowchart TB\n  root[\"effective-interact/\"] --> skill[\"SKILL.md\\n触发合同、模式阶梯、HTML 升级规则\"]\n  root --> gitignore[\".gitignore\\n忽略本地 artifacts 输出\"]\n  root --> evals[\"evals/routing-cases.json\\n正例、反例、禁止加载、HTML 时机\"]\n  root --> refs[\"references/\\n详细模式与输入 schema\"]\n  refs --> patterns[\"interaction-patterns.md\\n第一性原理编排、模式选择、运行时边界\"]\n  refs --> schema[\"interaction-input-schema.json\\n生成器输入结构\"]\n  root --> scripts[\"scripts/\\n生成和验证执行层\"]\n  scripts --> create[\"create-interaction.mjs\\nJSON -> 单文件 HTML\"]\n  scripts --> validate[\"validate-interaction.mjs\\n静态 + 浏览器校验\"]\n  root --> assets[\"assets/\\n模板、组件、fixtures\"]\n  assets --> templates[\"templates/\\n报告页面形态\"]\n  assets --> components[\"components/\\n交互和 rich render 运行时\"]\n  assets --> fixtures[\"fixtures/\\n生成器和触发场景回归输入\"]\n  fixtures --> structure[\"skill-structure-map-report.json\\n本结构地图输入\"]"
     },
     {
       "type": "data-table",
@@ -56,9 +55,21 @@
       "status": "ready",
       "summary": "把目录树拆成可扫读的职责表。",
       "columns": [
-        { "key": "path", "label": "路径", "width": "32%" },
-        { "key": "role", "label": "作用", "width": "42%" },
-        { "key": "when", "label": "何时读取/执行", "width": "26%" }
+        {
+          "key": "path",
+          "label": "路径",
+          "width": "32%"
+        },
+        {
+          "key": "role",
+          "label": "作用",
+          "width": "42%"
+        },
+        {
+          "key": "when",
+          "label": "何时读取/执行",
+          "width": "26%"
+        }
       ],
       "rows": [
         {
@@ -66,11 +77,11 @@
           "role": "最小触发合同：何时加载、如何选择 plain text / Markdown / visual Markdown / HTML。",
           "when": "skill 触发时必读"
         },
-      {
-        "path": ".gitignore",
-        "role": "忽略本地 artifacts/，让中间 ledger 和生成 HTML 不进入版本控制。",
-        "when": "生成或检查临时产物边界时"
-      },
+        {
+          "path": ".gitignore",
+          "role": "忽略本地 artifacts/，让中间 ledger 和生成 HTML 不进入版本控制。",
+          "when": "生成或检查临时产物边界时"
+        },
         {
           "path": "evals/routing-cases.json",
           "role": "正例、相邻反例、禁止加载、HTML 升级时机的可迁移 eval。",
@@ -202,7 +213,9 @@
       "filePath": "skills/effective-interact/SKILL.md",
       "language": "yaml",
       "startLine": 1,
-      "highlightLines": [3],
+      "highlightLines": [
+        3
+      ],
       "content": "---\nname: effective-interact\ndescription: Load when an agent pauses to report relatively complex information needing Chinese-first clear complex communication, alignment, multi-option choice, status/incident, long-task fact ledgers, implementation plans, reviews, maps, explainers, evidence, risks, validation, or handoff; choose plain text/Markdown/visual Markdown/HTML by decision cost; do not load merely because answer is long; skip trivial chat/bundled apps.\n---"
     },
     {

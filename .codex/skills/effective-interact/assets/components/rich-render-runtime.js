@@ -73,30 +73,7 @@
   }
 
   function applyReportMarkSyntax(source) {
-    return String(source || "").replace(/==([^=\n]+)==/g, function (_match, value) {
-      return renderReportHighlight(value);
-    });
-  }
-
-  function renderReportHighlight(value) {
-    var text = String(value || "");
-    var keyword = text.match(/^keyword-(major|notable|general)\|(.+)$/);
-    if (keyword) {
-      return '<strong class="text-keyword keyword-' + keyword[1] + '">' + keyword[2] + '</strong>';
-    }
-    var dailyTag = text.match(/^tag-([a-z0-9-]+)\|(.+)$/);
-    if (dailyTag) {
-      return '<mark class="text-highlight daily-tag daily-tag-' + safeHighlightClass(dailyTag[1]) + '">' + dailyTag[2] + '</mark>';
-    }
-    var trend = text.match(/^trend-(new|up|down|same)\|(.+)$/);
-    if (trend) {
-      return '<mark class="text-highlight daily-tag trend-status trend-status-' + trend[1] + '">' + trend[2] + '</mark>';
-    }
-    return '<mark class="text-highlight">' + text + '</mark>';
-  }
-
-  function safeHighlightClass(value) {
-    return String(value || "").replace(/[^a-z0-9-]/gi, "").toLowerCase() || "topic";
+    return String(source || "").replace(/==([^=\n]+)==/g, '<mark class="text-highlight">$1</mark>');
   }
 
   function updatePageRuntimeState() {

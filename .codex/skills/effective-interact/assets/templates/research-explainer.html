@@ -64,6 +64,7 @@
         <h2>Rendered explanation</h2>
         <div class="tabs" role="tablist" aria-label="Explainer sections">
           <button data-tab="mechanism" aria-selected="true">Mechanism</button>
+          <button data-tab="boundary">Boundary</button>
           <button data-tab="tradeoffs">Tradeoffs</button>
           <button data-tab="examples">Examples</button>
         </div>
@@ -93,6 +94,15 @@
             <pre>graph LR
   Question --&gt; Evidence --&gt; Conclusion</pre>
           </details>
+        </section>
+
+        <section id="boundary" data-panel hidden>
+          <div class="glossary">
+            <div class="term"><strong>Definition</strong><br>State the local definition in one short paragraph.</div>
+            <div class="term"><strong>Adjacent concept</strong><br>Name the nearest term people confuse with this one and explain the difference.</div>
+            <div class="term"><strong>Avoid / use instead</strong><br>Call out wording that would change the decision, routing, or validation claim.</div>
+            <div class="term"><strong>Usage scenario</strong><br>Show one repo-local situation where the distinction changes the next action.</div>
+          </div>
         </section>
 
         <section id="tradeoffs" data-panel hidden>

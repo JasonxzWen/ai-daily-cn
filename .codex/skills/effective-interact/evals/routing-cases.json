@@ -77,6 +77,17 @@
       "rationale": "A wide module/dependency map with file roles is too dense for linear prose."
     },
     {
+      "id": "positive-repo-capability-implementation-map-html",
+      "kind": "positive",
+      "prompt": "描述本仓库的能力、结构、功能、实现。",
+      "shouldLoad": true,
+      "expectedMode": "html-artifact",
+      "expectedSkill": "effective-interact",
+      "htmlEscalation": true,
+      "expectedArtifactShape": "repo-capability-map",
+      "rationale": "A whole-repo explainer spanning capabilities, structure, functions, and implementation needs navigation, maps, and source evidence instead of linear prose."
+    },
+    {
       "id": "positive-skill-structure-tree-html",
       "kind": "positive",
       "prompt": "展示这个 skill 的目录树，每个文件和目录的作用都要概述，让我一眼看懂结构。",

@@ -8,6 +8,8 @@ const SCRIPT_PATH = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT_PATH), "..");
 const DEFAULT_SKILLS_ROOT = ".codex/skills";
 const DEFAULT_PRESERVED_TOP_LEVEL_DIRS = ["artifacts"];
+const DEFAULT_SYNC_MODE = "preserve-conflicts";
+const SUPPORTED_SYNC_MODES = new Set(["preserve-conflicts", "full-overwrite"]);
 
 function toPortablePath(value) {
   return value.split(path.sep).join("/");
@@ -55,6 +57,15 @@ function removeFileIfExists(filePath) {
   }
 }
 
+function assertDescendant(parentPath, candidatePath, label) {
+  const parent = path.resolve(parentPath);
+  const candidate = path.resolve(candidatePath);
+  const relative = path.relative(parent, candidate);
+  if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new Error(`${label} must stay within ${parent}: ${candidate}`);
+  }
+}
+
 function pruneEmptyDirectories(rootPath) {
   if (!fs.existsSync(rootPath) || !fs.statSync(rootPath).isDirectory()) {
     return false;
@@ -83,7 +94,9 @@ function removeManagedEntries(targetDir, preservedTopLevelDirs) {
     if (preservedTopLevelDirs.has(entry.name)) {
       continue;
     }
-    fs.rmSync(path.join(targetDir, entry.name), { recursive: true, force: true });
+    const targetPath = path.join(targetDir, entry.name);
+    assertDescendant(targetDir, targetPath, "Managed skill entry removal");
+    fs.rmSync(targetPath, { recursive: true, force: true });
   }
 }
 
@@ -215,7 +228,7 @@ function resolveSkillCategories(manifest, sourceSkillNames, targetSkillNames, ta
 }
 
 function syncImportedSkill(skillName, options) {
-  const { sourceSkillsRoot, targetSkillsRoot, preservedTopLevelDirs, copiedFiles } = options;
+  const { sourceSkillsRoot, targetSkillsRoot, preservedTopLevelDirs, copiedFiles, strategy = "imported-skill" } = options;
   const sourceDir = path.join(sourceSkillsRoot, skillName);
   const targetDir = path.join(targetSkillsRoot, skillName);
   const sourceFiles = walkFiles(sourceDir, { skipTopLevelDirs: preservedTopLevelDirs });
@@ -227,11 +240,38 @@ function syncImportedSkill(skillName, options) {
     copiedFiles.push({
       skill: skillName,
       path: relativePath,
-      strategy: "imported-skill"
+      strategy
     });
   }
 
   pruneEmptyDirectories(targetDir);
+}
+
+function removeHarnessHubCopies(targetSkillsRoot) {
+  if (!fs.existsSync(targetSkillsRoot)) {
+    return 0;
+  }
+
+  let removed = 0;
+
+  function visit(currentPath) {
+    for (const entry of fs.readdirSync(currentPath, { withFileTypes: true })) {
+      const nextPath = path.join(currentPath, entry.name);
+      if (!entry.isDirectory()) {
+        continue;
+      }
+      if (entry.name === "_harness-hub") {
+        assertDescendant(targetSkillsRoot, nextPath, "Harness Hub conflict copy removal");
+        fs.rmSync(nextPath, { recursive: true, force: true });
+        removed += 1;
+        continue;
+      }
+      visit(nextPath);
+    }
+  }
+
+  visit(targetSkillsRoot);
+  return removed;
 }
 
 function cleanupStaleHarnessHubCopies(harnessHubDir, sourceFiles) {
@@ -333,7 +373,9 @@ function removeStaleImportedSkills(sourceSkillNames, targetSkillsRoot, importedS
     if (sourceSkillSet.has(skill) || localOnlySkillSet.has(skill) || overlappingSkillSet.has(skill)) {
       continue;
     }
-    fs.rmSync(path.join(targetSkillsRoot, skill), { recursive: true, force: true });
+    const targetPath = path.join(targetSkillsRoot, skill);
+    assertDescendant(targetSkillsRoot, targetPath, "Stale imported skill removal");
+    fs.rmSync(targetPath, { recursive: true, force: true });
   }
 }
 
@@ -352,6 +394,10 @@ export function syncHarnessHub(options = {}) {
   const sourceSkillsRoot = path.join(sourceRoot, "skills");
   const targetSkillsRoot = path.join(root, DEFAULT_SKILLS_ROOT);
   const preservedTopLevelDirs = new Set(manifest.policy?.skippedTopLevelSourceDirs ?? DEFAULT_PRESERVED_TOP_LEVEL_DIRS);
+  const syncMode = options.syncMode ?? manifest.policy?.syncMode ?? DEFAULT_SYNC_MODE;
+  if (!SUPPORTED_SYNC_MODES.has(syncMode)) {
+    throw new Error(`Unsupported Harness Hub sync mode: ${syncMode}`);
+  }
   const sourceSkillNames = readSkillNames(sourceSkillsRoot);
   const targetSkillNames = readSkillNames(targetSkillsRoot);
   const categories = resolveSkillCategories(manifest, sourceSkillNames, targetSkillNames, targetSkillsRoot);
@@ -359,6 +405,7 @@ export function syncHarnessHub(options = {}) {
   const preservedConflicts = [];
   const identicalFiles = [];
   const localOnlyFilesKept = [];
+  let removedHarnessHubCopies = 0;
 
   fs.mkdirSync(targetSkillsRoot, { recursive: true });
   removeStaleImportedSkills(
@@ -374,24 +421,41 @@ export function syncHarnessHub(options = {}) {
       sourceSkillsRoot,
       targetSkillsRoot,
       preservedTopLevelDirs,
-      copiedFiles
+      copiedFiles,
+      strategy: "imported-skill"
     });
   }
 
-  for (const skillName of categories.overlappingSkills) {
-    if (!fs.existsSync(path.join(sourceSkillsRoot, skillName))) {
-      continue;
+  if (syncMode === "full-overwrite") {
+    for (const skillName of categories.overlappingSkills) {
+      if (!fs.existsSync(path.join(sourceSkillsRoot, skillName))) {
+        continue;
+      }
+      syncImportedSkill(skillName, {
+        sourceSkillsRoot,
+        targetSkillsRoot,
+        preservedTopLevelDirs,
+        copiedFiles,
+        strategy: "overwritten-skill"
+      });
     }
-    syncOverlappingSkill(skillName, {
-      root,
-      sourceSkillsRoot,
-      targetSkillsRoot,
-      preservedTopLevelDirs,
-      copiedFiles,
-      preservedConflicts,
-      identicalFiles,
-      localOnlyFilesKept
-    });
+    removedHarnessHubCopies = removeHarnessHubCopies(targetSkillsRoot);
+  } else {
+    for (const skillName of categories.overlappingSkills) {
+      if (!fs.existsSync(path.join(sourceSkillsRoot, skillName))) {
+        continue;
+      }
+      syncOverlappingSkill(skillName, {
+        root,
+        sourceSkillsRoot,
+        targetSkillsRoot,
+        preservedTopLevelDirs,
+        copiedFiles,
+        preservedConflicts,
+        identicalFiles,
+        localOnlyFilesKept
+      });
+    }
   }
 
   const sourceMetadata = options.sourceMetadata ?? readGitMetadata(sourceRoot);
@@ -409,10 +473,13 @@ export function syncHarnessHub(options = {}) {
       skillsRoot: DEFAULT_SKILLS_ROOT
     },
     policy: {
+      syncMode,
       importedSkills: manifest.policy?.importedSkills ?? "Hub-only skills are copied into .codex/skills.",
       overlappingSkills:
-        manifest.policy?.overlappingSkills ??
-        "Existing local skill files remain active. Hub-only files are added. Same-path Hub conflicts are preserved under _harness-hub/ inside the same skill.",
+        syncMode === "full-overwrite"
+          ? "Existing local skill files with the same skill name are overwritten from Harness Hub; conflict copies under _harness-hub are removed."
+          : manifest.policy?.overlappingSkills ??
+            "Existing local skill files remain active. Hub-only files are added. Same-path Hub conflicts are preserved under _harness-hub/ inside the same skill.",
       localOnlySkills: manifest.policy?.localOnlySkills ?? "Local-only skills are left untouched.",
       skippedTopLevelSourceDirs: [...preservedTopLevelDirs],
       baseline:
@@ -428,10 +495,12 @@ export function syncHarnessHub(options = {}) {
       copiedFiles: copiedFiles.length,
       preservedConflicts: preservedConflicts.length,
       identicalFiles: identicalFiles.length,
-      localOnlyFilesKept: localOnlyFilesKept.length
+      localOnlyFilesKept: localOnlyFilesKept.length,
+      removedHarnessHubCopies
     },
     importedSkills: categories.importedSkills,
     overlappingSkills: categories.overlappingSkills,
+    overwrittenSkills: syncMode === "full-overwrite" ? categories.overlappingSkills : [],
     localOnlySkills: categories.localOnlySkills,
     copiedFiles,
     preservedConflicts,
@@ -469,6 +538,15 @@ function parseArgs(argv) {
         throw new Error("--manifest requires a value");
       }
       options.manifestPath = value;
+      index += 1;
+      continue;
+    }
+    if (arg === "--sync-mode") {
+      const value = argv[index + 1];
+      if (!value) {
+        throw new Error("--sync-mode requires a value");
+      }
+      options.syncMode = value;
       index += 1;
       continue;
     }

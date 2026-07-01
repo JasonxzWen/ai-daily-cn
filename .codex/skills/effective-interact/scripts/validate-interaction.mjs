@@ -170,6 +170,34 @@ function collectRichContentOpportunityWarnings(documentMarkup) {
   return warnings;
 }
 
+function collectVisualStructureWarnings(documentMarkup) {
+  const warnings = [];
+  const structuredTypes = new Set([
+    "summary-cards",
+    "data-table",
+    "mermaid",
+    "code",
+    "diff",
+    "timeline",
+    "evidence",
+    "decision-matrix",
+    "tabs",
+    "filterable-cards",
+    "chart"
+  ]);
+  const sectionTypes = [...String(documentMarkup || "").matchAll(/data-section-type="([^"]+)"/gi)]
+    .map((match) => String(match[1] || "").trim())
+    .filter(Boolean);
+  const hasStructuredSection = sectionTypes.some((type) => structuredTypes.has(type));
+  const hasRenderedTable = /<table\b/i.test(documentMarkup);
+
+  if (!hasStructuredSection && !hasRenderedTable) {
+    warnings.push("advisory: visual structure gate: unless the report is intentionally plain-brief, add at least one visible structure such as cards, a table, matrix, timeline, flow, source-linked code/evidence, or filterable layout");
+  }
+
+  return warnings;
+}
+
 function collectRichRenderWarnings(html, mode) {
   const warnings = [];
   const value = String(html || "");
@@ -246,6 +274,25 @@ function attrValue(tag, name) {
   return match ? match[1] : "";
 }
 
+function metaContent(documentMarkup, name) {
+  const pattern = new RegExp(`<meta\\b(?=[^>]*name="${name}")[^>]*>`, "i");
+  const tag = String(documentMarkup || "").match(pattern)?.[0] || "";
+  return attrValue(tag, "content");
+}
+
+function collectHandoffDurabilityWarnings(documentMarkup) {
+  const htmlTag = String(documentMarkup || "").match(/<html\b[^>]*>/i)?.[0] || "";
+  const hero = String(documentMarkup || "").match(/<header\b(?=[^>]*report-hero)[\s\S]*?<\/header>/i)?.[0] || "";
+  const artifactKind = attrValue(htmlTag, "data-artifact-kind") || attrValue(hero, "data-artifact-kind") || attrValue(String(documentMarkup || ""), "data-artifact-kind");
+  const durableKinds = new Set(["handoff", "review", "status", "research", "decision", "explainer"]);
+  const shouldHaveDurability = durableKinds.has(artifactKind);
+  const sourcePath = attrValue(htmlTag, "data-handoff-source-path") || metaContent(documentMarkup, "handoff-source-path");
+  const regenerationCommand = attrValue(htmlTag, "data-handoff-regeneration-command") || metaContent(documentMarkup, "handoff-regeneration-command");
+
+  if (!shouldHaveDurability || (sourcePath && regenerationCommand)) return [];
+  return ["advisory: handoff durability: add data-handoff-source-path and data-handoff-regeneration-command so ignored HTML artifacts can be regenerated"];
+}
+
 function normalizeFragmentId(value) {
   return String(value || "")
     .replace(/^#/, "")
@@ -265,7 +312,7 @@ function collectNavigationOrderIssues(documentMarkup) {
     .filter((id) => id && id !== "report-top");
   if (navIds.length === 0) return issues;
 
-  const sectionIds = [...documentMarkup.matchAll(/<(?:section|details)\b[^>]*>/gi)]
+  const sectionIds = [...documentMarkup.matchAll(/<section\b[^>]*>/gi)]
     .map((match) => match[0])
     .filter((tag) => tag.includes("data-section-type=") || /id="(?:evidence|verification|next-actions)"/i.test(tag))
     .map((tag) => attrValue(tag, "id"))
@@ -335,6 +382,103 @@ function collectRuntimeAuditIssues(documentMarkup) {
   return issues;
 }
 
+function collectSectionBlocks(documentMarkup) {
+  return [...String(documentMarkup || "").matchAll(/<section\b(?=[^>]*data-section-type=)[^>]*>[\s\S]*?<\/section>/gi)]
+    .map((match) => match[0]);
+}
+
+function openingTag(block) {
+  return String(block || "").match(/^<section\b[^>]*>/i)?.[0] || "";
+}
+
+function hasHighlightToken(block) {
+  return /class="[^"]*\bhljs-(?:keyword|title|type|attr|attribute|string|comment|number|literal|built_in)\b/i.test(String(block || ""));
+}
+
+function collectCodeHighlightIssues(documentMarkup, runtime, runtimePins) {
+  const issues = [];
+  const blocks = collectSectionBlocks(documentMarkup)
+    .filter((block) => attrValue(openingTag(block), "data-section-type") === "code");
+  for (const block of blocks) {
+    const tag = openingTag(block);
+    const id = attrValue(tag, "id") || "code";
+    const state = attrValue(tag, "data-render-state");
+    if (runtime) {
+      if (!(block.includes("data-rich-code") && block.includes("language-") && runtimePins)) {
+        issues.push(`${id} lacks runtime code declaration`);
+      }
+      continue;
+    }
+    if (state === "degraded") continue;
+    if (!hasHighlightToken(block)) issues.push(`${id} has no syntax highlight tokens`);
+  }
+  return issues;
+}
+
+function collectVisibleComponentIssues(documentMarkup) {
+  const issues = [];
+  for (const block of collectSectionBlocks(documentMarkup)) {
+    const tag = openingTag(block);
+    const id = attrValue(tag, "id") || "section";
+    const type = attrValue(tag, "data-section-type");
+    const text = textFromHtml(block);
+    if (!text) {
+      issues.push(`${id} ${type} has no visible text`);
+      continue;
+    }
+
+    if (type === "summary-cards") {
+      const strongValues = collectTagText(block, "strong");
+      if (strongValues.length === 0) issues.push(`${id} summary-cards has no visible card values`);
+      if (/<strong\b[^>]*>\s*<\/strong>/i.test(block)) issues.push(`${id} summary-cards contains an empty card value`);
+    } else if (type === "data-table") {
+      const cells = collectTagText(block, "td");
+      if (cells.length === 0 || cells.every((cell) => !cell)) issues.push(`${id} data-table has no visible body cells`);
+    } else if (type === "timeline") {
+      const hasSemanticList = collectTagText(block, "li").length > 0;
+      const hasStepShape = /<strong\b[^>]*>\s*\S[\s\S]*?<\/strong>/i.test(block) && /<span\b[^>]*>\s*\S[\s\S]*?<\/span>/i.test(block);
+      if (!hasSemanticList && !hasStepShape) {
+        issues.push(`${id} timeline has empty step labels or details`);
+      }
+    } else if (type === "decision-matrix") {
+      if (collectTagText(block, "h3").length === 0 || collectTagText(block, "li").length === 0) {
+        issues.push(`${id} decision-matrix has no visible option names or points`);
+      }
+    } else if (type === "actions") {
+      if (collectTagText(block, "li").length === 0) issues.push(`${id} actions has no visible action items`);
+    } else if (type === "tabs") {
+      if (collectTagText(block, "button").length === 0 || !/class="[^"]*\btab-panel\b/i.test(block)) {
+        issues.push(`${id} tabs has no visible tab labels or panels`);
+      }
+    } else if (type === "filterable-cards") {
+      if (collectTagText(block, "h3").length === 0 || collectTagText(block, "p").length === 0) {
+        issues.push(`${id} filterable-cards has no visible card titles or bodies`);
+      }
+    }
+  }
+  return issues;
+}
+
+function collectStatusConsistencyIssues(documentMarkup) {
+  const htmlTag = String(documentMarkup || "").match(/<html\b[^>]*>/i)?.[0] || "";
+  const status = attrValue(htmlTag, "data-status");
+  if (status !== "complete") return [];
+
+  const issues = [];
+  const unsettledSections = [...String(documentMarkup || "").matchAll(/data-section-status="(pending|draft|review|blocked|failed|fail|not-run)"/gi)]
+    .map((match) => match[1]);
+  const badVerification = [...String(documentMarkup || "").matchAll(/data-verification-status="(fail|not-run)"/gi)]
+    .map((match) => match[1]);
+
+  if (unsettledSections.length > 0) {
+    issues.push(`complete report includes unsettled section statuses: ${[...new Set(unsettledSections)].join(", ")}`);
+  }
+  if (badVerification.length > 0) {
+    issues.push(`complete report includes failed or not-run verification: ${[...new Set(badVerification)].join(", ")}`);
+  }
+  return issues;
+}
+
 function hasSafeSinks(html) {
   return !/javascript:/i.test(html)
     && !/\son[a-z]+\s*=/i.test(html)
@@ -354,11 +498,15 @@ function validateStatic(html) {
   const hasVerificationSection = html.includes('id="verification"') || html.includes('data-verification');
   const hasDataTable = html.includes('data-section-type="data-table"');
   const hasInteractiveControls = /<(button|input|select)[^>]+data-(filter-target|tab-group|copy-from|copy-text|search-for)/.test(documentMarkup);
+  const visibleComponentIssues = collectVisibleComponentIssues(documentMarkup);
+  const statusConsistencyIssues = collectStatusConsistencyIssues(documentMarkup);
   const warnings = collectReadabilityWarnings(documentMarkup);
   warnings.push(...collectDecisionBriefWarnings(documentMarkup));
+  warnings.push(...collectVisualStructureWarnings(documentMarkup));
   warnings.push(...collectRichContentOpportunityWarnings(documentMarkup));
   warnings.push(...collectRichRenderWarnings(html, mode));
   warnings.push(...collectAestheticPreflightWarnings(html, documentMarkup));
+  warnings.push(...collectHandoffDurabilityWarnings(documentMarkup));
 
   add(checks, "report-root", html.includes("data-html-work-report"), "missing data-html-work-report root", issues);
   add(checks, "render-mode", ["runtime-cdn", "pre-rendered", "fallback-only"].includes(mode), `unexpected render mode: ${mode}`, issues);
@@ -371,12 +519,15 @@ function validateStatic(html) {
   const navigationOrderIssues = collectNavigationOrderIssues(documentMarkup);
   add(checks, "navigation-order", navigationOrderIssues.length === 0, navigationOrderIssues.join("; "), issues);
   checks.push("decision-brief-scan");
+  checks.push("visual-structure-gate-scan");
   checks.push("rich-content-opportunity-scan");
   checks.push("aesthetic-preflight-scan");
   add(checks, "section-groups", html.includes("data-section-group="), "sections lack group metadata", issues);
   add(checks, "intent-metadata", html.includes("data-report-intent") && html.includes("data-primary-question=") && html.includes("data-time-budget="), "missing report intent metadata", issues);
   if (hasRichSections) add(checks, "source-fallbacks", html.includes("data-source-fallback"), "rich sections lack source fallback markers", issues);
   add(checks, "render-states", html.includes("data-render-state=") || html.includes("data-runtime-state="), "missing render state metadata", issues);
+  add(checks, "visible-component-content", visibleComponentIssues.length === 0, visibleComponentIssues.join("; "), issues);
+  add(checks, "status-consistency", statusConsistencyIssues.length === 0, statusConsistencyIssues.join("; "), issues);
 
   if (html.includes('data-section-type="markdown"')) {
     add(
@@ -406,11 +557,12 @@ function validateStatic(html) {
   }
 
   if (html.includes('data-section-type="code"')) {
+    const codeHighlightIssues = collectCodeHighlightIssues(documentMarkup, runtime, runtimePins);
     add(
       checks,
       "code-highlighted",
-      html.includes('class="hljs') || (runtime && html.includes("data-rich-code") && html.includes("language-") && runtimePins),
-      "code section lacks highlight markup or runtime declaration",
+      codeHighlightIssues.length === 0,
+      codeHighlightIssues.join("; "),
       issues
     );
     add(checks, "code-paths-inert", html.includes("data-file-path="), "code section lacks inert file path label", issues);
@@ -1107,7 +1259,7 @@ async function validateBrowserWithCdp(file, mode) {
       if (item.columnHighlights < 1) issues.push(`data table ${item.id} did not highlight hovered column`);
       if (transformScale(item.transform) < 1.02) issues.push(`data table ${item.id} did not scale hovered cell`);
     }
-    if (mode === "runtime-cdn" && code.length > 0 && totalHighlightTokens === 0) issues.push("runtime code blocks are ready without highlight tokens");
+    if (code.some((item) => item.state === "ready") && totalHighlightTokens === 0) issues.push("ready code blocks have no highlight tokens");
     if (!interactions.titleVisible || !interactions.evidenceVisible) issues.push("interactions hid primary title or evidence");
     const navTargetFocused = Boolean(interactions.navTargetId && interactions.focusedSections?.includes(interactions.navTargetId));
     if (interactions.navTargetId && interactions.activeNavTarget !== interactions.navTargetId && !navTargetFocused) issues.push(`nav click did not activate ${interactions.navTargetId}`);
