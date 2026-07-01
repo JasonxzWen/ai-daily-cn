@@ -6316,10 +6316,131 @@ test("official blog author records CLI writes curated records and clean summary 
   );
 });
 
+test("official-blog:author-records dry-run validates reviewed authoring without writing records", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-author-records-dry-run-"));
+  const inputPath = path.join(tmp, "official-blog-reviewed-authoring.json");
+  const outputDir = path.join(tmp, "knowledge", "official-blogs");
+  const outputPath = path.join(tmp, "official-blog-author-records-dry-run.json");
+  const noDirOutputPath = path.join(tmp, "official-blog-author-records-dry-run-no-dir.json");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    kind: "official_blog_reviewed_authoring",
+    visibility: "internal",
+    reviewed_entries: [
+      {
+        intake_id: "openai-agent-workflow-evals-2026-07-01",
+        company: "openai",
+        canonical_url: "https://openai.com/index/agent-workflow-evals?utm_source=authoring",
+        published_at: "2026-07-01",
+        title_original: "Agent workflow evals in production",
+        review_decision: "include",
+        title_zh: "Agent workflow evals in production",
+        summary_zh: "This reviewed authoring entry captures reusable production agent workflow eval patterns, observability checks, and launch constraints without preserving the full article body.",
+        key_ideas: [
+          "Workflow evals should measure end-to-end task completion, not isolated answers.",
+          "Tool permissions and recovery paths need explicit test coverage before launch.",
+          "Observability metrics should be reviewed together with eval pass rates."
+        ],
+        practice_checklist: [
+          "Bind eval cases to real production workflows.",
+          "Track tool failures and recovery paths."
+        ],
+        importance: "major",
+        content_type: "engineering_note",
+        topics: ["agent", "evals", "tool_use"],
+        related_blog_ids: ["openai-new-tools-building-agents-2025-03-11"],
+        related_report_dates: ["2026-07-01"],
+        admission: {
+          decision: "include",
+          reason: "Reviewed engineering practice record.",
+          matched_criteria: ["engineering_practice", "agent_workflow", "eval_methodology"]
+        },
+        opening_preview: "Opening preview must not leak from dry-run output.",
+        body: "Full body must not leak from dry-run output.",
+        raw_transcript: "Raw transcript must not leak from dry-run output."
+      }
+    ],
+    manual_review_required: [
+      {
+        intake_id: "openai-partnership-news-2026-07-01",
+        opening_preview: "Manual preview must not leak from dry-run output."
+      }
+    ],
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:author-records",
+    "--input",
+    inputPath,
+    "--output-dir",
+    outputDir,
+    "--output",
+    outputPath,
+    "--dry-run",
+    "--generated-at",
+    "2026-07-01T09:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.dry_run, true);
+  assert.equal(parsed.drafts.records.length, 1);
+  assert.equal(parsed.records_written.length, 0);
+  assert.equal(parsed.records_planned.length, 1);
+  assert.equal(parsed.records_planned[0].id, "openai-agent-workflow-evals-2026-07-01");
+  assert.equal(parsed.records_planned[0].company, "openai");
+  assert.equal(
+    parsed.records_planned[0].path,
+    path.join(outputDir, "openai", "openai-agent-workflow-evals-2026-07-01.json")
+  );
+  assert.equal(raw.includes("Opening preview must not leak"), false);
+  assert.equal(raw.includes("Full body must not leak"), false);
+  assert.equal(raw.includes("Raw transcript must not leak"), false);
+  assert.equal(raw.includes("Manual preview must not leak"), false);
+  assert.equal(raw.includes("should_not_leak"), false);
+  assert.equal(raw.includes("candidate_pool"), false);
+  assert(!raw.startsWith("\uFEFF"));
+  await assert.rejects(
+    () => fs.stat(outputDir),
+    /ENOENT/
+  );
+
+  const noDirResult = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:author-records",
+    "--input",
+    inputPath,
+    "--output",
+    noDirOutputPath,
+    "--dry-run",
+    "--generated-at",
+    "2026-07-01T09:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(noDirResult.stdout, /"ok": true/);
+  const noDirParsed = JSON.parse(await fs.readFile(noDirOutputPath, "utf8"));
+  assert.equal(noDirParsed.dry_run, true);
+  assert.equal(noDirParsed.records_planned.length, 1);
+  assert.equal(noDirParsed.records_planned[0].path, "");
+  assert.equal(noDirParsed.records_written.length, 0);
+});
+
 test("official blog author records CLI refuses public output paths", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-author-records-public-"));
   const inputPath = path.join(tmp, "reviewed-official-blogs.json");
   const publicOutputDir = path.join(tmp, "docs", "data", "official-blog-records");
+  const publicOutputPath = path.join(tmp, "docs", "data", "author-records-dry-run.json");
+  const internalOutputPath = path.join(tmp, "internal", "author-records-dry-run.json");
   await fs.writeFile(inputPath, `${JSON.stringify({
     reviewed_entries: [
       {
@@ -6352,6 +6473,63 @@ test("official blog author records CLI refuses public output paths", async () =>
       return true;
     }
   );
+  await assert.rejects(
+    () => fs.stat(publicOutputDir),
+    /ENOENT/
+  );
+
+  await assert.rejects(
+    () => execFileAsync(process.execPath, [
+      path.join(rootDir, "src/cli.js"),
+      "official-blog:author-records",
+      "--input",
+      inputPath,
+      "--output",
+      publicOutputPath,
+      "--dry-run",
+      "--repo-root",
+      tmp
+    ], {
+      cwd: rootDir,
+      maxBuffer: 1024 * 1024
+    }),
+    (error) => {
+      assert.equal(error.code, 1);
+      assert.match(error.stdout, /official_blog_author_records_public_output_forbidden/);
+      return true;
+    }
+  );
+  await assert.rejects(
+    () => fs.stat(publicOutputPath),
+    /ENOENT/
+  );
+
+  await assert.rejects(
+    () => execFileAsync(process.execPath, [
+      path.join(rootDir, "src/cli.js"),
+      "official-blog:author-records",
+      "--input",
+      inputPath,
+      "--output-dir",
+      publicOutputDir,
+      "--output",
+      internalOutputPath,
+      "--dry-run",
+      "--repo-root",
+      tmp
+    ], {
+      cwd: rootDir,
+      maxBuffer: 1024 * 1024
+    }),
+    (error) => {
+      assert.equal(error.code, 1);
+      assert.match(error.stdout, /official_blog_author_records_public_output_forbidden/);
+      return true;
+    }
+  );
+  const dryRunError = JSON.parse(await fs.readFile(internalOutputPath, "utf8"));
+  assert.equal(dryRunError.ok, false);
+  assert.equal(dryRunError.error, "official_blog_author_records_public_output_forbidden");
   await assert.rejects(
     () => fs.stat(publicOutputDir),
     /ENOENT/

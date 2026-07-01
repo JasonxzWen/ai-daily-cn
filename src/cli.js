@@ -223,13 +223,14 @@ try {
     if (!inputPath) {
       throw new PublisherError("official_blog_author_records_input_required", "official-blog:author-records requires --input <reviewed-official-blogs.json>.");
     }
+    const dryRun = Boolean(args["dry-run"]);
     const outputDir = args["output-dir"];
-    if (!outputDir) {
+    if (!outputDir && !dryRun) {
       throw new PublisherError("official_blog_author_records_output_dir_required", "official-blog:author-records requires --output-dir <knowledge/official-blogs>.");
     }
     const rootDir = path.resolve(args["repo-root"] || process.cwd());
     const resolvedInputPath = path.resolve(inputPath);
-    const resolvedOutputDir = path.resolve(outputDir);
+    const resolvedOutputDir = outputDir ? path.resolve(outputDir) : "";
     const outputPath = typeof args.output === "string" ? args.output : "";
     assertOfficialBlogAuthorRecordsOutputPath({
       outputPath,
@@ -245,8 +246,16 @@ try {
       existingIndex,
       generatedAt: args["generated-at"]
     });
+    const recordsPlanned = drafts.records.map((record) => ({
+      id: record.id,
+      company: record.company,
+      path: resolvedOutputDir ? path.join(resolvedOutputDir, record.company, `${record.id}.json`) : ""
+    }));
     const recordsWritten = [];
     for (const record of drafts.records) {
+      if (dryRun) {
+        continue;
+      }
       const recordPath = path.join(resolvedOutputDir, record.company, `${record.id}.json`);
       fs.mkdirSync(path.dirname(recordPath), { recursive: true });
       fs.writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`, "utf8");
@@ -260,7 +269,9 @@ try {
       ok: true,
       input_path: resolvedInputPath,
       output_dir: resolvedOutputDir,
+      dry_run: dryRun,
       drafts,
+      records_planned: recordsPlanned,
       records_written: recordsWritten
     }, outputPath);
   } else if (command === "official-blog:suggest-relations") {

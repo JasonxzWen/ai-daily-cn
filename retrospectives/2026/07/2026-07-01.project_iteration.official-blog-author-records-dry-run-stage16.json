@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-author-records-dry-run-stage16",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog author records dry-run stage 16",
+  "slug": "official-blog-author-records-dry-run-stage16",
+  "status": "completed",
+  "summary": "This iteration adds a dry-run mode to the final official-blog author-records command. It validates Stage 15 reviewed-authoring artifacts through the same draft-record path, reports planned record writes, keeps public output guards intact, and avoids creating curated record files or directories during dry-run validation.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official-blog:author-records dry-run\" tests/unit.test.js",
+      "node --test --test-name-pattern \"official-blog:author-records|official-blog:reviewed-authoring\" tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The final curated-record write step needs a no-mutation validation mode.",
+      "evidence": "Stage 16 adds `official-blog:author-records --dry-run`, which returns `drafts`, `records_planned`, and an empty `records_written` list without creating record directories.",
+      "scope": "official_blog_author_records",
+      "persistence": "implemented",
+      "recommended_action": "Run dry-run before writing completed reviewed-authoring artifacts into `knowledge/official-blogs`."
+    },
+    {
+      "lesson": "Stage 15 reviewed-authoring artifacts should be treated as first-class final workflow inputs.",
+      "evidence": "The dry-run regression feeds an `official_blog_reviewed_authoring` artifact directly into `official-blog:author-records`.",
+      "scope": "official_blog_reviewed_authoring",
+      "persistence": "implemented",
+      "recommended_action": "Use reviewed-authoring output as the handoff artifact for final author-record validation and writes."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The final official-blog author-record command could only be exercised by writing records, making it harder to safely verify completed reviewed-authoring artifacts.",
+      "evidence": "Stage 16 adds `--dry-run` support, path planning, no-write assertions, and public output guard coverage for dry-run planning directories.",
+      "module": "src/cli.js, tests/unit.test.js",
+      "suggestion": "Validate final official-blog authoring artifacts through `official-blog:author-records --dry-run` before performing the explicit write.",
+      "expected_benefit": "The official-blog knowledge workflow gains a deterministic no-mutation checkpoint between human-reviewed authoring and persistent graph updates.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through CLI behavior and regression coverage.",
+      "ledger_links": [
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official-blog:author-records dry-run validates reviewed authoring without writing records"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add an explicit operator runbook that sequences official-blog preview feed, intake, review packet, review decisions, authoring brief, reviewed authoring, dry-run author records, and final author-record write.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add fixture-backed examples for a complete OpenAI and Anthropic official-blog ingestion run once the operator runbook exists.",
+      "owner": "project"
+    }
+  ]
+}
