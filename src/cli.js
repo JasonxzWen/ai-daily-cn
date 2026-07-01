@@ -46,6 +46,7 @@ import {
   createOfficialBlogAuthoringBrief,
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
+  createOfficialBlogReviewedAuthoring,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
   createOfficialBlogReviewDecisions,
@@ -401,6 +402,26 @@ try {
       input_path: resolvedInputPath,
       relations_path: resolvedRelationsPath,
       authoring_brief: authoringBrief
+    }, outputPath);
+  } else if (command === "official-blog:reviewed-authoring") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || args["authoring-brief"] || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_reviewed_authoring_input_required", "official-blog:reviewed-authoring requires --input <official-blog-authoring-brief.json>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogReviewedAuthoringOutputPath({ outputPath, rootDir });
+    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const reviewedAuthoring = createOfficialBlogReviewedAuthoring(input, {
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"]
+    });
+    printJson({
+      ok: true,
+      input_path: resolvedInputPath,
+      reviewed_authoring: reviewedAuthoring
     }, outputPath);
   } else if (command === "preflight:worktree") {
     const args = parseArgs(argv);
@@ -1218,6 +1239,14 @@ function assertOfficialBlogAuthoringBriefOutputPath(options = {}) {
   });
 }
 
+function assertOfficialBlogReviewedAuthoringOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_reviewed_authoring_public_output_forbidden",
+    message: "official-blog:reviewed-authoring writes internal reviewed authoring data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
 function assertOfficialBlogInternalOutputPath(options = {}) {
   const outputPath = String(options.outputPath || "").trim();
   if (!outputPath) {
@@ -1244,7 +1273,8 @@ function isOfficialBlogInternalCommand(value) {
     value === "official-blog:context" ||
     value === "official-blog:review-packet" ||
     value === "official-blog:review-decisions" ||
-    value === "official-blog:authoring-brief";
+    value === "official-blog:authoring-brief" ||
+    value === "official-blog:reviewed-authoring";
 }
 
 function isOfficialBlogInternalPublicOutputPath(outputPath, rootDir) {

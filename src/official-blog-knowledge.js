@@ -733,6 +733,44 @@ export function createOfficialBlogAuthoringBrief(input = {}, options = {}) {
   };
 }
 
+export function createOfficialBlogReviewedAuthoring(input = {}, options = {}) {
+  const authoringBrief = officialBlogReviewedAuthoringBrief(input);
+  const authoringItems = Array.isArray(authoringBrief.authoring_items) ? authoringBrief.authoring_items : [];
+  const manualReview = Array.isArray(authoringBrief.manual_review_required) ? authoringBrief.manual_review_required : [];
+  const reviewedEntries = [];
+  const invalidEntries = [];
+  const reportDate = String(options.reportDate || options.report_date || authoringBrief.report_date || "");
+
+  for (const [index, item] of authoringItems.entries()) {
+    const template = officialBlogReviewedAuthoringTemplate(item);
+    try {
+      const record = normalizeOfficialBlogKnowledgeDraftEntry(template, { index });
+      reviewedEntries.push(officialBlogReviewedAuthoringEntry(record, template, item));
+    } catch (error) {
+      invalidEntries.push(officialBlogReviewedAuthoringInvalidEntry(item, template, index, error.message));
+    }
+  }
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_reviewed_authoring",
+    visibility: "internal",
+    report_date: reportDate,
+    generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
+    authoring_required_fields: officialBlogAuthoringRequiredFields(),
+    stats: {
+      authoring_items: authoringItems.length,
+      reviewed_entries: reviewedEntries.length,
+      manual_review_required: manualReview.length,
+      invalid_entries: invalidEntries.length
+    },
+    reviewed_entries: reviewedEntries,
+    manual_review_required: manualReview.map(officialBlogReviewedAuthoringManualReviewSummary),
+    invalid_entries: invalidEntries
+  };
+}
+
 export function createOfficialBlogIntakeQueue(input = {}, options = {}) {
   const candidates = officialBlogIntakeCandidates(input);
   const existingByUrl = existingOfficialBlogRecordByUrl(options.existingIndex);
@@ -1595,6 +1633,83 @@ function officialBlogAuthoringRequiredFields() {
     "key_ideas",
     "practice_checklist"
   ];
+}
+
+function officialBlogReviewedAuthoringBrief(input = {}) {
+  const brief = input?.kind === "official_blog_authoring_brief"
+    ? input
+    : input?.authoring_brief?.kind === "official_blog_authoring_brief"
+      ? input.authoring_brief
+      : input?.authoringBrief?.kind === "official_blog_authoring_brief"
+        ? input.authoringBrief
+        : input?.brief?.kind === "official_blog_authoring_brief"
+          ? input.brief
+          : null;
+  if (!brief) {
+    throw new Error("official blog reviewed authoring requires authoring_brief");
+  }
+  return brief;
+}
+
+function officialBlogReviewedAuthoringTemplate(item = {}) {
+  if (item?.reviewed_entry_template && typeof item.reviewed_entry_template === "object") {
+    return item.reviewed_entry_template;
+  }
+  if (item?.reviewedEntryTemplate && typeof item.reviewedEntryTemplate === "object") {
+    return item.reviewedEntryTemplate;
+  }
+  return {};
+}
+
+function officialBlogReviewedAuthoringEntry(record = {}, rawEntry = {}, sourceItem = {}) {
+  return {
+    intake_id: String(rawEntry.intake_id || sourceItem.intake_id || ""),
+    id: String(record.id || ""),
+    company: String(record.company || ""),
+    canonical_url: String(record.canonical_url || ""),
+    normalized_url: String(record.normalized_url || ""),
+    published_at: String(record.published_at || ""),
+    title_original: String(record.title_original || ""),
+    review_decision: "include",
+    admission: {
+      decision: "include",
+      rationale: String(record.admission?.rationale || ""),
+      matched_criteria: uniqueSorted(record.admission?.matched_criteria || [])
+    },
+    title_zh: String(record.title_zh || ""),
+    summary_zh: String(record.summary_zh || ""),
+    key_ideas: stringArray(record.key_ideas),
+    practice_checklist: stringArray(record.practice_checklist),
+    importance: String(record.importance || ""),
+    content_type: String(record.content_type || ""),
+    topics: uniqueSorted(record.topics || []),
+    related_blog_ids: uniqueSorted(record.related_blog_ids || []),
+    related_report_dates: uniqueSorted(record.related_report_dates || [])
+  };
+}
+
+function officialBlogReviewedAuthoringInvalidEntry(item = {}, template = {}, index, reason) {
+  return {
+    index,
+    intake_id: String(template?.intake_id || item?.intake_id || ""),
+    title_original: String(template?.title_original || template?.titleOriginal || item?.title_original || item?.titleOriginal || item?.title || "").trim(),
+    canonical_url: String(template?.canonical_url || template?.canonicalUrl || template?.url || item?.canonical_url || item?.canonicalUrl || item?.url || "").trim(),
+    reason
+  };
+}
+
+function officialBlogReviewedAuthoringManualReviewSummary(item = {}) {
+  return {
+    intake_id: String(item.intake_id || ""),
+    company: String(item.company || ""),
+    company_label: String(item.company_label || (item.company === "anthropic" ? "Anthropic" : item.company === "openai" ? "OpenAI" : "")),
+    canonical_url: String(item.canonical_url || item.canonicalUrl || item.url || ""),
+    normalized_url: String(item.normalized_url || item.normalizedUrl || safeNormalizeOfficialBlogUrl(item.canonical_url || item.canonicalUrl || item.url || "") || ""),
+    published_at: String(item.published_at || item.publishedAt || ""),
+    title_original: String(item.title_original || item.titleOriginal || item.title || ""),
+    final_decision: String(item.final_decision || ""),
+    final_action: String(item.final_action || "")
+  };
 }
 
 function officialBlogAuthoringAiReview(aiReview = {}) {

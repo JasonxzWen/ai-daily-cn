@@ -7161,6 +7161,167 @@ test("official blog authoring-brief CLI refuses public output paths", async () =
   }
 });
 
+test("official-blog:reviewed-authoring CLI writes clean internal reviewed authoring", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-reviewed-authoring-"));
+  const inputPath = path.join(tmp, "official-blog-authoring-brief.json");
+  const outputPath = path.join(tmp, "official-blog-reviewed-authoring.json");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    kind: "official_blog_authoring_brief",
+    visibility: "internal",
+    report_date: "2026-07-01",
+    authoring_items: [
+      {
+        intake_id: "openai-agent-workflow-evals-2026-07-01",
+        reviewed_entry_template: {
+          intake_id: "openai-agent-workflow-evals-2026-07-01",
+          company: "openai",
+          canonical_url: "https://openai.com/index/agent-workflow-evals",
+          published_at: "2026-07-01",
+          title_original: "Agent workflow evals in production",
+          opening_preview: "This opening preview must not leak.",
+          review_decision: "include",
+          admission: {
+            decision: "include",
+            reason: "Approved because this is a reusable engineering practice post.",
+            matched_criteria: ["engineering_practice", "agent_workflow", "eval_methodology"]
+          },
+          title_zh: "Agent workflow evals in production",
+          summary_zh: "This reviewed authoring entry captures reusable production agent workflow eval patterns, observability checks, and launch constraints without preserving the full article body.",
+          key_ideas: [
+            "Workflow evals should measure end-to-end task completion, not isolated answers.",
+            "Tool permissions and recovery paths need explicit test coverage before launch.",
+            "Observability metrics should be reviewed together with eval pass rates."
+          ],
+          practice_checklist: [
+            "Bind eval cases to real production workflows.",
+            "Track tool failures and recovery paths."
+          ],
+          importance: "major",
+          content_type: "engineering_note",
+          topics: ["agent", "evals", "tool_use"],
+          related_blog_ids: ["openai-new-tools-building-agents-2025-03-11"],
+          related_report_dates: ["2026-07-01"],
+          body: "Full article body must not leak.",
+          raw_transcript: "Raw transcript must not leak."
+        }
+      },
+      {
+        intake_id: "openai-incomplete-authoring-2026-07-01",
+        reviewed_entry_template: {
+          intake_id: "openai-incomplete-authoring-2026-07-01",
+          company: "openai",
+          canonical_url: "https://openai.com/index/incomplete-authoring",
+          published_at: "2026-07-01",
+          title_original: "Incomplete authoring template",
+          review_decision: "include",
+          admission: {
+            decision: "include",
+            reason: "Approved but incomplete.",
+            matched_criteria: ["engineering_practice"]
+          },
+          title_zh: "Incomplete authoring template",
+          importance: "notable",
+          content_type: "engineering_note",
+          topics: ["agent"]
+        }
+      }
+    ],
+    manual_review_required: [
+      {
+        intake_id: "openai-partnership-news-2026-07-01",
+        company: "openai",
+        canonical_url: "https://openai.com/index/partnership-news",
+        published_at: "2026-07-01",
+        title_original: "Partnership news",
+        opening_preview: "Manual review CLI preview must not leak.",
+        final_decision: "needs_review",
+        final_action: "manual_review_required"
+      }
+    ],
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:reviewed-authoring",
+    "--input",
+    inputPath,
+    "--output",
+    outputPath,
+    "--date",
+    "2026-07-01",
+    "--generated-at",
+    "2026-07-01T09:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.reviewed_authoring.kind, "official_blog_reviewed_authoring");
+  assert.equal(parsed.reviewed_authoring.visibility, "internal");
+  assert.equal(parsed.reviewed_authoring.stats.reviewed_entries, 1);
+  assert.equal(parsed.reviewed_authoring.stats.manual_review_required, 1);
+  assert.equal(parsed.reviewed_authoring.stats.invalid_entries, 1);
+  assert.equal(parsed.reviewed_authoring.reviewed_entries[0].intake_id, "openai-agent-workflow-evals-2026-07-01");
+  assert.equal(parsed.reviewed_authoring.invalid_entries[0].intake_id, "openai-incomplete-authoring-2026-07-01");
+  assert.equal(JSON.stringify(parsed.reviewed_authoring).includes("opening preview must not leak"), false);
+  assert.equal(JSON.stringify(parsed.reviewed_authoring).includes("Full article body must not leak"), false);
+  assert.equal(JSON.stringify(parsed.reviewed_authoring).includes("Raw transcript"), false);
+  assert.equal(JSON.stringify(parsed.reviewed_authoring).includes("Manual review CLI preview must not leak"), false);
+  assert.equal(JSON.stringify(parsed.reviewed_authoring).includes("should_not_leak"), false);
+  assert.equal(JSON.stringify(parsed.reviewed_authoring).includes("candidate_pool"), false);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
+test("official-blog:reviewed-authoring CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-reviewed-authoring-public-"));
+  const inputPath = path.join(tmp, "official-blog-authoring-brief.json");
+  const publicOutputPaths = [
+    path.join(tmp, "docs", "data", "official-blog-reviewed-authoring.json"),
+    path.join(tmp, "docs", "official-blogs", "reviewed-authoring.json"),
+    path.join(tmp, "docs", "official-blog-reviewed-authoring.html"),
+    path.join(tmp, "docs", "reports", "official-blog-reviewed-authoring.html")
+  ];
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    kind: "official_blog_authoring_brief",
+    visibility: "internal",
+    authoring_items: [],
+    manual_review_required: []
+  })}\n`, "utf8");
+
+  for (const publicOutputPath of publicOutputPaths) {
+    await assert.rejects(
+      () => execFileAsync(process.execPath, [
+        path.join(rootDir, "src/cli.js"),
+        "official-blog:reviewed-authoring",
+        "--input",
+        inputPath,
+        "--output",
+        publicOutputPath,
+        "--repo-root",
+        tmp
+      ], {
+        cwd: rootDir,
+        maxBuffer: 1024 * 1024
+      }),
+      (error) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stdout, /official_blog_reviewed_authoring_public_output_forbidden/);
+        return true;
+      }
+    );
+    await assert.rejects(
+      () => fs.stat(publicOutputPath),
+      /ENOENT/
+    );
+  }
+});
+
 test("publish:verify-pages emits structured retryable misses without nonzero exit", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-pages-verify-"));
   const preloadPath = path.join(tmp, "fake-fetch.mjs");

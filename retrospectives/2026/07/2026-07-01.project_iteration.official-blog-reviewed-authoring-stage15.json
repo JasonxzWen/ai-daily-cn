@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-reviewed-authoring-stage15",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog reviewed authoring stage 15",
+  "slug": "official-blog-reviewed-authoring-stage15",
+  "status": "completed",
+  "summary": "This iteration adds an internal reviewed-authoring validation step for OpenAI and Anthropic official-blog templates. It consumes completed Stage 14 human templates, validates them with the same constraints used by the final author-record step, keeps manual-review items separate, reports incomplete templates as invalid entries, and emits a sanitized internal handoff without writing curated records or public artifacts.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog reviewed authoring|official-blog:reviewed-authoring\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Completed authoring templates need an internal validation gate before curated records are written.",
+      "evidence": "Stage 15 produces `official_blog_reviewed_authoring` and reuses final draft-entry validation before emitting `reviewed_entries`.",
+      "scope": "official_blog_reviewed_authoring",
+      "persistence": "implemented",
+      "recommended_action": "Run `official-blog:reviewed-authoring` on completed authoring briefs before `official-blog:author-records`."
+    },
+    {
+      "lesson": "Manual-review items must remain blocked even when they contain completed-looking fields.",
+      "evidence": "Stage 15 reads only `authoring_items[].reviewed_entry_template`; `manual_review_required` items are summarized separately and never promoted.",
+      "scope": "official_blog_manual_review",
+      "persistence": "implemented",
+      "recommended_action": "Promote customer or partnership stories only after a separate explicit review turns them into accepted authoring items."
+    },
+    {
+      "lesson": "Authoring validation should produce a clean internal artifact rather than partial public data.",
+      "evidence": "The Stage 15 CLI refuses public output paths and strips opening previews, bodies, transcripts, source audit, and candidate pools from reviewed-authoring output.",
+      "scope": "official_blog_public_data_minimization",
+      "persistence": "implemented",
+      "recommended_action": "Keep reviewed-authoring artifacts under internal working paths until curated records are explicitly written."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Completed Stage 14 templates had no deterministic validation checkpoint before the final author-record write command.",
+      "evidence": "Stage 15 adds `createOfficialBlogReviewedAuthoring` and `official-blog:reviewed-authoring`, plus tests for completed-template validation, manual-review isolation, clean JSON output, invalid incomplete templates, and public output guards.",
+      "module": "src/official-blog-knowledge.js, src/cli.js, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Validate completed official-blog authoring briefs into an internal reviewed-authoring artifact before writing curated knowledge records.",
+      "expected_benefit": "The official-blog workflow gains a deterministic quality gate between human translation/synthesis and persistent knowledge graph updates.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through pure function and CLI coverage, with public output guards and internal payload sanitization.",
+      "ledger_links": [
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-daily-not-machine-log",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog reviewed authoring validates completed templates and keeps manual items separate",
+        "official-blog:reviewed-authoring CLI writes clean internal reviewed authoring",
+        "official-blog:reviewed-authoring CLI refuses public output paths"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Add a wrapper runbook command that executes preview feed, intake, review packet, review decisions, authoring brief, reviewed authoring, relation suggestions, and author-record writes as explicit auditable steps.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add public official-blog index integration only after internal reviewed-authoring and author-record artifacts have stable examples.",
+      "owner": "project"
+    }
+  ]
+}

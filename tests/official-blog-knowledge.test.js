@@ -10,6 +10,7 @@ import {
   createOfficialBlogKnowledgeContext,
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
+  createOfficialBlogReviewedAuthoring,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
   createOfficialBlogReviewDecisions,
@@ -1093,6 +1094,127 @@ test("official blog authoring brief creates human templates from accepted decisi
   assert.equal(briefPayload.includes("should_not_leak"), false);
   assert.equal(briefPayload.includes("candidate_pool"), false);
   assert.equal(briefPayload.includes("content_html"), false);
+});
+
+test("official blog reviewed authoring validates completed templates and keeps manual items separate", () => {
+  const result = createOfficialBlogReviewedAuthoring({
+    kind: "official_blog_authoring_brief",
+    visibility: "internal",
+    report_date: "2026-07-01",
+    authoring_items: [
+      {
+        intake_id: "anthropic-production-agent-evals-2026-07-01",
+        reviewed_entry_template: {
+          intake_id: "anthropic-production-agent-evals-2026-07-01",
+          company: "anthropic",
+          canonical_url: "https://www.anthropic.com/research/production-agent-evals?utm_source=authoring",
+          published_at: "2026-07-01",
+          title_original: "Production agent evals for Claude workflows",
+          opening_preview: "This opening preview must not leak.",
+          review_decision: "include",
+          admission: {
+            decision: "include",
+            reason: "Approved because the completed post records reusable agent workflow eval practice.",
+            matched_criteria: ["engineering_practice", "agent_workflow", "eval_methodology"]
+          },
+          title_zh: "Production agent evals for Claude workflows",
+          summary_zh: "This reviewed authoring entry explains reusable production agent eval practices, deployment constraints, observability loops, and workflow checks without copying the full source article.",
+          key_ideas: [
+            "Production agent evals should cover tool calls, permissions, and task completion quality.",
+            "Regression checks need to bind to real workflows rather than isolated single-turn answers.",
+            "Deployment readiness should include observability metrics and failure recovery paths."
+          ],
+          practice_checklist: [
+            "Define workflow-level evals before launch.",
+            "Record tool permissions, recovery paths, and observability metrics."
+          ],
+          importance: "major",
+          content_type: "engineering_note",
+          topics: ["agent", "evals", "tool_use"],
+          related_blog_ids: ["anthropic-building-effective-agents-2024-12-19"],
+          related_report_dates: ["2026-07-01"],
+          body: "Full article body must not leak.",
+          content_html: "<p>Full article body must not leak.</p>",
+          raw_transcript: "Raw review transcript must not leak."
+        }
+      },
+      {
+        intake_id: "openai-incomplete-authoring-2026-07-01",
+        reviewed_entry_template: {
+          intake_id: "openai-incomplete-authoring-2026-07-01",
+          company: "openai",
+          canonical_url: "https://openai.com/index/incomplete-authoring",
+          published_at: "2026-07-01",
+          title_original: "Incomplete authoring template",
+          review_decision: "include",
+          admission: {
+            decision: "include",
+            reason: "Approved but not yet completed.",
+            matched_criteria: ["engineering_practice"]
+          },
+          title_zh: "Incomplete authoring template",
+          importance: "notable",
+          content_type: "engineering_note",
+          topics: ["agent"]
+        }
+      }
+    ],
+    manual_review_required: [
+      {
+        intake_id: "anthropic-customer-story-2026-07-01",
+        company: "anthropic",
+        canonical_url: "https://www.anthropic.com/news/customer-story",
+        published_at: "2026-07-01",
+        title_original: "How a customer built with Claude",
+        opening_preview: "Manual review opening preview must not leak.",
+        reviewed_entry_template: {
+          review_decision: "include",
+          title_zh: "Manual item must not be promoted",
+          summary_zh: "This manual review item looks filled out but must not enter reviewed_entries because it did not pass accepted authoring.",
+          key_ideas: ["Do not promote", "Manual only", "Needs review"],
+          body: "Manual body must not leak."
+        },
+        final_decision: "needs_review",
+        final_action: "manual_review_required"
+      }
+    ],
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, {
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T09:00:00.000Z"
+  });
+
+  assert.equal(result.kind, "official_blog_reviewed_authoring");
+  assert.equal(result.visibility, "internal");
+  assert.equal(result.admission_policy.version, "official-blog-admission-v1");
+  assert.equal(result.stats.authoring_items, 2);
+  assert.equal(result.stats.reviewed_entries, 1);
+  assert.equal(result.stats.manual_review_required, 1);
+  assert.equal(result.stats.invalid_entries, 1);
+  assert.equal(result.reviewed_entries[0].intake_id, "anthropic-production-agent-evals-2026-07-01");
+  assert.equal(result.reviewed_entries[0].review_decision, "include");
+  assert.equal(result.reviewed_entries[0].admission.decision, "include");
+  assert.deepEqual(result.reviewed_entries[0].topics, ["agent", "evals", "tool_use"]);
+  assert.deepEqual(result.reviewed_entries[0].related_blog_ids, ["anthropic-building-effective-agents-2024-12-19"]);
+  assert.equal(result.manual_review_required[0].intake_id, "anthropic-customer-story-2026-07-01");
+  assert.equal(result.invalid_entries[0].intake_id, "openai-incomplete-authoring-2026-07-01");
+  assert.match(result.invalid_entries[0].reason, /summary_zh|key_ideas/);
+
+  const drafts = createOfficialBlogKnowledgeDrafts(result);
+  assert.equal(drafts.records.length, 1);
+  assert.equal(drafts.invalid_entries.length, 0);
+  assert.equal(drafts.records[0].id, "anthropic-production-agent-evals-2026-07-01");
+
+  const payload = JSON.stringify(result);
+  assert.equal(payload.includes("opening preview must not leak"), false);
+  assert.equal(payload.includes("Full article body must not leak"), false);
+  assert.equal(payload.includes("Raw review transcript"), false);
+  assert.equal(payload.includes("Manual body must not leak"), false);
+  assert.equal(payload.includes("Manual review opening preview must not leak"), false);
+  assert.equal(payload.includes("should_not_leak"), false);
+  assert.equal(payload.includes("candidate_pool"), false);
+  assert.equal(payload.includes("content_html"), false);
 });
 
 test("official blog knowledge drafts require reviewed authoring fields and omit queue internals", async () => {
