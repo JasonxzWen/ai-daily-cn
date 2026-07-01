@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  OFFICIAL_BLOG_ADMISSION_POLICY,
   createOfficialBlogKnowledgeContext,
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
@@ -12,6 +13,8 @@ import {
   createOfficialBlogRelationshipSuggestions,
   loadOfficialBlogKnowledge,
   normalizeOfficialBlogUrl,
+  toPublicOfficialBlogKnowledge,
+  validateOfficialBlogKnowledge,
   triageOfficialBlogPreview
 } from "../src/official-blog-knowledge.js";
 
@@ -511,6 +514,103 @@ test("official blog preview feed caps stored opening paragraphs", () => {
   assert.equal(feed.candidates[0].opening_paragraphs[0].length, 1200);
   assert.equal(feed.candidates[0].opening_preview.length, 1200);
   assert.equal(feed.candidates[0].opening_preview.includes("This second paragraph"), false);
+});
+
+test("official blog admission policy is versioned and preview-only for internal artifacts", async () => {
+  assert.equal(OFFICIAL_BLOG_ADMISSION_POLICY.version, "official-blog-admission-v1");
+
+  const feed = createOfficialBlogPreviewFeed({
+    items: [
+      {
+        company: "openai",
+        url: "https://openai.com/index/introducing-examplemodel-6",
+        date: "2026-07-01",
+        title: "Introducing ExampleModel 6",
+        content_html: [
+          "<p>This new model release explains benchmark results, evals, safety mitigations, and integration guidance.</p>",
+          "<p>The opening segment includes developer deployment constraints.</p>"
+        ].join("")
+      }
+    ]
+  }, {
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+
+  const existingIndex = await loadOfficialBlogKnowledge({ rootDir });
+  const queue = createOfficialBlogIntakeQueue({
+    candidates: feed.candidates
+  }, {
+    existingIndex,
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+  const context = createOfficialBlogKnowledgeContext({
+    entries: [
+      {
+        company: "openai",
+        title_original: "ExampleModel 6 implementation notes",
+        admission: {
+          decision: "include",
+          matched_criteria: ["new_model", "eval_methodology"]
+        },
+        topics: ["evals"]
+      }
+    ]
+  }, {
+    existingIndex,
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+
+  for (const artifact of [feed, queue, context]) {
+    assert.equal(artifact.admission_policy.version, "official-blog-admission-v1");
+    assert.equal(artifact.admission_policy.scope, OFFICIAL_BLOG_ADMISSION_POLICY.scope);
+    assert.deepEqual(artifact.admission_policy.first_pass.input_fields, ["title_original", "opening_preview"]);
+    assert.equal(artifact.admission_policy.first_pass.opening_paragraph_limit, 2);
+    assert.equal(artifact.admission_policy.first_pass.opening_char_limit, 1200);
+    assert(artifact.admission_policy.include_criteria.some((criterion) => criterion.id === "new_model"));
+    assert(artifact.admission_policy.include_criteria.some((criterion) => criterion.id === "harness_engineering"));
+    assert(artifact.admission_policy.include_criteria.some((criterion) => criterion.id === "agent_workflow"));
+    assert(artifact.admission_policy.exclude_categories.some((category) => category.id === "company_news" && /partnership|customer/.test(category.description)));
+    assert.match(artifact.admission_policy.review_rule, /needs_review/);
+    assert.equal(JSON.stringify(artifact.admission_policy).includes("full article body"), false);
+  }
+});
+
+test("public official blog knowledge exposes curation scope without internal admission policy details", async () => {
+  await withTempKnowledge([baseRecord], async (knowledgeDir) => {
+    const index = await loadOfficialBlogKnowledge({ knowledgeDir });
+    const publicIndex = toPublicOfficialBlogKnowledge(index, {
+      generatedAt: "2026-07-01T08:00:00.000Z"
+    });
+
+    assert.equal(publicIndex.curation_scope, index.admission_policy.scope);
+    assert.equal(Object.hasOwn(publicIndex, "admission_policy"), false);
+    assert.equal(Object.hasOwn(publicIndex, "policy_scope"), false);
+    const serialized = JSON.stringify(publicIndex);
+    assert.equal(serialized.includes("company_news"), false);
+    assert.equal(serialized.includes("first_pass"), false);
+    assert.equal(serialized.includes("opening_preview"), false);
+  });
+});
+
+test("official blog admission policy schema rejects missing required criteria", async () => {
+  await withTempKnowledge([baseRecord], async (knowledgeDir) => {
+    const index = await loadOfficialBlogKnowledge({ knowledgeDir });
+    const missingIncludeCriterion = structuredClone(index);
+    missingIncludeCriterion.admission_policy.include_criteria = missingIncludeCriterion.admission_policy.include_criteria
+      .filter((criterion) => criterion.id !== "new_model");
+    const missingExcludeCategory = structuredClone(index);
+    missingExcludeCategory.admission_policy.exclude_categories = missingExcludeCategory.admission_policy.exclude_categories
+      .filter((category) => category.id !== "company_news");
+
+    const includeValidation = await validateOfficialBlogKnowledge(missingIncludeCriterion);
+    const excludeValidation = await validateOfficialBlogKnowledge(missingExcludeCategory);
+
+    assert.equal(includeValidation.valid, false);
+    assert(includeValidation.errors.some((error) => error.path.includes("/admission_policy/include_criteria")));
+    assert.equal(excludeValidation.valid, false);
+    assert(excludeValidation.errors.some((error) => error.path.includes("/admission_policy/exclude_categories")));
+  });
 });
 
 test("official blog knowledge drafts require reviewed authoring fields and omit queue internals", async () => {

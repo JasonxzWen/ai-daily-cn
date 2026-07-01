@@ -62,7 +62,59 @@ const TRACKING_PARAMS = new Set([
 ]);
 
 export const OFFICIAL_BLOG_ADMISSION_POLICY = {
+  version: "official-blog-admission-v1",
   scope: "Curated OpenAI and Anthropic official blogs with durable product, model, technical-practice, harness, agent workflow, eval, safety-engineering, or implementation knowledge value.",
+  first_pass: {
+    input_fields: ["title_original", "opening_preview"],
+    opening_paragraph_limit: TRIAGE_OPENING_PARAGRAPH_LIMIT,
+    opening_char_limit: TRIAGE_OPENING_CHAR_LIMIT,
+    rule: "Use only the title plus opening preview or first paragraphs for first-pass triage."
+  },
+  include_criteria: [
+    {
+      id: "new_product",
+      description: "New product, API, developer platform primitive, or product surface with durable implementation value."
+    },
+    {
+      id: "new_model",
+      description: "New model release with capabilities, evals, safety notes, integration guidance, or deployment constraints."
+    },
+    {
+      id: "engineering_practice",
+      description: "Reusable architecture, workflow, implementation pattern, observability, permission, sandbox, or rollout practice."
+    },
+    {
+      id: "harness_engineering",
+      description: "Harness, long-running-agent environment, regression, isolation, or execution-management practice."
+    },
+    {
+      id: "agent_workflow",
+      description: "Agent, multi-agent, tool-use, routing, MCP, computer-use, or orchestration workflow guidance."
+    },
+    {
+      id: "eval_methodology",
+      description: "Evaluation, benchmark, measurement, regression, or test methodology with reusable engineering value."
+    },
+    {
+      id: "safety_engineering",
+      description: "Safety, alignment, containment, permission, blast-radius, or deployment-constraint engineering practice."
+    }
+  ],
+  exclude_categories: [
+    {
+      id: "company_news",
+      description: "Ordinary partnership, customer adoption, collaboration, sales, or company-news update without concrete reusable product, model, or engineering implementation detail."
+    },
+    {
+      id: "business_update",
+      description: "Funding, hiring, event, award, regional expansion, market availability, or broad enterprise productivity announcement."
+    },
+    {
+      id: "low_knowledge_value",
+      description: "Preview does not show a durable technical, product, model, engineering, eval, or safety-methodology increment."
+    }
+  ],
+  review_rule: "Use needs_review, not include, when a customer or partnership story hints at concrete architecture, evals, permissions, observability, rollout controls, agent workflow, or similar implementation detail but the opening preview is not enough to prove durable knowledge value.",
   include: [
     "new products or developer platform primitives",
     "new model releases with capability, evaluation, safety, or integration guidance",
@@ -77,7 +129,7 @@ export const OFFICIAL_BLOG_ADMISSION_POLICY = {
     "customer stories that only say a company adopted OpenAI or Claude",
     "business-news previews that use broad workflow, productivity, employee, customer, or AI-tools language without concrete reusable engineering detail"
   ],
-  review: "First pass should use only the title plus opening preview/first paragraphs, not the full article body. Use needs_review when a partnership or customer story hints at concrete architecture, evals, permissions, observability, agent workflow, or rollout controls but the opening preview is not enough to prove durable knowledge value."
+  review: "First pass should use only the title plus opening preview/first paragraphs, not the complete article text. Use needs_review when a partnership or customer story hints at concrete architecture, evals, permissions, observability, agent workflow, or rollout controls but the opening preview is not enough to prove durable knowledge value."
 };
 
 export async function loadOfficialBlogKnowledge(options = {}) {
@@ -308,6 +360,7 @@ export function createOfficialBlogPreviewFeed(input = "", options = {}) {
     report_date: String(options.reportDate || options.report_date || ""),
     generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
     source_label: String(options.sourceLabel || options.source_label || "").trim(),
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
     stats: {
       total_entries: parsed.entries.length + parsed.invalid_entries.length,
       candidates: candidates.length,
@@ -510,6 +563,7 @@ export function createOfficialBlogKnowledgeContext(input = {}, options = {}) {
     kind: "official_blog_knowledge_context",
     visibility: "internal",
     generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
     stats: {
       total_entries: entries.length,
       matched_entries: matchedEntries,
@@ -607,6 +661,7 @@ export function createOfficialBlogIntakeQueue(input = {}, options = {}) {
     report_date: String(options.reportDate || ""),
     generated_at: String(options.generatedAt || new Date().toISOString()),
     policy_scope: OFFICIAL_BLOG_ADMISSION_POLICY.scope,
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
     stats: {
       total_candidates: candidates.length,
       review_queue: reviewQueue.length,
@@ -1770,7 +1825,7 @@ function buildOfficialBlogKnowledgeIndex(records) {
 
   return {
     schema_version: 1,
-    admission_policy: OFFICIAL_BLOG_ADMISSION_POLICY,
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
     companies,
     topics,
     stats: {
@@ -1780,6 +1835,10 @@ function buildOfficialBlogKnowledgeIndex(records) {
     },
     records: sortedRecords
   };
+}
+
+function officialBlogAdmissionPolicyArtifact() {
+  return structuredClone(OFFICIAL_BLOG_ADMISSION_POLICY);
 }
 
 async function collectJsonFiles(dir) {

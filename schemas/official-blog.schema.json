@@ -12,9 +12,117 @@
     "admission_policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["scope", "include", "exclude", "review"],
+      "required": [
+        "version",
+        "scope",
+        "first_pass",
+        "include_criteria",
+        "exclude_categories",
+        "review_rule",
+        "include",
+        "exclude",
+        "review"
+      ],
       "properties": {
+        "version": {
+          "const": "official-blog-admission-v1"
+        },
         "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "first_pass": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["input_fields", "opening_paragraph_limit", "opening_char_limit", "rule"],
+          "properties": {
+            "input_fields": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "enum": ["title_original", "opening_preview"]
+              },
+              "uniqueItems": true
+            },
+            "opening_paragraph_limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "opening_char_limit": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 5000
+            },
+            "rule": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "include_criteria": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "uniqueItems": true,
+          "allOf": [
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "new_product" } } } },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "new_model" } } } },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "engineering_practice" } } } },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "harness_engineering" } } } },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "agent_workflow" } } } },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "eval_methodology" } } } },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "safety_engineering" } } } }
+          ],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "description"],
+            "properties": {
+              "id": {
+                "enum": [
+                  "new_product",
+                  "new_model",
+                  "engineering_practice",
+                  "harness_engineering",
+                  "agent_workflow",
+                  "eval_methodology",
+                  "safety_engineering"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "exclude_categories": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "allOf": [
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "company_news" } } } },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "business_update" } } } },
+            { "contains": { "type": "object", "required": ["id"], "properties": { "id": { "const": "low_knowledge_value" } } } }
+          ],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "description"],
+            "properties": {
+              "id": {
+                "enum": ["company_news", "business_update", "low_knowledge_value"]
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "review_rule": {
           "type": "string",
           "minLength": 1
         },

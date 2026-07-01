@@ -6005,6 +6005,8 @@ test("official blog intake CLI writes a clean internal review queue", async () =
   const parsed = JSON.parse(raw);
   assert.equal(parsed.ok, true);
   assert.equal(parsed.queue.visibility, "internal");
+  assert.equal(parsed.queue.admission_policy.version, "official-blog-admission-v1");
+  assert.deepEqual(parsed.queue.admission_policy.first_pass.input_fields, ["title_original", "opening_preview"]);
   assert.equal(parsed.queue.review_queue.length, 1);
   assert.equal(parsed.queue.excluded.length, 1);
   assert.equal(parsed.queue.stats.total_candidates, 2);
@@ -6099,6 +6101,8 @@ test("official blog parse-feed CLI writes a clean internal preview feed", async 
   assert.equal(parsed.feed.kind, "official_blog_preview_feed");
   assert.equal(parsed.feed.visibility, "internal");
   assert.equal(parsed.feed.company, "openai");
+  assert.equal(parsed.feed.admission_policy.version, "official-blog-admission-v1");
+  assert.deepEqual(parsed.feed.admission_policy.first_pass.input_fields, ["title_original", "opening_preview"]);
   assert.equal(parsed.feed.candidates.length, 1);
   assert.equal(parsed.feed.candidates[0].opening_preview.includes("Later full body"), false);
   assert(!raw.startsWith("\uFEFF"));
@@ -6473,6 +6477,8 @@ test("official blog context CLI writes clean internal context", async () => {
   assert.equal(parsed.ok, true);
   assert.equal(parsed.context.kind, "official_blog_knowledge_context");
   assert.equal(parsed.context.visibility, "internal");
+  assert.equal(parsed.context.admission_policy.version, "official-blog-admission-v1");
+  assert(parsed.context.admission_policy.exclude_categories.some((category) => category.id === "company_news"));
   assert.equal(parsed.context.records.length, 1);
   assert.equal(parsed.context.records[0].id, "openai-custom-context-record-2026-07-01");
   assert.equal(JSON.stringify(parsed.context).includes("should_not_leak"), false);

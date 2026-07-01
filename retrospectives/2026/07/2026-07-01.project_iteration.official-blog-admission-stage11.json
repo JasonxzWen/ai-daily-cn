@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-admission-stage11",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog admission stage 11",
+  "slug": "official-blog-admission-stage11",
+  "status": "completed",
+  "summary": "This iteration makes the OpenAI and Anthropic official-blog admission threshold explicit and reusable by internal artifacts. Preview, intake, context, and knowledge-index outputs now carry a versioned policy that tells later AI review to use only the title plus capped opening preview for first-pass triage, include durable product/model/engineering knowledge, exclude ordinary company news, and route technical customer or partnership stories to review instead of automatic curation.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog admission policy|official blog intake CLI|official blog context CLI\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run content:contract",
+      "npm run test",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Official-blog intake needs to carry the admission standard as data, not only source-code behavior.",
+      "evidence": "Stage 11 adds `admission_policy.version`, `first_pass`, `include_criteria`, `exclude_categories`, and `review_rule` to internal preview, intake, context, and knowledge-index artifacts.",
+      "scope": "official_blog_admission_policy",
+      "persistence": "implemented",
+      "recommended_action": "Use the policy artifact as the prompt contract when a later stage asks an AI reviewer to decide whether a new OpenAI or Anthropic post belongs in the curated knowledge graph."
+    },
+    {
+      "lesson": "First-pass blog admission should stay preview-only until a candidate is reviewed.",
+      "evidence": "The policy records title plus opening preview as the only first-pass input and keeps the existing two-paragraph, 1200-character cap.",
+      "scope": "official_blog_preview_triage",
+      "persistence": "implemented",
+      "recommended_action": "Do not let downstream AI review use full article text for the initial include/exclude decision; use full reading only after an item reaches review or authoring."
+    },
+    {
+      "lesson": "Public official-blog output should expose curation scope, not internal admission mechanics.",
+      "evidence": "Stage 11 tests prove `toPublicOfficialBlogKnowledge` omits `admission_policy`, `first_pass`, and `company_news` internals while preserving the public curation scope.",
+      "scope": "official_blog_public_minimization",
+      "persistence": "implemented",
+      "recommended_action": "Keep internal policy details in local artifacts; public pages should show curated records and reader-safe scope only."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "The official-blog admission standard could drift between deterministic intake, AI review, and future daily-generation prompts because internal artifacts only exposed results, not the rule used to produce them.",
+      "evidence": "Stage 11 adds a schema-validated versioned admission policy and asserts it on pure functions plus CLI outputs.",
+      "module": "src/official-blog-knowledge.js, schemas/official-blog.schema.json, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Carry `official-blog-admission-v1` with internal official-blog artifacts and require later AI reviewers to follow the preview-only include/exclude/review rule.",
+      "expected_benefit": "New blog intake, translation, and daily-context steps can consistently reject low-value company news while preserving high-value product, model, and engineering-practice posts.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through schema-validated internal policy metadata and deterministic tests.",
+      "ledger_links": [
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-daily-not-machine-log",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog admission policy is versioned and preview-only for internal artifacts",
+        "public official blog knowledge exposes curation scope without internal admission policy details",
+        "official blog intake CLI writes a clean internal review queue",
+        "official blog context CLI writes clean internal context"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-main-stream-blacklist-refill",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "When wiring official-blog intake into daily generation, include the policy artifact next to the review queue so AI review uses the same preview-only admission standard.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add real-feed examples for OpenAI and Anthropic after live intake is wired, but keep tests deterministic with stored fixtures.",
+      "owner": "project"
+    }
+  ]
+}
