@@ -11,6 +11,7 @@ import {
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
+  createOfficialBlogReviewDecisions,
   createOfficialBlogReviewPacket,
   loadOfficialBlogKnowledge,
   normalizeOfficialBlogUrl,
@@ -783,6 +784,177 @@ test("official blog review packet sanitizes invalid candidates from existing que
   assert.equal(serialized.includes("content_html"), false);
   assert.equal(serialized.includes("should_not_leak"), false);
   assert.equal(serialized.includes("raw crawler log"), false);
+});
+
+test("official blog review decisions normalize AI output without auto-promoting manual review", async () => {
+  const existingIndex = await loadOfficialBlogKnowledge({ rootDir });
+  const packet = createOfficialBlogReviewPacket({
+    candidates: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/examplemodel-8-review-decisions",
+        published_at: "2026-07-01",
+        title: "Introducing ExampleModel 8",
+        opening_preview: "This new model release explains evals, safety mitigations, deployment constraints, and developer integration guidance."
+      },
+      {
+        company: "anthropic",
+        canonical_url: "https://www.anthropic.com/news/examplebank-agent-routing-review-decisions",
+        published_at: "2026-07-01",
+        title: "How ExampleBank built a Claude support workflow",
+        opening_preview: "The opening preview describes routing architecture, tool permissions, evaluation harnesses, observability, and rollout controls for production agents."
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/internal-agent-eval-playbook-review-decisions",
+        published_at: "2026-07-01",
+        title: "A production agent eval playbook",
+        opening_preview: "This engineering practice note explains eval harness design, regression checks, failure triage, and observability for agent workflows."
+      }
+    ]
+  }, {
+    existingIndex,
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+  const model = packet.review_items.find((item) => item.title_original.includes("ExampleModel 8"));
+  const customer = packet.review_items.find((item) => item.company === "anthropic");
+  const practice = packet.review_items.find((item) => item.title_original.includes("eval playbook"));
+  assert(model);
+  assert(customer);
+  assert(practice);
+
+  const decisions = createOfficialBlogReviewDecisions({
+    review_packet: packet,
+    decisions: [
+      {
+        intake_id: model.intake_id,
+        decision: "include",
+        matched_criteria: ["new_model"],
+        suggested_topics: ["model_release_context", "evals"],
+        rationale: "The preview shows a durable model release with evals, safety notes, and developer integration guidance.",
+        confidence: 0.93,
+        body: "This full body must not leak."
+      },
+      {
+        intake_id: customer.intake_id,
+        decision: "include",
+        matched_criteria: ["agent_workflow"],
+        suggested_topics: ["agent_workflow"],
+        rationale: "The preview hints at implementation detail, but it is still a customer story and needs manual reading.",
+        confidence: "high",
+        raw_transcript: "This raw AI transcript must not leak."
+      },
+      {
+        intake_id: practice.intake_id,
+        decision: "exclude",
+        matched_criteria: [],
+        suggested_topics: ["evals"],
+        rationale: "The reviewer did not find enough reusable detail in the preview.",
+        confidence: 0.61
+      },
+      {
+        intake_id: model.intake_id,
+        decision: "include",
+        matched_criteria: ["new_model"],
+        rationale: "Duplicate decision should be rejected."
+      },
+      {
+        intake_id: "unknown-intake-id",
+        decision: "include",
+        matched_criteria: ["new_product"],
+        rationale: "Unknown intake id should be rejected."
+      }
+    ],
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, {
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+
+  assert.equal(decisions.kind, "official_blog_review_decisions");
+  assert.equal(decisions.visibility, "internal");
+  assert.equal(decisions.admission_policy.version, "official-blog-admission-v1");
+  assert.equal(decisions.ai_review_contract.review_basis, "title_and_opening_preview_only");
+  assert.equal(decisions.stats.review_items, 3);
+  assert.equal(decisions.stats.decisions_received, 5);
+  assert.equal(decisions.stats.accepted_for_authoring, 1);
+  assert.equal(decisions.stats.needs_manual_review, 1);
+  assert.equal(decisions.stats.excluded, 1);
+  assert.equal(decisions.stats.invalid_decisions, 2);
+
+  assert.equal(decisions.accepted_for_authoring[0].intake_id, model.intake_id);
+  assert.equal(decisions.accepted_for_authoring[0].final_action, "ready_for_manual_authoring");
+  assert.equal(decisions.needs_manual_review[0].intake_id, customer.intake_id);
+  assert.equal(decisions.needs_manual_review[0].ai_review.decision, "include");
+  assert.equal(decisions.needs_manual_review[0].final_decision, "needs_review");
+  assert.equal(decisions.needs_manual_review[0].final_action, "manual_review_required");
+  assert.equal(decisions.excluded[0].intake_id, practice.intake_id);
+  assert(decisions.invalid_decisions.some((item) => item.reason.includes("duplicate intake_id")));
+  assert(decisions.invalid_decisions.some((item) => item.reason.includes("unknown intake_id")));
+
+  const decisionPayload = JSON.stringify({
+    accepted_for_authoring: decisions.accepted_for_authoring,
+    needs_manual_review: decisions.needs_manual_review,
+    excluded: decisions.excluded,
+    invalid_decisions: decisions.invalid_decisions
+  });
+  assert.equal(decisionPayload.includes("This full body must not leak"), false);
+  assert.equal(decisionPayload.includes("raw AI transcript"), false);
+  assert.equal(decisionPayload.includes("should_not_leak"), false);
+  assert.equal(decisionPayload.includes("candidate_pool"), false);
+  assert.equal(decisionPayload.includes("content_html"), false);
+});
+
+test("official blog review decisions reject policy-invalid criteria and missing decisions", async () => {
+  const packet = createOfficialBlogReviewPacket({
+    candidates: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/review-decision-policy-invalid",
+        published_at: "2026-07-01",
+        title: "Launching a developer product for agent workflow reviews",
+        opening_preview: "This new developer product adds agent workflow controls, eval harnesses, and deployment guardrails."
+      },
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/review-decision-missing",
+        published_at: "2026-07-01",
+        title: "A safety engineering playbook for agent deployment",
+        opening_preview: "This safety engineering note explains containment, permissions, rollout controls, and evaluation gates."
+      }
+    ]
+  }, {
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+  const invalidCriteriaItem = packet.review_items.find((item) => item.title_original.includes("developer product"));
+  const missingItem = packet.review_items.find((item) => item.title_original.includes("safety engineering"));
+  assert(invalidCriteriaItem);
+  assert(missingItem);
+
+  const decisions = createOfficialBlogReviewDecisions({
+    review_packet: packet,
+    decisions: [
+      {
+        intake_id: invalidCriteriaItem.intake_id,
+        decision: "include",
+        matched_criteria: ["company_news"],
+        suggested_topics: ["company_news"],
+        rationale: "This should fail because company_news is not an include criterion.",
+        confidence: 0.5
+      }
+    ]
+  }, {
+    reportDate: "2026-07-01",
+    generatedAt: "2026-07-01T08:00:00.000Z"
+  });
+
+  assert.equal(decisions.stats.accepted_for_authoring, 0);
+  assert.equal(decisions.stats.invalid_decisions, 2);
+  assert(decisions.invalid_decisions.some((item) => item.reason.includes("matched_criteria outside admission policy")));
+  assert(decisions.invalid_decisions.some((item) => item.reason.includes("missing AI decision")));
 });
 
 test("official blog knowledge drafts require reviewed authoring fields and omit queue internals", async () => {

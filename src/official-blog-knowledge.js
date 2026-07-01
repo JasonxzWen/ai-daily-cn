@@ -616,6 +616,85 @@ export function createOfficialBlogReviewPacket(input = {}, options = {}) {
   };
 }
 
+export function createOfficialBlogReviewDecisions(input = {}, options = {}) {
+  const packet = officialBlogReviewDecisionPacket(input);
+  const reviewItems = Array.isArray(packet.review_items) ? packet.review_items : [];
+  const reviewItemsById = new Map(reviewItems.map((item) => [String(item.intake_id || "").trim(), item]));
+  const decisionEntries = officialBlogReviewDecisionEntries(input);
+  const policy = officialBlogDecisionAdmissionPolicy(packet);
+  const allowedCriteria = officialBlogDecisionAllowedCriteria(policy);
+  const acceptedForAuthoring = [];
+  const needsManualReview = [];
+  const excluded = [];
+  const invalidDecisions = [];
+  const seenKnownIntakeIds = new Set();
+
+  for (const [index, rawDecision] of decisionEntries.entries()) {
+    const intakeId = String(rawDecision?.intake_id || rawDecision?.intakeId || rawDecision?.id || "").trim();
+    if (!intakeId) {
+      invalidDecisions.push(officialBlogReviewDecisionInvalid(rawDecision, index, "missing intake_id"));
+      continue;
+    }
+    const packetItem = reviewItemsById.get(intakeId);
+    if (!packetItem) {
+      invalidDecisions.push(officialBlogReviewDecisionInvalid(rawDecision, index, `unknown intake_id: ${intakeId}`));
+      continue;
+    }
+    if (seenKnownIntakeIds.has(intakeId)) {
+      invalidDecisions.push(officialBlogReviewDecisionInvalid(rawDecision, index, `duplicate intake_id: ${intakeId}`));
+      continue;
+    }
+    seenKnownIntakeIds.add(intakeId);
+
+    const normalized = officialBlogNormalizeAiReviewDecision(rawDecision, {
+      index,
+      allowedCriteria
+    });
+    if (!normalized.ok) {
+      invalidDecisions.push(officialBlogReviewDecisionInvalid(rawDecision, index, normalized.reason));
+      continue;
+    }
+
+    const item = officialBlogReviewDecisionItem(packetItem, normalized.decision);
+    if (item.final_decision === "include") {
+      acceptedForAuthoring.push(item);
+    } else if (item.final_decision === "needs_review") {
+      needsManualReview.push(item);
+    } else {
+      excluded.push(item);
+    }
+  }
+
+  for (const item of reviewItems) {
+    const intakeId = String(item.intake_id || "").trim();
+    if (intakeId && !seenKnownIntakeIds.has(intakeId)) {
+      invalidDecisions.push(officialBlogReviewDecisionInvalid({ intake_id: intakeId }, null, `missing AI decision for intake_id: ${intakeId}`));
+    }
+  }
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_review_decisions",
+    visibility: "internal",
+    report_date: String(options.reportDate || options.report_date || packet.report_date || ""),
+    generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
+    admission_policy: policy,
+    ai_review_contract: officialBlogAiReviewContract(),
+    stats: {
+      review_items: reviewItems.length,
+      decisions_received: decisionEntries.length,
+      accepted_for_authoring: acceptedForAuthoring.length,
+      needs_manual_review: needsManualReview.length,
+      excluded: excluded.length,
+      invalid_decisions: invalidDecisions.length
+    },
+    accepted_for_authoring: acceptedForAuthoring,
+    needs_manual_review: needsManualReview,
+    excluded,
+    invalid_decisions: invalidDecisions
+  };
+}
+
 export function createOfficialBlogIntakeQueue(input = {}, options = {}) {
   const candidates = officialBlogIntakeCandidates(input);
   const existingByUrl = existingOfficialBlogRecordByUrl(options.existingIndex);
@@ -1153,6 +1232,185 @@ function officialBlogReviewPacketInvalidCandidate(entry = {}, fallbackReason = "
     canonical_url: String(entry.canonical_url || entry.url || "").trim(),
     reason: String(entry.reason || fallbackReason).trim()
   };
+}
+
+function officialBlogReviewDecisionPacket(input = {}) {
+  const packet = input?.kind === "official_blog_review_packet"
+    ? input
+    : input?.review_packet?.kind === "official_blog_review_packet"
+      ? input.review_packet
+      : input?.reviewPacket?.kind === "official_blog_review_packet"
+        ? input.reviewPacket
+        : input?.packet?.kind === "official_blog_review_packet"
+          ? input.packet
+          : null;
+  if (!packet) {
+    throw new Error("official blog review decisions require review_packet");
+  }
+  return packet;
+}
+
+function officialBlogReviewDecisionEntries(input = {}) {
+  if (Array.isArray(input)) {
+    return input;
+  }
+  if (Array.isArray(input.decisions)) {
+    return input.decisions;
+  }
+  if (Array.isArray(input.review_decisions)) {
+    return input.review_decisions;
+  }
+  if (Array.isArray(input.reviewDecisions)) {
+    return input.reviewDecisions;
+  }
+  if (Array.isArray(input.items)) {
+    return input.items;
+  }
+  if (Array.isArray(input.entries)) {
+    return input.entries;
+  }
+  if (input.review_decisions && typeof input.review_decisions === "object") {
+    return officialBlogReviewDecisionEntries(input.review_decisions);
+  }
+  if (input.reviewDecisions && typeof input.reviewDecisions === "object") {
+    return officialBlogReviewDecisionEntries(input.reviewDecisions);
+  }
+  if (input.ai_review && typeof input.ai_review === "object") {
+    return officialBlogReviewDecisionEntries(input.ai_review);
+  }
+  if (input.aiReview && typeof input.aiReview === "object") {
+    return officialBlogReviewDecisionEntries(input.aiReview);
+  }
+  return [];
+}
+
+function officialBlogDecisionAdmissionPolicy(packet = {}) {
+  return officialBlogAdmissionPolicyArtifact();
+}
+
+function officialBlogDecisionAllowedCriteria(policy = {}) {
+  const fromPolicy = (Array.isArray(policy.include_criteria) ? policy.include_criteria : [])
+    .map((criterion) => String(criterion?.id || criterion || "").trim())
+    .filter(Boolean);
+  const values = fromPolicy.length > 0 ? fromPolicy : [...OFFICIAL_BLOG_MATCHED_CRITERIA];
+  return new Set(values);
+}
+
+function officialBlogNormalizeAiReviewDecision(rawDecision = {}, context = {}) {
+  const decision = normalizeOfficialBlogReviewDecision(rawDecision.decision || rawDecision.review_decision || rawDecision.reviewDecision);
+  if (!["include", "needs_review", "exclude"].includes(decision)) {
+    return {
+      ok: false,
+      reason: `invalid AI decision at index ${context.index}: ${decision || "(missing)"}`
+    };
+  }
+
+  const matchedCriteria = uniqueSorted(officialBlogArrayLike(rawDecision.matched_criteria || rawDecision.matchedCriteria || rawDecision.criteria));
+  const outsidePolicy = matchedCriteria.filter((criterion) => !context.allowedCriteria.has(criterion));
+  if (outsidePolicy.length > 0) {
+    return {
+      ok: false,
+      reason: `matched_criteria outside admission policy at index ${context.index}: ${outsidePolicy.join(", ")}`
+    };
+  }
+
+  return {
+    ok: true,
+    decision: {
+      decision,
+      matched_criteria: matchedCriteria,
+      suggested_topics: officialBlogReviewDecisionTopics(rawDecision.suggested_topics || rawDecision.suggestedTopics || rawDecision.topics),
+      rationale: officialBlogReviewDecisionRationale(rawDecision.rationale || rawDecision.reason),
+      confidence: officialBlogReviewDecisionConfidence(rawDecision.confidence)
+    }
+  };
+}
+
+function officialBlogReviewDecisionItem(packetItem = {}, aiReview = {}) {
+  const deterministicDecision = normalizeOfficialBlogReviewDecision(packetItem.deterministic_triage?.decision);
+  let finalDecision = aiReview.decision === "include" && deterministicDecision === "include"
+    ? "include"
+    : aiReview.decision === "exclude"
+      ? "exclude"
+      : "needs_review";
+  if (deterministicDecision === "needs_review") {
+    finalDecision = "needs_review";
+  }
+  if (deterministicDecision && !["include", "needs_review"].includes(deterministicDecision)) {
+    finalDecision = "exclude";
+  }
+
+  return {
+    ...officialBlogReviewDecisionPacketItemBase(packetItem),
+    ai_review: aiReview,
+    final_decision: finalDecision,
+    final_action: finalDecision === "include"
+      ? "ready_for_manual_authoring"
+      : finalDecision === "needs_review"
+        ? "manual_review_required"
+        : "do_not_author"
+  };
+}
+
+function officialBlogReviewDecisionPacketItemBase(packetItem = {}) {
+  return {
+    intake_id: String(packetItem.intake_id || ""),
+    company: String(packetItem.company || ""),
+    company_label: String(packetItem.company_label || ""),
+    canonical_url: String(packetItem.canonical_url || ""),
+    normalized_url: String(packetItem.normalized_url || safeNormalizeOfficialBlogUrl(packetItem.canonical_url) || ""),
+    published_at: String(packetItem.published_at || ""),
+    title_original: String(packetItem.title_original || ""),
+    opening_preview: String(packetItem.opening_preview || ""),
+    opening_paragraph_count: Number.isFinite(Number(packetItem.opening_paragraph_count))
+      ? Number(packetItem.opening_paragraph_count)
+      : officialBlogPreviewParagraphCount(packetItem.opening_preview),
+    deterministic_triage: {
+      decision: String(packetItem.deterministic_triage?.decision || ""),
+      reason: String(packetItem.deterministic_triage?.reason || ""),
+      matched_criteria: uniqueSorted(packetItem.deterministic_triage?.matched_criteria || [])
+    }
+  };
+}
+
+function officialBlogReviewDecisionInvalid(rawDecision = {}, index, reason) {
+  return {
+    index,
+    intake_id: String(rawDecision?.intake_id || rawDecision?.intakeId || rawDecision?.id || "").trim(),
+    reason: String(reason || "invalid AI decision").trim()
+  };
+}
+
+function officialBlogArrayLike(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (typeof value === "string" && value.trim()) {
+    return [value];
+  }
+  return [];
+}
+
+function officialBlogReviewDecisionTopics(value) {
+  return uniqueSorted(officialBlogArrayLike(value))
+    .filter((topic) => OFFICIAL_BLOG_TOPIC_ID_RE.test(topic))
+    .slice(0, 12);
+}
+
+function officialBlogReviewDecisionRationale(value) {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 600);
+}
+
+function officialBlogReviewDecisionConfidence(value) {
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) {
+    return Math.max(0, Math.min(1, numeric));
+  }
+  const bucket = normalizeOfficialBlogReviewDecision(value);
+  return ["high", "medium", "low"].includes(bucket) ? bucket : "";
 }
 
 function officialBlogReviewPacketItem(candidate = {}) {

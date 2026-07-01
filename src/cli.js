@@ -47,6 +47,7 @@ import {
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
+  createOfficialBlogReviewDecisions,
   createOfficialBlogReviewPacket,
   loadOfficialBlogKnowledge
 } from "./official-blog-knowledge.js";
@@ -334,6 +335,39 @@ try {
       ok: true,
       input_path: resolvedInputPath,
       review_packet: reviewPacket
+    }, outputPath);
+  } else if (command === "official-blog:review-decisions") {
+    const args = parseArgs(argv);
+    const packetPath = args.packet || args["review-packet"];
+    const inputPath = args.input || firstJsonPath(argv);
+    if (!packetPath) {
+      throw new PublisherError("official_blog_review_decisions_packet_required", "official-blog:review-decisions requires --packet <official-blog-review-packet.json>.");
+    }
+    if (!inputPath) {
+      throw new PublisherError("official_blog_review_decisions_input_required", "official-blog:review-decisions requires --input <ai-review-decisions.json>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedPacketPath = path.resolve(packetPath);
+    const resolvedInputPath = path.resolve(inputPath);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogReviewDecisionsOutputPath({ outputPath, rootDir });
+    const packet = JSON.parse(fs.readFileSync(resolvedPacketPath, "utf8"));
+    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const reviewDecisionInput = Array.isArray(input)
+      ? { review_packet: packet, decisions: input }
+      : {
+          ...input,
+          review_packet: packet
+        };
+    const reviewDecisions = createOfficialBlogReviewDecisions(reviewDecisionInput, {
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"]
+    });
+    printJson({
+      ok: true,
+      packet_path: resolvedPacketPath,
+      input_path: resolvedInputPath,
+      review_decisions: reviewDecisions
     }, outputPath);
   } else if (command === "preflight:worktree") {
     const args = parseArgs(argv);
@@ -1122,6 +1156,14 @@ function assertOfficialBlogReviewPacketOutputPath(options = {}) {
   });
 }
 
+function assertOfficialBlogReviewDecisionsOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_review_decisions_public_output_forbidden",
+    message: "official-blog:review-decisions writes internal AI review decision data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
 function assertOfficialBlogInternalOutputPath(options = {}) {
   const outputPath = String(options.outputPath || "").trim();
   if (!outputPath) {
@@ -1146,7 +1188,8 @@ function isOfficialBlogInternalCommand(value) {
     value === "official-blog:author-records" ||
     value === "official-blog:suggest-relations" ||
     value === "official-blog:context" ||
-    value === "official-blog:review-packet";
+    value === "official-blog:review-packet" ||
+    value === "official-blog:review-decisions";
 }
 
 function isOfficialBlogInternalPublicOutputPath(outputPath, rootDir) {
