@@ -695,6 +695,10 @@ export function createOfficialBlogAiReviewHandoff(input = {}, options = {}) {
   const duplicates = packet.duplicates;
   const invalidCandidates = packet.invalid_candidates;
   const decisionTemplate = reviewItems.map(officialBlogAiReviewDecisionTemplateItem);
+  const sanitization = officialBlogAiReviewSanitizationSummary(packet.stats?.sanitization);
+  const sanitizationWarning = sanitization.changed_fields > 0
+    ? "Handoff preview fields were sanitized; review upstream feed extraction if this is unexpected."
+    : undefined;
 
   return {
     schema_version: 1,
@@ -710,7 +714,9 @@ export function createOfficialBlogAiReviewHandoff(input = {}, options = {}) {
       needs_review: reviewItems.filter((item) => item.deterministic_triage?.decision === "needs_review").length,
       excluded_items: excludedItems.length,
       duplicates: duplicates.length,
-      invalid_candidates: invalidCandidates.length
+      invalid_candidates: invalidCandidates.length,
+      sanitization,
+      ...(sanitizationWarning ? { sanitization_warning: sanitizationWarning } : {})
     },
     prompt: officialBlogAiReviewHandoffPrompt(),
     review_packet: packet,
@@ -1420,14 +1426,15 @@ function officialBlogAiReviewHandoffPrompt() {
 }
 
 function officialBlogAiReviewSafePacket(packet = {}) {
+  const sanitization = officialBlogAiReviewSanitizationTracker();
   const reviewItems = (Array.isArray(packet.review_items) ? packet.review_items : [])
-    .map(officialBlogAiReviewSafeReviewItem);
+    .map((item) => officialBlogAiReviewSafeReviewItem(item, sanitization));
   const excludedItems = (Array.isArray(packet.excluded_items) ? packet.excluded_items : [])
-    .map(officialBlogAiReviewSafeExcludedItem);
+    .map((item) => officialBlogAiReviewSafeExcludedItem(item, sanitization));
   const duplicates = (Array.isArray(packet.duplicates) ? packet.duplicates : [])
-    .map(officialBlogAiReviewSafeDuplicateItem);
+    .map((item) => officialBlogAiReviewSafeDuplicateItem(item, sanitization));
   const invalidCandidates = (Array.isArray(packet.invalid_candidates) ? packet.invalid_candidates : [])
-    .map(officialBlogAiReviewSafeInvalidCandidate);
+    .map((entry) => officialBlogAiReviewSafeInvalidCandidate(entry, sanitization));
   const totalCandidates = Number(packet.stats?.total_candidates);
 
   return {
@@ -1447,7 +1454,8 @@ function officialBlogAiReviewSafePacket(packet = {}) {
       needs_review: reviewItems.filter((item) => item.deterministic_triage.decision === "needs_review").length,
       excluded_items: excludedItems.length,
       duplicates: duplicates.length,
-      invalid_candidates: invalidCandidates.length
+      invalid_candidates: invalidCandidates.length,
+      sanitization: officialBlogAiReviewSanitizationSummary(sanitization)
     },
     review_items: reviewItems,
     excluded_items: excludedItems,
@@ -1456,73 +1464,81 @@ function officialBlogAiReviewSafePacket(packet = {}) {
   };
 }
 
-function officialBlogAiReviewSafeReviewItem(item = {}) {
+function officialBlogAiReviewSafeReviewItem(item = {}, sanitization) {
   return {
-    ...officialBlogAiReviewSafePacketItemBase(item),
+    ...officialBlogAiReviewSafePacketItemBase(item, sanitization),
     suggested_topics: officialBlogReviewDecisionTopics(item.suggested_topics || item.suggestedTopics || item.topics),
-    knowledge_value: officialBlogAiReviewSafeText(item.knowledge_value, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.knowledgeValue),
-    next_action: officialBlogAiReviewSafeText(item.next_action, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.nextAction)
+    knowledge_value: officialBlogAiReviewSafeText(item.knowledge_value, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.knowledgeValue, sanitization),
+    next_action: officialBlogAiReviewSafeText(item.next_action, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.nextAction, sanitization)
   };
 }
 
-function officialBlogAiReviewSafeExcludedItem(item = {}) {
+function officialBlogAiReviewSafeExcludedItem(item = {}, sanitization) {
   return {
-    ...officialBlogAiReviewSafeReviewItem(item),
-    excluded_as: officialBlogAiReviewSafeText(item.excluded_as, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.triageReason)
+    ...officialBlogAiReviewSafeReviewItem(item, sanitization),
+    excluded_as: officialBlogAiReviewSafeText(item.excluded_as, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.triageReason, sanitization)
   };
 }
 
-function officialBlogAiReviewSafeDuplicateItem(item = {}) {
+function officialBlogAiReviewSafeDuplicateItem(item = {}, sanitization) {
   return {
-    ...officialBlogAiReviewSafePacketItemBase(item),
-    duplicate_source: officialBlogAiReviewSafeText(item.duplicate_source, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.duplicate),
-    duplicate_of: officialBlogAiReviewSafeText(item.duplicate_of, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.duplicate)
+    ...officialBlogAiReviewSafePacketItemBase(item, sanitization),
+    duplicate_source: officialBlogAiReviewSafeText(item.duplicate_source, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.duplicate, sanitization),
+    duplicate_of: officialBlogAiReviewSafeText(item.duplicate_of, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.duplicate, sanitization)
   };
 }
 
-function officialBlogAiReviewSafeInvalidCandidate(entry = {}) {
+function officialBlogAiReviewSafeInvalidCandidate(entry = {}, sanitization) {
   return {
     index: entry.index,
-    title_original: officialBlogAiReviewSafeText(entry.title_original || entry.title, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.title),
-    canonical_url: officialBlogAiReviewSafeUrl(entry.canonical_url || entry.url),
-    reason: officialBlogAiReviewSafeText(entry.reason || "invalid candidate", OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.invalidReason)
+    title_original: officialBlogAiReviewSafeText(entry.title_original || entry.title, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.title, sanitization),
+    canonical_url: officialBlogAiReviewSafeUrl(entry.canonical_url || entry.url, sanitization),
+    reason: officialBlogAiReviewSafeText(entry.reason || "invalid candidate", OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.invalidReason, sanitization)
   };
 }
 
-function officialBlogAiReviewSafePacketItemBase(packetItem = {}) {
-  const canonicalUrl = officialBlogAiReviewSafeUrl(packetItem.canonical_url);
-  const normalizedUrl = officialBlogAiReviewSafeUrl(packetItem.normalized_url || safeNormalizeOfficialBlogUrl(canonicalUrl));
-  const openingPreview = officialBlogAiReviewSafeText(packetItem.opening_preview, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.openingPreview);
+function officialBlogAiReviewSafePacketItemBase(packetItem = {}, sanitization) {
+  const canonicalUrl = officialBlogAiReviewSafeUrl(packetItem.canonical_url, sanitization);
+  const normalizedUrl = officialBlogAiReviewSafeUrl(packetItem.normalized_url || safeNormalizeOfficialBlogUrl(canonicalUrl), sanitization);
+  const openingPreview = officialBlogAiReviewSafeText(packetItem.opening_preview, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.openingPreview, sanitization);
   return {
-    intake_id: officialBlogAiReviewSafeText(packetItem.intake_id, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.id),
-    company: officialBlogAiReviewSafeText(packetItem.company, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.company),
-    company_label: officialBlogAiReviewSafeText(packetItem.company_label, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.companyLabel),
+    intake_id: officialBlogAiReviewSafeText(packetItem.intake_id, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.id, sanitization),
+    company: officialBlogAiReviewSafeText(packetItem.company, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.company, sanitization),
+    company_label: officialBlogAiReviewSafeText(packetItem.company_label, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.companyLabel, sanitization),
     canonical_url: canonicalUrl,
     normalized_url: normalizedUrl,
-    published_at: officialBlogAiReviewSafeText(packetItem.published_at, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.date),
-    title_original: officialBlogAiReviewSafeText(packetItem.title_original, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.title),
+    published_at: officialBlogAiReviewSafeText(packetItem.published_at, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.date, sanitization),
+    title_original: officialBlogAiReviewSafeText(packetItem.title_original, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.title, sanitization),
     opening_preview: openingPreview,
     opening_paragraph_count: Number.isFinite(Number(packetItem.opening_paragraph_count))
       ? Number(packetItem.opening_paragraph_count)
       : officialBlogPreviewParagraphCount(openingPreview),
     deterministic_triage: {
-      decision: officialBlogAiReviewSafeText(packetItem.deterministic_triage?.decision, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.triageDecision),
-      reason: officialBlogAiReviewSafeText(packetItem.deterministic_triage?.reason, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.triageReason),
+      decision: officialBlogAiReviewSafeText(packetItem.deterministic_triage?.decision, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.triageDecision, sanitization),
+      reason: officialBlogAiReviewSafeText(packetItem.deterministic_triage?.reason, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.triageReason, sanitization),
       matched_criteria: uniqueSorted(packetItem.deterministic_triage?.matched_criteria || [])
     }
   };
 }
 
-function officialBlogAiReviewSafeUrl(value) {
+function officialBlogAiReviewSafeUrl(value, sanitization) {
   const text = String(value || "").trim();
   if (!text || officialBlogAiReviewContainsPrivatePath(text)) {
+    if (text) {
+      officialBlogAiReviewRecordSanitization(sanitization, {
+        changed: true,
+        redactedPath: true
+      });
+    }
     return "";
   }
   return text;
 }
 
-function officialBlogAiReviewSafeText(value, maxLength) {
-  const text = String(value || "")
+function officialBlogAiReviewSafeText(value, maxLength, sanitization) {
+  const rawText = String(value || "");
+  const redactedPath = officialBlogAiReviewContainsPrivatePath(rawText);
+  const text = rawText
     .replace(/(^|[\s"'([{])[A-Za-z]:[\\/][^\s"'<>]+/g, "$1[redacted-path]")
     .replace(/(?:\/Users|\/home)\/[^\s"'<>]+/g, "[redacted-path]")
     .replace(/\\\\[^\s"'<>]+/g, "[redacted-path]")
@@ -1530,9 +1546,51 @@ function officialBlogAiReviewSafeText(value, maxLength) {
     .trim();
   const limit = Number(maxLength);
   if (Number.isFinite(limit) && limit > 0 && text.length > limit) {
+    officialBlogAiReviewRecordSanitization(sanitization, {
+      changed: true,
+      redactedPath,
+      truncated: true
+    });
     return text.slice(0, limit).trimEnd();
   }
+  if (redactedPath) {
+    officialBlogAiReviewRecordSanitization(sanitization, {
+      changed: true,
+      redactedPath: true
+    });
+  }
   return text;
+}
+
+function officialBlogAiReviewSanitizationTracker() {
+  return {
+    changed_fields: 0,
+    redacted_path_fields: 0,
+    truncated_fields: 0
+  };
+}
+
+function officialBlogAiReviewRecordSanitization(sanitization, event = {}) {
+  if (!sanitization || typeof sanitization !== "object") {
+    return;
+  }
+  if (event.changed) {
+    sanitization.changed_fields += 1;
+  }
+  if (event.redactedPath) {
+    sanitization.redacted_path_fields += 1;
+  }
+  if (event.truncated) {
+    sanitization.truncated_fields += 1;
+  }
+}
+
+function officialBlogAiReviewSanitizationSummary(sanitization = {}) {
+  return {
+    changed_fields: Number(sanitization.changed_fields) || 0,
+    redacted_path_fields: Number(sanitization.redacted_path_fields) || 0,
+    truncated_fields: Number(sanitization.truncated_fields) || 0
+  };
 }
 
 function officialBlogAiReviewContainsPrivatePath(value) {

@@ -6578,6 +6578,100 @@ test("official blog review-handoff CLI sanitizes allowlisted fields", async () =
   assert(!raw.startsWith("\uFEFF"));
 });
 
+test("official blog review-handoff CLI reports aggregate sanitization diagnostics", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-handoff-diagnostics-"));
+  const inputPath = path.join(tmp, "review-packet.json");
+  const handoffPath = path.join(tmp, "review-handoff.json");
+  const longBodyTail = Array.from({ length: 80 }, (_, index) => `CLI_STAGE22_FULL_BODY_TAIL_${index}`).join(" ");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    kind: "official_blog_review_packet",
+    visibility: "internal",
+    report_date: "2026-07-01",
+    generated_at: "2026-07-01T12:00:00.000Z",
+    admission_policy: {},
+    ai_review_contract: { review_basis: "title_and_opening_preview_only" },
+    stats: {
+      total_candidates: 1,
+      review_items: 1,
+      included: 1,
+      needs_review: 0,
+      excluded_items: 0,
+      duplicates: 0,
+      invalid_candidates: 0
+    },
+    review_items: [
+      {
+        intake_id: "openai-example-2026-07-01",
+        company: "openai",
+        canonical_url: "https://openai.com/index/example-agent-workflow",
+        normalized_url: "https://openai.com/index/example-agent-workflow",
+        published_at: "2026-07-01",
+        title_original: `Example agent workflow C:\\Users\\Admin\\stage22-cli-title ${longBodyTail}`,
+        opening_preview: `A developer primitive D:\\private\\stage22-cli-preview and /Users/admin/stage22-cli-preview. ${longBodyTail}`,
+        deterministic_triage: {
+          decision: "include",
+          reason: `technical preview C:\\Users\\Admin\\stage22-cli-reason ${longBodyTail}`,
+          matched_criteria: ["new_product"]
+        },
+        suggested_topics: ["agent"],
+        knowledge_value: `high /home/admin/stage22-cli-knowledge ${longBodyTail}`,
+        next_action: `review D:\\private\\stage22-cli-action and \\\\corp-share\\stage22-cli-action ${longBodyTail}`
+      }
+    ],
+    excluded_items: [],
+    duplicates: [],
+    invalid_candidates: []
+  })}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-handoff",
+    "--input",
+    inputPath,
+    "--output",
+    handoffPath,
+    "--date",
+    "2026-07-01",
+    "--generated-at",
+    "2026-07-01T12:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(handoffPath, "utf8");
+  const parsed = JSON.parse(raw);
+  const diagnostics = parsed.handoff.stats.sanitization;
+  assert(Number.isInteger(diagnostics.changed_fields));
+  assert(Number.isInteger(diagnostics.redacted_path_fields));
+  assert(Number.isInteger(diagnostics.truncated_fields));
+  assert(diagnostics.changed_fields >= 5);
+  assert(diagnostics.redacted_path_fields >= 5);
+  assert(diagnostics.truncated_fields >= 4);
+  assert.match(parsed.handoff.stats.sanitization_warning, /sanitized/i);
+
+  const diagnosticJson = JSON.stringify({
+    diagnostics,
+    warning: parsed.handoff.stats.sanitization_warning
+  });
+  for (const marker of [
+    "C:\\Users\\Admin\\stage22-cli",
+    "D:\\private\\stage22-cli",
+    "\\\\corp-share\\stage22-cli",
+    "/Users/admin/stage22-cli",
+    "/home/admin/stage22-cli",
+    "CLI_STAGE22_FULL_BODY_TAIL_79",
+    "[redacted-path]",
+    "title_original",
+    "opening_preview",
+    "review_items"
+  ]) {
+    assert.equal(diagnosticJson.includes(marker), false, `${marker} must not appear in CLI aggregate diagnostics`);
+  }
+  assert(!raw.startsWith("\uFEFF"));
+});
+
 test("official blog review-handoff CLI refuses public output paths", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-handoff-public-"));
   const inputPath = path.join(tmp, "review-packet.json");

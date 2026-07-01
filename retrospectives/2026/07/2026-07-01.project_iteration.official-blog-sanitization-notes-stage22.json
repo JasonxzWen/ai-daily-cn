@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-sanitization-notes-stage22",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog sanitization notes stage 22",
+  "slug": "official-blog-sanitization-notes-stage22",
+  "status": "completed",
+  "summary": "This iteration adds aggregate-only sanitization diagnostics to the official-blog AI review handoff. Operators can now see whether preview-safe fields were redacted or truncated without exposing original values, private paths, field paths, or full-body text.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog AI review handoff reports aggregate sanitization diagnostics|official blog review-handoff CLI reports aggregate sanitization diagnostics\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test --test-name-pattern \"official blog AI review handoff|official blog review-handoff|official blog workflow runbook is executable and safety-backed\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Sanitizer visibility should be aggregate-only when the sanitized content may be private.",
+      "evidence": "Stage 22 tests assert that handoff diagnostics include only numeric counts and a generic warning, while private markers, redacted values, field paths, and long tail markers stay out of the diagnostics object.",
+      "scope": "official_blog_handoff_safety",
+      "persistence": "implemented",
+      "recommended_action": "Keep future handoff diagnostics as counters or boolean summaries unless there is a specific reviewed need for more detail."
+    },
+    {
+      "lesson": "Clean handoffs should stay quiet so operators only investigate actual sanitizer activity.",
+      "evidence": "The clean Stage 18 replay handoff is expected to report zero sanitization counts and no sanitization warning while preserving the two include items and one manual-review item.",
+      "scope": "official_blog_operator_workflow",
+      "persistence": "implemented",
+      "recommended_action": "Avoid warning text for zero-count diagnostics in future internal workflow artifacts."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "Sanitization counts show that a handoff was cleaned but do not identify which upstream feed produced the pollution.",
+      "evidence": "Stage 22 intentionally avoids field paths and raw values to prevent diagnostics from becoming a leakage surface.",
+      "module": "src/official-blog-knowledge.js",
+      "suggestion": "If operator debugging needs more detail later, consider source-level aggregate buckets such as candidate count by company, without field paths or raw values.",
+      "expected_benefit": "Operators could isolate noisy feed exports while preserving the internal handoff privacy boundary.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Future project iteration with tests proving any source-level diagnostics remain aggregate-only.",
+      "ledger_links": [
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-data-minimization"
+      ],
+      "validation_evidence": [
+        "official blog AI review handoff reports aggregate sanitization diagnostics",
+        "official blog review-handoff CLI reports aggregate sanitization diagnostics"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Consider source-level aggregate sanitizer counters if operator debugging later needs them.",
+      "owner": "project"
+    }
+  ]
+}

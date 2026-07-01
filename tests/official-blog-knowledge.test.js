@@ -2170,6 +2170,86 @@ test("official blog AI review handoff bounds preview fields and redacts private 
   assert.equal(templateItem.confidence, null);
 });
 
+test("official blog AI review handoff reports aggregate sanitization diagnostics", async () => {
+  const fixtureDir = path.join(rootDir, "tests", "fixtures", "official-blog-runbook-replay");
+  const fixture = JSON.parse(await fs.readFile(path.join(fixtureDir, "replay.json"), "utf8"));
+  const feeds = await Promise.all(fixture.feeds.map(async (feed) => ({
+    company: feed.company,
+    source_label: feed.source_label,
+    feed_text: await fs.readFile(path.join(fixtureDir, feed.file), "utf8")
+  })));
+  const session = createOfficialBlogReviewSession({ feeds }, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+
+  const cleanHandoff = createOfficialBlogAiReviewHandoff(session.review_packet, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  assert.deepEqual(cleanHandoff.stats.sanitization, {
+    changed_fields: 0,
+    redacted_path_fields: 0,
+    truncated_fields: 0
+  });
+  assert.equal(cleanHandoff.stats.sanitization_warning, undefined);
+  assert.equal(cleanHandoff.stats.included, 2);
+  assert.equal(cleanHandoff.stats.needs_review, 1);
+
+  const pollutedPacket = JSON.parse(JSON.stringify(session.review_packet));
+  const longBodyTail = Array.from({ length: 80 }, (_, index) => `STAGE22_FULL_BODY_TAIL_${index}`).join(" ");
+  pollutedPacket.review_items[0].title_original = `Agent workflow launch C:\\Users\\Admin\\stage22-secret-title ${longBodyTail}`;
+  pollutedPacket.review_items[0].opening_preview = `Preview before /Users/admin/stage22-secret-preview and \\\\corp-share\\stage22-preview. ${longBodyTail}`;
+  pollutedPacket.review_items[0].deterministic_triage.reason = `Reason D:\\private\\stage22-triage-note ${longBodyTail}`;
+  pollutedPacket.review_items[0].knowledge_value = `value /home/admin/stage22-knowledge-note ${longBodyTail}`;
+  pollutedPacket.review_items[0].next_action = `review C:\\Users\\Admin\\stage22-next-action ${longBodyTail}`;
+  pollutedPacket.excluded_items[0].opening_preview = `Excluded preview C:\\Users\\Admin\\stage22-excluded ${longBodyTail}`;
+  pollutedPacket.duplicates = [
+    {
+      ...pollutedPacket.review_items[1],
+      duplicate_source: "C:\\Users\\Admin\\stage22-duplicate-source",
+      duplicate_of: "D:\\private\\stage22-duplicate-of"
+    }
+  ];
+  pollutedPacket.invalid_candidates = [
+    {
+      index: 0,
+      title_original: `Invalid C:\\Users\\Admin\\stage22-invalid-title ${longBodyTail}`,
+      canonical_url: "https://openai.com/index/example",
+      reason: `Invalid reason /Users/admin/stage22-invalid-reason ${longBodyTail}`
+    }
+  ];
+
+  const handoff = createOfficialBlogAiReviewHandoff(pollutedPacket, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  const diagnostics = handoff.stats.sanitization;
+  assert(Number.isInteger(diagnostics.changed_fields));
+  assert(Number.isInteger(diagnostics.redacted_path_fields));
+  assert(Number.isInteger(diagnostics.truncated_fields));
+  assert(diagnostics.changed_fields >= 8);
+  assert(diagnostics.redacted_path_fields >= 8);
+  assert(diagnostics.truncated_fields >= 5);
+  assert.match(handoff.stats.sanitization_warning, /sanitized/i);
+
+  const diagnosticJson = JSON.stringify({ diagnostics, warning: handoff.stats.sanitization_warning });
+  for (const marker of [
+    "C:\\Users\\Admin\\stage22",
+    "D:\\private\\stage22",
+    "\\\\corp-share\\stage22",
+    "/Users/admin/stage22",
+    "/home/admin/stage22",
+    "STAGE22_FULL_BODY_TAIL_79",
+    "[redacted-path]",
+    "title_original",
+    "opening_preview",
+    "review_items"
+  ]) {
+    assert.equal(diagnosticJson.includes(marker), false, `${marker} must not appear in aggregate diagnostics`);
+  }
+});
+
 test("official blog workflow runbook is executable and safety-backed", async () => {
   const runbookPath = path.join(rootDir, "tasks", "official-blog-workflow-runbook.md");
   const planPath = path.join(rootDir, "docs", "official-blog-knowledge-plan.md");
