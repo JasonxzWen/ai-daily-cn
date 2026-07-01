@@ -47,6 +47,7 @@ import {
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogReviewedAuthoring,
+  createOfficialBlogReviewSession,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
   createOfficialBlogReviewDecisions,
@@ -216,6 +217,29 @@ try {
       ok: true,
       input_path: resolvedInputPath,
       feed
+    }, outputPath);
+  } else if (command === "official-blog:review-session") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || args.manifest || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_review_session_input_required", "official-blog:review-session requires --input <review-session-manifest.json>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogReviewSessionOutputPath({ outputPath, rootDir });
+    const manifest = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const session = createOfficialBlogReviewSession({
+      report_date: manifest.report_date || manifest.reportDate,
+      generated_at: manifest.generated_at || manifest.generatedAt,
+      feeds: officialBlogReviewSessionManifestFeeds(manifest, path.dirname(resolvedInputPath))
+    }, {
+      reportDate: args.date || firstPositionalDate(argv) || manifest.report_date || manifest.reportDate,
+      generatedAt: args["generated-at"] || manifest.generated_at || manifest.generatedAt
+    });
+    printJson({
+      ok: true,
+      session
     }, outputPath);
   } else if (command === "official-blog:author-records") {
     const args = parseArgs(argv);
@@ -1182,6 +1206,14 @@ function assertOfficialBlogParseFeedOutputPath(options = {}) {
   });
 }
 
+function assertOfficialBlogReviewSessionOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_review_session_public_output_forbidden",
+    message: "official-blog:review-session writes internal preview, triage, and AI review packet data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
 function assertOfficialBlogAuthorRecordsOutputPath(options = {}) {
   assertOfficialBlogInternalOutputPath({
     outputPath: options.outputPath,
@@ -1242,6 +1274,30 @@ function officialBlogAuthoringBriefRelationshipInput(input = {}) {
   return input;
 }
 
+function officialBlogReviewSessionManifestFeeds(manifest = {}, manifestDir = process.cwd()) {
+  const feeds = Array.isArray(manifest.feeds) ? manifest.feeds : [];
+  if (feeds.length === 0) {
+    throw new PublisherError("official_blog_review_session_feeds_required", "official-blog:review-session manifest requires a non-empty feeds array.");
+  }
+
+  return feeds.map((feed, index) => {
+    const feedPath = officialBlogReviewSessionManifestFeedPath(feed);
+    if (!feedPath) {
+      throw new PublisherError("official_blog_review_session_feed_path_required", `official-blog:review-session feed at index ${index} requires file/path/feed_path/input.`);
+    }
+    const resolvedFeedPath = path.resolve(manifestDir, feedPath);
+    return {
+      company: feed.company,
+      source_label: feed.source_label || feed.sourceLabel || feed.source || path.basename(resolvedFeedPath),
+      feed_text: fs.readFileSync(resolvedFeedPath, "utf8")
+    };
+  });
+}
+
+function officialBlogReviewSessionManifestFeedPath(feed = {}) {
+  return String(feed.file || feed.path || feed.feed_path || feed.feedPath || feed.input || "").trim();
+}
+
 function assertOfficialBlogAuthoringBriefOutputPath(options = {}) {
   assertOfficialBlogInternalOutputPath({
     ...options,
@@ -1279,6 +1335,7 @@ function isOfficialBlogIntakePublicOutputPath(outputPath, rootDir) {
 function isOfficialBlogInternalCommand(value) {
   return value === "official-blog:intake" ||
     value === "official-blog:parse-feed" ||
+    value === "official-blog:review-session" ||
     value === "official-blog:author-records" ||
     value === "official-blog:suggest-relations" ||
     value === "official-blog:context" ||

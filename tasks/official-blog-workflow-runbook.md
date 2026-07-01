@@ -45,7 +45,40 @@ Use an internal scratch path such as `.tmp/official-blog-workflow/<date>/` or an
 
 Use stable dated filenames so the artifacts can be reviewed and replayed.
 
-1. Parse feed or exported source input.
+1. Prepare a local review-session manifest.
+
+   ```json
+   {
+     "report_date": "<YYYY-MM-DD>",
+     "generated_at": "<ISO-8601 timestamp>",
+     "feeds": [
+       {
+         "company": "openai",
+         "source_label": "OpenAI official blog feed",
+         "file": "<local-openai-rss-or-export.json>"
+       },
+       {
+         "company": "anthropic",
+         "source_label": "Anthropic official blog feed",
+         "file": "<local-anthropic-rss-or-export.json>"
+       }
+     ]
+   }
+   ```
+
+   The `file` values are local RSS, Atom, or exported JSON inputs. They may be absolute paths or paths relative to the manifest file. File paths are read by the CLI but are not written into the review-session artifact.
+
+2. Preferred path: build the preview-to-review session.
+
+   ```powershell
+   node src/cli.js official-blog:review-session --input <internal-dir>/00-review-session-manifest.json --output <internal-dir>/03-review-session.json --date <YYYY-MM-DD>
+   ```
+
+   Expected artifact kind: `official_blog_review_session` under `session`. This artifact contains `preview_feeds`, `combined_preview_feed`, `intake_queue`, and `review_packet`. It stops before AI decisions, manual `needs_review` resolution, human authoring, dry-run, and curated record writes. It must not contain `official_blog_review_decisions`, `official_blog_authoring_brief`, `official_blog_reviewed_authoring`, `official_blog_knowledge_drafts`, `records_planned`, or `records_written`.
+
+   The next step may use `<internal-dir>/03-review-session.json` directly as `--packet`; the CLI reads `session.review_packet` from the review-session artifact.
+
+3. Split audit path: parse feed or exported source input.
 
    ```powershell
    node src/cli.js official-blog:parse-feed --company openai --input <rss-or-export.json> --output <internal-dir>/01-preview-feed.json --date <YYYY-MM-DD>
@@ -53,7 +86,7 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected artifact kind: `official_blog_preview_feed`.
 
-2. Build the preview-only intake queue.
+4. Split audit path: build the preview-only intake queue.
 
    ```powershell
    node src/cli.js official-blog:intake --input <internal-dir>/01-preview-feed.json --output <internal-dir>/02-intake-queue.json --date <YYYY-MM-DD>
@@ -61,7 +94,7 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected artifact kind: `official_blog_intake_queue`. This step applies the admission standard from title + opening preview and keeps full text out of the queue.
 
-3. Produce the AI review packet.
+5. Split audit path: produce the AI review packet.
 
    ```powershell
    node src/cli.js official-blog:review-packet --input <internal-dir>/02-intake-queue.json --output <internal-dir>/03-review-packet.json --date <YYYY-MM-DD>
@@ -69,15 +102,15 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected artifact kind: `official_blog_review_packet`. The packet gives AI only the preview-safe material and the admission policy.
 
-4. Normalize AI review decisions.
+6. Normalize AI review decisions.
 
    ```powershell
-   node src/cli.js official-blog:review-decisions --packet <internal-dir>/03-review-packet.json --input <internal-dir>/04-ai-decisions.json --output <internal-dir>/05-review-decisions.json --date <YYYY-MM-DD>
+   node src/cli.js official-blog:review-decisions --packet <internal-dir>/03-review-session.json --input <internal-dir>/04-ai-decisions.json --output <internal-dir>/05-review-decisions.json --date <YYYY-MM-DD>
    ```
 
-   Expected artifact kind: `official_blog_review_decisions`. This step must not auto-promote deterministic `needs_review` items.
+   Expected artifact kind: `official_blog_review_decisions`. This step requires a separate AI decisions file and must not auto-promote deterministic `needs_review` items. If you used the split audit path, pass `<internal-dir>/03-review-packet.json` as `--packet` instead.
 
-5. Create the human authoring brief.
+7. Create the human authoring brief.
 
    ```powershell
    node src/cli.js official-blog:authoring-brief --input <internal-dir>/05-review-decisions.json --output <internal-dir>/06-authoring-brief.json --date <YYYY-MM-DD>
@@ -85,7 +118,7 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected artifact kind: `official_blog_authoring_brief`. Only accepted decisions become human authoring templates; manual-review items stay separate.
 
-6. Complete the human fields, then validate reviewed authoring.
+8. Complete the human fields, then validate reviewed authoring.
 
    ```powershell
    node src/cli.js official-blog:reviewed-authoring --input <internal-dir>/06-authoring-brief.completed.json --output <internal-dir>/07-reviewed-authoring.json --date <YYYY-MM-DD>
@@ -93,7 +126,7 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected artifact kind: `official_blog_reviewed_authoring`. The completed template supplies the Chinese digest fields; the command validates required fields and keeps manual-review items out of promotion.
 
-7. Validate final record writes without mutation.
+9. Validate final record writes without mutation.
 
    ```powershell
    node src/cli.js official-blog:author-records --dry-run --input <internal-dir>/07-reviewed-authoring.json --output-dir knowledge/official-blogs --output <internal-dir>/08-author-records-dry-run.json
@@ -101,7 +134,7 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    Expected output includes `official_blog_knowledge_drafts`, `records_planned`, and `records_written: []`. Dry-run does not create directories or record files. Review the planned ids, companies, canonical URLs, topics, related ids, and output paths before writing anything to the curated knowledge directory.
 
-8. Write curated records only after dry-run review.
+10. Write curated records only after dry-run review.
 
    Step marker: `official-blog:author-records --output-dir knowledge/official-blogs`.
 
@@ -109,9 +142,9 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
    node src/cli.js official-blog:author-records --input <internal-dir>/07-reviewed-authoring.json --output-dir knowledge/official-blogs --output <internal-dir>/09-author-records-written.json
    ```
 
-   This is the only step that writes curated record JSON under `knowledge/official-blogs`. Do not run it until step 7 has been reviewed.
+   This is the only step that writes curated record JSON under `knowledge/official-blogs`. Do not run it until step 9 has been reviewed.
 
-9. Build and validate the public projection separately.
+11. Build and validate the public projection separately.
 
    ```powershell
    node --test --test-name-pattern "official blog runbook replay fixtures" tests/official-blog-knowledge.test.js
