@@ -6371,6 +6371,198 @@ test("official blog review session CLI refuses public output paths", async () =>
   }
 });
 
+test("official blog review-handoff CLI writes clean prompt and decision template", async () => {
+  const fixtureDir = path.join(rootDir, "tests", "fixtures", "official-blog-runbook-replay");
+  const fixture = JSON.parse(await fs.readFile(path.join(fixtureDir, "replay.json"), "utf8"));
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-handoff-"));
+  const manifestPath = path.join(tmp, "review-session-manifest.json");
+  const sessionPath = path.join(tmp, "official-blog-review-session.json");
+  const handoffPath = path.join(tmp, "official-blog-review-handoff.json");
+  await fs.writeFile(manifestPath, `${JSON.stringify({
+    report_date: fixture.report_date,
+    generated_at: fixture.generated_at,
+    feeds: fixture.feeds.map((feed) => ({
+      company: feed.company,
+      source_label: feed.source_label,
+      file: path.join(fixtureDir, feed.file)
+    }))
+  }, null, 2)}\n`, "utf8");
+  await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-session",
+    "--input",
+    manifestPath,
+    "--output",
+    sessionPath
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-handoff",
+    "--input",
+    sessionPath,
+    "--output",
+    handoffPath,
+    "--date",
+    fixture.report_date,
+    "--generated-at",
+    fixture.generated_at
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(handoffPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.handoff.kind, "official_blog_ai_review_handoff");
+  assert.equal(parsed.handoff.visibility, "internal");
+  assert.equal(parsed.handoff.stats.review_items, 3);
+  assert.equal(parsed.handoff.stats.included, 2);
+  assert.equal(parsed.handoff.stats.needs_review, 1);
+  assert.equal(parsed.handoff.review_packet.kind, "official_blog_review_packet");
+  assert.equal(parsed.handoff.prompt.review_basis, "title_and_opening_preview_only");
+  assert.equal(parsed.handoff.decision_template.length, 3);
+  assert(parsed.handoff.decision_template.every((entry) => entry.decision === ""));
+  assert(parsed.handoff.decision_template.every((entry) => entry.rationale === ""));
+  assert(parsed.handoff.decision_template.every((entry) => entry.confidence === null));
+  assert.equal(Object.hasOwn(parsed.handoff, "source_audit"), false);
+  assert.equal(Object.hasOwn(parsed.handoff, "candidate_pool"), false);
+  for (const privatePath of [manifestPath, sessionPath, handoffPath, fixtureDir, tmp]) {
+    assert.equal(raw.includes(privatePath), false);
+    assert.equal(raw.includes(JSON.stringify(privatePath).slice(1, -1)), false);
+  }
+  for (const marker of fixture.forbidden_markers) {
+    assert.equal(raw.includes(marker), false, `${marker} must stay outside review handoff output`);
+  }
+  for (const laterArtifact of [
+    "official_blog_review_decisions",
+    "official_blog_authoring_brief",
+    "official_blog_reviewed_authoring",
+    "official_blog_knowledge_drafts",
+    "records_planned",
+    "records_written",
+    "raw_transcript"
+  ]) {
+    assert.equal(raw.includes(laterArtifact), false, `${laterArtifact} must not appear before AI decision checkpoint`);
+  }
+  assert(!raw.startsWith("\uFEFF"));
+
+  const decisionsPath = path.join(tmp, "ai-review-decisions.json");
+  const reviewDecisionsPath = path.join(tmp, "review-decisions.json");
+  await fs.writeFile(decisionsPath, `${JSON.stringify(parsed.handoff.decision_template.map((entry) => ({
+    intake_id: entry.intake_id,
+    decision: entry.deterministic_decision,
+    matched_criteria: entry.allowed_matched_criteria.slice(0, 1),
+    suggested_topics: entry.suggested_topics,
+    rationale: `separate AI decision for ${entry.title_original}`,
+    confidence: 0.9
+  })), null, 2)}\n`, "utf8");
+
+  await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-decisions",
+    "--packet",
+    handoffPath,
+    "--input",
+    decisionsPath,
+    "--output",
+    reviewDecisionsPath,
+    "--date",
+    fixture.report_date,
+    "--generated-at",
+    fixture.generated_at
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+  const reviewDecisionRaw = await fs.readFile(reviewDecisionsPath, "utf8");
+  const reviewDecisionParsed = JSON.parse(reviewDecisionRaw);
+  assert.equal(reviewDecisionParsed.review_decisions.kind, "official_blog_review_decisions");
+  assert.equal(reviewDecisionParsed.review_decisions.stats.accepted_for_authoring, 2);
+  assert.equal(reviewDecisionParsed.review_decisions.stats.needs_manual_review, 1);
+});
+
+test("official blog review-handoff CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-handoff-public-"));
+  const inputPath = path.join(tmp, "review-packet.json");
+  const publicOutputPaths = [
+    path.join(tmp, "docs", "data", "official-blog-review-handoff.json"),
+    path.join(tmp, "docs", "official-blogs", "review-handoff.json"),
+    path.join(tmp, "docs", "official-blog-review-handoff.html"),
+    path.join(tmp, "docs", "reports", "official-blog-review-handoff.html")
+  ];
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    kind: "official_blog_review_packet",
+    visibility: "internal",
+    report_date: "2026-07-01",
+    generated_at: "2026-07-01T12:00:00.000Z",
+    admission_policy: {},
+    ai_review_contract: { review_basis: "title_and_opening_preview_only" },
+    stats: {
+      total_candidates: 1,
+      review_items: 1,
+      included: 1,
+      needs_review: 0,
+      excluded_items: 0,
+      duplicates: 0,
+      invalid_candidates: 0
+    },
+    review_items: [
+      {
+        intake_id: "openai-example-2026-07-01",
+        company: "openai",
+        canonical_url: "https://openai.com/index/example-agent-workflow",
+        normalized_url: "https://openai.com/index/example-agent-workflow",
+        published_at: "2026-07-01",
+        title_original: "Example agent workflow",
+        opening_preview: "A developer platform primitive for production agent workflows.",
+        deterministic_triage: {
+          decision: "include",
+          reason: "technical preview",
+          matched_criteria: ["new_product"]
+        },
+        suggested_topics: ["agent"],
+        knowledge_value: "high"
+      }
+    ],
+    excluded_items: [],
+    duplicates: [],
+    invalid_candidates: []
+  })}\n`, "utf8");
+
+  for (const publicOutputPath of publicOutputPaths) {
+    await assert.rejects(
+      () => execFileAsync(process.execPath, [
+        path.join(rootDir, "src/cli.js"),
+        "official-blog:review-handoff",
+        "--input",
+        inputPath,
+        "--output",
+        publicOutputPath,
+        "--repo-root",
+        tmp
+      ], {
+        cwd: rootDir,
+        maxBuffer: 1024 * 1024
+      }),
+      (error) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stdout, /official_blog_review_handoff_public_output_forbidden/);
+        return true;
+      }
+    );
+    await assert.rejects(
+      () => fs.stat(publicOutputPath),
+      /ENOENT/
+    );
+  }
+});
+
 test("official blog author records CLI writes curated records and clean summary JSON", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-author-records-"));
   const inputPath = path.join(tmp, "reviewed-official-blogs.json");

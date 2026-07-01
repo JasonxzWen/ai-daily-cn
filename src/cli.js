@@ -47,6 +47,7 @@ import {
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogReviewedAuthoring,
+  createOfficialBlogAiReviewHandoff,
   createOfficialBlogReviewSession,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
@@ -240,6 +241,25 @@ try {
     printJson({
       ok: true,
       session
+    }, outputPath);
+  } else if (command === "official-blog:review-handoff") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || args.packet || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_review_handoff_input_required", "official-blog:review-handoff requires --input <review-session-or-review-packet.json>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogReviewHandoffOutputPath({ outputPath, rootDir });
+    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const handoff = createOfficialBlogAiReviewHandoff(input, {
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"]
+    });
+    printJson({
+      ok: true,
+      handoff
     }, outputPath);
   } else if (command === "official-blog:author-records") {
     const args = parseArgs(argv);
@@ -1214,6 +1234,14 @@ function assertOfficialBlogReviewSessionOutputPath(options = {}) {
   });
 }
 
+function assertOfficialBlogReviewHandoffOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_review_handoff_public_output_forbidden",
+    message: "official-blog:review-handoff writes internal AI review prompt and decision template data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
 function assertOfficialBlogAuthorRecordsOutputPath(options = {}) {
   assertOfficialBlogInternalOutputPath({
     outputPath: options.outputPath,
@@ -1336,6 +1364,7 @@ function isOfficialBlogInternalCommand(value) {
   return value === "official-blog:intake" ||
     value === "official-blog:parse-feed" ||
     value === "official-blog:review-session" ||
+    value === "official-blog:review-handoff" ||
     value === "official-blog:author-records" ||
     value === "official-blog:suggest-relations" ||
     value === "official-blog:context" ||

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-ai-review-handoff-stage20",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog AI review handoff stage 20",
+  "slug": "official-blog-ai-review-handoff-stage20",
+  "status": "completed",
+  "summary": "This iteration adds an internal AI review handoff for the official-blog workflow. The handoff turns a review packet or review-session output into preview-safe AI instructions and a blank decision template, while preserving the separate AI decisions file, manual review, authoring, dry-run, and curated-record write checkpoints.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog AI review handoff|official blog review-handoff\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The AI review step needs a copy-safe handoff artifact, not manual prompt assembly from a review packet.",
+      "evidence": "Stage 20 adds `official_blog_ai_review_handoff` with prompt instructions, embedded review packet, and blank decision templates keyed by `intake_id`.",
+      "scope": "official_blog_workflow",
+      "persistence": "implemented",
+      "recommended_action": "Use the handoff artifact as the stable boundary between preview review packet creation and separate AI decision capture."
+    },
+    {
+      "lesson": "A prompt handoff must not become an implicit decision normalizer.",
+      "evidence": "Stage 20 tests assert every decision template keeps `decision`, `rationale`, and `confidence` blank or neutral, and that `official-blog:review-decisions` still requires a separate AI decisions file.",
+      "scope": "official_blog_safety",
+      "persistence": "implemented",
+      "recommended_action": "Keep future AI handoff automation from filling decision fields or promoting `needs_review` items before explicit normalization and human checkpoints."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The workflow still depends on an operator or agent to paste AI decisions back into the expected JSON shape.",
+      "evidence": "Stage 20 creates the prompt and blank decision template but intentionally does not call AI or populate decisions.",
+      "module": "tasks/official-blog-workflow-runbook.md",
+      "suggestion": "Consider a later validation-only sample decisions fixture or schema helper for operator-filled AI outputs.",
+      "expected_benefit": "A schema helper could catch malformed AI output before decision normalization without weakening the manual checkpoint.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Future project iteration with tests proving malformed decisions are rejected and no AI output is auto-generated.",
+      "ledger_links": [
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection"
+      ],
+      "validation_evidence": [
+        "official blog review-handoff CLI writes clean prompt and decision template"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Consider a validation-only helper for operator-filled AI decision JSON after handoff usage stabilizes.",
+      "owner": "project"
+    }
+  ]
+}
