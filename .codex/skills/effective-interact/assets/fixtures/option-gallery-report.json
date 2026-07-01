@@ -2,7 +2,6 @@
   "title": "Option gallery decision brief",
   "summary": "**Compare-first conclusion:** use the generated report path unless the choice needs a custom disposable editor.",
   "status": "review",
-  "template": "decision-matrix",
   "renderMode": "pre-rendered",
   "generatedAt": "2026-05-18T00:00:00.000Z",
   "intent": {
@@ -22,7 +21,9 @@
       "id": "claim-option-gallery",
       "statement": "Option gallery reports lower decision cost when the unresolved work is choosing between alternatives.",
       "kind": "recommendation",
-      "evidenceIds": ["evidence-html-effectiveness"],
+      "evidenceIds": [
+        "evidence-html-effectiveness"
+      ],
       "confidence": "high",
       "dateRange": "2026-05-18",
       "knownLimits": [
@@ -74,9 +75,18 @@
       "status": "ready",
       "summary": "Use the smallest artifact that performs the needed HTML-only job.",
       "columns": [
-        { "key": "signal", "label": "Signal" },
-        { "key": "shape", "label": "Shape" },
-        { "key": "guardrail", "label": "Guardrail" }
+        {
+          "key": "signal",
+          "label": "Signal"
+        },
+        {
+          "key": "shape",
+          "label": "Shape"
+        },
+        {
+          "key": "guardrail",
+          "label": "Guardrail"
+        }
       ],
       "rows": [
         {
@@ -132,5 +142,8 @@
   "nextActions": [
     "Generate this fixture through create-interaction.mjs.",
     "Validate the generated HTML with validate-interaction.mjs."
-  ]
+  ],
+  "presentation": {
+    "showNextActions": true
+  }
 }

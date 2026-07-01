@@ -1,6 +1,6 @@
 # Report Shape
 
-Default to a private Markdown report. HTML can be a follow-up only when the user needs filtering, navigation, or comparison across many evidence items.
+Default to a private Markdown report for the analysis record. For high-volume, multi-session, multi-case, or option-heavy audits, also generate an `effective-interact` visual-report input and validate the resulting HTML artifact when filtering, navigation, or comparison across many evidence items lowers interpretation cost.
 
 ## Required Order
 

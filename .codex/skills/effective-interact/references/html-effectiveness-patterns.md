@@ -1,6 +1,6 @@
 # HTML Effectiveness Pattern Library
 
-Use this reference when a request resembles the linked HTML effectiveness examples. Do not copy page-specific labels, layouts, or copy. Generalize the communication job, then choose the lightest artifact that reduces decision cost.
+Use this reference when a request resembles the linked HTML effectiveness examples. Source reviewed: `ThariqS/html-effectiveness` at `0e8d447494c81c661f2458b329e076a7ff7d75ec` (Apache-2.0; README labels it sample code, not maintained, and not accepting contributions). Do not copy page-specific labels, layouts, or copy. Generalize the communication job, then choose the lightest artifact that reduces decision cost.
 
 ## Anti-Overfit Rules
 
@@ -9,6 +9,7 @@ Use this reference when a request resembles the linked HTML effectiveness exampl
 - Keep production UI, full app building, slide decks, and long-lived prototypes in their own skills.
 - Use HTML only when navigation, side-by-side comparison, visual inspection, drilldown, filtering, local controls, or export makes the next decision faster.
 - Keep artifacts source-backed: claims should trace to files, commands, explicit assumptions, or linked sources.
+- For glossary-like sources, borrow the communication structure only. Write local-original definitions, preserve license boundaries, and make adjacent-term contrasts explicit.
 
 ## Source-Derived Case Families
 
@@ -26,8 +27,8 @@ Use this reference when a request resembles the linked HTML effectiveness exampl
 | Prototype interaction approval | Try a tiny interaction model and export the decision. | `prototype-approval` | drag/toggle controls, state list, export checklist | Never persist hidden state or mutate repo data. |
 | SVG illustration options | Compare explanatory illustrations or header visuals. | `illustration-gallery` | SVG panels, palette chips, usage notes | Do not create a production brand system here. |
 | Annotated flowchart | Explain a process with branches, gates, owners, or failure paths. | `flow-drilldown` | flow diagram, step cards, failure notes, owner/action table | One simple linear flow can stay as visual Markdown. |
-| Feature research explainer | Explain a feature or internal mechanism with citations and examples. | `explorable-explainer` | TL;DR cards, tabs, source rail, code/config examples | Do not overclaim beyond evidence. |
-| Concept research explainer | Teach a concept with a small interactive model. | `explorable-explainer` | sliders/toggles, glossary, example states, fallback explanation | The page must make sense without controls. |
+| Feature research explainer | Explain a feature or internal mechanism with citations and examples. | `explorable-explainer` | TL;DR cards, definition/boundary notes, tabs, source rail, code/config examples | Do not overclaim beyond evidence. |
+| Concept research explainer | Teach a concept or vocabulary boundary with examples and optional interaction. | `explorable-explainer` | definition cards, adjacent-term contrast, avoid/use-instead notes, glossary, example states, fallback explanation | The page must make sense without controls and must not copy external glossary text. |
 | Engineering status report | Show current state, progress, risks, owners, and next actions. | `status-dashboard` | metric cards, risk table, timeline, owner/status filters | Do not invent metrics or greenwash blockers. |
 | Incident report | Explain timeline, impact, root cause, mitigations, and follow-ups. | `incident-report` | timeline, impact cards, action item table, diff/config evidence | Keep dates/times concrete and distinguish facts from assumptions. |
 | Triage board editor | Sort or filter a small work queue and export decisions. | `triage-board-editor` | board, filters, priority chips, Markdown export | No network writes or hidden persistence. |
@@ -38,11 +39,12 @@ Use this reference when a request resembles the linked HTML effectiveness exampl
 
 Default visual language should feel like a dense engineering workbench, not a marketing page:
 
-- Warm neutral base: off-white page, white panels, muted taupe lines, dark warm ink.
-- Clay accent for focus, active controls, highlighted paths, and call-to-action affordances.
-- Olive success, umber warning, brick danger, and deep teal information states.
-- Typography: system sans for UI and report text; editor-like monospace only for code, paths, config, and exports.
-- Cards stay compact with 8px radius or less, clear borders, restrained shadows, and hover focus only when it improves scanning.
+- Warm neutral base: `#FAF9F5` page, `#FFFFFF` panels, `#D1CFC5` 1.5px lines, `#141413` primary ink, and `#3D3D3A` body ink.
+- Clay `#D97757` for focus, active controls, highlighted paths, and call-to-action affordances; oat `#E3DACC` and soft gray `#F0EEE6` for quiet fills.
+- Olive `#788C5D` success, umber warning, brick `#B04A3F` danger, and deep teal information states.
+- Typography: serif headings (`ui-serif`, Georgia) at weight 500; system sans for UI and report text; monospace only for code, paths, labels, config, counters, and exports.
+- Cards stay compact with 12px panel radius, 8px row/code radius, clear borders, restrained shadows, and hover focus only when it improves scanning.
+- Prefer unframed mastheads and section rules over card-wrapped report headers. First screen should show the answer and first useful structure, not boilerplate template metadata.
 - Use color to encode status, severity, grouping, ownership, or selected state. Do not use decorative gradients or color-only meaning.
 
 ## Taste-Derived Aesthetic Preflight
@@ -57,18 +59,18 @@ Selective source: `Leonxlnx/taste-skill` at `3c7017d636c3a4aad378433ea6d0cfa6c92
 - Motion check: motion must explain focus, state, filtering, navigation, or copy feedback. Provide `prefers-reduced-motion`; avoid spectacle-only animation.
 - Pre-flight before handoff: palette, card purpose, section repetition, hero density, contrast, reduced motion, mobile collapse, overflow, and visible copy/export path.
 
-## Template Mapping
+## Component Mapping
 
-| Template | Best source families | Notes |
+| Component composition | Best source families | Notes |
 | --- | --- | --- |
-| `decision-matrix` | code approach exploration, multi-option approval | Compare-first; recommendation visible before details. |
-| `visual-exploration` | visual directions, design systems, component variants, SVG illustration options | Shows visual inspection surfaces without becoming production UI. |
-| `implementation-plan` | implementation plan, milestone/dependency planning | Separates plan, gates, risks, and owner/action details. |
-| `review-findings` | PR review, review evidence tours | Keeps findings filterable and code evidence adjacent. |
-| `implementation-handoff` | PR writeup, completed implementation handoff | Author-side story, file tour, test plan, rollout notes. |
-| `research-explainer` | code understanding, feature/concept research, flow drilldown | Explains mechanisms with citations, diagrams, examples, and glossary. |
-| `conclusion-dashboard` | status report, incident report, release acceptance | Fast scan of current state, timeline, risks, and follow-ups. |
-| `editor-workbench` | triage board, feature flags, prompt tuner | Local-only interaction plus visible Markdown, JSON, diff, or prompt export. |
+| `decision-matrix` + `data-table` + `code` | code approach exploration, multi-option approval | Compare-first; recommendation visible before details. |
+| `summary-cards` + `data-table` + `code` | visual directions, design systems, component variants, SVG illustration options | Shows visual inspection surfaces without becoming production UI. |
+| `timeline` + `data-table` + `mermaid` | implementation plan, milestone/dependency planning | Separates plan, gates, risks, and owner/action details. |
+| `filterable-cards` + `diff` + `actions` | PR review, review evidence tours | Keeps findings filterable and code evidence adjacent. |
+| `summary-cards` + `data-table` + `code` | PR writeup, completed implementation handoff | Author-side story, file tour, test plan, rollout notes. |
+| `tabs` + `mermaid` + `data-table` | code understanding, feature/concept research, vocabulary boundary, flow drilldown | Explains mechanisms and terms with definitions, adjacent-concept contrasts, citations, diagrams, examples, and glossary. |
+| `summary-cards` + `timeline` + `data-table` | status report, incident report, release acceptance | Fast scan of current state, timeline, risks, and follow-ups. |
+| `tabs` + `code` + `actions` | triage board, feature flags, prompt tuner | Local-only interaction plus visible Markdown, JSON, diff, or prompt export. |
 
 ## HTML Escalation Checklist
 

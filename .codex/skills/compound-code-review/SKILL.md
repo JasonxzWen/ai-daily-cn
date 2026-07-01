@@ -1,17 +1,16 @@
 ---
 name: compound-code-review
-description: "Run a Compound Engineering-inspired code review with structured findings, reviewer lenses, anchored confidence, and fix routing. Use for deep pre-PR review, CE-style review, multi-perspective review, or when a normal verification pass is too shallow."
+description: "Load when a workflow-router-selected owner workflow needs Compound Engineering-inspired code review for deep pre-PR, CE-style, or multi-perspective review with structured findings, lenses, confidence, and fix routing; skip ordinary verification."
 license: MIT
 metadata:
   source: "EveryInc/compound-engineering-plugin plugins/compound-engineering/skills/ce-code-review"
   upstream_commit: "d090bde0ff1bbc33ec3c3b2049cb4687e9d76532"
   upstream_plugin_version: "3.8.0"
-  adapted_for: "Codex Skill Hub"
 ---
 
 # Compound Code Review
 
-This is a narrow Codex adaptation of `ce-code-review` from `EveryInc/compound-engineering-plugin`.
+This is a narrow skill adaptation of `ce-code-review` from `EveryInc/compound-engineering-plugin`.
 
 It preserves the useful review contract: reviewer lenses, evidence-backed findings, anchored confidence, severity grouping, and action routing. It deliberately omits the rest of the Compound Engineering plugin surface.
 
@@ -23,7 +22,7 @@ Do not use it for:
 
 - normal final command gates; use `verification-loop`
 - focused security-only checks; use `security-review`
-- UI/accessibility audits; use `web-design-guidelines`
+- UI/accessibility audits; use `web-design-guidelines` only when that helper is relevant and available
 - addressing GitHub review threads; this skill reports findings only
 - committing, pushing, opening PRs, filing issues, or replying on external systems
 
@@ -120,4 +119,4 @@ State the highest-signal next action. Do not include broad cleanup or speculativ
 
 ## Source Notes
 
-This skill is adapted from the MIT-licensed Compound Engineering `ce-code-review` workflow. The adaptation keeps the review model and structured contracts while replacing the full plugin's custom agent dependency with Codex-compatible reviewer lenses and a read-only default.
+This skill is adapted from the MIT-licensed Compound Engineering `ce-code-review` workflow. The adaptation keeps the review model and structured contracts while replacing the full plugin's custom agent dependency with agent-compatible reviewer lenses and a read-only default.

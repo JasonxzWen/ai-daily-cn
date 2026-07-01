@@ -2,7 +2,6 @@
   "title": "把五篇材料讲清楚：从技能评测到技能进化",
   "summary": "Status: Build skill utility gates before self-evolving skills.",
   "status": "complete",
-  "template": "research-explainer",
   "renderMode": "pre-rendered",
   "handoff": {
     "sourcePath": "skills/effective-interact/assets/fixtures/skill-research-report-readable.json",
@@ -27,12 +26,30 @@
       "group": "summary",
       "summary": "这五个对象其实在回答同一个问题：经验怎么变成可复用、可验证、可改进的技能。",
       "cards": [
-        { "label": "问题", "value": "Agent 做过任务后，经验会散在日志里。" },
-        { "label": "SkillLens", "value": "先判断什么样的经验写成技能后真的有用。" },
-        { "label": "GEPA", "value": "把 prompt / policy 文本当成可进化资产。" },
-        { "label": "SkillOpt", "value": "把这种进化方法专门用来训练 SKILL.md。" },
-        { "label": "达尔文.skill / autoresearch", "value": "把论文思路落成工程里的 keep / discard 循环。" },
-        { "label": "Harness Hub", "value": "现在最缺的是评测闭环，不是更多技能条目。" }
+        {
+          "label": "问题",
+          "value": "Agent 做过任务后，经验会散在日志里。"
+        },
+        {
+          "label": "SkillLens",
+          "value": "先判断什么样的经验写成技能后真的有用。"
+        },
+        {
+          "label": "GEPA",
+          "value": "把 prompt / policy 文本当成可进化资产。"
+        },
+        {
+          "label": "SkillOpt",
+          "value": "把这种进化方法专门用来训练 SKILL.md。"
+        },
+        {
+          "label": "达尔文.skill / autoresearch",
+          "value": "把论文思路落成工程里的 keep / discard 循环。"
+        },
+        {
+          "label": "Harness Hub",
+          "value": "现在最缺的是评测闭环，不是更多技能条目。"
+        }
       ]
     },
     {
@@ -41,11 +58,26 @@
       "group": "main",
       "summary": "先分清每个对象站在哪一层，后面的算法才容易理解。",
       "columns": [
-        { "key": "layer", "label": "层级" },
-        { "key": "item", "label": "材料" },
-        { "key": "plain", "label": "一句话理解" },
-        { "key": "question", "label": "它在回答的问题" },
-        { "key": "hub", "label": "对 Harness Hub 的启发" }
+        {
+          "key": "layer",
+          "label": "层级"
+        },
+        {
+          "key": "item",
+          "label": "材料"
+        },
+        {
+          "key": "plain",
+          "label": "一句话理解"
+        },
+        {
+          "key": "question",
+          "label": "它在回答的问题"
+        },
+        {
+          "key": "hub",
+          "label": "对 Harness Hub 的启发"
+        }
       ],
       "rows": [
         {
@@ -126,11 +158,26 @@
       "group": "details",
       "summary": "把 GEPA 当成一个五步循环，而不是先记论文术语。",
       "columns": [
-        { "key": "step", "label": "步骤" },
-        { "key": "plain", "label": "普通说法" },
-        { "key": "input", "label": "输入" },
-        { "key": "output", "label": "输出" },
-        { "key": "hub_example", "label": "换成 Harness Hub 的例子" }
+        {
+          "key": "step",
+          "label": "步骤"
+        },
+        {
+          "key": "plain",
+          "label": "普通说法"
+        },
+        {
+          "key": "input",
+          "label": "输入"
+        },
+        {
+          "key": "output",
+          "label": "输出"
+        },
+        {
+          "key": "hub_example",
+          "label": "换成 Harness Hub 的例子"
+        }
       ],
       "rows": [
         {
@@ -176,10 +223,22 @@
       "group": "details",
       "summary": "GEPA 是更通用的文本进化思想，SkillOpt 把它约束到 skill 文档训练。",
       "columns": [
-        { "key": "dimension", "label": "维度" },
-        { "key": "gepa", "label": "GEPA" },
-        { "key": "skillopt", "label": "SkillOpt" },
-        { "key": "why", "label": "为什么这点重要" }
+        {
+          "key": "dimension",
+          "label": "维度"
+        },
+        {
+          "key": "gepa",
+          "label": "GEPA"
+        },
+        {
+          "key": "skillopt",
+          "label": "SkillOpt"
+        },
+        {
+          "key": "why",
+          "label": "为什么这点重要"
+        }
       ],
       "rows": [
         {
@@ -214,10 +273,22 @@
       "group": "impact",
       "summary": "按能不能立刻变成仓库任务来排序。",
       "columns": [
-        { "key": "priority", "label": "优先级" },
-        { "key": "do", "label": "该做什么" },
-        { "key": "reason", "label": "为什么" },
-        { "key": "first_step", "label": "第一步" }
+        {
+          "key": "priority",
+          "label": "优先级"
+        },
+        {
+          "key": "do",
+          "label": "该做什么"
+        },
+        {
+          "key": "reason",
+          "label": "为什么"
+        },
+        {
+          "key": "first_step",
+          "label": "第一步"
+        }
       ],
       "rows": [
         {
@@ -278,21 +349,32 @@
       "id": "claim-utility-first",
       "statement": "Harness Hub 当前最该补的是可验证的 skill utility loop，而不是继续扩大 skill 数量。",
       "kind": "conclusion",
-      "evidenceIds": ["skilllens-paper", "skillopt-paper", "harness-hub-readme"],
+      "evidenceIds": [
+        "skilllens-paper",
+        "skillopt-paper",
+        "harness-hub-readme"
+      ],
       "confidence": "high"
     },
     {
       "id": "claim-gate-first",
       "statement": "任何 skill 自优化都应先经过 held-out validation gate，再考虑晋升到正式分发面。",
       "kind": "recommendation",
-      "evidenceIds": ["skillopt-paper", "skillopt-repo", "gepa-repo"],
+      "evidenceIds": [
+        "skillopt-paper",
+        "skillopt-repo",
+        "gepa-repo"
+      ],
       "confidence": "high"
     },
     {
       "id": "claim-human-review",
       "statement": "对分发型仓库，默认人工晋升比默认全自动自改更符合治理边界。",
       "kind": "recommendation",
-      "evidenceIds": ["darwin-skill-readme", "harness-hub-sources"],
+      "evidenceIds": [
+        "darwin-skill-readme",
+        "harness-hub-sources"
+      ],
       "confidence": "high"
     }
   ],

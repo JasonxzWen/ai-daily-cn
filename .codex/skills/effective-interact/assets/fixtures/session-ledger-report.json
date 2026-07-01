@@ -2,7 +2,6 @@
   "title": "Long-task session ledger",
   "summary": "Decision: use a local JSONL ledger only when long-task facts would drift.",
   "status": "review",
-  "template": "conclusion-dashboard",
   "renderMode": "runtime-cdn",
   "generatedAt": "2026-05-21T00:00:00.000Z",
   "intent": {
@@ -22,7 +21,10 @@
       "id": "claim-ledger-path",
       "statement": "The session ledger belongs under the ignored skill-local artifacts tree.",
       "kind": "conclusion",
-      "evidenceIds": ["ledger-schema", "skill-gitignore"],
+      "evidenceIds": [
+        "ledger-schema",
+        "skill-gitignore"
+      ],
       "confidence": "high",
       "dateRange": "2026-05-21"
     },
@@ -30,9 +32,13 @@
       "id": "claim-redaction",
       "statement": "Ledger entries should summarize tool output and never store secrets or raw large logs.",
       "kind": "risk",
-      "evidenceIds": ["ledger-schema"],
+      "evidenceIds": [
+        "ledger-schema"
+      ],
       "confidence": "high",
-      "knownLimits": ["The ledger is a fact preservation aid; source evidence still needs commands, files, or assumptions."]
+      "knownLimits": [
+        "The ledger is a fact preservation aid; source evidence still needs commands, files, or assumptions."
+      ]
     }
   ],
   "sections": [
@@ -77,9 +83,21 @@
       "status": "ready",
       "summary": "Each row is a compact fact, not a transcript dump.",
       "columns": [
-        { "key": "kind", "label": "kind", "width": "18%" },
-        { "key": "keep", "label": "record", "width": "40%" },
-        { "key": "avoid", "label": "avoid", "width": "42%" }
+        {
+          "key": "kind",
+          "label": "kind",
+          "width": "18%"
+        },
+        {
+          "key": "keep",
+          "label": "record",
+          "width": "40%"
+        },
+        {
+          "key": "avoid",
+          "label": "avoid",
+          "width": "42%"
+        }
       ],
       "rows": [
         {
@@ -154,5 +172,8 @@
   "nextActions": [
     "Create a ledger only when long-task facts would otherwise drift.",
     "Use ledger facts as report inputs, then still cite commands, files, or assumptions."
-  ]
+  ],
+  "presentation": {
+    "showEvidence": true
+  }
 }

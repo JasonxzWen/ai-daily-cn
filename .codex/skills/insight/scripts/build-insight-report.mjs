@@ -5,9 +5,10 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 function usage() {
-  return `Usage: node skills/insight/scripts/build-insight-report.mjs --ledger <events.jsonl> [--manifest <manifest.json>] [--out <report.md>] [--json]
+  return `Usage: node skills/insight/scripts/build-insight-report.mjs --ledger <events.jsonl> [--manifest <manifest.json>] [--out <report.md>] [--effective-interact-input <input.json>] [--json]
 
-Builds a private Markdown report from an insight event ledger.`;
+Builds a private Markdown report from an insight event ledger.
+Optionally writes an effective-interact JSON input for a visual HTML handoff.`;
 }
 
 function parseArgs(argv) {
@@ -15,6 +16,7 @@ function parseArgs(argv) {
     ledger: null,
     manifest: null,
     out: null,
+    effectiveInteractInput: null,
     json: false,
     help: false,
   };
@@ -27,6 +29,8 @@ function parseArgs(argv) {
       options.manifest = readValue(argv, ++index, arg);
     } else if (arg === '--out') {
       options.out = readValue(argv, ++index, arg);
+    } else if (arg === '--effective-interact-input') {
+      options.effectiveInteractInput = readValue(argv, ++index, arg);
     } else if (arg === '--json') {
       options.json = true;
     } else if (arg === '--help' || arg === '-h') {
@@ -281,6 +285,101 @@ function topBottlenecks(events) {
     }));
 }
 
+function topInsights(events, bottlenecks, manifest) {
+  const strong = strongInteractionEvents(events);
+  const insights = [];
+  const candidate = events.filter((event) => event.relevance === 'candidate');
+  const validation = signalCount(strong, 'validation');
+  const decisions = signalCount(strong, 'decision');
+  const toolTrace = signalCount(strong, 'toolTrace');
+  const missingClaude = manifest?.hosts?.includes('claude-code')
+    && !events.some((event) => event.host === 'claude-code' && isInteractionEvent(event));
+  const repeatedBottleneck = bottlenecks.find((item) => item.count > 0 && item.key !== 'evidence coverage');
+
+  if (strong.length < 2) {
+    insights.push({
+      tier: 'weak lead',
+      title: 'Evidence is too thin for a strong collaboration pattern',
+      text: 'Use this audit as an instrumentation read, not as proof of user or agent behavior.',
+      evidence: [...strong, ...candidate].slice(0, 3).map((event) => event.id),
+      confidence: 'low',
+    });
+  }
+
+  if (repeatedBottleneck) {
+    insights.push({
+      tier: 'strong insight',
+      title: `${repeatedBottleneck.key} is the clearest friction pattern`,
+      text: `${repeatedBottleneck.count} confirmed interaction event(s) point to this pattern before any recommendation is selected.`,
+      evidence: repeatedBottleneck.ids.slice(0, 5),
+      confidence: repeatedBottleneck.count >= 2 ? 'high' : 'medium',
+    });
+  }
+
+  if (strong.length > 0 && validation === 0) {
+    insights.push({
+      tier: 'strong insight',
+      title: 'Validation closure is not visible in confirmed traces',
+      text: 'Recent work may still be valid, but the trace does not give the user durable proof of closure.',
+      evidence: strong.slice(0, 5).map((event) => event.id),
+      confidence: strong.length >= 3 ? 'high' : 'medium',
+    });
+  }
+
+  if (strong.length > 0 && toolTrace === 0) {
+    insights.push({
+      tier: 'weak lead',
+      title: 'Tool-branch quality cannot be judged from the current ledger',
+      text: 'The audit should not claim failed tool strategy without parsed tool-call or tool-result evidence.',
+      evidence: strong.slice(0, 3).map((event) => event.id),
+      confidence: 'low',
+    });
+  }
+
+  if (strong.length >= 3 && decisions > 0 && validation > 0 && !repeatedBottleneck) {
+    insights.push({
+      tier: 'strong insight',
+      title: 'The visible pattern is mostly healthy execution, not repeated friction',
+      text: 'Confirmed traces show decision and validation signals without a repeated bottleneck lead.',
+      evidence: strong.slice(0, 5).map((event) => event.id),
+      confidence: 'medium',
+    });
+  }
+
+  if (missingClaude) {
+    insights.push({
+      tier: 'unknown',
+      title: 'Claude Code behavior is under-evidenced',
+      text: 'The requested host is in scope, but no confirmed Claude Code interaction event was collected.',
+      evidence: events.filter((event) => event.host === 'claude-code').slice(0, 3).map((event) => event.id),
+      confidence: 'unknown',
+    });
+  }
+
+  if (insights.length === 0) {
+    insights.push({
+      tier: 'unknown',
+      title: 'No strong insight should be forced from this ledger',
+      text: 'The correct output is a bounded evidence summary plus next instrumentation, not a padded narrative.',
+      evidence: strong.slice(0, 3).map((event) => event.id),
+      confidence: 'unknown',
+    });
+  }
+
+  return dedupeInsights(insights).slice(0, 3);
+}
+
+function dedupeInsights(insights) {
+  const seen = new Set();
+  return insights.filter((insight) => {
+    if (seen.has(insight.title)) {
+      return false;
+    }
+    seen.add(insight.title);
+    return true;
+  });
+}
+
 function recommendations(events, bottlenecks, manifest) {
   const recs = [];
   const strong = strongInteractionEvents(events);
@@ -480,6 +579,302 @@ function formatEvidenceIds(ids) {
   return ids.length > 0 ? ids.map((id) => `\`${id}\``).join(', ') : 'no direct event IDs';
 }
 
+function formatPlainEvidenceIds(ids) {
+  return ids.length > 0 ? ids.join(', ') : 'no direct event IDs';
+}
+
+function confidenceForCluster(group) {
+  if (group.high > 0) {
+    return 'high';
+  }
+  if (group.confirmed > 0) {
+    return 'medium';
+  }
+  return 'low';
+}
+
+function objectRows(rows, dimension) {
+  return rows.map(([value, count]) => ({ dimension, value, count }));
+}
+
+function statusForVerdict(label) {
+  if (label === 'healthy') return 'ready';
+  if (label === 'blocked') return 'blocked';
+  if (label === 'under-evidenced') return 'review';
+  return 'review';
+}
+
+function buildEffectiveInteractInput({
+  events,
+  manifest,
+  warnings,
+  verdict,
+  strong,
+  insights,
+  bottlenecks,
+  recs,
+  clusters,
+  sourceClassRows,
+  confidenceRows,
+  repoAffinityRows,
+  evidenceRoleRows,
+  eventTypeRows,
+  signalRows,
+  outPath,
+}) {
+  const confirmedCount = events.filter((event) => event.relevance === 'confirmed').length;
+  const candidateCount = events.filter((event) => event.relevance === 'candidate').length;
+  const traceAuditRows = [
+    { metric: 'Strong confirmed interaction events', value: strong.length, note: 'Primary evidence tier for strong claims.' },
+    { metric: 'Confirmed events', value: confirmedCount, note: 'Confirmed relevance, including context.' },
+    { metric: 'Candidate events', value: candidateCount, note: 'Weak support or instrumentation leads only.' },
+    { metric: 'Parsed tool-call/result events', value: events.filter(isParsedToolEvent).length, note: 'Used for tool branch judgment.' },
+    { metric: 'Blocker or failure events', value: signalCount(events, 'blocker'), note: 'Broad signal; strong claims still require primary interaction evidence.' },
+    { metric: 'Validation events', value: signalCount(events, 'validation'), note: 'Closure visibility.' },
+    { metric: 'Decision events', value: signalCount(events, 'decision'), note: 'Decision capture visibility.' },
+    { metric: 'Warnings', value: warnings.length, note: 'Collection/report limits.' },
+  ];
+
+  return {
+    title: 'Insight 交互审计可视化汇报',
+    summary: `结论：${verdict.label}。${verdict.text}`,
+    status: statusForVerdict(verdict.label),
+    renderMode: 'pre-rendered',
+    intent: {
+      audience: 'Repository maintainer reviewing human-agent collaboration traces',
+      primaryQuestion: '哪些交互模式、瓶颈和改进建议有证据支持？',
+      decision: '先处理最高证据强度的改进项，不用薄弱证据硬编结论。',
+      timeBudget: '2-5 minutes',
+      artifactKind: 'status',
+      successCriteria: [
+        'Separate strong insights from weak leads and unknowns.',
+        'Show evidence coverage before recommendations.',
+        'Make bottlenecks, recommendations, and next actions scan-first.',
+      ],
+    },
+    sections: [
+      {
+        type: 'data-table',
+        title: '结论与证据强度',
+        group: 'summary',
+        status: statusForVerdict(verdict.label),
+        summary: '先看 verdict、证据层级和报告边界。',
+        columns: [
+          { key: 'metric', label: '指标' },
+          { key: 'value', label: '值' },
+          { key: 'note', label: '含义' },
+        ],
+        rows: [
+          { metric: 'Verdict', value: verdict.label, note: verdict.text },
+          { metric: 'Total events', value: events.length, note: 'Collected ledger events.' },
+          { metric: 'Strong interaction', value: strong.length, note: 'Can support strong insight when pattern repeats.' },
+          { metric: 'Confirmed', value: confirmedCount, note: 'Project-related evidence.' },
+          { metric: 'Candidate', value: candidateCount, note: 'Weak leads only.' },
+          { metric: 'Warnings', value: warnings.length, note: 'Missing or degraded evidence limits.' },
+        ],
+      },
+      {
+        type: 'data-table',
+        title: 'Top Insights',
+        group: 'main',
+        status: 'info',
+        summary: '洞察按证据层级分级；薄弱证据只给弱线索。',
+        columns: [
+          { key: 'tier', label: '层级' },
+          { key: 'title', label: '洞察' },
+          { key: 'confidence', label: '置信度' },
+          { key: 'evidence', label: '证据 ID' },
+          { key: 'text', label: '解释' },
+        ],
+        rows: insights.map((item) => ({
+          tier: item.tier,
+          title: item.title,
+          confidence: item.confidence,
+          evidence: formatPlainEvidenceIds(item.evidence),
+          text: item.text,
+        })),
+      },
+      {
+        type: 'data-table',
+        title: 'Top Bottlenecks',
+        group: 'main',
+        status: bottlenecks.some((item) => item.count > 0) ? 'warn' : 'info',
+        summary: '瓶颈只从主要交互证据中归纳。',
+        columns: [
+          { key: 'category', label: '瓶颈' },
+          { key: 'count', label: '次数', align: 'right' },
+          { key: 'evidence', label: '证据 ID' },
+          { key: 'impact', label: '影响' },
+        ],
+        rows: bottlenecks.map((item) => ({
+          category: item.key,
+          count: item.count,
+          evidence: formatPlainEvidenceIds(item.ids.slice(0, 5)),
+          impact: item.text,
+        })),
+      },
+      {
+        type: 'data-table',
+        title: 'Top Recommendations',
+        group: 'decision',
+        status: 'info',
+        summary: '建议必须可执行，并能追溯到瓶颈或证据限制。',
+        columns: [
+          { key: 'recommendation', label: '建议' },
+          { key: 'owner', label: '建议 owner' },
+          { key: 'evidence', label: '证据 ID' },
+        ],
+        rows: recs.map((item) => ({
+          recommendation: item.title,
+          owner: item.owner,
+          evidence: formatPlainEvidenceIds(item.evidence),
+        })),
+      },
+      {
+        type: 'data-table',
+        title: 'Evidence Coverage',
+        group: 'evidence',
+        status: warnings.length > 0 ? 'warn' : 'info',
+        summary: '来源、置信度、repo 关联和证据角色分布。',
+        columns: [
+          { key: 'dimension', label: '维度' },
+          { key: 'value', label: '值' },
+          { key: 'count', label: '数量', align: 'right' },
+        ],
+        rows: [
+          ...objectRows(sourceClassRows, 'sourceClass'),
+          ...objectRows(confidenceRows, 'confidence'),
+          ...objectRows(repoAffinityRows, 'repoAffinity'),
+          ...objectRows(evidenceRoleRows, 'evidenceRole'),
+        ],
+      },
+      {
+        type: 'data-table',
+        title: 'Task Clusters',
+        group: 'details',
+        status: clusters.length > 0 ? 'info' : 'warn',
+        summary: '把会话按 trace/source 聚合，避免只看全局计数。',
+        columns: [
+          { key: 'task', label: '任务/会话线索' },
+          { key: 'events', label: '事件', align: 'right' },
+          { key: 'tools', label: '工具', align: 'right' },
+          { key: 'blockers', label: '阻塞', align: 'right' },
+          { key: 'validation', label: '验证', align: 'right' },
+          { key: 'confidence', label: '置信度' },
+          { key: 'source', label: '来源' },
+        ],
+        rows: clusters.map((group) => ({
+          task: group.title,
+          events: group.events.length,
+          tools: group.tool,
+          blockers: group.blockers,
+          validation: group.validation,
+          confidence: confidenceForCluster(group),
+          source: group.key,
+        })),
+      },
+      {
+        type: 'data-table',
+        title: 'Trace Audit',
+        group: 'details',
+        status: 'info',
+        summary: '工具、验证、决策和阻塞信号的可见性。',
+        columns: [
+          { key: 'metric', label: '指标' },
+          { key: 'value', label: '值', align: 'right' },
+          { key: 'note', label: '解释' },
+        ],
+        rows: traceAuditRows,
+      },
+      {
+        type: 'data-table',
+        title: 'Event Type And Signal Mix',
+        group: 'details',
+        status: 'info',
+        summary: '用于判断这次审计是否偏向某类 trace。',
+        columns: [
+          { key: 'dimension', label: '维度' },
+          { key: 'value', label: '值' },
+          { key: 'count', label: '数量', align: 'right' },
+        ],
+        rows: [
+          ...objectRows(eventTypeRows, 'eventType'),
+          ...objectRows(signalRows, 'signal'),
+        ],
+      },
+      {
+        type: 'markdown',
+        title: '证据边界',
+        group: 'risks',
+        status: warnings.length > 0 ? 'warn' : 'info',
+        summary: '哪些结论不能从当前 ledger 里推出。',
+        content: [
+          '- 强洞察只能来自 confirmed、非 low-confidence、exact/strong repo affinity 的 interaction evidence。',
+          '- Candidate、repo-state、low-confidence 或稀疏样本只支持 weak lead、unknown 或 next instrumentation。',
+          '- 普通源码文件不是 interaction evidence；它只能解释背景，不能单独成为瓶颈。',
+          '- 如果 host trace 根缺失或不可读，需要先修采集面，再判断该 host 的代理行为。',
+          warnings.length > 0 ? `- 当前 warnings: ${warnings.join('; ')}` : '- 当前没有采集或报告 warning。',
+        ].join('\n'),
+      },
+      {
+        type: 'actions',
+        title: '下一步',
+        group: 'next',
+        status: 'info',
+        summary: '优先处理最高证据强度的改进项。',
+        items: recs.map((item) => `${item.title} (${item.owner})`),
+      },
+    ],
+    claims: [
+      {
+        id: 'claim-verdict',
+        statement: `Insight verdict is ${verdict.label}: ${verdict.text}`,
+        kind: 'conclusion',
+        evidenceIds: strong.slice(0, 5).map((event) => event.id),
+        confidence: strong.length >= 2 ? 'medium' : 'low',
+        knownLimits: warnings,
+      },
+      ...insights.map((item, index) => ({
+        id: `claim-insight-${index + 1}`,
+        statement: item.title,
+        kind: item.tier === 'unknown' ? 'assumption' : 'trend',
+        evidenceIds: item.evidence,
+        confidence: item.confidence,
+      })),
+    ],
+    evidence: [
+      {
+        id: 'evidence-ledger',
+        kind: 'file',
+        label: 'Insight event ledger',
+        value: path.basename(outPath),
+        status: 'info',
+        knownLimits: ['Ledger location may be temporary or ignored by design.'],
+      },
+      {
+        id: 'evidence-manifest',
+        kind: 'file',
+        label: 'Insight manifest',
+        value: manifest ? 'manifest provided' : 'manifest missing',
+        status: manifest ? 'pass' : 'warn',
+      },
+    ],
+    verification: [
+      {
+        label: 'Insight Markdown report generated',
+        status: 'pass',
+        detail: outPath,
+      },
+      {
+        label: 'Effective Interact input generated',
+        status: 'pass',
+        detail: 'Run create-interaction.mjs and validate-interaction.mjs before handoff.',
+      },
+    ],
+    nextActions: recs.map((item) => `${item.title} (${item.owner})`),
+  };
+}
+
 function formatEvidenceAppendix(events) {
   if (events.length === 0) {
     return '- No events collected.';
@@ -504,6 +899,7 @@ export function buildInsightReport(options) {
   const verdict = healthVerdict(events);
   const strong = strongInteractionEvents(events);
   const bottlenecks = topBottlenecks(events);
+  const insights = topInsights(events, bottlenecks, manifest);
   const recs = recommendations(events, bottlenecks, manifest);
   const outPath = path.resolve(options.out || path.join(path.dirname(path.resolve(options.ledger)), 'insight-report.md'));
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
@@ -550,6 +946,10 @@ ${tableRows(evidenceRoleRows)}
 Host roots:
 
 ${hostCoverageRows(manifest, events)}
+## Top Insights
+
+${insights.map((item, index) => `${index + 1}. **${item.title}** (${item.tier}, confidence=${item.confidence}): ${item.text} Evidence: ${formatEvidenceIds(item.evidence)}.`).join('\n')}
+
 ## Top Bottlenecks
 
 ${bottlenecks.map((item, index) => `${index + 1}. **${item.key}**: ${item.text} Evidence: ${formatEvidenceIds(item.ids.slice(0, 5))}.`).join('\n')}
@@ -618,9 +1018,34 @@ ${warnings.length > 0 ? warnings.map((warning) => `- ${warning}`).join('\n') : '
 `;
 
   fs.writeFileSync(outPath, report);
+  let effectiveInteractInputPath = null;
+  if (options.effectiveInteractInput) {
+    effectiveInteractInputPath = path.resolve(options.effectiveInteractInput);
+    fs.mkdirSync(path.dirname(effectiveInteractInputPath), { recursive: true });
+    const input = buildEffectiveInteractInput({
+      events,
+      manifest,
+      warnings,
+      verdict,
+      strong,
+      insights,
+      bottlenecks,
+      recs,
+      clusters,
+      sourceClassRows,
+      confidenceRows,
+      repoAffinityRows,
+      evidenceRoleRows,
+      eventTypeRows,
+      signalRows,
+      outPath,
+    });
+    fs.writeFileSync(effectiveInteractInputPath, `${JSON.stringify(input, null, 2)}\n`, 'utf8');
+  }
   return {
     ok: true,
     reportPath: outPath,
+    effectiveInteractInputPath,
     verdict: verdict.label,
     counts: {
       total: events.length,

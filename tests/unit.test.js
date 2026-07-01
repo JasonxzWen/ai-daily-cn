@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
+import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -1644,7 +1645,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   ];
   const input = reportToInteractionInput(report, { includeInternalSections: true });
 
-  assert.equal(input.template, "research-explainer");
+  assert.equal(input.intent.artifactKind, "research");
   assert.equal(input.renderMode, "pre-rendered");
   assert.equal(input.heroMode, "daily-report");
   assert.equal(input.heroTitle, "2026-05-15");
@@ -15473,16 +15474,13 @@ test("public daily IA reset enforces stories original X compact tracking hover a
 });
 
 test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: effective-interact CSS has no hover dim", async () => {
-  const cssPaths = [
-    path.join(rootDir, ".codex/skills/effective-interact/assets/components/interaction-ui.css"),
-    path.join(rootDir, ".codex/skills/effective-interact/_harness-hub/assets/components/interaction-ui.css")
-  ];
+  const cssPath = path.join(rootDir, ".codex/skills/effective-interact/assets/components/interaction-ui.css");
+  const conflictCopyPath = path.join(rootDir, ".codex/skills/effective-interact/_harness-hub");
+  const css = await fs.readFile(cssPath, "utf8");
 
-  for (const cssPath of cssPaths) {
-    const css = await fs.readFile(cssPath, "utf8");
-    assert.doesNotMatch(css, /\.focus-field:has\(\.interactive-card:hover\)\s+\.interactive-card:not\(:hover\)/);
-    assert.doesNotMatch(css, /filter:\s*grayscale\(0\.45\)/);
-  }
+  assert.equal(fsSync.existsSync(conflictCopyPath), false);
+  assert.doesNotMatch(css, /\.focus-field:has\(\.interactive-card:hover\)\s+\.interactive-card:not\(:hover\)/);
+  assert.doesNotMatch(css, /filter:\s*grayscale\(0\.45\)/);
 });
 
 test("public daily IA reset enforces stories original X compact tracking hover and source effectiveness: README and API aggregators are not blocked as non-feed-like", async () => {

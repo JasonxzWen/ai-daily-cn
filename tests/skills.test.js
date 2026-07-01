@@ -47,12 +47,13 @@ test("effective-interact skill is installed with generator, validator, schema, a
 
   const schema = JSON.parse(await fsp.readFile(path.join(skillDir, "references", "interaction-input-schema.json"), "utf8"));
   assert.deepEqual(schema.required, ["title", "summary", "status", "sections"]);
-  assert(schema.properties.heroMode.enum.includes("daily-report"));
-  assert(schema.properties.heroStats);
+  assert(schema.properties.presentation.properties.showHeroStats);
+  assert(schema.properties.intent.properties.artifactKind.enum.includes("research"));
+  assert.equal(Object.hasOwn(schema.properties, "template"), false);
   assert(schema.properties.sections.items.properties.type.enum.includes("diff"));
 });
 
-test("Harness Hub skill aggregation imports new skills without dropping local skill assets", async () => {
+test("Harness Hub skill aggregation full-overwrites overlapping skills without conflict copies", async () => {
   const manifestPath = path.join(rootDir, ".codex", "harness-hub-aggregation.json");
   const manifest = JSON.parse(await fsp.readFile(manifestPath, "utf8"));
 
@@ -67,12 +68,13 @@ test("Harness Hub skill aggregation imports new skills without dropping local sk
   assert.equal(manifest.localOnlySkills.includes("source-to-insight-blog"), false);
   assert(manifest.overlappingSkills.includes("tdd-workflow"));
   assert(manifest.overlappingSkills.includes("workflow-router"));
+  assert.equal(manifest.policy.syncMode, "full-overwrite");
+  assert.equal(manifest.counts.preservedConflicts, 0);
+  assert(manifest.overwrittenSkills.includes("effective-interact"));
+  assert(manifest.overwrittenSkills.includes("workflow-router"));
 
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "workflow-router", "SKILL.md")), true);
-  assert.equal(
-    fs.existsSync(path.join(rootDir, ".codex", "skills", "workflow-router", "_harness-hub", "scripts", "route-intent.mjs")),
-    true
-  );
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "workflow-router", "_harness-hub")), false);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "karpathy-guidelines", "SKILL.md")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "harness-quality-check", "SKILL.md")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "insight", "SKILL.md")), true);
@@ -80,12 +82,9 @@ test("Harness Hub skill aggregation imports new skills without dropping local sk
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "source-post", "SKILL.md")), true);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "source-to-insight-blog", "SKILL.md")), false);
   assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "html-work-reports", "SKILL.md")), true);
-  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "agents", "openai.yaml")), true);
-  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "_harness-hub", "SKILL.md")), true);
-  assert.equal(
-    fs.existsSync(path.join(rootDir, ".codex", "skills", "effective-interact", "_harness-hub", "scripts", "create-interaction.mjs")),
-    true
-  );
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "agents", "openai.yaml")), false);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "tdd-workflow", "_harness-hub")), false);
+  assert.equal(fs.existsSync(path.join(rootDir, ".codex", "skills", "effective-interact", "_harness-hub")), false);
 });
 
 test("Claude Code curated skills expose Harness Hub additions without Codex scaffolding", async () => {
@@ -217,7 +216,7 @@ test("Workflow router treats Harness Hub update adaptation as maintenance", () =
     [
       scriptPath,
       "--prompt",
-      "检查一下harness-hub的更新，把全部新特性、新功能都适配过来，codex和claude code都要兼容下",
+      "Update Harness Hub skill aggregation and adapt local overlay changes.",
       "--json"
     ],
     {
@@ -359,217 +358,64 @@ test("effective-interact generator creates a validated self-contained interactio
   assert(result.checks.includes("source-linked-code-evidence"));
 });
 
-test("effective-interact renders source inventory finder without using row-hiding search", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-finder-"));
-  const inputPath = path.join(tmp, "source-finder.json");
+
+test("effective-interact rejects legacy template inputs after 0.4.0 overwrite", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-legacy-template-"));
+  const inputPath = path.join(tmp, "legacy-template.json");
   await fsp.writeFile(
     inputPath,
     JSON.stringify({
-      title: "Source finder smoke",
-      summary: "Inventory finder smoke.",
+      title: "Legacy template check",
+      summary: "Legacy template inputs must not be accepted.",
       status: "complete",
       template: "research-explainer",
-      renderMode: "pre-rendered",
-      sections: [
-        {
-          type: "markdown",
-          title: "Full source inventory",
-          richId: "source-inventory",
-          sourceInventoryFinder: true,
-          sourceInventoryFinderTotal: 2,
-          content: "- overview"
-        },
-        {
-          type: "markdown",
-          title: "Core sources",
-          richId: "source-inventory-group-core-primary",
-          content: "- **OpenAI News RSS**; rss / core / configured\n- **WeChat Platform AI Feed**; rsshub / manual / platform:wechat / configuration_needed"
-        }
-      ]
+      sections: [{ type: "markdown", title: "Result", content: "- Should fail" }]
     }),
     "utf8"
   );
 
   const generated = spawnSync(
     process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "source-finder", "--json"],
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "legacy-template", "--json"],
     { cwd: rootDir, encoding: "utf8" }
   );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
 
-  const payload = JSON.parse(generated.stdout);
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  assert.match(html, /data-source-inventory-finder/);
-  assert.match(html, /data-source-inventory-search/);
-  assert.match(html, /data-source-inventory-status/);
-  assert.match(html, /data-source-inventory-next/);
-  assert.match(html, /data-source-inventory-clear/);
-  assert.doesNotMatch(html, /data-search-for="source-inventory"/);
-
-  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
-    cwd: rootDir,
-    encoding: "utf8"
-  });
-  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+  assert.notEqual(generated.status, 0);
+  assert.match(generated.stderr || generated.stdout, /template is no longer supported/);
 });
 
-test("effective-interact hero highlight renders link and reason as full-width stacked lines", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-hero-layout-"));
-  const inputPath = path.join(tmp, "hero-layout.json");
+test("effective-interact renders 0.4.0 presentation opt-ins and artifact kind", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-presentation-"));
+  const inputPath = path.join(tmp, "presentation.json");
   await fsp.writeFile(
     inputPath,
     JSON.stringify({
-      title: "AI 日报 2026-05-27",
-      summary: "- **[Copilot Studio computer-using agents GA](https://example.com/copilot)**：这是今天最值得放在 header 的产品消息。",
+      title: "Presentation check",
+      summary: "BLUF: the page uses explicit presentation toggles.",
       status: "complete",
-      template: "research-explainer",
       renderMode: "pre-rendered",
-      sections: [
-        {
-          type: "markdown",
-          title: "主体信息",
-          content: "- 已验证的主体信息。"
-        }
-      ]
-    }),
-    "utf8"
-  );
-
-  const generated = spawnSync(
-    process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "hero-layout", "--json"],
-    { cwd: rootDir, encoding: "utf8" }
-  );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
-
-  const payload = JSON.parse(generated.stdout);
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  assert.match(html, /class="hero-brief hero-brief-single"/);
-  assert.match(html, /hero-highlight-list/);
-  assert.match(html, /hero-highlight-link/);
-  assert.match(html, /hero-highlight-reason/);
-  assert.doesNotMatch(html, /<p class="hero-summary-text">-\s*<strong>/);
-
-  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
-    cwd: rootDir,
-    encoding: "utf8"
-  });
-  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
-});
-
-test("effective-interact can hide hero summary and navigation while keeping report stats", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-hide-hero-summary-"));
-  const inputPath = path.join(tmp, "hide-hero-summary.json");
-  await fsp.writeFile(
-    inputPath,
-    JSON.stringify({
-      title: "AI Daily 2026-05-28",
-      summary: "- **[Hidden highlight](https://example.com)**: this should not render in the hero.",
-      hideHeroSummary: true,
-      hideNavigation: true,
-      status: "complete",
-      template: "research-explainer",
-      renderMode: "pre-rendered",
-      intent: {
-        primaryQuestion: "What changed?",
-        decision: "Keep the hero concise.",
-        successCriteria: ["Hero summary is suppressed."]
+      presentation: {
+        showHeroStats: true,
+        showSuccessCriteria: true,
+        showClaims: true,
+        showEvidence: true,
+        showVerification: true,
+        showNextActions: true
       },
-      nextActions: ["Follow up"],
-      sections: [
-        {
-          type: "markdown",
-          title: "Main",
-          content: "- Verified item."
-        }
-      ]
-    }),
-    "utf8"
-  );
-
-  const generated = spawnSync(
-    process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "hide-hero-summary", "--json"],
-    { cwd: rootDir, encoding: "utf8" }
-  );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
-
-  const payload = JSON.parse(generated.stdout);
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  const body = html.slice(html.indexOf("<body>"));
-  assert.match(body, /class="hero-brief hero-brief-single"/);
-  assert.match(body, /hero-stat-grid/);
-  assert.doesNotMatch(body, /hero-summary-text/);
-  assert.doesNotMatch(body, /hero-highlight-list/);
-  assert.doesNotMatch(body, /Hidden highlight/);
-  assert.doesNotMatch(body, /report-nav/);
-  assert.doesNotMatch(body, /速览/);
-});
-
-test("effective-interact section headers omit visual group label tags", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-no-section-group-label-"));
-  const inputPath = path.join(tmp, "no-section-group-label.json");
-  await fsp.writeFile(
-    inputPath,
-    JSON.stringify({
-      title: "AI Daily 2026-05-29",
-      summary: "Section group labels should stay machine metadata only.",
-      status: "complete",
-      template: "research-explainer",
-      renderMode: "pre-rendered",
-      sections: [
-        {
-          type: "markdown",
-          title: "Hot Blogs",
-          group: "main",
-          content: "- Verified item."
-        }
-      ]
-    }),
-    "utf8"
-  );
-
-  const generated = spawnSync(
-    process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "no-section-group-label", "--json"],
-    { cwd: rootDir, encoding: "utf8" }
-  );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
-
-  const payload = JSON.parse(generated.stdout);
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  const section = html.match(/<section class="panel rich-section"[^>]*id="section-hot-blogs-1"[\s\S]*?<\/section>/)?.[0] || "";
-  assert(section);
-  assert.match(section, /<h2>Hot Blogs<\/h2>/);
-  assert.doesNotMatch(section, /<p class="meta">/);
-  assert.match(section, /data-section-group="main"/);
-});
-
-test("effective-interact date-only hero renders only the visible date", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-date-only-hero-"));
-  const inputPath = path.join(tmp, "date-only-hero.json");
-  await fsp.writeFile(
-    inputPath,
-    JSON.stringify({
-      title: "AI Daily 2026-05-28",
-      summary: "This summary should stay outside the hero.",
-      heroMode: "date-only",
-      heroTitle: "2026-05-28",
-      status: "complete",
-      template: "research-explainer",
-      renderMode: "pre-rendered",
       intent: {
+        artifactKind: "research",
         primaryQuestion: "What changed?",
-        decision: "Keep only the date in the hero.",
-        successCriteria: ["No status or intent cards."]
+        decision: "Use the updated component-first report contract.",
+        timeBudget: "2m",
+        successCriteria: ["Legacy template is absent", "Evidence is visible"]
       },
-      nextActions: ["Follow up"],
+      claims: [{ id: "claim-1", statement: "The report uses the 0.4.0 input contract.", kind: "conclusion", evidenceIds: ["evidence-1"], confidence: "high" }],
+      evidence: [{ id: "evidence-1", kind: "file", label: "Schema", filePath: ".codex/skills/effective-interact/references/interaction-input-schema.json", status: "pass" }],
+      verification: [{ label: "Generator", status: "pass", detail: "Generated with pre-rendered mode." }],
+      nextActions: ["Use sections and presentation toggles instead of legacy templates."],
       sections: [
-        {
-          type: "markdown",
-          title: "Main",
-          content: "- Verified item."
-        }
+        { type: "summary-cards", title: "Summary", cards: [{ label: "Mode", value: "0.4.0", detail: "Component-first" }] },
+        { type: "markdown", title: "Details", content: "- No legacy template field." }
       ]
     }),
     "utf8"
@@ -577,350 +423,20 @@ test("effective-interact date-only hero renders only the visible date", async ()
 
   const generated = spawnSync(
     process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "date-only-hero", "--json"],
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "presentation", "--json"],
     { cwd: rootDir, encoding: "utf8" }
   );
   assert.equal(generated.status, 0, generated.stderr || generated.stdout);
 
   const payload = JSON.parse(generated.stdout);
   const html = await fsp.readFile(payload.outputPath, "utf8");
-  const start = html.indexOf('<header id="report-top"');
-  const end = html.indexOf("</header>", start) + "</header>".length;
-  const header = html.slice(start, end);
-  assert.match(header, /report-hero-minimal/);
-  assert.match(header, /class="report-title report-date-title">2026-05-28<\/h1>/);
-  assert.doesNotMatch(header, /AI Daily/);
-  assert.doesNotMatch(header, /eyebrow/);
-  assert.doesNotMatch(header, /status-pill/);
-  assert.doesNotMatch(header, /hero-stat-grid/);
-  assert.doesNotMatch(header, /hero-decision-grid/);
-  assert.doesNotMatch(header, /What changed\?/);
-  assert.doesNotMatch(header, /Follow up/);
-});
-
-test("effective-interact daily report hero renders summary metrics and links", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-compact-hero-"));
-  const inputPath = path.join(tmp, "compact-hero.json");
-  await fsp.writeFile(
-    inputPath,
-    JSON.stringify({
-      title: "AI Daily 2026-05-29",
-      summary: "今日主线：模型能力、企业可运维性和 agent 采用证据同时推进。",
-      heroMode: "daily-report",
-      heroTitle: "2026-05-29",
-      heroEyebrow: "AI 日报",
-      heroStats: [
-        { label: "主体", value: "4", detail: "重点条目" },
-        { label: "信源窗", value: "05-27..05-29", detail: "扩展" }
-      ],
-      heroLinks: [
-        {
-          label: "结构化 JSON",
-          href: "https://example.com/data.json",
-          icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmciLz4="
-        }
-      ],
-      hideNavigation: true,
-      status: "complete",
-      template: "research-explainer",
-      renderMode: "pre-rendered",
-      sections: [
-        {
-          type: "markdown",
-          title: "主体信息",
-          content: "- Verified item."
-        }
-      ]
-    }),
-    "utf8"
-  );
-
-  const generated = spawnSync(
-    process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "compact-hero", "--json"],
-    { cwd: rootDir, encoding: "utf8" }
-  );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
-
-  const payload = JSON.parse(generated.stdout);
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  const start = html.indexOf('<header id="report-top"');
-  const end = html.indexOf("</header>", start) + "</header>".length;
-  const header = html.slice(start, end);
-  assert.match(header, /data-hero-mode="daily-report"/);
-  assert.match(header, /<div class="eyebrow">AI 日报<\/div>/);
-  assert.match(header, /<h1 class="report-title report-date-title">2026-05-29<\/h1>/);
-  assert.match(header, /今日主线：模型能力/);
-  assert.match(header, /<span>主体<\/span>/);
-  assert.match(header, /<strong>4<\/strong>/);
-  assert.match(header, /class="inline-site-icon hero-link-icon"/);
-  assert.match(header, /href="https:\/\/example\.com\/data\.json"/);
-  assert.doesNotMatch(header, /hero-decision-grid/);
-  assert.doesNotMatch(html, /<nav class="report-nav"/);
-});
-
-test("effective-interact keeps local daily-report extensions while applying Harness Hub defaults", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-effective-interact-merged-"));
-  const inputPath = path.join(tmp, "merged-effective-interact.json");
-  await fsp.writeFile(
-    inputPath,
-    JSON.stringify({
-      title: "AI Daily merged behavior",
-      summary: "- **[Primary item](https://example.com/primary)**: local hero highlight layout should still render.",
-      heroMode: "daily-report",
-      heroTitle: "2026-06-02",
-      heroStats: [{ label: "Items", value: "1", detail: "local extension" }],
-      heroLinks: [{ label: "Data", href: "https://example.com/data.json" }],
-      hideNavigation: true,
-      status: "complete",
-      sections: [
-        {
-          type: "mermaid",
-          title: "Fallback flow",
-          content: "graph LR\n  A --> B"
-        }
-      ]
-    }),
-    "utf8"
-  );
-
-  const generated = spawnSync(
-    process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "merged-effective-interact", "--json"],
-    {
-      cwd: rootDir,
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        EFFECTIVE_INTERACT_DISABLE_BROWSER_MERMAID: "1"
-      }
-    }
-  );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
-
-  const payload = JSON.parse(generated.stdout);
-  assert.equal(payload.renderMode, "pre-rendered");
-
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  assert.match(html, /data-render-mode="pre-rendered"/);
-  assert.match(html, /data-hero-mode="daily-report"/);
-  assert.match(html, /<h1 class="report-title report-date-title">2026-06-02<\/h1>/);
-  assert.match(html, /hero-highlight-list/);
-  assert.match(html, /hero-link/);
-  assert.doesNotMatch(html, /<nav class="report-nav"/);
-  assert.match(html, /data-rich-kind="mermaid" data-render-state="degraded"/);
-  assert.match(html, /data-mermaid-renderer="fallback"/);
-});
-
-test("effective-interact can collapse appendix sections and next actions by default", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-collapsed-appendix-"));
-  const inputPath = path.join(tmp, "collapsed-appendix.json");
-  await fsp.writeFile(
-    inputPath,
-    JSON.stringify({
-      title: "AI Daily 2026-05-28",
-      summary: "Collapsed appendix check.",
-      status: "complete",
-      template: "research-explainer",
-      renderMode: "pre-rendered",
-      nextActionsCollapsed: true,
-      nextActions: ["Tighten source checks"],
-      sections: [
-        {
-          type: "markdown",
-          title: "Source Audit",
-          group: "verification",
-          appendix: true,
-          appendixLabel: "Appendix",
-          collapsed: true,
-          summary: "Trace details only.",
-          content: "- Retried discovery once."
-        }
-      ]
-    }),
-    "utf8"
-  );
-
-  const generated = spawnSync(
-    process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "collapsed-appendix", "--json"],
-    { cwd: rootDir, encoding: "utf8" }
-  );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
-
-  const payload = JSON.parse(generated.stdout);
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  const appendix = html.match(/<details class="panel rich-section collapsible-panel appendix-panel"[^>]*id="section-source-audit-1"[\s\S]*?<\/details>/)?.[0] || "";
-  assert(appendix);
-  assert.match(appendix, /data-section-collapsed="true"/);
-  assert.match(appendix, /data-section-appendix="true"/);
-  assert.match(appendix, /<span class="meta">Appendix<\/span>/);
-  assert.match(appendix, /<span class="collapsible-title">Source Audit<\/span>/);
-  assert.match(appendix, /Retried discovery once/);
-  assert.doesNotMatch(appendix.match(/^<details[^>]+>/)?.[0] || "", /\sopen(?:\s|>)/);
-
-  const nextActions = html.match(/<details class="panel supplemental-panel collapsible-panel appendix-panel"[^>]*id="next-actions"[\s\S]*?<\/details>/)?.[0] || "";
-  assert(nextActions);
-  assert.match(nextActions, /<span class="collapsible-title">下一步<\/span>/);
-  assert.match(nextActions, /Tighten source checks/);
-  assert.doesNotMatch(nextActions.match(/^<details[^>]+>/)?.[0] || "", /\sopen(?:\s|>)/);
-});
-
-test("effective-interact pre-rendered markdown keeps ordered lists and highlight tags", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-ordered-list-"));
-  const inputPath = path.join(tmp, "ordered-list.json");
-  await fsp.writeFile(
-    inputPath,
-    JSON.stringify({
-      title: "AI 日报 2026-05-28",
-      summary: "Ordered list check.",
-      status: "complete",
-      template: "research-explainer",
-      renderMode: "pre-rendered",
-      sections: [
-        {
-          type: "markdown",
-          title: "GitHub Trending",
-          content: [
-            "1. **[![GitHub](data:image/png;base64,iVBORw0KGgo=) example/repo](https://github.com/example/repo)** ==trend-new|NEW==：示例项目。",
-            "2. **[example/up](https://github.com/example/up)** ==trend-up|↑ UP +2==：上升项目。",
-            "3. **[example/down](https://github.com/example/down)** ==trend-down|↓ DOWN -1==：下降项目。",
-            "4. **[example/same](https://github.com/example/same)** ==trend-same|SAME==：持平项目。",
-            "",
-            "| 指标 | 数值 | 说明 |",
-            "|---|---|---|",
-            "| Stars | 456 | 本周新增 |"
-          ].join("\n")
-        }
-      ]
-    }),
-    "utf8"
-  );
-
-  const generated = spawnSync(
-    process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "ordered-list", "--json"],
-    { cwd: rootDir, encoding: "utf8" }
-  );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
-
-  const payload = JSON.parse(generated.stdout);
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  assert.match(html, /<ol><li><strong><a href="https:\/\/github\.com\/example\/repo" rel="noreferrer"><img class="inline-site-icon"/);
-  const sourceIcon = html.match(/<ol><li><strong><a[^>]+><img[^>]+>/)?.[0] || "";
-  assert.doesNotMatch(sourceIcon, /data-lightbox-image/);
-  assert.match(html, /<strong><a href="https:\/\/github\.com\/example\/repo"/);
-  assert.match(html, /<mark class="text-highlight daily-tag trend-status trend-status-new">NEW<\/mark>/);
-  assert.match(html, /<mark class="text-highlight daily-tag trend-status trend-status-up">↑ UP \+2<\/mark>/);
-  assert.match(html, /<mark class="text-highlight daily-tag trend-status trend-status-down">↓ DOWN -1<\/mark>/);
-  assert.match(html, /<mark class="text-highlight daily-tag trend-status trend-status-same">SAME<\/mark>/);
-  assert.doesNotMatch(html, /<ul><li>1\./);
-  assert.match(html, /<div class="markdown-table-scroll"><table>/);
-});
-
-test("effective-interact pre-rendered markdown images are lightbox-enabled", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-image-lightbox-"));
-  const inputPath = path.join(tmp, "image-lightbox.json");
-  await fsp.writeFile(
-    inputPath,
-    JSON.stringify({
-      title: "AI 鏃ユ姤 2026-05-28",
-      summary: "Image lightbox check.",
-      status: "complete",
-      template: "research-explainer",
-      renderMode: "pre-rendered",
-      sections: [
-        {
-          type: "markdown",
-          title: "Evidence",
-          content: "![Evidence chart](https://example.com/chart.png)\n\n![GitHub](data:image/png;base64,iVBORw0KGgo=)"
-        }
-      ]
-    }),
-    "utf8"
-  );
-
-  const generated = spawnSync(
-    process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "image-lightbox", "--json"],
-    { cwd: rootDir, encoding: "utf8" }
-  );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
-
-  const payload = JSON.parse(generated.stdout);
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  const evidenceImage = html.match(/<img class="markdown-image"[^>]+>/)?.[0] || "";
-  const sourceIcon = html.match(/<img class="inline-site-icon"[^>]+>/)?.[0] || "";
-  assert.match(evidenceImage, /data-lightbox-image="true"/);
-  assert.match(evidenceImage, /data-lightbox-caption="Evidence chart"/);
-  assert.match(evidenceImage, /role="button"/);
-  assert.match(evidenceImage, /tabindex="0"/);
-  assert.doesNotMatch(sourceIcon, /data-lightbox-image/);
-  assert.match(html, /image-lightbox/);
-});
-
-test("effective-interact filterable cards render linked project subcards", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-project-cards-"));
-  const inputPath = path.join(tmp, "project-cards.json");
-  await fsp.writeFile(
-    inputPath,
-    JSON.stringify({
-      title: "AI 日报 2026-05-27",
-      summary: "Project cards layout check.",
-      status: "complete",
-      template: "research-explainer",
-      renderMode: "pre-rendered",
-      sections: [
-        {
-          type: "filterable-cards",
-          title: "今日值得关注的项目",
-          group: "projects",
-          cardClass: "project-card",
-          items: [
-            {
-              group: "PROJECTS",
-              title: "Project Alpha",
-              href: "https://example.com/project-alpha",
-              subtitle: "@projectalpha",
-              titleIcon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=",
-              body: "A **reusable** plugin set for ==agent workflows==. <script>alert(1)</script>",
-              tags: ["daily signal"],
-              points: [
-                {
-                  label: "Publisher",
-                  value: "Hugging Face",
-                  icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4="
-                },
-                { label: "领域", value: "agent、workflow" },
-                { label: "作用", value: "Use for repeatable workflows." }
-              ]
-            }
-          ]
-        }
-      ]
-    }),
-    "utf8"
-  );
-
-  const generated = spawnSync(
-    process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "project-cards", "--json"],
-    { cwd: rootDir, encoding: "utf8" }
-  );
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
-
-  const payload = JSON.parse(generated.stdout);
-  const html = await fsp.readFile(payload.outputPath, "utf8");
-  assert.match(html, /project-card/);
-  assert.match(html, /project-card-grid/);
-  assert.match(html, /<h3><a class="card-title-link" href="https:\/\/example\.com\/project-alpha" rel="noreferrer"><img class="[^"]*\binline-site-icon\b[^"]*\bcard-title-icon\b[^"]*"/);
-  assert.match(html, /class="card-subtitle">@projectalpha<\/span>/);
-  assert.match(html, /card-detail-list/);
-  assert.match(html, /card-detail-icon/);
-  assert.match(html, /<dt>领域<\/dt>/);
-  assert.match(html, /A <strong>reusable<\/strong> plugin set for <mark class="text-highlight">agent workflows<\/mark>\./);
-  assert.doesNotMatch(html, /<script>alert/);
-  assert.match(html, /Use for repeatable workflows\./);
+  assert.match(html, /data-artifact-kind="research"/);
+  assert.match(html, /hero-stat-grid/);
+  assert.match(html, /data-report-region="claims"/);
+  assert.match(html, /data-report-region="evidence"/);
+  assert.match(html, /data-report-region="verification"/);
+  assert.match(html, /data-report-region="actions"/);
+  assert.doesNotMatch(html, /data-template=/);
 
   const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
     cwd: rootDir,
@@ -929,82 +445,42 @@ test("effective-interact filterable cards render linked project subcards", async
   assert.equal(validation.status, 0, validation.stderr || validation.stdout);
 });
 
-test("effective-interact filterable cards render card stats, bars, and tables", async () => {
-  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-card-visuals-"));
-  const inputPath = path.join(tmp, "card-visuals.json");
+test("effective-interact filterable cards render the upstream component contract", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-filterable-cards-"));
+  const inputPath = path.join(tmp, "filterable-cards.json");
   await fsp.writeFile(
     inputPath,
     JSON.stringify({
-      title: "AI 日报 2026-06-05",
-      summary: "Tracking card visual check.",
+      title: "Filterable cards check",
+      summary: "Cards expose upstream filter controls and searchable bodies.",
       status: "complete",
-      template: "research-explainer",
       renderMode: "pre-rendered",
-      sections: [
-        {
-          type: "filterable-cards",
-          title: "每日追踪",
-          group: "signals",
-          cardClass: "tracking-card",
-          showFilters: false,
-          items: [
-            {
-              group: "模型使用",
-              title: "OpenRouter",
-              href: "https://openrouter.ai/rankings",
-              body: "公开榜单信号，不等同模型能力评测。",
-              stats: [
-                { label: "覆盖", value: "Top 10", detail: "公开榜单已解析" },
-                { label: "榜首", value: "DeepSeek V4 Flash", detail: "2.9T tokens / +18%" }
-              ],
-              bars: {
-                title: "供应商分布",
-                rows: [
-                  { label: "deepseek", value: 3, status: "3/10" },
-                  { label: "anthropic", value: 2, status: "2/10" }
-                ]
-              },
-              table: {
-                title: "Top 10 榜单",
-                columns: [
-                  { key: "rank", label: "排名", width: "64px" },
-                  { key: "model", label: "模型" },
-                  { key: "tokens", label: "调用量" }
-                ],
-                rows: [
-                  { rank: "#1", model: "DeepSeek V4 Flash", tokens: "2.9T tokens" },
-                  { rank: "#2", model: "Hy3 preview", tokens: "2.7T tokens" }
-                ]
-              }
-            }
-          ]
-        }
-      ]
+      sections: [{
+        type: "filterable-cards",
+        title: "Cards",
+        items: [
+          { title: "Alpha", body: "Alpha body", category: "A" },
+          { title: "Beta", body: "Beta body", category: "B" }
+        ]
+      }]
     }),
     "utf8"
   );
 
   const generated = spawnSync(
     process.execPath,
-    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "card-visuals", "--json"],
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "filterable-cards", "--json"],
     { cwd: rootDir, encoding: "utf8" }
   );
   assert.equal(generated.status, 0, generated.stderr || generated.stdout);
 
   const payload = JSON.parse(generated.stdout);
   const html = await fsp.readFile(payload.outputPath, "utf8");
-  assert.match(html, /card-stat-grid/);
-  assert.match(html, /data-card-bars/);
-  assert.match(html, /data-card-data-table/);
-  assert.match(html, /DeepSeek V4 Flash/);
-  assert.match(html, /2\.9T tokens/);
-  assert.doesNotMatch(html, /<dl class="card-detail-list"/);
-
-  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
-    cwd: rootDir,
-    encoding: "utf8"
-  });
-  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+  assert.match(html, /data-section-type="filterable-cards"/);
+  assert.match(html, /data-filter-target="section-cards-1"/);
+  assert.match(html, /data-search-target="section-cards-1"/);
+  assert.match(html, /Alpha body/);
+  assert.match(html, /Beta body/);
 });
 
 test("effective-interact filterable cards render local tracking components with multi-entity lines and public trace", async () => {
@@ -1016,7 +492,6 @@ test("effective-interact filterable cards render local tracking components with 
       title: "AI Daily 2026-06-12",
       summary: "Tracking component visual check.",
       status: "complete",
-      template: "research-explainer",
       renderMode: "pre-rendered",
       sections: [
         {
@@ -1139,7 +614,6 @@ test("effective-interact renders sanitized official tracking component snapshots
       title: "AI Daily 2026-06-12",
       summary: "Official tracking component snapshot check.",
       status: "complete",
-      template: "research-explainer",
       renderMode: "pre-rendered",
       sections: [
         {
@@ -1230,7 +704,6 @@ test("effective-interact rejects broad official tracking page dumps", async () =
       title: "AI Daily 2026-06-12",
       summary: "Broad official tracking component snapshot check.",
       status: "complete",
-      template: "research-explainer",
       renderMode: "pre-rendered",
       sections: [
         {
@@ -1311,7 +784,6 @@ test("effective-interact renders Artificial Analysis collected tabs without fall
       title: "AI Daily 2026-06-12",
       summary: "AA component visual check.",
       status: "complete",
-      template: "research-explainer",
       renderMode: "pre-rendered",
       sections: [
         {
@@ -1424,7 +896,6 @@ test("effective-interact filterable cards can hide visual group labels", async (
       title: "AI 日报 2026-05-28",
       summary: "Blog card hierarchy check.",
       status: "complete",
-      template: "research-explainer",
       renderMode: "pre-rendered",
       sections: [
         {
@@ -1489,7 +960,6 @@ test("effective-interact filterable cards support exclusive default filters", as
       title: "AI Daily Filter Contract",
       summary: "Filterable card defaults.",
       status: "complete",
-      template: "research-explainer",
       renderMode: "pre-rendered",
       sections: [
         {
@@ -1613,7 +1083,6 @@ test("effective-interact renders up to five card media items for daily tracking 
       title: "AI 日报 2026-05-28",
       summary: "测试 tracking 卡片多图渲染。",
       status: "complete",
-      template: "research-explainer",
       renderMode: "pre-rendered",
       sections: [
         {

@@ -2,7 +2,6 @@
   "title": "Disposable export editor brief",
   "summary": "**Visible export only:** use a disposable HTML editor only when the user must tune a small decision surface and then copy Markdown, JSON, or diff back into the real workflow.",
   "status": "review",
-  "template": "research-explainer",
   "renderMode": "pre-rendered",
   "generatedAt": "2026-05-18T00:00:00.000Z",
   "intent": {
@@ -22,7 +21,9 @@
       "id": "claim-visible-export",
       "statement": "Editor-like HTML reports are acceptable only when the export path is visible and copyable.",
       "kind": "recommendation",
-      "evidenceIds": ["evidence-editor-cases"],
+      "evidenceIds": [
+        "evidence-editor-cases"
+      ],
       "confidence": "high",
       "dateRange": "2026-05-18",
       "knownLimits": [
@@ -83,9 +84,18 @@
       "status": "ready",
       "summary": "If one row cannot be satisfied, do not use this skill for the editor.",
       "columns": [
-        { "key": "rule", "label": "Rule" },
-        { "key": "why", "label": "Why it exists" },
-        { "key": "fallback", "label": "Fallback" }
+        {
+          "key": "rule",
+          "label": "Rule"
+        },
+        {
+          "key": "why",
+          "label": "Why it exists"
+        },
+        {
+          "key": "fallback",
+          "label": "Fallback"
+        }
       ],
       "rows": [
         {
@@ -115,7 +125,10 @@
       "language": "json",
       "filePath": "skills/effective-interact/artifacts/example-export.json",
       "startLine": 1,
-      "highlightLines": [2, 6],
+      "highlightLines": [
+        2,
+        6
+      ],
       "content": "{\n  \"mode\": \"visible-export-only\",\n  \"selected\": [\"option-gallery\", \"disposable-export-editor\"],\n  \"blocked\": [\"network-write\", \"repo-write\", \"credential-edit\"],\n  \"handoff\": {\n    \"format\": \"json\",\n    \"reviewRequired\": true\n  }\n}"
     },
     {
@@ -166,5 +179,8 @@
   "nextActions": [
     "Use this fixture when evaluating lightweight editor guidance.",
     "Keep production UI, bundled apps, and slide decks routed to their adjacent skills."
-  ]
+  ],
+  "presentation": {
+    "showNextActions": true
+  }
 }

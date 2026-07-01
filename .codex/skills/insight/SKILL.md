@@ -1,6 +1,6 @@
 ---
 name: insight
-description: "Load when the user asks for a repository interaction insight audit, cross-session Codex or Claude Code work trace review, agent task profile, tool-call decision audit, or project collaboration bottleneck analysis; do not load for public source-backed posts, single-run agent failure debugging, or ordinary summaries."
+description: "Load when user asks for repository interaction insight audit, cross-session Codex/Claude Code trace review, agent task profile, tool-call decision audit, collaboration bottleneck analysis, session-level insight, or improvement recommendations; skip public posts, single-run failures, and ordinary summaries."
 license: MIT
 metadata:
   source: "local-original"
@@ -10,7 +10,11 @@ metadata:
 
 Use this skill to audit recent human-agent collaboration for the current repository across Codex and Claude Code traces.
 
-The goal is not a status summary. The goal is a private, evidence-backed interaction audit: what the user has been asking for, how agent work has actually progressed, where the collaboration is getting stuck, whether tool-call decisions were reasonable, and which few changes would improve the next iterations.
+The goal is not a status summary. The goal is a private, evidence-backed interaction audit: what the user has been asking for, how agent work has actually progressed, where the collaboration is getting stuck, whether tool-call decisions were reasonable, which patterns explain the current friction, and which few changes would improve the next iterations.
+
+If this skill is loaded, the answer must contain actual insights and recommendations, not just a timeline. A compliant report explains "so what": repeated request patterns, mismatch between user expectations and agent behavior, tool or routing decisions that created friction, and the highest-leverage changes for the next session.
+
+Use layered evidence and confidence levels. Strong insights require confirmed, non-low-confidence interaction evidence with exact or strong repository affinity. Candidate traces, ordinary repo state, low-confidence evidence, or sparse samples can support only weak leads, unknowns, or next-instrumentation recommendations. Do not fabricate patterns to fill the report shape.
 
 ## Boundaries
 
@@ -26,8 +30,10 @@ The goal is not a status summary. The goal is a private, evidence-backed interac
 2. Identify the repository: current path, project name, package metadata when present, and git remote when available.
 3. Collect evidence with `scripts/collect-insight-events.mjs`. Include repo-local context and project-related host traces. Keep source class, repo affinity, confidence, confirmed relevance, and candidate relevance separate.
 4. Build a private report with `scripts/build-insight-report.mjs`.
-5. Read the report before answering. Do not rely on memory-only impressions.
-6. Give the user the answer-first summary: collaboration health, top bottlenecks, top recommendations, evidence limits, and questions that cannot be inferred.
+5. For high-volume, multi-session, multi-case, or option-heavy audits, also generate an `effective-interact` input with `--effective-interact-input <input.json>` and use a validated HTML artifact as the presentation layer. `insight` still owns the analysis.
+6. Read the report before answering. Do not rely on memory-only impressions.
+7. Give the user the answer-first summary: collaboration health, top insights, top bottlenecks, top recommendations, evidence limits, and questions that cannot be inferred.
+8. If evidence is thin, label the result under-evidenced and still provide a small "next instrumentation" section: what trace source, task state, or handoff record would make the next audit sharper.
 
 ## Progressive Loading
 
@@ -50,6 +56,12 @@ Build the report:
 node skills/insight/scripts/build-insight-report.mjs --ledger <events.jsonl> --manifest <manifest.json> --json
 ```
 
+Build the report plus an `effective-interact` visual-report input:
+
+```bash
+node skills/insight/scripts/build-insight-report.mjs --ledger <events.jsonl> --manifest <manifest.json> --effective-interact-input <insight-visual.input.json> --json
+```
+
 If the user supplies `--out`, choose an ignored local report directory. If no output path is supplied, the scripts use the operating-system temp directory.
 
 ## Report Contract
@@ -58,12 +70,22 @@ The report must include:
 
 1. BLUF: whether recent collaboration appears healthy, mixed, blocked, or under-evidenced.
 2. Evidence coverage: host roots, source classes, confidence, repo affinity, and missing-host limits.
-3. Top 3 bottlenecks with evidence IDs.
-4. Top 3 recommendations that are precise enough to become follow-up work.
-5. Task profile: request types, task clusters, change trends, validation closure, and repeated needs.
-6. Trace audit: tool calls, branch decisions, repeated failed tools, context drift, failures, and recoveries.
-7. Core positioning and drift risk, only when evidence supports it.
-8. Unknowns: user preferences or expectations that cannot be inferred.
+3. Top 3 insights: behavior patterns or mismatches that explain why sessions felt productive, stuck, or generic. Each insight needs evidence IDs or an explicit under-evidenced label.
+4. Top 3 bottlenecks with evidence IDs and impact on user time, trust, or delivery quality.
+5. Top 3 recommendations that are precise enough to become follow-up work. Each recommendation must include the target change, expected effect, and the next validation signal.
+6. Task profile: request types, task clusters, change trends, validation closure, and repeated needs.
+7. Trace audit: tool calls, branch decisions, repeated failed tools, context drift, failures, and recoveries.
+8. Core positioning and drift risk, only when evidence supports it.
+9. Unknowns: user preferences or expectations that cannot be inferred.
+
+## Output Quality Bar
+
+- Bad: "The collaboration had some issues; improve communication."
+- Good: "The repeated gap is not task execution but handoff visibility: three sessions ended with validation facts in logs but no durable report, so the user had to infer status. Add a mandatory handoff checkpoint after material repo changes and verify it with the next session's trace."
+- Recommendations should be operational: add a routing case, change a skill contract, record a state file, run a validation command, ask a narrower intake question, or change a handoff shape.
+- It is acceptable to return fewer than three strong insights or recommendations when evidence is thin. Label weak findings by evidence tier instead of padding the report.
+- Use `effective-interact` for dense final reports when navigation, visual comparison, evidence coverage, trace clusters, or option tradeoffs would reduce human interpretation cost. Use it as the presentation layer only; `insight` still owns the analysis and recommendations.
+- When an `effective-interact` artifact is generated, validate it before handoff. If HTML is waived, unavailable, or the audit is thin enough for Markdown, say why.
 
 ## Gotchas
 

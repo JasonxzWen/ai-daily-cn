@@ -2,7 +2,6 @@
   "title": "Harness vocabulary explainer",
   "summary": "Decision: use local-original definitions to explain Harness Hub concepts without copying external glossary text.",
   "status": "ready",
-  "template": "research-explainer",
   "renderMode": "pre-rendered",
   "generatedAt": "2026-05-29T00:00:00.000Z",
   "intent": {
@@ -58,9 +57,21 @@
       "status": "ready",
       "summary": "The same rows can be used for model/agent, skill/tool, or check/review distinctions.",
       "columns": [
-        { "key": "part", "label": "Part", "width": "22%" },
-        { "key": "purpose", "label": "Purpose", "width": "42%" },
-        { "key": "failure", "label": "Failure it prevents", "width": "36%" }
+        {
+          "key": "part",
+          "label": "Part",
+          "width": "22%"
+        },
+        {
+          "key": "purpose",
+          "label": "Purpose",
+          "width": "42%"
+        },
+        {
+          "key": "failure",
+          "label": "Failure it prevents",
+          "width": "36%"
+        }
       ],
       "rows": [
         {
@@ -120,9 +131,18 @@
       "status": "ready",
       "summary": "These anchors keep local explainers aligned with repo policy.",
       "columns": [
-        { "key": "anchor", "label": "Anchor" },
-        { "key": "role", "label": "Role" },
-        { "key": "acceptance", "label": "Acceptance" }
+        {
+          "key": "anchor",
+          "label": "Anchor"
+        },
+        {
+          "key": "role",
+          "label": "Role"
+        },
+        {
+          "key": "acceptance",
+          "label": "Acceptance"
+        }
       ],
       "rows": [
         {
@@ -165,7 +185,7 @@
           "label": "Source registry",
           "value": "docs/source-projects.md",
           "filePath": "docs/source-projects.md",
-          "line": 34,
+          "line": 38,
           "status": "info"
         },
         {
@@ -194,14 +214,19 @@
       "id": "claim-local-original",
       "statement": "Harness Hub vocabulary explainers must use local-original definitions rather than copied external glossary text.",
       "kind": "conclusion",
-      "evidenceIds": ["evidence-source-registry", "evidence-vocabulary"],
+      "evidenceIds": [
+        "evidence-source-registry",
+        "evidence-vocabulary"
+      ],
       "confidence": "high"
     },
     {
       "id": "claim-boundary-first",
       "statement": "The reusable explainer value is the adjacent-concept boundary, not a larger glossary.",
       "kind": "recommendation",
-      "evidenceIds": ["evidence-patterns"],
+      "evidenceIds": [
+        "evidence-patterns"
+      ],
       "confidence": "medium"
     }
   ],
@@ -213,7 +238,7 @@
       "value": "docs/source-projects.md",
       "status": "info",
       "filePath": "docs/source-projects.md",
-      "line": 34
+      "line": 38
     },
     {
       "id": "evidence-vocabulary",

@@ -1,11 +1,10 @@
 ---
 name: diagnose
-description: Diagnose hard bugs and performance regressions through a reproducible feedback loop, ranked hypotheses, targeted instrumentation, a fix, and a regression test. Use when the user reports broken behavior, a failing command, a hard-to-reproduce bug, or a performance regression; use agent-introspection-debugging instead when the agent or tool harness is what is failing.
+description: Load when a workflow-router-selected owner workflow needs hard bugs and performance regressions, failing commands, hard-to-reproduce behavior, or unknown root causes diagnosed; use agent-introspection-debugging instead for agent/tool harness failures.
 license: MIT
 metadata:
   source: "mattpocock/skills skills/engineering/diagnose"
   upstream_commit: "9fecab929abb904c68ce3366a1781df31ab22832"
-  adapted_for: "Codex Skill Hub"
 ---
 
 # Diagnose

@@ -2,7 +2,6 @@
   "title": "effective interaction generation handoff",
   "summary": "The generator can produce a readable, evidence-backed report without CDN dependencies.",
   "status": "complete",
-  "template": "implementation-handoff",
   "renderMode": "pre-rendered",
   "generatedAt": "2026-05-13T00:00:00.000Z",
   "sections": [
@@ -40,7 +39,9 @@
       "filePath": "skills/effective-interact/scripts/create-interaction.mjs",
       "language": "javascript",
       "startLine": 504,
-      "highlightLines": [505],
+      "highlightLines": [
+        505
+      ],
       "content": "export function createInteraction(input) {\n  return renderHtml(input);\n}"
     },
     {
@@ -117,5 +118,9 @@
   "nextActions": [
     "Review generated report visually.",
     "Archive the OpenSpec change after final validation."
-  ]
+  ],
+  "presentation": {
+    "showEvidence": true,
+    "showVerification": true
+  }
 }

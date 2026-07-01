@@ -1,6 +1,7 @@
 ---
 name: security-review
-description: Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.
+description: Load when a workflow-router-selected owner workflow needs security-sensitive code, auth, user input, secrets, API endpoints, payments, injection risk, or unsafe IO reviewed; use compound-code-review for broader review.
+license: MIT
 ---
 
 # Security Review Skill

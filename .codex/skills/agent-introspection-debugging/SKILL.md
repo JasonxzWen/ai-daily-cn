@@ -1,6 +1,7 @@
 ---
 name: agent-introspection-debugging
-description: Structured self-debugging workflow for AI agent failures using capture, diagnosis, contained recovery, and introspection reports.
+description: Load when a workflow-router-selected owner workflow needs agent run, tool loop, context drift, or recoverable harness/tool failure debugging; use diagnose for product/runtime bugs.
+license: MIT
 ---
 
 # Agent Introspection Debugging

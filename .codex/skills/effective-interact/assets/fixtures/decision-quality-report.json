@@ -2,7 +2,6 @@
   "title": "Decision quality report",
   "summary": "Use intent, claims, and evidence to decide whether the HTML report contract is ready to extend.",
   "status": "review",
-  "template": "decision-matrix",
   "renderMode": "pre-rendered",
   "generatedAt": "2026-05-18T00:00:00.000Z",
   "intent": {
@@ -22,10 +21,14 @@
       "id": "claim-intent-contract",
       "statement": "Intent metadata should control density before visual modules are selected.",
       "kind": "conclusion",
-      "evidenceIds": ["evidence-design-doc"],
+      "evidenceIds": [
+        "evidence-design-doc"
+      ],
       "confidence": "high",
       "dateRange": "2026-05-18",
-      "knownLimits": ["Intent is optional for backward compatibility."]
+      "knownLimits": [
+        "Intent is optional for backward compatibility."
+      ]
     },
     {
       "id": "claim-open-question",
@@ -33,7 +36,9 @@
       "kind": "assumption",
       "evidenceIds": [],
       "confidence": "medium",
-      "knownLimits": ["This change uses deterministic checks first."]
+      "knownLimits": [
+        "This change uses deterministic checks first."
+      ]
     }
   ],
   "sections": [
@@ -46,12 +51,20 @@
         {
           "name": "Implement intent and claims first",
           "status": "recommended",
-          "points": ["Keeps the report conclusion-first", "Improves validator coverage", "Avoids broad UI expansion"]
+          "points": [
+            "Keeps the report conclusion-first",
+            "Improves validator coverage",
+            "Avoids broad UI expansion"
+          ]
         },
         {
           "name": "Add a general dashboard builder",
           "status": "rejected",
-          "points": ["Outside skill boundary", "Harder to validate", "Duplicates frontend builder skills"]
+          "points": [
+            "Outside skill boundary",
+            "Harder to validate",
+            "Duplicates frontend builder skills"
+          ]
         }
       ]
     },

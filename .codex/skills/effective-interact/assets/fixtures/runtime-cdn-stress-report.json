@@ -2,7 +2,6 @@
   "title": "Runtime CDN visual stress report - Mermaid, code, grouped navigation, and long multilingual content",
   "summary": "Stress the report generator with rich content, long labels, many sections, wide code, nested JSON, and grouped navigation that must remain readable inside Codex.",
   "status": "review",
-  "template": "research-explainer",
   "renderMode": "runtime-cdn",
   "generatedAt": "2026-05-14T00:00:00.000Z",
   "sections": [
@@ -105,7 +104,10 @@
       "filePath": "skills/effective-interact/scripts/create-interaction.mjs",
       "language": "typescript",
       "startLine": 118,
-      "highlightLines": [119, 123],
+      "highlightLines": [
+        119,
+        123
+      ],
       "content": "type RuntimeDependency = { id: string; name: string; version: string; url: string; purpose: string; required: boolean; status: 'pending' | 'ready' | 'degraded' | 'failed' };\nexport function buildRuntimeDependencyManifest(input: ReportInput): RuntimeDependency[] {\n  const dependencySource = 'https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/styles/github-dark.min.css and a deliberately long string that must not force body-level horizontal overflow in the generated report';\n  return runtimeDependencies.map((dependency) => ({ ...dependency, status: 'pending', purpose: `${dependency.purpose} via ${dependencySource}` }));\n}"
     },
     {
@@ -117,7 +119,10 @@
       "filePath": "skills/effective-interact/assets/fixtures/runtime-cdn-stress-report.json",
       "language": "json",
       "startLine": 1,
-      "highlightLines": [4, 8],
+      "highlightLines": [
+        4,
+        8
+      ],
       "content": "{\n  \"renderMode\": \"runtime-cdn\",\n  \"runtime\": {\n    \"libraries\": [\"DOMPurify\", \"Marked\", \"Mermaid\", \"highlight.js\"],\n    \"states\": { \"markdown\": \"ready\", \"mermaid\": \"ready\", \"code\": \"ready\" },\n    \"fallbacks\": { \"source\": true, \"visibleStatus\": true }\n  }\n}"
     },
     {
@@ -129,7 +134,9 @@
       "filePath": "openspec/changes/polish-effective-interact-runtime-quality/tasks.md",
       "language": "bash",
       "startLine": 72,
-      "highlightLines": [73],
+      "highlightLines": [
+        73
+      ],
       "content": "bun skills/effective-interact/scripts/create-interaction.mjs --input skills/effective-interact/assets/fixtures/runtime-cdn-stress-report.json --slug effective-interact-runtime-cdn-stress --json\nbun skills/effective-interact/scripts/validate-interaction.mjs skills/effective-interact/artifacts/effective-interact-runtime-cdn-stress.html --json --require-browser"
     },
     {
@@ -227,17 +234,29 @@
         {
           "name": "runtime-cdn",
           "status": "recommended",
-          "points": ["Best visual fidelity in Codex", "Uses mature libraries", "Requires visible dependency state"]
+          "points": [
+            "Best visual fidelity in Codex",
+            "Uses mature libraries",
+            "Requires visible dependency state"
+          ]
         },
         {
           "name": "pre-rendered",
           "status": "explicit",
-          "points": ["Better offline behavior", "More local complexity", "Still needs visual validation"]
+          "points": [
+            "Better offline behavior",
+            "More local complexity",
+            "Still needs visual validation"
+          ]
         },
         {
           "name": "fallback-only",
           "status": "degraded",
-          "points": ["Readable source only", "No claim of rich rendering", "Useful for constrained environments"]
+          "points": [
+            "Readable source only",
+            "No claim of rich rendering",
+            "Useful for constrained environments"
+          ]
         }
       ]
     },

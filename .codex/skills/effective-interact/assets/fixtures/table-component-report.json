@@ -1,58 +1,83 @@
 {
-  "title": "HTML \u6c47\u62a5\u6280\u80fd\u7ef4\u62a4\u4ea4\u4ed8",
-  "summary": "\u7ed3\u8bba\u5148\u884c\uff1adata-table \u627f\u8f7d\u5206\u6bb5\u4ea4\u4ed8\u4fe1\u606f\uff0cinline \u5f3a\u8c03\u63d0\u4f9b\u9605\u8bfb\u951a\u70b9\uff0c\u9a8c\u8bc1\u7ed3\u679c\u7ee7\u7eed\u7559\u5728\u540c\u4e00\u4efd HTML \u91cc\u3002",
+  "title": "HTML 汇报技能维护交付",
+  "summary": "结论先行：data-table 承载分段交付信息，inline 强调提供阅读锚点，验证结果继续留在同一份 HTML 里。",
   "status": "complete",
-  "template": "conclusion-dashboard",
   "renderMode": "pre-rendered",
   "generatedAt": "2026-05-15T00:00:00.000Z",
   "sections": [
     {
       "type": "markdown",
-      "title": "\u4ea4\u4ed8\u7ed3\u8bba",
+      "title": "交付结论",
       "group": "summary",
       "status": "ready",
       "content": "- **Table-first**: structured delivery details move into a table before they become long prose.\n- Use *short phrases* and ==visual anchor== markers for key risks and verification results."
     },
     {
       "type": "data-table",
-      "title": "\u7ef4\u62a4\u4ea4\u4ed8\u77e9\u9635",
+      "title": "维护交付矩阵",
       "group": "details",
       "status": "ready",
-      "summary": "\u628a\u53d8\u66f4\u3001\u98ce\u9669\u548c\u9a8c\u8bc1\u5199\u6210\u53ef\u6bd4\u8f83\u7684\u77ed\u8bed\u3002",
-      "caption": "Hover \u6216 Tab \u805a\u7126\u4efb\u610f\u5355\u5143\u683c\uff0c\u67e5\u770b\u5f53\u524d\u683c\u3001\u6240\u5728\u884c\u548c\u5217\u7684\u5b9a\u4f4d\u53cd\u9988\u3002",
+      "summary": "把变更、风险和验证写成可比较的短语。",
+      "caption": "Hover 或 Tab 聚焦任意单元格，查看当前格、所在行和列的定位反馈。",
       "columns": [
-        { "key": "stage", "label": "\u4e8b\u9879", "width": "18%" },
-        { "key": "points", "label": "\u53d8\u66f4\u70b9", "width": "34%" },
-        { "key": "reporting", "label": "\u6c47\u62a5\u91cd\u70b9", "width": "30%" },
-        { "key": "hover", "label": "\u5b9a\u4f4d\u53cd\u9988", "align": "center", "width": "18%" }
+        {
+          "key": "stage",
+          "label": "事项",
+          "width": "18%"
+        },
+        {
+          "key": "points",
+          "label": "变更点",
+          "width": "34%"
+        },
+        {
+          "key": "reporting",
+          "label": "汇报重点",
+          "width": "30%"
+        },
+        {
+          "key": "hover",
+          "label": "定位反馈",
+          "align": "center",
+          "width": "18%"
+        }
       ],
       "rows": [
         {
-          "stage": "\u6587\u5b57\u91cd\u70b9",
-          "points": ["\u7ed3\u8bba\u5148\u884c", "\u98ce\u9669\u663e\u5f0f\u6807\u8bb0"],
+          "stage": "文字重点",
+          "points": [
+            "结论先行",
+            "风险显式标记"
+          ],
           "reporting": "**Risk** and ==row + column== states stay visible in the maintenance matrix.",
-          "hover": "\u53ef\u626b\u8bfb"
+          "hover": "可扫读"
         },
         {
-          "stage": "\u8868\u683c\u8868\u8fbe",
-          "points": ["\u77ed\u8bed\u4f18\u5148", "\u7a33\u5b9a\u884c\u5217\u5bf9\u6bd4"],
-          "reporting": "\u7ed3\u6784\u5316\u6570\u636e\u8fdb\u5165\u8868\u683c\uff0c\u957f\u89e3\u91ca\u79fb\u5230\u540e\u7eed\u6bb5\u843d\u3002",
-          "hover": "\u683c\u5b50\u653e\u5927"
+          "stage": "表格表达",
+          "points": [
+            "短语优先",
+            "稳定行列对比"
+          ],
+          "reporting": "结构化数据进入表格，长解释移到后续段落。",
+          "hover": "格子放大"
         },
         {
-          "stage": "\u9a8c\u8bc1",
-          "points": ["\u9759\u6001\u7ed3\u6784", "\u6d4f\u89c8\u5668 hover"],
+          "stage": "验证",
+          "points": [
+            "静态结构",
+            "浏览器 hover"
+          ],
           "reporting": "==Verification== stays beside the changed behavior, not hidden in prose.",
-          "hover": "\u884c\u5217\u9ad8\u4eae"
+          "hover": "行列高亮"
         }
       ]
     }
   ],
   "verification": [
     {
-      "label": "\u8868\u683c\u7ec4\u4ef6",
+      "label": "表格组件",
       "status": "pass",
-      "detail": "\u793a\u4f8b\u62a5\u544a\u901a\u8fc7\u751f\u6210\u5668\u548c\u6d4f\u89c8\u5668\u6821\u9a8c\u3002"
+      "detail": "示例报告通过生成器和浏览器校验。"
     }
   ]
 }

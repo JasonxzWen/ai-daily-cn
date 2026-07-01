@@ -114,12 +114,44 @@
 
   function applyTrackingScale(button) {
     var mode = button.getAttribute("data-scale-mode");
-    var root = button.closest("[data-tracking-component]");
-    if (!mode || !root) return;
-    root.setAttribute("data-scale", mode);
-    root.querySelectorAll("[data-scale-mode]").forEach(function (peer) {
+    var component = button.closest("[data-tracking-component]");
+    if (!mode || !component) return;
+    component.setAttribute("data-scale", mode);
+    component.querySelectorAll("[data-scale-mode]").forEach(function (peer) {
       peer.setAttribute("aria-pressed", String(peer === button));
     });
+  }
+
+  function ensureLightbox() {
+    var existing = document.querySelector(".image-lightbox[data-report-lightbox]");
+    if (existing) return existing;
+    var lightbox = document.createElement("div");
+    lightbox.className = "image-lightbox";
+    lightbox.setAttribute("data-report-lightbox", "");
+    lightbox.setAttribute("hidden", "");
+    lightbox.innerHTML = '<button class="image-lightbox__close" type="button" aria-label="Close image">×</button><img class="image-lightbox__image" alt="">';
+    document.body.appendChild(lightbox);
+    return lightbox;
+  }
+
+  function closeLightbox() {
+    var lightbox = document.querySelector(".image-lightbox[data-report-lightbox]");
+    if (!lightbox) return;
+    lightbox.hidden = true;
+    lightbox.removeAttribute("data-open");
+    document.body.classList.remove("lightbox-open");
+  }
+
+  function openLightbox(trigger) {
+    var image = trigger.matches("img") ? trigger : trigger.querySelector("img");
+    if (!image || !image.getAttribute("src")) return;
+    var lightbox = ensureLightbox();
+    var target = lightbox.querySelector(".image-lightbox__image");
+    target.src = image.currentSrc || image.getAttribute("src");
+    target.alt = image.getAttribute("alt") || "";
+    lightbox.hidden = false;
+    lightbox.setAttribute("data-open", "true");
+    document.body.classList.add("lightbox-open");
   }
 
   function applySearch(input) {
@@ -130,104 +162,6 @@
     document.querySelectorAll("[data-search-target='" + target + "']").forEach(function (item) {
       item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
     });
-  }
-
-  function sourceInventoryRows(root) {
-    if (!root) return [];
-    var prefix = root.getAttribute("data-source-inventory-target-prefix") || "section-source-inventory-group-";
-    return Array.prototype.slice.call(document.querySelectorAll("[id]"))
-      .filter(function (section) { return section.id.indexOf(prefix) === 0; })
-      .reduce(function (rows, section) {
-        return rows.concat(Array.prototype.slice.call(section.querySelectorAll("li")));
-      }, [])
-      .filter(function (row) { return Boolean(row.querySelector("strong")); });
-  }
-
-  function sourceInventoryTotal(root, rows) {
-    var configured = Number(root.getAttribute("data-source-inventory-total"));
-    return Number.isFinite(configured) && configured >= 0 ? Math.trunc(configured) : rows.length;
-  }
-
-  function setSourceInventoryStatus(root, text) {
-    var status = root ? root.querySelector("[data-source-inventory-status]") : null;
-    if (status) status.textContent = text;
-  }
-
-  function updateSourceInventoryButtons(root, hasQuery, matchCount) {
-    var next = root.querySelector("[data-source-inventory-next]");
-    var clear = root.querySelector("[data-source-inventory-clear]");
-    if (next) next.disabled = matchCount === 0;
-    if (clear) clear.disabled = !hasQuery;
-  }
-
-  function clearSourceInventoryHighlights(rows) {
-    rows.forEach(function (row) {
-      row.classList.remove("source-inventory-match", "source-inventory-active-match");
-    });
-  }
-
-  function resetSourceInventoryFinder(root) {
-    var rows = sourceInventoryRows(root);
-    clearSourceInventoryHighlights(rows);
-    root.setAttribute("data-source-inventory-active-index", "-1");
-    root.setAttribute("data-source-inventory-match-count", "0");
-    updateSourceInventoryButtons(root, false, 0);
-    setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
-  }
-
-  function applySourceInventoryFinder(input) {
-    var root = input.closest("[data-source-inventory-finder]");
-    if (!root) return;
-    var rows = sourceInventoryRows(root);
-    var query = input.value.trim();
-    var normalized = query.toLowerCase();
-    var matches = [];
-
-    rows.forEach(function (row) {
-      row.classList.remove("source-inventory-active-match");
-      var matched = Boolean(normalized) && row.textContent.toLowerCase().indexOf(normalized) !== -1;
-      row.classList.toggle("source-inventory-match", matched);
-      if (matched) matches.push(row);
-    });
-
-    var activeIndex = matches.length > 0 ? 0 : -1;
-    if (activeIndex >= 0) {
-      matches[activeIndex].classList.add("source-inventory-active-match");
-    }
-    root.setAttribute("data-source-inventory-active-index", String(activeIndex));
-    root.setAttribute("data-source-inventory-match-count", String(matches.length));
-    updateSourceInventoryButtons(root, Boolean(query), matches.length);
-
-    if (!query) {
-      setSourceInventoryStatus(root, "输入关键词后只高亮匹配项，全部 " + sourceInventoryTotal(root, rows) + " 条仍保留在页面中。");
-      return;
-    }
-    setSourceInventoryStatus(root, "匹配 " + matches.length + "/" + sourceInventoryTotal(root, rows) + "：" + query + "；未隐藏或重排任何信源。");
-  }
-
-  function activateSourceInventoryMatch(root, direction) {
-    var matches = sourceInventoryRows(root).filter(function (row) {
-      return row.classList.contains("source-inventory-match");
-    });
-    if (matches.length === 0) {
-      updateSourceInventoryButtons(root, true, 0);
-      return;
-    }
-    var current = Number(root.getAttribute("data-source-inventory-active-index"));
-    if (!Number.isFinite(current) || current < 0) current = 0;
-    var nextIndex = (current + direction + matches.length) % matches.length;
-    matches.forEach(function (row) {
-      row.classList.remove("source-inventory-active-match");
-    });
-    matches[nextIndex].classList.add("source-inventory-active-match");
-    root.setAttribute("data-source-inventory-active-index", String(nextIndex));
-    if (matches[nextIndex].scrollIntoView) {
-      try {
-        matches[nextIndex].scrollIntoView({ block: "center", inline: "nearest" });
-      } catch (_) {
-        matches[nextIndex].scrollIntoView();
-      }
-    }
   }
 
   function updateEvidenceSpotlight(card, event) {
@@ -333,121 +267,17 @@
       if (isActive) activeLink = link;
     });
 
-    if (active && active.id !== lastActiveNavId && activeLink) {
-      keepActiveNavLinkVisible(activeLink);
+    if (active && active.id !== lastActiveNavId && activeLink && activeLink.scrollIntoView) {
+      try {
+        activeLink.scrollIntoView({ block: "nearest", inline: "nearest" });
+      } catch (_) {
+        activeLink.scrollIntoView();
+      }
     }
     lastActiveNavId = active ? active.id : "";
   }
 
-  function keepActiveNavLinkVisible(activeLink) {
-    var scroller = activeLink.closest("[data-nav-group]") || activeLink.closest("[data-report-" + "nav]");
-    if (!scroller || scroller.scrollWidth <= scroller.clientWidth) return;
-
-    var linkRect = activeLink.getBoundingClientRect();
-    var scrollerRect = scroller.getBoundingClientRect();
-    var inset = 8;
-    if (linkRect.left < scrollerRect.left + inset) {
-      scroller.scrollLeft += linkRect.left - scrollerRect.left - inset;
-    } else if (linkRect.right > scrollerRect.right - inset) {
-      scroller.scrollLeft += linkRect.right - scrollerRect.right + inset;
-    }
-  }
-
-  var imageLightbox = null;
-  var imageLightboxReturnFocus = null;
-
-  function ensureImageLightbox() {
-    if (imageLightbox) return imageLightbox;
-
-    var root = document.createElement("div");
-    root.className = "image-lightbox";
-    root.hidden = true;
-    root.setAttribute("role", "dialog");
-    root.setAttribute("aria-modal", "true");
-    root.setAttribute("aria-label", "图片放大预览");
-    root.innerHTML = [
-      '<button class="image-lightbox__backdrop" type="button" data-lightbox-close aria-label="关闭放大图片"></button>',
-      '<figure class="image-lightbox__figure">',
-      '<button class="image-lightbox__close" type="button" data-lightbox-close aria-label="关闭放大图片">关闭</button>',
-      '<img class="image-lightbox__image" alt="">',
-      '<figcaption class="image-lightbox__caption"></figcaption>',
-      '</figure>'
-    ].join("");
-    document.body.appendChild(root);
-
-    imageLightbox = {
-      root: root,
-      image: root.querySelector(".image-lightbox__image"),
-      caption: root.querySelector(".image-lightbox__caption"),
-      close: root.querySelector(".image-lightbox__close")
-    };
-    return imageLightbox;
-  }
-
-  function imageLightboxCaption(image) {
-    var explicit = image.getAttribute("data-lightbox-caption") || image.getAttribute("alt") || "";
-    if (explicit.trim()) return explicit.trim();
-
-    var figure = image.closest("figure");
-    var caption = figure ? figure.querySelector("figcaption") : null;
-    if (caption && caption.textContent.trim()) return caption.textContent.trim();
-
-    var paragraph = image.closest("p");
-    var next = paragraph ? paragraph.nextElementSibling : null;
-    if (next && next.matches("p") && next.textContent.trim()) {
-      return next.textContent.trim();
-    }
-    return "";
-  }
-
-  function openImageLightbox(image) {
-    var source = image.currentSrc || image.getAttribute("src") || "";
-    if (!source) return;
-
-    var dialog = ensureImageLightbox();
-    var caption = imageLightboxCaption(image);
-    imageLightboxReturnFocus = image;
-    dialog.image.src = source;
-    dialog.image.alt = image.getAttribute("alt") || caption || "放大图片";
-    dialog.caption.textContent = caption;
-    dialog.caption.hidden = !caption;
-    dialog.root.hidden = false;
-    dialog.root.setAttribute("data-open", "true");
-    document.body.classList.add("lightbox-open");
-    window.setTimeout(function () {
-      if (dialog.close && dialog.close.focus) {
-        dialog.close.focus({ preventScroll: true });
-      }
-    }, 0);
-  }
-
-  function closeImageLightbox() {
-    if (!imageLightbox || imageLightbox.root.hidden) return;
-    imageLightbox.root.removeAttribute("data-open");
-    imageLightbox.root.hidden = true;
-    document.body.classList.remove("lightbox-open");
-    imageLightbox.image.removeAttribute("src");
-    if (imageLightboxReturnFocus && imageLightboxReturnFocus.focus) {
-      imageLightboxReturnFocus.focus({ preventScroll: true });
-    }
-    imageLightboxReturnFocus = null;
-  }
-
   document.addEventListener("click", function (event) {
-    var lightboxClose = event.target.closest("[data-lightbox-close]");
-    if (lightboxClose) {
-      event.preventDefault();
-      closeImageLightbox();
-      return;
-    }
-
-    var lightboxImage = event.target.closest("[data-lightbox-image]");
-    if (lightboxImage) {
-      event.preventDefault();
-      openImageLightbox(lightboxImage);
-      return;
-    }
-
     var navLink = event.target.closest("[data-nav-link]");
     if (navLink) {
       var href = navLink.getAttribute("href") || "";
@@ -459,23 +289,20 @@
       }
     }
 
+    var lightboxTrigger = event.target.closest("[data-lightbox-image]");
+    if (lightboxTrigger) {
+      event.preventDefault();
+      openLightbox(lightboxTrigger);
+      return;
+    }
+
+    if (event.target.closest(".image-lightbox__close") || (event.target.matches(".image-lightbox") && event.target.getAttribute("data-report-lightbox") !== null)) {
+      closeLightbox();
+      return;
+    }
+
     var button = event.target.closest("button");
     if (!button) return;
-
-    if (button.matches("[data-source-inventory-next]")) {
-      var sourceInventoryNextRoot = button.closest("[data-source-inventory-finder]");
-      if (sourceInventoryNextRoot) activateSourceInventoryMatch(sourceInventoryNextRoot, 1);
-      return;
-    }
-
-    if (button.matches("[data-source-inventory-clear]")) {
-      var sourceInventoryClearRoot = button.closest("[data-source-inventory-finder]");
-      var sourceInventoryInput = sourceInventoryClearRoot ? sourceInventoryClearRoot.querySelector("[data-source-inventory-search]") : null;
-      if (sourceInventoryInput) sourceInventoryInput.value = "";
-      if (sourceInventoryClearRoot) resetSourceInventoryFinder(sourceInventoryClearRoot);
-      if (sourceInventoryInput && sourceInventoryInput.focus) sourceInventoryInput.focus({ preventScroll: true });
-      return;
-    }
 
     if (button.matches("[data-copy-text]")) {
       copyText(button.getAttribute("data-copy-text"), button);
@@ -490,33 +317,16 @@
       applyFilter(button);
     }
 
-        if (button.matches("[data-tab-group][data-tab]")) {
-          activateTab(button);
-        }
-
-        if (button.matches("[data-scale-mode]")) {
-          applyTrackingScale(button);
-        }
-      });
-
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
-      closeImageLightbox();
-      return;
+    if (button.matches("[data-tab-group][data-tab]")) {
+      activateTab(button);
     }
 
-    if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-lightbox-image]")) {
-      event.preventDefault();
-      openImageLightbox(event.target);
+    if (button.matches("[data-scale-mode]")) {
+      applyTrackingScale(button);
     }
   });
 
   document.addEventListener("input", function (event) {
-    if (event.target.matches("[data-source-inventory-search]")) {
-      applySourceInventoryFinder(event.target);
-      return;
-    }
-
     if (event.target.matches("[data-search-for]")) {
       applySearch(event.target);
     }
@@ -561,6 +371,11 @@
   window.addEventListener("hashchange", function () {
     highlightTargetSection(hashTargetId());
     updateActiveNavigation();
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeLightbox();
+    }
   });
   highlightTargetSection(hashTargetId());
   updateActiveNavigation();

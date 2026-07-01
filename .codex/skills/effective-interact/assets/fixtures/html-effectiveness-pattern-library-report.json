@@ -2,7 +2,6 @@
   "title": "HTML effectiveness 范例吸收地图",
   "summary": "Decision: 19 pages map to pattern families; HTML triggers only by decision cost.",
   "status": "ready",
-  "template": "visual-exploration",
   "renderMode": "runtime-cdn",
   "intent": {
     "audience": "维护 effective-interact 的 Codex agent",
@@ -23,9 +22,21 @@
       "group": "overview",
       "summary": "先看吸收边界。",
       "cards": [
-        { "label": "吸收方式", "value": "模式族", "detail": "19 页 -> 19 个泛化 case family" },
-        { "label": "触发依据", "value": "决策成本", "detail": "比较、审批、理解、导出、复盘" },
-        { "label": "视觉方向", "value": "暖中性", "detail": "off-white / clay / olive / taupe" }
+        {
+          "label": "吸收方式",
+          "value": "模式族",
+          "detail": "19 页 -> 19 个泛化 case family"
+        },
+        {
+          "label": "触发依据",
+          "value": "决策成本",
+          "detail": "比较、审批、理解、导出、复盘"
+        },
+        {
+          "label": "视觉方向",
+          "value": "暖中性",
+          "detail": "off-white / clay / olive / taupe"
+        }
       ]
     },
     {
@@ -56,31 +67,138 @@
       "summary": "覆盖全部参考页，但只保留可迁移的沟通需求。",
       "caption": "每行是一个来源场景的泛化结果，不是硬编码页面标题。",
       "columns": [
-        { "key": "source", "label": "来源场景" },
-        { "key": "trigger", "label": "泛化触发" },
-        { "key": "shape", "label": "artifact shape" },
-        { "key": "mode", "label": "默认模式" }
+        {
+          "key": "source",
+          "label": "来源场景"
+        },
+        {
+          "key": "trigger",
+          "label": "泛化触发"
+        },
+        {
+          "key": "shape",
+          "label": "artifact shape"
+        },
+        {
+          "key": "mode",
+          "label": "默认模式"
+        }
       ],
       "rows": [
-        { "source": "code approaches", "trigger": "多种实现路径 + 代码片段 + 风险/测试维度", "shape": "approach-comparison", "mode": "HTML when > compact table" },
-        { "source": "visual designs", "trigger": "视觉方向审批，不直接做生产 UI", "shape": "visual-style-board", "mode": "HTML gallery" },
-        { "source": "implementation plan", "trigger": "milestones、依赖、验收门槛、owners 对齐", "shape": "implementation-plan", "mode": "HTML plan" },
-        { "source": "code review PR", "trigger": "多 finding、severity、代码/patch 证据、行动导出", "shape": "review-findings", "mode": "HTML review" },
-        { "source": "PR writeup", "trigger": "作者侧 reviewer handoff、file tour、test plan", "shape": "pr-writeup", "mode": "HTML writeup" },
-        { "source": "code understanding", "trigger": "跨文件调用链、模块边界、source anchors", "shape": "module-map", "mode": "visual Markdown or HTML" },
-        { "source": "design system", "trigger": "token、type、spacing、组件规则审阅", "shape": "design-system-reference", "mode": "HTML reference" },
-        { "source": "component variants", "trigger": "组件状态/变体矩阵审批", "shape": "component-variant-matrix", "mode": "HTML matrix" },
-        { "source": "prototype animation", "trigger": "micro-interaction timing/easing 审批", "shape": "prototype-approval", "mode": "HTML preview" },
-        { "source": "prototype interaction", "trigger": "小交互模型试用 + 决策导出", "shape": "prototype-approval", "mode": "HTML preview" },
-        { "source": "SVG illustrations", "trigger": "插画方向、palette、适用场景比较", "shape": "illustration-gallery", "mode": "HTML gallery" },
-        { "source": "flowchart diagram", "trigger": "流程分支、gate、owner、失败路径", "shape": "flow-drilldown", "mode": "Mermaid or HTML" },
-        { "source": "research feature explainer", "trigger": "feature 机制 + examples + citations", "shape": "explorable-explainer", "mode": "HTML explainer" },
-        { "source": "research concept explainer", "trigger": "概念模型 + glossary + 互动参数", "shape": "explorable-explainer", "mode": "HTML explainer" },
-        { "source": "status report", "trigger": "进度、风险、owner、follow-up 快速扫读", "shape": "status-dashboard", "mode": "Markdown or HTML" },
-        { "source": "incident report", "trigger": "timeline、impact、root cause、mitigation、actions", "shape": "incident-report", "mode": "HTML report" },
-        { "source": "editor triage board", "trigger": "小型 triage、filter、行动项导出", "shape": "triage-board-editor", "mode": "HTML editor" },
-        { "source": "editor feature flags", "trigger": "flag 状态审阅、warning、JSON/diff export", "shape": "feature-flag-editor", "mode": "HTML editor" },
-        { "source": "editor prompt tuner", "trigger": "prompt 分区调整、preview、quality checklist、copy export", "shape": "prompt-tuner-editor", "mode": "HTML editor" }
+        {
+          "source": "code approaches",
+          "trigger": "多种实现路径 + 代码片段 + 风险/测试维度",
+          "shape": "approach-comparison",
+          "mode": "HTML when > compact table"
+        },
+        {
+          "source": "visual designs",
+          "trigger": "视觉方向审批，不直接做生产 UI",
+          "shape": "visual-style-board",
+          "mode": "HTML gallery"
+        },
+        {
+          "source": "implementation plan",
+          "trigger": "milestones、依赖、验收门槛、owners 对齐",
+          "shape": "implementation-plan",
+          "mode": "HTML plan"
+        },
+        {
+          "source": "code review PR",
+          "trigger": "多 finding、severity、代码/patch 证据、行动导出",
+          "shape": "review-findings",
+          "mode": "HTML review"
+        },
+        {
+          "source": "PR writeup",
+          "trigger": "作者侧 reviewer handoff、file tour、test plan",
+          "shape": "pr-writeup",
+          "mode": "HTML writeup"
+        },
+        {
+          "source": "code understanding",
+          "trigger": "跨文件调用链、模块边界、source anchors",
+          "shape": "module-map",
+          "mode": "visual Markdown or HTML"
+        },
+        {
+          "source": "design system",
+          "trigger": "token、type、spacing、组件规则审阅",
+          "shape": "design-system-reference",
+          "mode": "HTML reference"
+        },
+        {
+          "source": "component variants",
+          "trigger": "组件状态/变体矩阵审批",
+          "shape": "component-variant-matrix",
+          "mode": "HTML matrix"
+        },
+        {
+          "source": "prototype animation",
+          "trigger": "micro-interaction timing/easing 审批",
+          "shape": "prototype-approval",
+          "mode": "HTML preview"
+        },
+        {
+          "source": "prototype interaction",
+          "trigger": "小交互模型试用 + 决策导出",
+          "shape": "prototype-approval",
+          "mode": "HTML preview"
+        },
+        {
+          "source": "SVG illustrations",
+          "trigger": "插画方向、palette、适用场景比较",
+          "shape": "illustration-gallery",
+          "mode": "HTML gallery"
+        },
+        {
+          "source": "flowchart diagram",
+          "trigger": "流程分支、gate、owner、失败路径",
+          "shape": "flow-drilldown",
+          "mode": "Mermaid or HTML"
+        },
+        {
+          "source": "research feature explainer",
+          "trigger": "feature 机制 + examples + citations",
+          "shape": "explorable-explainer",
+          "mode": "HTML explainer"
+        },
+        {
+          "source": "research concept explainer",
+          "trigger": "概念模型 + glossary + 互动参数",
+          "shape": "explorable-explainer",
+          "mode": "HTML explainer"
+        },
+        {
+          "source": "status report",
+          "trigger": "进度、风险、owner、follow-up 快速扫读",
+          "shape": "status-dashboard",
+          "mode": "Markdown or HTML"
+        },
+        {
+          "source": "incident report",
+          "trigger": "timeline、impact、root cause、mitigation、actions",
+          "shape": "incident-report",
+          "mode": "HTML report"
+        },
+        {
+          "source": "editor triage board",
+          "trigger": "小型 triage、filter、行动项导出",
+          "shape": "triage-board-editor",
+          "mode": "HTML editor"
+        },
+        {
+          "source": "editor feature flags",
+          "trigger": "flag 状态审阅、warning、JSON/diff export",
+          "shape": "feature-flag-editor",
+          "mode": "HTML editor"
+        },
+        {
+          "source": "editor prompt tuner",
+          "trigger": "prompt 分区调整、preview、quality checklist、copy export",
+          "shape": "prompt-tuner-editor",
+          "mode": "HTML editor"
+        }
       ]
     },
     {
@@ -94,45 +212,83 @@
           "group": "compare",
           "title": "Approach / option comparison",
           "body": "实现路径、多方案审批、PR 写作都需要 recommendation-first，然后开放证据和取舍。",
-          "metrics": { "density": "high", "risk": "medium" },
-          "tags": ["decision", "copyable action"]
+          "metrics": {
+            "density": "high",
+            "risk": "medium"
+          },
+          "tags": [
+            "decision",
+            "copyable action"
+          ]
         },
         {
           "group": "visual",
           "title": "Visual approval board",
           "body": "视觉方向、设计系统、组件矩阵、插画选项需要可视化审阅，但不越界实现生产 UI。",
           "swatches": [
-            { "label": "clay", "color": "#D97757" },
-            { "label": "olive", "color": "#788C5D" },
-            { "label": "warm line", "color": "#D1CFC5" }
+            {
+              "label": "clay",
+              "color": "#D97757"
+            },
+            {
+              "label": "olive",
+              "color": "#788C5D"
+            },
+            {
+              "label": "warm line",
+              "color": "#D1CFC5"
+            }
           ],
-          "tags": ["artboard", "tokens", "approval"]
+          "tags": [
+            "artboard",
+            "tokens",
+            "approval"
+          ]
         },
         {
           "group": "plan",
           "title": "Plan / dependency map",
           "body": "implementation plan、milestone map、flowchart 需要顺序、依赖、gate 和 owner 同屏。",
-          "metrics": { "layers": "timeline + graph", "risk": "explicit" },
-          "tags": ["milestones", "gates"]
+          "metrics": {
+            "layers": "timeline + graph",
+            "risk": "explicit"
+          },
+          "tags": [
+            "milestones",
+            "gates"
+          ]
         },
         {
           "group": "explain",
           "title": "Explorable explainer",
           "body": "code understanding、feature research、concept research 需要 TL;DR、diagram、source rail、glossary 和示例。",
-          "tags": ["source-backed", "fallback-readable"]
+          "tags": [
+            "source-backed",
+            "fallback-readable"
+          ]
         },
         {
           "group": "report",
           "title": "Status / incident report",
           "body": "状态和事故报告要按 facts、timeline、impact、risk、follow-up 组织，不靠长段落。",
-          "metrics": { "time": "concrete", "owner": "visible" },
-          "tags": ["timeline", "accountability"]
+          "metrics": {
+            "time": "concrete",
+            "owner": "visible"
+          },
+          "tags": [
+            "timeline",
+            "accountability"
+          ]
         },
         {
           "group": "editor",
           "title": "Disposable export editor",
           "body": "triage、feature flags、prompt tuning 都只能本地操作，并提供 Markdown/JSON/diff/prompt 显式导出。",
-          "tags": ["no writes", "no storage", "export"]
+          "tags": [
+            "no writes",
+            "no storage",
+            "export"
+          ]
         }
       ]
     },
@@ -142,19 +298,60 @@
       "group": "templates",
       "summary": "新增模板补齐参考页中缺失的 artifact shapes。",
       "columns": [
-        { "key": "template", "label": "模板" },
-        { "key": "covers", "label": "覆盖" },
-        { "key": "guardrail", "label": "边界" }
+        {
+          "key": "template",
+          "label": "模板"
+        },
+        {
+          "key": "covers",
+          "label": "覆盖"
+        },
+        {
+          "key": "guardrail",
+          "label": "边界"
+        }
       ],
       "rows": [
-        { "template": "decision-matrix", "covers": "approach comparison / multi-option approval", "guardrail": "recommendation visible" },
-        { "template": "visual-exploration", "covers": "visual direction / design system / component variants / illustration gallery", "guardrail": "not production UI" },
-        { "template": "implementation-plan", "covers": "milestone plan / dependency plan / acceptance gates", "guardrail": "plan is not completion" },
-        { "template": "review-findings", "covers": "PR/code review artifact", "guardrail": "findings first, summary secondary" },
-        { "template": "implementation-handoff", "covers": "PR writeup / file tour / rollout handoff", "guardrail": "evidence before narrative polish" },
-        { "template": "research-explainer", "covers": "code understanding / feature or concept explainer / flow drilldown", "guardrail": "source-backed claims" },
-        { "template": "conclusion-dashboard", "covers": "status / incident / release acceptance", "guardrail": "no invented metrics" },
-        { "template": "editor-workbench", "covers": "triage / feature flag / prompt tuner", "guardrail": "visible export only" }
+        {
+          "template": "decision-matrix",
+          "covers": "approach comparison / multi-option approval",
+          "guardrail": "recommendation visible"
+        },
+        {
+          "template": "visual-exploration",
+          "covers": "visual direction / design system / component variants / illustration gallery",
+          "guardrail": "not production UI"
+        },
+        {
+          "template": "implementation-plan",
+          "covers": "milestone plan / dependency plan / acceptance gates",
+          "guardrail": "plan is not completion"
+        },
+        {
+          "template": "review-findings",
+          "covers": "PR/code review artifact",
+          "guardrail": "findings first, summary secondary"
+        },
+        {
+          "template": "implementation-handoff",
+          "covers": "PR writeup / file tour / rollout handoff",
+          "guardrail": "evidence before narrative polish"
+        },
+        {
+          "template": "research-explainer",
+          "covers": "code understanding / feature or concept explainer / flow drilldown",
+          "guardrail": "source-backed claims"
+        },
+        {
+          "template": "conclusion-dashboard",
+          "covers": "status / incident / release acceptance",
+          "guardrail": "no invented metrics"
+        },
+        {
+          "template": "editor-workbench",
+          "covers": "triage / feature flag / prompt tuner",
+          "guardrail": "visible export only"
+        }
       ]
     },
     {
@@ -175,42 +372,173 @@
       "id": "claim-generalized",
       "statement": "参考页被吸收为可迁移模式族，而不是逐页标题触发。",
       "kind": "conclusion",
-      "evidenceIds": ["source-01", "source-20"],
+      "evidenceIds": [
+        "source-01",
+        "source-20"
+      ],
       "confidence": "high"
     },
     {
       "id": "claim-visual",
       "statement": "默认视觉风格采用暖中性工程汇报 token，适合高密度信息展示。",
       "kind": "recommendation",
-      "evidenceIds": ["source-02", "source-05", "source-11"],
+      "evidenceIds": [
+        "source-02",
+        "source-05",
+        "source-11"
+      ],
       "confidence": "medium",
-      "knownLimits": ["视觉 token 是抽象参考，不复制原页面 CSS。"]
+      "knownLimits": [
+        "视觉 token 是抽象参考，不复制原页面 CSS。"
+      ]
     }
   ],
   "evidence": [
-    { "id": "source-01", "kind": "source", "label": "01 exploration code approaches", "sourceUrl": "https://thariqs.github.io/html-effectiveness/01-exploration-code-approaches.html", "status": "info" },
-    { "id": "source-02", "kind": "source", "label": "02 exploration visual designs", "sourceUrl": "https://thariqs.github.io/html-effectiveness/02-exploration-visual-designs.html", "status": "info" },
-    { "id": "source-16", "kind": "source", "label": "16 implementation plan", "sourceUrl": "https://thariqs.github.io/html-effectiveness/16-implementation-plan.html", "status": "info" },
-    { "id": "source-03", "kind": "source", "label": "03 code review PR", "sourceUrl": "https://thariqs.github.io/html-effectiveness/03-code-review-pr.html", "status": "info" },
-    { "id": "source-17", "kind": "source", "label": "17 PR writeup", "sourceUrl": "https://thariqs.github.io/html-effectiveness/17-pr-writeup.html", "status": "info" },
-    { "id": "source-04", "kind": "source", "label": "04 code understanding", "sourceUrl": "https://thariqs.github.io/html-effectiveness/04-code-understanding.html", "status": "info" },
-    { "id": "source-05", "kind": "source", "label": "05 design system", "sourceUrl": "https://thariqs.github.io/html-effectiveness/05-design-system.html", "status": "info" },
-    { "id": "source-06", "kind": "source", "label": "06 component variants", "sourceUrl": "https://thariqs.github.io/html-effectiveness/06-component-variants.html", "status": "info" },
-    { "id": "source-07", "kind": "source", "label": "07 prototype animation", "sourceUrl": "https://thariqs.github.io/html-effectiveness/07-prototype-animation.html", "status": "info" },
-    { "id": "source-08", "kind": "source", "label": "08 prototype interaction", "sourceUrl": "https://thariqs.github.io/html-effectiveness/08-prototype-interaction.html", "status": "info" },
-    { "id": "source-10", "kind": "source", "label": "10 SVG illustrations", "sourceUrl": "https://thariqs.github.io/html-effectiveness/10-svg-illustrations.html", "status": "info" },
-    { "id": "source-13", "kind": "source", "label": "13 flowchart diagram", "sourceUrl": "https://thariqs.github.io/html-effectiveness/13-flowchart-diagram.html", "status": "info" },
-    { "id": "source-14", "kind": "source", "label": "14 research feature explainer", "sourceUrl": "https://thariqs.github.io/html-effectiveness/14-research-feature-explainer.html", "status": "info" },
-    { "id": "source-15", "kind": "source", "label": "15 research concept explainer", "sourceUrl": "https://thariqs.github.io/html-effectiveness/15-research-concept-explainer.html", "status": "info" },
-    { "id": "source-11", "kind": "source", "label": "11 status report", "sourceUrl": "https://thariqs.github.io/html-effectiveness/11-status-report.html", "status": "info" },
-    { "id": "source-12", "kind": "source", "label": "12 incident report", "sourceUrl": "https://thariqs.github.io/html-effectiveness/12-incident-report.html", "status": "info" },
-    { "id": "source-18", "kind": "source", "label": "18 editor triage board", "sourceUrl": "https://thariqs.github.io/html-effectiveness/18-editor-triage-board.html", "status": "info" },
-    { "id": "source-19", "kind": "source", "label": "19 editor feature flags", "sourceUrl": "https://thariqs.github.io/html-effectiveness/19-editor-feature-flags.html", "status": "info" },
-    { "id": "source-20", "kind": "source", "label": "20 editor prompt tuner", "sourceUrl": "https://thariqs.github.io/html-effectiveness/20-editor-prompt-tuner.html", "status": "info" }
+    {
+      "id": "source-01",
+      "kind": "source",
+      "label": "01 exploration code approaches",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/01-exploration-code-approaches.html",
+      "status": "info"
+    },
+    {
+      "id": "source-02",
+      "kind": "source",
+      "label": "02 exploration visual designs",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/02-exploration-visual-designs.html",
+      "status": "info"
+    },
+    {
+      "id": "source-16",
+      "kind": "source",
+      "label": "16 implementation plan",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/16-implementation-plan.html",
+      "status": "info"
+    },
+    {
+      "id": "source-03",
+      "kind": "source",
+      "label": "03 code review PR",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/03-code-review-pr.html",
+      "status": "info"
+    },
+    {
+      "id": "source-17",
+      "kind": "source",
+      "label": "17 PR writeup",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/17-pr-writeup.html",
+      "status": "info"
+    },
+    {
+      "id": "source-04",
+      "kind": "source",
+      "label": "04 code understanding",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/04-code-understanding.html",
+      "status": "info"
+    },
+    {
+      "id": "source-05",
+      "kind": "source",
+      "label": "05 design system",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/05-design-system.html",
+      "status": "info"
+    },
+    {
+      "id": "source-06",
+      "kind": "source",
+      "label": "06 component variants",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/06-component-variants.html",
+      "status": "info"
+    },
+    {
+      "id": "source-07",
+      "kind": "source",
+      "label": "07 prototype animation",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/07-prototype-animation.html",
+      "status": "info"
+    },
+    {
+      "id": "source-08",
+      "kind": "source",
+      "label": "08 prototype interaction",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/08-prototype-interaction.html",
+      "status": "info"
+    },
+    {
+      "id": "source-10",
+      "kind": "source",
+      "label": "10 SVG illustrations",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/10-svg-illustrations.html",
+      "status": "info"
+    },
+    {
+      "id": "source-13",
+      "kind": "source",
+      "label": "13 flowchart diagram",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/13-flowchart-diagram.html",
+      "status": "info"
+    },
+    {
+      "id": "source-14",
+      "kind": "source",
+      "label": "14 research feature explainer",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/14-research-feature-explainer.html",
+      "status": "info"
+    },
+    {
+      "id": "source-15",
+      "kind": "source",
+      "label": "15 research concept explainer",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/15-research-concept-explainer.html",
+      "status": "info"
+    },
+    {
+      "id": "source-11",
+      "kind": "source",
+      "label": "11 status report",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/11-status-report.html",
+      "status": "info"
+    },
+    {
+      "id": "source-12",
+      "kind": "source",
+      "label": "12 incident report",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/12-incident-report.html",
+      "status": "info"
+    },
+    {
+      "id": "source-18",
+      "kind": "source",
+      "label": "18 editor triage board",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/18-editor-triage-board.html",
+      "status": "info"
+    },
+    {
+      "id": "source-19",
+      "kind": "source",
+      "label": "19 editor feature flags",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/19-editor-feature-flags.html",
+      "status": "info"
+    },
+    {
+      "id": "source-20",
+      "kind": "source",
+      "label": "20 editor prompt tuner",
+      "sourceUrl": "https://thariqs.github.io/html-effectiveness/20-editor-prompt-tuner.html",
+      "status": "info"
+    }
   ],
   "verification": [
-    { "label": "source families", "status": "pass", "detail": "All 19 supplied pages mapped to generalized case families." },
-    { "label": "overfit guardrail", "status": "pass", "detail": "Triggers are written by reader need and artifact shape, not by source page title." }
+    {
+      "label": "source families",
+      "status": "pass",
+      "detail": "All 19 supplied pages mapped to generalized case families."
+    },
+    {
+      "label": "overfit guardrail",
+      "status": "pass",
+      "detail": "Triggers are written by reader need and artifact shape, not by source page title."
+    }
   ],
   "nextActions": [
     "Use evals/routing-cases.json to protect trigger timing.",
