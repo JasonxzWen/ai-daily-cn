@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.harness-hub-047-sync",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Harness Hub 0473656 prompt context harness loop sync",
+  "status": "completed",
+  "summary": "Updated the local Harness Hub source checkout to origin/main at 047365688dcdeeb5ef0489095a4b8b1c65f0122b, refreshed the aggregation manifest, migrated target-safe context engineering and loop engineering resources under .harness-hub, and expanded the local harness init and validation gates while preserving AI daily production effective-interact renderer adaptations.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "commits": [
+      "047365688dcdeeb5ef0489095a4b8b1c65f0122b"
+    ],
+    "validation_commands": [
+      "red manifest stale check failed before update with manifest commit c603b2ac333d2071a394a29c2dfe90d02e1197aa versus origin/main 047365688dcdeeb5ef0489095a4b8b1c65f0122b",
+      "source checkout pull --ff-only",
+      "node scripts/update-harness-hub.mjs --source-root <harness-hub-source>",
+      "source CLI init-harness dry-run for this target",
+      "npm run harness:init",
+      "node scripts/harness-validate.mjs",
+      "npm run content:contract"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Harness Hub target-safe migration should use managed outputs and local adaptation, not source-repo wholesale copies.",
+      "evidence": "The dry-run identified .harness-hub state, context, loop, evaluator, and quality outputs while also blocking root overwrites and dirty skill files; the final migration copied target resources and kept source packaging out of the repository.",
+      "scope": "harness_hub_target_migration",
+      "persistence": "implemented",
+      "recommended_action": "For future Harness Hub updates, run the source CLI dry-run first and migrate only target-safe managed outputs unless the user explicitly asks to adopt source-repo packaging."
+    },
+    {
+      "lesson": "Production effective-interact adaptations must survive Harness Hub full-overwrite sync.",
+      "evidence": "The first npm run validate attempt reached npm run test and failed 21 tests after active effective-interact files were overwritten; restoring those local adaptations brought the diff back to harness/context/loop resources.",
+      "scope": "effective_interact_renderer",
+      "persistence": "implemented",
+      "recommended_action": "Keep feedback/p1-effective-interact-production-renderer in the regression self-check for every Harness Hub sync and do not accept skill overwrite results until npm run test or npm run validate proves the production renderer contract."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The existing update script still reports full-overwrite copiedFiles for effective-interact even when the target must preserve local renderer adaptations.",
+      "evidence": "The aggregation manifest records copied files from the upstream sync, while validation required restoring local active effective-interact files to keep the daily renderer tests viable.",
+      "module": "scripts/update-harness-hub.mjs",
+      "suggestion": "Consider moving high-risk target-adapted skills such as effective-interact to preserve-conflicts or adding a per-skill local-adaptation allowlist.",
+      "expected_benefit": "Future Harness Hub syncs would preserve upstream evidence without temporarily breaking production daily rendering tests.",
+      "requires_user_confirmation": true,
+      "promotion_path": "Future project_iteration after user confirmation; would need updater tests and manifest semantics.",
+      "ledger_links": [
+        "feedback/p1-effective-interact-production-renderer"
+      ],
+      "validation_evidence": [
+        "npm run validate"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-ledger-validation-binding",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-daily-resilience-contract",
+    "feedback/p1-public-daily-content-contract"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Evaluate whether scripts/update-harness-hub.mjs should support per-skill preserve-conflicts for effective-interact and other target-adapted skills.",
+      "owner": "project"
+    }
+  ],
+  "slug": "harness-hub-047-sync"
+}

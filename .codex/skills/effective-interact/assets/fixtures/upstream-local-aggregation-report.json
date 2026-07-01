@@ -1,0 +1,71 @@
+{
+  "title": "Upstream Local Aggregation Check",
+  "summary": "A compact report proving upstream component style and local production extensions can coexist.",
+  "status": "complete",
+  "renderMode": "pre-rendered",
+  "heroStats": [
+    {
+      "label": "Merge mode",
+      "value": "selective",
+      "detail": "No wholesale overwrite"
+    }
+  ],
+  "sections": [
+    {
+      "type": "filterable-cards",
+      "title": "Merged Card Surface",
+      "group": "verification",
+      "summary": "Filterable cards keep upstream layout while preserving local rich card fields.",
+      "showFilters": true,
+      "filterLabel": "Surface",
+      "defaultFilterValue": "daily",
+      "items": [
+        {
+          "group": "daily",
+          "title": "Production Renderer",
+          "subtitle": "local extension",
+          "href": "https://example.com/report",
+          "body": "Local card extensions preserve external title links, semantic media, stats, and visible body copy.",
+          "tags": [
+            "style|upstream tokens",
+            "contract|local renderer"
+          ],
+          "stats": [
+            {
+              "label": "Renderer",
+              "value": "pre-rendered",
+              "detail": "single-file HTML"
+            },
+            {
+              "label": "Policy",
+              "value": "no hover dim",
+              "detail": "sibling text stays readable"
+            }
+          ],
+          "media": [
+            {
+              "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
+              "alt": "Semantic one-pixel fixture image",
+              "caption": "Local lightbox media contract"
+            }
+          ],
+          "points": [
+            {
+              "label": "Verification",
+              "value": "Generated through create-interaction.mjs and validated before handoff."
+            }
+          ]
+        },
+        {
+          "group": "upstream",
+          "title": "Component Style",
+          "body": "Upstream style remains the reference for compact panels, grouped navigation, filters, and validation-first reports.",
+          "tags": [
+            "style|compact",
+            "validation|required"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.effective-interact-upstream-local-merge",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Effective Interact upstream local selective merge",
+  "status": "completed",
+  "summary": "Compared upstream Harness Hub effective-interact with the local AI daily adapted implementation, rejected unsafe wholesale overwrite and hover sibling dim behavior, then codified a selective aggregation policy with fixture and unit coverage proving upstream component style and local production renderer extensions can coexist.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "commits": [
+      "047365688dcdeeb5ef0489095a4b8b1c65f0122b"
+    ],
+    "validation_commands": [
+      "red aggregation check failed before implementation with missing aggregation policy and missing no-hover-dim rule",
+      "green aggregation check passed after documentation and fixture updates",
+      "node --test --test-name-pattern \"effective-interact preserves local production extensions\" tests/skills.test.js",
+      "node .codex/skills/effective-interact/scripts/create-interaction.mjs --input .codex/skills/effective-interact/assets/fixtures/upstream-local-aggregation-report.json --slug upstream-local-aggregation --json",
+      "node .codex/skills/effective-interact/scripts/validate-interaction.mjs .codex/skills/effective-interact/artifacts/upstream-local-aggregation.html --json --require-browser",
+      "playwright screenshot check for desktop and mobile local artifact",
+      "npm run test",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Upstream effective-interact should be treated as a style and component reference in this repository, not as an implementation source that can overwrite local production renderer extensions.",
+      "evidence": "The upstream active files were narrower than the local adapted files and would remove local title links, media lightbox, tracking components, hero extensions, and official snapshot containment if copied wholesale.",
+      "scope": "effective_interact_aggregation",
+      "persistence": "implemented",
+      "recommended_action": "Keep the Upstream/Local Aggregation Policy in DESIGN.md and require focused tests before accepting future upstream effective-interact implementation changes."
+    },
+    {
+      "lesson": "Hover sibling dim and blur patterns are not compatible with the public daily reader contract.",
+      "evidence": "The upstream CSS introduced a hover sibling dim pattern, while the local ledger and unit tests require no hover dim/blur of public daily card text.",
+      "scope": "effective_interact_visual_contract",
+      "persistence": "implemented",
+      "recommended_action": "Prefer active-item lift, outline, shadow, or spotlight while keeping sibling evidence readable."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The Harness Hub updater and aggregation manifest still lack an explicit target-adapted skill mode for effective-interact.",
+      "evidence": "This task had to reconcile upstream and local effective-interact manually even though the previous manifest described full-overwrite sync.",
+      "module": "scripts/update-harness-hub.mjs",
+      "suggestion": "Add per-skill aggregation modes such as style-reference or target-adapted so future effective-interact updates can import docs, fixtures, and safe primitives without replacing production renderer behavior.",
+      "expected_benefit": "Future Harness Hub updates can absorb upstream design work with less risk of breaking AI daily report rendering tests.",
+      "requires_user_confirmation": true,
+      "promotion_path": "Future project_iteration after user confirmation; requires updater tests and manifest contract update.",
+      "ledger_links": [
+        "feedback/p1-effective-interact-production-renderer",
+        "feedback/p1-public-daily-ia-source-effectiveness-reset"
+      ],
+      "validation_evidence": [
+        "npm run test",
+        "npm run validate"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-public-daily-ia-source-effectiveness-reset",
+    "feedback/p1-official-snapshot-layout-containment",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-public-media-contract",
+    "feedback/p1-semantic-evidence-images"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Model effective-interact as a target-adapted skill in the Harness Hub aggregation manifest or updater.",
+      "owner": "project"
+    }
+  ],
+  "slug": "effective-interact-upstream-local-merge"
+}

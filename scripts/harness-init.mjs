@@ -7,19 +7,29 @@ const force = process.argv.includes('--force');
 const json = process.argv.includes('--json');
 
 const seeds = [
-  ['progress.example.md', 'progress.md'],
-  ['session-handoff.example.md', 'session-handoff.md'],
-  ['tasks/current-task.example.md', 'tasks/current-task.md'],
+  ['progress.example.md', 'progress.md', { optional: false }],
+  ['session-handoff.example.md', 'session-handoff.md', { optional: false }],
+  ['tasks/current-task.example.md', 'tasks/current-task.md', { optional: false }],
+  ['.harness-hub/state-templates/current-task.md', '.harness-hub/state/current-task.md', { optional: true }],
+  ['.harness-hub/state-templates/decisions.md', '.harness-hub/state/decisions.md', { optional: true }],
+  ['.harness-hub/state-templates/progress.md', '.harness-hub/state/progress.md', { optional: true }],
+  ['.harness-hub/state-templates/session-handoff.md', '.harness-hub/state/session-handoff.md', { optional: true }],
+  ['.harness-hub/state-templates/loop-runs.jsonl', '.harness-hub/state/loop-runs.jsonl', { optional: true }],
+  ['.harness-hub/state-templates/interrupt-decisions.jsonl', '.harness-hub/state/interrupt-decisions.jsonl', { optional: true }],
+  ['.harness-hub/state-templates/capability-events.jsonl', '.harness-hub/state/capability-events.jsonl', { optional: true }],
 ];
 
 const results = [];
 const failures = [];
 
-for (const [source, target] of seeds) {
+for (const [source, target, seedOptions] of seeds) {
   const sourcePath = path.join(root, source);
   const targetPath = path.join(root, target);
 
   if (!fs.existsSync(sourcePath)) {
+    if (seedOptions?.optional) {
+      continue;
+    }
     failures.push(`${source}: missing harness state example`);
     continue;
   }

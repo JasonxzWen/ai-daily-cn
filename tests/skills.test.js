@@ -483,6 +483,46 @@ test("effective-interact filterable cards render the upstream component contract
   assert.match(html, /Beta body/);
 });
 
+test("effective-interact preserves local production extensions while aggregating upstream style", async () => {
+  const design = await fsp.readFile(path.join(skillDir, "DESIGN.md"), "utf8");
+  const patterns = await fsp.readFile(path.join(skillDir, "references", "interaction-patterns.md"), "utf8");
+  const css = await fsp.readFile(path.join(skillDir, "assets", "components", "interaction-ui.css"), "utf8");
+  const js = await fsp.readFile(path.join(skillDir, "assets", "components", "interaction-ui.js"), "utf8");
+
+  assert.match(design, /Upstream\/Local Aggregation Policy/);
+  assert.match(patterns, /Do not dim, blur, grayscale, or otherwise suppress sibling card text on hover/);
+  assert.doesNotMatch(css, /:has\(\.interactive-card:hover\)\s+\.interactive-card:not\(:hover\)/);
+  assert.match(js, /if \(item\.matches\("button"\)\) return;/);
+  assert.match(js, /data-scale-mode/);
+  assert.match(js, /data-lightbox-image/);
+
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-effective-interact-merge-"));
+  const fixture = path.join(skillDir, "assets", "fixtures", "upstream-local-aggregation-report.json");
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", fixture, "--out-dir", tmp, "--slug", "upstream-local-aggregation", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  assert.match(html, /data-render-mode="pre-rendered"/);
+  assert.match(html, /data-section-type="filterable-cards"/);
+  assert.match(html, /card-title-link/);
+  assert.match(html, /card-subtitle/);
+  assert.match(html, /data-card-stats/);
+  assert.match(html, /data-lightbox-image="true"/);
+  assert.match(html, /data-filter-value="daily" aria-pressed="true"/);
+  assert.match(html, /<article[^>]+data-filter-value="upstream"[^>]+hidden/);
+
+  const validation = spawnSync(process.execPath, [validateReportScript, payload.outputPath, "--json", "--skip-browser"], {
+    cwd: rootDir,
+    encoding: "utf8"
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+});
+
 test("effective-interact filterable cards render local tracking components with multi-entity lines and public trace", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-tracking-component-"));
   const inputPath = path.join(tmp, "tracking-component.json");

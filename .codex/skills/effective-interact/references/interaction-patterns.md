@@ -515,7 +515,8 @@ Runtime rules:
 ## Interaction And Motion Contract
 
 - Use hover/focus to reveal affordances, not to hide essential evidence.
-- Apply dim/blur to non-focused cards during filtering or hover comparison, but never make text unreadable.
+- Do not dim, blur, grayscale, or otherwise suppress sibling card text on hover. This repository keeps public-reader cards fully readable while hover/focus may lift, outline, shadow, or spotlight only the active item.
+- During explicit filtering, hide unmatched cards with the `hidden` attribute and keep filter buttons visible; do not rely on translucent unmatched cards as the primary state.
 - Use transitions for opacity, transform, color, and outline; keep durations around 120-220ms.
 - Support keyboard state with `:focus-visible`.
 - Include `@media (prefers-reduced-motion: reduce)` and remove transform/animation there.

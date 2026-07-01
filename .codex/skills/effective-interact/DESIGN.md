@@ -26,6 +26,23 @@ fictional sample data, tracking code, or page-specific labels.
    React, Tailwind, shadcn, persistence, credentials, analytics, or network
    writes.
 
+## Upstream/Local Aggregation Policy
+
+Treat upstream Harness Hub `effective-interact` as the style and component
+reference, not as a safe wholesale replacement for this repository. Keep the
+upstream component-first visual language: compact panels, grouped navigation,
+filterable cards, source-linked evidence, static single-file output, and
+validation-first handoff. Preserve local AI daily production extensions when
+they provide stricter public-report behavior: title links, safe external links,
+semantic media with lightbox support, hero stats/links, tracking components,
+official snapshot containment, and richer card details.
+
+When upstream and local behavior conflict, prefer the stricter local production
+contract if it is bound to `npm run test` or `npm run validate`. In particular,
+do not import hover patterns that dim, blur, grayscale, or suppress sibling
+card text in public-reader reports; hover/focus can lift, outline, shadow, or
+spotlight the active item without making neighboring evidence harder to read.
+
 ## Required References
 
 - `references/report-ia.md` - information budget, first screen, navigation,

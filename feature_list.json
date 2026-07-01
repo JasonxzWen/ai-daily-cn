@@ -207,5 +207,210 @@
       "log analysis",
       "validation"
     ]
+  },
+  "feature_state_policy": {
+    "required_fields": [
+      "id",
+      "behavior",
+      "status",
+      "acceptance",
+      "validation",
+      "evidence"
+    ],
+    "allowed_statuses": [
+      "not_started",
+      "active",
+      "blocked",
+      "ready_for_validation",
+      "passing",
+      "failing",
+      "deferred"
+    ],
+    "passing_requires": [
+      "validation command",
+      "pass/fail result",
+      "evidence summary or path",
+      "checkpoint commit or skip reason"
+    ]
+  },
+  "validation_priority_policy": {
+    "P0": [
+      "new or changed behavior test",
+      "nearest relevant suite",
+      "required static or runtime gate",
+      "web browser acceptance when Web user-visible behavior changes"
+    ],
+    "P1": [
+      "affected module, integration, system, API, data-flow, or cross-boundary checks",
+      "risk assessment when a P1 check is skipped"
+    ],
+    "P2": [
+      "broader regression, repeated runs, cross-browser or mobile viewport, accessibility, or performance hardening",
+      "explicit defer reason when not run"
+    ]
+  },
+  "web_acceptance_policy": {
+    "applies_to": [
+      "Web UI",
+      "routing",
+      "forms",
+      "interaction state",
+      "user-visible browser behavior"
+    ],
+    "required_evidence": [
+      "local URL",
+      "scenario",
+      "viewport",
+      "agent-run browser result",
+      "console or network findings",
+      "screenshot, trace, video, log, or explicit skip reason"
+    ],
+    "default_tool_boundary": "Use webapp-testing for one-off local acceptance; use e2e-testing only for durable Playwright suites.",
+    "safety_boundary": "Do not use production accounts, real payments, or external writes unless explicitly approved."
+  },
+  "pr_closeout_policy": {
+    "applies_after": [
+      "PR creation",
+      "PR update",
+      "branch push for review"
+    ],
+    "required_checks": [
+      "PR URL and head commit",
+      "mergeability or merge-state status",
+      "CI/check-run status",
+      "conflict status",
+      "branch-protection blockers"
+    ],
+    "actionable_resolution": [
+      "resolve in-scope conflicts",
+      "fix failing checks that are within the accepted task scope",
+      "rerun relevant validation",
+      "push updates before handoff"
+    ],
+    "stop_conditions": [
+      "user decision",
+      "credential or permission boundary",
+      "reviewer action",
+      "protected-branch override",
+      "external service recovery"
+    ],
+    "merge_boundary": "Do not merge a PR unless the user explicitly requests that remote mutation."
+  },
+  "finish_closeout_policy": {
+    "applies_after": [
+      "P0 validation",
+      "test and acceptance",
+      "material implementation or review work"
+    ],
+    "required_checks": [
+      "final independent review or explicit skip reason",
+      "technical debt and first-principles implementation fit",
+      "project-rule or workflow drift",
+      "PR or merge-readiness status when a PR exists",
+      "conflict decisions and risk surfaced to the user",
+      "insight audit recommendations or explicit skip reason"
+    ],
+    "subagent_boundary": "Use subagents only for independent read-only review or verification; the main agent owns synthesis and final decisions.",
+    "insight_boundary": "Use insight to audit tool calling, repeated low-value lookup loops, misleading evidence, docs/code conflicts, AI infrastructure lessons, and skill or workflow extraction candidates.",
+    "merge_boundary": "Drive to merge-ready or complete the merge only when the user explicitly authorizes that remote mutation."
+  },
+  "agentic_loop_policy": {
+    "loop_model": "Producer -> Verifier -> Arbiter -> Main Agent Decision",
+    "default_loops": [
+      "plan-review",
+      "test-design",
+      "implementation-review",
+      "frontend-acceptance",
+      "diagnosis-regression",
+      "docs-consistency",
+      "pr-closeout",
+      "insight-retro"
+    ],
+    "host_adapters": [
+      "codex-subagent",
+      "claude-code-subagent",
+      "deterministic-check",
+      "browser-acceptance",
+      "ci-check"
+    ],
+    "required_evidence": [
+      "original task or target spec",
+      "acceptance criteria",
+      "producer output or current diff",
+      "verifier evidence or explicit skip reason",
+      "arbiter verdict or explicit skip reason",
+      "stop condition when a loop may repeat or iteration controls are recorded",
+      "iteration and maxIterations when a loop may repeat",
+      "main agent decision"
+    ],
+    "iteration_policy": {
+      "fields": [
+        "iteration",
+        "maxIterations",
+        "stopCondition"
+      ],
+      "rules": [
+        "single-pass loops may omit iteration, maxIterations, and stopCondition",
+        "when either iteration field is present, both values must be positive integers and stopCondition is required",
+        "iteration must be less than or equal to maxIterations",
+        "allowed stopCondition values are continue, revise, interrupt, deliver, handoff, and complete"
+      ]
+    },
+    "arbiter_boundary": "Arbiters are read-only. They do not edit code, resolve conflicts, push, publish, merge, or make final user-facing decisions.",
+    "dispatch_boundary": "Hooks and deterministic checks may request or validate loop evidence, but must not auto-dispatch delegated agents.",
+    "main_agent_responsibility": "The main agent owns synthesis, user-visible decisions, integration, and final handoff."
+  },
+  "loop_control_policy": {
+    "control_plane": "Loop Engineering decides when to continue, validate, interrupt, and record auditable action decisions.",
+    "capability_invocations": [
+      "standalone",
+      "composable",
+      "loop-participant"
+    ],
+    "default_behavior": "Continue low-risk local work when scope, ownership, and validation are clear; interrupt when risk signals require human review.",
+    "interrupt_policy": ".harness-hub/loop/policies/interrupt-policy.md",
+    "audit_schema": ".harness-hub/loop/policies/action-audit-schema.md",
+    "evals": [
+      ".harness-hub/loop/evals/interrupt-policy/good-cases.jsonl",
+      ".harness-hub/loop/evals/interrupt-policy/bad-cases.jsonl",
+      ".harness-hub/loop/evals/interrupt-policy/regression-cases.jsonl"
+    ],
+    "runtime_ledgers": [
+      ".harness-hub/state/loop-runs.jsonl",
+      ".harness-hub/state/interrupt-decisions.jsonl",
+      ".harness-hub/state/capability-events.jsonl"
+    ]
+  },
+  "context_engineering_policy": {
+    "knowledge_layer": "LLM Wiki keeps stable project knowledge in Markdown without duplicating raw sources or agent-native memory.",
+    "managed_schema": [
+      ".harness-hub/context/AGENTS.md",
+      ".harness-hub/context/README.md",
+      ".harness-hub/context/llm-wiki-schema.md"
+    ],
+    "wiki_root": ".harness-hub/context/wiki",
+    "obsidian_profile": ".harness-hub/context/wiki/.obsidian",
+    "write_policy": "Initialize incrementally; require human confirmation before knowledge writes; preserve wiki content file-by-file during standard updates.",
+    "stable_content": [
+      "design principles",
+      "product expectations",
+      "architecture intent",
+      "iteration rules",
+      "durable decisions",
+      "good and bad cases",
+      "contradictions"
+    ],
+    "excluded_content": [
+      "current task progress",
+      "rapidly changing implementation details",
+      "raw source copies",
+      "native agent memory",
+      "credentials or private local state"
+    ],
+    "validation": [
+      "context schema markers",
+      "wiki index/update-log/contradiction files",
+      "portable Obsidian JSON profile"
+    ]
   }
 }
