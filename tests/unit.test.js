@@ -6223,6 +6223,154 @@ test("official blog parse-feed CLI refuses public output paths", async () => {
   );
 });
 
+test("official blog review session CLI writes clean internal preview-to-review packet", async () => {
+  const fixtureDir = path.join(rootDir, "tests", "fixtures", "official-blog-runbook-replay");
+  const fixture = JSON.parse(await fs.readFile(path.join(fixtureDir, "replay.json"), "utf8"));
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-session-"));
+  const manifestPath = path.join(tmp, "review-session-manifest.json");
+  const outputPath = path.join(tmp, "official-blog-review-session.json");
+  await fs.writeFile(manifestPath, `${JSON.stringify({
+    report_date: fixture.report_date,
+    generated_at: fixture.generated_at,
+    feeds: fixture.feeds.map((feed) => ({
+      company: feed.company,
+      source_label: feed.source_label,
+      file: path.join(fixtureDir, feed.file)
+    }))
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-session",
+    "--input",
+    manifestPath,
+    "--output",
+    outputPath
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.session.kind, "official_blog_review_session");
+  assert.equal(parsed.session.visibility, "internal");
+  assert.equal(parsed.session.stats.feeds, 2);
+  assert.equal(parsed.session.stats.candidates, 4);
+  assert.equal(parsed.session.stats.review_items, 3);
+  assert.equal(parsed.session.stats.included, 2);
+  assert.equal(parsed.session.stats.needs_review, 1);
+  assert.equal(parsed.session.stats.excluded, 1);
+  assert.equal(parsed.session.preview_feeds.length, 2);
+  assert.equal(parsed.session.intake_queue.kind, "official_blog_intake_queue");
+  assert.equal(parsed.session.review_packet.kind, "official_blog_review_packet");
+  assert.equal(parsed.session.review_packet.ai_review_contract.review_basis, "title_and_opening_preview_only");
+  assert.equal(Object.hasOwn(parsed.session, "source_audit"), false);
+  assert.equal(Object.hasOwn(parsed.session, "candidate_pool"), false);
+  for (const privatePath of [manifestPath, fixtureDir, tmp]) {
+    assert.equal(raw.includes(privatePath), false);
+    assert.equal(raw.includes(JSON.stringify(privatePath).slice(1, -1)), false);
+  }
+  for (const marker of fixture.forbidden_markers) {
+    assert.equal(raw.includes(marker), false, `${marker} must stay outside review session output`);
+  }
+  for (const laterArtifact of [
+    "official_blog_review_decisions",
+    "official_blog_authoring_brief",
+    "official_blog_reviewed_authoring",
+    "official_blog_knowledge_drafts",
+    "records_planned",
+    "records_written",
+    "raw_transcript"
+  ]) {
+    assert.equal(raw.includes(laterArtifact), false, `${laterArtifact} must not appear before manual checkpoints`);
+  }
+  assert(!raw.startsWith("\uFEFF"));
+
+  const decisionsPath = path.join(tmp, "ai-review-decisions.json");
+  const reviewDecisionsPath = path.join(tmp, "review-decisions.json");
+  await fs.writeFile(decisionsPath, `${JSON.stringify(parsed.session.review_packet.review_items.map((item) => ({
+    intake_id: item.intake_id,
+    decision: item.deterministic_triage.decision,
+    matched_criteria: item.deterministic_triage.matched_criteria,
+    suggested_topics: item.suggested_topics,
+    rationale: `checkpoint decision for ${item.title_original}`,
+    confidence: 0.9
+  })), null, 2)}\n`, "utf8");
+
+  await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-decisions",
+    "--packet",
+    outputPath,
+    "--input",
+    decisionsPath,
+    "--output",
+    reviewDecisionsPath,
+    "--date",
+    fixture.report_date,
+    "--generated-at",
+    fixture.generated_at
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+  const reviewDecisionRaw = await fs.readFile(reviewDecisionsPath, "utf8");
+  const reviewDecisionParsed = JSON.parse(reviewDecisionRaw);
+  assert.equal(reviewDecisionParsed.review_decisions.kind, "official_blog_review_decisions");
+  assert.equal(reviewDecisionParsed.review_decisions.stats.accepted_for_authoring, 2);
+  assert.equal(reviewDecisionParsed.review_decisions.stats.needs_manual_review, 1);
+});
+
+test("official blog review session CLI refuses public output paths", async () => {
+  const fixtureDir = path.join(rootDir, "tests", "fixtures", "official-blog-runbook-replay");
+  const fixture = JSON.parse(await fs.readFile(path.join(fixtureDir, "replay.json"), "utf8"));
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-session-public-"));
+  const manifestPath = path.join(tmp, "review-session-manifest.json");
+  const publicOutputPaths = [
+    path.join(tmp, "docs", "data", "official-blog-review-session.json"),
+    path.join(tmp, "docs", "official-blogs", "review-session.json"),
+    path.join(tmp, "docs", "official-blog-review-session.html"),
+    path.join(tmp, "docs", "reports", "official-blog-review-session.html")
+  ];
+  await fs.writeFile(manifestPath, `${JSON.stringify({
+    feeds: fixture.feeds.map((feed) => ({
+      company: feed.company,
+      source_label: feed.source_label,
+      file: path.join(fixtureDir, feed.file)
+    }))
+  })}\n`, "utf8");
+
+  for (const publicOutputPath of publicOutputPaths) {
+    await assert.rejects(
+      () => execFileAsync(process.execPath, [
+        path.join(rootDir, "src/cli.js"),
+        "official-blog:review-session",
+        "--input",
+        manifestPath,
+        "--output",
+        publicOutputPath,
+        "--repo-root",
+        tmp
+      ], {
+        cwd: rootDir,
+        maxBuffer: 1024 * 1024
+      }),
+      (error) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stdout, /official_blog_review_session_public_output_forbidden/);
+        return true;
+      }
+    );
+    await assert.rejects(
+      () => fs.stat(publicOutputPath),
+      /ENOENT/
+    );
+  }
+});
+
 test("official blog author records CLI writes curated records and clean summary JSON", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-author-records-"));
   const inputPath = path.join(tmp, "reviewed-official-blogs.json");

@@ -11,6 +11,7 @@ import {
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogReviewedAuthoring,
+  createOfficialBlogReviewSession,
   createOfficialBlogIntakeQueue,
   createOfficialBlogRelationshipSuggestions,
   createOfficialBlogReviewDecisions,
@@ -1916,6 +1917,64 @@ test("official blog runbook replay fixtures exercise local OpenAI and Anthropic 
   }
 });
 
+test("official blog review session composes preview intake and review packet without later artifacts", async () => {
+  const fixtureDir = path.join(rootDir, "tests", "fixtures", "official-blog-runbook-replay");
+  const fixture = JSON.parse(await fs.readFile(path.join(fixtureDir, "replay.json"), "utf8"));
+  const feeds = await Promise.all(fixture.feeds.map(async (feed) => ({
+    company: feed.company,
+    source_label: feed.source_label,
+    feed_text: await fs.readFile(path.join(fixtureDir, feed.file), "utf8")
+  })));
+
+  const session = createOfficialBlogReviewSession({ feeds }, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+
+  assert.equal(session.kind, "official_blog_review_session");
+  assert.equal(session.visibility, "internal");
+  assert.equal(session.stats.feeds, 2);
+  assert.equal(session.stats.candidates, 4);
+  assert.equal(session.stats.review_items, 3);
+  assert.equal(session.stats.included, 2);
+  assert.equal(session.stats.needs_review, 1);
+  assert.equal(session.stats.excluded, 1);
+  assert.equal(session.stats.duplicates, 0);
+  assert.equal(session.stats.invalid_candidates, 0);
+  assert.equal(session.preview_feeds.length, 2);
+  assert.equal(session.combined_preview_feed.kind, "official_blog_preview_feed");
+  assert.equal(session.intake_queue.kind, "official_blog_intake_queue");
+  assert.equal(session.review_packet.kind, "official_blog_review_packet");
+  assert.equal(session.review_packet.ai_review_contract.review_basis, "title_and_opening_preview_only");
+  assert.equal(Object.hasOwn(session, "source_audit"), false);
+  assert.equal(Object.hasOwn(session, "candidate_pool"), false);
+
+  const sessionJson = JSON.stringify(session);
+  const reviewItemsByUrl = new Map(session.review_packet.review_items.map((item) => [item.normalized_url, item]));
+  assert(reviewItemsByUrl.has(normalizeOfficialBlogUrl(fixture.ai_decisions[0].canonical_url)));
+  assert(reviewItemsByUrl.has(normalizeOfficialBlogUrl(fixture.ai_decisions[1].canonical_url)));
+  assert.equal(
+    reviewItemsByUrl.get(normalizeOfficialBlogUrl(fixture.ai_decisions[2].canonical_url))?.deterministic_triage.decision,
+    "needs_review"
+  );
+  assert.equal(sessionJson.includes(fixture.expected.hidden_body_excluded_url), true);
+
+  for (const marker of fixture.forbidden_markers) {
+    assert.equal(sessionJson.includes(marker), false, `${marker} must stay outside review session`);
+  }
+  for (const laterArtifact of [
+    "official_blog_review_decisions",
+    "official_blog_authoring_brief",
+    "official_blog_reviewed_authoring",
+    "official_blog_knowledge_drafts",
+    "records_planned",
+    "records_written",
+    "raw_transcript"
+  ]) {
+    assert.equal(sessionJson.includes(laterArtifact), false, `${laterArtifact} must not appear before manual checkpoints`);
+  }
+});
+
 test("official blog workflow runbook is executable and safety-backed", async () => {
   const runbookPath = path.join(rootDir, "tasks", "official-blog-workflow-runbook.md");
   const planPath = path.join(rootDir, "docs", "official-blog-knowledge-plan.md");
@@ -1925,6 +1984,7 @@ test("official blog workflow runbook is executable and safety-backed", async () 
   assert(plan.includes("tasks/official-blog-workflow-runbook.md"));
 
   const orderedCommands = [
+    "official-blog:review-session",
     "official-blog:parse-feed",
     "official-blog:intake",
     "official-blog:review-packet",
@@ -1944,6 +2004,8 @@ test("official blog workflow runbook is executable and safety-backed", async () 
   for (const requiredText of [
     "title + opening preview",
     "must not read full article text for first-pass admission",
+    "review-session manifest",
+    "session.review_packet",
     "new products",
     "new models",
     "harness engineering",

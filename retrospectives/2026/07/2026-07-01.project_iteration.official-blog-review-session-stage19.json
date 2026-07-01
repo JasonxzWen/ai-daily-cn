@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-review-session-stage19",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog review session stage 19",
+  "slug": "official-blog-review-session-stage19",
+  "status": "completed",
+  "summary": "This iteration adds an internal official-blog review-session entrypoint. The new pure function and CLI command read local OpenAI and Anthropic feed inputs, create preview feeds, combine candidates, create the intake queue, and package the AI review packet while stopping before AI decision normalization, human authoring, dry-run, or curated record writes.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog review session\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The early official-blog workflow can be compressed safely only if the compressed artifact still stops before the human and dry-run checkpoints.",
+      "evidence": "Stage 19 adds `official_blog_review_session` with preview feeds, combined preview feed, intake queue, and review packet, while tests assert that review decisions, authoring briefs, knowledge drafts, records_planned, and records_written are absent.",
+      "scope": "official_blog_workflow",
+      "persistence": "implemented",
+      "recommended_action": "Keep future orchestration increments scoped to explicit checkpoint boundaries and prove omitted later artifacts in tests."
+    },
+    {
+      "lesson": "Operator shortcuts should avoid leaking local manifest or feed paths into internal artifacts.",
+      "evidence": "The CLI test uses a manifest with local feed file paths and asserts the output JSON omits the manifest path, fixture directory, and temp directory.",
+      "scope": "official_blog_privacy",
+      "persistence": "implemented",
+      "recommended_action": "Preserve path minimization tests when adding any additional official-blog workflow outputs."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The review-session command still requires an operator or AI runner to supply a separate AI decisions file.",
+      "evidence": "Stage 19 intentionally stops at `session.review_packet` and only proves that the session output can feed `official-blog:review-decisions` when a separate decisions file is provided.",
+      "module": "src/cli.js",
+      "suggestion": "Consider a later guarded helper for generating the AI decision prompt or packet handoff, without normalizing decisions automatically.",
+      "expected_benefit": "A prompt handoff could reduce copy/paste mistakes while keeping the AI and human checkpoints explicit.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Future project iteration with tests proving no auto-promotion of `needs_review` and no public artifact writes.",
+      "ledger_links": [
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection"
+      ],
+      "validation_evidence": [
+        "official blog review session CLI writes clean internal preview-to-review packet"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Consider an AI review-prompt handoff helper after review-session usage stabilizes.",
+      "owner": "project"
+    }
+  ]
+}

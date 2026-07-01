@@ -616,6 +616,64 @@ export function createOfficialBlogReviewPacket(input = {}, options = {}) {
   };
 }
 
+export function createOfficialBlogReviewSession(input = {}, options = {}) {
+  const reportDate = String(options.reportDate || options.report_date || input?.report_date || input?.reportDate || "");
+  const generatedAt = String(options.generatedAt || options.generated_at || input?.generated_at || input?.generatedAt || new Date().toISOString());
+  const feeds = officialBlogReviewSessionFeeds(input);
+  if (feeds.length === 0) {
+    throw new Error("official blog review session requires at least one feed");
+  }
+
+  const previewFeeds = feeds.map((feed, index) => {
+    const feedText = officialBlogReviewSessionFeedText(feed, index);
+    return createOfficialBlogPreviewFeed(feedText, {
+      company: feed?.company,
+      reportDate,
+      generatedAt,
+      sourceLabel: feed?.source_label || feed?.sourceLabel || feed?.source || `official-blog-feed-${index + 1}`
+    });
+  });
+  const combinedPreviewFeed = combineOfficialBlogPreviewFeeds(previewFeeds, {
+    reportDate,
+    generatedAt
+  });
+  const intakeQueue = createOfficialBlogIntakeQueue(combinedPreviewFeed, {
+    reportDate,
+    generatedAt
+  });
+  const reviewPacket = createOfficialBlogReviewPacket({
+    feed: combinedPreviewFeed,
+    queue: intakeQueue
+  }, {
+    reportDate,
+    generatedAt
+  });
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_review_session",
+    visibility: "internal",
+    report_date: reportDate,
+    generated_at: generatedAt,
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
+    stats: {
+      feeds: previewFeeds.length,
+      candidates: combinedPreviewFeed.stats.candidates,
+      invalid_entries: combinedPreviewFeed.stats.invalid_entries,
+      review_items: reviewPacket.stats.review_items,
+      included: reviewPacket.stats.included,
+      needs_review: reviewPacket.stats.needs_review,
+      excluded: intakeQueue.stats.excluded,
+      duplicates: reviewPacket.stats.duplicates,
+      invalid_candidates: reviewPacket.stats.invalid_candidates
+    },
+    preview_feeds: previewFeeds,
+    combined_preview_feed: combinedPreviewFeed,
+    intake_queue: intakeQueue,
+    review_packet: reviewPacket
+  };
+}
+
 export function createOfficialBlogReviewDecisions(input = {}, options = {}) {
   const packet = officialBlogReviewDecisionPacket(input);
   const reviewItems = Array.isArray(packet.review_items) ? packet.review_items : [];
@@ -1238,6 +1296,63 @@ function decodeOfficialBlogEntities(value) {
     });
 }
 
+function officialBlogReviewSessionFeeds(input = {}) {
+  if (Array.isArray(input)) {
+    return input;
+  }
+  if (Array.isArray(input?.feeds)) {
+    return input.feeds;
+  }
+  if (typeof input === "string" || input?.feed_text || input?.feedText || input?.xml || input?.content || input?.text) {
+    return [input];
+  }
+  return [];
+}
+
+function officialBlogReviewSessionFeedText(feed = {}, index = 0) {
+  if (typeof feed === "string") {
+    return feed;
+  }
+  const feedText = String(feed?.feed_text ?? feed?.feedText ?? feed?.xml ?? feed?.content ?? feed?.text ?? "");
+  if (!feedText.trim()) {
+    throw new Error(`official blog review session feed missing feed_text at index ${index}`);
+  }
+  return feedText;
+}
+
+function combineOfficialBlogPreviewFeeds(feeds = [], options = {}) {
+  const candidates = feeds.flatMap((feed) => Array.isArray(feed?.candidates) ? feed.candidates : []);
+  const invalidEntries = feeds.flatMap((feed, feedIndex) => (
+    Array.isArray(feed?.invalid_entries) ? feed.invalid_entries : []
+  ).map((entry) => ({
+    ...entry,
+    feed_index: feedIndex,
+    feed_company: String(feed?.company || "").trim(),
+    source_label: String(feed?.source_label || "").trim()
+  })));
+  const sourceLabel = feeds
+    .map((feed) => String(feed?.source_label || "").trim())
+    .filter(Boolean)
+    .join("; ");
+
+  return {
+    schema_version: 1,
+    kind: "official_blog_preview_feed",
+    visibility: "internal",
+    report_date: String(options.reportDate || options.report_date || ""),
+    generated_at: String(options.generatedAt || options.generated_at || new Date().toISOString()),
+    source_label: sourceLabel,
+    admission_policy: officialBlogAdmissionPolicyArtifact(),
+    stats: {
+      total_entries: feeds.reduce((sum, feed) => sum + Number(feed?.stats?.total_entries || 0), 0),
+      candidates: candidates.length,
+      invalid_entries: invalidEntries.length
+    },
+    candidates,
+    invalid_entries: invalidEntries
+  };
+}
+
 function officialBlogIntakeCandidates(input = {}) {
   if (Array.isArray(input)) {
     return input;
@@ -1311,15 +1426,16 @@ function officialBlogReviewPacketInvalidCandidate(entry = {}, fallbackReason = "
 }
 
 function officialBlogReviewDecisionPacket(input = {}) {
-  const packet = input?.kind === "official_blog_review_packet"
-    ? input
-    : input?.review_packet?.kind === "official_blog_review_packet"
-      ? input.review_packet
-      : input?.reviewPacket?.kind === "official_blog_review_packet"
-        ? input.reviewPacket
-        : input?.packet?.kind === "official_blog_review_packet"
-          ? input.packet
-          : null;
+  const packet = [
+    input,
+    input?.review_packet,
+    input?.reviewPacket,
+    input?.packet,
+    input?.session?.review_packet,
+    input?.review_packet?.session?.review_packet,
+    input?.reviewPacket?.session?.review_packet,
+    input?.packet?.session?.review_packet
+  ].find((candidate) => candidate?.kind === "official_blog_review_packet");
   if (!packet) {
     throw new Error("official blog review decisions require review_packet");
   }
