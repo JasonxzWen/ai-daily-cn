@@ -31,6 +31,20 @@ const OFFICIAL_BLOG_MATCHED_CRITERIA = new Set([
 ]);
 const OFFICIAL_BLOG_RECORD_ID_RE = /^(openai|anthropic)-[a-z0-9][a-z0-9-]*-[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
 const OFFICIAL_BLOG_TOPIC_ID_RE = /^[a-z0-9][a-z0-9_:-]*$/;
+const OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS = Object.freeze({
+  id: 160,
+  company: 40,
+  companyLabel: 80,
+  date: 32,
+  title: 220,
+  openingPreview: 700,
+  triageDecision: 32,
+  triageReason: 240,
+  knowledgeValue: 120,
+  nextAction: 120,
+  duplicate: 160,
+  invalidReason: 240
+});
 const REPORT_ITEM_SECTIONS = [
   "main_items",
   "hot_blogs",
@@ -1413,7 +1427,7 @@ function officialBlogAiReviewSafePacket(packet = {}) {
   const duplicates = (Array.isArray(packet.duplicates) ? packet.duplicates : [])
     .map(officialBlogAiReviewSafeDuplicateItem);
   const invalidCandidates = (Array.isArray(packet.invalid_candidates) ? packet.invalid_candidates : [])
-    .map((entry) => officialBlogReviewPacketInvalidCandidate(entry));
+    .map(officialBlogAiReviewSafeInvalidCandidate);
   const totalCandidates = Number(packet.stats?.total_candidates);
 
   return {
@@ -1444,26 +1458,87 @@ function officialBlogAiReviewSafePacket(packet = {}) {
 
 function officialBlogAiReviewSafeReviewItem(item = {}) {
   return {
-    ...officialBlogReviewDecisionPacketItemBase(item),
+    ...officialBlogAiReviewSafePacketItemBase(item),
     suggested_topics: officialBlogReviewDecisionTopics(item.suggested_topics || item.suggestedTopics || item.topics),
-    knowledge_value: String(item.knowledge_value || ""),
-    next_action: String(item.next_action || "")
+    knowledge_value: officialBlogAiReviewSafeText(item.knowledge_value, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.knowledgeValue),
+    next_action: officialBlogAiReviewSafeText(item.next_action, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.nextAction)
   };
 }
 
 function officialBlogAiReviewSafeExcludedItem(item = {}) {
   return {
     ...officialBlogAiReviewSafeReviewItem(item),
-    excluded_as: String(item.excluded_as || "")
+    excluded_as: officialBlogAiReviewSafeText(item.excluded_as, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.triageReason)
   };
 }
 
 function officialBlogAiReviewSafeDuplicateItem(item = {}) {
   return {
-    ...officialBlogReviewDecisionPacketItemBase(item),
-    duplicate_source: String(item.duplicate_source || ""),
-    duplicate_of: String(item.duplicate_of || "")
+    ...officialBlogAiReviewSafePacketItemBase(item),
+    duplicate_source: officialBlogAiReviewSafeText(item.duplicate_source, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.duplicate),
+    duplicate_of: officialBlogAiReviewSafeText(item.duplicate_of, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.duplicate)
   };
+}
+
+function officialBlogAiReviewSafeInvalidCandidate(entry = {}) {
+  return {
+    index: entry.index,
+    title_original: officialBlogAiReviewSafeText(entry.title_original || entry.title, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.title),
+    canonical_url: officialBlogAiReviewSafeUrl(entry.canonical_url || entry.url),
+    reason: officialBlogAiReviewSafeText(entry.reason || "invalid candidate", OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.invalidReason)
+  };
+}
+
+function officialBlogAiReviewSafePacketItemBase(packetItem = {}) {
+  const canonicalUrl = officialBlogAiReviewSafeUrl(packetItem.canonical_url);
+  const normalizedUrl = officialBlogAiReviewSafeUrl(packetItem.normalized_url || safeNormalizeOfficialBlogUrl(canonicalUrl));
+  const openingPreview = officialBlogAiReviewSafeText(packetItem.opening_preview, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.openingPreview);
+  return {
+    intake_id: officialBlogAiReviewSafeText(packetItem.intake_id, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.id),
+    company: officialBlogAiReviewSafeText(packetItem.company, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.company),
+    company_label: officialBlogAiReviewSafeText(packetItem.company_label, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.companyLabel),
+    canonical_url: canonicalUrl,
+    normalized_url: normalizedUrl,
+    published_at: officialBlogAiReviewSafeText(packetItem.published_at, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.date),
+    title_original: officialBlogAiReviewSafeText(packetItem.title_original, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.title),
+    opening_preview: openingPreview,
+    opening_paragraph_count: Number.isFinite(Number(packetItem.opening_paragraph_count))
+      ? Number(packetItem.opening_paragraph_count)
+      : officialBlogPreviewParagraphCount(openingPreview),
+    deterministic_triage: {
+      decision: officialBlogAiReviewSafeText(packetItem.deterministic_triage?.decision, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.triageDecision),
+      reason: officialBlogAiReviewSafeText(packetItem.deterministic_triage?.reason, OFFICIAL_BLOG_HANDOFF_TEXT_LIMITS.triageReason),
+      matched_criteria: uniqueSorted(packetItem.deterministic_triage?.matched_criteria || [])
+    }
+  };
+}
+
+function officialBlogAiReviewSafeUrl(value) {
+  const text = String(value || "").trim();
+  if (!text || officialBlogAiReviewContainsPrivatePath(text)) {
+    return "";
+  }
+  return text;
+}
+
+function officialBlogAiReviewSafeText(value, maxLength) {
+  const text = String(value || "")
+    .replace(/(^|[\s"'([{])[A-Za-z]:[\\/][^\s"'<>]+/g, "$1[redacted-path]")
+    .replace(/(?:\/Users|\/home)\/[^\s"'<>]+/g, "[redacted-path]")
+    .replace(/\\\\[^\s"'<>]+/g, "[redacted-path]")
+    .replace(/\s+/g, " ")
+    .trim();
+  const limit = Number(maxLength);
+  if (Number.isFinite(limit) && limit > 0 && text.length > limit) {
+    return text.slice(0, limit).trimEnd();
+  }
+  return text;
+}
+
+function officialBlogAiReviewContainsPrivatePath(value) {
+  return /(^|[\s"'([{])[A-Za-z]:[\\/]/.test(value) ||
+    /(?:^|\s)(?:\/Users|\/home)\//.test(value) ||
+    /\\\\/.test(value);
 }
 
 function officialBlogAiReviewDecisionTemplateItem(item = {}) {

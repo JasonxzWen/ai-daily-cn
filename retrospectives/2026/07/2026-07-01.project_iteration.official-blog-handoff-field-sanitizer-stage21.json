@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-handoff-field-sanitizer-stage21",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog handoff field sanitizer stage 21",
+  "slug": "official-blog-handoff-field-sanitizer-stage21",
+  "status": "completed",
+  "summary": "This iteration tightens the official-blog AI review handoff by sanitizing allowlisted preview fields before they enter the handoff, embedded review packet, or blank decision template. It redacts private local paths and caps preview text lengths so full article bodies cannot be smuggled through fields that are otherwise safe to expose to first-pass AI review.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog AI review handoff bounds preview fields|official blog review-handoff CLI sanitizes allowlisted fields\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test --test-name-pattern \"official blog AI review handoff|official blog review-handoff|official blog workflow runbook is executable and safety-backed\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node --test tests/unit.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "A structural allowlist is not enough when the allowlisted value itself can be polluted.",
+      "evidence": "Stage 21 adds function and CLI tests that put local paths and full-body-sized text inside `title_original`, `opening_preview`, `deterministic_triage.reason`, `knowledge_value`, and `next_action`, then assert the final handoff has no private markers and bounded field lengths.",
+      "scope": "official_blog_safety",
+      "persistence": "implemented",
+      "recommended_action": "Keep future official-blog handoff fields bounded and path-sanitized when they are copied into AI-facing artifacts."
+    },
+    {
+      "lesson": "Private-path detection must not treat HTTP URL schemes as Windows drive paths.",
+      "evidence": "The Stage 21 handoff target group caught an initial sanitizer regression where an HTTP URL scheme was mistaken for a drive path; the rule now only matches drive paths at string boundaries or after separator characters.",
+      "scope": "official_blog_url_safety",
+      "persistence": "implemented",
+      "recommended_action": "When adding privacy sanitizers, test that canonical HTTP URLs remain intact."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "Handoff preview text now has fixed caps, but future operators may want a visible warning when a field was truncated or redacted.",
+      "evidence": "Stage 21 sanitizes polluted fields silently to preserve a compact JSON contract.",
+      "module": "src/official-blog-knowledge.js",
+      "suggestion": "Consider adding an internal `sanitization_notes` counter to the handoff stats after the operator workflow stabilizes.",
+      "expected_benefit": "Operators could spot upstream feed pollution without exposing private text or expanding the AI-facing prompt.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Future project iteration with tests proving notes are aggregate-only and never include redacted values.",
+      "ledger_links": [
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-data-minimization"
+      ],
+      "validation_evidence": [
+        "official blog AI review handoff bounds preview fields and redacts private paths",
+        "official blog review-handoff CLI sanitizes allowlisted fields"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Consider aggregate-only sanitization counters for operator diagnostics.",
+      "owner": "project"
+    }
+  ]
+}

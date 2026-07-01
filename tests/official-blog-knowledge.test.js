@@ -2099,6 +2099,77 @@ test("official blog AI review handoff sanitizes embedded packet before AI handof
   }
 });
 
+test("official blog AI review handoff bounds preview fields and redacts private paths", async () => {
+  const fixtureDir = path.join(rootDir, "tests", "fixtures", "official-blog-runbook-replay");
+  const fixture = JSON.parse(await fs.readFile(path.join(fixtureDir, "replay.json"), "utf8"));
+  const feeds = await Promise.all(fixture.feeds.map(async (feed) => ({
+    company: feed.company,
+    source_label: feed.source_label,
+    feed_text: await fs.readFile(path.join(fixtureDir, feed.file), "utf8")
+  })));
+  const session = createOfficialBlogReviewSession({ feeds }, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  const pollutedPacket = JSON.parse(JSON.stringify(session.review_packet));
+  const longBodyTail = Array.from({ length: 80 }, (_, index) => `FULL_BODY_SENTENCE_SHOULD_NOT_SURVIVE_${index}`).join(" ");
+  pollutedPacket.review_items[0].title_original = `Agent workflow launch C:\\Users\\Admin\\stage21-secret-title ${longBodyTail}`;
+  pollutedPacket.review_items[0].opening_preview = `Short useful preview before C:\\Users\\Admin\\stage21-secret-preview and /Users/admin/stage21-secret-preview. ${longBodyTail}`;
+  pollutedPacket.review_items[0].deterministic_triage.reason = `Preview reason D:\\private\\stage21-triage-note ${longBodyTail}`;
+  pollutedPacket.review_items[0].knowledge_value = `high value /home/admin/stage21-knowledge-note ${longBodyTail}`;
+  pollutedPacket.review_items[0].next_action = `review C:\\Users\\Admin\\stage21-next-action and \\\\corp-share\\stage21-next-action ${longBodyTail}`;
+  pollutedPacket.excluded_items[0].opening_preview = `Excluded preview C:\\Users\\Admin\\stage21-excluded ${longBodyTail}`;
+  pollutedPacket.duplicates = [
+    {
+      ...pollutedPacket.review_items[1],
+      duplicate_source: "C:\\Users\\Admin\\stage21-duplicate-source",
+      duplicate_of: "D:\\private\\stage21-duplicate-of"
+    }
+  ];
+  pollutedPacket.invalid_candidates = [
+    {
+      index: 0,
+      title_original: `Invalid C:\\Users\\Admin\\stage21-invalid-title ${longBodyTail}`,
+      canonical_url: "https://openai.com/index/example",
+      reason: `Invalid reason /Users/admin/stage21-invalid-reason ${longBodyTail}`
+    }
+  ];
+
+  const handoff = createOfficialBlogAiReviewHandoff(pollutedPacket, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  const handoffJson = JSON.stringify(handoff);
+
+  for (const marker of [
+    "C:\\Users\\Admin\\stage21",
+    "C:\\\\Users\\\\Admin\\\\stage21",
+    "D:\\private\\stage21",
+    "D:\\\\private\\\\stage21",
+    "\\\\corp-share\\stage21",
+    "\\\\\\\\corp-share\\\\stage21",
+    "/Users/admin/stage21",
+    "/home/admin/stage21",
+    "FULL_BODY_SENTENCE_SHOULD_NOT_SURVIVE_79"
+  ]) {
+    assert.equal(handoffJson.includes(marker), false, `${marker} must not survive handoff sanitization`);
+  }
+
+  const reviewItem = handoff.review_packet.review_items[0];
+  const templateItem = handoff.decision_template[0];
+  assert(reviewItem.title_original.length <= 220);
+  assert(reviewItem.opening_preview.length <= 700);
+  assert(reviewItem.deterministic_triage.reason.length <= 240);
+  assert(reviewItem.knowledge_value.length <= 120);
+  assert(reviewItem.next_action.length <= 120);
+  assert(templateItem.title_original.length <= 220);
+  assert(templateItem.opening_preview.length <= 700);
+  assert(templateItem.deterministic_reason.length <= 240);
+  assert.equal(templateItem.decision, "");
+  assert.equal(templateItem.rationale, "");
+  assert.equal(templateItem.confidence, null);
+});
+
 test("official blog workflow runbook is executable and safety-backed", async () => {
   const runbookPath = path.join(rootDir, "tasks", "official-blog-workflow-runbook.md");
   const planPath = path.join(rootDir, "docs", "official-blog-knowledge-plan.md");

@@ -6487,6 +6487,97 @@ test("official blog review-handoff CLI writes clean prompt and decision template
   assert.equal(reviewDecisionParsed.review_decisions.stats.needs_manual_review, 1);
 });
 
+test("official blog review-handoff CLI sanitizes allowlisted fields", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-handoff-sanitize-"));
+  const inputPath = path.join(tmp, "review-packet.json");
+  const handoffPath = path.join(tmp, "review-handoff.json");
+  const longBodyTail = Array.from({ length: 80 }, (_, index) => `CLI_FULL_BODY_SENTENCE_SHOULD_NOT_SURVIVE_${index}`).join(" ");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    kind: "official_blog_review_packet",
+    visibility: "internal",
+    report_date: "2026-07-01",
+    generated_at: "2026-07-01T12:00:00.000Z",
+    admission_policy: {},
+    ai_review_contract: { review_basis: "title_and_opening_preview_only" },
+    stats: {
+      total_candidates: 1,
+      review_items: 1,
+      included: 1,
+      needs_review: 0,
+      excluded_items: 0,
+      duplicates: 0,
+      invalid_candidates: 0
+    },
+    review_items: [
+      {
+        intake_id: "openai-example-2026-07-01",
+        company: "openai",
+        canonical_url: "https://openai.com/index/example-agent-workflow",
+        normalized_url: "https://openai.com/index/example-agent-workflow",
+        published_at: "2026-07-01",
+        title_original: `Example agent workflow C:\\Users\\Admin\\stage21-cli-title ${longBodyTail}`,
+        opening_preview: `A developer platform primitive D:\\private\\stage21-cli-preview and /Users/admin/stage21-cli-preview. ${longBodyTail}`,
+        deterministic_triage: {
+          decision: "include",
+          reason: `technical preview C:\\Users\\Admin\\stage21-cli-reason ${longBodyTail}`,
+          matched_criteria: ["new_product"]
+        },
+        suggested_topics: ["agent"],
+        knowledge_value: `high /home/admin/stage21-cli-knowledge ${longBodyTail}`,
+        next_action: `review D:\\private\\stage21-cli-action and \\\\corp-share\\stage21-cli-action ${longBodyTail}`
+      }
+    ],
+    excluded_items: [],
+    duplicates: [],
+    invalid_candidates: []
+  })}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:review-handoff",
+    "--input",
+    inputPath,
+    "--output",
+    handoffPath,
+    "--date",
+    "2026-07-01",
+    "--generated-at",
+    "2026-07-01T12:00:00.000Z"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(handoffPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.handoff.kind, "official_blog_ai_review_handoff");
+  for (const marker of [
+    "C:\\Users\\Admin\\stage21-cli",
+    "C:\\\\Users\\\\Admin\\\\stage21-cli",
+    "D:\\private\\stage21-cli",
+    "D:\\\\private\\\\stage21-cli",
+    "\\\\corp-share\\stage21-cli",
+    "\\\\\\\\corp-share\\\\stage21-cli",
+    "/Users/admin/stage21-cli",
+    "/home/admin/stage21-cli",
+    "CLI_FULL_BODY_SENTENCE_SHOULD_NOT_SURVIVE_79"
+  ]) {
+    assert.equal(raw.includes(marker), false, `${marker} must not survive CLI handoff sanitization`);
+  }
+  const reviewItem = parsed.handoff.review_packet.review_items[0];
+  const templateItem = parsed.handoff.decision_template[0];
+  assert(reviewItem.title_original.length <= 220);
+  assert(reviewItem.opening_preview.length <= 700);
+  assert(reviewItem.deterministic_triage.reason.length <= 240);
+  assert(reviewItem.knowledge_value.length <= 120);
+  assert(reviewItem.next_action.length <= 120);
+  assert.equal(templateItem.decision, "");
+  assert.equal(templateItem.rationale, "");
+  assert.equal(templateItem.confidence, null);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
 test("official blog review-handoff CLI refuses public output paths", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-review-handoff-public-"));
   const inputPath = path.join(tmp, "review-packet.json");
