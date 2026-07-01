@@ -114,11 +114,13 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 9. Build and validate the public projection separately.
 
    ```powershell
+   node --test --test-name-pattern "official blog runbook replay fixtures" tests/official-blog-knowledge.test.js
    npm run build:check-clean
    npm run privacy:validate
    npm run validate
    ```
 
+   The replay fixture test exercises OpenAI and Anthropic examples locally without live network access before the broader validation suite runs.
    The public projection may update generated `docs/data/official-blogs.json` and `docs/official-blogs/` only through the normal site build/publish path, never through internal review or authoring commands.
 
 ## Review Checklist

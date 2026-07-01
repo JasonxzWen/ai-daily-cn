@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-fixture-replay-stage18",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog fixture replay stage 18",
+  "slug": "official-blog-fixture-replay-stage18",
+  "status": "completed",
+  "summary": "This iteration adds a local fixture-backed replay for the official-blog workflow. The replay exercises OpenAI and Anthropic feed excerpts through preview parsing, intake, AI review packet creation, decision normalization, authoring brief generation, completed human templates, reviewed-authoring validation, and knowledge draft creation without live network access.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog runbook replay fixtures\" tests/official-blog-knowledge.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The runbook needs a fixture replay so future changes can prove the full path without relying on live OpenAI or Anthropic feeds.",
+      "evidence": "Stage 18 adds `tests/fixtures/official-blog-runbook-replay/` and a deterministic replay test that produces two accepted draft records and holds a customer-framed item at manual review.",
+      "scope": "official_blog_workflow",
+      "persistence": "implemented",
+      "recommended_action": "Run the replay test whenever changing official-blog workflow docs, admission behavior, or authoring contracts."
+    },
+    {
+      "lesson": "Preview-only triage should be tested with content that has technical terms outside the opening preview.",
+      "evidence": "The Anthropic regional partnership fixture contains technical terms only after the preview limit and remains excluded, proving full article body text is not used for first-pass admission.",
+      "scope": "official_blog_admission",
+      "persistence": "implemented",
+      "recommended_action": "Keep hidden-body fixtures in the replay when expanding admission criteria."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The operator still has to run each official-blog workflow command manually.",
+      "evidence": "Stage 18 validates the flow through in-process functions and fixture inputs but does not add a single orchestration command.",
+      "module": "src/cli.js",
+      "suggestion": "Consider an explicit orchestrator command only after the manual checkpoint semantics are stable.",
+      "expected_benefit": "A future orchestrator could reduce operator error while preserving dry-run and human-review checkpoints.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Future project iteration with CLI tests and no public artifact writes.",
+      "ledger_links": [
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-importance-selection"
+      ],
+      "validation_evidence": [
+        "official blog runbook replay fixtures exercise local OpenAI and Anthropic flow"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-authoritative-retrospectives",
+    "feedback/p1-effective-interact-production-renderer"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Consider a single official-blog workflow orchestrator command after the manual checkpoint rules are stable.",
+      "owner": "project"
+    }
+  ]
+}

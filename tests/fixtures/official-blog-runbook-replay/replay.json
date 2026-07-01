@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-07-01",
+  "generated_at": "2026-07-01T12:00:00.000Z",
+  "feeds": [
+    {
+      "company": "openai",
+      "source_label": "OpenAI RSS fixture",
+      "file": "openai.xml"
+    },
+    {
+      "company": "anthropic",
+      "source_label": "Anthropic RSS fixture",
+      "file": "anthropic.xml"
+    }
+  ],
+  "forbidden_markers": [
+    "FULL_ARTICLE_BODY_SHOULD_NOT_APPEAR",
+    "RAW_AI_TRACE_SHOULD_NOT_APPEAR",
+    "SOURCE_AUDIT_SHOULD_NOT_APPEAR",
+    "CANDIDATE_POOL_SHOULD_NOT_APPEAR",
+    "MANUAL_REVIEW_BODY_SHOULD_NOT_APPEAR"
+  ],
+  "ai_decisions": [
+    {
+      "canonical_url": "https://openai.com/index/harness-engineering-for-agent-workflows/",
+      "decision": "include",
+      "matched_criteria": [
+        "agent_workflow",
+        "engineering_practice",
+        "eval_methodology",
+        "harness_engineering",
+        "new_product",
+        "safety_engineering"
+      ],
+      "suggested_topics": [
+        "agent",
+        "coding_agent",
+        "evals",
+        "harness_engineering",
+        "tool_use"
+      ],
+      "rationale": "The opening preview introduces a reusable Codex harness engineering pattern with evals, permissions, observability, and tool-use practice.",
+      "confidence": 0.96
+    },
+    {
+      "canonical_url": "https://www.anthropic.com/research/claude-safety-evals-tool-use",
+      "decision": "include",
+      "matched_criteria": [
+        "engineering_practice",
+        "eval_methodology",
+        "new_model",
+        "safety_engineering"
+      ],
+      "suggested_topics": [
+        "evals",
+        "model_release_context",
+        "safety_engineering",
+        "tool_use"
+      ],
+      "rationale": "The opening preview describes model release context, evals, safety constraints, deployment limits, and tool-use permissions.",
+      "confidence": 0.94
+    },
+    {
+      "canonical_url": "https://openai.com/index/customer-agent-workflow-adoption/",
+      "decision": "include",
+      "matched_criteria": [
+        "agent_workflow",
+        "engineering_practice",
+        "eval_methodology"
+      ],
+      "suggested_topics": [
+        "agent",
+        "evals",
+        "tool_use"
+      ],
+      "rationale": "The preview has customer framing plus implementation hints, so it must stay in manual review until a human reads the article.",
+      "confidence": 0.72
+    }
+  ],
+  "human_authoring": [
+    {
+      "canonical_url": "https://openai.com/index/harness-engineering-for-agent-workflows/",
+      "title_zh": "Codex harness engineering for agent workflows",
+      "summary_zh": "This local replay digest captures a reusable Codex harness pattern for long running agent workflows, including eval coverage, sandbox permissions, tool-use checks, context handling, and observability gates.",
+      "key_ideas": [
+        "Harness engineering turns long-running agent behavior into a repeatable workflow contract.",
+        "Agent workflow evals should cover tool calls, sandbox permissions, and recovery paths.",
+        "Context handling and observability need to be checked before production rollout."
+      ],
+      "practice_checklist": [
+        "Bind each agent workflow to eval cases and permission checks.",
+        "Track tool failures, context drift, and recovery paths in the harness."
+      ],
+      "importance": "major",
+      "content_type": "engineering_note",
+      "topics": [
+        "agent",
+        "coding_agent",
+        "evals",
+        "harness_engineering",
+        "tool_use"
+      ],
+      "related_blog_ids": [
+        "openai-new-tools-building-agents-2025-03-11"
+      ],
+      "related_report_dates": [
+        "2026-07-01"
+      ]
+    },
+    {
+      "canonical_url": "https://www.anthropic.com/research/claude-safety-evals-tool-use",
+      "title_zh": "Claude safety evals and tool-use system card",
+      "summary_zh": "This local replay digest summarizes Claude model release context with reusable safety eval, containment, deployment constraint, tool-use permission, and observability practices for production agents.",
+      "key_ideas": [
+        "Model release context should connect benchmark evals to capability and safety boundaries.",
+        "Tool-use permissions and deployment constraints need explicit release documentation.",
+        "Regression checks and observability help turn safety notes into operational practice."
+      ],
+      "practice_checklist": [
+        "Review eval coverage alongside deployment constraints before launch.",
+        "Document tool permissions, containment assumptions, and monitoring signals."
+      ],
+      "importance": "major",
+      "content_type": "model_release_context",
+      "topics": [
+        "evals",
+        "model_release_context",
+        "safety_engineering",
+        "tool_use"
+      ],
+      "related_blog_ids": [
+        "anthropic-building-effective-agents-2024-12-19"
+      ],
+      "related_report_dates": [
+        "2026-07-01"
+      ]
+    }
+  ],
+  "expected": {
+    "hidden_body_excluded_url": "https://www.anthropic.com/news/regional-partnership-update",
+    "records": [
+      {
+        "id": "openai-harness-engineering-for-agent-workflows-2026-07-01",
+        "company": "openai",
+        "topics": [
+          "agent",
+          "harness_engineering",
+          "tool_use"
+        ]
+      },
+      {
+        "id": "anthropic-claude-safety-evals-tool-use-2026-07-01",
+        "company": "anthropic",
+        "topics": [
+          "evals",
+          "safety_engineering",
+          "tool_use"
+        ]
+      }
+    ]
+  }
+}

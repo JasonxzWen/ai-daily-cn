@@ -1767,6 +1767,155 @@ test("repository seed knowledge includes curated OpenAI and Anthropic records", 
   assert(index.records.some((record) => record.topics.includes("structured_outputs")));
 });
 
+test("official blog runbook replay fixtures exercise local OpenAI and Anthropic flow", async () => {
+  const fixtureDir = path.join(rootDir, "tests", "fixtures", "official-blog-runbook-replay");
+  const fixture = JSON.parse(await fs.readFile(path.join(fixtureDir, "replay.json"), "utf8"));
+  const previewFeeds = [];
+  for (const feed of fixture.feeds) {
+    const feedXml = await fs.readFile(path.join(fixtureDir, feed.file), "utf8");
+    previewFeeds.push(createOfficialBlogPreviewFeed(feedXml, {
+      company: feed.company,
+      reportDate: fixture.report_date,
+      generatedAt: fixture.generated_at,
+      sourceLabel: feed.source_label
+    }));
+  }
+
+  const previewFeed = {
+    kind: "official_blog_preview_feed",
+    visibility: "internal",
+    report_date: fixture.report_date,
+    generated_at: fixture.generated_at,
+    candidates: previewFeeds.flatMap((feed) => feed.candidates)
+  };
+  assert.equal(previewFeed.candidates.length, 4);
+  assert(previewFeed.candidates.every((candidate) => candidate.opening_paragraphs.length <= 2));
+  for (const marker of fixture.forbidden_markers) {
+    assert.equal(JSON.stringify(previewFeed).includes(marker), false, `${marker} must stay outside preview feed`);
+  }
+
+  const intake = createOfficialBlogIntakeQueue(previewFeed, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  assert.equal(intake.kind, "official_blog_intake_queue");
+  assert.equal(intake.stats.included, 2);
+  assert.equal(intake.stats.needs_review, 1);
+  assert.equal(intake.stats.excluded, 1);
+  assert.equal(
+    intake.excluded.find((item) => item.normalized_url === normalizeOfficialBlogUrl(fixture.expected.hidden_body_excluded_url))
+      ?.admission.matched_criteria.length,
+    0
+  );
+
+  const reviewPacket = createOfficialBlogReviewPacket(intake, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  assert.equal(reviewPacket.kind, "official_blog_review_packet");
+  assert.equal(reviewPacket.stats.review_items, 3);
+  assert.equal(reviewPacket.stats.excluded_items, 1);
+
+  const reviewItemsByUrl = new Map(reviewPacket.review_items.map((item) => [item.normalized_url, item]));
+  const decisions = fixture.ai_decisions.map((decision) => {
+    const item = reviewItemsByUrl.get(normalizeOfficialBlogUrl(decision.canonical_url));
+    assert(item, `missing review item for ${decision.canonical_url}`);
+    return {
+      intake_id: item.intake_id,
+      decision: decision.decision,
+      matched_criteria: decision.matched_criteria,
+      suggested_topics: decision.suggested_topics,
+      rationale: decision.rationale,
+      confidence: decision.confidence,
+      raw_transcript: fixture.forbidden_markers[1]
+    };
+  });
+  const reviewDecisions = createOfficialBlogReviewDecisions({
+    review_packet: reviewPacket,
+    decisions,
+    source_audit: { marker: fixture.forbidden_markers[2] },
+    candidate_pool: { marker: fixture.forbidden_markers[3] }
+  }, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  assert.equal(reviewDecisions.kind, "official_blog_review_decisions");
+  assert.equal(reviewDecisions.stats.accepted_for_authoring, 2);
+  assert.equal(reviewDecisions.stats.needs_manual_review, 1);
+  assert.equal(reviewDecisions.stats.invalid_decisions, 0);
+
+  const brief = createOfficialBlogAuthoringBrief({ review_decisions: reviewDecisions }, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  assert.equal(brief.kind, "official_blog_authoring_brief");
+  assert.equal(brief.stats.authoring_items, 2);
+  assert.equal(brief.stats.manual_review_required, 1);
+  assert.equal(brief.manual_review_required[0].final_decision, "needs_review");
+
+  const authoredByUrl = new Map(fixture.human_authoring.map((entry) => [
+    normalizeOfficialBlogUrl(entry.canonical_url),
+    entry
+  ]));
+  const reviewed = createOfficialBlogReviewedAuthoring({
+    ...brief,
+    authoring_items: brief.authoring_items.map((item) => {
+      const authored = authoredByUrl.get(item.normalized_url);
+      assert(authored, `missing human authoring for ${item.canonical_url}`);
+      return {
+        ...item,
+        reviewed_entry_template: {
+          ...item.reviewed_entry_template,
+          ...authored
+        }
+      };
+    }),
+    source_audit: { marker: fixture.forbidden_markers[2] },
+    candidate_pool: { marker: fixture.forbidden_markers[3] }
+  }, {
+    reportDate: fixture.report_date,
+    generatedAt: fixture.generated_at
+  });
+  assert.equal(reviewed.kind, "official_blog_reviewed_authoring");
+  assert.equal(reviewed.stats.reviewed_entries, 2);
+  assert.equal(reviewed.stats.manual_review_required, 1);
+  assert.equal(reviewed.stats.invalid_entries, 0);
+  assert.equal(
+    reviewed.reviewed_entries.some((entry) => entry.intake_id === brief.manual_review_required[0].intake_id),
+    false
+  );
+
+  const drafts = createOfficialBlogKnowledgeDrafts(reviewed, {
+    existingIndex: { records: [] },
+    generatedAt: fixture.generated_at
+  });
+  assert.equal(drafts.kind, "official_blog_knowledge_drafts");
+  assert.equal(drafts.records.length, 2);
+  assert.equal(drafts.invalid_entries.length, 0);
+  assert.equal(
+    drafts.records.some((record) => record.id === brief.manual_review_required[0].intake_id),
+    false
+  );
+
+  const recordsById = new Map(drafts.records.map((record) => [record.id, record]));
+  for (const expectedRecord of fixture.expected.records) {
+    const record = recordsById.get(expectedRecord.id);
+    assert(record, `missing record ${expectedRecord.id}`);
+    assert.equal(record.company, expectedRecord.company);
+    for (const topic of expectedRecord.topics) {
+      assert(record.topics.includes(topic), `${record.id} should include topic ${topic}`);
+    }
+    assert.equal(Object.hasOwn(record, "opening_preview"), false);
+    assert.equal(Object.hasOwn(record, "body"), false);
+    assert.equal(Object.hasOwn(record, "raw_transcript"), false);
+  }
+
+  const sanitizedPayload = JSON.stringify({ reviewDecisions, brief, reviewed, drafts });
+  for (const marker of fixture.forbidden_markers) {
+    assert.equal(sanitizedPayload.includes(marker), false, `${marker} must not leak past review normalization`);
+  }
+});
+
 test("official blog workflow runbook is executable and safety-backed", async () => {
   const runbookPath = path.join(rootDir, "tasks", "official-blog-workflow-runbook.md");
   const planPath = path.join(rootDir, "docs", "official-blog-knowledge-plan.md");
