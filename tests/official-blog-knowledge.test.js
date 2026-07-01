@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  createOfficialBlogKnowledgeContext,
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
@@ -826,6 +827,229 @@ test("official blog relationship suggestions report duplicates and suppress comp
     assert.match(result.invalid_entries[0].reason, /unsupported official blog company/);
     assert.equal(result.suggestions.length, 1);
     assert.equal(result.suggestions[0].suggested_related_blog_ids.length, 0);
+  });
+});
+
+test("official blog knowledge context ranks URL topic and criteria matches without leaking internals", async () => {
+  const effectiveAgentsRecord = {
+    ...baseRecord,
+    id: "anthropic-building-effective-agents-2024-12-19",
+    company: "anthropic",
+    canonical_url: "https://www.anthropic.com/research/building-effective-agents",
+    normalized_url: "https://www.anthropic.com/research/building-effective-agents",
+    published_at: "2024-12-19",
+    title_original: "Building effective agents",
+    title_zh: "Building effective agents digest",
+    content_type: "best_practice",
+    topics: ["agent", "evals", "harness_engineering", "workflow_orchestration"],
+    admission: {
+      decision: "include",
+      rationale: "Reusable agent workflow and evaluation guidance.",
+      matched_criteria: ["engineering_practice", "harness_engineering", "agent_workflow", "eval_methodology"]
+    },
+    related_blog_ids: ["openai-new-tools-building-agents-2025-03-11"],
+    related_report_dates: ["2025-03-12"]
+  };
+
+  await withTempKnowledge([baseRecord, effectiveAgentsRecord], async (knowledgeDir) => {
+    const existingIndex = await loadOfficialBlogKnowledge({ knowledgeDir });
+    const before = JSON.stringify(existingIndex.records);
+    const result = createOfficialBlogKnowledgeContext({
+      report_date: "2026-07-01",
+      hot_blogs: [
+        {
+          company: "openai",
+          canonical_url: "https://openai.com/index/agent-harness-patterns",
+          title_original: "Agent harness patterns for production workflows",
+          topics: ["agent", "harness_engineering", "workflow_orchestration"],
+          admission: {
+            decision: "include",
+            matched_criteria: ["engineering_practice", "harness_engineering", "agent_workflow"]
+          },
+          opening_preview: "Internal preview must not be copied into the knowledge context.",
+          body: "Full body must not be copied into the knowledge context."
+        },
+        {
+          company: "openai",
+          canonical_url: "https://openai.com/index/introducing-structured-outputs-in-the-api/?utm_source=report",
+          title_original: "Structured outputs in the API",
+          topics: ["structured_outputs"],
+          admission: {
+            decision: "include",
+            matched_criteria: ["new_product", "engineering_practice"]
+          },
+          source_audit: { should_not_leak: true }
+        }
+      ],
+      source_audit: { should_not_leak: true },
+      candidate_pool: { should_not_leak: true }
+    }, {
+      existingIndex,
+      generatedAt: "2026-07-01T08:00:00.000Z",
+      limit: 5
+    });
+
+    assert.equal(result.kind, "official_blog_knowledge_context");
+    assert.equal(result.visibility, "internal");
+    assert.equal(result.stats.total_entries, 2);
+    assert.equal(result.stats.matched_records, 2);
+    assert.equal(result.invalid_entries.length, 0);
+    assert.equal(result.records.length, 2);
+
+    const structured = result.records.find((record) => record.id === "openai-structured-outputs-2024-08-06");
+    assert(structured);
+    assert(structured.reasons.includes("url_match"));
+    assert.deepEqual(structured.source_entry_indexes, [1]);
+    assert.equal(structured.summary_zh, baseRecord.summary_zh);
+    assert(structured.key_ideas.length >= 3);
+
+    const agents = result.records.find((record) => record.id === "anthropic-building-effective-agents-2024-12-19");
+    assert(agents);
+    assert(agents.score > 0);
+    assert(agents.reasons.includes("shared_topics"));
+    assert(agents.reasons.includes("shared_matched_criteria"));
+    assert(agents.reasons.includes("cross_company_comparable_practice"));
+    assert.deepEqual(agents.matched_topics, ["agent", "harness_engineering", "workflow_orchestration"]);
+    assert(agents.matched_criteria.includes("agent_workflow"));
+    assert.deepEqual(agents.related_report_dates, ["2025-03-12"]);
+
+    const serialized = JSON.stringify(result);
+    assert.equal(serialized.includes("Internal preview must not be copied"), false);
+    assert.equal(serialized.includes("Full body must not be copied"), false);
+    assert.equal(serialized.includes("should_not_leak"), false);
+    assert.equal(Object.hasOwn(result.records[0], "opening_preview"), false);
+    assert.equal(Object.hasOwn(result.records[0], "body"), false);
+    assert.equal(JSON.stringify(existingIndex.records), before);
+  });
+});
+
+test("official blog knowledge context ignores company-only news and isolates invalid entries", async () => {
+  await withTempKnowledge([baseRecord], async (knowledgeDir) => {
+    const existingIndex = await loadOfficialBlogKnowledge({ knowledgeDir });
+    const result = createOfficialBlogKnowledgeContext({
+      entries: [
+        {
+          company: "openai",
+          canonical_url: "https://openai.com/news/examplecorp-partnership",
+          title_original: "OpenAI and ExampleCorp expand enterprise partnership",
+          opening_preview: "The companies will bring AI tools to more employees and improve business workflows.",
+          admission: {
+            decision: "exclude",
+            matched_criteria: []
+          },
+          topics: []
+        },
+        {
+          company: "unknown",
+          canonical_url: "https://example.com/blog/agent-evals",
+          title_original: "Unsupported company agent evals",
+          topics: ["agent"],
+          admission: {
+            decision: "include",
+            matched_criteria: ["engineering_practice"]
+          }
+        }
+      ]
+    }, {
+      existingIndex,
+      generatedAt: "2026-07-01T08:00:00.000Z"
+    });
+
+    assert.equal(result.kind, "official_blog_knowledge_context");
+    assert.equal(result.stats.total_entries, 2);
+    assert.equal(result.stats.matched_records, 0);
+    assert.equal(result.stats.unmatched_entries, 1);
+    assert.equal(result.invalid_entries.length, 1);
+    assert.match(result.invalid_entries[0].reason, /unsupported official blog company/);
+    assert.equal(result.records.length, 0);
+  });
+});
+
+test("official blog knowledge context covers explicit related ids limits and generic criteria suppression", async () => {
+  const effectiveAgentsRecord = {
+    ...baseRecord,
+    id: "anthropic-building-effective-agents-2024-12-19",
+    company: "anthropic",
+    canonical_url: "https://www.anthropic.com/research/building-effective-agents",
+    published_at: "2024-12-19",
+    title_original: "Building effective agents",
+    title_zh: "Building effective agents digest",
+    content_type: "best_practice",
+    topics: ["agent", "evals", "harness_engineering", "workflow_orchestration"],
+    admission: {
+      decision: "include",
+      rationale: "Reusable agent workflow and evaluation guidance.",
+      matched_criteria: ["engineering_practice", "harness_engineering", "agent_workflow", "eval_methodology"]
+    },
+    related_blog_ids: []
+  };
+  const newToolsRecord = {
+    ...baseRecord,
+    id: "openai-new-tools-building-agents-2025-03-11",
+    company: "openai",
+    canonical_url: "https://openai.com/index/new-tools-for-building-agents/",
+    published_at: "2025-03-11",
+    title_original: "New tools for building agents",
+    title_zh: "New tools for building agents digest",
+    importance: "major",
+    content_type: "product_practice",
+    topics: ["agent", "tool_use", "workflow_orchestration"],
+    admission: {
+      decision: "include",
+      rationale: "Introduces reusable platform tools for agent workflows.",
+      matched_criteria: ["new_product", "engineering_practice", "agent_workflow"]
+    },
+    related_blog_ids: ["anthropic-building-effective-agents-2024-12-19"]
+  };
+
+  await withTempKnowledge([baseRecord, effectiveAgentsRecord, newToolsRecord], async (knowledgeDir) => {
+    const existingIndex = await loadOfficialBlogKnowledge({ knowledgeDir });
+    const limited = createOfficialBlogKnowledgeContext({
+      entries: [
+        { canonical_url: baseRecord.canonical_url, title_original: baseRecord.title_original },
+        { canonical_url: effectiveAgentsRecord.canonical_url, title_original: effectiveAgentsRecord.title_original },
+        { canonical_url: newToolsRecord.canonical_url, title_original: newToolsRecord.title_original }
+      ]
+    }, {
+      existingIndex,
+      generatedAt: "2026-07-01T08:00:00.000Z",
+      limit: 1
+    });
+
+    assert.equal(limited.records.length, 1);
+    assert.equal(limited.records[0].id, "openai-new-tools-building-agents-2025-03-11");
+    assert.deepEqual(limited.records[0].reasons, ["url_match"]);
+
+    const explicitAndNoise = createOfficialBlogKnowledgeContext({
+      entries: [
+        {
+          canonical_url: "https://example.com/internal-related-id-only",
+          title_original: "Related id only entry",
+          related_blog_ids: ["anthropic-building-effective-agents-2024-12-19"]
+        },
+        {
+          company: "openai",
+          canonical_url: "https://openai.com/index/generic-engineering-practice-news",
+          title_original: "Generic engineering practice news",
+          admission: {
+            decision: "include",
+            matched_criteria: ["engineering_practice"]
+          },
+          topics: []
+        }
+      ]
+    }, {
+      existingIndex,
+      generatedAt: "2026-07-01T08:00:00.000Z"
+    });
+
+    assert.equal(explicitAndNoise.stats.total_entries, 2);
+    assert.equal(explicitAndNoise.stats.matched_entries, 1);
+    assert.equal(explicitAndNoise.stats.unmatched_entries, 1);
+    assert.equal(explicitAndNoise.records.length, 1);
+    assert.equal(explicitAndNoise.records[0].id, "anthropic-building-effective-agents-2024-12-19");
+    assert.deepEqual(explicitAndNoise.records[0].reasons, ["explicit_related_blog_id"]);
+    assert.deepEqual(explicitAndNoise.records[0].source_entry_indexes, [0]);
   });
 });
 

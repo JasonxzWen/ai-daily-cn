@@ -42,6 +42,7 @@ import {
 import { runDailyWorkflow } from "./daily-runner.js";
 import { runStatusSelfCheck } from "./status-self-check.js";
 import {
+  createOfficialBlogKnowledgeContext,
   createOfficialBlogKnowledgeDrafts,
   createOfficialBlogPreviewFeed,
   createOfficialBlogIntakeQueue,
@@ -282,6 +283,31 @@ try {
       ok: true,
       input_path: resolvedInputPath,
       relationship_suggestions: relationshipSuggestions
+    }, outputPath);
+  } else if (command === "official-blog:context") {
+    const args = parseArgs(argv);
+    const inputPath = args.input || firstJsonPath(argv);
+    if (!inputPath) {
+      throw new PublisherError("official_blog_context_input_required", "official-blog:context requires --input <local-report-or-candidates.json>.");
+    }
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const resolvedInputPath = path.resolve(inputPath);
+    const outputPath = typeof args.output === "string" ? args.output : "";
+    assertOfficialBlogContextOutputPath({ outputPath, rootDir });
+    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const existingIndex = await loadOfficialBlogKnowledge({
+      rootDir,
+      knowledgeDir: args["knowledge-dir"] ? path.resolve(args["knowledge-dir"]) : undefined
+    });
+    const context = createOfficialBlogKnowledgeContext(input, {
+      existingIndex,
+      generatedAt: args["generated-at"],
+      limit: args.limit || args["max-records"]
+    });
+    printJson({
+      ok: true,
+      input_path: resolvedInputPath,
+      context
     }, outputPath);
   } else if (command === "preflight:worktree") {
     const args = parseArgs(argv);
@@ -1054,6 +1080,14 @@ function assertOfficialBlogSuggestRelationsOutputPath(options = {}) {
   });
 }
 
+function assertOfficialBlogContextOutputPath(options = {}) {
+  assertOfficialBlogInternalOutputPath({
+    ...options,
+    errorCode: "official_blog_context_public_output_forbidden",
+    message: "official-blog:context writes internal knowledge context data; choose an internal output path outside docs/data, docs/official-blogs, and public HTML."
+  });
+}
+
 function assertOfficialBlogInternalOutputPath(options = {}) {
   const outputPath = String(options.outputPath || "").trim();
   if (!outputPath) {
@@ -1076,7 +1110,8 @@ function isOfficialBlogInternalCommand(value) {
   return value === "official-blog:intake" ||
     value === "official-blog:parse-feed" ||
     value === "official-blog:author-records" ||
-    value === "official-blog:suggest-relations";
+    value === "official-blog:suggest-relations" ||
+    value === "official-blog:context";
 }
 
 function isOfficialBlogInternalPublicOutputPath(outputPath, rootDir) {

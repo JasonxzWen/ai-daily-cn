@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-01.project_iteration.official-blog-knowledge-stage10",
+  "run_type": "project_iteration",
+  "date": "2026-07-01",
+  "title": "Official blog knowledge stage 10",
+  "slug": "official-blog-knowledge-stage10",
+  "status": "completed",
+  "summary": "This iteration adds an internal official-blog knowledge context builder for OpenAI and Anthropic blog knowledge. Local reports, candidate pools, intake queues, or reviewed entries can now be matched against curated records by URL, explicit related ids, topics, and admission criteria to produce compact prompt-ready context without mutating knowledge records, fetching live pages, or writing public docs output.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test --test-name-pattern \"official blog knowledge context|official blog context CLI\" tests/official-blog-knowledge.test.js tests/unit.test.js",
+      "node --test tests/official-blog-knowledge.test.js",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run content:contract",
+      "npm run test",
+      "git diff --check",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Daily generation needs a compact official-blog context artifact before prompt integration.",
+      "evidence": "Stage 10 produces `official_blog_knowledge_context` with capped records, source entry indexes, scores, reason codes, and curated summary fields while leaving public rendering unchanged.",
+      "scope": "official_blog_knowledge_context",
+      "persistence": "implemented",
+      "recommended_action": "Use this artifact as the input boundary when a later stage wires official blog knowledge into daily drafting or prompt context."
+    },
+    {
+      "lesson": "A single generic matched criterion is too weak for context linking when no topic overlaps.",
+      "evidence": "Stage 10 requires topic overlap or at least two shared admission criteria; same-company context remains only a bonus on top of substantive overlap.",
+      "scope": "official_blog_context_scoring",
+      "persistence": "implemented",
+      "recommended_action": "Keep context scoring tied to durable product, model, engineering, eval, safety, or agent workflow overlap instead of broad company association."
+    },
+    {
+      "lesson": "Official blog context must remain internal until accepted curated records are rendered.",
+      "evidence": "Stage 10 CLI `official-blog:context` rejects public `docs/data`, `docs/official-blogs`, and public HTML output paths and omits raw previews, bodies, source audit, and candidate pool fields from context records.",
+      "scope": "official_blog_internal_output_boundary",
+      "persistence": "implemented",
+      "recommended_action": "Expose only public-safe curated official-blog records through the public knowledge page; keep prompt context artifacts in internal paths."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "implemented",
+      "issue": "Daily generation had no deterministic compact context artifact for connecting current items to curated OpenAI and Anthropic official blog knowledge.",
+      "evidence": "Stage 10 adds `createOfficialBlogKnowledgeContext`, CLI command `official-blog:context`, deterministic matching by URL, related ids, topics, and admission criteria, invalid entry isolation, clean `--output` behavior, and public-output path rejection.",
+      "module": "src/official-blog-knowledge.js, src/cli.js, tests/official-blog-knowledge.test.js, tests/unit.test.js",
+      "suggestion": "Generate an internal official-blog context file before later daily draft prompt integration.",
+      "expected_benefit": "New daily reports and future blog summaries can cite related official blog knowledge without exposing raw candidate pools or relying on ad hoc search.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Implemented through deterministic context builder and CLI tests.",
+      "ledger_links": [
+        "feedback/p1-public-data-minimization",
+        "feedback/p1-public-internal-report-separation",
+        "feedback/p1-public-daily-not-machine-log",
+        "feedback/p1-public-importance-selection",
+        "feedback/p1-editorial-importance-density-source-visibility",
+        "feedback/p1-discovery-output-json",
+        "feedback/p1-feedback-memory-self-check",
+        "feedback/p1-authoritative-retrospectives"
+      ],
+      "validation_evidence": [
+        "official blog knowledge context ranks URL topic and criteria matches without leaking internals",
+        "official blog knowledge context ignores company-only news and isolates invalid entries",
+        "official blog context CLI writes clean internal context",
+        "official blog context CLI refuses public output paths"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-public-importance-selection",
+    "feedback/p1-main-stream-blacklist-refill",
+    "feedback/p1-editorial-importance-density-source-visibility",
+    "feedback/p1-discovery-output-json",
+    "feedback/p1-effective-interact-production-renderer",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Wire `official-blog:context` into the daily generation workflow as an internal pre-draft context file, then update prompts to cite only accepted compact context records.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Add a public knowledge graph/index view only after the internal context path is validated against real daily runs and public-data minimization gates.",
+      "owner": "project"
+    }
+  ]
+}

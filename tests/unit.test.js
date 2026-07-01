@@ -6384,6 +6384,154 @@ test("official blog suggest-relations CLI refuses public output paths", async ()
   }
 });
 
+test("official blog context CLI writes clean internal context", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-context-"));
+  const inputPath = path.join(tmp, "official-blog-context-input.json");
+  const outputPath = path.join(tmp, "official-blog-context.json");
+  const knowledgeDir = path.join(tmp, "knowledge", "official-blogs");
+  const knowledgeCompanyDir = path.join(knowledgeDir, "openai");
+  await fs.mkdir(knowledgeCompanyDir, { recursive: true });
+  await fs.writeFile(path.join(knowledgeCompanyDir, "openai-custom-context-record-2026-07-01.json"), `${JSON.stringify({
+    id: "openai-custom-context-record-2026-07-01",
+    company: "openai",
+    canonical_url: "https://openai.com/index/custom-context-record/",
+    normalized_url: "https://openai.com/index/custom-context-record",
+    published_at: "2026-07-01",
+    title_original: "Custom context record",
+    title_zh: "Custom context record digest",
+    importance: "notable",
+    content_type: "engineering_note",
+    topics: ["agent", "tool_use"],
+    admission: {
+      decision: "include",
+      rationale: "Fixture record for official-blog context CLI knowledge-dir coverage.",
+      matched_criteria: ["engineering_practice", "agent_workflow"]
+    },
+    summary_zh: "This fixture summary is intentionally longer than forty characters so the official blog schema accepts it during CLI tests.",
+    key_ideas: [
+      "Use a custom temporary knowledge directory for CLI tests.",
+      "Keep official blog context output internal.",
+      "Avoid relying on repository seed records in this CLI fixture."
+    ],
+    practice_checklist: [
+      "Pass --knowledge-dir to the CLI.",
+      "Assert only the custom record is matched."
+    ],
+    related_blog_ids: [],
+    related_report_dates: []
+  }, null, 2)}\n`, "utf8");
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    entries: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/custom-context-record/?utm_source=test",
+        title_original: "Custom context record",
+        topics: ["agent", "tool_use"],
+        admission: {
+          decision: "include",
+          matched_criteria: ["engineering_practice", "agent_workflow"]
+        },
+        opening_preview: "This internal preview should not be copied into context records."
+      },
+      {
+        company: "anthropic",
+        canonical_url: "https://www.anthropic.com/research/production-agent-harness-patterns",
+        title_original: "Production agent harness patterns",
+        suggested_topics: ["agent", "harness_engineering", "workflow_orchestration"],
+        admission: {
+          decision: "include",
+          matched_criteria: ["engineering_practice", "harness_engineering", "agent_workflow"]
+        },
+        body: "This full body should not be copied into context records."
+      }
+    ],
+    source_audit: { should_not_leak: true },
+    candidate_pool: { should_not_leak: true }
+  }, null, 2)}\n`, "utf8");
+
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, "src/cli.js"),
+    "official-blog:context",
+    "--input",
+    inputPath,
+    "--output",
+    outputPath,
+    "--knowledge-dir",
+    knowledgeDir,
+    "--generated-at",
+    "2026-07-01T08:00:00.000Z",
+    "--limit",
+    "5"
+  ], {
+    cwd: rootDir,
+    maxBuffer: 1024 * 1024
+  });
+
+  assert.match(result.stdout, /"ok": true/);
+  const raw = await fs.readFile(outputPath, "utf8");
+  const parsed = JSON.parse(raw);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.context.kind, "official_blog_knowledge_context");
+  assert.equal(parsed.context.visibility, "internal");
+  assert.equal(parsed.context.records.length, 1);
+  assert.equal(parsed.context.records[0].id, "openai-custom-context-record-2026-07-01");
+  assert.equal(JSON.stringify(parsed.context).includes("should_not_leak"), false);
+  assert.equal(JSON.stringify(parsed.context).includes("This internal preview should not be copied"), false);
+  assert.equal(JSON.stringify(parsed.context).includes("This full body should not be copied"), false);
+  assert(!raw.startsWith("\uFEFF"));
+});
+
+test("official blog context CLI refuses public output paths", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-context-public-"));
+  const inputPath = path.join(tmp, "official-blog-context-input.json");
+  const publicOutputPaths = [
+    path.join(tmp, "docs", "data", "official-blog-context.json"),
+    path.join(tmp, "docs", "official-blogs", "context.json"),
+    path.join(tmp, "docs", "official-blog-context.html")
+  ];
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    entries: [
+      {
+        company: "openai",
+        canonical_url: "https://openai.com/index/introducing-structured-outputs-in-the-api/",
+        title_original: "Structured outputs in the API",
+        topics: ["structured_outputs"],
+        admission: {
+          decision: "include",
+          matched_criteria: ["new_product"]
+        }
+      }
+    ]
+  })}\n`, "utf8");
+
+  for (const publicOutputPath of publicOutputPaths) {
+    await assert.rejects(
+      () => execFileAsync(process.execPath, [
+        path.join(rootDir, "src/cli.js"),
+        "official-blog:context",
+        "--input",
+        inputPath,
+        "--output",
+        publicOutputPath,
+        "--repo-root",
+        tmp
+      ], {
+        cwd: rootDir,
+        maxBuffer: 1024 * 1024
+      }),
+      (error) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stdout, /official_blog_context_public_output_forbidden/);
+        return true;
+      }
+    );
+    await assert.rejects(
+      () => fs.stat(publicOutputPath),
+      /ENOENT/
+    );
+  }
+});
+
 test("publish:verify-pages emits structured retryable misses without nonzero exit", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-cli-pages-verify-"));
   const preloadPath = path.join(tmp, "fake-fetch.mjs");
