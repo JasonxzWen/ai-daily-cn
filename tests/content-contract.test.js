@@ -97,6 +97,33 @@ test("real artifact content contract scans report directory and surfaces blockin
   assert(result.degraded.some((issue) => issue.code === "story_template_narrative"));
 });
 
+test("real artifact content contract enforces public copy gate by default", async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-public-copy-real-"));
+  const dataDir = path.join(tmp, "reports-data", "2026", "07");
+  const htmlDir = path.join(tmp, "docs", "reports", "2026", "07");
+  fs.mkdirSync(dataDir, { recursive: true });
+  fs.mkdirSync(htmlDir, { recursive: true });
+
+  const report = {
+    ...storyFixture("OpenAI 发布模型能力更新，说明评测设置和使用范围。"),
+    report_date: "2026-07-01",
+    summary: "今天的候选池显示，OpenAI 披露模型能力和评估方法更新。"
+  };
+  fs.writeFileSync(path.join(dataDir, "2026-07-01.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  fs.writeFileSync(path.join(htmlDir, "2026-07-01.html"), "<main>候选池</main>", "utf8");
+
+  const result = await evaluateRealArtifactContentContract({
+    rootDir: tmp,
+    dataInput: "reports-data",
+    htmlInput: path.join("docs", "reports"),
+    latest: 1
+  });
+
+  assert.equal(result.ok, false);
+  assert(result.issues.some((issue) => issue.code === "public_copy_banned_audit_or_template_wording"));
+  assert.equal(result.reports[0].summary.checked.public_copy_gate, true);
+});
+
 test("latest committed report carries no BLOCKING content-contract issues", () => {
   const found = [];
   const dirs = (p) => { try { return fs.readdirSync(p, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort(); } catch { return []; } };

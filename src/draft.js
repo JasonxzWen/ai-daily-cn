@@ -260,6 +260,7 @@ export async function generateReportDraft(options = {}) {
     appendSourceStatusSuggestionsToDraft(report, sourceStatusUpdate),
     { preserveExistingStories: true }
   );
+  sanitizeGeneratedPublicReport(reportWithSourceSuggestions);
   const sourceStatusHistoryPath = await writeSourceStatusHistory(sourceStatusUpdate);
 
   const outputPath = path.resolve(rootDir, options.outputPath || path.join(".tmp", "daily-report.json"));
@@ -344,6 +345,93 @@ export function mergeDiscoveryPayloads(payloads, options = {}) {
     metaById,
     evidence_assets: mergeEvidenceAssets(evidenceAssets)
   };
+}
+
+const GENERATED_PUBLIC_COPY_REPLACEMENTS = [
+  [/\u66f4\u65b0AI\s*\u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b\u5b9e\u8df5/gu, "\u8bf4\u660e AI \u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b\u53d8\u5316"],
+  [/\u66f4\u65b0AI\s*\u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b/gu, "\u8bf4\u660e AI \u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b\u53d8\u5316"],
+  [/\u66f4\u65b0\s+AI\s*\u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b/gu, "\u8bf4\u660e AI \u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b\u53d8\u5316"],
+  [/\u6750\u6599\u8986\u76d6/gu, "\u5185\u5bb9\u5305\u62ec"],
+  [/\u6750\u6599\u628a/gu, "\u8fd9\u6761\u4fe1\u606f\u628a"],
+  [/\u5df2\u62ab\u9732\u4e8b\u5b9e\u96c6\u4e2d\u5728/gu, "\u53ef\u6838\u5bf9\u4fe1\u606f\u96c6\u4e2d\u5728"],
+  [/\u5df2\u62ab\u9732\u7ec6\u8282\u8986\u76d6/gu, "\u7ec6\u8282\u5305\u62ec"],
+  [/\u8fb9\u754c\u843d\u5728\u843d\u5730\u8d28\u91cf\u53d6\u51b3\u4e8e/gu, "\u5b9e\u9645\u6548\u679c\u8fd8\u8981\u770b"],
+  [/\u8fb9\u754c\u843d\u5728/gu, "\u5224\u65ad\u65f6\u8fd8\u8981\u770b"],
+  [/\u843d\u5730\u8d28\u91cf\u53d6\u51b3\u4e8e/gu, "\u5b9e\u9645\u6548\u679c\u53d6\u51b3\u4e8e"],
+  [/\u5019\u9009\u6c60/gu, "\u5165\u9009\u7ebf\u7d22"],
+  [/\u51c6\u5165\u95e8\u69db/gu, "\u5165\u9009\u6807\u51c6"],
+  [/\u4fe1\u6e90\u5ba1\u8ba1/gu, "\u6765\u6e90\u6838\u5bf9"],
+  [/\u4fe1\u6e90\u8986\u76d6\u4e0e\u7f3a\u53e3/gu, "\u6765\u6e90\u8986\u76d6\u72b6\u6001"],
+  [/\u53d1\u5e03\u8d28\u91cf\u8bf4\u660e/gu, "\u53d1\u5e03\u72b6\u6001\u8bf4\u660e"],
+  [/README \u4e3b\u8981\u56f4\u7ed5/gu, "README \u91cd\u70b9\u8bf4\u660e"],
+  [/\u9605\u8bfb\u65f6\u5148\u770b/gu, "\u9605\u8bfb\u65f6\u91cd\u70b9\u770b"],
+  [/\u9700\u8981\u7ed3\u5408\u4ed3\u5e93\u9875\u9762\u786e\u8ba4/gu, "\u9700\u8981\u56de\u5230\u4ed3\u5e93\u9875\u9762\u6838\u5bf9"],
+  [/\u8fdb\u5165 GitHub Trending Top/gu, "\u51fa\u73b0\u5728 GitHub Trending Top"],
+  [/\u4eca\u5929\u8fdb\u5165 GitHub Trending/gu, "\u4eca\u5929\u51fa\u73b0\u5728 GitHub Trending"],
+  [/\u62ab\u9732/gu, "\u8bf4\u660e"]
+];
+
+const GENERATED_PUBLIC_COPY_SECTIONS = [
+  "stories",
+  "main_items",
+  "model_releases",
+  "hot_blogs",
+  "chinese_media_dynamics",
+  "daily_tracking",
+  "projects",
+  "github_trending",
+  "huggingface_trending",
+  "builder_observations",
+  "official_org_updates",
+  "community_leads"
+];
+
+function sanitizeGeneratedPublicReport(report) {
+  if (!report || typeof report !== "object") {
+    return report;
+  }
+  for (const key of ["title", "summary", "hero_summary"]) {
+    if (typeof report[key] === "string") {
+      report[key] = sanitizeGeneratedPublicCopy(report[key]);
+    }
+  }
+  for (const sectionName of GENERATED_PUBLIC_COPY_SECTIONS) {
+    if (Array.isArray(report[sectionName])) {
+      report[sectionName] = report[sectionName].map((item) => sanitizeGeneratedPublicItem(item));
+    }
+  }
+  return report;
+}
+
+function sanitizeGeneratedPublicItem(value) {
+  if (typeof value === "string") {
+    return sanitizeGeneratedPublicCopy(value);
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeGeneratedPublicItem(item));
+  }
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+  for (const [key, entry] of Object.entries(value)) {
+    if (isGeneratedPublicInternalKey(key)) {
+      continue;
+    }
+    value[key] = sanitizeGeneratedPublicItem(entry);
+  }
+  return value;
+}
+
+function isGeneratedPublicInternalKey(key) {
+  return /^(?:candidate_id|source_audit|self_check|quality_status|selection_snapshot|debug|raw|notes|status|source_id|rule_id|verification_status|verification_note|matched_terms|included_in|published_by|degraded_sections|evidence_assets)$/i.test(String(key || ""));
+}
+
+function sanitizeGeneratedPublicCopy(value) {
+  let cleaned = String(value || "");
+  for (const [pattern, replacement] of GENERATED_PUBLIC_COPY_REPLACEMENTS) {
+    cleaned = cleaned.replace(pattern, replacement);
+  }
+  return cleaned;
 }
 
 function selectReportItems(merged, options = {}) {
@@ -2270,7 +2358,7 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       watchPoints: openRouterSnapshotWatchPoints(snapshot),
       metrics: openRouterSnapshotMetrics(snapshot),
       snapshot,
-      evidenceNote: `source_audit status=${source.status}; ${snapshot.top_entries.length} OpenRouter top models parsed from public_page_snapshot`,
+      evidenceNote: `\u6765\u6e90\u68c0\u67e5\u72b6\u6001=${source.status}; ${snapshot.top_entries.length} OpenRouter top models parsed from public_page_snapshot`,
       verificationNote: `已解析 OpenRouter 公开 Rankings 页面的 This Week Top ${snapshot.top_entries.length}；快照时间 ${snapshot.snapshot_as_of}，这是平台用量信号，不是全市场份额或能力评测。`,
       watchNext: "若榜首、Top 10 构成或周变化继续异常，回到模型发布、价格页和状态页核验是发布驱动、价格驱动还是平台内工作流迁移。"
     };
@@ -2282,7 +2370,7 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       changeStatus: "blocked",
       changeSummary: "Artificial Analysis 官方组件 snapshot 不可用，不能确认可发布的榜单组件。",
       sourceUnavailableNote: "Artificial Analysis 官方 web 组件 snapshot 本轮不可用；已隐藏榜单数据卡，只保留官方入口供读者手动核对。",
-      evidenceNote: `source_audit status=${source.status}; official_component_snapshot_missing${source.notes ? `; notes=${source.notes}` : ""}`,
+      evidenceNote: `\u6765\u6e90\u68c0\u67e5\u72b6\u6001=${source.status}; official_component_snapshot_missing${source.notes ? `; notes=${source.notes}` : ""}`,
       verificationNote: "Artificial Analysis 需要官方 DOM/CSS snapshot 才能渲染公开追踪组件；本轮未取得可用 snapshot，因此不重画本地假组件。",
       watchNext: "下次抓取若恢复官方 snapshot，再展示榜单组件；本轮以官方入口人工核对为准。"
     };
@@ -2297,7 +2385,7 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       watchPoints: artificialAnalysisSnapshotWatchPoints(snapshot),
       metrics: artificialAnalysisSnapshotMetrics(snapshot),
       snapshot,
-      evidenceNote: `source_audit status=${source.status}; ${snapshot.top_entries.length} Artificial Analysis top models parsed from public_page_snapshot`,
+      evidenceNote: `\u6765\u6e90\u68c0\u67e5\u72b6\u6001=${source.status}; ${snapshot.top_entries.length} Artificial Analysis top models parsed from public_page_snapshot`,
       verificationNote: `已解析 Artificial Analysis Intelligence Index 公开页面的 Top ${snapshot.top_entries.length}；快照时间 ${snapshot.snapshot_as_of}，这是独立综合评测信号，不是生产选型结论。`,
       watchNext: "若榜首或 Top 10 构成变化，继续核对分项 benchmark、价格、延迟和自有 workload 复测结果。"
     };
@@ -2309,7 +2397,7 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       changeStatus: "blocked",
       changeSummary: "SWE-bench Pro 官方组件 snapshot 不可用，不能确认可发布的榜单组件。",
       sourceUnavailableNote: "SWE-bench Pro 官方 web 组件 snapshot 本轮不可用；已隐藏榜单数据卡，只保留官方入口供读者手动核对。",
-      evidenceNote: `source_audit status=${source.status}; official_component_snapshot_missing${source.notes ? `; notes=${source.notes}` : ""}`,
+      evidenceNote: `\u6765\u6e90\u68c0\u67e5\u72b6\u6001=${source.status}; official_component_snapshot_missing${source.notes ? `; notes=${source.notes}` : ""}`,
       verificationNote: "SWE-bench Pro 需要官方榜单组件 snapshot 才能渲染公开追踪卡；本轮未取得可用 snapshot，因此不重画本地假组件。",
       watchNext: "下次抓取若恢复官方 snapshot，再展示榜单组件；本轮以官方入口人工核对为准。"
     };
@@ -2324,7 +2412,7 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       watchPoints: sweBenchProSnapshotWatchPoints(snapshot),
       metrics: sweBenchProSnapshotMetrics(snapshot),
       snapshot,
-      evidenceNote: `source_audit status=${source.status}; ${snapshot.top_entries.length} SWE-bench Pro rows parsed from official page snapshot`,
+      evidenceNote: `\u6765\u6e90\u68c0\u67e5\u72b6\u6001=${source.status}; ${snapshot.top_entries.length} SWE-bench Pro rows parsed from official page snapshot`,
       verificationNote: `已解析 Scale Labs SWE-Bench Pro Public Dataset 的 Top ${snapshot.top_entries.length}；快照时间 ${snapshot.snapshot_as_of}，这是 coding benchmark 信号，不是生产选型结论。`,
       watchNext: "若榜首或 Top 10 构成变化，继续核对 agent scaffold、成本限制、置信区间和团队自有仓库复测结果。"
     };
@@ -2337,9 +2425,9 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
       changeSummary: source.status === "checked"
         ? "本轮检查了官方入口，但未形成可核验的榜单变化条目。"
         : "本轮检查了官方入口，未解析到当日可入选变化。",
-      evidenceNote: `source_audit status=${source.status}${source.notes ? `; notes=${source.notes}` : ""}`,
+      evidenceNote: `\u6765\u6e90\u68c0\u67e5\u72b6\u6001=${source.status}${source.notes ? `; notes=${source.notes}` : ""}`,
       verificationNote: source.status === "checked"
-        ? "本轮已检查官方入口并记录到 source_audit；如页面为动态榜单，仍以点开官方页为最终核对。"
+        ? "\u672c\u8f6e\u5df2\u68c0\u67e5\u5b98\u65b9\u5165\u53e3\uff1b\u5982\u9875\u9762\u4e3a\u52a8\u6001\u699c\u5355\uff0c\u4ecd\u4ee5\u70b9\u5f00\u5b98\u65b9\u9875\u4e3a\u6700\u7ec8\u6838\u5bf9\u3002"
         : "本轮已检查官方入口，但未解析到当日可入选条目；保留为追踪面而非事实更新。"
     };
   }
@@ -2348,7 +2436,7 @@ function dailyTrackingAuditStatus(sourceAudit, tracker) {
     verificationStatus: "unverified",
     changeStatus: "blocked",
     changeSummary: "本轮官方入口抓取受阻，不能确认榜单是否变化。",
-    evidenceNote: `source_audit status=${source.status || "blocked"}${source.notes ? `; notes=${source.notes}` : ""}`,
+    evidenceNote: `\u6765\u6e90\u68c0\u67e5\u72b6\u6001=${source.status || "blocked"}${source.notes ? `; notes=${source.notes}` : ""}`,
     verificationNote: `本轮固定入口抓取受阻：${source.notes || source.status || "blocked"}。`
   };
 }

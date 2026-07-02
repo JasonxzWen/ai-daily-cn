@@ -44,7 +44,7 @@ The user confirmed on 2026-06-30 that the 2026-06-29 source-first public page it
 - `source_metrics_dashboard` follows the story and shows operational metrics, including effective source counts, blocked/stale/no-update counts, and section health, only inside the internal diagnostic surface.
 - Source governance order is fixed editorial order, not a daily dynamic sort: `core_primary`, `china_models`, `open_source_platforms`, `tracking_metrics`, `builder_community`, `platform_cn_media`, then `english_media_search`.
 - The source governance unit is `logical_source`. A logical source may group multiple collection entries when they represent the same named source identity.
-- The complete inventory unit is `collection_entry`. The current 157 collection entries are full inventory rows, not public daily story content.
+- The complete inventory unit is `collection_entry`. The current 153 collection entries are full inventory rows, not public daily story content.
 - Full inventory expansion means every collection entry remains visible exactly once inside the internal source-first runtime, grouped by fixed section rank, with search or focus behavior that highlights but does not hide non-matching rows.
 - Blocked, stale, skipped, unconfigured, disabled, manual, and no-update sources must remain visible to source governance rather than silently disappearing.
 - Story-centered daily content remains the public fact carrier; source-first sections explain coverage, reliability, gaps, and provenance only in internal governance or explicit diagnostic contexts.

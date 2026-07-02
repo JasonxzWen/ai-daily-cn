@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-02.project_iteration.public-contract-prune-closure",
+  "run_type": "project_iteration",
+  "date": "2026-07-02",
+  "title": "Public contract and source prune closure",
+  "slug": "public-contract-prune-closure",
+  "status": "completed",
+  "summary": "This iteration closes the remaining handoff items with a repair-and-prune bias. It enables the public-copy contract for real dated artifacts by default, repairs the 2026-07-01 public JSON and HTML, removes repeatedly blocked Reddit community hotspot feeds from the default source reset surface, preserves HNRSS, GitHub watchlist, and Chinese direct RSS requirements, and renames public source-status copy so internal process terms do not appear on reader pages.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "npm run content:contract -- --json",
+      "node --test --test-name-pattern \"real artifact content contract enforces public copy gate by default|configured source reset excludes ineffective Reddit community hotspot feeds|configured source reset includes GitHub watchlist, Chinese direct RSS, and community hotspots|source reset preflight passes only when the durable source reset surface is present\" tests/content-contract.test.js tests/unit.test.js",
+      "node scripts/check-daily-page.mjs 2026-07-01 docs --json --output .tmp/closure-page-check-2026-07-01.json",
+      "browser screenshot validation for 2026-07-01 desktop 1280x900 and mobile 375x812",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Real artifact content contracts must use the same public-copy gate as synthetic fixtures once a report date enters the enforced window.",
+      "evidence": "The initial real artifact check failed on 2026-07-01 after the default gate was enabled; the repaired JSON and HTML now pass npm run content:contract.",
+      "scope": "real_artifact_content_contract",
+      "persistence": "implemented",
+      "recommended_action": "Keep the default gate enabled for real 2026-07-01+ artifacts and only disable it with an explicit test-scoped option."
+    },
+    {
+      "lesson": "Repeatedly blocked Reddit hotspot feeds should not be part of the default source reset requirement when stable HNRSS community coverage remains.",
+      "evidence": "Default community hotspots now retain Hacker News/HNRSS sources and remove Reddit feed requirements; source reset tests prove GitHub watchlist and Chinese direct RSS remain required.",
+      "scope": "source_reset_community_hotspots",
+      "persistence": "implemented",
+      "recommended_action": "Treat Reddit as optional/manual future input unless a reliable ingestion path is proven by current validation."
+    },
+    {
+      "lesson": "Reader-facing source status copy can still leak internal process language even when debug sections are hidden.",
+      "evidence": "The page contract caught public wording such as internal candidate-pool terminology; public copy now uses reader-facing source status wording.",
+      "scope": "public_daily_source_status_copy",
+      "persistence": "implemented",
+      "recommended_action": "Keep page and content-contract checks aligned so visible HTML and docs data are both scanned."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The already generated 2026-07-02 daily output should be rerun before publish authorization.",
+      "evidence": "This closure repairs the durable source reset and public-copy contract behavior, but it did not run a real publish or regenerate the 2026-07-02 report for production.",
+      "module": "daily_publish_workflow",
+      "suggestion": "Run the daily automation or publish dry-run on this repaired revision before any real publish.",
+      "expected_benefit": "The next run uses the pruned source surface and default real-artifact public-copy gate.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Next daily-run validation before publish authorization.",
+      "ledger_links": [
+        "feedback/p1-public-surface-diet-source-reset",
+        "feedback/p1-public-daily-followup-contracts",
+        "feedback/p1-daily-content-contract-hard-gate"
+      ],
+      "validation_evidence": [
+        "content contract passes",
+        "page check passes",
+        "desktop and mobile screenshots reviewed"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-public-surface-diet-source-reset",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-daily-content-contract-hard-gate",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-prepublish-editorial-prune-gate",
+    "feedback/p1-platform-unconfigured-degraded",
+    "feedback/p1-platform-exempt-discovery-wiring",
+    "feedback/p1-platform-exempt-public-rendering",
+    "feedback/p1-china-ai-hard-gate",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Rerun the daily automation or publish dry-run on the repaired revision before any real publish.",
+      "owner": "project"
+    }
+  ]
+}

@@ -97,7 +97,7 @@ const FIXED_SOURCE_REQUIREMENTS = [
       { groups: ["content_sources"], label: "MIT Technology Review", name: /MIT Technology Review/i },
       { groups: ["content_sources"], label: "Ars Technica", name: /Ars Technica/i },
       { groups: ["content_sources"], label: "VentureBeat AI", name: /VentureBeat AI/i },
-      { groups: ["content_sources"], label: "HNRSS Frontpage", name: /HNRSS Frontpage/i }
+      { groups: ["content_sources"], label: "HNRSS Frontpage", name: /(?:HNRSS Frontpage|Hacker News Frontpage 100\+)/i, url: /hnrss\.org\/frontpage/i }
     ]
   },
   {
@@ -1051,6 +1051,9 @@ function addSelectionDegradation({ report, candidatePool, reasons, affectedSecti
     if (section === "github_trending") {
       continue;
     }
+    if (selectionSnapshotProvesSparseFullSelection(report, section, minimum)) {
+      continue;
+    }
     if ((counts.get(section) || 0) >= minimum && sectionCount(report, section) < minimum) {
       reasons.push(`${section}_selection_degraded`);
       affectedSections.push(section);
@@ -1065,6 +1068,35 @@ function addSelectionDegradation({ report, candidatePool, reasons, affectedSecti
     reasons.push("content_units_selection_degraded");
     affectedSections.push("content_units");
   }
+}
+
+function selectionSnapshotProvesSparseFullSelection(report, section, minimum) {
+  const snapshot = report?.self_check?.selection_snapshot?.[section];
+  if (!snapshot || typeof snapshot !== "object") {
+    return false;
+  }
+  const eligible = firstFiniteNumber(
+    snapshot.eligible_after_filter,
+    snapshot.eligible_after_ai_filter,
+    snapshot.filtered_eligible,
+    snapshot.eligible_candidates_after_filter,
+    snapshot.eligible_candidates
+  );
+  if (eligible === null || eligible >= minimum) {
+    return false;
+  }
+  const selected = firstFiniteNumber(snapshot.selected, snapshot.included, sectionCount(report, section));
+  return selected !== null && selected >= eligible;
+}
+
+function firstFiniteNumber(...values) {
+  for (const value of values) {
+    const number = Number(value);
+    if (Number.isFinite(number) && number >= 0) {
+      return number;
+    }
+  }
+  return null;
 }
 
 function groupHasBlockingSignal(group) {
