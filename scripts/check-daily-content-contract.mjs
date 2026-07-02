@@ -678,16 +678,59 @@ function pushPublicText(fields, pathName, value) {
 }
 
 function visibleHtmlText(html) {
-  return String(html || "")
-    .replace(/<script\b[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style\b[\s\S]*?<\/style>/gi, " ")
-    .replace(/<template\b[\s\S]*?<\/template>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&quot;/gi, "\"");
+  return stripHtmlToVisibleText(String(html || ""))
+    .replace(/&(?:nbsp|#160|#x[aA]0);/gi, " ");
+}
+
+function stripHtmlToVisibleText(input) {
+  const ignoredRawTextTags = new Set(["script", "style", "template"]);
+  let output = "";
+  let index = 0;
+  let skippedTag = "";
+
+  while (index < input.length) {
+    const nextTagStart = input.indexOf("<", index);
+    if (nextTagStart === -1) {
+      if (!skippedTag) {
+        output += input.slice(index);
+      }
+      break;
+    }
+
+    if (!skippedTag) {
+      output += `${input.slice(index, nextTagStart)} `;
+    }
+
+    const tagEnd = input.indexOf(">", nextTagStart + 1);
+    if (tagEnd === -1) {
+      break;
+    }
+
+    const tag = parseHtmlTag(input.slice(nextTagStart + 1, tagEnd));
+    if (skippedTag) {
+      if (tag.closing && tag.name === skippedTag) {
+        skippedTag = "";
+      }
+    } else if (!tag.closing && !tag.selfClosing && ignoredRawTextTags.has(tag.name)) {
+      skippedTag = tag.name;
+    }
+
+    index = tagEnd + 1;
+  }
+
+  return output;
+}
+
+function parseHtmlTag(rawTag) {
+  const trimmed = String(rawTag || "").trim();
+  const closing = trimmed.startsWith("/");
+  const body = closing ? trimmed.slice(1).trimStart() : trimmed;
+  const name = (body.match(/^[A-Za-z][A-Za-z0-9:-]*/) || [""])[0].toLowerCase();
+  return {
+    name,
+    closing,
+    selfClosing: /\/\s*$/.test(body)
+  };
 }
 
 function excerptAround(text, index, length) {
