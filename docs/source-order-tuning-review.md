@@ -21,7 +21,7 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 <!-- order-tuning-unmapped-counts -->
 <!-- order-tuning-total-unmapped:68 -->
 
-These counts come from the 157-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
+These counts come from the 153-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|

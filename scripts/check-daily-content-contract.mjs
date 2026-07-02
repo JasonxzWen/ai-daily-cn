@@ -30,6 +30,8 @@ const PUBLIC_COPY_BANNED_TERMS = [
   "已披露细节覆盖",
   "更新AI 产品、平台或工程实践",
   "更新 AI 产品、平台或工程实践",
+  "\u66f4\u65b0AI \u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b",
+  "\u66f4\u65b0 AI \u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b",
   "README 主要围绕",
   "阅读时先看",
   "需要结合仓库页面确认",
@@ -119,7 +121,7 @@ export async function evaluateRealArtifactContentContract(options = {}) {
     const html = artifact.htmlPath ? await readOptionalText(artifact.htmlPath) : "";
     const result = evaluateDailyContentContract(report, {
       html,
-      enforcePublicCopyGate: options.enforcePublicCopyGate === undefined ? false : options.enforcePublicCopyGate
+      enforcePublicCopyGate: options.enforcePublicCopyGate
     });
     const reportEntry = {
       report_date: artifact.reportDate,

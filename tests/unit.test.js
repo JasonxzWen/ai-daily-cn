@@ -10416,7 +10416,6 @@ test("configured source reset includes GitHub watchlist, Chinese direct RSS, and
     "github-watch-ai-news-agent-commits",
     "github-watch-ml-news-of-the-week-readme",
     "community-hn-frontpage-100",
-    "community-reddit-machinelearning",
     "intermediary-qbitai",
     "intermediary-36kr",
     "intermediary-infoq-cn"
@@ -10431,8 +10430,23 @@ test("configured source reset includes GitHub watchlist, Chinese direct RSS, and
   assert.equal(byId.get("intermediary-36kr").enablement, "core");
   assert.equal(byId.get("intermediary-infoq-cn").enablement, "core");
   assert(communityHotspots.sources.every((source) => source.public_degraded_on_blocked === false));
+  assert(!communityHotspots.sources.some((source) => /reddit/i.test(`${source.id} ${source.name} ${source.url}`)));
   assert(githubWatchlist.sources.some((source) => source.repository === "zarazhangrui/follow-builders"));
   assert(![...byId.keys()].some((id) => /wechat|zhihu|rsshub/i.test(id)));
+});
+
+test("configured source reset excludes ineffective Reddit community hotspot feeds", async () => {
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional,manual"
+  });
+  const byId = new Set(registry.sources.map((source) => source.id));
+  const communityHotspots = JSON.parse(await fs.readFile(path.join(rootDir, "config", "sources", "community-hotspots.json"), "utf8"));
+
+  assert(byId.has("community-hn-frontpage-100"));
+  assert(byId.has("community-hn-ai-newest"));
+  assert(![...byId].some((id) => /^community-reddit-/i.test(id)));
+  assert(!communityHotspots.sources.some((source) => /reddit/i.test(`${source.id} ${source.name} ${source.url}`)));
 });
 
 test("source reset preflight passes only when the durable source reset surface is present", async () => {
@@ -11779,6 +11793,30 @@ test("quality review rejects internal review language in public body text", asyn
   assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
 });
 
+test("quality review routes public-copy banned terms to editorial repair", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.report_date = "2026-07-02";
+  report.summary = "候选池显示 Google 更新AI 产品、平台或工程实践。";
+  report.stories = [
+    {
+      story_id: "public-copy-story",
+      title: "OpenAI 发布经济分析",
+      what_happened: "OpenAI 发布新的经济分析，候选池摘录显示企业采用率上升。",
+      why_it_matters: "企业团队可以回到原始研究口径判断采用速度。",
+      sources: [{ label: "OpenAI", url: "https://openai.com/research/example" }]
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const issues = review.issues.filter((issue) => issue.code === "public_copy_banned_term");
+
+  assert.equal(review.ok, false);
+  assert(issues.some((issue) => issue.path === "summary"));
+  assert(issues.some((issue) => issue.path === "stories[0].what_happened"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite" && task.path === "summary"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite" && task.path === "stories[0].what_happened"));
+});
+
 test("quality review rejects templated hot blog summaries even when length and Chinese ratio pass", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.hot_blogs = [
@@ -11944,6 +11982,36 @@ test("AI repair contract cannot change source facts or links", async () => {
   assert.deepEqual(result.applied.map((edit) => edit.path), ["main_items[0].bullets[0]"]);
   assert.equal(result.rejected[0].path, "main_items[0].url");
   assert.equal(result.rejected[0].code, "path_not_allowed");
+});
+
+test("AI repair contract rejects public-copy banned terms in replacement values", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.report_date = "2026-07-02";
+  const originalSummary = report.summary;
+  const result = applyQualityRepairContract(report, {
+    schema_version: 1,
+    report_date: report.report_date,
+    edits: [
+      {
+        path: "main_items[0].bullets[0]",
+        value: "**OpenAI** added a concrete source-linked update for the daily workflow.",
+        reason: "Clean public copy.",
+        evidence_path: "main_items[0].url"
+      },
+      {
+        path: "summary",
+        value: "候选池显示 OpenAI 披露模型能力更新。",
+        reason: "This must be rejected.",
+        evidence_path: "summary"
+      }
+    ]
+  });
+
+  assert.equal(result.report.main_items[0].bullets[0], "**OpenAI** added a concrete source-linked update for the daily workflow.");
+  assert.equal(result.report.summary, originalSummary);
+  assert.deepEqual(result.applied.map((edit) => edit.path), ["main_items[0].bullets[0]"]);
+  assert.equal(result.rejected[0].path, "summary");
+  assert.equal(result.rejected[0].code, "public_copy_banned_term");
 });
 
 test("AI repair contract can update hero highlight result and impact copy", async () => {
@@ -12727,7 +12795,7 @@ test("public report projection preserves sanitized public quality events", async
   report.quality_status = {
     status: "degraded",
     reasons: ["builder_sources_blocked"],
-    affected_sections: ["builder_observations"],
+    affected_sections: ["builder_observations", "source_audit.china_ai_sources"],
     public_note: "Builder discovery was unavailable; the public report omits that lane.",
     degraded_sections: [
       {
@@ -12742,6 +12810,14 @@ test("public report projection preserves sanitized public quality events", async
         message: "builder_observations coverage is degraded and should be disclosed in the public report.",
         remediation: "Internal repair note must not be copied to public data.",
         internal_debug: "private runner detail"
+      },
+      {
+        code: "china_ai_sources_blocked",
+        error_code: "quality_degraded",
+        section: "source_audit.china_ai_sources",
+        severity: "degraded",
+        message: "China AI source checks were degraded; public output should only name the affected public section.",
+        remediation: "Internal audit group must not be copied to public data."
       }
     ],
     blocking_issues: []
@@ -12762,23 +12838,22 @@ test("public report projection preserves sanitized public quality events", async
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
   assert.equal(publicData.quality_status.status, "degraded");
   assert.equal(publicData.quality_status.public_note, "Builder discovery was unavailable; the public report omits that lane.");
-  assert.deepEqual(publicData.quality_status.affected_sections, ["builder_observations"]);
-  assert.deepEqual(publicData.quality_status.degraded_events, [
-    {
-      code: "builder_sources_blocked",
-      section: "builder_observations",
-      severity: "degraded",
-      message: "builder_observations coverage is degraded and should be disclosed in the public report.",
-      source: {
-        name: "Builder discovery",
-        url: "https://x.com/"
-      }
-    }
-  ]);
+  assert.deepEqual(publicData.quality_status.affected_sections, ["builder_observations", "hot_blogs"]);
+  assert(publicData.quality_status.degraded_events.some((event) =>
+    event.code === "builder_sources_blocked" &&
+    event.section === "builder_observations" &&
+    event.source?.url === "https://x.com/"
+  ));
+  assert(publicData.quality_status.degraded_events.some((event) =>
+    event.code === "china_ai_sources_blocked" &&
+    event.section === "hot_blogs" &&
+    event.message === "China AI source checks were degraded; public output should only name the affected public section."
+  ));
   const qualityKeys = collectJsonKeys(publicData.quality_status);
   for (const key of ["degraded_sections", "blocking_issues", "remediation", "internal_debug"]) {
     assert(!qualityKeys.has(key), `${key} must not appear in public quality events`);
   }
+  assert(!JSON.stringify(publicData.quality_status).includes("source_audit"));
 });
 
 test("production daily does not enable PromptLayer-inspired theme or ticket grids", async () => {
@@ -16442,7 +16517,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-first runtime is internal governance by default",
     "Public daily pages remain story-first and exclude source runtime audit sections",
     "source signal story before source metrics dashboard in internal source-first runtime",
-    "157 collection entries are complete inventory rows, not public daily story content",
+    "153 collection entries are complete inventory rows, not public daily story content",
     "Story-centered content remains the fact carrier",
     "Promote a collection entry only when source governance should track it as a named source"
   ]) {
@@ -16453,7 +16528,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-First V2 Addendum",
     "Public daily pages are story-first by default and exclude source-first runtime audit sections.",
     "The internal source-first runtime puts `source_signal_story` before `source_metrics_dashboard`.",
-    "The current 157 collection entries are full inventory rows, not public daily story content.",
+    "The current 153 collection entries are full inventory rows, not public daily story content.",
     "`config/source-display-contract.json` is the executable authority"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation should preserve source-first v2 decision: ${phrase}`);
@@ -16926,7 +17001,7 @@ test("source inventory order reference validator rejects drift and private field
 
   await expectInvalid(
     reference.replace(firstSourceLinePattern, ""),
-    /must list 157 source ids|must list source id exactly once/
+    /must list \d+ source ids|must list source id exactly once/
   );
   await expectInvalid(
     reference.replace(firstSourceLinePattern, `${firstSourceLine}${firstSourceLine}`),
@@ -17430,17 +17505,20 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
   const input = reportToSourceFirstInteractionInput(report);
   const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const inventoryEntryCount = String(inventoryRows.length);
+  const inheritedRuntimeCount = 9;
+  const collectionOnlyCount = 68;
+  const unreportedRuntimeCount = inventoryRows.length - inheritedRuntimeCount - collectionOnlyCount;
   const metricByTitle = new Map((dashboard?.items || []).map((item) => [item.title, item]));
   const statValue = (title, label = "数量") =>
     metricByTitle.get(title)?.stats?.find((stat) => stat.label === label)?.value;
   const serializedDashboard = JSON.stringify(dashboard);
 
-  assert.equal(inventoryRows.length, 157);
-  assert.equal(statValue("全量采集入口"), "157");
-  assert.equal(statValue("已知入口运行态"), "157");
-  assert.equal(statValue("继承逻辑状态"), "9");
-  assert.equal(statValue("未上报逻辑源"), "80");
-  assert.equal(statValue("仅采集入口"), "68");
+  assert.equal(statValue("全量采集入口"), inventoryEntryCount);
+  assert.equal(statValue("已知入口运行态"), inventoryEntryCount);
+  assert.equal(statValue("继承逻辑状态"), String(inheritedRuntimeCount));
+  assert.equal(statValue("未上报逻辑源"), String(unreportedRuntimeCount));
+  assert.equal(statValue("仅采集入口"), String(collectionOnlyCount));
   assert.match(serializedDashboard, /INVENTORY_TOTAL/);
   assert.match(serializedDashboard, /RUNTIME_KNOWN/);
   assert.match(serializedDashboard, /INHERITED_RUNTIME/);
@@ -17545,7 +17623,7 @@ test("system operating dashboard summarizes public report metrics after source d
   assert.equal(statValue("信号模块"), "7");
   assert.equal(statValue("趋势与追踪"), "22");
   assert.equal(statValue("信源覆盖"), "1/6");
-  assert.equal(statValue("信源覆盖", "全量入口"), "157");
+  assert.equal(statValue("信源覆盖", "全量入口"), String(buildSourceInventoryRows({ rootDir: process.cwd() }).length));
   assert.equal(statValue("运行质量"), "degraded");
   assert.equal(statValue("运行质量", "降级提醒"), "2");
   assert.match(serializedDashboard, /SYSTEM_CONTENT/);
@@ -17923,6 +18001,8 @@ test("source signal story renders first-screen cards before metrics", () => {
     }
   ];
   report.source_effectiveness = sourceMetricsDashboardRowsFixture();
+  const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
+  const inventoryEntryCount = String(inventoryRows.length);
 
   const input = reportToSourceFirstInteractionInput(report);
   const story = input.sections.find((section) => section.richId === "source-signal-story");
@@ -17951,12 +18031,12 @@ test("source signal story renders first-screen cards before metrics", () => {
     ["低信号", "2"],
     ["阻塞", "1"],
     ["未配置或跳过", "1"],
-    ["全量入口", "157"],
-    ["入口运行态", "157/157"]
+    ["全量入口", inventoryEntryCount],
+    ["入口运行态", `${inventoryEntryCount}/${inventoryEntryCount}`]
   ]);
   assert(story.items.every((item) => item.showGroup === false));
   assert(story.items.every((item) => item.titleIcon));
-  assert.match(story.summary, /全量采集入口 157/);
+  assert.match(story.summary, new RegExp(`全量采集入口 ${inventoryEntryCount}`));
   assert.match(story.content, /全量信源入口/);
   assert.match(serializedStory, /OpenAI 发布企业平台能力/);
   assert.match(serializedStory, /GitHub Trending 出现 agent 工具链/);
@@ -18351,7 +18431,7 @@ test("internal source inventory panel lists all registered source entries before
   assert(inventoryGroupIndexes.length > 0, "inventory detail groups should render");
   assert(storyIndex > Math.max(...inventoryGroupIndexes), "stories should remain after the complete source-first area");
   assert.equal(inventory.type, "filterable-cards");
-  assert.match(inventory.summary, /157/);
+  assert.match(inventory.summary, new RegExp(String(inventoryRows.length)));
   assert.equal((inventoryCardsText.match(/- \*\*/g) || []).length, 0);
   assert.equal(inventoryGroupRowCount, inventoryRows.length);
   assert.match(inventoryGroupContent, /DeepSeek News/);
@@ -18435,7 +18515,7 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert(inventory, "inventory overview should render");
   assert.equal(inventory.type, "filterable-cards");
   assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview should not carry all detail rows");
-  assert.match(inventory.summary, /157/);
+  assert.match(inventory.summary, new RegExp(String(inventoryRows.length)));
   assert(inventoryHrefs.includes("#section-source-inventory-group-core-primary"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-china-models"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-tracking-metrics"), JSON.stringify(inventoryHrefs));
@@ -18982,6 +19062,26 @@ test("public daily followups infer localized X avatars from avatar_url during cl
 
   assert(card);
   assert.equal(card.titleIcon, "../../../assets/avatars/2026/06/2026-06-23-avatarbuilder.png");
+
+  const inputPath = path.join(tmp, "interaction-input.json");
+  const renderOutDir = path.join(tmp, "interaction");
+  await fs.writeFile(inputPath, `${JSON.stringify(input, null, 2)}\n`, "utf8");
+  const result = await execFileAsync(process.execPath, [
+    path.join(rootDir, ".codex/skills/effective-interact/scripts/create-interaction.mjs"),
+    "--input",
+    inputPath,
+    "--out-dir",
+    renderOutDir,
+    "--slug",
+    "builder-avatar-title-icon",
+    "--json"
+  ], { cwd: rootDir });
+  const rendered = JSON.parse(result.stdout);
+  const html = await fs.readFile(rendered.outputPath, "utf8");
+  assert.match(
+    html,
+    /<a class="card-title-link" href="https:\/\/x\.com\/avatarbuilder\/status\/2059000000000000002"[^>]*><img class="inline-site-icon card-title-icon" src="\.\.\/\.\.\/\.\.\/assets\/avatars\/2026\/06\/2026-06-23-avatarbuilder\.png"/
+  );
 });
 
 test("public daily followups expose source reset contracts without weekly misattribution", async () => {
@@ -22119,6 +22219,23 @@ test("publish quality accepts strict fixed source proof when a public source is 
   assert(!issues.some((issue) => issue.code === "fixed_source_e_public_apis"));
 });
 
+test("publish quality accepts Hacker News Frontpage 100+ as HNRSS Frontpage fixed source proof", () => {
+  const report = strictPublishReportFixture();
+  const hnrssSource = report.source_audit.content_sources.sources
+    .find((source) => source.name === "HNRSS Frontpage");
+  hnrssSource.name = "Hacker News Frontpage 100+";
+  hnrssSource.url = "https://hnrss.org/frontpage?points=100";
+
+  const classification = classifyPublishQuality(report, strictPublishOptionsFixture());
+
+  assert.deepEqual(classification.blocking_issues, []);
+  assert(
+    !classification.degraded_sections.some(
+      (issue) => issue.code === "fixed_source_c_global_media" && issue.missing_sources?.includes("HNRSS Frontpage")
+    )
+  );
+});
+
 test("publish quality blocks strict daily reports without automation revision proof", () => {
   const report = strictPublishReportFixture();
   delete report.self_check.automation_revision;
@@ -22359,6 +22476,34 @@ test("publish quality skips strict section minimums when selection snapshot prov
       (issue) => issue.code === "main_items_below_strict_minimum" || issue.code === "hot_blogs_below_strict_minimum"
     )
   );
+});
+
+test("quality status does not mark Builder selection degraded when all eligible filtered candidates were selected", () => {
+  const report = strictPublishReportFixture();
+  report.builder_observations = report.builder_observations.slice(0, 7);
+  report.self_check.builder_observations = report.builder_observations.length;
+  report.self_check.selection_snapshot = {
+    builder_observations: {
+      eligible_candidates: 7,
+      eligible_after_filter: 7,
+      selected: 7
+    }
+  };
+  report.quality_status = { status: "ok", reasons: [], affected_sections: [], public_note: "" };
+  const candidatePool = {
+    candidates: Array.from({ length: 13 }, (_unused, index) => ({
+      id: `builder-candidate-${index + 1}`,
+      category: "builder_observation",
+      status: index < 7 ? "included" : "rejected",
+      included_in: index < 7 ? "builder_observations" : ""
+    }))
+  };
+
+  const status = deriveQualityStatus(report, candidatePool);
+
+  assert(!status.reasons.includes("builder_observations_selection_degraded"));
+  assert(!status.affected_sections.includes("builder_observations"));
+  assert(!status.degraded_sections.some((issue) => issue.section === "builder_observations" && issue.code === "builder_observations_selection_degraded"));
 });
 
 test("publish quality blocks strict daily reports with summarized Builder observations", () => {

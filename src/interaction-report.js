@@ -474,7 +474,7 @@ export function reportToInteractionInput(report, options = {}) {
     if (publicSourceCoverage) {
       sections.push({
         type: "markdown",
-        title: "信源覆盖与缺口",
+        title: "来源覆盖状态",
         group: "verification",
         richId: "public-source-coverage",
         content: publicSourceCoverage
@@ -503,7 +503,7 @@ export function reportToInteractionInput(report, options = {}) {
         appendix: true,
         appendixLabel: "附录",
         collapsed: true,
-        summary: "来源、候选池和重试记录，默认折叠。",
+        summary: "来源、内部筛选明细和重试记录，默认折叠。",
         content: formatSourceAudit(report.source_audit)
       },
       {
@@ -758,7 +758,7 @@ function dailyIntent(report) {
       "主体信息解释它与内容、产品、平台、策略或工程判断的关系",
       "观点、播客、社区讨论和产品雷达承载高密度但标明来源风险",
       "HTML 保留结构化导航、卡片、证据图片和 source_audit 附录",
-      "结构化 JSON 可回溯到候选池与核验状态"
+      "结构化 JSON 可回溯到内部筛选明细与核验状态"
     ]
   };
 }
@@ -3879,7 +3879,7 @@ function sourceMetricDashboardCards(metrics, inventoryMetrics = {}) {
       value: metrics.total,
       tag: { label: "TOTAL", kind: "general" },
       subtitle: "固定展示合同",
-      body: "固定展示合同中的公开信源行；公开页只展示读者需要的运行状态，不公开内部候选池、筛选分数或发布调试记录。"
+      body: "固定展示合同中的公开信源行；公开页只展示读者需要的运行状态，不公开内部筛选明细、筛选分数或发布调试记录。"
     }),
     sourceMetricDashboardCard({
       title: "公开入选",
@@ -4792,7 +4792,7 @@ function formatPublicSourceCoverage(audit) {
     return "";
   }
   return [
-    "本节只保留读者需要知道的覆盖缺口：哪些来源本轮检查过、哪些没有信号、哪些因为配置或来源状态跳过。它不展示内部候选池、筛选分数或发布调试记录。",
+    "本节只保留读者需要知道的覆盖缺口：哪些来源本轮检查过、哪些没有信号、哪些因为配置或来源状态跳过。它不展示内部筛选明细、筛选分数或发布调试记录。",
     "",
     ...rows
   ].join("\n");
@@ -4816,7 +4816,7 @@ function formatPublicSourceCoverageV2(audit) {
     return acc;
   }, { checked: 0, no_signal: 0, blocked: 0, skipped: 0 });
   return [
-    "本节只展示读者需要知道的信源覆盖状态，不公开内部候选池、筛选分数或发布调试记录。",
+    "本节只展示读者需要知道的信源覆盖状态，不公开内部筛选明细、筛选分数或发布调试记录。",
     "",
     [
       `${sourceStatusTag("checked")} ${totals.checked}`,

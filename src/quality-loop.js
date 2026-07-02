@@ -1,6 +1,32 @@
 import { PublisherError } from "./errors.js";
 import { findPlainLanguageIssues } from "./plain-language.js";
 
+const PUBLIC_COPY_BANNED_TERMS = [
+  "披露",
+  "准入门槛",
+  "候选池",
+  "信源审计",
+  "信源覆盖与缺口",
+  "发布质量说明",
+  "source_audit",
+  "self_check",
+  "candidate_id",
+  "材料覆盖",
+  "边界落在",
+  "落地质量取决于",
+  "已披露事实集中在",
+  "已披露细节覆盖",
+  "更新AI 产品、平台或工程实践",
+  "更新 AI 产品、平台或工程实践",
+  "README 主要围绕",
+  "阅读时先看",
+  "需要结合仓库页面确认",
+  "进入 GitHub Trending Top",
+  "今天进入 GitHub Trending"
+];
+const PUBLIC_COPY_BANNED_PATTERN = new RegExp(PUBLIC_COPY_BANNED_TERMS.map(escapeRegex).join("|"), "i");
+const PUBLIC_COPY_GATE_START_DATE = "2026-07-01";
+
 const DEFAULT_HIGHLIGHT_LIMITS = {
   maxPerText: 3,
   maxChars: 32,
@@ -77,6 +103,9 @@ const PUBLIC_TEXT_FIELDS = [
   ["hero_highlights", "*", "reason"],
   ["hero_highlights", "*", "what_happened"],
   ["hero_highlights", "*", "why_watch"],
+  ["stories", "*", "title"],
+  ["stories", "*", "what_happened"],
+  ["stories", "*", "why_it_matters"],
   ["main_items", "*", "title"],
   ["main_items", "*", "summary"],
   ["main_items", "*", "bullets", "*"],
@@ -155,6 +184,7 @@ export function reviewReportQuality(report, options = {}) {
   }
 
   for (const entry of textEntries) {
+    collectPublicCopyBannedTermIssues(entry, issues, aiReviewTasks, report);
     collectEnglishToneIssues(entry, issues);
     collectAutoDraftTemplateIssues(entry, issues, aiReviewTasks);
     collectPublicTemplateBodyIssues(entry, issues, aiReviewTasks);
@@ -261,6 +291,11 @@ export function applyQualityRepairContract(report, contract = {}) {
       rejected.push({ index, path: pathName, code: "value_invalid", message: "edit.value must be a non-empty string." });
       return;
     }
+    const bannedTerm = shouldRunPublicCopyGate(report) ? publicCopyBannedTerm(edit.value) : "";
+    if (bannedTerm) {
+      rejected.push({ index, path: pathName, code: "public_copy_banned_term", message: `AI repair value still contains banned public copy term: ${bannedTerm}` });
+      return;
+    }
 
     const tokens = parsePath(pathName);
     if (!pathExists(repaired, tokens)) {
@@ -295,6 +330,43 @@ export function applyQualityRepairContract(report, contract = {}) {
     applied,
     rejected
   };
+}
+
+function collectPublicCopyBannedTermIssues(entry, issues, aiReviewTasks, report) {
+  if (!shouldRunPublicCopyGate(report)) {
+    return;
+  }
+  const term = publicCopyBannedTerm(entry.value);
+  if (!term) {
+    return;
+  }
+  const repairable = isAllowedRepairPath(entry.path);
+  issues.push({
+    code: "public_copy_banned_term",
+    severity: "error",
+    path: entry.path,
+    message: `Public copy contains banned audit/template wording: ${term}`,
+    repairable
+  });
+  if (repairable) {
+    aiReviewTasks.push({
+      kind: "public_editorial_rewrite",
+      path: entry.path,
+      instruction:
+        "Rewrite this public field as concrete reader-facing Chinese. Do not use audit/source-gate/template wording, and never emit terms such as 披露、候选池、准入门槛、信源审计、材料覆盖、边界落在、更新AI 产品、平台或工程实践、README 主要围绕, source_audit, self_check, or candidate_id."
+    });
+  }
+}
+
+function shouldRunPublicCopyGate(report) {
+  const reportDate = String(report?.report_date || "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(reportDate) && reportDate >= PUBLIC_COPY_GATE_START_DATE;
+}
+
+function publicCopyBannedTerm(value) {
+  const text = stripMarkup(value).replace(/\s+/g, " ").trim();
+  const match = text.match(PUBLIC_COPY_BANNED_PATTERN);
+  return match ? match[0] : "";
 }
 
 // Stories are the reader-facing unit (interaction-report.js / site.js render

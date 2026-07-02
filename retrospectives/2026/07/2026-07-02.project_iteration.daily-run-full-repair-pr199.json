@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-02.project_iteration.daily-run-full-repair-pr199",
+  "run_type": "project_iteration",
+  "date": "2026-07-02",
+  "title": "Daily run full repair after PR199",
+  "slug": "daily-run-full-repair-pr199",
+  "status": "completed",
+  "summary": "This iteration repairs the post-PR199 daily publishing path after the 2026-07-02 run stopped at the page quality gate. It fixes Builder/X title avatar rendering, aligns the HNRSS fixed-source alias with the current source reset name, prevents false sparse-supply Builder degradation, and routes public audit/template wording through the AI editorial repair loop.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node scripts/check-daily-page.mjs 2026-07-02 <original-run-docs> --json --output .tmp/repair-red-page-check-2026-07-02.json",
+      "node --test --test-name-pattern \"public daily followups infer localized X avatars from avatar_url during clean build|publish quality accepts Hacker News Frontpage 100\\+ as HNRSS Frontpage fixed source proof|quality status does not mark Builder selection degraded when all eligible filtered candidates were selected|quality review routes public-copy banned terms to editorial repair|AI repair contract rejects public-copy banned terms in replacement values\" tests/unit.test.js",
+      "node scripts/check-daily-page.mjs 2026-07-02 .tmp/repair-build-2026-07-02/docs --json --output .tmp/repair-page-check-2026-07-02.json",
+      "npm run content:contract",
+      "node scripts/harness-validate.mjs",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [
+    {
+      "section": "china_ai",
+      "code": "china_ai_no_recent_signal",
+      "message": "Executed no-signal remains a degraded condition, not a hard publish blocker."
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": "Builder/X title icons can be lost at the final renderer even when report data already contains inferred local avatar paths.",
+      "evidence": "The page check failed on `source_icons_present`; the renderer now accepts safe local media paths for title icons and tracked reports regenerate with avatar images inside Builder/X card titles.",
+      "scope": "public_daily_builder_cards",
+      "persistence": "implemented",
+      "recommended_action": "Keep title-icon regression coverage tied to the effective-interact renderer, not only the interaction input model."
+    },
+    {
+      "lesson": "Fixed-source proof must track source reset display aliases, or valid current sources become false degraded reasons.",
+      "evidence": "`Hacker News Frontpage 100+` now satisfies the HNRSS global-media requirement through a unit-backed alias check.",
+      "scope": "daily_fixed_source_status",
+      "persistence": "implemented",
+      "recommended_action": "When renaming source reset surfaces, update both quality-status requirements and replay tests in the same change."
+    },
+    {
+      "lesson": "Sparse candidate supply should not be treated as dropped selection when selection snapshots prove all eligible items were used.",
+      "evidence": "Builder/X quality status now checks `eligible_candidates` and `eligible_after_filter` before adding selection degradation.",
+      "scope": "builder_selection_quality",
+      "persistence": "implemented",
+      "recommended_action": "Use selection snapshots for minimum-count judgments whenever a lane can legitimately have fewer eligible candidates."
+    },
+    {
+      "lesson": "Public copy banned terms need to enter the AI repair path before publish, and dirty repair output must be rejected.",
+      "evidence": "The quality loop now creates public editorial rewrite tasks for 2026-07-01+ banned audit/template wording and the repair contract rejects replacements that still contain those terms.",
+      "scope": "public_editorial_repair",
+      "persistence": "implemented",
+      "recommended_action": "Rerun the daily path after this repair before publishing the 2026-07-02 report."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The old generated 2026-07-02 report still contains public-copy audit/template wording.",
+      "evidence": "Local quality-review replay routes those fields to public editorial rewrite tasks with the repaired code.",
+      "module": "src/quality-loop.js",
+      "suggestion": "Rerun the daily automation or dry-run publish path on the repaired revision so the editorial repair loop rewrites the old generated copy before any real publish.",
+      "expected_benefit": "The report can progress past the icon gate without carrying reader-facing audit residue.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Next daily-run validation before publish authorization.",
+      "ledger_links": [
+        "feedback/p1-public-daily-followup-contracts",
+        "feedback/p1-daily-content-contract-hard-gate",
+        "feedback/p1-ai-quality-review-loop"
+      ],
+      "validation_evidence": [
+        "public-copy banned-term tasks are generated",
+        "AI repair contract rejects dirty replacements"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-public-surface-diet-source-reset",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-daily-content-contract-hard-gate",
+    "feedback/p1-ai-quality-review-loop",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-china-ai-hard-gate",
+    "feedback/p1-public-media-contract",
+    "feedback/p1-feedback-memory-self-check",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Rerun the daily automation or publish dry-run on the repaired revision before any real publish.",
+      "owner": "project"
+    },
+    {
+      "status": "recommended",
+      "action": "Inspect the generated AI repair contract for public-copy banned wording after rerun and verify the page check remains green on desktop and mobile.",
+      "owner": "project"
+    }
+  ]
+}

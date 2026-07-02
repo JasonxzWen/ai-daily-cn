@@ -76,6 +76,14 @@ const SCREENSHOT_CAPTURE_RE = /(?:full[_-]?page|browser|viewport|screenshot|page
 const LEGACY_REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf|reddit|r\/machinelearning|r\/localllama)/i;
 const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf)/i;
 const COMMUNITY_HOTSPOT_SOURCE_RE = /(?:hnrss|hacker news|news\.ycombinator|reddit\.com\/r\/(?:machinelearning|localllama|singularity|artificial)|r\/(?:machinelearning|localllama|singularity|artificial))/i;
+const PUBLIC_QUALITY_SECTION_ALIASES = new Map([
+  ["source_audit.github_trending", "github_trending"],
+  ["source_audit.huggingface_trending", "huggingface_trending"],
+  ["source_audit.builder_sources", "builder_observations"],
+  ["source_audit.china_ai_sources", "hot_blogs"],
+  ["source_audit.content_sources", "hot_blogs"],
+  ["source_audit.search_sources", "community_leads"]
+]);
 const LEGACY_PUBLIC_SOURCE_FILTER_SECTIONS = [
   "stories",
   "main_items",
@@ -1335,6 +1343,7 @@ function publicQualityStatus(status = {}, options = {}) {
   }
   const affectedSections = arrayValue(status.affected_sections)
     .map((item) => String(item || "").trim())
+    .map(publicQualitySection)
     .filter(Boolean)
     .filter((section) => retiredPlatformMode !== "remove" || !RETIRED_PLATFORM_SECTIONS.has(section));
   if (affectedSections.length > 0) {
@@ -1342,12 +1351,46 @@ function publicQualityStatus(status = {}, options = {}) {
   }
   const degradedEvents = arrayValue(status.degraded_sections)
     .map(sanitizePublicDegradationEvent)
+    .map(publicQualityEvent)
     .filter(Boolean)
     .filter((event) => publicQualityEventAllowed(event, retiredPlatformMode));
   if (degradedEvents.length > 0) {
     result.degraded_events = degradedEvents;
   }
   return Object.keys(result).length > 0 ? result : undefined;
+}
+
+function publicQualityEvent(event) {
+  if (!event || typeof event !== "object") {
+    return null;
+  }
+  const section = publicQualitySection(event.section);
+  if (!section) {
+    return null;
+  }
+  return {
+    ...event,
+    section,
+    message: publicQualityMessage(event.message, section)
+  };
+}
+
+function publicQualityMessage(value, section) {
+  return String(value || "").replace(/source_audit[._-][a-z0-9_-]+/gi, section);
+}
+
+function publicQualitySection(value) {
+  const section = String(value || "").trim();
+  if (!section) {
+    return "";
+  }
+  if (PUBLIC_QUALITY_SECTION_ALIASES.has(section)) {
+    return PUBLIC_QUALITY_SECTION_ALIASES.get(section);
+  }
+  if (/^source_audit[._-]/i.test(section)) {
+    return "source_status";
+  }
+  return section;
 }
 
 function publicQualityEventAllowed(event, retiredPlatformMode) {

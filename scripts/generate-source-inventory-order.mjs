@@ -64,7 +64,7 @@ export function buildSourceInventoryOrderMarkdown({ rootDir = process.cwd() } = 
     lines.push(...sectionLines(group));
   }
 
-  return `${lines.join("\n").replace(/\n{3,}/g, "\n\n")}\n`;
+  return `${lines.join("\n").replace(/\n{3,}/g, "\n\n").trimEnd()}\n`;
 }
 
 function groupInventoryRows(rows = []) {

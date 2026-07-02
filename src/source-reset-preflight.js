@@ -30,11 +30,7 @@ const REQUIRED_GITHUB_WATCH_SOURCE_IDS = [
 
 const REQUIRED_COMMUNITY_HOTSPOT_SOURCE_IDS = [
   "community-hn-frontpage-100",
-  "community-hn-ai-newest",
-  "community-reddit-machinelearning",
-  "community-reddit-localllama",
-  "community-reddit-singularity",
-  "community-reddit-artificial"
+  "community-hn-ai-newest"
 ];
 
 const REQUIRED_DIRECT_CHINESE_SOURCE_IDS = [
