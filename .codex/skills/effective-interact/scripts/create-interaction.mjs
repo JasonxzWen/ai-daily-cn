@@ -1179,7 +1179,7 @@ function renderCardTitle(item) {
   const subtitleHtml = subtitle ? `<span class="card-subtitle">${escapeHtml(subtitle)}</span>` : "";
   const href = safeLink(item.href || item.url || "");
   const iconSource = item.titleIcon || item.title_icon || item.icon || item.iconDataUri || item.icon_data_uri || "";
-  const icon = safeDataImage(iconSource) || safeLink(iconSource);
+  const icon = safeDataImage(iconSource) || safeMediaSrc(iconSource);
   const iconHtml = icon ? `<img class="inline-site-icon card-title-icon" src="${escapeAttr(icon)}" alt="" loading="lazy" decoding="async">` : "";
   if (!href) {
     return `<h3>${iconHtml}<span class="card-title-text"><span>${title}</span>${subtitleHtml}</span></h3>`;
