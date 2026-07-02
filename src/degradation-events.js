@@ -4,10 +4,7 @@ const AUDIT_GROUP_CONTRACTS = {
   builder_sources: { code: "builder_sources_blocked", section: "builder_observations" },
   china_ai_sources: { code: "china_ai_sources_blocked", section: "hot_blogs" },
   content_sources: { code: "content_sources_blocked", section: "hot_blogs" },
-  search_sources: { code: "search_sources_blocked", section: "community_leads" },
-  wechat_sources: { code: "wechat_sources_blocked", section: "wechat_items" },
-  zhihu_sources: { code: "zhihu_sources_blocked", section: "zhihu_items" },
-  reddit_sources: { code: "reddit_sources_blocked", section: "reddit_items" }
+  search_sources: { code: "search_sources_blocked", section: "community_leads" }
 };
 
 export function createPublicDegradationEvent(input = {}) {

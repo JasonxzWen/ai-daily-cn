@@ -12,6 +12,31 @@ const MAIN_FILLER_PATTERN = /材料覆盖|边界落在|后续观察|读者可核
 const HOT_BLOG_FILLER_PATTERN = /原文说明|读者可核对|继续留意|本文可作为|信息较为有限|后续观察|可继续关注|材料覆盖/i;
 const GITHUB_FILLER_PATTERN = /公开描述提到|进入 GitHub Trending|需要结合仓库页面确认|优先核对 README|实现线索|值得关注的项目/i;
 const TRACKING_FAKE_PATTERN = /openrouter-mini-card|artificial-analysis-mini-card|local_simplified|simplified_metric|simplified_bars|fake benchmark|toy component/i;
+const PUBLIC_COPY_GATE_START_DATE = "2026-07-01";
+const PUBLIC_COPY_BANNED_TERMS = [
+  "披露",
+  "准入门槛",
+  "候选池",
+  "信源审计",
+  "信源覆盖与缺口",
+  "发布质量说明",
+  "source_audit",
+  "self_check",
+  "candidate_id",
+  "材料覆盖",
+  "边界落在",
+  "落地质量取决于",
+  "已披露事实集中在",
+  "已披露细节覆盖",
+  "更新AI 产品、平台或工程实践",
+  "更新 AI 产品、平台或工程实践",
+  "README 主要围绕",
+  "阅读时先看",
+  "需要结合仓库页面确认",
+  "进入 GitHub Trending Top",
+  "今天进入 GitHub Trending"
+];
+const PUBLIC_COPY_BANNED_PATTERN = new RegExp(PUBLIC_COPY_BANNED_TERMS.map(escapeRegExp).join("|"), "i");
 
 export function evaluateDailyContentContract(report, options = {}) {
   const issues = [];
@@ -25,6 +50,7 @@ export function evaluateDailyContentContract(report, options = {}) {
   checkHotBlogs(report, { html }, issues);
   checkBuilderX(report, issues, degraded);
   checkTrackingComponents(report, { html }, issues, degraded);
+  checkPublicCopy(report, { html, enforcePublicCopyGate: options.enforcePublicCopyGate }, issues);
 
   return {
     ok: issues.length === 0,
@@ -37,14 +63,16 @@ export function evaluateDailyContentContract(report, options = {}) {
         "REQ-006": "GitHub Trending Top20 README summaries",
         "REQ-007": "Builder/X eligible selection",
         "REQ-008": "hot blog public summaries",
-        "REQ-010": "tracking official component snapshots"
+        "REQ-010": "tracking official component snapshots",
+        "REQ-PUBLIC-COPY": "public reader copy does not expose audit wording or banned AI-flavored templates"
       },
       checked: {
         main_items: asArray(report?.main_items).length,
         github_trending: asArray(report?.github_trending).length,
         hot_blogs: asArray(report?.hot_blogs).length,
         builder_observations: asArray(report?.builder_observations).length,
-        daily_tracking: asArray(report?.daily_tracking).length
+        daily_tracking: asArray(report?.daily_tracking).length,
+        public_copy_gate: shouldRunPublicCopyGate(report, { enforcePublicCopyGate: options.enforcePublicCopyGate })
       }
     }
   };
@@ -89,7 +117,10 @@ export async function evaluateRealArtifactContentContract(options = {}) {
   for (const artifact of artifacts) {
     const report = JSON.parse(await fs.readFile(artifact.reportPath, "utf8"));
     const html = artifact.htmlPath ? await readOptionalText(artifact.htmlPath) : "";
-    const result = evaluateDailyContentContract(report, { html });
+    const result = evaluateDailyContentContract(report, {
+      html,
+      enforcePublicCopyGate: options.enforcePublicCopyGate === undefined ? false : options.enforcePublicCopyGate
+    });
     const reportEntry = {
       report_date: artifact.reportDate,
       report_path: normalizePath(path.relative(rootDir, artifact.reportPath)),
@@ -536,6 +567,176 @@ function checkTrackingComponents(report, options, issues, degraded) {
       }));
     }
   }
+}
+
+function checkPublicCopy(report, options, issues) {
+  if (!shouldRunPublicCopyGate(report, options)) {
+    return;
+  }
+  const hits = publicCopyHits(report, options);
+  if (hits.length === 0) {
+    return;
+  }
+  issues.push(blockingIssue({
+    code: "public_copy_banned_audit_or_template_wording",
+    requirement: "REQ-PUBLIC-COPY",
+    section: "public_copy",
+    message: "Public daily copy must not expose machine-audit wording, source-gate wording, or user-banned AI-flavored templates.",
+    count: hits.length,
+    examples: hits.slice(0, 8)
+  }));
+}
+
+function shouldRunPublicCopyGate(report, options = {}) {
+  if (options.enforcePublicCopyGate === false) {
+    return false;
+  }
+  const reportDate = textValue(report?.report_date);
+  return /^\d{4}-\d{2}-\d{2}$/.test(reportDate) && reportDate >= PUBLIC_COPY_GATE_START_DATE;
+}
+
+function publicCopyHits(report, options = {}) {
+  const fields = collectPublicReportFields(report);
+  const htmlText = visibleHtmlText(options.html || "");
+  if (htmlText) {
+    fields.push({ path: "html", text: htmlText });
+  }
+  const hits = [];
+  for (const field of fields) {
+    const text = normalizeWhitespace(field.text);
+    const match = text.match(PUBLIC_COPY_BANNED_PATTERN);
+    if (!match) {
+      continue;
+    }
+    hits.push({
+      path: field.path,
+      term: match[0],
+      excerpt: excerptAround(text, match.index || 0, match[0].length)
+    });
+  }
+  return hits;
+}
+
+function collectPublicReportFields(report = {}) {
+  const fields = [];
+  for (const field of ["title", "summary", "hero_summary", "report_date"]) {
+    pushPublicText(fields, field, report?.[field]);
+  }
+  for (const sectionName of [
+    "stories",
+    "main_items",
+    "model_releases",
+    "hot_blogs",
+    "chinese_media_dynamics",
+    "daily_tracking",
+    "projects",
+    "github_trending",
+    "huggingface_trending",
+    "builder_observations",
+    "official_org_updates",
+    "community_leads"
+  ]) {
+    asArray(report?.[sectionName]).forEach((item, index) => {
+      collectPublicItemFields(fields, `${sectionName}[${index}]`, item);
+    });
+  }
+  return fields;
+}
+
+function collectPublicItemFields(fields, basePath, item) {
+  if (!item || typeof item !== "object") {
+    pushPublicText(fields, basePath, item);
+    return;
+  }
+  for (const [key, value] of Object.entries(item)) {
+    if (isInternalPublicCopyKey(key)) {
+      continue;
+    }
+    const nextPath = `${basePath}.${key}`;
+    if (Array.isArray(value)) {
+      value.forEach((entry, index) => collectPublicItemFields(fields, `${nextPath}[${index}]`, entry));
+    } else if (value && typeof value === "object") {
+      collectPublicItemFields(fields, nextPath, value);
+    } else {
+      pushPublicText(fields, nextPath, value);
+    }
+  }
+}
+
+function isInternalPublicCopyKey(key) {
+  return /^(?:candidate_id|source_audit|self_check|quality_status|selection_snapshot|debug|raw|notes|status|source_id|rule_id|verification_status|verification_note|matched_terms|included_in|published_by|degraded_sections|evidence_assets)$/i.test(String(key || ""));
+}
+
+function pushPublicText(fields, pathName, value) {
+  if (typeof value !== "string" && typeof value !== "number") {
+    return;
+  }
+  const text = textValue(value);
+  if (text) {
+    fields.push({ path: pathName, text });
+  }
+}
+
+function visibleHtmlText(html) {
+  return stripHtmlToVisibleText(String(html || ""))
+    .replace(/&(?:nbsp|#160|#x[aA]0);/gi, " ");
+}
+
+function stripHtmlToVisibleText(input) {
+  const ignoredRawTextTags = new Set(["script", "style", "template"]);
+  let output = "";
+  let index = 0;
+  let skippedTag = "";
+
+  while (index < input.length) {
+    const nextTagStart = input.indexOf("<", index);
+    if (nextTagStart === -1) {
+      if (!skippedTag) {
+        output += input.slice(index);
+      }
+      break;
+    }
+
+    if (!skippedTag) {
+      output += `${input.slice(index, nextTagStart)} `;
+    }
+
+    const tagEnd = input.indexOf(">", nextTagStart + 1);
+    if (tagEnd === -1) {
+      break;
+    }
+
+    const tag = parseHtmlTag(input.slice(nextTagStart + 1, tagEnd));
+    if (skippedTag) {
+      if (tag.closing && tag.name === skippedTag) {
+        skippedTag = "";
+      }
+    } else if (!tag.closing && !tag.selfClosing && ignoredRawTextTags.has(tag.name)) {
+      skippedTag = tag.name;
+    }
+
+    index = tagEnd + 1;
+  }
+
+  return output;
+}
+
+function parseHtmlTag(rawTag) {
+  const trimmed = String(rawTag || "").trim();
+  const closing = trimmed.startsWith("/");
+  const body = closing ? trimmed.slice(1).trimStart() : trimmed;
+  const name = (body.match(/^[A-Za-z][A-Za-z0-9:-]*/) || [""])[0].toLowerCase();
+  return {
+    name,
+    closing,
+    selfClosing: /\/\s*$/.test(body)
+  };
+}
+
+function excerptAround(text, index, length) {
+  const start = Math.max(0, index - 24);
+  const end = Math.min(text.length, index + length + 36);
+  return text.slice(start, end);
 }
 
 function hasPublicTrackingDebugTrace(html) {

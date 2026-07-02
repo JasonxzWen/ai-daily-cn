@@ -19,18 +19,18 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:73 -->
+<!-- order-tuning-total-unmapped:68 -->
 
-These counts come from the 145-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
+These counts come from the 157-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
 | `core_primary` | 3 | Phase 22 promotes the reviewed Apple, Meta Engineering, NVIDIA Developer, and xAI official sources; keep reviewing the remaining durable company/platform blogs. |
 | `china_models` | 20 | Phase 17 promotes the first five official China model sources; continue with platform/lab sources in later batches. |
-| `open_source_platforms` | 11 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
+| `open_source_platforms` | 1 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
 | `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
-| `builder_community` | 32 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
-| `platform_cn_media` | 5 | Promote stable Chinese media/platform clue sources after WeChat/Zhihu. |
+| `builder_community` | 41 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
+| `platform_cn_media` | 1 | Promote stable direct Chinese RSS/media clue sources only after they prove durable reader value. |
 | `english_media_search` | 2 | Keep most search/media aggregation low priority; Product Hunt can be promoted if product discovery remains useful. |
 
 ## Promotion Candidate Review
@@ -58,11 +58,11 @@ These candidates are proposed first-class logical sources. They are not merged i
 | `content-luma-changelog` | `luma-ai-products` | `builder_community` | 90 | `promote` | Luma changelog entries can carry useful image/video generation product updates. |
 | `content-smol-ai-news` | `smol-ai-news` | `builder_community` | 100 | `promote` | Smol AI News is a maintained AI news feed suitable for low-threshold discovery review. |
 | `content-the-magnifier-ai` | `the-magnifier-ai` | `builder_community` | 110 | `promote` | The Magnifier AI can remain a low-threshold analysis and discovery review candidate. |
-| `intermediary-qbitai` | `qbitai` | `platform_cn_media` | 30 | `promote` | QbitAI is a stable Chinese AI media clue source. |
-| `intermediary-jiqizhixin` | `machine-heart` | `platform_cn_media` | 40 | `promote` | Machine Heart is a durable Chinese AI media source. |
-| `intermediary-infoq-cn` | `infoq-cn` | `platform_cn_media` | 50 | `promote` | InfoQ CN is useful for Chinese enterprise/engineering AI signals. |
+| `content-pika-product` | `pika-ai-products` | `builder_community` | 120 | `promote` | Pika product updates can carry concrete AIGC/video workflow signals when dated and source-backed. |
+| `content-kling-product` | `kling-ai-products` | `builder_community` | 130 | `promote` | Kling product updates can carry China-facing AIGC/video product signals when concrete. |
 | `intermediary-sspai` | `sspai-ai` | `platform_cn_media` | 60 | `promote` | SSPAI can surface China-facing product and tool signals. |
-| `intermediary-36kr` | `36kr-ai` | `platform_cn_media` | 70 | `promote` | 36Kr is a lower-priority Chinese business/media clue source. |
+| `intermediary-leiphone` | `leiphone-ai` | `platform_cn_media` | 80 | `promote` | Leiphone can remain a lower-priority Chinese technology clue source if it proves useful. |
+| `intermediary-ifanr` | `ifanr-ai` | `platform_cn_media` | 90 | `promote` | iFanr can remain manual/review-only for product and consumer AI signals. |
 | `content-product-hunt-trending` | `product-hunt-trending` | `english_media_search` | 60 | `promote` | Product Hunt can be useful for product discovery after major English media. |
 | `content-product-hunt-devtools` | `product-hunt-devtools` | `english_media_search` | 70 | `promote` | Product Hunt developer tools is a narrower product-discovery lane. |
 

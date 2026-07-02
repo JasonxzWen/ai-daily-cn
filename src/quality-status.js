@@ -4,7 +4,6 @@ import { PublisherError } from "./errors.js";
 import { AUTOMATION_REVISION_RULES, AUTOMATION_REVISION_RULE_ALIASES } from "./automation-revision.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { normalizeUrlIdentity } from "./url.js";
-import { PLATFORM_TO_AUDIT_GROUP } from "./platform-exempt.js";
 import { degradationEventFromAuditGroup } from "./degradation-events.js";
 
 const BLOCKED_SOURCE_STATUSES = new Set(["blocked", "skipped_missing_token", "skipped_missing_base_url"]);
@@ -200,7 +199,6 @@ export function deriveQualityStatus(report, candidatePool = null) {
     degradedSections: sourceDegradedSections
   });
   addDailyTrackingDegradation({ report, reasons, affectedSections });
-  addPlatformSourceDegradation({ report, reasons, affectedSections });
 
   addSelectionDegradation({ report, candidatePool, reasons, affectedSections });
 
@@ -402,10 +400,7 @@ function degradedReasonForSection(reasons, section) {
     huggingface_trending: "huggingface_trending_blocked",
     hot_blogs: "content_sources_blocked",
     builder_observations: "builder_sources_blocked",
-    daily_tracking: "daily_tracking_source_blocked",
-    wechat_items: "wechat_sources_blocked",
-    zhihu_items: "zhihu_sources_blocked",
-    reddit_items: "reddit_sources_blocked"
+    daily_tracking: "daily_tracking_source_blocked"
   }[section];
   if (mapped && reasons.includes(mapped)) {
     return mapped;
@@ -860,7 +855,7 @@ function builderObservationContractViolations(report) {
 function strictEvidenceIssues(report, options = {}) {
   const assets = Array.isArray(report?.evidence_assets) ? report.evidence_assets : [];
   const itemUrls = new Set(
-    ["main_items", "model_releases", "hot_blogs", "projects", "daily_tracking", "builder_observations", "community_leads", "wechat_items", "zhihu_items", "reddit_items"]
+    ["main_items", "model_releases", "hot_blogs", "projects", "daily_tracking", "builder_observations", "community_leads"]
       .flatMap((section) => (Array.isArray(report?.[section]) ? report[section] : []))
       .map((item) => normalizeUrl(item?.url))
       .filter(Boolean)
@@ -1024,21 +1019,6 @@ function addDailyTrackingDegradation({ report, reasons, affectedSections }) {
   }
   reasons.push("daily_tracking_source_blocked");
   affectedSections.push("daily_tracking");
-}
-
-function addPlatformSourceDegradation({ report, reasons, affectedSections }) {
-  for (const [platform, groupName] of Object.entries(PLATFORM_TO_AUDIT_GROUP)) {
-    const section = `${platform}_items`;
-    const group = report?.source_audit?.[groupName];
-    if (!groupHasBlockingSignal(group)) {
-      continue;
-    }
-    if (sectionCount(report, section) > 0) {
-      continue;
-    }
-    reasons.push(`${groupName}_blocked`);
-    affectedSections.push(section);
-  }
 }
 
 function sourceAuditHasBlockedDailyTracker(sourceAudit) {

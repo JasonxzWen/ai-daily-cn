@@ -9,11 +9,13 @@
       "candidate_category": "community_lead",
       "tier": "T3",
       "authority": "intermediary",
-      "enablement": "optional",
+      "enablement": "core",
       "verification_policy": "primary_required",
       "requires_original_url": false,
       "max_items_per_run": 3,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "direct_rss_required_by_user": true,
+      "public_section_hint": "chinese_direct_rss"
     },
     {
       "id": "intermediary-qbitai",
@@ -23,11 +25,13 @@
       "candidate_category": "community_lead",
       "tier": "T3",
       "authority": "intermediary",
-      "enablement": "optional",
+      "enablement": "core",
       "verification_policy": "primary_required",
       "requires_original_url": false,
       "max_items_per_run": 20,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "direct_rss_required_by_user": true,
+      "public_section_hint": "chinese_direct_rss"
     },
     {
       "id": "intermediary-jiqizhixin",
@@ -41,7 +45,10 @@
       "verification_policy": "primary_required",
       "requires_original_url": false,
       "max_items_per_run": 20,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "direct_rss_required_by_user": true,
+      "public_section_hint": "chinese_direct_rss",
+      "notes": "Probe result 2026-07-01: https://www.jiqizhixin.com/rss returned HTTP 200 text/html instead of RSS/XML in this environment. Keep the currently working articles HTML index; do not claim a direct RSS feed until the endpoint returns XML."
     },
     {
       "id": "intermediary-leiphone",
@@ -65,11 +72,14 @@
       "candidate_category": "community_lead",
       "tier": "T3",
       "authority": "intermediary",
-      "enablement": "optional",
+      "enablement": "core",
       "verification_policy": "primary_required",
       "requires_original_url": false,
       "max_items_per_run": 3,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "direct_rss_required_by_user": true,
+      "public_section_hint": "chinese_direct_rss",
+      "notes": "Probe result 2026-07-01: https://www.infoq.cn/article/rss returned HTML; https://www.infoq.cn/feed returned XML and remains the active source."
     },
     {
       "id": "intermediary-sspai",

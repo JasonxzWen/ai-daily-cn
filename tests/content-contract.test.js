@@ -44,6 +44,34 @@ test("content contract is clean for authored story narrative", () => {
   assert.equal(result.degraded.filter((d) => d.code === "story_template_narrative").length, 0);
 });
 
+test("public copy gate blocks user-banned audit and AI-flavored wording for new reports", () => {
+  const report = {
+    ...storyFixture("OpenAI 披露模型能力更新，材料覆盖评测设置和候选池筛选。"),
+    report_date: "2026-07-01"
+  };
+  const result = evaluateDailyContentContract(report, {
+    html: "<main><h2>信源覆盖与缺口</h2><p>准入门槛通过。</p></main>"
+  });
+  const issues = result.issues.filter((issue) => issue.code === "public_copy_banned_audit_or_template_wording");
+  assert.equal(issues.length, 1);
+  assert(issues[0].examples.some((example) => example.term === "披露"));
+  assert(issues[0].examples.some((example) => example.term === "信源覆盖与缺口" || example.term === "准入门槛"));
+});
+
+test("public copy gate ignores internal source audit fields", () => {
+  const report = {
+    ...storyFixture("OpenAI 发布模型能力更新，说明评测设置和使用范围。"),
+    report_date: "2026-07-01",
+    source_audit: {
+      content_sources: {
+        notes: "内部信源审计可以记录披露、候选池和准入门槛这类诊断词。"
+      }
+    }
+  };
+  const result = evaluateDailyContentContract(report);
+  assert.equal(result.issues.filter((issue) => issue.code === "public_copy_banned_audit_or_template_wording").length, 0);
+});
+
 test("real artifact content contract scans report directory and surfaces blocking issues", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-content-contract-"));
   const dataDir = path.join(tmp, "reports-data", "2026", "06");
@@ -82,7 +110,9 @@ test("latest committed report carries no BLOCKING content-contract issues", () =
   found.sort();
   const latest = found[found.length - 1];
   assert.ok(latest, "a committed report must exist");
-  const result = evaluateDailyContentContract(JSON.parse(fs.readFileSync(latest, "utf8")));
+  const result = evaluateDailyContentContract(JSON.parse(fs.readFileSync(latest, "utf8")), {
+    enforcePublicCopyGate: false
+  });
   assert.deepEqual(
     result.issues.map((i) => i.code),
     [],

@@ -20,6 +20,7 @@ import { sanitizeTrackingComponentSnapshot } from "./tracking-components.js";
 import { sanitizePublicDegradationEvent } from "./degradation-events.js";
 import { loadOfficialBlogKnowledge, toPublicOfficialBlogKnowledge } from "./official-blog-knowledge.js";
 import { normalizeGithubReadmeSummary } from "./github-readme.js";
+import { isPublicSurfaceDietEnabled } from "./public-surface-policy.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
@@ -70,8 +71,26 @@ const PUBLIC_DATA_PRIVATE_KEYS = new Set([
   "publish_to_public"
 ]);
 const NON_PUBLIC_ASSET_ROLES = new Set(["icon", "favicon", "logo", "avatar", "thumbnail"]);
+const RETIRED_PLATFORM_SECTIONS = new Set(["wechat_items", "zhihu_items", "reddit_items"]);
 const SCREENSHOT_CAPTURE_RE = /(?:full[_-]?page|browser|viewport|screenshot|page[_-]?capture)/i;
-const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf|reddit|r\/machinelearning|r\/localllama)/i;
+const LEGACY_REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf|reddit|r\/machinelearning|r\/localllama)/i;
+const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf)/i;
+const COMMUNITY_HOTSPOT_SOURCE_RE = /(?:hnrss|hacker news|news\.ycombinator|reddit\.com\/r\/(?:machinelearning|localllama|singularity|artificial)|r\/(?:machinelearning|localllama|singularity|artificial))/i;
+const LEGACY_PUBLIC_SOURCE_FILTER_SECTIONS = [
+  "stories",
+  "main_items",
+  "model_releases",
+  "hot_blogs",
+  "chinese_media_dynamics",
+  "projects",
+  "github_trending",
+  "huggingface_trending",
+  "builder_observations",
+  "official_org_updates",
+  "wechat_items",
+  "zhihu_items",
+  "reddit_items"
+];
 const PUBLIC_SOURCE_FILTER_SECTIONS = [
   "stories",
   "main_items",
@@ -83,6 +102,7 @@ const PUBLIC_SOURCE_FILTER_SECTIONS = [
   "huggingface_trending",
   "builder_observations",
   "official_org_updates",
+  "community_leads",
   "wechat_items",
   "zhihu_items",
   "reddit_items"
@@ -593,6 +613,7 @@ function topicLookupByDate(trends) {
 }
 
 function dateSignalMetrics(feedReport = {}, report = {}) {
+  const surfaceDietEnabled = isPublicSurfaceDietEnabled(report);
   const stories = arrayValue(report.stories);
   const mainItems = arrayValue(report.main_items);
   const modelReleases = arrayValue(report.model_releases);
@@ -601,13 +622,15 @@ function dateSignalMetrics(feedReport = {}, report = {}) {
   const githubTrending = arrayValue(report.github_trending);
   const huggingFaceTrending = arrayValue(report.huggingface_trending);
   const builderObservations = arrayValue(report.builder_observations);
-  const communityLeads = [];
+  const communityLeads = surfaceDietEnabled ? arrayValue(report.community_leads).filter(isPublicCommunityHotspotItem) : [];
   const evidenceAssets = arrayValue(report.evidence_assets);
-  const platformItems = [
-    ...arrayValue(report.wechat_items),
-    ...arrayValue(report.zhihu_items),
-    ...arrayValue(report.reddit_items)
-  ];
+  const platformItems = surfaceDietEnabled
+    ? []
+    : [
+      ...arrayValue(report.wechat_items),
+      ...arrayValue(report.zhihu_items),
+      ...arrayValue(report.reddit_items)
+    ];
   const mainItemsCount = stories.length > 0 ? stories.length : mainItems.length > 0 ? mainItems.length : Number(feedReport.main_items || 0);
   const builderCount = builderObservations.length > 0 ? builderObservations.length : Number(feedReport.builder_observations || 0);
   const sectionCounts = [
@@ -703,24 +726,43 @@ function publicReportWithoutRemovedSources(report) {
   if (!report || typeof report !== "object") {
     return report;
   }
+  const surfaceDietEnabled = isPublicSurfaceDietEnabled(report);
+  const sourceFilterSections = surfaceDietEnabled ? PUBLIC_SOURCE_FILTER_SECTIONS : LEGACY_PUBLIC_SOURCE_FILTER_SECTIONS;
+  const removedSourceRe = surfaceDietEnabled ? REMOVED_PUBLIC_SOURCE_RE : LEGACY_REMOVED_PUBLIC_SOURCE_RE;
   const next = structuredClone(report);
-  for (const sectionName of PUBLIC_SOURCE_FILTER_SECTIONS) {
+  for (const sectionName of sourceFilterSections) {
     if (Array.isArray(next[sectionName])) {
-      next[sectionName] = next[sectionName].filter((item) => !isRemovedPublicSourceItem(item));
+      next[sectionName] = next[sectionName].filter((item) => !isRemovedPublicSourceItem(item, removedSourceRe));
     }
   }
-  delete next.community_leads;
+  if (surfaceDietEnabled && Array.isArray(next.community_leads)) {
+    next.community_leads = next.community_leads.filter(isPublicCommunityHotspotItem);
+    if (next.community_leads.length === 0) {
+      delete next.community_leads;
+    }
+  }
+  if (surfaceDietEnabled) {
+    delete next.wechat_items;
+    delete next.zhihu_items;
+    delete next.reddit_items;
+  } else {
+    delete next.community_leads;
+  }
   if (Array.isArray(next.source_effectiveness)) {
-    next.source_effectiveness = next.source_effectiveness.filter((row) => !isRemovedPublicSourceItem(row));
+    next.source_effectiveness = next.source_effectiveness.filter((row) => !isRemovedPublicSourceItem(row, removedSourceRe));
   }
   if (Array.isArray(next.hero_highlights)) {
-    next.hero_highlights = next.hero_highlights.filter((item) => !isRemovedPublicSourceItem(item));
+    next.hero_highlights = next.hero_highlights.filter((item) => !isRemovedPublicSourceItem(item, removedSourceRe));
   }
   return next;
 }
 
-function isRemovedPublicSourceItem(item) {
-  return REMOVED_PUBLIC_SOURCE_RE.test(publicSourceSearchText(item));
+function isRemovedPublicSourceItem(item, sourceRe = REMOVED_PUBLIC_SOURCE_RE) {
+  return sourceRe.test(publicSourceSearchText(item));
+}
+
+function isPublicCommunityHotspotItem(item) {
+  return COMMUNITY_HOTSPOT_SOURCE_RE.test(publicSourceSearchText(item));
 }
 
 function publicSourceSearchText(value) {
@@ -1035,12 +1077,27 @@ function withDefaultImportanceForReport(report) {
 }
 
 function publicReportData(report) {
+  const surfaceDietEnabled = isPublicSurfaceDietEnabled(report);
   const publicReport = publicReportWithoutRemovedSources(report);
   const result = sanitizePublicValue(publicReport);
-  delete result.community_leads;
+  if (surfaceDietEnabled) {
+    delete result.wechat_items;
+    delete result.zhihu_items;
+    delete result.reddit_items;
+  } else {
+    delete result.community_leads;
+  }
   result.stories = publicStories(publicReport?.stories);
   result.hero_highlights = publicHeroHighlights(publicReport?.hero_highlights);
-  const qualityStatus = publicQualityStatus(publicReport?.quality_status);
+  if (surfaceDietEnabled) {
+    result.community_leads = publicCommunityLeads(publicReport?.community_leads);
+    if (result.community_leads.length === 0) {
+      delete result.community_leads;
+    }
+  }
+  const qualityStatus = publicQualityStatus(publicReport?.quality_status, {
+    retiredPlatformMode: surfaceDietEnabled ? "remove" : "legacy"
+  });
   if (qualityStatus) {
     result.quality_status = qualityStatus;
   }
@@ -1053,6 +1110,12 @@ function publicReportData(report) {
   result.source_effectiveness = publicSourceEffectiveness(publicReport?.source_effectiveness);
   result.evidence_assets = publicEvidenceAssets(publicReport?.evidence_assets);
   return result;
+}
+
+function publicCommunityLeads(items = []) {
+  return arrayValue(items)
+    .filter(isPublicCommunityHotspotItem)
+    .map((item) => sanitizePublicValue(item));
 }
 
 function publicGithubTrending(items = []) {
@@ -1256,10 +1319,11 @@ function stripOfficialSnapshotIfUnpublishable(snapshot) {
   delete snapshot.official_component_snapshot;
 }
 
-function publicQualityStatus(status = {}) {
+function publicQualityStatus(status = {}, options = {}) {
   if (!status || typeof status !== "object") {
     return undefined;
   }
+  const retiredPlatformMode = options.retiredPlatformMode || "keep";
   const result = {};
   const statusValue = String(status.status || "").trim();
   if (statusValue) {
@@ -1269,17 +1333,38 @@ function publicQualityStatus(status = {}) {
   if (publicNote) {
     result.public_note = publicNote;
   }
-  const affectedSections = arrayValue(status.affected_sections).map((item) => String(item || "").trim()).filter(Boolean);
+  const affectedSections = arrayValue(status.affected_sections)
+    .map((item) => String(item || "").trim())
+    .filter(Boolean)
+    .filter((section) => retiredPlatformMode !== "remove" || !RETIRED_PLATFORM_SECTIONS.has(section));
   if (affectedSections.length > 0) {
     result.affected_sections = affectedSections;
   }
   const degradedEvents = arrayValue(status.degraded_sections)
     .map(sanitizePublicDegradationEvent)
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((event) => publicQualityEventAllowed(event, retiredPlatformMode));
   if (degradedEvents.length > 0) {
     result.degraded_events = degradedEvents;
   }
   return Object.keys(result).length > 0 ? result : undefined;
+}
+
+function publicQualityEventAllowed(event, retiredPlatformMode) {
+  const section = String(event?.section || "");
+  if (!RETIRED_PLATFORM_SECTIONS.has(section)) {
+    return true;
+  }
+  if (retiredPlatformMode === "remove") {
+    return false;
+  }
+  if (retiredPlatformMode !== "legacy") {
+    return true;
+  }
+  const code = String(event?.code || "");
+  return (section === "wechat_items" && code === "wechat_sources_blocked") ||
+    (section === "zhihu_items" && code === "zhihu_sources_blocked") ||
+    (section === "reddit_items" && code === "reddit_sources_blocked");
 }
 
 function publicEvidenceAssets(assets) {

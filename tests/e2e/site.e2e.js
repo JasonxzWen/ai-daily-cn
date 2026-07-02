@@ -310,23 +310,23 @@ structuredReport.source_effectiveness = [
     not_included_reason: "",
     statuses: ["checked"],
     candidate_count: 10,
-    included_count: 8,
+    included_count: 10,
     notes: "weekly language pools"
   },
   {
-    id: "wechat-platform",
-    name: "WeChat Platform",
-    role: "platform_signal",
-    configured: false,
+    id: "community-hotspots",
+    name: "Community Hotspots",
+    role: "community",
+    configured: true,
     reachable: false,
     parsed_recent: false,
     candidate_created: false,
     public_included: false,
-    not_included_reason: "not_configured_or_not_checked",
-    statuses: ["skipped_missing_base_url"],
+    not_included_reason: "blocked_or_unreachable",
+    statuses: ["blocked"],
     candidate_count: 0,
     included_count: 0,
-    notes: "RSSHUB_BASE_URL missing"
+    notes: "Reddit endpoint may be rate-limited; internal diagnostic only"
   }
 ];
 structuredReport.source_audit = {

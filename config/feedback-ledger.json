@@ -483,10 +483,10 @@
     {
       "id": "feedback/p1-public-source-coverage-visualization",
       "severity": "P1",
-      "status": "implemented",
-      "title": "Show source coverage as visual tags with collapsed details",
+      "status": "closed",
+      "title": "Superseded public source coverage visualization",
       "problem": "The public `source coverage and gaps` section regressed into a dense text list, hiding the actual visit status, gaps, and source-lane health from readers.",
-      "expected_behavior": "Public source coverage renders a compact visual summary with colored status tags and collapsed per-source details for GitHub Trending, Hugging Face Trending, China AI, blogs, Builder/X, OpenRouter/Artificial Analysis, WeChat, Zhihu, Reddit, search, and health lanes without exposing candidate pools or internal scoring.",
+      "expected_behavior": "Superseded on 2026-07-01 by the public surface diet: public daily pages no longer render source coverage/gaps. Source health and coverage details stay in internal diagnostics only.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -495,7 +495,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "public source coverage visualization uses tags and collapsed details",
+        "test_name": "public source coverage visualization is retired from public daily reports",
         "gate": "npm run validate"
       }
     },
@@ -587,10 +587,10 @@
     {
       "id": "feedback/p1-platform-exempt-discovery-wiring",
       "severity": "P1",
-      "status": "implemented",
-      "title": "Wire platform exempt discovery into daily runs",
+      "status": "closed",
+      "title": "Superseded platform exempt discovery wiring",
       "problem": "PR #68 added low-threshold WeChat, Zhihu, and Reddit discovery commands, but the daily runner did not execute those commands or pass their outputs into report:draft, so the feature was merged but ineffective.",
-      "expected_behavior": "Daily generation runs discover:wechat-platform, discover:zhihu-platform, and discover:reddit-platform before report:draft and includes their JSON artifacts in the report:draft input list. Kill-switched or empty platform sources produce auditable no-signal output rather than invented content.",
+      "expected_behavior": "Superseded on 2026-07-01. Daily generation no longer runs discover:wechat-platform, discover:zhihu-platform, or discover:reddit-platform. Direct Chinese RSS, GitHub watchlist, and community hotspots replace this lane.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -600,17 +600,17 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "daily runner wires platform exempt discovery outputs into report draft",
+        "test_name": "daily runner omits retired platform discovery outputs from report draft",
         "gate": "npm run validate"
       }
     },
     {
       "id": "feedback/p1-platform-exempt-public-rendering",
       "severity": "P1",
-      "status": "implemented",
-      "title": "Render platform exempt items as reader-facing weak signals",
+      "status": "closed",
+      "title": "Superseded platform exempt public rendering",
       "problem": "Low-threshold platform sections could technically work while still publishing internal discovery fields, machine-generated feed titles, or long English excerpts as reader content.",
-      "expected_behavior": "Public WeChat, Zhihu, and Reddit cards render concise reader-facing titles and summaries, keep only explicit weak-signal disclosure, and never expose source_id, rule_id, source_level, verification_status, matched_terms, why_watch, collection notes, or raw English thread dumps in public HTML.",
+      "expected_behavior": "Superseded on 2026-07-01. Public daily pages no longer render WeChat, Zhihu, or old Reddit platform cards; community hotspots are the only retained public community lane and old platform diagnostics stay internal.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -620,7 +620,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "platform exempt report sections require public audit disclosure and render independently",
+        "test_name": "public daily omits source coverage gaps and retired platform diagnostics",
         "gate": "npm run validate"
       }
     },
@@ -721,8 +721,8 @@
       "severity": "P1",
       "status": "implemented",
       "title": "Preserve editorial importance, blog density, and source gap visibility",
-      "problem": "Daily reports could miss the original model launch, split channel availability into separate main stories, render one-line hot blog summaries, recycle low-utility vendor PR, and hide WeChat/Zhihu source gaps from the public page.",
-      "expected_behavior": "Original model/provider launches outrank duplicate channel availability; channel availability is folded into the original story. Hot blogs expose 3-5 concrete public key points. Recent duplicate or low-utility vendor PRs are excluded or downgraded. Public daily pages show source coverage gaps for WeChat, Zhihu, Reddit/X, Builder, and content sources without exposing internal candidate pools or debug appendices.",
+      "problem": "Daily reports could miss the original model launch, split channel availability into separate main stories, render one-line hot blog summaries, recycle low-utility vendor PR, and lose source-gap evidence entirely.",
+      "expected_behavior": "Original model/provider launches outrank duplicate channel availability; channel availability is folded into the original story. Hot blogs expose concrete public summaries. Recent duplicate or low-utility vendor PRs are excluded or downgraded. Source gaps stay in internal diagnostics and public pages show only reader-relevant content, not source coverage or old platform gap sections.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -836,10 +836,10 @@
     {
       "id": "feedback/p1-platform-unconfigured-degraded",
       "severity": "P1",
-      "status": "implemented",
-      "title": "Disclose unconfigured platform sources",
-      "problem": "WeChat or Zhihu without a real configured entrypoint could silently disappear or be mistaken for a healthy no-signal run.",
-      "expected_behavior": "Placeholder, missing-base-url, or kill-switched WeChat/Zhihu sources keep daily publishing possible but set explicit degraded quality reasons and public affected sections.",
+      "status": "closed",
+      "title": "Retire unconfigured platform source degradation",
+      "problem": "WeChat or Zhihu without a real configured entrypoint used to require explicit degraded quality reasons, but the platform lanes are now retired from the default workflow.",
+      "expected_behavior": "Legacy WeChat/Zhihu source_audit fields may remain in old internal fixtures, but they do not create public degraded reasons, affected sections, or blocking issues. New durable coverage comes from the GitHub watchlist, direct Chinese RSS, and community hotspots.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -849,7 +849,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "unconfigured WeChat and Zhihu sources degrade without blocking publish",
+        "test_name": "retired WeChat and Zhihu source audit fields do not create public degradation",
         "gate": "npm run validate"
       }
     },
@@ -935,7 +935,7 @@
       "status": "implemented",
       "title": "Reset public daily IA and source effectiveness gates",
       "problem": "The public daily could still be technically generated while showing low-density sections, generic explanatory filler, translated X/Twitter commentary, table-like daily tracking regressions, hover-dim interactions, and no clear answer for whether each core source was configured, reachable, parsed, selected as candidate, and publicly included.",
-      "expected_behavior": "Public daily reports use edited stories as the main list, GitHub Trending as an independent Top 5-8 module, parsed compact daily tracking components, original X/Twitter text, collapsed/limited source coverage and community signals, no generic public filler copy, no hover dim/blur of sibling cards, clean-build reproducibility, and a source-effectiveness table with `configured`, `reachable`, `parsed_recent`, `candidate_created`, `public_included`, and `not_included_reason` for core official, aggregator, media, HN, and GitHub sources. README/API aggregators use source-specific health contracts and are not blocked by RSS/feed-like rules.",
+      "expected_behavior": "Public daily reports use edited stories as the main list, GitHub Trending as an independent Top10 module, parsed compact daily tracking components, original X/Twitter text, bottom community hotspots only when whitelisted, no public source coverage block, no generic public filler copy, no hover dim/blur of sibling cards, clean-build reproducibility, and a source-effectiveness table with `configured`, `reachable`, `parsed_recent`, `candidate_created`, `public_included`, and `not_included_reason` for core official, aggregator, media, HN/community hotspots, GitHub watchlist, and Chinese direct RSS sources. README/API aggregators use source-specific health contracts and are not blocked by RSS/feed-like rules.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1086,7 +1086,7 @@
       "status": "implemented",
       "title": "Generate the daily main list as deduped edited stories",
       "problem": "The public daily can become a long source-type report with duplicated URLs, repeated templated summaries, and generic main items such as `OpenAI更新AI 产品、平台或工程实践`, which fails the 3-minute reader goal even when publish succeeds.",
-      "expected_behavior": "The generator builds a main list of edited merged stories: default 8, maximum 12, fewer allowed when fewer qualify; no templated story is used to fill the quota; strong primary single-source stories may enter, secondary/community single-source items default to signal sections; same-day URL/factual duplicates merge into one story with sources; previous-7-report duplicates stay out unless materially updated; GitHub Trending remains a first-class visible Top 5-8 module; summary and trend claims derive from visible stories or signals; quality gates degrade by demoting bad story candidates and block only unusable artifacts, unverifiable main stories, or publish safety failures.",
+      "expected_behavior": "The generator builds a main list of edited merged stories: default 8, maximum 12, fewer allowed when fewer qualify; no templated story is used to fill the quota; strong primary single-source stories may enter, secondary/community single-source items default to signal sections; same-day URL/factual duplicates merge into one story with sources; previous-7-report duplicates stay out unless materially updated; GitHub Trending remains a first-class visible Top10 module; summary and trend claims derive from visible stories or signals; quality gates degrade by demoting bad story candidates and block only unusable artifacts, unverifiable main stories, or publish safety failures.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1186,7 +1186,7 @@
       "status": "implemented",
       "title": "Preserve public daily follow-up quality contracts",
       "problem": "Public daily pages can regress after IA changes: Artificial Analysis can expose empty score/cost/scatter tabs, story labels can use awkward bilingual wording or repeat `披露`, external links can stay in the same tab, GitHub Trending can show template README summaries, X/Twitter avatars can fail to localize, and platform/GitHub-watch source lanes can look ineffective or be misattributed.",
-      "expected_behavior": "Daily public reports hide uncollected Artificial Analysis tabs instead of rendering empty fallback panels; the story list is titled `今日主线`; story titles avoid repeated `披露`; every external report link opens a new tab with `noopener noreferrer`; GitHub Trending rejects `README 主要围绕`/`阅读时先看` template summaries and falls back to source/rank/star facts; Builder/X cards infer downloaded local avatars from `avatar_url`; source effectiveness includes explicit WeChat, Zhihu, and GitHub organization-watch rows and does not attribute GitHub Trending weekly candidates to RuanYF Weekly.",
+      "expected_behavior": "Daily public reports hide uncollected Artificial Analysis tabs instead of rendering empty fallback panels; the story list is titled `今日主线`; story titles avoid repeated `披露`; every external report link opens a new tab with `noopener noreferrer`; GitHub Trending rejects `README 主要围绕`/`阅读时先看` template summaries and falls back to source/rank/star facts; Builder/X cards infer downloaded local avatars from `avatar_url`; source effectiveness includes explicit GitHub watchlist, Chinese direct RSS, community hotspots, and GitHub organization-watch rows and does not attribute GitHub Trending weekly candidates to RuanYF Weekly.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1201,6 +1201,37 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily followups hide empty Artificial Analysis fallback tabs",
+        "gate": "npm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-public-surface-diet-source-reset",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep the public daily slim and bind the new source reset",
+      "problem": "The user repeatedly requested that public pages stop showing machine-audit/log wording and that new source requirements land durably, but prior iterations left old platform lanes, public source coverage, weak GitHub watch wiring, and AI-flavored public copy able to recur.",
+      "expected_behavior": "New public daily pages do not render source coverage/gaps, source_audit, candidate pools, access-gate wording, or banned terms such as `披露`. GitHub Trending renders as Top10. Default discovery no longer runs WeChat/Zhihu/old Reddit platform lanes. Registered sources include the requested GitHub watchlist, Chinese direct RSS, and bottom community hotspots; Reddit/HNRSS blockages remain internal diagnostics unless selected content itself affects reader judgment.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "docs/ai-daily-requirements-reconciliation.md",
+        "package.json",
+        "config/sources/github-watchlist.json",
+        "config/sources/community-hotspots.json",
+        "config/sources/intermediary-sources.json",
+        "config/source-display-contract.json",
+        "src/interaction-report.js",
+        "src/site.js",
+        "src/source-effectiveness.js",
+        "scripts/check-daily-content-contract.mjs",
+        "tasks/daily-publish-runbook.md",
+        "docs/codex-automation-setup.md",
+        "tests/unit.test.js",
+        "tests/content-contract.test.js"
+      ],
+      "validation": {
+        "command": "npm run test",
+        "test_name": "configured source reset includes GitHub watchlist, Chinese direct RSS, and community hotspots",
         "gate": "npm run validate"
       }
     },

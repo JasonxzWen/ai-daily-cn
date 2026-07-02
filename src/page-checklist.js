@@ -1,3 +1,8 @@
+import {
+  PUBLIC_SURFACE_DIET_START_GENERATED_AT,
+  PUBLIC_SURFACE_DIET_START_REPORT_DATE
+} from "./public-surface-policy.js";
+
 const FORBIDDEN_SECTION_TEXT = [
   "\u6a21\u578b\u53d1\u5e03",
   "\u4eca\u65e5\u503c\u5f97\u5173\u6ce8\u7684\u9879\u76ee",
@@ -57,7 +62,9 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     imageLoadTimedOut,
     publicImageMinWidth,
     publicImageMinHeight,
-    publicImageMinArea
+    publicImageMinArea,
+    publicSurfaceDietStartReportDate,
+    publicSurfaceDietStartGeneratedAt
   }) => {
     const checks = [];
     const issues = [];
@@ -254,6 +261,12 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     const githubTrendCards = githubTrendingSection ? Array.from(githubTrendingSection.querySelectorAll(".github-trending-card")) : [];
     const githubTrendRows = githubTrendingSection ? Array.from(githubTrendingSection.querySelectorAll("ol > li")) : [];
     const githubTrendItems = githubTrendCards.length > 0 ? githubTrendCards : githubTrendRows;
+    const pageGeneratedAt = document.querySelector("meta[name='generated-at']")?.getAttribute("content") || "";
+    const generatedTime = Date.parse(pageGeneratedAt);
+    const dietEnabled = Number.isFinite(generatedTime)
+      ? generatedTime >= Date.parse(publicSurfaceDietStartGeneratedAt)
+      : /^\d{4}-\d{2}-\d{2}$/.test(reportDate || "") && reportDate >= publicSurfaceDietStartReportDate;
+    const expectedGithubTrendCount = dietEnabled ? 10 : 8;
     const weakGithubTrendRows = githubTrendItems
       .map((row, index) => {
         const text = row.textContent?.replace(/\s+/g, " ").trim() || "";
@@ -270,12 +283,14 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       })
       .filter(Boolean);
     addCheck(
-      "github_trending_reader_facing_top5_to_8",
-      githubTrendItems.length >= 5 && githubTrendItems.length <= 8 && weakGithubTrendRows.length === 0,
-      "GitHub Trending should render Top 5 to 8 in the public page with README-grounded Chinese reader-facing summaries when README fetch succeeds.",
+      `github_trending_reader_facing_top${expectedGithubTrendCount}`,
+      githubTrendItems.length === expectedGithubTrendCount && weakGithubTrendRows.length === 0,
+      `GitHub Trending should render Top ${expectedGithubTrendCount} in the public page with README-grounded Chinese reader-facing summaries when README fetch succeeds.`,
       {
         count: githubTrendItems.length,
-        expected_count_range: "5..8",
+        expected_count: expectedGithubTrendCount,
+        generated_at: pageGeneratedAt,
+        public_surface_diet_enabled: dietEnabled,
         weak_rows: weakGithubTrendRows
       }
     );
@@ -808,7 +823,9 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     imageLoadTimedOut: imageLoad.timedOut,
     publicImageMinWidth: PUBLIC_CONTENT_IMAGE_MIN_WIDTH,
     publicImageMinHeight: PUBLIC_CONTENT_IMAGE_MIN_HEIGHT,
-    publicImageMinArea: PUBLIC_CONTENT_IMAGE_MIN_AREA
+    publicImageMinArea: PUBLIC_CONTENT_IMAGE_MIN_AREA,
+    publicSurfaceDietStartReportDate: PUBLIC_SURFACE_DIET_START_REPORT_DATE,
+    publicSurfaceDietStartGeneratedAt: PUBLIC_SURFACE_DIET_START_GENERATED_AT
   });
 
   return {
