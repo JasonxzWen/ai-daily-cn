@@ -6037,20 +6037,24 @@ test("public artifact privacy scan blocks local machine path leakage", async () 
   await fs.mkdir(path.join(tmp, "reports-data"), { recursive: true });
   await fs.writeFile(path.join(tmp, "docs/reports/report.html"), "<p>C:\\Users\\Admin\\.codex\\automations\\ai-daily</p>", "utf8");
   await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"ok\":true}", "utf8");
+  await fs.writeFile(path.join(tmp, "docs/index.html"), "<p>clean public index</p>", "utf8");
   const blocked = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
   assert.equal(blocked.ok, false);
   assert(blocked.findings.some((finding) => finding.pattern === "windows_user_path"));
 
   await fs.writeFile(path.join(tmp, "docs/reports/report.html"), "<p>https://mp.weixin.qq.com/s/example</p>", "utf8");
   await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"wechat_items\":[],\"source_effectiveness\":[],\"code\":\"content_sources_blocked\"}", "utf8");
+  await fs.writeFile(path.join(tmp, "docs/index.html"), "<p>Builder source coverage is degraded.</p>", "utf8");
   const publicDataBlocked = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
   assert.equal(publicDataBlocked.ok, false);
   assert(publicDataBlocked.findings.some((finding) => finding.pattern === "public_retired_platform_section"));
   assert(publicDataBlocked.findings.some((finding) => finding.pattern === "public_source_effectiveness"));
+  assert(publicDataBlocked.findings.some((finding) => finding.pattern === "public_source_coverage_wording"));
   assert(publicDataBlocked.findings.some((finding) => finding.pattern === "public_source_blocked_code"));
 
-  await fs.writeFile(path.join(tmp, "reports-data/internal.json"), "{\"wechat_items\":[],\"source_audit\":{}}", "utf8");
+  await fs.writeFile(path.join(tmp, "reports-data/internal.json"), "{\"wechat_items\":[],\"source_audit\":{},\"note\":\"Builder source coverage is degraded.\"}", "utf8");
   await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"ok\":true}", "utf8");
+  await fs.writeFile(path.join(tmp, "docs/index.html"), "<p>clean public index</p>", "utf8");
   const clean = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
   assert.equal(clean.ok, true, JSON.stringify(clean.findings));
 });
@@ -13210,6 +13214,11 @@ test("date index view model keeps chronological order and transparent signal str
   assert(dateIndex.items[1].strength.reasons.some((reason) => reason.id === "github_full"));
   assert.equal(dateIndex.items[1].highlights[0].title, "Main signal 1");
   assert.equal(dateIndex.items[1].quality.status, "degraded");
+  assert.equal(
+    dateIndex.items[1].quality.public_note,
+    "Some discovery coverage is degraded; this report may be incomplete."
+  );
+  assert.doesNotMatch(dateIndex.items[1].quality.public_note, /source coverage/i);
   assert.deepEqual(dateIndex.items[1].quality.affected_sections, ["builder_observations", "source_coverage"]);
   assert.equal(dateIndex.items[1].flags.has_degraded, true);
   assert.equal(dateIndex.items[1].top_topic.label, "coding agent");
@@ -13223,6 +13232,7 @@ test("date index view model keeps chronological order and transparent signal str
   assert(!serialized.includes("self_check"));
   assert(!serialized.includes("candidate_pool"));
   assert(!serialized.includes("Internal audit"));
+  assert(!serialized.includes("Builder and source coverage"));
 
   assert.equal(deriveDateSignalStrength({
     main_items_count: 5,

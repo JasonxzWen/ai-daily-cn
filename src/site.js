@@ -77,6 +77,7 @@ const SCREENSHOT_CAPTURE_RE = /(?:full[_-]?page|browser|viewport|screenshot|page
 const LEGACY_REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf|reddit|r\/machinelearning|r\/localllama)/i;
 const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf)/i;
 const COMMUNITY_HOTSPOT_SOURCE_RE = /(?:hnrss|hacker news|news\.ycombinator|reddit\.com\/r\/(?:machinelearning|localllama|singularity|artificial)|r\/(?:machinelearning|localllama|singularity|artificial))/i;
+const PUBLIC_DISCOVERY_DEGRADED_NOTE = "Some discovery coverage is degraded; this report may be incomplete.";
 const PUBLIC_QUALITY_SECTION_ALIASES = new Map([
   ["source_audit.github_trending", "github_trending"],
   ["source_audit.huggingface_trending", "huggingface_trending"],
@@ -1359,6 +1360,9 @@ function publicQualityNote(value) {
   const note = publicQualityMessage(value, "source_status").trim();
   if (!note) {
     return "";
+  }
+  if (/\bsource\s+coverage\b/i.test(note)) {
+    return PUBLIC_DISCOVERY_DEGRADED_NOTE;
   }
   if (/\bblocked audit trail\b|审计记录|信源审计|source[_ -]?audit/i.test(note)) {
     return "部分采集覆盖降级，公开页仅展示已核验内容。";

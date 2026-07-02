@@ -22,6 +22,7 @@ const LOCAL_INFO_PATTERNS = [
 
 const PUBLIC_DOCS_FORBIDDEN_PATTERNS = [
   { name: "public_source_effectiveness", pattern: /\bsource_effectiveness\b/i },
+  { name: "public_source_coverage_wording", pattern: /\bsource\s+coverage\b/i },
   { name: "public_source_audit", pattern: /\bsource_audit\b/i },
   { name: "public_self_check", pattern: /\bself_check\b/i },
   { name: "public_retired_platform_section", pattern: /\b(?:wechat_items|zhihu_items|reddit_items)\b/i },
