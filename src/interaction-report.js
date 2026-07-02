@@ -80,6 +80,34 @@ const PUBLIC_SOURCE_FILTER_SECTIONS = [
   "zhihu_items",
   "reddit_items"
 ];
+const PUBLIC_SECTION_RICH_ID_ALLOWLIST = Object.freeze(new Set([
+  "official-blog-updates",
+  "github-trending",
+  "huggingface-trending",
+  "trend-tracking",
+  "subscribed-rss",
+  "chinese-media-rss",
+  "twitter-discussion",
+  "other-github-repository-updates",
+  "community-hotspots",
+  "main-signal-cards",
+  "story-list"
+]));
+const PUBLIC_SECTION_TYPE_TITLE_ALLOWLIST = Object.freeze(new Set());
+const PUBLIC_SECTION_RICH_ID_DENYLIST = Object.freeze(new Set([
+  "public-source-coverage",
+  "source-signal-story",
+  "source-first-dashboard",
+  "system-operating-dashboard",
+  "source-status-focus",
+  "source-map",
+  "source-inventory"
+]));
+const PUBLIC_SECTION_RICH_ID_ALLOWED_PREFIXES = Object.freeze(["track-", "story-"]);
+const PUBLIC_SECTION_RICH_ID_DENIED_PREFIXES = Object.freeze(["source-map-group-", "source-inventory-group-"]);
+const PUBLIC_SECTION_GROUP_ALLOWLIST = Object.freeze(new Set(["main", "projects", "signals"]));
+const PUBLIC_SECTION_TYPE_ALLOWLIST = Object.freeze(new Set(["markdown", "filterable-cards"]));
+const PUBLIC_SECTION_TITLE_DENYLIST = Object.freeze(new Set(["微信公众号线索", "知乎线索", "Reddit 线索"]));
 
 const SOURCE_ICONS = new Map([
   ...Object.entries(CACHED_SOURCE_ICONS),
@@ -226,6 +254,7 @@ export function reportToInteractionInput(report, options = {}) {
   const rawReport = report && typeof report === "object" ? report : {};
   const includeInternalSections = options.includeInternalSections === true;
   const includeSourceFirstRuntimeSections = options.includeSourceFirstRuntimeSections === true;
+  const defaultPublicMode = !includeInternalSections && !includeSourceFirstRuntimeSections;
   const surfaceDietEnabled = isPublicSurfaceDietEnabled(rawReport);
   const renderReport = !includeInternalSections && !includeSourceFirstRuntimeSections && options.suppressRemovedPublicSources !== false
     ? publicReportWithoutRemovedSources(rawReport)
@@ -519,6 +548,8 @@ export function reportToInteractionInput(report, options = {}) {
     );
   }
 
+  const publicSections = defaultPublicMode ? filterPublicInteractionSections(sections) : sections;
+
   return {
     title: report.title,
     summary: dailyHeroSynopsis(report, { stories, mainItems, sourceEffectivenessRows }),
@@ -553,9 +584,39 @@ export function reportToInteractionInput(report, options = {}) {
       ],
       ...dailyIntent(report)
     },
-    sections,
+    sections: publicSections,
     nextActions: []
   };
+}
+
+function filterPublicInteractionSections(sections = []) {
+  return (Array.isArray(sections) ? sections : []).filter(isAllowedPublicInteractionSection);
+}
+
+function isAllowedPublicInteractionSection(section = {}) {
+  const richId = String(section?.richId || "").trim();
+  if (String(section?.group || "") === "verification") {
+    return false;
+  }
+  if (richId) {
+    if (PUBLIC_SECTION_RICH_ID_DENYLIST.has(richId)) {
+      return false;
+    }
+    if (PUBLIC_SECTION_RICH_ID_DENIED_PREFIXES.some((prefix) => richId.startsWith(prefix))) {
+      return false;
+    }
+    return PUBLIC_SECTION_RICH_ID_ALLOWLIST.has(richId)
+      || PUBLIC_SECTION_RICH_ID_ALLOWED_PREFIXES.some((prefix) => richId.startsWith(prefix));
+  }
+  const fallbackKey = `${section?.type || ""}:${section?.title || ""}`;
+  if (PUBLIC_SECTION_TITLE_DENYLIST.has(String(section?.title || ""))) {
+    return false;
+  }
+  if (PUBLIC_SECTION_TYPE_TITLE_ALLOWLIST.has(fallbackKey)) {
+    return true;
+  }
+  return PUBLIC_SECTION_GROUP_ALLOWLIST.has(String(section?.group || ""))
+    && PUBLIC_SECTION_TYPE_ALLOWLIST.has(String(section?.type || ""));
 }
 
 function formatSourceFirstRuntimeSections({
@@ -1356,7 +1417,7 @@ function mainItemCategoryLabel(item) {
 
 function emptyMainItemContent(context = {}) {
   if (context.report?.report_status === "empty_due_to_network_outage") {
-    return "本次固定信源发现面全部因网络不可用阻塞，未写入未核验主体事实。请展开“发布质量说明”和“信源审计”查看各来源状态。";
+    return "本次固定信息来源全部因网络不可用阻塞，未写入未核验主体事实。发布前请先恢复采集并重新生成日报。";
   }
   return "暂无已核验信号。";
 }
@@ -3148,13 +3209,7 @@ function formatTwitterDiscussion(items, auditGroup, options = {}) {
     return "";
   }
 
-  const checkedSources = Array.isArray(auditGroup.sources)
-    ? auditGroup.sources
-        .map((source) => `${source.name || "未知来源"}:${source.status || "unknown"}${source.notes ? `（${source.notes}）` : ""}`)
-        .join("；")
-    : "未记录具体来源";
-  const reason = auditGroup.blocked_reason || auditGroup.notes || "未入选近期原始 X/Twitter status。";
-  const content = `- **降级说明**：本轮已检查 X/Twitter 相关来源，但未形成可入选的原始 status 条目。原因：${reason}\n- **检查来源**：${checkedSources}`;
+  const content = "- **来源状态**：本轮 X/Twitter 讨论来源已检查，但未形成可入选的原始公开 status 条目。具体采集状态保留在内部诊断中。";
   return options.includeHeading ? `### X/Twitter 讨论\n\n${content}` : content;
 }
 

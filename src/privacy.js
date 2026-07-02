@@ -20,6 +20,15 @@ const LOCAL_INFO_PATTERNS = [
   { name: "file_url_local_path", pattern: /file:\/\/\/?(?:[A-Za-z]:|\/(?:Users|home|tmp)\b)/i }
 ];
 
+const PUBLIC_DOCS_FORBIDDEN_PATTERNS = [
+  { name: "public_source_effectiveness", pattern: /\bsource_effectiveness\b/i },
+  { name: "public_source_audit", pattern: /\bsource_audit\b/i },
+  { name: "public_self_check", pattern: /\bself_check\b/i },
+  { name: "public_retired_platform_section", pattern: /\b(?:wechat_items|zhihu_items|reddit_items)\b/i },
+  { name: "public_retired_platform_degradation", pattern: /\b(?:wechat_sources_blocked|zhihu_sources_blocked|reddit_sources_blocked)\b/i },
+  { name: "public_source_blocked_code", pattern: /\b[a-z0-9_]+_sources_blocked\b/i }
+];
+
 export async function scanPublicArtifactsForLocalInfo(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const targets = options.targets || PUBLIC_ARTIFACT_PATHS;
@@ -43,11 +52,15 @@ export async function scanPublicArtifactsForLocalInfo(options = {}) {
   const findings = [];
   for (const filePath of files) {
     const text = await fs.readFile(filePath, "utf8");
-    for (const { name, pattern } of patterns) {
+    const relativeFile = path.relative(rootDir, filePath).replace(/\\/g, "/");
+    const filePatterns = relativeFile.startsWith("docs/")
+      ? [...patterns, ...PUBLIC_DOCS_FORBIDDEN_PATTERNS]
+      : patterns;
+    for (const { name, pattern } of filePatterns) {
       const match = pattern.exec(text);
       if (match) {
         findings.push({
-          file: path.relative(rootDir, filePath).replace(/\\/g, "/"),
+          file: relativeFile,
           pattern: name,
           excerpt: redactExcerpt(text, match.index)
         });

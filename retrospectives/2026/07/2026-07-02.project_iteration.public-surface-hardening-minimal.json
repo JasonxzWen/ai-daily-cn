@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-02.project_iteration.public-surface-hardening-minimal",
+  "run_type": "project_iteration",
+  "date": "2026-07-02",
+  "title": "Minimal public surface hardening",
+  "slug": "public-surface-hardening-minimal",
+  "status": "completed",
+  "summary": "This iteration converts the accepted public-surface hardening plan into executable repair-and-prune constraints. Public data no longer exposes source_effectiveness, default public interaction input drops internal/source-runtime sections, the public copy gate blocks source effectiveness wording, retired platform discovery stages are invalid policy entries, and retired platform sections remain optional during report normalization.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/unit.test.js --test-name-pattern \"public data|public section contract|resilience policy|platform\"",
+      "node --test tests/content-contract.test.js --test-name-pattern \"public copy\"",
+      "node --test tests/unit.test.js --test-name-pattern \"platform|retired\"",
+      "npm run content:contract",
+      "npm run resilience:validate",
+      "npm run build",
+      "npm run privacy:validate",
+      "node scripts/check-daily-page.mjs --date <latest-date> --out docs --output .tmp/public-surface-page-check.json",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "npm run validate"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Public source diagnostics need runtime and artifact gates, not just prose instructions.",
+      "evidence": "Default interaction output now filters verification/source-runtime sections and public docs data omits source_effectiveness.",
+      "scope": "public_daily_surface",
+      "persistence": "implemented",
+      "recommended_action": "Keep public-facing source diagnostics out of default report generation unless a new reader-facing section is explicitly tested and approved."
+    },
+    {
+      "lesson": "Retired platform requirements should be optional on input and rejected as new discovery stages.",
+      "evidence": "Report normalization accepts absent WeChat/Zhihu/Reddit platform fields, while resilience policy validation rejects retired platform discovery stage ids.",
+      "scope": "daily_discovery_pipeline",
+      "persistence": "implemented",
+      "recommended_action": "Use direct RSS, GitHub watchlist, and community hotspots as the durable public lanes; keep retired platform diagnostics internal when legacy fixtures contain them."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "Future public reader sections with new rich ids can be filtered until the public allowlist is updated.",
+      "evidence": "The new filter favors the existing reader-facing rich ids and denies known source-runtime ids and prefixes.",
+      "module": "src/interaction-report.js",
+      "suggestion": "Add a focused test whenever introducing a new public section richId.",
+      "expected_benefit": "Prevents accidental public reintroduction of audit/runtime blocks while still allowing deliberate reader-facing additions.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Next public section addition review.",
+      "ledger_links": [
+        "feedback/p1-public-surface-diet-source-reset",
+        "feedback/p1-public-internal-report-separation"
+      ],
+      "validation_evidence": [
+        "public section contract test",
+        "content contract",
+        "page check"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-public-surface-diet-source-reset",
+    "feedback/p1-public-data-minimization",
+    "feedback/p1-public-internal-report-separation",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-platform-exempt-discovery-wiring",
+    "feedback/p1-platform-exempt-public-rendering",
+    "feedback/p1-daily-resilience-contract",
+    "feedback/p1-authoritative-retrospectives"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Before the next publish, run the daily dry-run on this revision and confirm public HTML/data still contain no source audit or source_effectiveness wording.",
+      "owner": "project"
+    }
+  ]
+}

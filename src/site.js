@@ -30,6 +30,7 @@ const PUBLIC_DATA_PRIVATE_KEYS = new Set([
   "candidate_id",
   "candidate_pool_path",
   "source_audit",
+  "source_effectiveness",
   "self_check",
   "quality_status",
   "source_window",
@@ -676,16 +677,14 @@ function dateSignalMetrics(feedReport = {}, report = {}) {
 
 function publicDateQuality(status = {}) {
   const value = status && typeof status === "object" ? status : {};
-  const rawStatus = String(value.status || "ok").toLowerCase();
+  const publicStatus = publicQualityStatus(value, { retiredPlatformMode: "remove" }) || {};
+  const rawStatus = String(publicStatus.status || value.status || "ok").toLowerCase();
   const normalizedStatus = ["ok", "degraded", "blocked"].includes(rawStatus) ? rawStatus : "ok";
-  const affectedSections = Array.isArray(value.affected_sections)
-    ? value.affected_sections.map((section) => String(section || "").trim()).filter(Boolean)
-    : [];
   return {
     status: normalizedStatus,
     label: normalizedStatus === "blocked" ? "阻断" : normalizedStatus === "degraded" ? "降级" : "正常",
-    public_note: String(value.public_note || "").trim(),
-    affected_sections: affectedSections
+    public_note: String(publicStatus.public_note || "").trim(),
+    affected_sections: arrayValue(publicStatus.affected_sections)
   };
 }
 
@@ -1088,11 +1087,10 @@ function publicReportData(report) {
   const surfaceDietEnabled = isPublicSurfaceDietEnabled(report);
   const publicReport = publicReportWithoutRemovedSources(report);
   const result = sanitizePublicValue(publicReport);
-  if (surfaceDietEnabled) {
-    delete result.wechat_items;
-    delete result.zhihu_items;
-    delete result.reddit_items;
-  } else {
+  delete result.wechat_items;
+  delete result.zhihu_items;
+  delete result.reddit_items;
+  if (!surfaceDietEnabled) {
     delete result.community_leads;
   }
   result.stories = publicStories(publicReport?.stories);
@@ -1104,7 +1102,7 @@ function publicReportData(report) {
     }
   }
   const qualityStatus = publicQualityStatus(publicReport?.quality_status, {
-    retiredPlatformMode: surfaceDietEnabled ? "remove" : "legacy"
+    retiredPlatformMode: "remove"
   });
   if (qualityStatus) {
     result.quality_status = qualityStatus;
@@ -1115,7 +1113,6 @@ function publicReportData(report) {
   result.github_trending = publicGithubTrending(publicReport?.github_trending);
   result.huggingface_trending = publicHuggingFaceTrending(publicReport?.huggingface_trending);
   result.projects = publicGithubProjects(publicReport?.projects);
-  result.source_effectiveness = publicSourceEffectiveness(publicReport?.source_effectiveness);
   result.evidence_assets = publicEvidenceAssets(publicReport?.evidence_assets);
   return result;
 }
@@ -1260,28 +1257,6 @@ function publicHeroHighlights(highlights = []) {
     });
 }
 
-function publicSourceEffectiveness(rows = []) {
-  return arrayValue(rows)
-    .filter((row) => row?.id && row?.name)
-    .map((row) => ({
-      id: String(row.id || ""),
-      name: String(row.name || ""),
-      role: String(row.role || ""),
-      configured: Boolean(row.configured),
-      reachable: Boolean(row.reachable),
-      parsed_recent: Boolean(row.parsed_recent),
-      candidate_created: Boolean(row.candidate_created),
-      public_included: Boolean(row.public_included),
-      not_included_reason: String(row.not_included_reason || ""),
-      source_ids: arrayValue(row.source_ids).map((item) => String(item || "")).filter(Boolean),
-      source_kinds: arrayValue(row.source_kinds).map((item) => String(item || "")).filter(Boolean),
-      statuses: arrayValue(row.statuses).map((item) => String(item || "")).filter(Boolean),
-      candidate_count: Number.isInteger(row.candidate_count) ? row.candidate_count : 0,
-      included_count: Number.isInteger(row.included_count) ? row.included_count : 0,
-      notes: String(row.notes || "")
-    }));
-}
-
 function sanitizePublicValue(value, key = "") {
   if (Array.isArray(value)) {
     return value.map((item) => sanitizePublicValue(item, key));
@@ -1337,7 +1312,7 @@ function publicQualityStatus(status = {}, options = {}) {
   if (statusValue) {
     result.status = statusValue;
   }
-  const publicNote = String(status.public_note || "").trim();
+  const publicNote = publicQualityNote(status.public_note);
   if (publicNote) {
     result.public_note = publicNote;
   }
@@ -1351,9 +1326,10 @@ function publicQualityStatus(status = {}, options = {}) {
   }
   const degradedEvents = arrayValue(status.degraded_sections)
     .map(sanitizePublicDegradationEvent)
-    .map(publicQualityEvent)
     .filter(Boolean)
-    .filter((event) => publicQualityEventAllowed(event, retiredPlatformMode));
+    .filter((event) => publicQualityEventAllowed(event, retiredPlatformMode))
+    .map(publicQualityEvent)
+    .filter(Boolean);
   if (degradedEvents.length > 0) {
     result.degraded_events = degradedEvents;
   }
@@ -1368,15 +1344,30 @@ function publicQualityEvent(event) {
   if (!section) {
     return null;
   }
-  return {
-    ...event,
+  const result = {
     section,
     message: publicQualityMessage(event.message, section)
   };
+  const severity = String(event.severity || "").trim();
+  if (severity) {
+    result.severity = severity;
+  }
+  return result;
+}
+
+function publicQualityNote(value) {
+  const note = publicQualityMessage(value, "source_status").trim();
+  if (!note) {
+    return "";
+  }
+  if (/\bblocked audit trail\b|审计记录|信源审计|source[_ -]?audit/i.test(note)) {
+    return "部分采集覆盖降级，公开页仅展示已核验内容。";
+  }
+  return note;
 }
 
 function publicQualityMessage(value, section) {
-  return String(value || "").replace(/source_audit[._-][a-z0-9_-]+/gi, section);
+  return String(value || "").replace(/\bsource_audit(?:[._-][a-z0-9_-]+)?\b/gi, section);
 }
 
 function publicQualitySection(value) {
@@ -1387,7 +1378,7 @@ function publicQualitySection(value) {
   if (PUBLIC_QUALITY_SECTION_ALIASES.has(section)) {
     return PUBLIC_QUALITY_SECTION_ALIASES.get(section);
   }
-  if (/^source_audit[._-]/i.test(section)) {
+  if (section === "source_audit" || /^source_audit[._-]/i.test(section)) {
     return "source_status";
   }
   return section;

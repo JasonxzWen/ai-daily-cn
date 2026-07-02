@@ -571,7 +571,7 @@
       "status": "implemented",
       "title": "Public docs data must not expose internal drafting state",
       "problem": "The public GitHub Pages data artifact under docs/data exposed internal fields such as candidate_id, source_audit, self_check, why_it_matters, reader_relevance, watch_next, and full candidate pools.",
-      "expected_behavior": "Build output writes a reader-safe docs/data report that omits internal audit, self-check, candidate, scoring, rationale, and publish-debug fields. Candidate pools stay in reports-data only and are not copied to public docs/data by default.",
+      "expected_behavior": "Build output writes a reader-safe docs/data report that omits internal audit, self-check, candidate, scoring, rationale, source_effectiveness rows, source-level diagnostics, and publish-debug fields. Candidate pools stay in reports-data only and are not copied to public docs/data by default.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -935,7 +935,7 @@
       "status": "implemented",
       "title": "Reset public daily IA and source effectiveness gates",
       "problem": "The public daily could still be technically generated while showing low-density sections, generic explanatory filler, translated X/Twitter commentary, table-like daily tracking regressions, hover-dim interactions, and no clear answer for whether each core source was configured, reachable, parsed, selected as candidate, and publicly included.",
-      "expected_behavior": "Public daily reports use edited stories as the main list, GitHub Trending as an independent Top10 module, parsed compact daily tracking components, original X/Twitter text, bottom community hotspots only when whitelisted, no public source coverage block, no generic public filler copy, no hover dim/blur of sibling cards, clean-build reproducibility, and a source-effectiveness table with `configured`, `reachable`, `parsed_recent`, `candidate_created`, `public_included`, and `not_included_reason` for core official, aggregator, media, HN/community hotspots, GitHub watchlist, and Chinese direct RSS sources. README/API aggregators use source-specific health contracts and are not blocked by RSS/feed-like rules.",
+      "expected_behavior": "Public daily reports use edited stories as the main list, GitHub Trending as an independent Top10 module, parsed compact daily tracking components, original X/Twitter text, bottom community hotspots only when whitelisted, no public source coverage block, no generic public filler copy, no hover dim/blur of sibling cards, and clean-build reproducibility. Internal source-effectiveness diagnostics still record `configured`, `reachable`, `parsed_recent`, `candidate_created`, `public_included`, and `not_included_reason` for core official, aggregator, media, HN/community hotspots, GitHub watchlist, and Chinese direct RSS sources, but public docs/data and reports do not expose `source_effectiveness` or source-level diagnostics. README/API aggregators use source-specific health contracts and are not blocked by RSS/feed-like rules.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1186,7 +1186,7 @@
       "status": "implemented",
       "title": "Preserve public daily follow-up quality contracts",
       "problem": "Public daily pages can regress after IA changes: Artificial Analysis can expose empty score/cost/scatter tabs, story labels can use awkward bilingual wording or repeat `披露`, external links can stay in the same tab, GitHub Trending can show template README summaries, X/Twitter avatars can fail to localize, and platform/GitHub-watch source lanes can look ineffective or be misattributed.",
-      "expected_behavior": "Daily public reports hide uncollected Artificial Analysis tabs instead of rendering empty fallback panels; the story list is titled `今日主线`; story titles avoid repeated `披露`; every external report link opens a new tab with `noopener noreferrer`; GitHub Trending rejects `README 主要围绕`/`阅读时先看` template summaries and falls back to source/rank/star facts; Builder/X cards infer downloaded local avatars from `avatar_url`; source effectiveness includes explicit GitHub watchlist, Chinese direct RSS, community hotspots, and GitHub organization-watch rows and does not attribute GitHub Trending weekly candidates to RuanYF Weekly.",
+      "expected_behavior": "Daily public reports hide uncollected Artificial Analysis tabs instead of rendering empty fallback panels; the story list is titled `今日主线`; story titles avoid repeated `披露`; every external report link opens a new tab with `noopener noreferrer`; GitHub Trending rejects `README 主要围绕`/`阅读时先看` template summaries and falls back to source/rank/star facts; Builder/X cards infer downloaded local avatars from `avatar_url`; internal source effectiveness includes explicit GitHub watchlist, Chinese direct RSS, community hotspots, and GitHub organization-watch rows and does not attribute GitHub Trending weekly candidates to RuanYF Weekly; public output uses source links and reader-facing tracking without exposing public `source_effectiveness` rows.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1210,7 +1210,7 @@
       "status": "implemented",
       "title": "Keep the public daily slim and bind the new source reset",
       "problem": "The user repeatedly requested that public pages stop showing machine-audit/log wording and that new source requirements land durably, but prior iterations left old platform lanes, public source coverage, weak GitHub watch wiring, and AI-flavored public copy able to recur.",
-      "expected_behavior": "New public daily pages do not render source coverage/gaps, source_audit, candidate pools, access-gate wording, or banned terms such as `披露`. GitHub Trending renders as Top10. Default discovery no longer runs WeChat/Zhihu/old Reddit platform lanes. Registered sources include the requested GitHub watchlist, Chinese direct RSS, and bottom community hotspots; Reddit/HNRSS blockages remain internal diagnostics unless selected content itself affects reader judgment.",
+      "expected_behavior": "New public daily pages do not render source coverage/gaps, source_audit, source_effectiveness/source effectiveness wording, verification sections, source-first runtime dashboards, candidate pools, access-gate wording, or banned terms such as `披露`. GitHub Trending renders as Top10. Default discovery no longer runs WeChat/Zhihu/old Reddit platform lanes. Registered sources include the requested GitHub watchlist, Chinese direct RSS, and bottom community hotspots; Reddit/HNRSS blockages remain internal diagnostics unless selected content itself affects reader judgment.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",

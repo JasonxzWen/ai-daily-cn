@@ -542,7 +542,6 @@
     }
   ],
   "generated_at": "2026-06-01T16:00:00+08:00",
-  "source_effectiveness": [],
   "stories": [
     {
       "story_id": "main-github-copilot-billing-june1",
@@ -709,9 +708,6 @@
   "chinese_media_dynamics": [],
   "daily_tracking": [],
   "official_org_updates": [],
-  "wechat_items": [],
-  "zhihu_items": [],
-  "reddit_items": [],
   "quality_status": {
     "status": "degraded",
     "public_note": "Builder source coverage is degraded; Builder observations may be incomplete.",
@@ -720,14 +716,9 @@
     ],
     "degraded_events": [
       {
-        "code": "builder_sources_blocked",
         "section": "builder_observations",
-        "severity": "degraded",
         "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
-        "source": {
-          "name": "follow-builders podcast feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json"
-        }
+        "severity": "degraded"
       }
     ]
   }

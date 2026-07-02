@@ -913,7 +913,8 @@ function renderQualityDetail(quality = {}) {
   const sections = Array.isArray(quality.affected_sections) && quality.affected_sections.length > 0
     ? `影响板块：${quality.affected_sections.map((section) => escapeHtml(section)).join("、")}。`
     : "";
-  return `<p>${escapeHtml(quality.public_note || "该日期存在覆盖或数据质量降级，需要阅读详情页核对。")} ${sections}</p>`;
+  const note = escapeHtml(quality.public_note || "该日期存在覆盖或数据质量降级，需要阅读详情页核对。");
+  return `<p>${sections ? `${note} ${sections}` : note}</p>`;
 }
 
 function renderDateHighlights(highlights) {

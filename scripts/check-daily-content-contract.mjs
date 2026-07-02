@@ -21,6 +21,8 @@ const PUBLIC_COPY_BANNED_TERMS = [
   "信源覆盖与缺口",
   "发布质量说明",
   "source_audit",
+  "source_effectiveness",
+  "source effectiveness",
   "self_check",
   "candidate_id",
   "材料覆盖",
