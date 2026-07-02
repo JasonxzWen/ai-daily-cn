@@ -72,6 +72,34 @@ test("public copy gate ignores internal source audit fields", () => {
   assert.equal(result.issues.filter((issue) => issue.code === "public_copy_banned_audit_or_template_wording").length, 0);
 });
 
+test("public copy gate blocks source effectiveness snake case wording", () => {
+  const report = {
+    ...storyFixture("OpenAI 发布模型能力更新，说明评测设置和使用范围。"),
+    report_date: "2026-07-01"
+  };
+  const result = evaluateDailyContentContract(report, {
+    html: "<main><p>source_effectiveness is internal diagnostics.</p></main>"
+  });
+  const issue = result.issues.find((item) => item.code === "public_copy_banned_audit_or_template_wording");
+
+  assert(issue);
+  assert(issue.examples.some((example) => example.term === "source_effectiveness"));
+});
+
+test("public copy gate blocks source effectiveness spaced wording", () => {
+  const report = {
+    ...storyFixture("OpenAI 发布模型能力更新，说明评测设置和使用范围。"),
+    report_date: "2026-07-01"
+  };
+  const result = evaluateDailyContentContract(report, {
+    html: "<main><p>source effectiveness is internal diagnostics.</p></main>"
+  });
+  const issue = result.issues.find((item) => item.code === "public_copy_banned_audit_or_template_wording");
+
+  assert(issue);
+  assert(issue.examples.some((example) => example.term === "source effectiveness"));
+});
+
 test("real artifact content contract scans report directory and surfaces blocking issues", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-content-contract-"));
   const dataDir = path.join(tmp, "reports-data", "2026", "06");

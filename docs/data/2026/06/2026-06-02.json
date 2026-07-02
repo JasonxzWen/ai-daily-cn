@@ -521,7 +521,6 @@
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-02.html",
   "html_path": "reports/2026/06/2026-06-02.html",
   "generated_at": "2026-06-02T06:14:41.487Z",
-  "source_effectiveness": [],
   "stories": [
     {
       "story_id": "main-openai-aws-frontier-codex",
@@ -688,9 +687,6 @@
   "chinese_media_dynamics": [],
   "daily_tracking": [],
   "official_org_updates": [],
-  "wechat_items": [],
-  "zhihu_items": [],
-  "reddit_items": [],
   "quality_status": {
     "status": "degraded",
     "public_note": "Content source and Builder source coverage is degraded; those sections may be incomplete.",
@@ -700,60 +696,44 @@
     ],
     "degraded_events": [
       {
-        "code": "content_sources_blocked",
         "section": "hot_blogs",
-        "severity": "degraded",
         "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
-        "source": {
-          "name": "Reddit r/MachineLearning",
-          "url": "https://www.reddit.com/r/MachineLearning/.json"
-        }
+        "severity": "degraded"
       },
       {
-        "code": "builder_sources_blocked",
         "section": "builder_observations",
-        "severity": "degraded",
         "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
-        "source": {
-          "name": "follow-builders podcast feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json"
-        }
+        "severity": "degraded"
       },
       {
-        "code": "huggingface_trending_below_strict_minimum",
         "section": "huggingface_trending",
-        "severity": "degraded",
-        "message": "huggingface_trending below strict publish minimum: 0/10."
+        "message": "huggingface_trending below strict publish minimum: 0/10.",
+        "severity": "degraded"
       },
       {
-        "code": "hot_blogs_below_strict_minimum",
         "section": "hot_blogs",
-        "severity": "degraded",
-        "message": "hot_blogs below strict publish minimum: 3/6."
+        "message": "hot_blogs below strict publish minimum: 3/6.",
+        "severity": "degraded"
       },
       {
-        "code": "projects_below_strict_minimum",
         "section": "projects",
-        "severity": "degraded",
-        "message": "projects below strict publish minimum: 3/8."
+        "message": "projects below strict publish minimum: 3/8.",
+        "severity": "degraded"
       },
       {
-        "code": "builder_observations_below_strict_minimum",
         "section": "builder_observations",
-        "severity": "degraded",
-        "message": "builder_observations below strict publish minimum: 3/8."
+        "message": "builder_observations below strict publish minimum: 3/8.",
+        "severity": "degraded"
       },
       {
-        "code": "fixed_source_e_public_apis",
-        "section": "source_audit",
-        "severity": "degraded",
-        "message": "E. public APIs and paper sources missing from final source_audit: arXiv cs.CL, arXiv cs.LG."
+        "section": "source_status",
+        "message": "E. public APIs and paper sources missing from final source_status: arXiv cs.CL, arXiv cs.LG.",
+        "severity": "degraded"
       },
       {
-        "code": "public_evidence_asset_invalid",
         "section": "evidence_assets",
-        "severity": "degraded",
-        "message": "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots."
+        "message": "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots.",
+        "severity": "degraded"
       }
     ]
   }

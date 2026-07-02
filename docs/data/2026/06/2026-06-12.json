@@ -2104,15 +2104,11 @@
       "importance": "notable"
     }
   ],
-  "wechat_items": [],
-  "zhihu_items": [],
-  "reddit_items": [],
   "evidence_assets": [],
   "generated_at": "2026-06-12T10:28:57.162Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-12.html",
   "html_path": "reports/2026/06/2026-06-12.html",
-  "source_effectiveness": [],
   "stories": [
     {
       "story_id": "main-content-anthropic-news-dxc-will-integrate-claude-into-the-systems-banks-airlines",
@@ -2281,59 +2277,33 @@
     "affected_sections": [
       "huggingface_trending",
       "daily_tracking",
-      "wechat_items",
-      "zhihu_items",
-      "reddit_items",
       "builder_observations"
     ],
     "degraded_events": [
       {
-        "code": "huggingface_trending_blocked",
         "section": "huggingface_trending",
-        "severity": "degraded",
-        "message": "huggingface_trending coverage is degraded and should be disclosed in the public report."
+        "message": "huggingface_trending coverage is degraded and should be disclosed in the public report.",
+        "severity": "degraded"
       },
       {
-        "code": "daily_tracking_source_blocked",
         "section": "daily_tracking",
-        "severity": "degraded",
-        "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。"
+        "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。",
+        "severity": "degraded"
       },
       {
-        "code": "wechat_sources_blocked",
-        "section": "wechat_items",
-        "severity": "degraded",
-        "message": "wechat_items coverage is degraded and should be disclosed in the public report."
-      },
-      {
-        "code": "zhihu_sources_blocked",
-        "section": "zhihu_items",
-        "severity": "degraded",
-        "message": "zhihu_items coverage is degraded and should be disclosed in the public report."
-      },
-      {
-        "code": "reddit_sources_blocked",
-        "section": "reddit_items",
-        "severity": "degraded",
-        "message": "reddit_items coverage is degraded and should be disclosed in the public report."
-      },
-      {
-        "code": "builder_observations_selection_degraded",
         "section": "builder_observations",
-        "severity": "degraded",
-        "message": "builder_observations coverage is degraded and should be disclosed in the public report."
+        "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
+        "severity": "degraded"
       },
       {
-        "code": "non_primary_source_disclosure_missing",
         "section": "hot_blogs",
-        "severity": "degraded",
-        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes."
+        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes.",
+        "severity": "degraded"
       },
       {
-        "code": "fixed_source_e_public_apis",
-        "section": "source_audit",
-        "severity": "degraded",
-        "message": "E. public APIs and paper sources missing from final source_audit: arXiv cs.CL, arXiv cs.LG."
+        "section": "source_status",
+        "message": "E. public APIs and paper sources missing from final source_status: arXiv cs.CL, arXiv cs.LG.",
+        "severity": "degraded"
       }
     ]
   }

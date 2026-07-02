@@ -365,7 +365,6 @@
   ],
   "evidence_assets": [],
   "generated_at": "2026-05-30T18:48:38.339Z",
-  "source_effectiveness": [],
   "stories": [
     {
       "story_id": "main-openai-third-party-eval-playbook",
@@ -412,43 +411,29 @@
   "chinese_media_dynamics": [],
   "daily_tracking": [],
   "official_org_updates": [],
-  "wechat_items": [],
-  "zhihu_items": [],
-  "reddit_items": [],
   "quality_status": {
     "status": "degraded",
-    "public_note": "固定发现命令在本地 shell 网络中失败；本报告使用已核验的 web fallback 来源并保留 blocked 审计记录。",
+    "public_note": "部分采集覆盖降级，公开页仅展示已核验内容。",
     "affected_sections": [
       "hot_blogs",
       "builder_observations",
-      "source_audit"
+      "source_status"
     ],
     "degraded_events": [
       {
-        "code": "content_sources_blocked",
         "section": "hot_blogs",
-        "severity": "degraded",
         "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
-        "source": {
-          "name": "Registered content sources",
-          "url": "https://github.com/jasonxzwen/ai-daily-cn/tree/main/config/sources"
-        }
+        "severity": "degraded"
       },
       {
-        "code": "builder_sources_blocked",
         "section": "builder_observations",
-        "severity": "degraded",
         "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
-        "source": {
-          "name": "follow-builders X feed",
-          "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json"
-        }
+        "severity": "degraded"
       },
       {
-        "code": "content_sources_blocked",
-        "section": "source_audit",
-        "severity": "degraded",
-        "message": "source_audit coverage is degraded and should be disclosed in the public report."
+        "section": "source_status",
+        "message": "source_status coverage is degraded and should be disclosed in the public report.",
+        "severity": "degraded"
       }
     ]
   }

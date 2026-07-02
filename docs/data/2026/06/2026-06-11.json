@@ -1040,15 +1040,11 @@
       "image_urls": []
     }
   ],
-  "wechat_items": [],
-  "zhihu_items": [],
-  "reddit_items": [],
   "evidence_assets": [],
   "generated_at": "2026-06-11T02:25:41.940Z",
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-11.html",
   "html_path": "reports/2026/06/2026-06-11.html",
-  "source_effectiveness": [],
   "stories": [
     {
       "story_id": "main-content-openai-news-access-openai-models-and-codex-through-your-oracle-cloud-com",
@@ -1219,64 +1215,43 @@
     "public_note": "Report generation is blocked by a startup or validation failure.",
     "affected_sections": [
       "hot_blogs",
-      "daily_tracking",
-      "wechat_items",
-      "zhihu_items"
+      "daily_tracking"
     ],
     "degraded_events": [
       {
-        "code": "content_sources_blocked",
         "section": "hot_blogs",
-        "severity": "degraded",
-        "message": "hot_blogs coverage is degraded and should be disclosed in the public report."
+        "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
+        "severity": "degraded"
       },
       {
-        "code": "daily_tracking_source_blocked",
         "section": "daily_tracking",
-        "severity": "degraded",
-        "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。"
+        "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。",
+        "severity": "degraded"
       },
       {
-        "code": "wechat_sources_blocked",
-        "section": "wechat_items",
-        "severity": "degraded",
-        "message": "wechat_items coverage is degraded and should be disclosed in the public report."
-      },
-      {
-        "code": "zhihu_sources_blocked",
-        "section": "zhihu_items",
-        "severity": "degraded",
-        "message": "zhihu_items coverage is degraded and should be disclosed in the public report."
-      },
-      {
-        "code": "hot_blogs_below_strict_minimum",
         "section": "hot_blogs",
-        "severity": "degraded",
-        "message": "hot_blogs below strict publish minimum: 4/6."
+        "message": "hot_blogs below strict publish minimum: 4/6.",
+        "severity": "degraded"
       },
       {
-        "code": "huggingface_trending_below_strict_minimum",
         "section": "huggingface_trending",
-        "severity": "degraded",
-        "message": "huggingface_trending below strict publish minimum: 0/10."
+        "message": "huggingface_trending below strict publish minimum: 0/10.",
+        "severity": "degraded"
       },
       {
-        "code": "non_primary_source_disclosure_missing",
         "section": "builder_observations",
-        "severity": "degraded",
-        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes."
+        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes.",
+        "severity": "degraded"
       },
       {
-        "code": "fixed_source_e_public_apis",
-        "section": "source_audit",
-        "severity": "degraded",
-        "message": "E. public APIs and paper sources missing from final source_audit: arXiv cs.CL, arXiv cs.LG."
+        "section": "source_status",
+        "message": "E. public APIs and paper sources missing from final source_status: arXiv cs.CL, arXiv cs.LG.",
+        "severity": "degraded"
       },
       {
-        "code": "public_evidence_asset_invalid",
         "section": "evidence_assets",
-        "severity": "degraded",
-        "message": "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots."
+        "message": "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots.",
+        "severity": "degraded"
       }
     ]
   }

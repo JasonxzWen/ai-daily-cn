@@ -36,6 +36,11 @@ const EXTRA_REQUIRED_STAGE_IDS = [
   "retrospective_correction_write",
   "retrospective_correction_validate"
 ];
+const RETIRED_DISCOVERY_STAGE_IDS = new Set([
+  "discover_wechat_platform",
+  "discover_zhihu_platform",
+  "discover_reddit_platform"
+]);
 
 const DOC_MARKERS = [
   {
@@ -179,6 +184,9 @@ function validatePolicyDocument({ policy, failures, requiredStageIds }) {
       failures.push(`config/daily-resilience-policy.json: duplicate stage id ${JSON.stringify(stage.id)}.`);
     }
     seen.add(stage.id);
+    if (RETIRED_DISCOVERY_STAGE_IDS.has(stage.id)) {
+      failures.push(`config/daily-resilience-policy.json: retired platform discovery stage ${stage.id} must not be registered.`);
+    }
     validateStagePolicy({ stage, label: `${label} (${stage.id})`, blockingWhitelist, failures });
   }
 

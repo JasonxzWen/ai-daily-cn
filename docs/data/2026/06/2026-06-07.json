@@ -681,7 +681,6 @@
   "report_status": "normal",
   "canonical_url": "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/06/2026-06-07.html",
   "html_path": "reports/2026/06/2026-06-07.html",
-  "source_effectiveness": [],
   "stories": [
     {
       "story_id": "main-content-cloudflare-blog-your-ai-bill-is-out-of-control-cloudflare-can-fix-it-now",
@@ -707,9 +706,6 @@
   "huggingface_trending": [],
   "chinese_media_dynamics": [],
   "official_org_updates": [],
-  "wechat_items": [],
-  "zhihu_items": [],
-  "reddit_items": [],
   "quality_status": {
     "status": "degraded",
     "public_note": "本轮每日追踪源部分受阻；受影响榜单只保留抓取状态，不写入未核验的新事实。",
@@ -719,68 +715,54 @@
     ],
     "degraded_events": [
       {
-        "code": "daily_tracking_source_blocked",
         "section": "daily_tracking",
-        "severity": "degraded",
-        "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。"
+        "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。",
+        "severity": "degraded"
       },
       {
-        "code": "main_items_below_strict_minimum",
         "section": "main_items",
-        "severity": "degraded",
-        "message": "main_items below strict publish minimum: 1/8."
+        "message": "main_items below strict publish minimum: 1/8.",
+        "severity": "degraded"
       },
       {
-        "code": "content_sources_blocked",
         "section": "hot_blogs",
-        "severity": "degraded",
         "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
-        "source": {
-          "name": "Baidu Press Releases",
-          "url": "https://ir.baidu.com/index.php/press-releases"
-        }
+        "severity": "degraded"
       },
       {
-        "code": "huggingface_trending_below_strict_minimum",
         "section": "huggingface_trending",
-        "severity": "degraded",
-        "message": "huggingface_trending below strict publish minimum: 0/10."
+        "message": "huggingface_trending below strict publish minimum: 0/10.",
+        "severity": "degraded"
       },
       {
-        "code": "hot_blogs_below_strict_minimum",
         "section": "hot_blogs",
-        "severity": "degraded",
-        "message": "hot_blogs below strict publish minimum: 3/6."
+        "message": "hot_blogs below strict publish minimum: 3/6.",
+        "severity": "degraded"
       },
       {
-        "code": "projects_below_strict_minimum",
         "section": "projects",
-        "severity": "degraded",
-        "message": "projects below strict publish minimum: 3/8."
+        "message": "projects below strict publish minimum: 3/8.",
+        "severity": "degraded"
       },
       {
-        "code": "builder_observations_below_strict_minimum",
         "section": "builder_observations",
-        "severity": "degraded",
-        "message": "builder_observations below strict publish minimum: 6/8."
+        "message": "builder_observations below strict publish minimum: 6/8.",
+        "severity": "degraded"
       },
       {
-        "code": "non_primary_source_disclosure_missing",
         "section": "builder_observations",
-        "severity": "degraded",
-        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes."
+        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes.",
+        "severity": "degraded"
       },
       {
-        "code": "fixed_source_e_public_apis",
-        "section": "source_audit",
-        "severity": "degraded",
-        "message": "E. public APIs and paper sources missing from final source_audit: arXiv cs.CL, arXiv cs.LG."
+        "section": "source_status",
+        "message": "E. public APIs and paper sources missing from final source_status: arXiv cs.CL, arXiv cs.LG.",
+        "severity": "degraded"
       },
       {
-        "code": "public_evidence_asset_invalid",
         "section": "evidence_assets",
-        "severity": "degraded",
-        "message": "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots."
+        "message": "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots.",
+        "severity": "degraded"
       }
     ]
   }

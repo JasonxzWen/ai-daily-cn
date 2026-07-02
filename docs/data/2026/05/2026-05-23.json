@@ -227,7 +227,6 @@
   "html_path": "reports/2026/05/2026-05-23.html",
   "generated_at": "2026-05-22T18:39:07.361Z",
   "hero_highlights": [],
-  "source_effectiveness": [],
   "github_trending": [],
   "stories": [
     {
@@ -356,9 +355,6 @@
   "daily_tracking": [],
   "official_org_updates": [],
   "evidence_assets": [],
-  "wechat_items": [],
-  "zhihu_items": [],
-  "reddit_items": [],
   "quality_status": {
     "status": "degraded",
     "public_note": "Builder source coverage is degraded; Builder observations may be incomplete.",
@@ -368,24 +364,14 @@
     ],
     "degraded_events": [
       {
-        "code": "github_trending_blocked",
         "section": "github_trending",
-        "severity": "degraded",
         "message": "github_trending coverage is degraded and should be disclosed in the public report.",
-        "source": {
-          "name": "GitHub Trending daily",
-          "url": "https://github.com/trending?since=daily"
-        }
+        "severity": "degraded"
       },
       {
-        "code": "builder_sources_blocked",
         "section": "builder_observations",
-        "severity": "degraded",
         "message": "builder_observations coverage is degraded and should be disclosed in the public report.",
-        "source": {
-          "name": "follow-builders prepare-digest",
-          "url": "https://github.com/zarazhangrui/follow-builders"
-        }
+        "severity": "degraded"
       }
     ]
   }

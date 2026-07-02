@@ -2585,7 +2585,7 @@ test("AIGC hero stat counts Chinese signals and omits zero-value cards", async (
   assert(!noAigcInput.heroStats.some((item) => item.label === "AIGC"));
 });
 
-test("X/Twitter discussion section reports checked-source degradation when no status is included", async () => {
+test("X/Twitter discussion section hides checked-source audit details when no status is included", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.source_audit = sourceAuditFixture();
   report.source_audit.builder_sources = {
@@ -2611,9 +2611,12 @@ test("X/Twitter discussion section reports checked-source degradation when no st
   const section = input.sections.find((item) => item.group === "signals");
 
   assert.equal(section.title, "X/Twitter 讨论");
-  assert(section.content.includes("降级说明"));
-  assert(section.content.includes("follow-builders X feed:blocked"));
-  assert(section.content.includes("HTTP 403"));
+  assert(section.content.includes("来源状态"));
+  assert(section.content.includes("未形成可入选的原始公开 status 条目"));
+  assert(!section.content.includes("follow-builders X feed"));
+  assert(!section.content.includes("blocked"));
+  assert(!section.content.includes("HTTP 403"));
+  assert(!section.content.includes("X feed blocked"));
 });
 
 test("effective-interact 输入不会渲染空的可选板块", async () => {
@@ -6039,6 +6042,15 @@ test("public artifact privacy scan blocks local machine path leakage", async () 
   assert(blocked.findings.some((finding) => finding.pattern === "windows_user_path"));
 
   await fs.writeFile(path.join(tmp, "docs/reports/report.html"), "<p>https://mp.weixin.qq.com/s/example</p>", "utf8");
+  await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"wechat_items\":[],\"source_effectiveness\":[],\"code\":\"content_sources_blocked\"}", "utf8");
+  const publicDataBlocked = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
+  assert.equal(publicDataBlocked.ok, false);
+  assert(publicDataBlocked.findings.some((finding) => finding.pattern === "public_retired_platform_section"));
+  assert(publicDataBlocked.findings.some((finding) => finding.pattern === "public_source_effectiveness"));
+  assert(publicDataBlocked.findings.some((finding) => finding.pattern === "public_source_blocked_code"));
+
+  await fs.writeFile(path.join(tmp, "reports-data/internal.json"), "{\"wechat_items\":[],\"source_audit\":{}}", "utf8");
+  await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"ok\":true}", "utf8");
   const clean = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
   assert.equal(clean.ok, true, JSON.stringify(clean.findings));
 });
@@ -8440,6 +8452,28 @@ test("daily resilience policy rejects missing required stages", async () => {
 
   assert.equal(result.ok, false);
   assert(result.failures.some((failure) => failure.includes("missing required stage")));
+});
+
+test("daily resilience policy rejects retired platform discovery stages", async () => {
+  const { validateDailyResiliencePolicy } = await import("../src/resilience-policy.js");
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-retired-stage-policy-"));
+  const policy = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-resilience-policy.json"), "utf8"));
+  policy.stages.push({
+    id: "discover_wechat_platform",
+    description: "Retired platform discovery stage must stay out of the default daily pipeline.",
+    retry: { max_attempts: 1, backoff_ms: [0], on: [] },
+    fallback: { kind: "none", action: "none" },
+    degrade: { allowed: false, action: "none" },
+    block: { allowed: true, reasons: ["unsafe_public_content"] },
+    summary_fields: ["stage_id", "status", "attempts"]
+  });
+  const policyPath = path.join(tmp, "daily-resilience-policy.json");
+  await fs.writeFile(policyPath, `${JSON.stringify(policy, null, 2)}\n`, "utf8");
+
+  const result = await validateDailyResiliencePolicy({ rootDir, policyPath });
+
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("retired platform discovery stage discover_wechat_platform")));
 });
 
 test("harness init recreates ignored local state files before validation", async () => {
@@ -12578,19 +12612,10 @@ test("buildSite writes reader-safe public data without internal fields or candid
   assert.equal(publicData.hero_highlights[0].why_watch, "Public impact for the must-read card.");
   assert.equal(publicData.hero_highlights[0].source_item_ref, report.main_items[0].url);
   assert(!JSON.stringify(publicData.hero_highlights).includes(report.main_items[0].candidate_id));
-  assert.equal(publicData.source_effectiveness.length, 1);
-  for (const key of [
-    "display_section",
-    "display_section_label",
-    "display_section_rank",
-    "display_rank",
-    "display_mode",
-    "status_label"
-  ]) {
-    assert.equal(publicData.source_effectiveness[0][key], undefined, `${key} must stay out of public docs data`);
-  }
-  assert.match(publicData.source_effectiveness[0].notes, /rss_not_available_404=https:\/\/ai\.meta\.com\/blog\/rss\//);
-  assert.match(publicData.source_effectiveness[0].notes, /strategy=html_index:https:\/\/ai\.meta\.com\/blog\//);
+  assert.equal(publicData.source_effectiveness, undefined);
+  assert(!JSON.stringify(publicData).includes("source_effectiveness"));
+  assert(!JSON.stringify(publicData).includes("rss_not_available_404=https://ai.meta.com/blog/rss/"));
+  assert(!JSON.stringify(publicData).includes("strategy=html_index:https://ai.meta.com/blog/"));
   assert.equal(publicData.evidence_assets.length, 1);
   assert.equal(publicData.evidence_assets[0].local_path, "assets/evidence/valid-source-asset.jpg");
 });
@@ -12716,7 +12741,7 @@ test("public artifacts omit removed community sources", async () => {
   assert.doesNotMatch(html, /<article[^>]+community-card/);
   assert.doesNotMatch(html, /id="section-other-sources"/);
   assert.equal(publicData.community_leads, undefined);
-  assert.deepEqual(publicData.source_effectiveness.map((row) => row.id), ["meta-ai"]);
+  assert.equal(publicData.source_effectiveness, undefined);
 });
 
 test("daily tracking renders multi-entity seven day trend lines", async () => {
@@ -12795,7 +12820,7 @@ test("public report projection preserves sanitized public quality events", async
   report.quality_status = {
     status: "degraded",
     reasons: ["builder_sources_blocked"],
-    affected_sections: ["builder_observations", "source_audit.china_ai_sources"],
+    affected_sections: ["builder_observations", "source_audit", "source_audit.china_ai_sources"],
     public_note: "Builder discovery was unavailable; the public report omits that lane.",
     degraded_sections: [
       {
@@ -12818,6 +12843,14 @@ test("public report projection preserves sanitized public quality events", async
         severity: "degraded",
         message: "China AI source checks were degraded; public output should only name the affected public section.",
         remediation: "Internal audit group must not be copied to public data."
+      },
+      {
+        code: "source_discovery_network_unavailable",
+        error_code: "quality_degraded",
+        section: "source_audit",
+        severity: "degraded",
+        message: "source_audit coverage is degraded and should be disclosed in the public report.",
+        remediation: "Internal audit group must not be copied to public data."
       }
     ],
     blocking_issues: []
@@ -12838,22 +12871,93 @@ test("public report projection preserves sanitized public quality events", async
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
   assert.equal(publicData.quality_status.status, "degraded");
   assert.equal(publicData.quality_status.public_note, "Builder discovery was unavailable; the public report omits that lane.");
-  assert.deepEqual(publicData.quality_status.affected_sections, ["builder_observations", "hot_blogs"]);
+  assert.deepEqual(publicData.quality_status.affected_sections, ["builder_observations", "source_status", "hot_blogs"]);
   assert(publicData.quality_status.degraded_events.some((event) =>
-    event.code === "builder_sources_blocked" &&
     event.section === "builder_observations" &&
-    event.source?.url === "https://x.com/"
+    event.message === "builder_observations coverage is degraded and should be disclosed in the public report."
   ));
   assert(publicData.quality_status.degraded_events.some((event) =>
-    event.code === "china_ai_sources_blocked" &&
     event.section === "hot_blogs" &&
     event.message === "China AI source checks were degraded; public output should only name the affected public section."
   ));
+  assert(publicData.quality_status.degraded_events.some((event) =>
+    event.section === "source_status" &&
+    event.message === "source_status coverage is degraded and should be disclosed in the public report."
+  ));
   const qualityKeys = collectJsonKeys(publicData.quality_status);
-  for (const key of ["degraded_sections", "blocking_issues", "remediation", "internal_debug"]) {
+  for (const key of ["degraded_sections", "blocking_issues", "remediation", "internal_debug", "code", "source"]) {
     assert(!qualityKeys.has(key), `${key} must not appear in public quality events`);
   }
   assert(!JSON.stringify(publicData.quality_status).includes("source_audit"));
+});
+
+test("public report projection removes retired platform data and degraded events", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-public-retired-platform-data-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const [year, month] = report.report_date.split("-");
+  const reportDir = path.join(dataInputDir, year, month);
+  await fs.mkdir(reportDir, { recursive: true });
+
+  report.wechat_items = [];
+  report.zhihu_items = [];
+  report.reddit_items = [];
+  report.quality_status = {
+    status: "degraded",
+    reasons: ["wechat_sources_blocked", "zhihu_sources_blocked", "content_sources_blocked"],
+    affected_sections: ["wechat_items", "zhihu_items", "hot_blogs"],
+    public_note: "Content sources degraded.",
+    degraded_sections: [
+      {
+        code: "wechat_sources_blocked",
+        section: "wechat_items",
+        severity: "degraded",
+        message: "wechat_items coverage is degraded."
+      },
+      {
+        code: "zhihu_sources_blocked",
+        section: "zhihu_items",
+        severity: "degraded",
+        message: "zhihu_items coverage is degraded."
+      },
+      {
+        code: "content_sources_blocked",
+        section: "hot_blogs",
+        severity: "degraded",
+        message: "Hot blog collection degraded."
+      }
+    ]
+  };
+
+  await fs.writeFile(path.join(reportDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  const publicData = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
+  const serialized = JSON.stringify(publicData);
+  assert.equal(publicData.wechat_items, undefined);
+  assert.equal(publicData.zhihu_items, undefined);
+  assert.equal(publicData.reddit_items, undefined);
+  assert.deepEqual(publicData.quality_status.affected_sections, ["hot_blogs"]);
+  assert(publicData.quality_status.degraded_events.some((event) =>
+    event.section === "hot_blogs" &&
+    event.message === "Hot blog collection degraded."
+  ));
+  assert(!serialized.includes("wechat_items"));
+  assert(!serialized.includes("zhihu_items"));
+  assert(!serialized.includes("reddit_items"));
+  assert(!serialized.includes("wechat_sources_blocked"));
+  assert(!serialized.includes("zhihu_sources_blocked"));
+  assert(!serialized.includes("content_sources_blocked"));
 });
 
 test("production daily does not enable PromptLayer-inspired theme or ticket grids", async () => {
@@ -17296,6 +17400,49 @@ test("internal source-first IA dashboard promotes source metrics and fixed sourc
   assert(!serializedSections.includes("source_audit"));
   assert(!serializedSections.includes("candidate_pool"));
   assert(!serializedSections.includes("selection_snapshot"));
+});
+
+test("public section contract rejects source audit self-check and source runtime sections", () => {
+  const report = strictPublishReportFixture();
+  report.report_date = "2026-06-30";
+  report.generated_at = "2026-06-30T09:00:00.000Z";
+  report.source_effectiveness = sourceFirstRuntimeRowsFixture();
+
+  const input = reportToInteractionInput(report);
+  const sectionIds = input.sections.map((section) => section.richId || `${section.type}:${section.title}`);
+  const serializedSections = JSON.stringify(input.sections);
+
+  assert(!input.sections.some((section) => section.group === "verification"));
+  for (const forbidden of [
+    "public-source-coverage",
+    "source-signal-story",
+    "source-first-dashboard",
+    "system-operating-dashboard",
+    "source-status-focus",
+    "source-map",
+    "source-inventory"
+  ]) {
+    assert(!sectionIds.includes(forbidden), `${forbidden} must stay out of public mode`);
+  }
+  assert(!sectionIds.some((id) => String(id).startsWith("source-map-group-")));
+  assert(!sectionIds.some((id) => String(id).startsWith("source-inventory-group-")));
+  assert(!serializedSections.includes("source_audit"));
+  assert(!serializedSections.includes("self_check"));
+  assert(!serializedSections.includes("source_effectiveness"));
+});
+
+test("explicit internal and source-first interaction modes keep diagnostic sections", () => {
+  const report = strictPublishReportFixture();
+  report.source_effectiveness = sourceFirstRuntimeRowsFixture();
+
+  const internalInput = reportToInteractionInput(report, { includeInternalSections: true });
+  assert(internalInput.sections.some((section) => section.group === "verification"));
+  assert(JSON.stringify(internalInput.sections).includes("source_audit"));
+
+  const sourceFirstInput = reportToSourceFirstInteractionInput(report);
+  const sourceFirstIds = sourceFirstInput.sections.map((section) => section.richId || "");
+  assert(sourceFirstIds.includes("source-first-dashboard"));
+  assert(sourceFirstIds.includes("source-inventory"));
 });
 
 function sourceFirstContractRichId(sectionId) {
@@ -21796,6 +21943,9 @@ test("report:write allows explicit network-outage empty reports only", async () 
   const interaction = reportToInteractionInput(result.report);
   const aiNewsSection = interaction.sections.find((section) => section.title === "AI 行业动态");
   assert(aiNewsSection.content.includes("未写入未核验主体事实"));
+  assert(!aiNewsSection.content.includes("发布质量说明"));
+  assert(!aiNewsSection.content.includes("信源审计"));
+  assert(!aiNewsSection.content.includes("固定信源发现面"));
 
   const invalid = structuredClone(result.report);
   invalid.report_status = "normal";
@@ -24247,6 +24397,28 @@ test("retired WeChat and Zhihu source audit fields do not create public degradat
   assert.equal(status.blocking_issues.length, 0);
 });
 
+test("report write allows absent retired platform sections and audit groups", async () => {
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  delete draft.wechat_items;
+  delete draft.zhihu_items;
+  delete draft.reddit_items;
+  delete draft.source_audit.wechat_sources;
+  delete draft.source_audit.zhihu_sources;
+  delete draft.source_audit.reddit_sources;
+
+  const report = normalizeReportDraft(draft, {
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    candidatePool
+  });
+
+  assert.equal(validateReport(report).valid, true);
+  assert.equal(report.wechat_items, undefined);
+  assert.equal(report.zhihu_items, undefined);
+  assert.equal(report.reddit_items, undefined);
+});
+
 test("official organization updates render separately from Builder observations", () => {
   const selected = selectOfficialOrgUpdates(
     [
@@ -24374,6 +24546,8 @@ test("retired platform report sections are omitted from public interaction", asy
   assert.equal(report.zhihu_items[0].rule_id, "zhihu-ai-agent-feed");
   assert.equal(report.quality_status.status, "ok");
   assert(!renderedText.includes("zhihu-platform-signal"));
+  assert(!renderedText.includes("知乎线索"));
+  assert(!renderedText.includes("Reddit 线索"));
   assert(!renderedText.includes("reddit_items"));
   assert(!renderedText.includes("platform-reddit-local-llama-feed"));
   assert(!renderedText.includes("source_id"));
