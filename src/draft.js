@@ -11,13 +11,9 @@ import { normalizeUrlIdentity } from "./url.js";
 import {
   auditGroupForPlatform,
   isPlatformExemptCategory,
-  PLATFORM_AUDIT_GROUPS,
   PLATFORM_CATEGORY_TO_SECTION,
-  PLATFORM_SECTIONS,
   PLATFORM_TO_AUDIT_GROUP,
-  platformFromCandidateCategory,
-  requirePlatformExemptItemContract,
-  sectionForPlatformCategory
+  platformFromCandidateCategory
 } from "./platform-exempt.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { selectChineseMediaDynamics } from "./chinese-media.js";
@@ -35,8 +31,7 @@ const REQUIRED_AUDIT_GROUPS = [
   "china_ai_sources",
   "content_sources",
   "search_sources",
-  "sources_health",
-  ...PLATFORM_AUDIT_GROUPS.filter((groupName) => groupName !== "reddit_sources")
+  "sources_health"
 ];
 const DEGRADED_DISCOVERY_INPUT_FALLBACKS = [
   {
@@ -89,22 +84,6 @@ const DEGRADED_DISCOVERY_INPUT_FALLBACKS = [
     sourceCategory: "community"
   },
   {
-    pattern: /^wechat-platform-\d{4}-\d{2}-\d{2}\.json$/i,
-    auditGroup: "wechat_sources",
-    sourceName: "WeChat platform discovery",
-    sourceUrl: "https://weixin.qq.com/",
-    sourceCategory: "community",
-    platform: "wechat"
-  },
-  {
-    pattern: /^zhihu-platform-\d{4}-\d{2}-\d{2}\.json$/i,
-    auditGroup: "zhihu_sources",
-    sourceName: "Zhihu platform discovery",
-    sourceUrl: "https://www.zhihu.com/",
-    sourceCategory: "community",
-    platform: "zhihu"
-  },
-  {
     pattern: /^sources-health-\d{4}-\d{2}-\d{2}\.json$/i,
     auditGroup: "sources_health",
     sourceName: "Source health check",
@@ -132,7 +111,7 @@ const REPORT_AUDIT_GROUP_FIELDS = new Set([
   "notes"
 ]);
 const AIGC_RE = /\bAIGC\b|generative\s+(?:ai|video|image|media|game|art|audio)|(?:ai|image|video|music|audio|speech|game|3d)\s+generation|AI\s+(?:video|image|music|game|short|film|asset|avatar|media|creator)|text-to-(?:image|video|speech|3d)|creator\s+tool|content\s+generation|game\s+(?:asset|world|level|character)\s+generation|runway|pika|sora|veo|luma|kling|hailuo|midjourney|stable diffusion|图像生成|图片生成|视频生成|影像生成|音乐生成|音频生成|语音生成|配音|短剧|漫剧|游戏资产|游戏生成|动画生成|三维生成|数字人|创作者工具|内容产业|文生图|文生视频|生图|生视频/i;
-const INTERMEDIARY_SOURCE_RE = /techcrunch|the verge|verge ai|ars technica|venturebeat|fast company|planet ai|google news|product hunt|producthunt|crunchbase|36kr|qbitai|jiqizhixin|leiphone|infoq|wechat|rsshub|reddit|hacker news|hnrss|smol ai|ben's bites|buttondown|ai news archive|the magnifier/i;
+const INTERMEDIARY_SOURCE_RE = /techcrunch|the verge|verge ai|ars technica|venturebeat|fast company|planet ai|google news|product hunt|producthunt|crunchbase|36kr|qbitai|jiqizhixin|leiphone|infoq|hacker news|hnrss|reddit|smol ai|ben's bites|buttondown|ai news archive|the magnifier/i;
 const AI_RELEVANCE_RE = /\b(ai|artificial intelligence|machine learning|ml|deep learning|neural|llm|large language model|model|models|agent|agents|agentic|chatgpt|codex|claude|gemini|gpt|grok|openai|anthropic|deepmind|xai|x\.ai|mistral|qwen|nemotron|reasoning|inference|eval|benchmark|rag|embedding|vector|transformer|diffusion|copilot|cursor|mcp)\b|人工智能|机器学习|深度学习|神经网络|大模型|模型|智能体|推理|评测|向量|多模态|代码助手/i;
 const BUILDER_RELEVANCE_RE = /\b(ai|agi|llm|model|agent|agents|openai|anthropic|claude|gemini|deepmind|google labs|gpt|codex|cursor|copilot|mcp|eval|benchmark|rag|inference|training|fine[-\s]?tuning|prompt|token|transformer|diffusion|sora|veo|runway)\b|人工智能|大模型|模型|智能体|代理|评测|推理|训练|微调|提示词|多模态|生成式|文生图|文生视频|代码助手/i;
 const BUILDER_IRRELEVANT_RE = /\bnot anything ai related\b|nothing to do with ai|unrelated to ai|off[-\s]?topic/i;
@@ -558,8 +537,6 @@ function selectReportItems(merged, options = {}) {
     return communityLeadItem(candidate);
   });
 
-  const platformSelections = selectPlatformExemptItems(candidates, selectedIds);
-
   return {
     candidates: finalizeMainAudit([...includedCandidates, ...derived]),
     stories,
@@ -573,7 +550,6 @@ function selectReportItems(merged, options = {}) {
     builder_observations: builderObservations,
     official_org_updates: officialOrgUpdates,
     community_leads: communityLeads,
-    ...platformSelections.sections,
     eligible_counts: {
       main_items: mainPool.length,
       github_trending: publicGithubCandidates.length,
@@ -582,8 +558,7 @@ function selectReportItems(merged, options = {}) {
       chinese_media_dynamics: chineseMediaDynamics.items.length,
       projects: projectSeeds.length,
       builder_observations: candidates.filter((candidate) => candidate.category === "builder_observation" && canPromoteToBuilderObservation(candidate)).length,
-      official_org_updates: officialOrgUpdates.length,
-      ...platformSelections.eligibleCounts
+      official_org_updates: officialOrgUpdates.length
     },
     selection_snapshot: {
       main_items: mainSelectionSnapshot,
@@ -656,6 +631,12 @@ function isRepeatedTemplateHotBlogCopy(item) {
 
 function finalizeMainAudit(candidates) {
   for (const candidate of candidates) {
+    if (isPlatformExemptCategory(candidate.category)) {
+      candidate.status = "excluded";
+      delete candidate.included_in;
+      candidate.main_reject_reason = candidate.main_reject_reason || "retired_platform_lane";
+      continue;
+    }
     if (candidate.main_selection_stage || candidate.main_reject_reason) {
       continue;
     }
@@ -664,45 +645,6 @@ function finalizeMainAudit(candidates) {
       : "not_evaluated_section_item";
   }
   return candidates;
-}
-
-function selectPlatformExemptItems(candidates, selectedIds) {
-  const sections = Object.fromEntries(PLATFORM_SECTIONS.map((sectionName) => [sectionName, []]));
-  const eligibleCounts = Object.fromEntries(PLATFORM_SECTIONS.map((sectionName) => [sectionName, 0]));
-  for (const [category, sectionName] of Object.entries(PLATFORM_CATEGORY_TO_SECTION)) {
-    const eligible = candidates
-      .filter((candidate) => candidate.category === category && !selectedIds.has(candidate.id))
-      .filter(canPromoteToPlatformExemptSection)
-      .sort((left, right) => candidateScore(right) - candidateScore(left));
-    eligibleCounts[sectionName] = eligible.length;
-    const seenUrls = new Set();
-    for (const candidate of eligible) {
-      if (sections[sectionName].length >= 6) break;
-      const urlKey = normalizeUrl(candidate.url);
-      if (!urlKey || seenUrls.has(urlKey)) continue;
-      seenUrls.add(urlKey);
-      markIncludedCandidate(candidate, category, sectionName);
-      selectedIds.add(candidate.id);
-      sections[sectionName].push(platformExemptItem(candidate));
-    }
-  }
-  return { sections, eligibleCounts };
-}
-
-function canPromoteToPlatformExemptSection(candidate) {
-  if (!isPlatformExemptCategory(candidate.category)) {
-    return false;
-  }
-  const sectionName = sectionForPlatformCategory(candidate.category);
-  if (!sectionName) {
-    return false;
-  }
-  try {
-    requirePlatformExemptItemContract(platformExemptItem(candidate), { sectionName });
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 async function loadRecentMainUrlHistory(rootDir, reportDate, lookbackDays = 7) {
@@ -1008,9 +950,6 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, can
     builder_observations: selection.builder_observations,
     official_org_updates: selection.official_org_updates || [],
     community_leads: selection.community_leads,
-    wechat_items: selection.wechat_items || [],
-    zhihu_items: selection.zhihu_items || [],
-    reddit_items: selection.reddit_items || [],
     evidence_assets: evidenceAssets,
     self_check: {
       report_date: reportDate,
@@ -1067,18 +1006,6 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, can
         official_org_updates: {
           eligible_candidates: selection.eligible_counts?.official_org_updates || 0,
           selected: (selection.official_org_updates || []).length
-        },
-        wechat_items: {
-          eligible_candidates: selection.eligible_counts?.wechat_items || 0,
-          selected: (selection.wechat_items || []).length
-        },
-        zhihu_items: {
-          eligible_candidates: selection.eligible_counts?.zhihu_items || 0,
-          selected: (selection.zhihu_items || []).length
-        },
-        reddit_items: {
-          eligible_candidates: selection.eligible_counts?.reddit_items || 0,
-          selected: (selection.reddit_items || []).length
         }
       },
       fallback_sources: [],
@@ -2663,39 +2590,6 @@ function nonPrimaryDisclosureFields(candidate) {
       : "该来源仅作为线索，事实性结论需要一手来源或多源确认。"),
     risk_note: candidate.risk_note || "融资、价格、benchmark、安全事故、监管和模型能力等高风险事实不得仅凭该线索写入主体。"
   };
-}
-
-function platformExemptItem(candidate) {
-  const item = {
-    candidate_id: candidate.id,
-    platform: candidate.platform || platformFromCandidateCategory(candidate.category),
-    source_id: candidate.source_id,
-    rule_id: candidate.rule_id || candidate.source_id,
-    title: displayTitleForCandidate(candidate),
-    url: candidate.url,
-    event_date: candidate.event_date,
-    source: candidate.source,
-    source_level: candidate.source_level,
-    verification_status: candidate.verification_status,
-    claim_text: candidate.claim_text,
-    why_watch: candidate.why_watch,
-    disclosure: candidate.disclosure,
-    matched_terms: Array.isArray(candidate.matched_terms) ? candidate.matched_terms : [],
-    exemption_policy: candidate.exemption_policy,
-    published_by_gate: candidate.published_by_gate,
-    ...(candidate.author ? { author: candidate.author } : {}),
-    ...(candidate.handle ? { handle: candidate.handle } : {}),
-    ...(candidate.evidence ? { summary: trimText(candidate.evidence, 260) } : {}),
-    ...(candidate.original_text ? { original_text: trimText(candidate.original_text, 500) } : {}),
-    ...(candidate.reader_relevance ? { why_watch: candidate.reader_relevance } : {}),
-    risk_label: platformExemptRiskLabel(candidate)
-  };
-  requirePlatformExemptItemContract(item, { sectionName: sectionForPlatformCategory(candidate.category) });
-  return item;
-}
-
-function platformExemptRiskLabel(candidate) {
-  return String(candidate.risk_label || candidate.risk_level || "").toLowerCase() === "low" ? "low" : "medium";
 }
 
 function mergeSourceAudit(target, audit) {

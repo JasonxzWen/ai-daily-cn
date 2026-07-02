@@ -149,9 +149,37 @@ export const CORE_SOURCE_CONTRACTS = [
   },
   {
     id: "follow-builders",
-    name: "follow-builders",
+    name: "follow-builders X feed",
     role: "builder_aggregator",
-    aliases: ["follow-builders", "follow builders", "zarazhangrui/follow-builders"]
+    aliases: ["github-watch-follow-builders-x", "follow-builders x feed", "feed-x.json"]
+  },
+  {
+    id: "github-watch-ai-news-radar",
+    name: "ai-news-radar GitHub watch",
+    role: "github_watch",
+    notes: "Repository watchlist requested by the user; probe 2026-07-01 confirmed master commits Atom is the usable daily surface.",
+    aliases: ["github-watch-ai-news-radar-commits", "learnprompt/ai-news-radar", "ai-news-radar github commits"]
+  },
+  {
+    id: "github-watch-follow-builders",
+    name: "follow-builders GitHub watch",
+    role: "github_watch",
+    notes: "Repository watchlist requested by the user; commit Atom plus raw X/podcast/blog JSON surfaces are monitored, with X feed also represented by the builder row.",
+    aliases: ["github-watch-follow-builders-commits", "github-watch-follow-builders-podcasts", "github-watch-follow-builders-blogs", "zarazhangrui/follow-builders"]
+  },
+  {
+    id: "github-watch-ai-news-agent",
+    name: "ai-news-agent GitHub watch",
+    role: "github_watch",
+    notes: "Repository watchlist requested by the user; probe 2026-07-01 confirmed main commits Atom is usable.",
+    aliases: ["github-watch-ai-news-agent-commits", "nickzren/ai-news-agent", "ai-news-agent github commits"]
+  },
+  {
+    id: "github-watch-ml-news-of-the-week",
+    name: "ML News of the Week GitHub watch",
+    role: "github_watch",
+    notes: "Recommended weekly source. README is large and weekly, so it should inform selection without becoming daily filler.",
+    aliases: ["github-watch-ml-news-of-the-week-readme", "github-watch-ml-news-of-the-week-commits", "salvatorera/ml-news-of-the-week", "ml news of the week"]
   },
   {
     id: "ml-papers-week",
@@ -208,20 +236,18 @@ export const CORE_SOURCE_CONTRACTS = [
     aliases: ["hacker news", "hnrss", "topstories", "hacker-news.firebaseio.com"]
   },
   {
-    id: "wechat-platform",
-    name: "WeChat Platform Sources",
-    role: "platform_signal",
-    requires_real_configuration: true,
-    notes: "WeChat requires a date-scoped article input or an explicitly configured private/self-hosted feed; placeholder and kill-switch rows mean the lane is not active.",
-    aliases: ["wechat_sources", "platform wechat", "platform-wechat", "wechat ai feed", "wechat article input", "mp.weixin", "weixin", "wechat"]
+    id: "community-hotspots",
+    name: "Community Hotspots",
+    role: "community_rss",
+    notes: "Bottom-of-report community pulse requested by the user. HNRSS is usable; Reddit RSS failures stay internal diagnostics unless selected content affects readers.",
+    aliases: ["community-hn-frontpage-100", "community-hn-ai-newest", "community-reddit-machinelearning", "community-reddit-localllama", "community-reddit-singularity", "community-reddit-artificial", "hnrss.org/frontpage?points=100", "hnrss.org/newest?q=ai", "reddit.com/r/machinelearning", "reddit.com/r/localllama", "reddit.com/r/singularity", "reddit.com/r/artificial"]
   },
   {
-    id: "zhihu-platform",
-    name: "Zhihu Platform Sources",
-    role: "platform_signal",
-    requires_real_configuration: true,
-    notes: "Zhihu requires an explicitly configured feed or platform source; placeholder and kill-switch rows mean the lane is not active.",
-    aliases: ["zhihu_sources", "platform zhihu", "platform-zhihu", "zhihu ai feed", "zhihu.com", "zhihu"]
+    id: "chinese-direct-rss",
+    name: "Chinese direct RSS",
+    role: "chinese_media",
+    notes: "Directly reachable Chinese RSS sources are retained; Jiqizhixin stays on the working articles index until its /rss endpoint returns XML.",
+    aliases: ["intermediary-qbitai", "intermediary-36kr", "intermediary-infoq-cn", "intermediary-jiqizhixin", "qbitai", "36kr.com/feed", "infoq.cn/feed", "jiqizhixin"]
   },
   {
     id: "github-org-watch",
@@ -565,14 +591,14 @@ function inferSourceInventorySectionId(source = {}) {
   if (/openrouter|artificial analysis|swe[-_ ]?bench|leaderboard|rankings|public_playwright/.test(text)) {
     return "tracking_metrics";
   }
-  if (/wechat|zhihu|jike|qbitai|machine heart|jiqizhixin|sspai|36kr|infoq cn|newrank|weixin|mp\.weixin/.test(text)) {
+  if (/qbitai|machine heart|jiqizhixin|sspai|36kr|infoq cn/.test(text)) {
     return "platform_cn_media";
-  }
-  if (/github|huggingface|hugging face|arxiv|papers|open source|opensource|model card/.test(text)) {
-    return "open_source_platforms";
   }
   if (/follow-builders|hacker news|hnrss|reddit|x\/twitter|twitter|builder|community/.test(text)) {
     return "builder_community";
+  }
+  if (/github|github-watch|ai-news-radar|ai-news-agent|ml-news-of-the-week|huggingface|hugging face|arxiv|papers|open source|opensource|model card/.test(text)) {
+    return "open_source_platforms";
   }
   if (/search_api|techcrunch|verge|technologyreview|ars technica|venturebeat|media|intermediary|aggregator/.test(text)) {
     return "english_media_search";

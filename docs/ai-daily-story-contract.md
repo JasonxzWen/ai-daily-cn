@@ -26,7 +26,7 @@
 | 合并依据 | 以事实身份合并：主体、事件类型、对象、日期、核心事实、权威 URL。 | 不按标题/摘要模板相似度合并。相似但事实不同的内容只能归同一 trend。 |
 | 同日去重 | 同 URL 只能归属一个 story；同事件多 URL 合并到 `sources[]`。 | 不允许相同 URL 在主 story 和其他模块用同样标题/摘要重复出现。 |
 | 跨日报去重 | 过去 7 期主列表出现过的 URL 或 story fingerprint 默认不再进主列表，除非有明确新进展。 | 不把 RSS 延迟、重推、旧内容重新包装为今天的新 story。 |
-| GitHub Trending | 一等固定模块，默认 Top 5-8 直接展示，不折叠。 | 不把 GitHub 降级成附录；也不让 GitHub 信号污染主 story 的事实口径。 |
+| GitHub Trending | 一等固定模块，公开 Top10 直接展示，不折叠。 | 不把 GitHub 降级成附录；也不让 GitHub 信号污染主 story 的事实口径。 |
 | 媒体/博客 | 优先作为 story sources；未进入主 story 但仍值得看的内容进入紧凑补充模块。 | 不再把每日追踪、博客、中文媒体、社区等平铺为多个同权大 section。 |
 | 顶部判断 | `summary`、`today_brief`、`trend_clusters` 从 stories + GitHub Top + signals 派生。 | 顶部判断不能独立生成后和正文脱节。 |
 | 质量门 | 默认自动降级：移出不合格主 story、保留来源线索并发布降级日报。 | 不把 story 数不足、趋势不足、图片缺失、社区为空变成发布阻塞。 |
@@ -126,7 +126,7 @@
 主 story 列表，默认 5-8 条，最多 12 条，允许少于 8
 
 项目/代码动态
-GitHub Trending Top 5-8，直接展示，不折叠
+GitHub Trending Top10，直接展示，不折叠
 
 社区与讨论信号
 X / Reddit / Builder / 中文社区 Top 3-5，直接展示摘要，其余进入更多线索
@@ -175,7 +175,7 @@ GitHub Trending 高密度展示字段：
 | 0. 规范落地 | 固定 story 契约、TODO 和反馈记忆。 | 本文档、reconciliation addendum、ledger/quick reference、规范锚点测试。 | 已落地；由 `story-centered daily contract is implemented with generator and rendering gates` 锚定。 |
 | 1. 生成闭环 | 从 source items 生成 `stories`，主列表默认 8、最多 12。 | `src/draft.js`、schema/prompt 兼容层、同日去重、模板标题拒绝。 | 已落地；story 数量、来源链接、模板拒绝、强一手单源、弱单源降级都有单测。 |
 | 2. 跨日报去重 | 最近 7 期 URL/fingerprint 去重。 | 读取近期 `docs/data` story/source/url/fingerprint 历史；记录 reject reason。 | 已落地；7-run history fixture 覆盖旧 story 无新进展不进主列表。 |
-| 3. GitHub 一等模块 | Top 5-8 直接展示，不折叠，和主 story 避免重复摘要。 | `src/interaction-report.js` public view 最多渲染 Top 8；JSON/内容合同仍保留 Top20。 | 已落地；page checklist 验收公开 Top 5-8，内容合同继续约束 Top20 采集。 |
+| 3. GitHub 一等模块 | Top10 直接展示，不折叠，和主 story 避免重复摘要。 | `src/interaction-report.js` public view 最多渲染 Top10；JSON/内容合同仍保留 Top20。 | 已落地；page checklist 验收公开 Top10，内容合同继续约束 Top20 采集。 |
 | 4. 顶部派生 | summary/trends 从正文 item 派生并回链。 | draft summary、trend cluster、hero compatibility。 | 已落地；单测断言 summary/trends 引用可见 story 或 signal item。 |
 | 5. 页面信息架构 | 压缩视觉层级，提升新闻阅读密度。 | `src/interaction-report.js`、story source links、page checklist。 | 已落地；仍要求每次改前端后跑桌面/移动 Playwright 截图。 |
 | 6. 发布质量门 | 自动降级优先，阻塞范围收紧到不可发布/不可核验/发布安全。 | quality loop、content contract、daily runner 摘要。 | 部分沿用现有 publish quality/content contract；真实 `daily:run --publish` 仍必须报告 blocking/degraded。 |
@@ -194,7 +194,7 @@ Phase 1 起必须新增或调整的测试：
 - `report:draft keeps strong primary single-source stories`
 - `report:draft keeps secondary or community single-source items out of main stories`
 - `summary and trend clusters reference existing story or signal items`
-- `GitHub Trending renders Top 5 to 8 as a visible first-class section`
+- `GitHub Trending renders Top10 as a visible first-class section`
 - `GitHub item covered by a main story keeps only ecosystem signal copy`
 - `daily quality downgrades invalid story candidates without blocking publish`
 
@@ -204,7 +204,7 @@ Phase 1 起必须新增或调整的测试：
 - 主 story 不超过 8 条，最多不超过 12 条。
 - 不能出现重复的 `OpenAI更新AI 产品、平台或工程实践`、`Alibaba Cloud披露模型能力和评估方法更新` 等模板 story。
 - 相同 URL 不得在主列表和社区线索中重复同样标题/摘要。
-- GitHub Trending 直接展示 Top 5-8，不折叠。
+- GitHub Trending 直接展示 Top10，不折叠。
 - 顶部判断可以回链到正文 story 或 GitHub/signal item。
 
 ## 验收声明边界

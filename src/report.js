@@ -26,7 +26,6 @@ import {
 import { validateReport } from "./schema.js";
 import {
   auditGroupForPlatform,
-  PLATFORM_AUDIT_GROUPS,
   PLATFORM_SECTIONS,
   platformForSection,
   requirePlatformExemptItemContract
@@ -392,15 +391,12 @@ function requireSourceAudit(report) {
     throw new PublisherError("source_audit_missing", "结构化日报草稿必须包含 source_audit，记录固定发现面和源健康检查结果。");
   }
 
-  const requiredGroups = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health", ...PLATFORM_AUDIT_GROUPS];
+  const requiredGroups = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
   if (String(report.report_date || "") >= "2026-06-11") {
     requiredGroups.splice(1, 0, "huggingface_trending");
     requiredGroups.splice(3, 0, "china_ai_sources");
   }
   for (const groupName of requiredGroups) {
-    if (PLATFORM_AUDIT_GROUPS.includes(groupName) && !audit[groupName]) {
-      continue;
-    }
     requireAuditGroup(audit[groupName], `source_audit.${groupName}`);
   }
 }
@@ -548,10 +544,7 @@ function heroHighlightReferenceItems(report) {
     "projects",
     "builder_observations",
     "official_org_updates",
-    "community_leads",
-    "wechat_items",
-    "zhihu_items",
-    "reddit_items"
+    "community_leads"
   ].flatMap((sectionName) => Array.isArray(report?.[sectionName]) ? report[sectionName] : []);
 }
 

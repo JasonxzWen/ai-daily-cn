@@ -84,6 +84,7 @@ import { npmInvocationForArgs } from "../src/process-runner.js";
 import { normalizeUrlIdentity } from "../src/url.js";
 import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { checkWorktreePreflight } from "../src/worktree-preflight.js";
+import { checkSourceResetPreflight } from "../src/source-reset-preflight.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 import { writeDailyPublishRetrospective } from "../src/retrospectives.js";
@@ -2350,6 +2351,44 @@ test("community lead short summaries are omitted from public cards", async () =>
   assert.doesNotMatch(body, /读者可以|公开信息仍应|产品入口|后续可复核/);
 });
 
+test("community hotspot feeds render as the bottom community hotspot section", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.report_date = "2026-07-02";
+  report.generated_at = "2026-07-02T00:00:00.000Z";
+  report.builder_observations = [];
+  report.self_check.builder_observations = 0;
+  report.community_leads = [
+    {
+      title: "HN discussion on agent evaluation harnesses",
+      content: "Hacker News 正在讨论 agent evaluation harnesses 的失败回放、浏览器自动化和本地调试入口。",
+      url: "https://news.ycombinator.com/item?id=123456",
+      source: "HNRSS Frontpage 100+",
+      event_date: "2026-07-01",
+      source_level: "community"
+    },
+    {
+      title: "Generic intermediary item should stay hidden",
+      content: "TechCrunch generic intermediary item.",
+      url: "https://techcrunch.com/example",
+      source: "TechCrunch AI",
+      event_date: "2026-07-01",
+      source_level: "intermediary"
+    }
+  ];
+
+  const input = reportToInteractionInput(report);
+  const section = input.sections.find((item) => item.richId === "community-hotspots");
+  const serialized = JSON.stringify(input.sections);
+
+  assert(section);
+  assert.equal(section.title, "社区热点");
+  assert.equal(section.cardClass, "community-card");
+  assert.equal(section.items.length, 1);
+  assert(JSON.stringify(section).includes("Hacker News"));
+  assert(!serialized.includes("TechCrunch generic intermediary item"));
+  assert(!input.sections.some((item) => item.richId === "other-sources"));
+});
+
 test("community lead title-only Chinese media items are omitted from public cards", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [];
@@ -3173,8 +3212,8 @@ test("report:draft merges weekly GitHub all-language and selected language pools
   const section = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
   assert(section);
   if (section.cardClass === "github-trending-card") {
-    assert.match(section.title, /Top 8/);
-    assert(section.items.length <= 8);
+    assert.match(section.title, /Top 10/);
+    assert(section.items.length <= 10);
     const failedCard = section.items.find((item) => item.title === "example/java-weekly-1");
     if (failedCard) {
       assert(failedCard.tags.some((tag) => String(tag).includes("README")));
@@ -4182,7 +4221,7 @@ test("registered discovery sources cover the user requested AI source list", asy
     ["MIT Technology Review", ["https://www.technologyreview.com/feed/"]],
     ["Ars Technica", ["https://feeds.arstechnica.com/arstechnica/index"]],
     ["VentureBeat AI", ["https://venturebeat.com/category/ai/feed"]],
-    ["HNRSS Frontpage", ["https://hnrss.org/frontpage"]],
+    ["Hacker News Frontpage 100+", ["https://hnrss.org/frontpage?points=100"]],
     ["Jiqizhixin", ["https://www.jiqizhixin.com/articles"]],
     ["QbitAI", ["https://www.qbitai.com/feed"]],
     ["SSPAI", ["https://sspai.com/feed"]],
@@ -5163,11 +5202,8 @@ test("content source discovery defaults to core and optional sources while keepi
 
   assert(collectedManual.source_audit.content_sources.enablement_counts.manual > 0);
   assert(!manualUrls.some((url) => url.includes("mp.weixin.qq.com")));
-  assert(
-    collectedManual.source_audit.content_sources.sources.some(
-      (source) => source.name === "WeChat Industry Whitelist Manual Intake" && source.status === "skipped_manual_review_required"
-    )
-  );
+  assert(manualUrls.some((url) => url.includes("ifanr.com/feed")));
+  assert(!collectedManual.source_audit.content_sources.sources.some((source) => /WeChat Industry Whitelist/i.test(source.name)));
 });
 
 test("content source discovery keeps self-media as intermediary leads requiring primary verification", async () => {
@@ -8926,7 +8962,7 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
     "README-level Chinese explanation",
     "Builder/X observations",
     "Hot blogs include Chinese and English sources",
-    "WeChat, Zhihu, and Reddit",
+    "requested GitHub watchlist, direct Chinese RSS, and bottom community-hotspot feeds",
     "OpenRouter and Artificial Analysis",
     "semantic assets",
     "Cross-Agent Iteration Roadmap Addendum",
@@ -10282,7 +10318,7 @@ test("daily runner writes infrastructure-exhausted correction rollup when publis
   assert.equal(JSON.parse(validation.stdout).records_checked, 2);
 });
 
-test("daily runner wires platform exempt discovery outputs into report draft", async () => {
+test("daily runner omits retired platform discovery outputs from report draft", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-platforms-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
   const calls = [];
@@ -10306,15 +10342,16 @@ test("daily runner wires platform exempt discovery outputs into report draft", a
     calls
       .map((stage) => stage.id)
       .filter((id) => id.includes("platform")),
-    ["discover_wechat_platform", "discover_zhihu_platform"]
+    []
   );
+  assert.equal(calls[0].id, "source_reset_preflight");
   const reportDraft = calls.find((stage) => stage.id === "report_draft");
   const inputIndex = reportDraft.command.args.indexOf("--input");
   const inputPaths = reportDraft.command.args[inputIndex + 1].split(",");
   assert(inputPaths.includes(".tmp/huggingface-trending-2026-06-09.json"));
   assert(inputPaths.includes(".tmp/china-ai-2026-06-09.json"));
-  assert(inputPaths.includes(".tmp/wechat-platform-2026-06-09.json"));
-  assert(inputPaths.includes(".tmp/zhihu-platform-2026-06-09.json"));
+  assert(!inputPaths.includes(".tmp/wechat-platform-2026-06-09.json"));
+  assert(!inputPaths.includes(".tmp/zhihu-platform-2026-06-09.json"));
   assert(!inputPaths.includes(".tmp/reddit-platform-2026-06-09.json"));
   assert(reportDraft.command.args.includes("--allow-degraded-inputs"));
 });
@@ -10349,14 +10386,118 @@ test("daily runner gives content source discovery enough candidate budget for th
   assert(limit >= 150, `content source limit ${limit} is below fixed source surface budget`);
 });
 
-test("reddit platform source is removed from default discovery", async () => {
+test("retired platform discovery scripts and source configs stay out of default discovery", async () => {
   const registry = await loadSourceRegistry({
     rootDir,
     includeEnablement: "core,optional,manual"
   });
   const ids = new Set(registry.sources.map((source) => source.id));
   assert(!ids.has("platform-reddit-local-llama-feed"));
-  assert(!Object.hasOwn(JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8")).scripts, "discover:reddit-platform"));
+  const scripts = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8")).scripts;
+  assert(!Object.hasOwn(scripts, "discover:reddit-platform"));
+  assert(!Object.hasOwn(scripts, "discover:wechat-platform"));
+  assert(!Object.hasOwn(scripts, "discover:zhihu-platform"));
+  assert.equal(fsSync.existsSync(path.join(rootDir, "config", "sources", "wechat-whitelist.json")), false);
+});
+
+test("configured source reset includes GitHub watchlist, Chinese direct RSS, and community hotspots", async () => {
+  const registry = await loadSourceRegistry({
+    rootDir,
+    includeEnablement: "core,optional,manual"
+  });
+  const byId = new Map(registry.sources.map((source) => [source.id, source]));
+  const githubWatchlist = JSON.parse(await fs.readFile(path.join(rootDir, "config", "sources", "github-watchlist.json"), "utf8"));
+  const communityHotspots = JSON.parse(await fs.readFile(path.join(rootDir, "config", "sources", "community-hotspots.json"), "utf8"));
+
+  for (const id of [
+    "github-watch-ai-news-radar-commits",
+    "github-watch-follow-builders-commits",
+    "github-watch-follow-builders-x",
+    "github-watch-ai-news-agent-commits",
+    "github-watch-ml-news-of-the-week-readme",
+    "community-hn-frontpage-100",
+    "community-reddit-machinelearning",
+    "intermediary-qbitai",
+    "intermediary-36kr",
+    "intermediary-infoq-cn"
+  ]) {
+    assert(byId.has(id), `source reset should register ${id}`);
+  }
+
+  assert.equal(byId.get("github-watch-ai-news-radar-commits").url, "https://github.com/LearnPrompt/ai-news-radar/commits/master.atom");
+  assert.equal(byId.get("community-hn-frontpage-100").url, "https://hnrss.org/frontpage?points=100");
+  assert.equal(byId.get("intermediary-infoq-cn").url, "https://www.infoq.cn/feed");
+  assert.equal(byId.get("intermediary-qbitai").enablement, "core");
+  assert.equal(byId.get("intermediary-36kr").enablement, "core");
+  assert.equal(byId.get("intermediary-infoq-cn").enablement, "core");
+  assert(communityHotspots.sources.every((source) => source.public_degraded_on_blocked === false));
+  assert(githubWatchlist.sources.some((source) => source.repository === "zarazhangrui/follow-builders"));
+  assert(![...byId.keys()].some((id) => /wechat|zhihu|rsshub/i.test(id)));
+});
+
+test("source reset preflight passes only when the durable source reset surface is present", async () => {
+  const result = await checkSourceResetPreflight({ rootDir });
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures));
+  assert(result.checked_files.includes("src/public-surface-policy.js"));
+  assert(result.checked_files.includes("config/sources/github-watchlist.json"));
+  assert(result.checked_files.includes("config/sources/community-hotspots.json"));
+  assert.equal(result.forbidden_package_scripts_present.length, 0);
+  assert.equal(result.missing_source_ids.length, 0);
+});
+
+test("source reset preflight blocks stale daily automation code", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-reset-preflight-"));
+  await fs.mkdir(path.join(tmp, "config", "sources"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "src"), { recursive: true });
+  await fs.writeFile(
+    path.join(tmp, "package.json"),
+    JSON.stringify({
+      scripts: {
+        "discover:wechat-platform": "node src/cli.js discover:wechat-platform"
+      }
+    }, null, 2),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(tmp, "config", "sources", "wechat-whitelist.json"),
+    JSON.stringify({ schema_version: 1, sources: [] }, null, 2),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(tmp, "config", "sources", "github-watchlist.json"),
+    JSON.stringify({ schema_version: 1, sources: [] }, null, 2),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(tmp, "config", "sources", "community-hotspots.json"),
+    JSON.stringify({
+      schema_version: 1,
+      sources: [
+        {
+          id: "community-hn-frontpage-100",
+          url: "https://hnrss.org/frontpage?points=100",
+          public_degraded_on_blocked: true
+        }
+      ]
+    }, null, 2),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(tmp, "config", "sources", "intermediary-sources.json"),
+    JSON.stringify({ schema_version: 1, sources: [] }, null, 2),
+    "utf8"
+  );
+
+  const result = await checkSourceResetPreflight({ rootDir: tmp });
+  const failureCodes = result.failures.map((failure) => failure.code);
+
+  assert.equal(result.ok, false);
+  assert(failureCodes.includes("missing_required_file"));
+  assert(failureCodes.includes("retired_source_config_present"));
+  assert(failureCodes.includes("retired_platform_script_present"));
+  assert(failureCodes.includes("missing_required_source_id"));
+  assert(failureCodes.includes("community_hotspot_public_degradation_enabled"));
 });
 
 test("daily runner hands AI repair back to Codex with publish review budget", async () => {
@@ -15873,10 +16014,7 @@ test("2026-06-23 story-first replay normalizes legacy report into deduped storie
       "community_leads",
       "builder_observations",
       "projects",
-      "official_org_updates",
-      "wechat_items",
-      "zhihu_items",
-      "reddit_items"
+      "official_org_updates"
     ]),
     [],
     "main story URLs must not repeat in lead or appendix sections"
@@ -16158,14 +16296,27 @@ test("source-first IA contract defines fixed source display sections and ranks",
   );
   const byId = new Map(rows.map((row) => [row.id, row]));
 
-  for (const id of ["openai-news", "anthropic-news", "google-deepmind", "github-trending", "github-org-watch", "wechat-platform", "zhihu-platform"]) {
+  for (const id of [
+    "openai-news",
+    "anthropic-news",
+    "google-deepmind",
+    "github-trending",
+    "github-org-watch",
+    "github-watch-ai-news-radar",
+    "github-watch-follow-builders",
+    "github-watch-ai-news-agent",
+    "github-watch-ml-news-of-the-week",
+    "chinese-direct-rss",
+    "community-hotspots"
+  ]) {
     assert(byId.has(id), `display contract should include ${id}`);
     assert.equal(typeof byId.get(id).rank, "number", `${id} should have a numeric display rank`);
   }
 
   assert.equal(byId.get("openai-news").section_id, "core_primary");
   assert.equal(byId.get("github-trending").section_id, "open_source_platforms");
-  assert.equal(byId.get("wechat-platform").section_id, "platform_cn_media");
+  assert.equal(byId.get("chinese-direct-rss").section_id, "platform_cn_media");
+  assert.equal(byId.get("community-hotspots").section_id, "builder_community");
 });
 
 test("source display contract governance is handbook-backed and complete", async () => {
@@ -16291,7 +16442,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-first runtime is internal governance by default",
     "Public daily pages remain story-first and exclude source runtime audit sections",
     "source signal story before source metrics dashboard in internal source-first runtime",
-    "145 collection entries are complete inventory rows, not public daily story content",
+    "157 collection entries are complete inventory rows, not public daily story content",
     "Story-centered content remains the fact carrier",
     "Promote a collection entry only when source governance should track it as a named source"
   ]) {
@@ -16302,7 +16453,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
     "Source-First V2 Addendum",
     "Public daily pages are story-first by default and exclude source-first runtime audit sections.",
     "The internal source-first runtime puts `source_signal_story` before `source_metrics_dashboard`.",
-    "The current 145 collection entries are full inventory rows, not public daily story content.",
+    "The current 157 collection entries are full inventory rows, not public daily story content.",
     "`config/source-display-contract.json` is the executable authority"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation should preserve source-first v2 decision: ${phrase}`);
@@ -16339,7 +16490,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -16366,7 +16517,7 @@ test("source order tuning review is validator-backed and complete", async () => 
     "content-tencent-hunyuan-blog",
     "content-smol-ai-news",
     "content-builder-simon-willison",
-    "intermediary-qbitai",
+    "intermediary-sspai",
     "content-product-hunt-trending"
   ]) {
     assert(review.includes(`\`${sourceId}\``), `review should include promotion candidate ${sourceId}`);
@@ -16423,9 +16574,9 @@ test("Anthropic Research logical source promotion is executable and review-backe
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 35);
-  assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
+  assert.equal(result.summary.logical_sources, 39);
+  assert.equal(result.summary.display_sources, 39);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
 
   const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
   assert(logical, "CORE_SOURCE_CONTRACTS should include anthropic-research-engineering");
@@ -16455,7 +16606,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
 
   assert(handbook.includes("anthropic-research-engineering"), "handbook should document the promoted logical source");
   assert(!review.includes("| `content-anthropic-research` | `anthropic-research-engineering` |"), "review should no longer list the promoted source as a future candidate");
-  assert.match(review, /order-tuning-total-unmapped:73/);
+  assert.match(review, /order-tuning-total-unmapped:68/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -16507,9 +16658,9 @@ test("core primary official logical source promotions are executable and review-
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 35);
-  assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
+  assert.equal(result.summary.logical_sources, 39);
+  assert.equal(result.summary.display_sources, 39);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
 
   const promotions = [
     {
@@ -16592,7 +16743,7 @@ test("core primary official logical source promotions are executable and review-
   for (const replacementSourceId of ["content-azure-blog", "content-tiktok-developers-blog", "content-cloudflare-blog", "content-google-keyword"]) {
     assert(review.includes(`| \`${replacementSourceId}\``), `review should include replacement promotion candidate ${replacementSourceId}`);
   }
-  assert.match(review, /order-tuning-total-unmapped:73/);
+  assert.match(review, /order-tuning-total-unmapped:68/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -16637,9 +16788,9 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 35);
-  assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
+  assert.equal(result.summary.logical_sources, 39);
+  assert.equal(result.summary.display_sources, 39);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -16675,9 +16826,9 @@ test("china model logical sources are promoted into the fixed display contract",
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 35);
-  assert.equal(result.summary.display_sources, 35);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 73);
+  assert.equal(result.summary.logical_sources, 39);
+  assert.equal(result.summary.display_sources, 39);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official"]) {
@@ -16775,7 +16926,7 @@ test("source inventory order reference validator rejects drift and private field
 
   await expectInvalid(
     reference.replace(firstSourceLinePattern, ""),
-    /must list 145 source ids|must list source id exactly once/
+    /must list 157 source ids|must list source id exactly once/
   );
   await expectInvalid(
     reference.replace(firstSourceLinePattern, `${firstSourceLine}${firstSourceLine}`),
@@ -16858,9 +17009,6 @@ test("source-first IA contract extends source effectiveness rows with stable dis
       notes: "HTTP 500 after a previously parsed recent entry"
     }
   ];
-  report.wechat_items = [];
-  report.zhihu_items = [];
-
   const rows = buildSourceEffectivenessTable({
     report,
     candidates: [
@@ -16886,7 +17034,8 @@ test("source-first IA contract extends source effectiveness rows with stable dis
   const anthropic = rows.find((row) => row.id === "anthropic-news");
   const deepmind = rows.find((row) => row.id === "google-deepmind");
   const huggingFace = rows.find((row) => row.id === "hugging-face-blog");
-  const wechat = rows.find((row) => row.id === "wechat-platform");
+  const chineseDirectRss = rows.find((row) => row.id === "chinese-direct-rss");
+  const communityHotspots = rows.find((row) => row.id === "community-hotspots");
 
   assert.equal(openai.display_section, "core_primary");
   assert.equal(openai.display_section_label, "核心一手源");
@@ -16898,11 +17047,12 @@ test("source-first IA contract extends source effectiveness rows with stable dis
   assert.equal(anthropic.status_label, "updated_not_selected");
   assert.equal(deepmind.status_label, "no_recent_update");
   assert.equal(huggingFace.status_label, "blocked");
-  assert.equal(wechat.status_label, "not_configured_or_skipped");
+  assert.equal(chineseDirectRss.status_label, "not_configured_or_skipped");
+  assert.equal(communityHotspots.status_label, "not_configured_or_skipped");
 
   const orderedIds = rows.map((row) => row.id);
   assert(orderedIds.indexOf("openai-news") < orderedIds.indexOf("github-trending"));
-  assert(orderedIds.indexOf("github-trending") < orderedIds.indexOf("wechat-platform"));
+  assert(orderedIds.indexOf("github-trending") < orderedIds.indexOf("chinese-direct-rss"));
 });
 
 test("internal source-first IA dashboard promotes source metrics and fixed source graph", () => {
@@ -17001,9 +17151,9 @@ test("internal source-first IA dashboard promotes source metrics and fixed sourc
       notes: "weekly language pools"
     },
     {
-      id: "wechat-platform",
-      name: "WeChat Platform",
-      role: "platform",
+      id: "chinese-direct-rss",
+      name: "Chinese Direct RSS",
+      role: "chinese_media",
       configured: false,
       reachable: false,
       parsed_recent: false,
@@ -17016,12 +17166,12 @@ test("internal source-first IA dashboard promotes source metrics and fixed sourc
       display_rank: 10,
       display_mode: "expanded",
       status_label: "not_configured_or_skipped",
-      source_ids: ["platform-wechat-ai-feed"],
-      source_kinds: ["rsshub"],
-      statuses: ["skipped_missing_base_url"],
+      source_ids: ["intermediary-qbitai"],
+      source_kinds: ["rss"],
+      statuses: ["no_signal"],
       candidate_count: 0,
       included_count: 0,
-      notes: "RSSHUB_BASE_URL missing"
+      notes: "direct Chinese RSS source checked but no selected public item"
     }
   ];
 
@@ -17065,7 +17215,7 @@ test("internal source-first IA dashboard promotes source metrics and fixed sourc
   assert(platformSourceGroup, "platform source group section should render from source_effectiveness");
   assert.match(coreSourceGroup.content, /Hugging Face Blog/);
   assert.match(coreSourceGroup.content, /blocked/);
-  assert.match(platformSourceGroup.content, /WeChat Platform/);
+  assert.match(platformSourceGroup.content, /Chinese Direct RSS/);
   assert.match(platformSourceGroup.content, /not_configured_or_skipped/);
   assert(storySections.length > 0, "story-first sections should remain visible");
   assert(!serializedSections.includes("source_audit"));
@@ -17140,9 +17290,9 @@ function sourceFirstRuntimeRowsFixture() {
       notes: "candidate created but not selected"
     },
     {
-      id: "wechat-platform",
-      name: "WeChat Platform",
-      role: "platform",
+      id: "chinese-direct-rss",
+      name: "Chinese Direct RSS",
+      role: "chinese_media",
       configured: false,
       reachable: false,
       parsed_recent: false,
@@ -17155,12 +17305,12 @@ function sourceFirstRuntimeRowsFixture() {
       display_rank: 10,
       display_mode: "expanded",
       status_label: "not_configured_or_skipped",
-      source_ids: ["platform-wechat-ai-feed"],
-      source_kinds: ["rsshub"],
-      statuses: ["skipped_missing_base_url"],
+      source_ids: ["intermediary-qbitai"],
+      source_kinds: ["rss"],
+      statuses: ["no_signal"],
       candidate_count: 0,
       included_count: 0,
-      notes: "RSSHUB_BASE_URL missing"
+      notes: "direct Chinese RSS source checked but no selected public item"
     }
   ];
 }
@@ -17285,12 +17435,12 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
     metricByTitle.get(title)?.stats?.find((stat) => stat.label === label)?.value;
   const serializedDashboard = JSON.stringify(dashboard);
 
-  assert.equal(inventoryRows.length, 145);
-  assert.equal(statValue("全量采集入口"), "145");
-  assert.equal(statValue("已知入口运行态"), "145");
-  assert.equal(statValue("继承逻辑状态"), "6");
-  assert.equal(statValue("未上报逻辑源"), "66");
-  assert.equal(statValue("仅采集入口"), "73");
+  assert.equal(inventoryRows.length, 157);
+  assert.equal(statValue("全量采集入口"), "157");
+  assert.equal(statValue("已知入口运行态"), "157");
+  assert.equal(statValue("继承逻辑状态"), "9");
+  assert.equal(statValue("未上报逻辑源"), "80");
+  assert.equal(statValue("仅采集入口"), "68");
   assert.match(serializedDashboard, /INVENTORY_TOTAL/);
   assert.match(serializedDashboard, /RUNTIME_KNOWN/);
   assert.match(serializedDashboard, /INHERITED_RUNTIME/);
@@ -17360,8 +17510,8 @@ test("system operating dashboard summarizes public report metrics after source d
   ];
   report.quality_status = {
     status: "degraded",
-    reasons: ["content_sources_blocked", "wechat_sources_blocked"],
-    affected_sections: ["hot_blogs", "wechat_items"],
+    reasons: ["content_sources_blocked", "community_hotspots_blocked"],
+    affected_sections: ["hot_blogs", "community_leads"],
     public_note: "部分公开信源降级。"
   };
 
@@ -17395,7 +17545,7 @@ test("system operating dashboard summarizes public report metrics after source d
   assert.equal(statValue("信号模块"), "7");
   assert.equal(statValue("趋势与追踪"), "22");
   assert.equal(statValue("信源覆盖"), "1/6");
-  assert.equal(statValue("信源覆盖", "全量入口"), "145");
+  assert.equal(statValue("信源覆盖", "全量入口"), "157");
   assert.equal(statValue("运行质量"), "degraded");
   assert.equal(statValue("运行质量", "降级提醒"), "2");
   assert.match(serializedDashboard, /SYSTEM_CONTENT/);
@@ -17450,7 +17600,7 @@ test("source inventory overview renders fixed section cards", () => {
   assert(inventory.items.every((item) => item.showGroup === false));
   assert(inventory.items.every((item) => Array.isArray(item.tags) && item.tags.length > 0));
   assert.match(JSON.stringify(inventory.items[0]), /core_primary|OpenAI Blog RSS|OpenAI News RSS/);
-  assert.match(JSON.stringify(inventory.items.find((item) => item.title === "中文平台与媒体线索")), /platform_cn_media|WeChat Industry Whitelist Manual Intake|QbitAI/);
+  assert.match(JSON.stringify(inventory.items.find((item) => item.title === "中文平台与媒体线索")), /platform_cn_media|QbitAI|36Kr|InfoQ CN|Jiqizhixin/);
   assert.match(JSON.stringify(inventory.items.find((item) => item.title === "榜单与持续指标")), /OpenRouter Rankings|Artificial Analysis Intelligence Index/);
   assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview must not duplicate all detail rows");
   assert.equal(inventoryGroupRowCount, inventoryRows.length, "detail groups must keep every collection entry");
@@ -17481,7 +17631,7 @@ test("source status focus renders attention cards", () => {
 
   const serialized = JSON.stringify(statusFocus);
   assert.match(serialized, /Hugging Face Blog/);
-  assert.match(serialized, /WeChat Platform/);
+  assert.match(serialized, /Chinese Direct RSS/);
   assert.match(serialized, /not_configured_or_skipped/);
   assert.match(serialized, /fetch_failed/);
   assert.match(serialized, /Google AI Blog/);
@@ -17492,7 +17642,7 @@ test("source status focus renders attention cards", () => {
   assert.doesNotMatch(serialized, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug|AI_DAILY_RSSHUB_BASE_URL|url_env|allowed_hosts/i);
 
   report.source_effectiveness = sourceFirstRuntimeRowsFixture().filter((row) =>
-    ["openai-news", "wechat-platform"].includes(row.id)
+    ["openai-news", "chinese-direct-rss"].includes(row.id)
   );
   const sparseInput = reportToSourceFirstInteractionInput(report);
   const sparseStatusFocus = sparseInput.sections.find((section) => section.richId === "source-status-focus");
@@ -17691,9 +17841,9 @@ test("source map scan index summarizes fixed groups before detail rows", () => {
       notes: "parsed but no candidate"
     },
     {
-      id: "wechat-platform",
-      name: "WeChat Platform",
-      role: "platform",
+      id: "chinese-direct-rss",
+      name: "Chinese Direct RSS",
+      role: "chinese_media",
       configured: false,
       reachable: false,
       parsed_recent: false,
@@ -17706,12 +17856,12 @@ test("source map scan index summarizes fixed groups before detail rows", () => {
       display_rank: 10,
       display_mode: "expanded",
       status_label: "not_configured_or_skipped",
-      source_ids: ["platform-wechat-ai-feed"],
-      source_kinds: ["rsshub"],
-      statuses: ["skipped_missing_base_url"],
+      source_ids: ["intermediary-qbitai"],
+      source_kinds: ["rss"],
+      statuses: ["no_signal"],
       candidate_count: 0,
       included_count: 0,
-      notes: "RSSHUB_BASE_URL missing"
+      notes: "direct Chinese RSS source checked but no selected public item"
     }
   ];
 
@@ -17747,7 +17897,7 @@ test("source map scan index summarizes fixed groups before detail rows", () => {
   assert.match(coreGroup.content, /blocked/);
   assert.match(openSourceGroup.content, /ML Papers of the Week/);
   assert.match(openSourceGroup.content, /parsed_not_candidate/);
-  assert.match(platformGroup.content, /WeChat Platform/);
+  assert.match(platformGroup.content, /Chinese Direct RSS/);
   assert.match(platformGroup.content, /not_configured_or_skipped/);
   assert(!serializedSections.includes("source_audit"));
   assert(!serializedSections.includes("candidate_pool"));
@@ -17801,19 +17951,19 @@ test("source signal story renders first-screen cards before metrics", () => {
     ["低信号", "2"],
     ["阻塞", "1"],
     ["未配置或跳过", "1"],
-    ["全量入口", "145"],
-    ["入口运行态", "145/145"]
+    ["全量入口", "157"],
+    ["入口运行态", "157/157"]
   ]);
   assert(story.items.every((item) => item.showGroup === false));
   assert(story.items.every((item) => item.titleIcon));
-  assert.match(story.summary, /全量采集入口 145/);
+  assert.match(story.summary, /全量采集入口 157/);
   assert.match(story.content, /全量信源入口/);
   assert.match(serializedStory, /OpenAI 发布企业平台能力/);
   assert.match(serializedStory, /GitHub Trending 出现 agent 工具链/);
   assert.match(serializedStory, /OpenAI News/);
   assert.match(serializedStory, /Anthropic News/);
   assert.match(serializedStory, /Hugging Face Blog/);
-  assert.match(serializedStory, /WeChat Platform/);
+  assert.match(serializedStory, /Chinese Direct RSS/);
   assert.match(serializedStory, /#section-source-first-dashboard/);
   assert.match(serializedStory, /#section-source-status-focus/);
   assert.match(serializedStory, /#section-source-inventory/);
@@ -17935,9 +18085,9 @@ test("internal source signal story rollup summarizes source signals before metri
       notes: "weekly language pools"
     },
     {
-      id: "wechat-platform",
-      name: "WeChat Platform",
-      role: "platform",
+      id: "chinese-direct-rss",
+      name: "Chinese Direct RSS",
+      role: "chinese_media",
       configured: false,
       reachable: false,
       parsed_recent: false,
@@ -17950,12 +18100,12 @@ test("internal source signal story rollup summarizes source signals before metri
       display_rank: 10,
       display_mode: "expanded",
       status_label: "not_configured_or_skipped",
-      source_ids: ["platform-wechat-ai-feed"],
-      source_kinds: ["rsshub"],
-      statuses: ["skipped_missing_base_url"],
+      source_ids: ["intermediary-qbitai"],
+      source_kinds: ["rss"],
+      statuses: ["no_signal"],
       candidate_count: 0,
       included_count: 0,
-      notes: "RSSHUB_BASE_URL missing"
+      notes: "direct Chinese RSS source checked but no selected public item"
     }
   ];
 
@@ -17981,7 +18131,7 @@ test("internal source signal story rollup summarizes source signals before metri
   assert.match(story.content, /GitHub Trending/);
   assert.match(story.content, /Anthropic News/);
   assert.match(story.content, /Hugging Face Blog/);
-  assert.match(story.content, /WeChat Platform/);
+  assert.match(story.content, /Chinese Direct RSS/);
   assert.match(story.content, /OpenAI 发布新的企业平台能力/);
   assert.match(story.content, /GitHub Trending 出现新的 agent 工具链/);
   assert.match(story.content, /信源运行概况/);
@@ -18103,9 +18253,9 @@ test("internal source-first hero synopsis promotes source signals into the diagn
       notes: "weekly language pools"
     },
     {
-      id: "wechat-platform",
-      name: "WeChat Platform",
-      role: "platform",
+      id: "chinese-direct-rss",
+      name: "Chinese Direct RSS",
+      role: "chinese_media",
       configured: false,
       reachable: false,
       parsed_recent: false,
@@ -18118,12 +18268,12 @@ test("internal source-first hero synopsis promotes source signals into the diagn
       display_rank: 10,
       display_mode: "expanded",
       status_label: "not_configured_or_skipped",
-      source_ids: ["platform-wechat-ai-feed"],
-      source_kinds: ["rsshub"],
-      statuses: ["skipped_missing_base_url"],
+      source_ids: ["intermediary-qbitai"],
+      source_kinds: ["rss"],
+      statuses: ["no_signal"],
       candidate_count: 0,
       included_count: 0,
-      notes: "RSSHUB_BASE_URL missing"
+      notes: "direct Chinese RSS source checked but no selected public item"
     }
   ];
 
@@ -18138,7 +18288,7 @@ test("internal source-first hero synopsis promotes source signals into the diagn
   assert.match(input.summary, /阻塞 1/);
   assert.match(input.summary, /未配置或跳过 1/);
   assert.match(input.summary, /Hugging Face Blog/);
-  assert.match(input.summary, /WeChat Platform/);
+  assert.match(input.summary, /Chinese Direct RSS/);
   assert.deepEqual(input.heroStats.slice(0, 3).map((item) => [item.label, item.value]), [
     ["公开信源", "2/5"],
     ["候选信源", "1"],
@@ -18201,13 +18351,12 @@ test("internal source inventory panel lists all registered source entries before
   assert(inventoryGroupIndexes.length > 0, "inventory detail groups should render");
   assert(storyIndex > Math.max(...inventoryGroupIndexes), "stories should remain after the complete source-first area");
   assert.equal(inventory.type, "filterable-cards");
-  assert.match(inventory.summary, /145/);
+  assert.match(inventory.summary, /157/);
   assert.equal((inventoryCardsText.match(/- \*\*/g) || []).length, 0);
   assert.equal(inventoryGroupRowCount, inventoryRows.length);
   assert.match(inventoryGroupContent, /DeepSeek News/);
   assert.match(inventoryGroupContent, /OpenAI News RSS/);
   assert.match(inventoryGroupContent, /OpenRouter Rankings/);
-  assert.match(inventoryGroupContent, /WeChat Industry Whitelist Manual Intake/);
   assert.match(inventoryGroupContent, /QbitAI/);
   assert.match(inventoryCardsText, /html_index/);
   assert.match(inventoryCardsText, /openrouter_rankings_public_playwright/);
@@ -18235,7 +18384,7 @@ test("source inventory rows expose runtime status layer", () => {
   assert.equal(missingRuntimeLines.length, 0, JSON.stringify(missingRuntimeLines));
   assert.match(findInventoryLine("OpenAI News RSS"), /运行状态：[\s\S]*included/);
   assert.match(findInventoryLine("Anthropic News"), /运行状态：[\s\S]*updated_not_selected/);
-  assert.match(findInventoryLine("WeChat Industry Whitelist Manual Intake"), /运行状态：[\s\S]*not_configured_or_skipped/);
+  assert.match(findInventoryLine("QbitAI"), /运行状态：[\s\S]*not_configured_or_skipped/);
   assert.match(findInventoryLine("Hugging Face Blog"), /运行状态：[\s\S]*unreported/);
   assert.match(findInventoryLine("Azure Blog"), /运行状态：[\s\S]*collection_only/);
   assert.doesNotMatch(inventoryLines.join("\n"), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
@@ -18286,7 +18435,7 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert(inventory, "inventory overview should render");
   assert.equal(inventory.type, "filterable-cards");
   assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview should not carry all detail rows");
-  assert.match(inventory.summary, /145/);
+  assert.match(inventory.summary, /157/);
   assert(inventoryHrefs.includes("#section-source-inventory-group-core-primary"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-china-models"), JSON.stringify(inventoryHrefs));
   assert(inventoryHrefs.includes("#section-source-inventory-group-tracking-metrics"), JSON.stringify(inventoryHrefs));
@@ -18301,7 +18450,6 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert.match(groupText, /DeepSeek News/);
   assert.match(groupText, /OpenAI News RSS/);
   assert.match(groupText, /OpenRouter Rankings/);
-  assert.match(groupText, /WeChat Industry Whitelist Manual Intake/);
   assert.match(groupText, /QbitAI/);
   assert(lastGroupIndex > inventoryIndex, JSON.stringify(publicSectionOrder));
   assert(firstStoryIndex > lastGroupIndex, JSON.stringify(publicSectionOrder));
@@ -18565,9 +18713,9 @@ test("source-first IA status focus surfaces actionable source states before the 
       notes: "parsed but no candidate"
     },
     {
-      id: "wechat-platform",
-      name: "WeChat Platform",
-      role: "platform",
+      id: "chinese-direct-rss",
+      name: "Chinese Direct RSS",
+      role: "chinese_media",
       configured: false,
       reachable: false,
       parsed_recent: false,
@@ -18580,12 +18728,12 @@ test("source-first IA status focus surfaces actionable source states before the 
       display_rank: 10,
       display_mode: "expanded",
       status_label: "not_configured_or_skipped",
-      source_ids: ["platform-wechat-ai-feed"],
-      source_kinds: ["rsshub"],
-      statuses: ["skipped_missing_base_url"],
+      source_ids: ["intermediary-qbitai"],
+      source_kinds: ["rss"],
+      statuses: ["no_signal"],
       candidate_count: 0,
       included_count: 0,
-      notes: "RSSHUB_BASE_URL missing"
+      notes: "direct Chinese RSS source checked but no selected public item"
     }
   ];
 
@@ -18617,8 +18765,8 @@ test("source-first IA status focus surfaces actionable source states before the 
   const actionCard = focus.items.find((item) => item.title === "需处理");
   const actionText = JSON.stringify(actionCard);
   assert.match(actionText, /Hugging Face Blog/);
-  assert.match(actionText, /WeChat Platform/);
-  assert(actionText.indexOf("Hugging Face Blog") < actionText.indexOf("WeChat Platform"));
+  assert.match(actionText, /Chinese Direct RSS/);
+  assert(actionText.indexOf("Hugging Face Blog") < actionText.indexOf("Chinese Direct RSS"));
   assert.match(actionText, /blocked/);
   assert.match(actionText, /not_configured_or_skipped/);
   assert.match(actionText, /not_configured_or_not_checked/);
@@ -18836,36 +18984,10 @@ test("public daily followups infer localized X avatars from avatar_url during cl
   assert.equal(card.titleIcon, "../../../assets/avatars/2026/06/2026-06-23-avatarbuilder.png");
 });
 
-test("public daily followups expose inactive platform and GitHub-watch source contracts without weekly misattribution", async () => {
+test("public daily followups expose source reset contracts without weekly misattribution", async () => {
   const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
   const report = {
     source_audit: {
-      wechat_sources: {
-        sources: [{
-          id: "platform-wechat-ai-feed",
-          name: "WeChat AI Feed",
-          url: "https://example.com/ai-daily-cn/platform/wechat.xml",
-          source_kind: "rss",
-          status: "no_signal",
-          parsed_count: 0,
-          notes: "kill_switch_enabled; placeholder_source"
-        }],
-        candidates_found: 0,
-        included: 0
-      },
-      zhihu_sources: {
-        sources: [{
-          id: "platform-zhihu-ai-feed",
-          name: "Zhihu AI Feed",
-          url: "https://example.com/ai-daily-cn/platform/zhihu.xml",
-          source_kind: "rss",
-          status: "no_signal",
-          parsed_count: 0,
-          notes: "kill_switch_enabled; placeholder_source"
-        }],
-        candidates_found: 0,
-        included: 0
-      },
       content_sources: {
         sources: [
           {
@@ -18876,6 +18998,51 @@ test("public daily followups expose inactive platform and GitHub-watch source co
             status: "no_signal",
             parsed_count: 0,
             notes: "0 recent repository events parsed"
+          },
+          {
+            id: "github-watch-ai-news-radar-commits",
+            name: "ai-news-radar GitHub commits",
+            url: "https://github.com/LearnPrompt/ai-news-radar/commits/master.atom",
+            source_kind: "rss",
+            status: "checked",
+            parsed_count: 1,
+            notes: "1 recent repository event parsed"
+          },
+          {
+            id: "github-watch-follow-builders-commits",
+            name: "follow-builders GitHub commits",
+            url: "https://github.com/zarazhangrui/follow-builders/commits/main.atom",
+            source_kind: "rss",
+            status: "checked",
+            parsed_count: 1,
+            notes: "1 recent repository event parsed"
+          },
+          {
+            id: "github-watch-ai-news-agent-commits",
+            name: "ai-news-agent GitHub commits",
+            url: "https://github.com/nickzren/ai-news-agent/commits/main.atom",
+            source_kind: "rss",
+            status: "checked",
+            parsed_count: 1,
+            notes: "1 recent repository event parsed"
+          },
+          {
+            id: "intermediary-qbitai",
+            name: "QbitAI",
+            url: "https://www.qbitai.com/feed",
+            source_kind: "rss",
+            status: "checked",
+            parsed_count: 1,
+            notes: "1 recent Chinese RSS item parsed"
+          },
+          {
+            id: "community-hn-frontpage-100",
+            name: "Hacker News Frontpage 100+",
+            url: "https://hnrss.org/frontpage?points=100",
+            source_kind: "rss",
+            status: "checked",
+            parsed_count: 1,
+            notes: "1 recent community hotspot parsed"
           }
         ],
         candidates_found: 0,
@@ -18912,10 +19079,13 @@ test("public daily followups expose inactive platform and GitHub-watch source co
   const byId = new Map(rows.map((row) => [row.id, row]));
 
   assert.equal(byId.has("ruanyf-weekly"), false);
-  assert.match(byId.get("wechat-platform")?.notes || "", /kill_switch_enabled|placeholder_source/);
-  assert.equal(byId.get("wechat-platform")?.public_included, false);
-  assert.match(byId.get("zhihu-platform")?.notes || "", /kill_switch_enabled|placeholder_source/);
-  assert.equal(byId.get("zhihu-platform")?.public_included, false);
+  assert.equal(byId.has("wechat-platform"), false);
+  assert.equal(byId.has("zhihu-platform"), false);
+  assert.equal(byId.get("chinese-direct-rss")?.public_included, false);
+  assert.equal(byId.get("community-hotspots")?.public_included, false);
+  assert(byId.has("github-watch-ai-news-radar"));
+  assert(byId.has("github-watch-follow-builders"));
+  assert(byId.has("github-watch-ai-news-agent"));
   assert(byId.get("github-org-watch")?.source_ids.includes("content-github-openai-org"));
   assert.equal(byId.get("github-org-watch")?.public_included, false);
 });
@@ -22697,8 +22867,10 @@ test("tracking component snapshots attach deterministically to daily tracking it
   assert(!JSON.stringify(enriched.daily_tracking[0].tracking_component_snapshot.public_trace).includes("raw_dom"));
 });
 
-test("public daily renders source coverage gaps without internal audit dumps", () => {
+test("public daily omits source coverage gaps and retired platform diagnostics", () => {
   const report = strictPublishReportFixture();
+  report.report_date = "2026-07-02";
+  report.generated_at = "2026-07-02T00:00:00.000Z";
   report.source_audit = sourceAuditFixture();
   report.source_audit.wechat_sources = {
     checked: true,
@@ -22737,16 +22909,13 @@ test("public daily renders source coverage gaps without internal audit dumps", (
 
   const input = reportToInteractionInput(report);
   const coverageSection = input.sections.find((section) =>
-    section.group === "verification" &&
-    typeof section.content === "string" &&
-    section.content.includes("WeChat Industry Whitelist Manual Intake")
+    section.richId === "public-source-coverage"
   );
   const serialized = JSON.stringify(input.sections);
 
-  assert(coverageSection, "public coverage summary should mention WeChat/Zhihu source gaps");
-  assert(coverageSection.content.includes("WeChat Industry Whitelist Manual Intake"));
-  assert(coverageSection.content.includes("QbitAI"));
-  assert(coverageSection.content.includes("Zhihu manual review"));
+  assert.equal(coverageSection, undefined);
+  assert(!serialized.includes("WeChat Industry Whitelist Manual Intake"));
+  assert(!serialized.includes("Zhihu manual review"));
   assert(!serialized.includes("source_audit"));
   assert(!serialized.includes("candidate_pool"));
   assert(!serialized.includes("Source status"));
@@ -22756,27 +22925,21 @@ test("public daily renders source coverage gaps without internal audit dumps", (
   assert(!serialized.includes("notes:"));
 });
 
-test("public source coverage visualization uses tags and collapsed details", () => {
+test("public source coverage visualization is retired from public daily reports", () => {
   const report = strictPublishReportFixture();
+  report.report_date = "2026-07-02";
+  report.generated_at = "2026-07-02T00:00:00.000Z";
   report.source_audit.china_ai_sources.sources[1].status = "no_signal";
   report.source_audit.china_ai_sources.sources[2].status = "blocked";
   report.source_audit.china_ai_sources.sources[2].notes = "HTTP 403";
 
   const input = reportToInteractionInput(report);
-  const coverageSection = input.sections.find((section) =>
-    section.group === "verification" &&
-    typeof section.content === "string" &&
-    section.content.includes("China AI official sources")
-  );
+  const serialized = JSON.stringify(input.sections);
 
-  assert(coverageSection);
-  assert.match(coverageSection.content, /<details><summary>/);
-  assert.match(coverageSection.content, /tag-status-checked/);
-  assert.match(coverageSection.content, /tag-status-no-signal/);
-  assert.match(coverageSection.content, /tag-status-blocked/);
-  assert.match(coverageSection.content, /Tencent Newsroom CN/);
-  assert(!coverageSection.content.includes("candidate_pool"));
-  assert(!coverageSection.content.includes("selection_snapshot"));
+  assert.equal(input.sections.find((section) => section.richId === "public-source-coverage"), undefined);
+  assert(!serialized.includes("China AI official sources"));
+  assert(!serialized.includes("candidate_pool"));
+  assert(!serialized.includes("selection_snapshot"));
 });
 
 test("public daily contract renders main items as industry and content-track streams", () => {
@@ -23372,8 +23535,7 @@ test("public daily source sections follow the agreed IA order", () => {
     "subscribed-rss",
     "chinese-media-rss",
     "twitter-discussion",
-    "other-github-repository-updates",
-    "public-source-coverage"
+    "other-github-repository-updates"
   ];
   const indexes = expectedOrder.map((sectionId) => sectionIds.indexOf(sectionId));
 
@@ -23899,7 +24061,7 @@ test("official organization update summaries strip internal review and English e
   assert.doesNotMatch(item.summary, /Treat this as a community lead|unless it is backed|AI-generated lesson summaries/);
 });
 
-test("unconfigured WeChat and Zhihu sources degrade without blocking publish", () => {
+test("retired WeChat and Zhihu source audit fields do not create public degradation", () => {
   const report = strictPublishReportFixture();
   report.wechat_items = [];
   report.zhihu_items = [];
@@ -23911,7 +24073,7 @@ test("unconfigured WeChat and Zhihu sources degrade without blocking publish", (
         name: "WeChat placeholder",
         url: "https://example.com/wechat-placeholder.xml",
         status: "skipped_missing_base_url",
-        notes: "No real WeChat entrypoint configured; public report must disclose degraded status."
+        notes: "Retired platform entrypoint retained only as legacy internal audit data."
       }
     ],
     candidates_found: 0,
@@ -23925,7 +24087,7 @@ test("unconfigured WeChat and Zhihu sources degrade without blocking publish", (
         name: "Zhihu placeholder",
         url: "https://example.com/zhihu-placeholder.xml",
         status: "skipped_missing_base_url",
-        notes: "No real Zhihu entrypoint configured; public report must disclose degraded status."
+        notes: "Retired platform entrypoint retained only as legacy internal audit data."
       }
     ],
     candidates_found: 0,
@@ -23933,9 +24095,10 @@ test("unconfigured WeChat and Zhihu sources degrade without blocking publish", (
   };
 
   const status = deriveQualityStatus(report);
-  assert.equal(status.status, "degraded");
-  assert(status.reasons.includes("wechat_sources_blocked"));
-  assert(status.reasons.includes("zhihu_sources_blocked"));
+  assert(!status.reasons.includes("wechat_sources_blocked"));
+  assert(!status.reasons.includes("zhihu_sources_blocked"));
+  assert(!status.affected_sections.includes("wechat_items"));
+  assert(!status.affected_sections.includes("zhihu_items"));
   assert.equal(status.blocking_issues.length, 0);
 });
 
@@ -24001,7 +24164,7 @@ test("official organization updates render separately from Builder observations"
   assert(!rendered.includes("Builder comment about enterprise AI"));
 });
 
-test("platform exempt report sections require public audit disclosure and render independently", async () => {
+test("retired platform report sections are omitted from public interaction", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
   const platformUrl = "https://www.zhihu.com/question/123/answer/456";
@@ -24065,18 +24228,14 @@ test("platform exempt report sections require public audit disclosure and render
   assert.equal(report.zhihu_items[0].source_id, "zhihu-ai-agent-feed");
   assert.equal(report.zhihu_items[0].rule_id, "zhihu-ai-agent-feed");
   assert.equal(report.quality_status.status, "ok");
-  assert(renderedText.includes("知乎线索"));
-  assert(renderedText.includes("未做一手回源核验"));
-  assert(!renderedText.includes("Reddit 线索"));
-  assert(!renderedText.includes("Reddit 讨论小米 1T MoE 模型 1000+ tokens/sec 声称"));
-  assert(!renderedText.includes("标准 8-GPU 节点"));
+  assert(!renderedText.includes("zhihu-platform-signal"));
+  assert(!renderedText.includes("reddit_items"));
+  assert(!renderedText.includes("platform-reddit-local-llama-feed"));
   assert(!renderedText.includes("source_id"));
   assert(!renderedText.includes("rule_id"));
   assert(!renderedText.includes("verification_status"));
   assert(!renderedText.includes("matched_terms"));
-  assert(!renderedText.includes("观察理由"));
   assert(!renderedText.includes("zhihu-ai-agent-feed"));
-  assert(!renderedText.includes("Reddit LocalLLaMA Platform Feed 发布了一条 AI 相关更新"));
   assert(!renderedText.includes("Crazy if true"));
 });
 
@@ -24195,7 +24354,7 @@ test("platform exempt discovery applies deterministic source rules", async () =>
   assert.equal(collected.source_audit.wechat_sources.included, 0);
 });
 
-test("report:draft publishes platform exempt candidates into independent sections", async () => {
+test("report:draft ignores retired platform exempt candidates in default daily sections", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-platform-draft-"));
   const reportDate = "2026-05-26";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -24222,22 +24381,18 @@ test("report:draft publishes platform exempt candidates into independent section
     cacheEvidence: false
   });
 
-  assert.equal(drafted.report.zhihu_items.length, 1);
-  assert.equal(drafted.report.zhihu_items[0].candidate_id, "zhihu-platform-draft-signal");
-  assert.equal(drafted.report.zhihu_items[0].verification_status, "platform_exempt_unverified");
-  assert.equal(drafted.report.zhihu_items[0].risk_label, "medium");
+  assert.equal(drafted.report.zhihu_items, undefined);
   const normalized = normalizeReportDraft(drafted.report, {
     siteUrl,
     generatedAt: fixedGeneratedAt,
     candidatePool: drafted.candidatePool
   });
   assert.equal(validateReport(normalized).valid, true, JSON.stringify(validateReport(normalized).errors));
-  assert.equal(drafted.report.source_audit.zhihu_sources.included, 1);
+  assert.equal(drafted.report.source_audit.zhihu_sources, undefined);
   assert(!drafted.report.main_items.some((item) => item.candidate_id === "zhihu-platform-draft-signal"));
-  assert(drafted.candidatePool.candidates.some((candidate) =>
+  assert(!drafted.candidatePool.candidates.some((candidate) =>
     candidate.id === "zhihu-platform-draft-signal" &&
-    candidate.status === "included" &&
-    candidate.included_in === "zhihu_items"
+    candidate.status === "included"
   ));
 });
 

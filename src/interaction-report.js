@@ -27,6 +27,7 @@ import {
   sourceFirstPresentationContract,
   sourceFirstPresentationRichIds
 } from "./source-effectiveness.js";
+import { isPublicSurfaceDietEnabled } from "./public-surface-policy.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -46,7 +47,24 @@ const PUBLIC_MEDIA_MIN_WIDTH = 240;
 const PUBLIC_MEDIA_MIN_HEIGHT = 160;
 const PUBLIC_MEDIA_MIN_AREA = 80000;
 const NON_CONTENT_MEDIA_ROLES = new Set(["icon", "favicon", "logo", "avatar", "decorative"]);
-const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf|reddit|r\/machinelearning|r\/localllama)/i;
+const LEGACY_REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf|reddit|r\/machinelearning|r\/localllama)/i;
+const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf)/i;
+const COMMUNITY_HOTSPOT_SOURCE_RE = /(?:hnrss|hacker news|news\.ycombinator|reddit\.com\/r\/(?:machinelearning|localllama|singularity|artificial)|r\/(?:machinelearning|localllama|singularity|artificial))/i;
+const LEGACY_PUBLIC_SOURCE_FILTER_SECTIONS = [
+  "stories",
+  "main_items",
+  "model_releases",
+  "hot_blogs",
+  "chinese_media_dynamics",
+  "projects",
+  "github_trending",
+  "huggingface_trending",
+  "builder_observations",
+  "official_org_updates",
+  "wechat_items",
+  "zhihu_items",
+  "reddit_items"
+];
 const PUBLIC_SOURCE_FILTER_SECTIONS = [
   "stories",
   "main_items",
@@ -151,24 +169,43 @@ function publicReportWithoutRemovedSources(report) {
   if (!report || typeof report !== "object") {
     return report;
   }
+  const surfaceDietEnabled = isPublicSurfaceDietEnabled(report);
+  const sourceFilterSections = surfaceDietEnabled ? PUBLIC_SOURCE_FILTER_SECTIONS : LEGACY_PUBLIC_SOURCE_FILTER_SECTIONS;
+  const removedSourceRe = surfaceDietEnabled ? REMOVED_PUBLIC_SOURCE_RE : LEGACY_REMOVED_PUBLIC_SOURCE_RE;
   const next = structuredClone(report);
-  for (const sectionName of PUBLIC_SOURCE_FILTER_SECTIONS) {
+  for (const sectionName of sourceFilterSections) {
     if (Array.isArray(next[sectionName])) {
-      next[sectionName] = next[sectionName].filter((item) => !isRemovedPublicSourceItem(item));
+      next[sectionName] = next[sectionName].filter((item) => !isRemovedPublicSourceItem(item, removedSourceRe));
     }
   }
-  delete next.community_leads;
+  if (surfaceDietEnabled && Array.isArray(next.community_leads)) {
+    next.community_leads = next.community_leads.filter(isPublicCommunityHotspotItem);
+    if (next.community_leads.length === 0) {
+      delete next.community_leads;
+    }
+  }
+  if (surfaceDietEnabled) {
+    delete next.wechat_items;
+    delete next.zhihu_items;
+    delete next.reddit_items;
+  } else {
+    delete next.community_leads;
+  }
   if (Array.isArray(next.source_effectiveness)) {
-    next.source_effectiveness = next.source_effectiveness.filter((row) => !isRemovedPublicSourceItem(row));
+    next.source_effectiveness = next.source_effectiveness.filter((row) => !isRemovedPublicSourceItem(row, removedSourceRe));
   }
   if (Array.isArray(next.hero_highlights)) {
-    next.hero_highlights = next.hero_highlights.filter((item) => !isRemovedPublicSourceItem(item));
+    next.hero_highlights = next.hero_highlights.filter((item) => !isRemovedPublicSourceItem(item, removedSourceRe));
   }
   return next;
 }
 
-function isRemovedPublicSourceItem(item) {
-  return REMOVED_PUBLIC_SOURCE_RE.test(publicSourceSearchText(item));
+function isRemovedPublicSourceItem(item, sourceRe = REMOVED_PUBLIC_SOURCE_RE) {
+  return sourceRe.test(publicSourceSearchText(item));
+}
+
+function isPublicCommunityHotspotItem(item) {
+  return COMMUNITY_HOTSPOT_SOURCE_RE.test(publicSourceSearchText(item));
 }
 
 function publicSourceSearchText(value) {
@@ -189,6 +226,7 @@ export function reportToInteractionInput(report, options = {}) {
   const rawReport = report && typeof report === "object" ? report : {};
   const includeInternalSections = options.includeInternalSections === true;
   const includeSourceFirstRuntimeSections = options.includeSourceFirstRuntimeSections === true;
+  const surfaceDietEnabled = isPublicSurfaceDietEnabled(rawReport);
   const renderReport = !includeInternalSections && !includeSourceFirstRuntimeSections && options.suppressRemovedPublicSources !== false
     ? publicReportWithoutRemovedSources(rawReport)
     : rawReport;
@@ -222,9 +260,11 @@ export function reportToInteractionInput(report, options = {}) {
       sourceEffectivenessRows
     )
     : [];
-  const platformItems = Object.fromEntries(
-    PLATFORM_SECTIONS.map((sectionName) => [sectionName, Array.isArray(report[sectionName]) ? report[sectionName] : []])
-  );
+  const platformItems = !surfaceDietEnabled
+    ? Object.fromEntries(
+      PLATFORM_SECTIONS.map((sectionName) => [sectionName, Array.isArray(report[sectionName]) ? report[sectionName] : []])
+    )
+    : {};
   const evidenceAssets = Array.isArray(report.evidence_assets) ? report.evidence_assets : [];
   const evidenceByUrl = evidenceAssetsBySourceUrl(evidenceAssets);
   const paths = reportRelativePaths(report.report_date);
@@ -302,12 +342,13 @@ export function reportToInteractionInput(report, options = {}) {
     });
   }
   if (githubTrending.length > 0) {
+    const githubLimit = surfaceDietEnabled ? 10 : 8;
     sections.push({
       type: "markdown",
-      title: "GitHub Trending · Top 8",
+      title: `GitHub Trending · Top ${githubLimit}`,
       group: "projects",
       richId: "github-trending",
-      content: formatGithubTrending(githubTrending, { trendAnnotations, projects })
+      content: formatGithubTrending(githubTrending, { trendAnnotations, projects, limit: githubLimit })
     });
   }
   if (huggingFaceTrending.length > 0) {
@@ -396,41 +437,49 @@ export function reportToInteractionInput(report, options = {}) {
       items: formatOfficialOrgUpdateCards(officialOrgUpdates, { report, evidenceByUrl, mediaOptions })
     });
   }
-  const communityCards = [];
+  const communityCards = surfaceDietEnabled
+    ? formatCommunityLeadCards(communityLeads.filter(isPublicCommunityHotspotItem).slice(0, 6), {
+      report,
+      evidenceByUrl,
+      mediaOptions
+    })
+    : [];
   if (communityCards.length > 0) {
     sections.push({
       type: "filterable-cards",
-      title: "其他信源",
+      title: "社区热点",
       group: "signals",
       cardClass: "community-card",
-      richId: "other-sources",
+      richId: "community-hotspots",
       showFilters: false,
       items: communityCards
     });
   }
-  for (const sectionName of PLATFORM_SECTIONS) {
-    const cards = formatPlatformExemptCards(platformItems[sectionName], sectionName, { report, evidenceByUrl, mediaOptions });
-    if (cards.length === 0) {
-      continue;
+  if (!surfaceDietEnabled) {
+    for (const sectionName of PLATFORM_SECTIONS) {
+      const cards = formatPlatformExemptCards(platformItems[sectionName], sectionName, { report, evidenceByUrl, mediaOptions });
+      if (cards.length === 0) {
+        continue;
+      }
+      sections.push({
+        type: "filterable-cards",
+        title: platformItemLabel(platformForSection(sectionName)),
+        group: "signals",
+        cardClass: "platform-card",
+        showFilters: false,
+        items: cards
+      });
     }
-    sections.push({
-      type: "filterable-cards",
-      title: platformItemLabel(platformForSection(sectionName)),
-      group: "signals",
-      cardClass: "platform-card",
-      showFilters: false,
-      items: cards
-    });
-  }
-  const publicSourceCoverage = formatPublicSourceCoverageV2(report.source_audit);
-  if (publicSourceCoverage) {
-    sections.push({
-      type: "markdown",
-      title: "信源覆盖与缺口",
-      group: "verification",
-      richId: "public-source-coverage",
-      content: publicSourceCoverage
-    });
+    const publicSourceCoverage = formatPublicSourceCoverageV2(report.source_audit);
+    if (publicSourceCoverage) {
+      sections.push({
+        type: "markdown",
+        title: "信源覆盖与缺口",
+        group: "verification",
+        richId: "public-source-coverage",
+        content: publicSourceCoverage
+      });
+    }
   }
   if (includeInternalSections) {
     const sourceAuditOverview = formatSourceAuditOverviewChart(report.source_audit, dataHref);
@@ -1402,9 +1451,10 @@ function formatGithubTrending(items, context = {}) {
     return "";
   }
 
+  const limit = Number.isFinite(Number(context.limit)) ? Number(context.limit) : 10;
   const projectIndex = indexProjects(projects);
   const trendingLines = items
-    .slice(0, 8)
+    .slice(0, limit)
     .map((item, index) => {
       const project = projectForTrend(item, projectIndex);
       const tag = githubTrendStatusHighlightTag(item);
@@ -1426,8 +1476,9 @@ function formatGithubTrending(items, context = {}) {
 
 function formatGithubTrendingCards(items, context = {}) {
   const projects = Array.isArray(context.projects) ? context.projects : [];
+  const limit = Number.isFinite(Number(context.limit)) ? Number(context.limit) : 10;
   const projectIndex = indexProjects(projects);
-  return items.slice(0, 8).map((item, index) => {
+  return items.slice(0, limit).map((item, index) => {
     const project = projectForTrend(item, projectIndex);
     const rank = Number.isFinite(Number(item.rank)) ? `#${Number(item.rank)}` : `#${index + 1}`;
     const repo = item.repo || item.name || repoFromUrl(item.url);
@@ -3547,10 +3598,7 @@ function formatSourceAudit(audit) {
     formatAuditGroup("Builder 原始源", audit.builder_sources),
     audit.content_sources ? formatAuditGroup("精选博客与访谈源", audit.content_sources) : "",
     audit.search_sources ? formatAuditGroup("搜索 / 新闻影子源", audit.search_sources) : "",
-    audit.sources_health ? formatAuditGroup("信源健康检查", audit.sources_health) : "",
-    audit.wechat_sources ? formatAuditGroup(platformItemLabel("wechat"), audit.wechat_sources) : "",
-    audit.zhihu_sources ? formatAuditGroup(platformItemLabel("zhihu"), audit.zhihu_sources) : "",
-    audit.reddit_sources ? formatAuditGroup(platformItemLabel("reddit"), audit.reddit_sources) : ""
+    audit.sources_health ? formatAuditGroup("信源健康检查", audit.sources_health) : ""
   ].filter(Boolean).join("\n\n");
 }
 
@@ -4737,7 +4785,7 @@ function formatPublicSourceCoverage(audit) {
   if (!audit) {
     return "";
   }
-  const rows = sourceAuditGroups(audit)
+  const rows = legacySourceAuditGroups(audit)
     .map(({ title, group }) => formatPublicSourceCoverageGroup(title, group))
     .filter(Boolean);
   if (rows.length === 0) {
@@ -4826,7 +4874,7 @@ function publicSourceCoverageDetailsV2(sources) {
 }
 
 function publicSourceCoverageGroups(audit) {
-  return sourceAuditGroups(audit).filter(({ group }) =>
+  return legacySourceAuditGroups(audit).filter(({ group }) =>
     group !== audit.sources_health &&
     group !== audit.reddit_sources
   );
@@ -4977,6 +5025,18 @@ function formatSourceAuditOverviewChart(audit, dataHref) {
 }
 
 function sourceAuditGroups(audit) {
+  return [
+    { title: "GitHub Trending", group: audit.github_trending },
+    { title: "Hugging Face Trending", group: audit.huggingface_trending },
+    { title: "China AI official sources", group: audit.china_ai_sources },
+    { title: "Builder 原始源", group: audit.builder_sources },
+    { title: "精选博客与访谈源", group: audit.content_sources },
+    { title: "搜索 / 新闻影子源", group: audit.search_sources },
+    { title: "信源健康检查", group: audit.sources_health }
+  ].filter((item) => item.group);
+}
+
+function legacySourceAuditGroups(audit) {
   return [
     { title: "GitHub Trending", group: audit.github_trending },
     { title: "Hugging Face Trending", group: audit.huggingface_trending },

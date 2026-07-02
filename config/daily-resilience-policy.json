@@ -45,6 +45,16 @@
       "replay_fixtures": ["daily-runner-clean-worktree"]
     },
     {
+      "id": "source_reset_preflight",
+      "description": "Fail fast when the checked-out daily code lacks the public-surface source reset contract.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_stale_or_incomplete_daily_code" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "checked_files", "error_code"],
+      "replay_fixtures": ["daily-runner-source-reset-preflight"]
+    },
+    {
       "id": "prompt_build",
       "description": "Build the dated generation prompt from committed prompt modules.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
@@ -133,26 +143,6 @@
       "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
       "summary_fields": ["stage_id", "status", "attempts", "provider_count", "failed_provider_count", "candidate_count"],
       "replay_fixtures": ["search-news-provider-timeout"]
-    },
-    {
-      "id": "discover_wechat_platform",
-      "description": "Collect WeChat platform candidates when configured.",
-      "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["timeout", "network_error"] },
-      "fallback": { "kind": "unconfigured_platform_degraded", "action": "emit_public_unconfigured_degraded_note" },
-      "degrade": { "allowed": true, "action": "publish_with_wechat_unconfigured_or_failed_note" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
-      "summary_fields": ["stage_id", "status", "attempts", "configured", "candidate_count", "degraded_reason"],
-      "replay_fixtures": ["wechat-unconfigured"]
-    },
-    {
-      "id": "discover_zhihu_platform",
-      "description": "Collect Zhihu platform candidates when configured.",
-      "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["timeout", "network_error"] },
-      "fallback": { "kind": "unconfigured_platform_degraded", "action": "emit_public_unconfigured_degraded_note" },
-      "degrade": { "allowed": true, "action": "publish_with_zhihu_unconfigured_or_failed_note" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
-      "summary_fields": ["stage_id", "status", "attempts", "configured", "candidate_count", "degraded_reason"],
-      "replay_fixtures": ["zhihu-unconfigured"]
     },
     {
       "id": "sources_health",
