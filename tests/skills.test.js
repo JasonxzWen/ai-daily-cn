@@ -991,6 +991,64 @@ test("effective-interact filterable cards can hide visual group labels", async (
   assert.match(card, /<figcaption>Original blog architecture diagram\.<\/figcaption>/);
 });
 
+test("effective-interact filterable card title icons allow relative build assets", async () => {
+  const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-relative-title-icon-"));
+  const inputPath = path.join(tmp, "relative-title-icon.json");
+  await fsp.writeFile(
+    inputPath,
+    JSON.stringify({
+      title: "AI Daily Icon Contract",
+      summary: "Relative title icons should survive sanitization.",
+      status: "complete",
+      renderMode: "pre-rendered",
+      sections: [
+        {
+          type: "filterable-cards",
+          title: "Builder",
+          group: "signals",
+          cardClass: "builder-card",
+          showFilters: false,
+          items: [
+            {
+              group: "X/Twitter",
+              showGroup: false,
+              title: "Avatar Builder",
+              subtitle: "@avatarbuilder",
+              href: "https://x.com/avatarbuilder/status/2059000000000000002",
+              titleIcon: "../../../assets/avatars/2026/06/2026-06-23-avatarbuilder.png",
+              body: "Original X status with a localized avatar asset available."
+            },
+            {
+              group: "X/Twitter",
+              showGroup: false,
+              title: "Unsafe Host Path",
+              href: "https://x.com/unsafe/status/2059000000000000003",
+              titleIcon: "C:\\Users\\Admin\\avatar.png",
+              body: "Host-local paths must not render."
+            }
+          ]
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const generated = spawnSync(
+    process.execPath,
+    [createReportScript, "--input", inputPath, "--out-dir", tmp, "--slug", "relative-title-icon", "--json"],
+    { cwd: rootDir, encoding: "utf8" }
+  );
+  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
+
+  const payload = JSON.parse(generated.stdout);
+  const html = await fsp.readFile(payload.outputPath, "utf8");
+  const cards = html.match(/<article class="interactive-card evidence-card evidence-spotlight builder-card"[\s\S]*?<\/article>/g) || [];
+
+  assert.equal(cards.length, 2);
+  assert.match(cards[0], /<img class="inline-site-icon card-title-icon" src="\.\.\/\.\.\/\.\.\/assets\/avatars\/2026\/06\/2026-06-23-avatarbuilder\.png"/);
+  assert.doesNotMatch(cards[1], /card-title-icon/);
+});
+
 test("effective-interact filterable cards support exclusive default filters", async () => {
   const tmp = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-exclusive-card-filters-"));
   const inputPath = path.join(tmp, "exclusive-card-filters.json");
