@@ -4,12 +4,16 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import Ajv from "ajv/dist/2020.js";
 import { createDailyCodexDagDryRun, createDailyCodexDagPlan, validateDailyCodexDag } from "../src/daily-codex-dag.js";
 
 const rootDir = process.cwd();
 const manifestPath = path.join(rootDir, "config", "daily-codex-dag.json");
 const dagCliPath = path.join(rootDir, "scripts", "run-daily-codex-dag.mjs");
+const dagRunSchemaPath = path.join(rootDir, "schemas", "daily-codex-dag-run.schema.json");
+const dryRunSummaryFixturePath = path.join(rootDir, "tests", "fixtures", "daily-codex-dag", "dry-run-summary.json");
 const fixedNow = "2026-07-03T08:00:00.000Z";
+let dagRunSummaryValidator = null;
 
 test("daily codex DAG manifest validates target node contract", async () => {
   const result = await validateDailyCodexDag({ rootDir });
@@ -134,6 +138,7 @@ test("daily codex DAG dry-run helper is deterministic and level ordered", async 
   assert.deepEqual(first.run.blocked_nodes, []);
   assert.deepEqual(first.run.planned_nodes, first.plan.nodes.map((item) => item.id));
   assert.equal(first.next_action.kind, "implement_executable_node_runner");
+  await assertValidDagRunSummary(first);
 
   const levelById = new Map();
   for (const level of first.run.levels) {
@@ -146,6 +151,30 @@ test("daily codex DAG dry-run helper is deterministic and level ordered", async 
       assert(levelById.get(dep) < levelById.get(item.id), `${item.id} should follow ${dep}`);
     }
   }
+});
+
+test("daily codex DAG dry-run summary schema validates fixture and rejects mixed envelopes", async () => {
+  const fixture = await loadDryRunSummaryFixture();
+  await assertValidDagRunSummary(fixture);
+
+  const successWithNullPlan = structuredCloneJson(fixture);
+  successWithNullPlan.plan = null;
+  await assertInvalidDagRunSummary(successWithNullPlan);
+
+  const successWithFailedValidation = structuredCloneJson(fixture);
+  successWithFailedValidation.validation.ok = false;
+  successWithFailedValidation.validation.failures = ["forced validation contradiction"];
+  await assertInvalidDagRunSummary(successWithFailedValidation);
+
+  const failureWithRunObject = {
+    ok: false,
+    failures: ["forced failure"],
+    warnings: [],
+    validation: null,
+    plan: null,
+    run: fixture.run
+  };
+  await assertInvalidDagRunSummary(failureWithRunObject);
 });
 
 test("daily codex DAG dry-run helper refuses invalid manifests without throwing", async () => {
@@ -164,6 +193,7 @@ test("daily codex DAG dry-run helper refuses invalid manifests without throwing"
   assert.equal(result.run, null);
   assert.deepEqual(result.warnings, []);
   assert(result.validation);
+  await assertValidDagRunSummary(result);
   assert(
     result.failures.some((failure) => failure.includes("missing-dry-run-input.json is not produced")),
     result.failures.join("\n")
@@ -182,6 +212,7 @@ test("daily codex DAG dry-run CLI writes JSON to stdout only", async () => {
   assert.equal(parsed.report_date, "2026-07-03");
   assert.equal(parsed.run.final_status, "dry_run_only");
   assert.equal(parsed.plan.node_count, 16);
+  await assertValidDagRunSummary(parsed);
   assert.deepEqual(await forbiddenPathSnapshot(), forbiddenBefore, "stdout-only dry-run must not mutate production or scratch paths");
 });
 
@@ -189,17 +220,26 @@ test("daily codex DAG dry-run CLI rejects invalid invocations with structured JS
   const missingDryRun = await runDagCli(["--date", "2026-07-03", "--json"]);
   assert.equal(missingDryRun.code, 1);
   assert.equal(missingDryRun.stderr, "");
-  assert.equal(JSON.parse(missingDryRun.stdout).failures[0], "daily codex DAG CLI requires --dry-run");
+  const missingDryRunJson = JSON.parse(missingDryRun.stdout);
+  assert.equal(missingDryRunJson.failures[0], "daily codex DAG CLI requires --dry-run");
+  assert.equal(missingDryRunJson.validation, null);
+  await assertValidDagRunSummary(missingDryRunJson);
 
   const missingJson = await runDagCli(["--dry-run", "--date", "2026-07-03"]);
   assert.equal(missingJson.code, 1);
   assert.equal(missingJson.stderr, "");
-  assert.equal(JSON.parse(missingJson.stdout).failures[0], "daily codex DAG CLI requires --json");
+  const missingJsonJson = JSON.parse(missingJson.stdout);
+  assert.equal(missingJsonJson.failures[0], "daily codex DAG CLI requires --json");
+  assert.equal(missingJsonJson.validation, null);
+  await assertValidDagRunSummary(missingJsonJson);
 
   const invalidDate = await runDagCli(["--dry-run", "--date", "20260703", "--json"]);
   assert.equal(invalidDate.code, 1);
   assert.equal(invalidDate.stderr, "");
-  assert.equal(JSON.parse(invalidDate.stdout).failures[0], "daily codex DAG CLI requires --date YYYY-MM-DD");
+  const invalidDateJson = JSON.parse(invalidDate.stdout);
+  assert.equal(invalidDateJson.failures[0], "daily codex DAG CLI requires --date YYYY-MM-DD");
+  assert.equal(invalidDateJson.validation, null);
+  await assertValidDagRunSummary(invalidDateJson);
 });
 
 test("daily codex DAG dry-run CLI writes opt-in summaries under .tmp only", async () => {
@@ -223,6 +263,7 @@ test("daily codex DAG dry-run CLI writes opt-in summaries under .tmp only", asyn
   const fileJson = JSON.parse(await fs.readFile(absoluteSummaryPath, "utf8"));
   assert.deepEqual(fileJson, stdoutJson);
   assert.equal(fileJson.ok, true);
+  await assertValidDagRunSummary(fileJson);
 
   await fs.rm(absoluteSummaryPath, { force: true });
 });
@@ -292,6 +333,8 @@ test("daily codex DAG dry-run CLI returns structured JSON for invalid manifest r
   assert.equal(parsed.ok, false);
   assert.equal(parsed.plan, null);
   assert.equal(parsed.run, null);
+  assert.equal(parsed.validation, null);
+  await assertValidDagRunSummary(parsed);
   assert(
     parsed.failures.some((failure) => failure.includes("config") && failure.includes("daily-codex-dag.json")),
     parsed.failures.join("\n")
@@ -524,6 +567,46 @@ test("daily codex DAG validator catches structural and boundary regressions", as
 
 async function loadManifest() {
   return JSON.parse(await fs.readFile(manifestPath, "utf8"));
+}
+
+async function loadDryRunSummaryFixture() {
+  return JSON.parse(await fs.readFile(dryRunSummaryFixturePath, "utf8"));
+}
+
+async function assertValidDagRunSummary(value) {
+  const validate = await getDagRunSummaryValidator();
+  if (!validate(value)) {
+    assert.fail(`daily codex DAG run summary should match schema:\n${formatAjvErrors(validate.errors)}`);
+  }
+}
+
+async function assertInvalidDagRunSummary(value) {
+  const validate = await getDagRunSummaryValidator();
+  if (validate(value)) {
+    assert.fail("daily codex DAG run summary schema accepted an invalid envelope");
+  }
+}
+
+async function getDagRunSummaryValidator() {
+  if (!dagRunSummaryValidator) {
+    const schema = JSON.parse(await fs.readFile(dagRunSchemaPath, "utf8"));
+    const ajv = new Ajv({ allErrors: true, strict: false });
+    for (const format of ["date", "date-time", "uri", "uri-reference", "email"]) {
+      ajv.addFormat(format, true);
+    }
+    dagRunSummaryValidator = ajv.compile(schema);
+  }
+  return dagRunSummaryValidator;
+}
+
+function formatAjvErrors(errors = []) {
+  return errors
+    .map((error) => `${error.instancePath || "/"} ${error.message}`)
+    .join("\n");
+}
+
+function structuredCloneJson(value) {
+  return JSON.parse(JSON.stringify(value));
 }
 
 function node(manifest, id) {

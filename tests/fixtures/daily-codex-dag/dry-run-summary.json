@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "failures": [],
+  "warnings": [],
+  "validation": {
+    "ok": true,
+    "failures": [],
+    "warnings": [],
+    "node_ids": ["fetch-source-health"],
+    "checked_files": ["config/daily-codex-dag.json"]
+  },
+  "mode": "daily_codex_dag_dry_run",
+  "report_date": "2026-07-03",
+  "generated_at": "2026-07-03T08:00:00.000Z",
+  "plan": {
+    "schema_version": 1,
+    "manifest_name": "daily-codex-dag-contract",
+    "description": "Minimal dry-run summary contract fixture.",
+    "node_count": 1,
+    "levels": [
+      {
+        "level": 0,
+        "node_ids": ["fetch-source-health"]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "fetch-source-health",
+        "title": "Fetch source health and raw candidate lanes",
+        "kind": "command",
+        "execution_status": "planned",
+        "plan_status": "planned",
+        "level": 0,
+        "dependencies": [],
+        "inputs": [],
+        "outputs": [
+          {
+            "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json",
+            "required": true
+          }
+        ],
+        "runner_stage_ref": "collect",
+        "parallel_group": "source-lanes",
+        "public_artifact": false,
+        "owner_path_scope": "internal_workdir"
+      }
+    ]
+  },
+  "run": {
+    "final_status": "dry_run_only",
+    "levels": [
+      {
+        "level": 0,
+        "node_ids": ["fetch-source-health"]
+      }
+    ],
+    "planned_nodes": ["fetch-source-health"],
+    "completed_nodes": [],
+    "blocked_nodes": []
+  },
+  "next_action": {
+    "kind": "implement_executable_node_runner",
+    "message": "Dry-run only; executable node execution is outside this fixture."
+  }
+}
