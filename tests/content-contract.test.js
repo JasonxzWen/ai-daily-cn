@@ -24,7 +24,15 @@ const storyFixture = (whatHappened) => ({
   stories: [
     { story_id: "s1", title: "阿里云发布视频生成升级", what_happened: whatHappened, why_it_matters: "面向 AIGC 创作", sources: [{ label: "Alibaba Cloud Blog", url: "https://www.alibabacloud.com/blog/a" }] }
   ],
-  main_items: [{ title: "阿里云发布视频生成升级", url: "https://www.alibabacloud.com/blog/a", bullets: ["阿里云升级视频生成模型，提升一致性与画质。"] }],
+  main_items: [{
+    title: "阿里云发布视频生成升级",
+    url: "https://www.alibabacloud.com/blog/a",
+    summary: "阿里云发布视频生成模型升级，重点改善人物动作表现、跨帧一致性和整体画面质量。",
+    bullets: [
+      "阿里云升级视频生成模型，提升一致性与画质。",
+      "这条信息来自阿里云原始博客，适合内容和产品团队评估生成视频能力。"
+    ]
+  }],
   github_trending: [],
   hot_blogs: [],
   builder_observations: []
@@ -44,18 +52,128 @@ test("content contract is clean for authored story narrative", () => {
   assert.equal(result.degraded.filter((d) => d.code === "story_template_narrative").length, 0);
 });
 
-test("public copy gate blocks user-banned audit and AI-flavored wording for new reports", () => {
+test("public copy gate blocks user-banned audit and AI-flavored wording from 2026-06-30", () => {
   const report = {
     ...storyFixture("OpenAI 披露模型能力更新，材料覆盖评测设置和候选池筛选。"),
-    report_date: "2026-07-01"
+    report_date: "2026-06-30"
   };
   const result = evaluateDailyContentContract(report, {
     html: "<main><h2>信源覆盖与缺口</h2><p>准入门槛通过。</p></main>"
   });
   const issues = result.issues.filter((issue) => issue.code === "public_copy_banned_audit_or_template_wording");
   assert.equal(issues.length, 1);
-  assert(issues[0].examples.some((example) => example.term === "披露"));
+  assert(issues[0].examples.some((example) => example.term === "材料覆盖"));
   assert(issues[0].examples.some((example) => example.term === "信源覆盖与缺口" || example.term === "准入门槛"));
+});
+
+test("public copy gate blocks source-first machine log summaries for new reports", () => {
+  const report = {
+    ...storyFixture("Google 说明 AI 产品、平台或工程变化，内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界。"),
+    report_date: "2026-07-02",
+    summary: "今天最值得看的主线有 Google Keyword说明 AI 产品、平台或工程变化；热门博客这轮主要看 agent 和开发工具的落地边界。",
+    main_items: [
+      {
+        title: "Google Keyword Blog: Nyc AI Summit",
+        summary: "Google Keyword说明 AI 产品、平台或工程变化，内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界，判断时还要看公开材料仍需要回到原文核对入口、权限、价格和适用范围。",
+        bullets: [
+          "Google 在纽约 AI Summit 中介绍教育机构、供应商和学校如何讨论 AI 培训与课堂试点。",
+          "材料涉及教育场景下的采购节奏、教师支持和合作安排。"
+        ],
+        url: "https://blog.google/products-and-platforms/products/education/nyc-ai-summit/"
+      },
+      {
+        title: "microsoft/HARC-Qwen2.5-7B-Instruct",
+        summary: "microsoft/HARC-Qwen2.5-7B-Instruct。",
+        bullets: [
+          "模型卡显示该仓库发布了基于 Qwen2.5-7B-Instruct 的 HARC 变体。",
+          "读者需要看到任务、数据或许可证等具体信息后才能判断是否值得使用。"
+        ],
+        url: "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct"
+      }
+    ]
+  };
+  const result = evaluateDailyContentContract(report);
+  const codes = result.issues.map((issue) => issue.code);
+
+  assert(codes.includes("public_copy_banned_audit_or_template_wording"));
+  assert(codes.includes("main_news_summary_not_authored"));
+});
+
+test("main news bullets reject deterministic audit follow-up lines", () => {
+  const report = storyFixture("OpenAI 发布基础设施复盘，说明崩溃样本如何进入结构化分析。");
+  report.main_items[0].bullets = [
+    "OpenAI 工程团队把多个 core dump 汇总成可查询数据集，用群体分析定位基础设施崩溃的共性线索。",
+    "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
+    "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。"
+  ];
+
+  const result = evaluateDailyContentContract(report);
+
+  assert(result.issues.some((issue) => issue.code === "main_news_bullet_contract_failed"));
+});
+
+test("public copy gate blocks GitHub/HF template summaries and Chinese-media English fallback", () => {
+  const report = {
+    ...storyFixture("OpenAI 发布模型能力更新，说明评测设置和使用范围。"),
+    report_date: "2026-07-02",
+    github_trending: [
+      {
+        repo: "xbtlin/ai-berkshire",
+        description: "ai-berkshire 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建；它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。"
+      }
+    ],
+    projects: [
+      {
+        repo: "google-labs-code/design.md",
+        description: "google-labs-code/design.md 是本轮开源榜单中的项目，公开页面显示它与工程工具、自动化、基础设施或开发者工作流相关。读者应看项目说明、安装步骤、示例质量、许可证、最近提交、问题区反馈和维护者回应，再判断是否适合试用或继续跟踪。"
+      },
+      {
+        repo: "ogulcancelik/herdr",
+        description: "herdr 是终端里的 agent multiplexer，真正可用性取决于任务面板、日志保留、失败恢复和与本地 worktree 策略的配合。成本。"
+      }
+    ],
+    huggingface_trending: [
+      {
+        repo: "deepseek-ai/DeepSeek-R1",
+        description: "deepseek-ai/DeepSeek-R1 是 Hugging Face 上的文本生成模型，热度指标是 7849894 downloads、13425 likes；页面还标出 task: text-generation。"
+      },
+      {
+        repo: "black-forest-labs/FLUX.1-dev",
+        description: "black-forest-labs/FLUX.1-dev 是 Hugging Face 上的图像生成模型。本周榜单记录 1090527 downloads、13429 likes，说明仍有较高社区使用热度；真正选型还要看模型卡、许可证、推理成本和限制。"
+      }
+    ],
+    hot_blogs: [
+      {
+        title: "OpenAI 更新 agent 工作流和开发工具能力",
+        summary: "更有价值的信息是agent 工作流、开发工具入口、权限控制和工程集成，判断这类方案时还要看实际效果取决于权限模型、评估回放、团队流程和可观测性。文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。"
+      }
+    ],
+    daily_tracking: [
+      {
+        title: "OpenRouter",
+        summary: "No previous component snapshot was available for comparison."
+      }
+    ],
+    chinese_media_dynamics: [
+      {
+        title: "QbitAI 线索",
+        summary: "QbitAI published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+      }
+    ]
+  };
+  const result = evaluateDailyContentContract(report);
+  const issue = result.issues.find((item) => item.code === "public_copy_banned_audit_or_template_wording");
+
+  assert(issue);
+  const terms = issue.examples.map((example) => example.term);
+  assert(terms.some((term) => ["面向agent 工作流和自动化工程", "核心能力是"].includes(term)));
+  assert(terms.some((term) => ["本轮开源榜单", "公开页面显示", "读者应看项目说明"].includes(term)));
+  assert(terms.some((term) => ["配合。成本"].includes(term)));
+  assert(terms.some((term) => ["热度指标是", "页面还标出"].includes(term)));
+  assert(terms.some((term) => ["本周榜单记录", "downloads、likes", "社区使用热度"].includes(term)));
+  assert(terms.some((term) => ["published this intermediary lead entry", "This is an intermediary/self-media lead", "trace it to a primary source"].includes(term)));
+  assert(terms.some((term) => ["更有价值的信息是", "判断这类方案时还要看", "文章梳理一个 AI 产品"].includes(term)));
+  assert(terms.includes("No previous component snapshot was available for comparison."));
 });
 
 test("public copy gate ignores internal source audit fields", () => {

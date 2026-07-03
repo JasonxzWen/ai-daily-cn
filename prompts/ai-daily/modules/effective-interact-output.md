@@ -4,7 +4,7 @@
 
 执行边界：
 
-- 结构化草稿先由 `npm run report:draft -- --date YYYY-MM-DD --input <discovery-jsons> --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json` 从候选池自动选取并写入 `.tmp/daily-report.json`，再用 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 标准化。
+- 结构化草稿可以由 `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute` 分阶段生成；该入口会把信息收集、准入判断、逐条新闻概括和组装拆成独立 Codex CLI 上下文。旧的 `npm run report:draft -- --date YYYY-MM-DD --input <discovery-jsons> --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json` 仍保留为确定性回退路径。两条路径最终都必须用 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 标准化。
 - `npm run build` 会把标准化后的日报 JSON 转成 effective-interact interaction input，并调用 `.codex/skills/effective-interact/scripts/create-interaction.mjs` 生成公开 HTML。
 - 公开日报使用 `renderMode: "pre-rendered"`，不得依赖远程脚本、远程字体或 CDN runtime。
 - interaction input 必须保留日报日期、覆盖时间范围、摘要、主体信息、非空热门博客、GitHub Trending weekly Top20、Builder 观察、社区线索、公开“信源覆盖与缺口”摘要、结构化 JSON 链接和 effective-interact 组件能力；空数组对应板块不要渲染到正文和导航中；国内/中文动态并入现有栏目，不生成独立“国内动态”导航项。
@@ -13,7 +13,7 @@
 - `model_releases` 只保留为结构化 JSON 索引，不渲染公开“模型发布”正文板块；相关模型新闻必须先进入 `main_items`。
 - `projects` 只作为 GitHub Trending 条目内的领域、用途和信号数据来源；不渲染公开“今日值得关注的项目”独立板块，也不渲染“项目 highlight / 项目 highlights”标签、子标题或额外项目列表。未匹配到 GitHub Trending Top20 的 `projects` 不公开展示。
 - 非一手来源进入观点、产品、Builder 或社区板块时，interaction input 必须在结构化数据里保留 `source_level` / `verification_status`，但公开卡片不要用“已核查事实 / 官方一手来源 / 第三方报道 / 社区线索 / 原始社交动态”等通用来源桶做重复 tag 或详情格；读者可见信息优先使用真实来源名、标题、正文、日期、原文链接和必要的具体披露。
-- `stories` 是生产日报主新闻流：默认 8 条、最多 12 条，允许少于 8；每条公开渲染具体标题、`what_happened`、紧凑 `why_it_matters`、`evidence_level` 和来源链接。`main_items` 仅作为兼容映射，不得重新作为独立事实池；公开页不渲染 `reader_relevance`、入选条件、候选分数或 watch-next。
+- `stories` 是生产日报主新闻流：默认 8 条、最多 12 条，允许少于 8；每个主题分组公开渲染为默认展开的大 cell，内部展示具体标题、2-3 条读者事实 bullet、`evidence_level` 和来源链接。`what_happened` / `why_it_matters` 可作为结构化素材，但公开页不得显示“发生了什么：/ 为什么值得看：”字段标签，也不得给每条 story 生成默认折叠详情。`main_items` 仅作为兼容映射，不得重新作为独立事实池；公开页不渲染 `reader_relevance`、入选条件、候选分数或 watch-next。
 - 热门博客公开卡片只呈现 100-200 个中文字符的文章概括和来源；不要渲染 `key_points`。当结构化草稿摘要不足、模板化或重复时，生成阶段应裁剪/降级或阻塞，不要在页面模板里临时造解释性废话。
 - 图片不是必填项；只有尺寸、语义和可读性合格的网页内部图片资产可公开展示，tiny icon、favicon、logo、头像、装饰图和不可读截图都不得展示。
 - 公开日报默认隐藏 source audit、自检、ledger、quality status 详情、candidate diagnostics、执行命令、remediation、parsed_count 和失败案例复盘；这些只留在 `reports-data`、质量报告或交接材料中。

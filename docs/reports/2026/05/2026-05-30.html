@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-artifact-kind="research" data-status="complete" data-runtime-state="not-runtime">
+<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-artifact-kind="research" data-status="degraded" data-runtime-state="not-runtime">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2943,8 +2943,105 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   color: var(--muted);
 }
 
-/* Stage D: Feishu-style left-rail table of contents (desktop only; mobile keeps
-   the engine's horizontal nav so the per-story TOC stays contained). */
+.report-shell {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.report-section-stack > section[id^="section-track-"] {
+  border-radius: 8px;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown {
+  font-size: 0.95rem;
+  line-height: 1.66;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown > p:first-child {
+  margin-top: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown strong {
+  display: block;
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.38;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown ul {
+  margin: 6px 0 14px;
+  padding-left: 1.15rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown li {
+  margin: 4px 0;
+}
+
+.inline-site-icon {
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: cover;
+}
+
+.card-title-icon {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px;
+  max-height: 18px;
+  flex: 0 0 18px;
+}
+
+.chip,
+.text-highlight,
+.daily-tag,
+.tag-highlight,
+.tag-stars,
+.tag-topic,
+.tag-major,
+.tag-notable,
+.tag-general {
+  font-size: 0.78rem;
+  line-height: 1.2;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.chip:hover,
+a.chip:hover,
+.text-highlight:hover,
+.daily-tag:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 44%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 76%, #ffffff);
+  color: var(--accent);
+}
+
+.chip-topic,
+.tag-topic {
+  border-color: #adc4ce;
+  background: #edf3f5;
+  color: #31586a;
+}
+
+.chip-major,
+.tag-major {
+  border-color: #d7a06a;
+  background: #fff1df;
+  color: #8a431c;
+}
+
+.chip-notable,
+.tag-notable {
+  border-color: #b7c68f;
+  background: #eef4df;
+  color: #526a2d;
+}
+
+/* Reader report left rail: desktop keeps category-level anchors; mobile keeps
+   the engine's horizontal nav. */
 @media (min-width: 761px) {
   .report-layout {
     grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
@@ -2972,6 +3069,60 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   .report-nav a {
     white-space: normal;
     border-radius: 6px;
+  }
+
+  .report-nav a[href^="#section-track-"] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    justify-content: flex-start;
+    border-left: 3px solid transparent;
+    margin-top: 8px;
+    font-size: 0.88rem;
+    font-weight: 760;
+  }
+
+  .report-nav a[href^="#section-track-"]::before {
+    display: block;
+    content: "正文主线";
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .report-nav a[href="#section-github-trending"]::before,
+  .report-nav a[href="#section-huggingface-trending"]::before {
+    content: "开源与模型";
+  }
+
+  .report-nav a[href="#section-trend-tracking"]::before,
+  .report-nav a[href="#section-model-releases"]::before {
+    content: "趋势追踪";
+  }
+
+  .report-nav a[href="#section-subscribed-rss"]::before,
+  .report-nav a[href="#section-hot-blogs"]::before,
+  .report-nav a[href="#section-chinese-media-dynamics"]::before {
+    content: "媒体与订阅";
+  }
+
+  .report-nav a[href^="#section-track-"]:hover,
+  .report-nav a[href^="#section-track-"][aria-current="true"] {
+    border-left-color: var(--accent);
+  }
+
+  .report-nav a:not([href^="#section-track-"]) {
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .report-nav a[href^="#section-story-"] {
+    display: none;
   }
 
   .report-nav a + a {
@@ -3020,7 +3171,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
           <div class="eyebrow">AI 日报 · 覆盖 2026-05-28 至 2026-05-30</div>
           <h1 class="report-title">2026-05-30</h1>
         </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
+        <div class="toolbar"><span class="status-pill status-warn">状态：降级</span></div>
       </div>
       <div class="hero-brief">
         <p class="hero-summary-text">今天的主线是前沿模型进入更窄、更可审计的使用场景：OpenAI 把 GPT-Rosalind 放进公共卫生和生物防御伙伴的可信访问链路，Google Cloud 将 Nano Banana 2 与 Nano Banana Pro 推到企业平台 GA，Anthropic 用 Series H 把安全研究、产品和算力供应链绑在一起。GitHub Trending 继续由视频生成、文档摄取、coding agent 和开源 CRM 占据前排。</p>
@@ -3044,12 +3195,9 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <div class="report-nav-group-title">阅读顺序</div>
       <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
       <a href="#section-track-industry" title="AI 行业动态" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>AI 行业动态</span></a>
-<a href="#section-story-1" title="OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问</span></a>
-<a href="#section-story-2" title="Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA</span></a>
-<a href="#section-story-3" title="Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴</span></a>
-<a href="#section-official-blog-updates" title="官方 Blog 更新" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>官方 Blog 更新</span></a>
-<a href="#section-github-trending" title="GitHub Trending · Top 8" data-nav-link data-nav-index="6" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
-<a href="#section-twitter-discussion" title="X/Twitter 讨论" data-nav-link data-nav-index="7" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
+<a href="#section-official-blog-updates" title="官方 Blog 更新" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>官方 Blog 更新</span></a>
+<a href="#section-github-trending" title="GitHub Trending · Top 8" data-nav-link data-nav-index="3" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
+<a href="#section-twitter-discussion" title="X/Twitter 讨论" data-nav-link data-nav-index="4" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3062,63 +3210,30 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）</p></div>
-    <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）</template>
-  </section>
-<details class="panel rich-section collapsible-panel" id="section-story-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问</span>
-      <span class="collapsible-subtitle">文章列出的任务包含 epidemiological modeling、early detection、screening 和 response preparedness，说明模型能力被包装为可审计的…</span>
-    </span>
+    <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）</p>
+<p><strong><a href="https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy"> OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>OpenAI 宣布 Rosalind Biodefense，并称将向选定的美国政府、盟友公共卫生与生物防御伙伴提供 GPT-Rosalind 的可信访问。帖子把使用场景限定在流行病建模、早期检测、筛查、风险评估和响应准备等公共安全任务，而不是面向大众直接开放。</li><li>文章列出的任务包含 epidemiological modeling、early detection、screening 和 response preparedness，说明模型能力被包装为可审计的公共卫生工具。</li><li>来源：<a href="https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy"> OpenAI</a></li></ul>
+<p><strong><a href="https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdDPC90ZXh0Pjwvc3ZnPg==" alt="Google Cloud" loading="lazy"> Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">enterprise agent governance: 7d 3x/3d</mark></p>
+<ul><li>Google Cloud 宣布 Nano Banana 2 和 Nano Banana Pro 在 Gemini Enterprise Agent Platform 上 GA。官方说明把 Nano Banana 2 对应为 Gemini 3.1 Flash Image，把 Nano Banana Pro 对应为 Gemini 3 Pro Image，并提示开发者也可通过 Gemini API 使用这些模型，但 API 路径不享有企业 SLA。</li><li>Nano Banana 2 支持视频文件作为输入提示仍处于 preview；1K/2K 输出 GA，4K 输出仍是 preview，生产场景需要按功能状态拆分开关。</li><li>来源：<a href="https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdDPC90ZXh0Pjwvc3ZnPg==" alt="Google Cloud" loading="lazy"> Google Cloud</a></li></ul>
+<p><strong><a href="https://www.anthropic.com/news/series-h" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic" loading="lazy"> Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>Anthropic 宣布完成 Series H，称本轮融资规模为 650 亿美元，由 Altimeter、Dragoneer、Greenoaks 与 Sequoia 共同领投。公司同时披露年化收入、战略内存伙伴、Amazon 与 Google/Broadcom 算力协议、SpaceX GPU 容量，以及 Claude 可在 AWS、Google Cloud 和 Azure 获得的部署路径。</li><li>Amazon 最高 5GW 的 Project Rainier 容量、Google/Broadcom 5GW TPU 协议和 SpaceX Colossus GPU 容量共同构成后续 Claude 供给的关键背景。</li><li>来源：<a href="https://www.anthropic.com/news/series-h" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic" loading="lazy"> Anthropic</a></li></ul></div>
+    <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy"> OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：OpenAI 宣布 Rosalind Biodefense，并称将向选定的美国政府、盟友公共卫生与生物防御伙伴提供 GPT-Rosalind 的可信访问。帖子把使用场景限定在流行病建模、早期检测、筛查、风险评估和响应准备等公共安全任务，而不是面向大众直接开放。</li><li>为什么值得看：文章列出的任务包含 epidemiological modeling、early detection、screening 和 response preparedness，说明模型能力被包装为可审计的公共卫生工具。</li><li>来源：<a href="https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy"> OpenAI</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问](https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/)** ==tag-major|重大== ==tag-topic|topic|primary==
-- 发生了什么：OpenAI 宣布 Rosalind Biodefense，并称将向选定的美国政府、盟友公共卫生与生物防御伙伴提供 GPT-Rosalind 的可信访问。帖子把使用场景限定在流行病建模、早期检测、筛查、风险评估和响应准备等公共安全任务，而不是面向大众直接开放。
-- 为什么值得看：文章列出的任务包含 epidemiological modeling、early detection、screening 和 response preparedness，说明模型能力被包装为可审计的公共卫生工具。
-- 来源：[![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI](https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-2" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA</span>
-      <span class="collapsible-subtitle">Nano Banana 2 支持视频文件作为输入提示仍处于 preview；1K/2K 输出 GA，4K 输出仍是 preview，生产场景需要按功能状态拆分开关。</span>
-    </span>
+**[![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问](https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/)** ==tag-major|重大== ==tag-topic|topic|primary==
+- OpenAI 宣布 Rosalind Biodefense，并称将向选定的美国政府、盟友公共卫生与生物防御伙伴提供 GPT-Rosalind 的可信访问。帖子把使用场景限定在流行病建模、早期检测、筛查、风险评估和响应准备等公共安全任务，而不是面向大众直接开放。
+- 文章列出的任务包含 epidemiological modeling、early detection、screening 和 response preparedness，说明模型能力被包装为可审计的公共卫生工具。
+- 来源：[![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI](https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdDPC90ZXh0Pjwvc3ZnPg==" alt="Google Cloud" loading="lazy"> Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">enterprise agent governance: 7d 3x/3d</mark></p>
-<ul><li>发生了什么：Google Cloud 宣布 Nano Banana 2 和 Nano Banana Pro 在 Gemini Enterprise Agent Platform 上 GA。官方说明把 Nano Banana 2 对应为 Gemini 3.1 Flash Image，把 Nano Banana Pro 对应为 Gemini 3 Pro Image，并提示开发者也可通过 Gemini API 使用这些模型，但 API 路径不享有企业 SLA。</li><li>为什么值得看：Nano Banana 2 支持视频文件作为输入提示仍处于 preview；1K/2K 输出 GA，4K 输出仍是 preview，生产场景需要按功能状态拆分开关。</li><li>来源：<a href="https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdDPC90ZXh0Pjwvc3ZnPg==" alt="Google Cloud" loading="lazy"> Google Cloud</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Google Cloud](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdDPC90ZXh0Pjwvc3ZnPg==) Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA](https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|enterprise agent governance: 7d 3x/3d==
-- 发生了什么：Google Cloud 宣布 Nano Banana 2 和 Nano Banana Pro 在 Gemini Enterprise Agent Platform 上 GA。官方说明把 Nano Banana 2 对应为 Gemini 3.1 Flash Image，把 Nano Banana Pro 对应为 Gemini 3 Pro Image，并提示开发者也可通过 Gemini API 使用这些模型，但 API 路径不享有企业 SLA。
-- 为什么值得看：Nano Banana 2 支持视频文件作为输入提示仍处于 preview；1K/2K 输出 GA，4K 输出仍是 preview，生产场景需要按功能状态拆分开关。
-- 来源：[![Google Cloud](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdDPC90ZXh0Pjwvc3ZnPg==) Google Cloud](https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴</span>
-      <span class="collapsible-subtitle">Amazon 最高 5GW 的 Project Rainier 容量、Google/Broadcom 5GW TPU 协议和 SpaceX Colossus GPU 容量共同构成后续 Claude…</span>
-    </span>
+**[![Google Cloud](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdDPC90ZXh0Pjwvc3ZnPg==) Google Cloud 宣布 Nano Banana 2 与 Nano Banana Pro GA](https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|enterprise agent governance: 7d 3x/3d==
+- Google Cloud 宣布 Nano Banana 2 和 Nano Banana Pro 在 Gemini Enterprise Agent Platform 上 GA。官方说明把 Nano Banana 2 对应为 Gemini 3.1 Flash Image，把 Nano Banana Pro 对应为 Gemini 3 Pro Image，并提示开发者也可通过 Gemini API 使用这些模型，但 API 路径不享有企业 SLA。
+- Nano Banana 2 支持视频文件作为输入提示仍处于 preview；1K/2K 输出 GA，4K 输出仍是 preview，生产场景需要按功能状态拆分开关。
+- 来源：[![Google Cloud](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdDPC90ZXh0Pjwvc3ZnPg==) Google Cloud](https://cloud.google.com/blog/products/ai-machine-learning/nano-banana-2-and-nano-banana-pro-are-generally-available)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://www.anthropic.com/news/series-h" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic" loading="lazy"> Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：Anthropic 宣布完成 Series H，称本轮融资规模为 650 亿美元，由 Altimeter、Dragoneer、Greenoaks 与 Sequoia 共同领投。公司同时披露年化收入、战略内存伙伴、Amazon 与 Google/Broadcom 算力协议、SpaceX GPU 容量，以及 Claude 可在 AWS、Google Cloud 和 Azure 获得的部署路径。</li><li>为什么值得看：Amazon 最高 5GW 的 Project Rainier 容量、Google/Broadcom 5GW TPU 协议和 SpaceX Colossus GPU 容量共同构成后续 Claude 供给的关键背景。</li><li>来源：<a href="https://www.anthropic.com/news/series-h" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=" alt="Anthropic" loading="lazy"> Anthropic</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Anthropic](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=) Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴](https://www.anthropic.com/news/series-h)** ==tag-major|重大== ==tag-topic|topic|primary==
-- 发生了什么：Anthropic 宣布完成 Series H，称本轮融资规模为 650 亿美元，由 Altimeter、Dragoneer、Greenoaks 与 Sequoia 共同领投。公司同时披露年化收入、战略内存伙伴、Amazon 与 Google/Broadcom 算力协议、SpaceX GPU 容量，以及 Claude 可在 AWS、Google Cloud 和 Azure 获得的部署路径。
-- 为什么值得看：Amazon 最高 5GW 的 Project Rainier 容量、Google/Broadcom 5GW TPU 协议和 SpaceX Colossus GPU 容量共同构成后续 Claude 供给的关键背景。
+**[![Anthropic](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=) Anthropic 完成 650 亿美元 Series H 融资并列出算力伙伴](https://www.anthropic.com/news/series-h)** ==tag-major|重大== ==tag-topic|topic|primary==
+- Anthropic 宣布完成 Series H，称本轮融资规模为 650 亿美元，由 Altimeter、Dragoneer、Greenoaks 与 Sequoia 共同领投。公司同时披露年化收入、战略内存伙伴、Amazon 与 Google/Broadcom 算力协议、SpaceX GPU 容量，以及 Claude 可在 AWS、Google Cloud 和 Azure 获得的部署路径。
+- Amazon 最高 5GW 的 Project Rainier 容量、Google/Broadcom 5GW TPU 协议和 SpaceX Colossus GPU 容量共同构成后续 Claude 供给的关键背景。
 - 来源：[![Anthropic](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEX6+fUUFBMAAAD////9/Pj29fH///3///ttbWvY19QRERDe3dkNDQy9vLnv7urp6OQ6OjmJiIZOTUxEREO0tLEyMTCtrKmlpKEqKinR0Mx2dnSPjoyBgX5UVFJjYmHDw7+Yl5QdHRzi9ahqAAABsklEQVRYhe2V25aCMAxFtYFWsSBeEe/+/09Om6RQRoQ4j7M4LzYU0pPdps5mkyZN+t9KSD2B8Pv1ElVgUON4/U0GKBVqoV2gKSjhCwMrNUep1Ec5Rmolt2A2IUFlfKgyP95ouQP8wsmeoMmXKbEDk7MBt2ydNBWpvREmgK1tEpy9b9j5B3YrxJiscUFKotDSniwId9Jc/Ou2jDASFHWR1cDQqyvmOXjfmjGKEoRtL5b0u4ww5pIa4OZfVjeAk20xljiWYGSEbjFTqb9gNM9QblLE209jAUZt6dy6N+FO24EYr0KMyaPtnM6YMT7GaiCEtOpM04ZeEePBEtsRA1z3Ea3SkaIuMkcRRkI4VxpQPRifwxQgtAAL29ruEOMZi5sP1sDYnG0W9yRirAUYaePeRJcRY7wPWGCEb2KMfDKLzxYYoVWRMjrYHl06ihFeePMcFpFOWXMZjWIMmHLQjaBqtz/M159q0Iue855GXcQN/hEjv7vpJND3NusIxjDd/QcKHYWX0TBGMkjHLn5M/Y1dREXaV28NbinU8Vd611EobnBU/2lMSe9zPIGrRONJkyZN6uoHDOIUEM1IBJkAAAAASUVORK5CYII=) Anthropic](https://www.anthropic.com/news/series-h)</template>
-  </details>
+  </section>
 <section class="panel" id="section-official-blog-updates" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>

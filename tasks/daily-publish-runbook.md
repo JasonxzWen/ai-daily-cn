@@ -7,11 +7,11 @@ Use this runbook for daily AI report generation and GitHub Pages publishing.
 
 ## Codex-Native Runner Contract
 
-- Scheduled and long-running publish tasks start from the launcher worktree and invoke `npm run daily:run -- --date YYYY-MM-DD`.
-- Dry-run-only mode is the default. It stops after `publish:dry-run:daily`, writes `.tmp/run-summary-YYYY-MM-DD.json`, and reports `final_status:"generated_only"`.
-- Real publish requires `npm run daily:run -- --date YYYY-MM-DD --publish`. Publish mode may run the final `publish` stage and uses max 5 review -> AI repair contract -> repair -> review loops.
-- The runner owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Codex owns semantic AI repair when `next_action.kind` is `codex_ai_repair_contract`; save the requested contract path with `schema_version`, `report_date`, `status:"ready"`, and non-empty `edits` before resuming with the same `daily:run` command. If runner created a `status:"template"` contract, fill only the necessary public-text edits and then change the status to `ready`; do not overwrite prior attempt files.
-- Use `--restart` only when you intentionally discard the same-date `.tmp/run-summary-YYYY-MM-DD.json` state and start over.
+- Scheduled and long-running publish tasks start from the launcher worktree and invoke `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
+- Dry-run-only mode is the default. It runs generation and quality gates, writes `.tmp/run-summary-YYYY-MM-DD.json`, and reports `final_status:"generated_only"`.
+- Real publish requires `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`. Publish mode runs `publish:dry-run:daily` before real publish and Pages verification.
+- The pipeline owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Information collection, admission, per-item summarization, assembly, quality review, source Phase 5 audit, content contract, page check, publish dry-run, real publish, and Pages verification are separate stages and should be read from `completed_stages`.
+- To intentionally discard same-date pipeline state, delete or replace `.tmp/daily-codex-pipeline/YYYY-MM-DD` before rerunning the same command.
 - Scheduled automation must use `publish:dry-run:daily` as the only dry-run command. The older `publish:dry-run -- --date YYYY-MM-DD` remains for manual diagnostics only.
 - A separate 21:30 status self-check runs `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json`.
 - `status:self-check` checks current artifacts, Pages HTTP, `quality_status`, `sources:health`, `publish:dry-run:daily`, and active Codex automations; `multiple_active_daily_publish_automations` is a blocking issue.
@@ -64,7 +64,7 @@ node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enab
 ```
 
 - Do not run retired platform discovery lanes (`discover:wechat-platform`, `discover:zhihu-platform`, or `discover:reddit-platform`). The current source reset uses direct Chinese RSS, the GitHub watchlist, and bottom community-hotspot feeds through `config/sources/*.json` and `discover:content-sources`.
-- `daily:run` must run `source_reset_preflight` before discovery. If it fails, treat the checkout as stale or incomplete source-reset code and stop; do not continue to generate a public daily from old scripts.
+- `daily:codex-pipeline` must run from a latest-main clean baseline before discovery. If bootstrap or source validation fails, treat the checkout as stale or incomplete source-reset code and stop; do not continue to generate a public daily from old scripts.
 - Keep direct Chinese RSS as intermediary leads only: QbitAI, InfoQ CN, 36Kr, and any actually working direct feed such as Machine Heart when the endpoint is verified as RSS/XML. Do not reintroduce RSSHub, WeChat aggregator templates, Zhihu scraping, or broad self-media feeds into the default run.
 - GitHub watchlist sources are fixed daily checks: `LearnPrompt/ai-news-radar`, `zarazhangrui/follow-builders`, `nickzren/ai-news-agent`, and `SalvatoreRa/ML-news-of-the-week`. `follow-builders` raw X JSON is the core Builder lane; repo commits and weekly README surfaces are context signals and must not become filler main stories without primary backtrace.
 - Community-hotspot feeds belong at the bottom of the public daily page when selected: HNRSS frontpage 100+, HNRSS AI newest, Reddit r/MachineLearning, r/LocalLLaMA, r/singularity, and r/artificial. HNRSS/Reddit blockages stay internal diagnostics unless the selected content itself changes reader-facing judgment.
@@ -81,10 +81,10 @@ npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-D
 
 - `report:draft` writes source successes, failures, empty results, selected `included` markers, and cached `image_url` evidence assets. If it cannot cache an image, keep the skipped reason in command output and let `quality_status.degraded_sections` disclose evidence coverage gaps.
 - For reports dated `2026-06-02` or later, apply the two-level publish quality gate. `blocking_issues` stop dry-run and real publish: invalid automation revision, report generation commit not proving latest `origin/main` through `origin_main_sha`, schema or candidate back-reference failures, stale/duplicated stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, or pre-publish public page quality failures. Fixed source surface gaps, GitHub Trending / Builder X / evidence asset coverage gaps, empty sections, and model-release mirroring gaps are `degraded_sections`: the report may publish, but source-health details stay in structured JSON/internal diagnostics. Public HTML shows degradation only when the issue changes reader-facing interpretation of the content. If repository publish succeeds but GitHub Pages has not refreshed after retries, report `published_pending_pages_verification` and verify the URL later instead of repeating publish.
-- If `daily:run` ends with `next_action.kind:"restart_latest_main"` after `publish_dry_run_daily` or `publish_real`, do not reuse the stale generated artifacts. Re-run from the launcher worktree so `publish:prepare-clean-worktree` fetches the current `origin/main` and the report is regenerated against that baseline:
+- If `daily:codex-pipeline` ends with `next_action.kind:"restart_latest_main"` after publish dry-run or real publish, do not reuse the stale generated artifacts. Re-run from the launcher worktree so the pipeline fetches the current `origin/main` and regenerates the report against that baseline:
 
 ```powershell
-npm run daily:run -- --date YYYY-MM-DD --restart
+npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
 ```
 
   Add `--publish` only when the original run was an explicitly approved real publish run.

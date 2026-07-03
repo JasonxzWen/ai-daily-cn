@@ -107,6 +107,7 @@ export function githubTrendMovementLabel(item) {
 export function cleanProjectDescription(value) {
   const text = String(value || "")
     .trim()
+    .replace(/\s*这类项目不应只看星标变化[^。]*。?/gu, "")
     .replace(/，在[^，。；]*(?:daily|weekly)[^，。；]*(?:中出现|出现)/gi, "")
     .replace(/，说明[^。；]+/g, "")
     .trim();
@@ -147,7 +148,7 @@ function githubTrendDescriptionSource(item = {}) {
 }
 
 function isGenericGithubTrendDescription(value) {
-  if (/公开描述指向|关键词包括|ranked\s+(?:model|repo|repository)\s+entry|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|README\s*显示核心能力|读者应先确认|适合先从|优先核对|重点看 README|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README/iu.test(String(value || ""))) {
+  if (/公开描述指向|关键词包括|ranked\s+(?:model|repo|repository)\s+entry|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|README\s*显示核心能力|读者应先确认|读者应先确认快速开始|适合先从|优先核对|重点看 README|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README|本轮开源榜单|公开页面显示|读者应看项目说明|公开信息只能说明开发者关注度增加|这类项目不应只看星标变化|面向AI\s*工程实践的开源项目|给出README\s*说明和使用入口|这类项目适合先从最小示例复现/iu.test(String(value || ""))) {
     return true;
   }
   return /进入 GitHub Trending Top 10|优先核对 README|重点看 README|可作为[^。；;]*?(?:实现线索|观察)|AI 工程工具方向的开源项目观察/u.test(String(value || ""));

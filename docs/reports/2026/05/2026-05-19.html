@@ -2943,8 +2943,105 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   color: var(--muted);
 }
 
-/* Stage D: Feishu-style left-rail table of contents (desktop only; mobile keeps
-   the engine's horizontal nav so the per-story TOC stays contained). */
+.report-shell {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.report-section-stack > section[id^="section-track-"] {
+  border-radius: 8px;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown {
+  font-size: 0.95rem;
+  line-height: 1.66;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown > p:first-child {
+  margin-top: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown strong {
+  display: block;
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.38;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown ul {
+  margin: 6px 0 14px;
+  padding-left: 1.15rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown li {
+  margin: 4px 0;
+}
+
+.inline-site-icon {
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: cover;
+}
+
+.card-title-icon {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px;
+  max-height: 18px;
+  flex: 0 0 18px;
+}
+
+.chip,
+.text-highlight,
+.daily-tag,
+.tag-highlight,
+.tag-stars,
+.tag-topic,
+.tag-major,
+.tag-notable,
+.tag-general {
+  font-size: 0.78rem;
+  line-height: 1.2;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.chip:hover,
+a.chip:hover,
+.text-highlight:hover,
+.daily-tag:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 44%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 76%, #ffffff);
+  color: var(--accent);
+}
+
+.chip-topic,
+.tag-topic {
+  border-color: #adc4ce;
+  background: #edf3f5;
+  color: #31586a;
+}
+
+.chip-major,
+.tag-major {
+  border-color: #d7a06a;
+  background: #fff1df;
+  color: #8a431c;
+}
+
+.chip-notable,
+.tag-notable {
+  border-color: #b7c68f;
+  background: #eef4df;
+  color: #526a2d;
+}
+
+/* Reader report left rail: desktop keeps category-level anchors; mobile keeps
+   the engine's horizontal nav. */
 @media (min-width: 761px) {
   .report-layout {
     grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
@@ -2972,6 +3069,60 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   .report-nav a {
     white-space: normal;
     border-radius: 6px;
+  }
+
+  .report-nav a[href^="#section-track-"] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    justify-content: flex-start;
+    border-left: 3px solid transparent;
+    margin-top: 8px;
+    font-size: 0.88rem;
+    font-weight: 760;
+  }
+
+  .report-nav a[href^="#section-track-"]::before {
+    display: block;
+    content: "正文主线";
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .report-nav a[href="#section-github-trending"]::before,
+  .report-nav a[href="#section-huggingface-trending"]::before {
+    content: "开源与模型";
+  }
+
+  .report-nav a[href="#section-trend-tracking"]::before,
+  .report-nav a[href="#section-model-releases"]::before {
+    content: "趋势追踪";
+  }
+
+  .report-nav a[href="#section-subscribed-rss"]::before,
+  .report-nav a[href="#section-hot-blogs"]::before,
+  .report-nav a[href="#section-chinese-media-dynamics"]::before {
+    content: "媒体与订阅";
+  }
+
+  .report-nav a[href^="#section-track-"]:hover,
+  .report-nav a[href^="#section-track-"][aria-current="true"] {
+    border-left-color: var(--accent);
+  }
+
+  .report-nav a:not([href^="#section-track-"]) {
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .report-nav a[href^="#section-story-"] {
+    display: none;
   }
 
   .report-nav a + a {
@@ -3043,12 +3194,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <div class="report-nav-group-title">阅读顺序</div>
       <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
       <a href="#section-track-industry" title="AI 行业动态" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>AI 行业动态</span></a>
-<a href="#section-story-1" title="OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境</span></a>
-<a href="#section-story-2" title="GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制</span></a>
-<a href="#section-story-3" title="xAI 推出 Grok Skills，让偏好和工作流跨会话复用" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>xAI 推出 Grok Skills，让偏好和工作流跨会话复用</span></a>
-<a href="#section-story-4" title="Sigma 发布面向 AI coding agents 的数据建模能力" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>Sigma 发布面向 AI coding agents 的数据建模能力</span></a>
-<a href="#section-story-5" title="Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报" data-nav-link data-nav-index="6" data-nav-group-name="main" data-nav-status="info"><span>Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报</span></a>
-<a href="#section-official-blog-updates" title="官方 Blog 更新" data-nav-link data-nav-index="7" data-nav-group-name="main" data-nav-status="info"><span>官方 Blog 更新</span></a>
+<a href="#section-official-blog-updates" title="官方 Blog 更新" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>官方 Blog 更新</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3061,99 +3207,44 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 5 条）</p></div>
-    <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 5 条）</template>
-  </section>
-<details class="panel rich-section collapsible-panel" id="section-story-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境</span>
-      <span class="collapsible-subtitle">双方还会探索 Codex、ChatGPT Enterprise 和 API based solutions 与 Dell AI Factory 的接口，覆盖数据准备、系统记录管理、测试和 AI 应用…</span>
-    </span>
+    <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 5 条）</p>
+<p><strong><a href="https://openai.com/index/dell-codex-enterprise-partnership/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News" loading="lazy"> OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 12x/6d</mark></p>
+<ul><li>OpenAI 宣布与 Dell Technologies 合作，让企业把 Codex 接近代码库、文档、业务系统和运营知识所在的混合或本地环境，而不是只把 agent 工作流放在云端入口。</li><li>双方还会探索 Codex、ChatGPT Enterprise 和 API-based solutions 与 Dell AI Factory 的接口，覆盖数据准备、系统记录管理、测试和 AI 应用部署。</li><li>来源：<a href="https://openai.com/index/dell-codex-enterprise-partnership/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News" loading="lazy"> OpenAI News</a></li></ul>
+<p><strong><a href="https://github.blog/changelog/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" loading="lazy"> GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">MCP: 7d 7x/3d</mark></p>
+<ul><li>GitHub Changelog 在 2026-05-18 同日列出多项 Copilot 更新：Actions 失败日志可一键交给 cloud agent 修复，cloud agent 增加更快低成本模型，Web chat 自动带入页面上下文，repo 级 cloud agent 配置可经 REST API 审计，Spaces API GA，Copilot CLI 远程控制 GA。</li><li>模型选择增加 Claude Haiku 4.5 和 GPT-5.4-mini，GitHub 明确把简单任务与复杂任务的模型成本分层暴露给用户。</li><li>来源：<a href="https://github.blog/changelog/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" loading="lazy"> GitHub Changelog</a></li></ul>
+<p><strong><a href="https://x.ai/news/grok-skills" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI News" loading="lazy"> xAI 推出 Grok Skills，让偏好和工作流跨会话复用</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 12x/6d</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">MCP: 7d 7x/3d</mark></p>
+<ul><li>xAI 宣布 Grok Skills 已在 Web、iOS 和 Android 可用，用户可以保存格式、偏好和工作流，让 Grok 在后续对话中复用；内置技能覆盖 Word 文档、演示文稿、表格、PDF 和技能创建。</li><li>技能系统重点落在 office document production 和重复工作流：生成或改写 .docx、PPT、Excel 和 PDF，而不只是聊天回答。</li><li>来源：<a href="https://x.ai/news/grok-skills" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI News" loading="lazy"> xAI News</a></li></ul>
+<p><strong><a href="https://www.sigmacomputing.com/resources/announcements/series-e" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNBPC90ZXh0Pjwvc3ZnPg==" alt="Sigma Announcement" loading="lazy"> Sigma 发布面向 AI coding agents 的数据建模能力</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 12x/6d</mark></p>
+<ul><li>Sigma 在官方公告中披露 Data Modeling Skills for AI Agents，允许数据工程师通过常用 AI coding agent 构建、管理和部署 Sigma data models。</li><li>这一能力的价值在于把组织自己的指标定义、数据模型和治理逻辑暴露给 coding agent，减少生成分析时脱离业务语义的风险。</li><li>来源：<a href="https://www.sigmacomputing.com/resources/announcements/series-e" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNBPC90ZXh0Pjwvc3ZnPg==" alt="Sigma Announcement" loading="lazy"> Sigma Announcement</a></li></ul>
+<p><strong><a href="https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlpMPC90ZXh0Pjwvc3ZnPg==" alt="Zignal Labs / GlobeNewswire Press Release" loading="lazy"> Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">enterprise agent governance: 7d 3x/3d</mark></p>
+<ul><li>Zignal Labs 宣布 Zignal AI，用于把 publicly available information 转成任务系统、合作伙伴集成和 agent-driven workflows 可消费的结构化情报，同时更新 ZEN 的 AI Chat、Inbox、agentic reporting 和 multi-agent workflow 能力。</li><li>发布稿称该能力可通过 ZEN、API、合作伙伴平台或客户自有系统接入，并已用于 Peraton IRIS 等 agent-driven workflow 场景。</li><li>来源：<a href="https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlpMPC90ZXh0Pjwvc3ZnPg==" alt="Zignal Labs / GlobeNewswire Press Release" loading="lazy"> Zignal Labs / GlobeNewswire Press Release</a></li></ul></div>
+    <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 5 条）
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://openai.com/index/dell-codex-enterprise-partnership/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News" loading="lazy"> OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 12x/6d</mark></p>
-<ul><li>发生了什么：OpenAI 宣布与 Dell Technologies 合作，让企业把 Codex 接近代码库、文档、业务系统和运营知识所在的混合或本地环境，而不是只把 agent 工作流放在云端入口。</li><li>为什么值得看：双方还会探索 Codex、ChatGPT Enterprise 和 API-based solutions 与 Dell AI Factory 的接口，覆盖数据准备、系统记录管理、测试和 AI 应用部署。</li><li>来源：<a href="https://openai.com/index/dell-codex-enterprise-partnership/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News" loading="lazy"> OpenAI News</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![OpenAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境](https://openai.com/index/dell-codex-enterprise-partnership/)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 12x/6d==
-- 发生了什么：OpenAI 宣布与 Dell Technologies 合作，让企业把 Codex 接近代码库、文档、业务系统和运营知识所在的混合或本地环境，而不是只把 agent 工作流放在云端入口。
-- 为什么值得看：双方还会探索 Codex、ChatGPT Enterprise 和 API-based solutions 与 Dell AI Factory 的接口，覆盖数据准备、系统记录管理、测试和 AI 应用部署。
-- 来源：[![OpenAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI News](https://openai.com/index/dell-codex-enterprise-partnership/)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-2" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制</span>
-      <span class="collapsible-subtitle">模型选择增加 Claude Haiku 4.5 和 GPT 5.4 mini，GitHub 明确把简单任务与复杂任务的模型成本分层暴露给用户。</span>
-    </span>
+**[![OpenAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 与 Dell 合作，把 Codex 推向混合和本地企业环境](https://openai.com/index/dell-codex-enterprise-partnership/)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 12x/6d==
+- OpenAI 宣布与 Dell Technologies 合作，让企业把 Codex 接近代码库、文档、业务系统和运营知识所在的混合或本地环境，而不是只把 agent 工作流放在云端入口。
+- 双方还会探索 Codex、ChatGPT Enterprise 和 API-based solutions 与 Dell AI Factory 的接口，覆盖数据准备、系统记录管理、测试和 AI 应用部署。
+- 来源：[![OpenAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI News](https://openai.com/index/dell-codex-enterprise-partnership/)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://github.blog/changelog/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" loading="lazy"> GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">MCP: 7d 7x/3d</mark></p>
-<ul><li>发生了什么：GitHub Changelog 在 2026-05-18 同日列出多项 Copilot 更新：Actions 失败日志可一键交给 cloud agent 修复，cloud agent 增加更快低成本模型，Web chat 自动带入页面上下文，repo 级 cloud agent 配置可经 REST API 审计，Spaces API GA，Copilot CLI 远程控制 GA。</li><li>为什么值得看：模型选择增加 Claude Haiku 4.5 和 GPT-5.4-mini，GitHub 明确把简单任务与复杂任务的模型成本分层暴露给用户。</li><li>来源：<a href="https://github.blog/changelog/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=" alt="GitHub Changelog" loading="lazy"> GitHub Changelog</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制](https://github.blog/changelog/)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|MCP: 7d 7x/3d==
-- 发生了什么：GitHub Changelog 在 2026-05-18 同日列出多项 Copilot 更新：Actions 失败日志可一键交给 cloud agent 修复，cloud agent 增加更快低成本模型，Web chat 自动带入页面上下文，repo 级 cloud agent 配置可经 REST API 审计，Spaces API GA，Copilot CLI 远程控制 GA。
-- 为什么值得看：模型选择增加 Claude Haiku 4.5 和 GPT-5.4-mini，GitHub 明确把简单任务与复杂任务的模型成本分层暴露给用户。
-- 来源：[![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) GitHub Changelog](https://github.blog/changelog/)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">xAI 推出 Grok Skills，让偏好和工作流跨会话复用</span>
-      <span class="collapsible-subtitle">技能系统重点落在 office document production 和重复工作流：生成或改写 .docx、PPT、Excel 和 PDF，而不只是聊天回答。</span>
-    </span>
+**[![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) GitHub Copilot 5 月 18 日集中增强 cloud agent、Spaces 和远程会话控制](https://github.blog/changelog/)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|MCP: 7d 7x/3d==
+- GitHub Changelog 在 2026-05-18 同日列出多项 Copilot 更新：Actions 失败日志可一键交给 cloud agent 修复，cloud agent 增加更快低成本模型，Web chat 自动带入页面上下文，repo 级 cloud agent 配置可经 REST API 审计，Spaces API GA，Copilot CLI 远程控制 GA。
+- 模型选择增加 Claude Haiku 4.5 和 GPT-5.4-mini，GitHub 明确把简单任务与复杂任务的模型成本分层暴露给用户。
+- 来源：[![GitHub Changelog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEwYFRUXFRUYFhYYFhYYFhYYFhYYFhYYFhYYFRUYFhYXFhYYFhYYFhYYFhYYFhbdrYu2AAAAD3RSTlMAPB6JqhDvvZwvUWV239COHVJZAAACP0lEQVRYhbVX6darIAxkVTbb93/bTxAxCas9986vlsMMIQwhMvbfoLmXaj+hpOf6LZub44twSL7OFmb7NrBJsUS3e4t9Qc0l9ICeJCb8MKZH+NHynzl/FIRt5q7G0ckEX6NH2BbfrfObCi/WbyrYd/zvRs29mL8HB+YX+wTuR0703Ny/TTuByQ4dOyULifIX3q4y+MkDaZ1jN/KE2dPNlHSz28MvYT1x2YDybEMxz7PDcA89UZVlBlDP7DqAlwI5BA3yZMZkvIU7CzDnnzE5AjrGpRFU/aZ8AWfv1UiY8RmTcH40tKeKM8CI4x6gc5fKLry38dRAUpYCQCF88CGO6iUAzAIuBGsPB9qDRpVsjY+CtvAQtjn3AhDg0Ie/CLhfBHRP4JccOGTExTbCIgF4Cos9hEcUaswFgJJyWgdexoVqEAErAkNn8v4yxYODPcGs/0igBFQgmu82BnrFPYlowUvQBHnP6F2d5hHNvl5YgzS3YSJJF3GVUNoayK4hhSJT82KfvHt+l0flGhraVe/+XQKvvEpm7WPSQ0Fb6vxCE5QzO3JGtAE2R76msaMASmrOnLriEtLCtAREtYBhRt/HRC5WIwS0x6LpQo6BXG1f8bHn3C0qPAtSGU9LQ91GEtfnG6Hj9wI7mzH6SFUC1SN0bfLomYgKNGpPtolbEmh2MllhUzIEuYuRQKcTQkc1EujWzrAm0NllBPhm6Qr0vlcy5Exg2kXdd74tYFYeL5FKFJmZqo5Z7ECY9qpKVGPo3+APYAxjeK4uwb8AAAAASUVORK5CYII=) GitHub Changelog](https://github.blog/changelog/)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://x.ai/news/grok-skills" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI News" loading="lazy"> xAI 推出 Grok Skills，让偏好和工作流跨会话复用</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 12x/6d</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">MCP: 7d 7x/3d</mark></p>
-<ul><li>发生了什么：xAI 宣布 Grok Skills 已在 Web、iOS 和 Android 可用，用户可以保存格式、偏好和工作流，让 Grok 在后续对话中复用；内置技能覆盖 Word 文档、演示文稿、表格、PDF 和技能创建。</li><li>为什么值得看：技能系统重点落在 office document production 和重复工作流：生成或改写 .docx、PPT、Excel 和 PDF，而不只是聊天回答。</li><li>来源：<a href="https://x.ai/news/grok-skills" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI News" loading="lazy"> xAI News</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![xAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=) xAI 推出 Grok Skills，让偏好和工作流跨会话复用](https://x.ai/news/grok-skills)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 12x/6d== ==tag-topic|MCP: 7d 7x/3d==
-- 发生了什么：xAI 宣布 Grok Skills 已在 Web、iOS 和 Android 可用，用户可以保存格式、偏好和工作流，让 Grok 在后续对话中复用；内置技能覆盖 Word 文档、演示文稿、表格、PDF 和技能创建。
-- 为什么值得看：技能系统重点落在 office document production 和重复工作流：生成或改写 .docx、PPT、Excel 和 PDF，而不只是聊天回答。
-- 来源：[![xAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=) xAI News](https://x.ai/news/grok-skills)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Sigma 发布面向 AI coding agents 的数据建模能力</span>
-      <span class="collapsible-subtitle">这一能力的价值在于把组织自己的指标定义、数据模型和治理逻辑暴露给 coding agent，减少生成分析时脱离业务语义的风险。</span>
-    </span>
+**[![xAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=) xAI 推出 Grok Skills，让偏好和工作流跨会话复用](https://x.ai/news/grok-skills)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 12x/6d== ==tag-topic|MCP: 7d 7x/3d==
+- xAI 宣布 Grok Skills 已在 Web、iOS 和 Android 可用，用户可以保存格式、偏好和工作流，让 Grok 在后续对话中复用；内置技能覆盖 Word 文档、演示文稿、表格、PDF 和技能创建。
+- 技能系统重点落在 office document production 和重复工作流：生成或改写 .docx、PPT、Excel 和 PDF，而不只是聊天回答。
+- 来源：[![xAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=) xAI News](https://x.ai/news/grok-skills)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://www.sigmacomputing.com/resources/announcements/series-e" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNBPC90ZXh0Pjwvc3ZnPg==" alt="Sigma Announcement" loading="lazy"> Sigma 发布面向 AI coding agents 的数据建模能力</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 12x/6d</mark></p>
-<ul><li>发生了什么：Sigma 在官方公告中披露 Data Modeling Skills for AI Agents，允许数据工程师通过常用 AI coding agent 构建、管理和部署 Sigma data models。</li><li>为什么值得看：这一能力的价值在于把组织自己的指标定义、数据模型和治理逻辑暴露给 coding agent，减少生成分析时脱离业务语义的风险。</li><li>来源：<a href="https://www.sigmacomputing.com/resources/announcements/series-e" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNBPC90ZXh0Pjwvc3ZnPg==" alt="Sigma Announcement" loading="lazy"> Sigma Announcement</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Sigma Announcement](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNBPC90ZXh0Pjwvc3ZnPg==) Sigma 发布面向 AI coding agents 的数据建模能力](https://www.sigmacomputing.com/resources/announcements/series-e)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 12x/6d==
-- 发生了什么：Sigma 在官方公告中披露 Data Modeling Skills for AI Agents，允许数据工程师通过常用 AI coding agent 构建、管理和部署 Sigma data models。
-- 为什么值得看：这一能力的价值在于把组织自己的指标定义、数据模型和治理逻辑暴露给 coding agent，减少生成分析时脱离业务语义的风险。
-- 来源：[![Sigma Announcement](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNBPC90ZXh0Pjwvc3ZnPg==) Sigma Announcement](https://www.sigmacomputing.com/resources/announcements/series-e)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报</span>
-      <span class="collapsible-subtitle">发布稿称该能力可通过 ZEN、API、合作伙伴平台或客户自有系统接入，并已用于 Peraton IRIS 等 agent driven workflow 场景。</span>
-    </span>
+**[![Sigma Announcement](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNBPC90ZXh0Pjwvc3ZnPg==) Sigma 发布面向 AI coding agents 的数据建模能力](https://www.sigmacomputing.com/resources/announcements/series-e)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 12x/6d==
+- Sigma 在官方公告中披露 Data Modeling Skills for AI Agents，允许数据工程师通过常用 AI coding agent 构建、管理和部署 Sigma data models。
+- 这一能力的价值在于把组织自己的指标定义、数据模型和治理逻辑暴露给 coding agent，减少生成分析时脱离业务语义的风险。
+- 来源：[![Sigma Announcement](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlNBPC90ZXh0Pjwvc3ZnPg==) Sigma Announcement](https://www.sigmacomputing.com/resources/announcements/series-e)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlpMPC90ZXh0Pjwvc3ZnPg==" alt="Zignal Labs / GlobeNewswire Press Release" loading="lazy"> Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">enterprise agent governance: 7d 3x/3d</mark></p>
-<ul><li>发生了什么：Zignal Labs 宣布 Zignal AI，用于把 publicly available information 转成任务系统、合作伙伴集成和 agent-driven workflows 可消费的结构化情报，同时更新 ZEN 的 AI Chat、Inbox、agentic reporting 和 multi-agent workflow 能力。</li><li>为什么值得看：发布稿称该能力可通过 ZEN、API、合作伙伴平台或客户自有系统接入，并已用于 Peraton IRIS 等 agent-driven workflow 场景。</li><li>来源：<a href="https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlpMPC90ZXh0Pjwvc3ZnPg==" alt="Zignal Labs / GlobeNewswire Press Release" loading="lazy"> Zignal Labs / GlobeNewswire Press Release</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Zignal Labs / GlobeNewswire Press Release](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlpMPC90ZXh0Pjwvc3ZnPg==) Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报](https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|enterprise agent governance: 7d 3x/3d==
-- 发生了什么：Zignal Labs 宣布 Zignal AI，用于把 publicly available information 转成任务系统、合作伙伴集成和 agent-driven workflows 可消费的结构化情报，同时更新 ZEN 的 AI Chat、Inbox、agentic reporting 和 multi-agent workflow 能力。
-- 为什么值得看：发布稿称该能力可通过 ZEN、API、合作伙伴平台或客户自有系统接入，并已用于 Peraton IRIS 等 agent-driven workflow 场景。
+**[![Zignal Labs / GlobeNewswire Press Release](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlpMPC90ZXh0Pjwvc3ZnPg==) Zignal Labs 推出 Zignal AI，面向任务系统和 agent-driven workflows 输出结构化情报](https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|enterprise agent governance: 7d 3x/3d==
+- Zignal Labs 宣布 Zignal AI，用于把 publicly available information 转成任务系统、合作伙伴集成和 agent-driven workflows 可消费的结构化情报，同时更新 ZEN 的 AI Chat、Inbox、agentic reporting 和 multi-agent workflow 能力。
+- 发布稿称该能力可通过 ZEN、API、合作伙伴平台或客户自有系统接入，并已用于 Peraton IRIS 等 agent-driven workflow 场景。
 - 来源：[![Zignal Labs / GlobeNewswire Press Release](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlpMPC90ZXh0Pjwvc3ZnPg==) Zignal Labs / GlobeNewswire Press Release](https://www.globenewswire.com/news-release/2026/05/18/3296553/0/en/Zignal-Labs-Launches-Zignal-AI-to-Deliver-Structured-Intelligence-for-Mission-Systems-Partners-and-Agent-Driven-Workflows.html)</template>
-  </details>
+  </section>
 <section class="panel" id="section-official-blog-updates" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>

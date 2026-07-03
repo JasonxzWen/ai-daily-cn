@@ -59,6 +59,7 @@ import { createOfficialComponentSnapshot } from "../src/official-component-snaps
 import {
   applyGithubReadmeSummary,
   githubReadmeCacheKey,
+  normalizeGithubReadmeSummary,
   summarizeGithubReadme
 } from "../src/github-readme.js";
 import { selectChineseMediaDynamics } from "../src/chinese-media.js";
@@ -286,6 +287,7 @@ function dailyContentContractAlignedReport() {
         url: "https://example.com/threads",
         source: "TechCrunch",
         event_date: "2026-06-16",
+        summary: "Meta 披露 Threads 月活用户达到 5 亿，并推出 Your Algo 与社区控制功能，让用户和创作者更直接影响推荐内容的排序方式。这条更新说明 Threads 正从增长指标转向分发机制竞争。",
         bullets: [
           "Meta 旗下 Threads 新增 Your Algo 和社区功能，并披露月活用户突破 500M，说明它已经进入主流内容平台竞争序列。",
           "个性化 feed 控制直接影响用户停留、创作者分发和广告库存，后续会和 TikTok、小红书、X 等平台争夺年轻用户注意力。",
@@ -683,7 +685,7 @@ test("report:draft does not backfill must read highlights from GitHub ranking ce
   ));
 });
 
-test("interaction input starts with story-first judgment trends and story list", async () => {
+test("interaction input starts with expanded story-first track cells", async () => {
   const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
 
   const input = reportToInteractionInput(report);
@@ -700,10 +702,11 @@ test("interaction input starts with story-first judgment trends and story list",
   assert.equal(input.sections.some((section) => ["today-judgment", "trend-themes", "story-list"].includes(section.richId)), false);
   assert(/^track-/.test(firstSection.richId || ""), "body should start with an editorial track section");
   assert(trackSections.length >= 1, "at least one editorial track section");
-  assert(storyDetailSections.length >= 1, "per-story collapsible sections exist");
-  assert(storyDetailSections.every((section) => section.type === "markdown" && section.collapsed === true && section.open === false));
-  assert(mainContent.includes("发生了什么"));
-  assert(mainContent.includes("为什么值得看"));
+  assert.equal(storyDetailSections.length, 0, "stories should stay inside expanded track cells");
+  assert(trackSections.every((section) => section.type === "markdown" && section.collapsed === false && section.open === true));
+  assert(mainContent.includes("来源："));
+  assert(!mainContent.includes("发生了什么"));
+  assert(!mainContent.includes("为什么值得看"));
 });
 
 test("interaction input uses compact same-month coverage stat for mobile hero", async () => {
@@ -733,9 +736,9 @@ test("public daily renders story-first sections without compact full list", asyn
   assert(!titles.includes("主体细节"));
   assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
   assert(trackSections.length >= 1);
-  assert(storyDetailSections.length >= 1);
-  assert(storyDetailSections.every((section) => section.type === "markdown" && section.collapsed === true && section.open === false));
-  assert(storyDetailSections.some((section) => section.content.includes("发生了什么")));
+  assert.equal(storyDetailSections.length, 0);
+  assert(trackSections.some((section) => section.content.includes("来源：")));
+  assert(trackSections.every((section) => section.collapsed === false && section.open === true));
 });
 
 test("public daily reports do not render source-first audit panels before story content", async () => {
@@ -1684,9 +1687,8 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
   assert(/^track-/.test(input.sections[0].richId || ""));
   assert(trackSections.length >= 1);
-  assert(storyDetailSections.length >= 1);
-  assert(storyDetailSections.every((section) => section.type === "markdown" && section.collapsed === true && section.open === false));
-  assert(storyDetailSections.some((section) => section.content.includes("发生了什么")));
+  assert.equal(storyDetailSections.length, 0);
+  assert(trackSections.every((section) => section.type === "markdown" && section.collapsed === false && section.open === true));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI News RSS](data:image/png;base64,"));
   assert(mainContent.includes("![OpenAI Status](data:image/png;base64,") && mainContent.includes("**[![OpenAI Status]"));
@@ -1753,7 +1755,7 @@ test("日报可以转换为 effective-interact 输入", async () => {
   assert(!trendingSection.content.includes("新上榜"));
   assert(input.intent.audience.includes("内容、产品、平台、策略与工程"));
   assert(input.intent.primaryQuestion.includes("内容、产品、平台、策略与工程团队"));
-  assert(storyDetailSections.some((section) => section.content.includes("Example Agent Platform GA")));
+  assert(trackSections.some((section) => section.content.includes("Example Agent Platform GA")));
   const sourceAuditSection = input.sections.find((section) => section.title === "信源审计");
   assert(sourceAuditSection);
   assert(sourceAuditSection.content.includes("![GitHub Trending](data:image/png;base64,"));
@@ -3394,10 +3396,11 @@ test("huggingface trending discovery and public section", async () => {
 
   assert(section);
   assert.match(section.content, /Qwen\/Qwen3-235B-A22B/);
-  assert.match(section.content, /likes 678/);
+  assert.match(section.content, /678 likes/);
   assert.match(section.content, /text-generation|文本生成/);
-  assert.match(section.content, /downloads 12345/);
+  assert.match(section.content, /12345 downloads/);
   assert.doesNotMatch(section.content, /trending entry|verify model card|公开描述指向|关键词包括|ranked model entry|README|优先核对|准入|复现门槛/i);
+  assert.doesNotMatch(section.content, /当前热度指标是|热度指标是|页面还标出|\/ likes\s+\d+|\/ downloads\s+\d+/i);
 });
 
 test("public data rewrites generic Hugging Face Trending machine descriptions", async () => {
@@ -3446,9 +3449,10 @@ test("public data rewrites generic Hugging Face Trending machine descriptions", 
   const serialized = JSON.stringify(publicJson.huggingface_trending);
 
   assert.doesNotMatch(serialized, /公开描述指向|关键词包括|ranked model entry|verify model card|trending entry/i);
+  assert.doesNotMatch(description, /热度指标是|页面还标出|downloads|likes/i);
   assert.match(description, /Hugging Face 上的文本生成模型/);
-  assert.match(description, /4053657 downloads/);
-  assert.match(description, /4917 likes/);
+  assert.equal(publicJson.huggingface_trending?.[0]?.downloads, 4053657);
+  assert.equal(publicJson.huggingface_trending?.[0]?.likes, 4917);
 });
 
 test("GitHub trending discovery retries transient fetch failures and records retry notes", async () => {
@@ -8231,6 +8235,30 @@ test("automation inventory uses explicit readonly insight role", async () => {
   assert.equal(result.automations.find((automation) => automation.id === "ai-daily-2")?.daily_publish, false);
 });
 
+test("automation inventory recognizes daily codex pipeline publish automation", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-codex-pipeline-automation-"));
+  const automationsDir = path.join(tmp, "automations");
+  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
+  await fs.writeFile(
+    path.join(automationsDir, "ai-2", "automation.toml"),
+    [
+      'id = "ai-2"',
+      'kind = "cron"',
+      'name = "AI Daily publish"',
+      'prompt = "npm run daily:codex-pipeline -- --date 2026-07-02 --execute --publish"',
+      'status = "ACTIVE"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await inspectAutomationInventory({ automationsDir, projectCwds: ["D:\\ai-daily-cn"] });
+
+  assert.deepEqual(result.active_publish_automations.map((automation) => automation.id), ["ai-2"]);
+  assert.equal(result.active_publish_automations[0].role, "daily_publish");
+  assert.equal(result.active_publish_automations[0].legacy_flow, false);
+});
+
 test("status:self-check reports degraded published state without blocking", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-status-self-check-ok-"));
   await writeSelfCheckReportFixture(tmp, "2026-06-04", {
@@ -8379,7 +8407,7 @@ test("daily workflow contract validates repository workflow markers", async () =
     [
       'id = "ai-daily"',
       'kind = "cron"',
-      'prompt = "node src/cli.js daily:run --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action publish:dry-run:daily"',
+      'prompt = "npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -11618,6 +11646,44 @@ test("quality review flags untranslated English excerpts in public observation s
   assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
 });
 
+test("quality review rejects source-first machine log public summaries", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.report_date = "2026-07-02";
+  report.summary = "今天最值得看的主线有 Google Keyword说明 AI 产品、平台或工程变化；microsoft/HARC-Qwen2.5-7B-Instruct；热门博客这轮主要看 agent 和开发工具的落地边界。";
+  report.main_items = [
+    {
+      ...report.main_items[0],
+      title: "Google Keyword Blog: Nyc AI Summit",
+      summary: "Google Keyword说明 AI 产品、平台或工程变化，内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界，判断时还要看公开材料仍需要回到原文核对入口、权限、价格和适用范围。",
+      bullets: [
+        "Google 在纽约 AI Summit 中介绍教育机构、供应商和学校如何讨论 AI 培训与课堂试点。",
+        "材料涉及教育场景下的采购节奏、教师支持和合作安排。"
+      ]
+    },
+    {
+      ...report.main_items[0],
+      title: "microsoft/HARC-Qwen2.5-7B-Instruct",
+      summary: "microsoft/HARC-Qwen2.5-7B-Instruct。",
+      bullets: [
+        "模型卡显示该仓库发布了基于 Qwen2.5-7B-Instruct 的 HARC 变体。",
+        "需要补充任务、数据或许可证等具体信息后才能判断是否值得使用。"
+      ]
+    }
+  ];
+
+  const review = reviewReportQuality(report);
+  const codes = review.issues.map((issue) => issue.code);
+
+  assert.equal(review.ok, false);
+  assert(codes.includes("public_copy_banned_term"));
+  assert(codes.includes("public_template_body"));
+  assert(codes.includes("main_item_reader_summary_not_authored"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "public_editorial_rewrite"));
+  assert(review.ai_review_tasks.some((task) => task.kind === "main_item_editorial_rewrite" && task.path === "main_items[1].summary"));
+  assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
+  assert.equal(review.checklist.find((item) => item.id === "public_editorial_quality").status, "failed");
+});
+
 test("quality review rejects templated builder translations", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.builder_observations = [
@@ -12390,6 +12456,58 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert.equal(feed.reports[0].markdown_url, undefined);
 });
 
+test("buildSite preserves explicit report quality status in docs data and homepage", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-quality-status-build-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.report_date = "2026-07-02";
+  report.title = "AI 日报 2026-07-02";
+  report.canonical_url = `${siteUrl}reports/2026/07/2026-07-02.html`;
+  report.html_path = "reports/2026/07/2026-07-02.html";
+  report.source_window = {
+    date_from: "2026-07-02",
+    date_to: "2026-07-02",
+    fallback_window_used: false,
+    notes: "quality status fixture"
+  };
+  report.generated_at = "2026-07-02T02:35:00+08:00";
+  report.quality_status = {
+    status: "degraded",
+    reasons: ["china_ai_no_recent_signal"],
+    affected_sections: ["hot_blogs"],
+    degraded_sections: [
+      {
+        section: "hot_blogs",
+        code: "china_ai_no_recent_signal",
+        message: "China AI source lane had no recent signal."
+      }
+    ],
+    public_note: "Some discovery coverage is degraded; this report may be incomplete."
+  };
+  assert.equal(deriveQualityStatus(report).status, "blocked", "fixture must catch accidental re-derivation");
+
+  const reportDir = path.join(dataInputDir, "2026", "07");
+  await fs.mkdir(reportDir, { recursive: true });
+  await fs.writeFile(path.join(reportDir, "2026-07-02.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/07/2026-07-02.json"), "utf8"));
+  assert.equal(publicData.quality_status.status, "degraded");
+  const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
+  assert.match(indexHtml, /data-quality-status="degraded"/);
+  assert.doesNotMatch(indexHtml, /Report generation is blocked by validation failure/);
+});
+
 test("buildSite ignores source status history metadata in reports-data", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-history-build-"));
   const dataInputDir = path.join(tmp, "reports-data");
@@ -13028,6 +13146,19 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
   const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
   const outDir = path.join(tmp, "docs");
   const report = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data/2026/06/2026-06-15.json"), "utf8"));
+  report.quality_status = {
+    status: "degraded",
+    public_note: "GitHub Trending 覆盖不完整，页面会保留降级提示。",
+    affected_sections: ["github_trending"],
+    degraded_sections: [
+      {
+        section: "github_trending",
+        code: "github_trending_partial",
+        message: "GitHub Trending 抓取不完整"
+      }
+    ],
+    blocking_issues: []
+  };
   await fs.mkdir(dataInputDir, { recursive: true });
   await fs.writeFile(path.join(dataInputDir, "2026-06-15.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
 
@@ -13047,9 +13178,13 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
   const html = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-15.html"), "utf8");
   assert.equal(publicData.schema_version, 1);
   assert.equal(publicData.report_date, "2026-06-15");
+  assert.equal(publicData.quality_status.status, "degraded");
   assert.equal(publicData.kind, undefined);
   assert.match(html, /effective-interact create-interaction\.mjs/);
   assert.match(html, /data-render-mode="pre-rendered"/);
+  assert.match(html, /data-status="degraded"/);
+  assert.match(html, /状态：降级/);
+  assert.doesNotMatch(html, /状态：完成/);
   assert.match(html, /data-section-type="filterable-cards"/);
   assert.doesNotMatch(html, /id="section-today-must-read"/);
   assert.doesNotMatch(html, /id="section-compact-main-list"/);
@@ -13057,7 +13192,7 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
   assert.doesNotMatch(html, /id="section-trend-themes"/);
   assert.doesNotMatch(html, /id="section-story-list"/);
   assert.match(html, /id="section-track-/);
-  assert.match(html, /id="section-story-\d+"/);
+  assert.doesNotMatch(html, /id="section-story-\d+"/);
   assert.doesNotMatch(html, /main-ticket-card|main-ticket-card-grid|section-main-signal-cards/);
   assert.match(html, /image-lightbox/);
   for (const key of ["source_audit", "self_check", "candidate_id", "degraded_sections", "remediation"]) {
@@ -14513,10 +14648,9 @@ test("interaction input renders AI industry, content track, and selected blog se
   assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
   assert(trackTitles.includes("AI 行业动态"));
   assert(trackTitles.includes("内容赛道动态"));
-  assert(storyDetailSections.length >= 2);
-  assert(storyDetailSections.every((section) => section.collapsed === true && section.open === false));
-  assert(storyDetailSections.some((section) => section.content.includes("发生了什么")));
-  assert(storyDetailSections.some((section) => section.content.includes("为什么值得看")));
+  assert.equal(storyDetailSections.length, 0);
+  assert(input.sections.filter((section) => /^track-/.test(section.richId || "")).every((section) => section.collapsed === false && section.open === true));
+  assert(input.sections.some((section) => /^track-/.test(section.richId || "") && section.content.includes("来源：")));
   assert(titles.includes("订阅 RSS"));
   assert(!titles.includes("AI 资讯"));
   assert(!titles.includes("热门博客"));
@@ -19075,12 +19209,14 @@ test("public daily followups use reader-facing story title and limit disclosure 
   }));
 
   const input = reportToInteractionInput(report);
+  const trackSections = input.sections.filter((section) => /^track-/.test(section.richId || ""));
   const storyDetailSections = input.sections.filter((section) => /^story-\d+$/.test(section.richId || ""));
-  const storyText = storyDetailSections
+  const storyText = trackSections
     .map((section) => `${section.title || ""}\n${section.summary || ""}\n${section.content || ""}`)
     .join("\n");
 
-  assert(storyDetailSections.length >= 1);
+  assert(trackSections.length >= 1);
+  assert.equal(storyDetailSections.length, 0);
   assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
   assert(!storyText.includes("重点 story"));
   assert((storyText.match(/披露/g) || []).length <= 1);
@@ -19444,7 +19580,8 @@ test("story-first interaction input starts with judgment trends and story list",
   assert(trackSections.length >= 1);
   assert.equal(input.sections.some((section) => section.richId === "main-signal-cards"), false);
   assert.equal(input.sections.some((section) => section.cardClass === "main-ticket-card"), false);
-  const storyContent = storyDetailSections.map((section) => section.content).join("\n");
+  assert.equal(storyDetailSections.length, 0);
+  const storyContent = trackSections.map((section) => section.content).join("\n");
   assert(storyContent.includes("Concrete story 1"));
   assert(storyContent.includes("Why story 1 matters"));
 });
@@ -22816,7 +22953,7 @@ test("public daily rejects machine audit logs from reader-facing sections", () =
     serializedSections,
     /source_audit|sources_health|candidate_pool|fetch_retries|parsed_count|machine audit log|Feedback Ledger Review|Regression Self-Check/i
   );
-  assert.match(serializedSections, /story|section/i);
+  assert.match(serializedSections, /section-track-|Strict main item/i);
 });
 
 test("public daily contract rejects invalid public media but allows missing media", () => {
@@ -23277,11 +23414,11 @@ test("public daily contract renders main items as industry and content-track str
   assert.equal(input.sections.some((section) => section.richId === "story-list"), false);
   assert(trackTitles.includes("AI 行业动态"));
   assert(trackTitles.includes("内容赛道动态"));
-  assert(storyDetailSections.length >= 1);
-  assert(storyDetailSections.every((section) => section.collapsed === true && section.open === false));
-  assert(content.includes("发生了什么"));
-  assert(content.includes("为什么值得看"));
-  assert(storyDetailSections.every((section) => section.content.includes("**[")));
+  assert.equal(storyDetailSections.length, 0);
+  assert(input.sections.filter((section) => /^track-/.test(section.richId || "")).every((section) => section.collapsed === false && section.open === true));
+  assert(!content.includes("发生了什么"));
+  assert(!content.includes("为什么值得看"));
+  assert(input.sections.filter((section) => /^track-/.test(section.richId || "")).every((section) => section.content.includes("**[")));
   assert(!input.sections.some((section) => ["AI 资讯", "大厂与政策", "产品与开源", "AIGC 动态", "今日判断", "趋势主题", "今日主线"].includes(section.title)));
 });
 
@@ -24264,6 +24401,17 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   assert.match(legacyItem.readme_summary, /agent-workbench 是面向|Agent 构建/);
 });
 
+test("GitHub README public summaries clamp on sentence boundaries", () => {
+  const summary = normalizeGithubReadmeSummary(
+    "OpenMontage 是开源的 agentic 视频生产系统，围绕 12 条 pipeline、52 个工具和多种 agent skill 组织剪辑、生成、配音与合成流程；适合关注 AI 视频生产链路的人看它如何把素材、脚本、模型服务和 ffmpeg/remotion 串起来。评估时还要看素材输入、模型服务、渲染队列和长视频任务的失败恢复。",
+    "calesthio/OpenMontage"
+  );
+
+  assert.doesNotMatch(summary, /失败恢。/);
+  assert(summary.endsWith("串起来。"), summary);
+  assert(summary.endsWith("。"), summary);
+});
+
 test("Chinese media dynamics include all in-window QbitAI SSPAI and Machine Heart entries", () => {
   const reportDate = "2026-06-12";
   const result = selectChineseMediaDynamics(
@@ -25130,9 +25278,9 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("定时任务和长程发布任务必须从 launcher worktree 启动"));
   assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD"));
   assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD --publish"));
+  assert(prompt.includes("npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish"));
   assert(prompt.includes(".tmp/run-summary-YYYY-MM-DD.json"));
   assert(prompt.includes("publish:dry-run:daily"));
-  assert(prompt.includes("--restart"));
   assert(prompt.includes("反思与迭代建议"));
   assert(prompt.includes("去套话检查"));
   assert(prompt.includes("plain_language_failed"));

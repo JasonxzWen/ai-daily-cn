@@ -2943,8 +2943,105 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   color: var(--muted);
 }
 
-/* Stage D: Feishu-style left-rail table of contents (desktop only; mobile keeps
-   the engine's horizontal nav so the per-story TOC stays contained). */
+.report-shell {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.report-section-stack > section[id^="section-track-"] {
+  border-radius: 8px;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown {
+  font-size: 0.95rem;
+  line-height: 1.66;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown > p:first-child {
+  margin-top: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown strong {
+  display: block;
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.38;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown ul {
+  margin: 6px 0 14px;
+  padding-left: 1.15rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown li {
+  margin: 4px 0;
+}
+
+.inline-site-icon {
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: cover;
+}
+
+.card-title-icon {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px;
+  max-height: 18px;
+  flex: 0 0 18px;
+}
+
+.chip,
+.text-highlight,
+.daily-tag,
+.tag-highlight,
+.tag-stars,
+.tag-topic,
+.tag-major,
+.tag-notable,
+.tag-general {
+  font-size: 0.78rem;
+  line-height: 1.2;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.chip:hover,
+a.chip:hover,
+.text-highlight:hover,
+.daily-tag:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 44%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 76%, #ffffff);
+  color: var(--accent);
+}
+
+.chip-topic,
+.tag-topic {
+  border-color: #adc4ce;
+  background: #edf3f5;
+  color: #31586a;
+}
+
+.chip-major,
+.tag-major {
+  border-color: #d7a06a;
+  background: #fff1df;
+  color: #8a431c;
+}
+
+.chip-notable,
+.tag-notable {
+  border-color: #b7c68f;
+  background: #eef4df;
+  color: #526a2d;
+}
+
+/* Reader report left rail: desktop keeps category-level anchors; mobile keeps
+   the engine's horizontal nav. */
 @media (min-width: 761px) {
   .report-layout {
     grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
@@ -2972,6 +3069,60 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   .report-nav a {
     white-space: normal;
     border-radius: 6px;
+  }
+
+  .report-nav a[href^="#section-track-"] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    justify-content: flex-start;
+    border-left: 3px solid transparent;
+    margin-top: 8px;
+    font-size: 0.88rem;
+    font-weight: 760;
+  }
+
+  .report-nav a[href^="#section-track-"]::before {
+    display: block;
+    content: "正文主线";
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .report-nav a[href="#section-github-trending"]::before,
+  .report-nav a[href="#section-huggingface-trending"]::before {
+    content: "开源与模型";
+  }
+
+  .report-nav a[href="#section-trend-tracking"]::before,
+  .report-nav a[href="#section-model-releases"]::before {
+    content: "趋势追踪";
+  }
+
+  .report-nav a[href="#section-subscribed-rss"]::before,
+  .report-nav a[href="#section-hot-blogs"]::before,
+  .report-nav a[href="#section-chinese-media-dynamics"]::before {
+    content: "媒体与订阅";
+  }
+
+  .report-nav a[href^="#section-track-"]:hover,
+  .report-nav a[href^="#section-track-"][aria-current="true"] {
+    border-left-color: var(--accent);
+  }
+
+  .report-nav a:not([href^="#section-track-"]) {
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .report-nav a[href^="#section-story-"] {
+    display: none;
   }
 
   .report-nav a + a {
@@ -3044,11 +3195,6 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <div class="report-nav-group-title">阅读顺序</div>
       <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
       <a href="#section-track-industry" title="AI 行业动态" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>AI 行业动态</span></a>
-<a href="#section-story-1" title="ThreatConnect 8.0 发布 Agentic Threat Intelligence Platform" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>ThreatConnect 8.0 发布 Agentic Threat Intelligence Platform</span></a>
-<a href="#section-story-2" title="AWS Partner Central agents 支持用自然语言创建机会并提供 MCP 入口" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>AWS Partner Central agents 支持用自然语言创建机会并提供 MCP 入口</span></a>
-<a href="#section-story-3" title="Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK</span></a>
-<a href="#section-story-4" title="xAI 发布 Grok Build 终端 coding agent early beta" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>xAI 发布 Grok Build 终端 coding agent early beta</span></a>
-<a href="#section-story-5" title="OpenAI 发布 ChatGPT 在敏感对话中的上下文安全更新" data-nav-link data-nav-index="6" data-nav-group-name="main" data-nav-status="info"><span>OpenAI 发布 ChatGPT 在敏感对话中的上下文安全更新</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3061,99 +3207,44 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 5 条）</p></div>
-    <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 5 条）</template>
-  </section>
-<details class="panel rich-section collapsible-panel" id="section-story-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">ThreatConnect 8.0 发布 Agentic Threat Intelligence Platform</span>
-      <span class="collapsible-subtitle">ThreatConnect Query Agent 会给出 source links 供继续核验；STRIDE Threat Modeling Agent 可从 Ask AI 或 Threat Ac…</span>
-    </span>
+    <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 5 条）</p>
+<p><strong><a href="https://knowledge.threatconnect.com/docs/8-0-release-notes" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlRSPC90ZXh0Pjwvc3ZnPg==" alt="ThreatConnect Release Notes" loading="lazy"> ThreatConnect 8.0 发布 Agentic Threat Intelligence Platform</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>ThreatConnect 8.0 release notes 显示，该版本加入 Agentic AI beta，把威胁情报查询、STRIDE 威胁建模、情报报告生成和 Intelligence Requirement 创建做成四类可从 Ask AI 入口调用的代理能力。</li><li>ThreatConnect Query Agent 会给出 source links 供继续核验；STRIDE Threat Modeling Agent 可从 Ask AI 或 Threat Actor Profile 详情页生成结构化报告。</li><li>来源：<a href="https://knowledge.threatconnect.com/docs/8-0-release-notes" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlRSPC90ZXh0Pjwvc3ZnPg==" alt="ThreatConnect Release Notes" loading="lazy"> ThreatConnect Release Notes</a></li></ul>
+<p><strong><a href="https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="AWS What&amp;#39;s New" loading="lazy"> AWS Partner Central agents 支持用自然语言创建机会并提供 MCP 入口</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>AWS 宣布 Partner Central agents 现在可通过自然语言对话加速 opportunity creation；该能力基于 Amazon Bedrock AgentCore，面向合作伙伴的 co-sell pipeline、deal hygiene 和 funding 机会识别。</li><li>入口同时覆盖 AWS Console 中的 Amazon Q chat 和可编程 Model Context Protocol，因此销售团队可以从既有工具中触发机会创建，而不是只能进入 AWS Console 表单。</li><li>来源：<a href="https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="AWS What&amp;#39;s New" loading="lazy"> AWS What&#39;s New</a></li></ul>
+<p><strong><a href="https://www.firecrawl.dev/changelog" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkZDPC90ZXh0Pjwvc3ZnPg==" alt="Firecrawl Changelog" loading="lazy"> Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>Firecrawl v2.10 changelog 把近几周的数据提取和安全功能合并到一个版本：`/parse`、Lockdown Mode、Question format、Highlights format，以及 Go、Ruby、PHP、.NET 官方 SDK。</li><li>Lockdown Mode 允许 `/scrape` 只从 Firecrawl index 返回结果，不发起 outbound requests，并默认 zero data retention；该能力覆盖 API、CLI 和 MCP。</li><li>来源：<a href="https://www.firecrawl.dev/changelog" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkZDPC90ZXh0Pjwvc3ZnPg==" alt="Firecrawl Changelog" loading="lazy"> Firecrawl Changelog</a></li></ul>
+<p><strong><a href="https://x.ai/news/grok-build-cli" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI News" loading="lazy"> xAI 发布 Grok Build 终端 coding agent early beta</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 6x/4d</mark></p>
+<ul><li>xAI 宣布 Grok Build early beta，面向 SuperGrok Heavy subscribers 提供一个直接在终端运行的 coding agent 和 CLI，用于专业软件工程与复杂 coding work。</li><li>官方页面明确 AGENTS.md、plugins、hooks、skills 和 MCP servers 可直接工作，说明 xAI 选择兼容现有 agent repo 约定，而不是要求用户迁移到全新项目格式。</li><li>来源：<a href="https://x.ai/news/grok-build-cli" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI News" loading="lazy"> xAI News</a></li></ul>
+<p><strong><a href="https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy"> OpenAI 发布 ChatGPT 在敏感对话中的上下文安全更新</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>OpenAI 介绍 ChatGPT 在 sensitive conversations 中识别逐步显现风险的更新：系统会在少数高风险场景中使用短 factual safety summaries，帮助模型理解上下文并更谨慎地响应。</li><li>OpenAI 公布的内部评估显示，长单轮对话中 suicide/self-harm 场景 intended safe response 提升 50%，harm-to-others 提升 16%；在 GPT-5.5 Instant 上，跨多对话 harm-to-others 提升 52%，suicide/self-harm 提升 39%。</li><li>来源：<a href="https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy"> OpenAI</a></li></ul></div>
+    <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 5 条）
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://knowledge.threatconnect.com/docs/8-0-release-notes" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlRSPC90ZXh0Pjwvc3ZnPg==" alt="ThreatConnect Release Notes" loading="lazy"> ThreatConnect 8.0 发布 Agentic Threat Intelligence Platform</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：ThreatConnect 8.0 release notes 显示，该版本加入 Agentic AI beta，把威胁情报查询、STRIDE 威胁建模、情报报告生成和 Intelligence Requirement 创建做成四类可从 Ask AI 入口调用的代理能力。</li><li>为什么值得看：ThreatConnect Query Agent 会给出 source links 供继续核验；STRIDE Threat Modeling Agent 可从 Ask AI 或 Threat Actor Profile 详情页生成结构化报告。</li><li>来源：<a href="https://knowledge.threatconnect.com/docs/8-0-release-notes" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlRSPC90ZXh0Pjwvc3ZnPg==" alt="ThreatConnect Release Notes" loading="lazy"> ThreatConnect Release Notes</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![ThreatConnect Release Notes](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlRSPC90ZXh0Pjwvc3ZnPg==) ThreatConnect 8.0 发布 Agentic Threat Intelligence Platform](https://knowledge.threatconnect.com/docs/8-0-release-notes)** ==tag-major|重大== ==tag-topic|topic|primary==
-- 发生了什么：ThreatConnect 8.0 release notes 显示，该版本加入 Agentic AI beta，把威胁情报查询、STRIDE 威胁建模、情报报告生成和 Intelligence Requirement 创建做成四类可从 Ask AI 入口调用的代理能力。
-- 为什么值得看：ThreatConnect Query Agent 会给出 source links 供继续核验；STRIDE Threat Modeling Agent 可从 Ask AI 或 Threat Actor Profile 详情页生成结构化报告。
-- 来源：[![ThreatConnect Release Notes](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlRSPC90ZXh0Pjwvc3ZnPg==) ThreatConnect Release Notes](https://knowledge.threatconnect.com/docs/8-0-release-notes)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-2" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">AWS Partner Central agents 支持用自然语言创建机会并提供 MCP 入口</span>
-      <span class="collapsible-subtitle">入口同时覆盖 AWS Console 中的 Amazon Q chat 和可编程 Model Context Protocol，因此销售团队可以从既有工具中触发机会创建，而不是只能进入 AWS Co…</span>
-    </span>
+**[![ThreatConnect Release Notes](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlRSPC90ZXh0Pjwvc3ZnPg==) ThreatConnect 8.0 发布 Agentic Threat Intelligence Platform](https://knowledge.threatconnect.com/docs/8-0-release-notes)** ==tag-major|重大== ==tag-topic|topic|primary==
+- ThreatConnect 8.0 release notes 显示，该版本加入 Agentic AI beta，把威胁情报查询、STRIDE 威胁建模、情报报告生成和 Intelligence Requirement 创建做成四类可从 Ask AI 入口调用的代理能力。
+- ThreatConnect Query Agent 会给出 source links 供继续核验；STRIDE Threat Modeling Agent 可从 Ask AI 或 Threat Actor Profile 详情页生成结构化报告。
+- 来源：[![ThreatConnect Release Notes](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzdjM2FlZCIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPlRSPC90ZXh0Pjwvc3ZnPg==) ThreatConnect Release Notes](https://knowledge.threatconnect.com/docs/8-0-release-notes)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="AWS What&amp;#39;s New" loading="lazy"> AWS Partner Central agents 支持用自然语言创建机会并提供 MCP 入口</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：AWS 宣布 Partner Central agents 现在可通过自然语言对话加速 opportunity creation；该能力基于 Amazon Bedrock AgentCore，面向合作伙伴的 co-sell pipeline、deal hygiene 和 funding 机会识别。</li><li>为什么值得看：入口同时覆盖 AWS Console 中的 Amazon Q chat 和可编程 Model Context Protocol，因此销售团队可以从既有工具中触发机会创建，而不是只能进入 AWS Console 表单。</li><li>来源：<a href="https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==" alt="AWS What&amp;#39;s New" loading="lazy"> AWS What&#39;s New</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![AWS What&#39;s New](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==) AWS Partner Central agents 支持用自然语言创建机会并提供 MCP 入口](https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/)** ==tag-major|重大== ==tag-topic|topic|primary==
-- 发生了什么：AWS 宣布 Partner Central agents 现在可通过自然语言对话加速 opportunity creation；该能力基于 Amazon Bedrock AgentCore，面向合作伙伴的 co-sell pipeline、deal hygiene 和 funding 机会识别。
-- 为什么值得看：入口同时覆盖 AWS Console 中的 Amazon Q chat 和可编程 Model Context Protocol，因此销售团队可以从既有工具中触发机会创建，而不是只能进入 AWS Console 表单。
-- 来源：[![AWS What&#39;s New](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==) AWS What&#39;s New](https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK</span>
-      <span class="collapsible-subtitle">Lockdown Mode 允许 /scrape 只从 Firecrawl index 返回结果，不发起 outbound requests，并默认 zero data retention；该能…</span>
-    </span>
+**[![AWS What&#39;s New](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==) AWS Partner Central agents 支持用自然语言创建机会并提供 MCP 入口](https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/)** ==tag-major|重大== ==tag-topic|topic|primary==
+- AWS 宣布 Partner Central agents 现在可通过自然语言对话加速 opportunity creation；该能力基于 Amazon Bedrock AgentCore，面向合作伙伴的 co-sell pipeline、deal hygiene 和 funding 机会识别。
+- 入口同时覆盖 AWS Console 中的 Amazon Q chat 和可编程 Model Context Protocol，因此销售团队可以从既有工具中触发机会创建，而不是只能进入 AWS Console 表单。
+- 来源：[![AWS What&#39;s New](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAdVBMVEUjLz7///8cKTkhLT0WJTYTIzQOIDIZJzcAFywAEyoAByQAECj19vcAGS7v8PHW2Nvm5+hTW2cIHDDf4eOipqySl51tdHxdZG6xtLkxO0gAAB56gIgpNUSBho2rrrNmbXa6vcFLU16JjpXOz9I8RlPDxckAAAMqqCy5AAACfUlEQVRYhe1V2Y7bMAwUdfuIJcvytb6P9P8/sZQTFCg29r4WhechAkhxRI7GCiE3bty48b+CCp0kkaSECKlCgEt+xKXAH4c5py7rl3KztvALF6WvcCvt/BDitV8Fz0fMNdMFA9tTOJAtiYEsIaxNIV0oiQwUX9U72bPzBnKYh7weAZ7xCrAzDABMKvD4OIOiyuvSXBAQqp2g6muGNMlTWIUsAUslrwCWBak0pcJd1AcKIYTuABJewCzdBh6Mlh6s3gEa5tR1OeP5WpZdCRA5LOKtBQZZj4J499gA7Fj34orAzfBGpGqAtgbzy0ItASpO2y0kisGd12Or8Kzq4YkErC2gG2D8aqCcwBJGaJSPBVJ0/HQAYmGLuYpQgyh0M8/Q6QHmEebHIZAUdQbbqREYyaDRjOk5EPAJigxavqTZBhPHasoYw4YMPZ/BgmlZj4NAjrtxsRFTFo2Flpj80jOWW5jPZRRYmpkUthSegkgUrXFEoyKbZArnsiZosF90EI0Zblvj0uAu3hUFGl9Nx0LUoWC6LacaHj20+94Lpmg4hRL2WshxpiD7vrfq4vwARul3r70jDJNcSHFKwS+bC5CkHvxan9hZ+C6+fC1IP75s6uXHtKqgmJw4/1rY3gzT1BVnBEQs6IOu1R9UeIHGj7qKPQxns6oePWibvJf8Owc6cV8LsMkTXXbaZFLZ8MXNHYuclByvkx7KO61zbzA1txq2K7H5o8xez+LW+G7KA6rVz8URNLmWHeTXUst+NfAJ6VYrRagpL5+UMAfetrfp39WZGZbwT8H6+qf6QKGczAf/fPWdmqas9uhtQPaDlf+AcqmT+ADq+eFWbty4ceOfw2/KDSaCQgTeSAAAAABJRU5ErkJggg==) AWS What&#39;s New](https://aws.amazon.com/about-aws/whats-new/2026/05/aws-partner-central-agents-oppo/)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://www.firecrawl.dev/changelog" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkZDPC90ZXh0Pjwvc3ZnPg==" alt="Firecrawl Changelog" loading="lazy"> Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：Firecrawl v2.10 changelog 把近几周的数据提取和安全功能合并到一个版本：`/parse`、Lockdown Mode、Question format、Highlights format，以及 Go、Ruby、PHP、.NET 官方 SDK。</li><li>为什么值得看：Lockdown Mode 允许 `/scrape` 只从 Firecrawl index 返回结果，不发起 outbound requests，并默认 zero data retention；该能力覆盖 API、CLI 和 MCP。</li><li>来源：<a href="https://www.firecrawl.dev/changelog" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkZDPC90ZXh0Pjwvc3ZnPg==" alt="Firecrawl Changelog" loading="lazy"> Firecrawl Changelog</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Firecrawl Changelog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkZDPC90ZXh0Pjwvc3ZnPg==) Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK](https://www.firecrawl.dev/changelog)** ==tag-major|重大== ==tag-topic|topic|primary==
-- 发生了什么：Firecrawl v2.10 changelog 把近几周的数据提取和安全功能合并到一个版本：`/parse`、Lockdown Mode、Question format、Highlights format，以及 Go、Ruby、PHP、.NET 官方 SDK。
-- 为什么值得看：Lockdown Mode 允许 `/scrape` 只从 Firecrawl index 返回结果，不发起 outbound requests，并默认 zero data retention；该能力覆盖 API、CLI 和 MCP。
-- 来源：[![Firecrawl Changelog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkZDPC90ZXh0Pjwvc3ZnPg==) Firecrawl Changelog](https://www.firecrawl.dev/changelog)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">xAI 发布 Grok Build 终端 coding agent early beta</span>
-      <span class="collapsible-subtitle">官方页面明确 AGENTS.md、plugins、hooks、skills 和 MCP servers 可直接工作，说明 xAI 选择兼容现有 agent repo 约定，而不是要求用户迁移到全新项…</span>
-    </span>
+**[![Firecrawl Changelog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkZDPC90ZXh0Pjwvc3ZnPg==) Firecrawl v2.10 合并发布 parse、Lockdown、Question/Highlights 和新 SDK](https://www.firecrawl.dev/changelog)** ==tag-major|重大== ==tag-topic|topic|primary==
+- Firecrawl v2.10 changelog 把近几周的数据提取和安全功能合并到一个版本：`/parse`、Lockdown Mode、Question format、Highlights format，以及 Go、Ruby、PHP、.NET 官方 SDK。
+- Lockdown Mode 允许 `/scrape` 只从 Firecrawl index 返回结果，不发起 outbound requests，并默认 zero data retention；该能力覆盖 API、CLI 和 MCP。
+- 来源：[![Firecrawl Changelog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkZDPC90ZXh0Pjwvc3ZnPg==) Firecrawl Changelog](https://www.firecrawl.dev/changelog)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://x.ai/news/grok-build-cli" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI News" loading="lazy"> xAI 发布 Grok Build 终端 coding agent early beta</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 6x/4d</mark></p>
-<ul><li>发生了什么：xAI 宣布 Grok Build early beta，面向 SuperGrok Heavy subscribers 提供一个直接在终端运行的 coding agent 和 CLI，用于专业软件工程与复杂 coding work。</li><li>为什么值得看：官方页面明确 AGENTS.md、plugins、hooks、skills 和 MCP servers 可直接工作，说明 xAI 选择兼容现有 agent repo 约定，而不是要求用户迁移到全新项目格式。</li><li>来源：<a href="https://x.ai/news/grok-build-cli" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=" alt="xAI News" loading="lazy"> xAI News</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![xAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=) xAI 发布 Grok Build 终端 coding agent early beta](https://x.ai/news/grok-build-cli)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 6x/4d==
-- 发生了什么：xAI 宣布 Grok Build early beta，面向 SuperGrok Heavy subscribers 提供一个直接在终端运行的 coding agent 和 CLI，用于专业软件工程与复杂 coding work。
-- 为什么值得看：官方页面明确 AGENTS.md、plugins、hooks、skills 和 MCP servers 可直接工作，说明 xAI 选择兼容现有 agent repo 约定，而不是要求用户迁移到全新项目格式。
-- 来源：[![xAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=) xAI News](https://x.ai/news/grok-build-cli)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">OpenAI 发布 ChatGPT 在敏感对话中的上下文安全更新</span>
-      <span class="collapsible-subtitle">OpenAI 公布的内部评估显示，长单轮对话中 suicide/self harm 场景 intended safe response 提升 50%，harm to others 提升 16%；在…</span>
-    </span>
+**[![xAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=) xAI 发布 Grok Build 终端 coding agent early beta](https://x.ai/news/grok-build-cli)** ==tag-major|重大== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 6x/4d==
+- xAI 宣布 Grok Build early beta，面向 SuperGrok Heavy subscribers 提供一个直接在终端运行的 coding agent 和 CLI，用于专业软件工程与复杂 coding work。
+- 官方页面明确 AGENTS.md、plugins、hooks、skills 和 MCP servers 可直接工作，说明 xAI 选择兼容现有 agent repo 约定，而不是要求用户迁移到全新项目格式。
+- 来源：[![xAI News](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAY1BMVEX///8AAACfn5/f39+/v7/Pz88NDQ2vr6/s7OxDQ0MeHh7w8PAHBwdUVFTk5OQvLy9PT0/Jyck7Ozu4uLiEhIR2dnZoaGixsbH19fUnJycXFxeRkZFcXFy8vLyoqKg/Pz9kZGR1Z31eAAAAwklEQVQ4jd2R0Q6CMAxFe8eGgCBOBBER/P+vtCt7YhvvugTS5B7W9kD0tyczxpyP8hyojoAbgM6m8zvn/aCSuamB9oEkMD6BWk847QfTWmeuGLjBq0EI+Mk7zkuqQoAUJzMVE5BfqAXeQXO+FkvvXuQAHQDysc35GjERAlt7JQpXICZKFpBVSsBEgMIpkOAaBUylncQxBbDCRn4D1zOQRSewPJ2bPwZsCr3QTwh4hV4o+yr2EyqlZPWFi9HyE1nzd88XhycHNygsF+YAAAAASUVORK5CYII=) xAI News](https://x.ai/news/grok-build-cli)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy"> OpenAI 发布 ChatGPT 在敏感对话中的上下文安全更新</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：OpenAI 介绍 ChatGPT 在 sensitive conversations 中识别逐步显现风险的更新：系统会在少数高风险场景中使用短 factual safety summaries，帮助模型理解上下文并更谨慎地响应。</li><li>为什么值得看：OpenAI 公布的内部评估显示，长单轮对话中 suicide/self-harm 场景 intended safe response 提升 50%，harm-to-others 提升 16%；在 GPT-5.5 Instant 上，跨多对话 harm-to-others 提升 52%，suicide/self-harm 提升 39%。</li><li>来源：<a href="https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI" loading="lazy"> OpenAI</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 发布 ChatGPT 在敏感对话中的上下文安全更新](https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/)** ==tag-major|重大== ==tag-topic|topic|primary==
-- 发生了什么：OpenAI 介绍 ChatGPT 在 sensitive conversations 中识别逐步显现风险的更新：系统会在少数高风险场景中使用短 factual safety summaries，帮助模型理解上下文并更谨慎地响应。
-- 为什么值得看：OpenAI 公布的内部评估显示，长单轮对话中 suicide/self-harm 场景 intended safe response 提升 50%，harm-to-others 提升 16%；在 GPT-5.5 Instant 上，跨多对话 harm-to-others 提升 52%，suicide/self-harm 提升 39%。
+**[![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI 发布 ChatGPT 在敏感对话中的上下文安全更新](https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/)** ==tag-major|重大== ==tag-topic|topic|primary==
+- OpenAI 介绍 ChatGPT 在 sensitive conversations 中识别逐步显现风险的更新：系统会在少数高风险场景中使用短 factual safety summaries，帮助模型理解上下文并更谨慎地响应。
+- OpenAI 公布的内部评估显示，长单轮对话中 suicide/self-harm 场景 intended safe response 提升 50%，harm-to-others 提升 16%；在 GPT-5.5 Instant 上，跨多对话 harm-to-others 提升 52%，suicide/self-harm 提升 39%。
 - 来源：[![OpenAI](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI](https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/)</template>
-  </details>
+  </section>
 
 
 

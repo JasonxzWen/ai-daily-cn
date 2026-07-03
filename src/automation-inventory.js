@@ -70,6 +70,7 @@ function parseAutomationToml(text, filePath) {
       ? false
       : !statusSelfCheck &&
         (/daily:run[\s\S]*--publish/i.test(text) ||
+          /daily:codex-pipeline[\s\S]*(--publish|\bpublish\b)/i.test(text) ||
           /confirm-push|publish:github-api|publish:prepare-worktree/i.test(text) ||
           (/AI[\s\S]*Daily|AI[\s\S]*daily|AI[\s\S]*日报/i.test(text) && /GitHub Pages|publish|发布/i.test(text)));
   return {

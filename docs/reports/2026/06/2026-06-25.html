@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-artifact-kind="research" data-status="complete" data-runtime-state="not-runtime">
+<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-artifact-kind="research" data-status="degraded" data-runtime-state="not-runtime">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2943,8 +2943,105 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   color: var(--muted);
 }
 
-/* Stage D: Feishu-style left-rail table of contents (desktop only; mobile keeps
-   the engine's horizontal nav so the per-story TOC stays contained). */
+.report-shell {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.report-section-stack > section[id^="section-track-"] {
+  border-radius: 8px;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown {
+  font-size: 0.95rem;
+  line-height: 1.66;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown > p:first-child {
+  margin-top: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown strong {
+  display: block;
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.38;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown ul {
+  margin: 6px 0 14px;
+  padding-left: 1.15rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown li {
+  margin: 4px 0;
+}
+
+.inline-site-icon {
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: cover;
+}
+
+.card-title-icon {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px;
+  max-height: 18px;
+  flex: 0 0 18px;
+}
+
+.chip,
+.text-highlight,
+.daily-tag,
+.tag-highlight,
+.tag-stars,
+.tag-topic,
+.tag-major,
+.tag-notable,
+.tag-general {
+  font-size: 0.78rem;
+  line-height: 1.2;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.chip:hover,
+a.chip:hover,
+.text-highlight:hover,
+.daily-tag:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 44%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 76%, #ffffff);
+  color: var(--accent);
+}
+
+.chip-topic,
+.tag-topic {
+  border-color: #adc4ce;
+  background: #edf3f5;
+  color: #31586a;
+}
+
+.chip-major,
+.tag-major {
+  border-color: #d7a06a;
+  background: #fff1df;
+  color: #8a431c;
+}
+
+.chip-notable,
+.tag-notable {
+  border-color: #b7c68f;
+  background: #eef4df;
+  color: #526a2d;
+}
+
+/* Reader report left rail: desktop keeps category-level anchors; mobile keeps
+   the engine's horizontal nav. */
 @media (min-width: 761px) {
   .report-layout {
     grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
@@ -2972,6 +3069,60 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   .report-nav a {
     white-space: normal;
     border-radius: 6px;
+  }
+
+  .report-nav a[href^="#section-track-"] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    justify-content: flex-start;
+    border-left: 3px solid transparent;
+    margin-top: 8px;
+    font-size: 0.88rem;
+    font-weight: 760;
+  }
+
+  .report-nav a[href^="#section-track-"]::before {
+    display: block;
+    content: "正文主线";
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .report-nav a[href="#section-github-trending"]::before,
+  .report-nav a[href="#section-huggingface-trending"]::before {
+    content: "开源与模型";
+  }
+
+  .report-nav a[href="#section-trend-tracking"]::before,
+  .report-nav a[href="#section-model-releases"]::before {
+    content: "趋势追踪";
+  }
+
+  .report-nav a[href="#section-subscribed-rss"]::before,
+  .report-nav a[href="#section-hot-blogs"]::before,
+  .report-nav a[href="#section-chinese-media-dynamics"]::before {
+    content: "媒体与订阅";
+  }
+
+  .report-nav a[href^="#section-track-"]:hover,
+  .report-nav a[href^="#section-track-"][aria-current="true"] {
+    border-left-color: var(--accent);
+  }
+
+  .report-nav a:not([href^="#section-track-"]) {
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .report-nav a[href^="#section-story-"] {
+    display: none;
   }
 
   .report-nav a + a {
@@ -3020,7 +3171,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
           <div class="eyebrow">AI 日报 · 覆盖 2026-06-23 至 2026-06-25</div>
           <h1 class="report-title">2026-06-25</h1>
         </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
+        <div class="toolbar"><span class="status-pill status-warn">状态：降级</span></div>
       </div>
       <div class="hero-brief">
         <p class="hero-summary-text">今天最值得看的主线有 Meta Newsroom披露 Claude Code agent 工具工作流；Alibaba Cloud披露 agent 与开发者工具能力；微软研究院更新AI 产品、平台或工程实践；热门博客这轮主要看 agent 和开发工具的落地边界。</p>
@@ -3045,22 +3196,14 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <div class="report-nav-group-title">阅读顺序</div>
       <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
       <a href="#section-track-industry" title="AI 行业动态" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>AI 行业动态</span></a>
-<a href="#section-story-2" title="Alibaba Cloud更新agent 与开发者工具能力" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>Alibaba Cloud更新agent 与开发者工具能力</span></a>
-<a href="#section-story-5" title="Google 为 Gemini 模型新增电脑操作能力" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>Google 为 Gemini 模型新增电脑操作能力</span></a>
-<a href="#section-story-7" title="OpenAI公布模型能力和推理入口变化" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>OpenAI公布模型能力和推理入口变化</span></a>
-<a href="#section-track-engineering" title="工程与开发者动态" data-nav-link data-nav-index="5" data-nav-group-name="main" data-nav-status="info"><span>工程与开发者动态</span></a>
-<a href="#section-story-1" title="Meta Newsroom发布 Claude Code agent 工具工作流" data-nav-link data-nav-index="6" data-nav-group-name="main" data-nav-status="info"><span>Meta Newsroom发布 Claude Code agent 工具工作流</span></a>
-<a href="#section-story-4" title="Alibaba Cloud更新agent 与开发者工具能力" data-nav-link data-nav-index="7" data-nav-group-name="main" data-nav-status="info"><span>Alibaba Cloud更新agent 与开发者工具能力</span></a>
-<a href="#section-story-6" title="Alibaba Cloud更新agent 与开发者工具能力" data-nav-link data-nav-index="8" data-nav-group-name="main" data-nav-status="info"><span>Alibaba Cloud更新agent 与开发者工具能力</span></a>
-<a href="#section-story-8" title="微软回顾降低数据中心用水强度的长期工程实践" data-nav-link data-nav-index="9" data-nav-group-name="main" data-nav-status="info"><span>微软回顾降低数据中心用水强度的长期工程实践</span></a>
-<a href="#section-track-opensource" title="开源动态" data-nav-link data-nav-index="10" data-nav-group-name="main" data-nav-status="info"><span>开源动态</span></a>
-<a href="#section-story-3" title="微软研究院用 Talos 自动化基因组再分析扩展罕见病诊断" data-nav-link data-nav-index="11" data-nav-group-name="main" data-nav-status="info"><span>微软研究院用 Talos 自动化基因组再分析扩展罕见病诊断</span></a>
-<a href="#section-official-blog-updates" title="官方 Blog 更新" data-nav-link data-nav-index="12" data-nav-group-name="main" data-nav-status="info"><span>官方 Blog 更新</span></a>
-<a href="#section-github-trending" title="GitHub Trending · Top 8" data-nav-link data-nav-index="13" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
-<a href="#section-trend-tracking" title="趋势追踪" data-nav-link data-nav-index="14" data-nav-group-name="signals" data-nav-status="info"><span>趋势追踪</span></a>
-<a href="#section-subscribed-rss" title="订阅 RSS" data-nav-link data-nav-index="15" data-nav-group-name="main" data-nav-status="info"><span>订阅 RSS</span></a>
-<a href="#section-chinese-media-rss" title="中文媒体 RSS" data-nav-link data-nav-index="16" data-nav-group-name="main" data-nav-status="info"><span>中文媒体 RSS</span></a>
-<a href="#section-twitter-discussion" title="X/Twitter 讨论" data-nav-link data-nav-index="17" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
+<a href="#section-track-engineering" title="工程与开发者动态" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>工程与开发者动态</span></a>
+<a href="#section-track-opensource" title="开源动态" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>开源动态</span></a>
+<a href="#section-official-blog-updates" title="官方 Blog 更新" data-nav-link data-nav-index="4" data-nav-group-name="main" data-nav-status="info"><span>官方 Blog 更新</span></a>
+<a href="#section-github-trending" title="GitHub Trending · Top 8" data-nav-link data-nav-index="5" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
+<a href="#section-trend-tracking" title="趋势追踪" data-nav-link data-nav-index="6" data-nav-group-name="signals" data-nav-status="info"><span>趋势追踪</span></a>
+<a href="#section-subscribed-rss" title="订阅 RSS" data-nav-link data-nav-index="7" data-nav-group-name="main" data-nav-status="info"><span>订阅 RSS</span></a>
+<a href="#section-chinese-media-rss" title="中文媒体 RSS" data-nav-link data-nav-index="8" data-nav-group-name="main" data-nav-status="info"><span>中文媒体 RSS</span></a>
+<a href="#section-twitter-discussion" title="X/Twitter 讨论" data-nav-link data-nav-index="9" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3073,63 +3216,30 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）</p></div>
-    <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）</template>
-  </section>
-<details class="panel rich-section collapsible-panel" id="section-story-2" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Alibaba Cloud更新agent 与开发者工具能力</span>
-      <span class="collapsible-subtitle">工程侧价值集中在 agent、开发工具和自动化工作流接入</span>
-    </span>
+    <div class="rendered-markdown"><p>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）</p>
+<p><strong><a href="https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud更新agent 与开发者工具能力</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>阿里云 Qwen 团队 6 月 25 日发布 Qwen-AgentWorld，这是一个用语言模拟 agent 环境的 world model，覆盖七个领域，用来支持通用 agent 的训练和评估。</li><li>工程侧价值集中在 agent、开发工具和自动化工作流接入</li><li>来源：<a href="https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud Blog</a></li></ul>
+<p><strong><a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-computer-use-gemini-3-5-flash/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" loading="lazy"> Google 为 Gemini 模型新增电脑操作能力</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>Google 在 Keyword 博客介绍 Gemini 3.5 Flash 的 computer use 能力，公开入口指向模型在网页和工具操作类任务中的使用方式；具体可用范围、权限和限制仍需要回到原文核对。</li><li>信号集中在 AI 产品、模型或平台策略的实际变化</li><li>来源：<a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-computer-use-gemini-3-5-flash/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" loading="lazy"> Google Keyword Blog</a></li></ul>
+<p><strong><a href="https://openai.com/index/openai-broadcom-jalapeno-inference-chip" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" loading="lazy"> OpenAI公布模型能力和推理入口变化</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|multi_source</mark></p>
+<ul><li>OpenAI 与 Broadcom 介绍面向 LLM 推理优化的定制 AI 芯片 Jalapeno，目标是提升 AI 系统的性能、效率和规模化能力。</li><li>信号集中在 AI 产品、模型或平台策略的实际变化</li><li>来源：<a href="https://openai.com/index/openai-broadcom-jalapeno-inference-chip" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" loading="lazy"> OpenAI News RSS</a> / <a href="https://openai.com/index/openai-broadcom-jalapeno-inference-chip" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Blog RSS" loading="lazy"> OpenAI Blog RSS</a> / <a href="https://openai.com/index/openai-broadcom-jalapeno-inference-chip" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Company News RSS" loading="lazy"> OpenAI Company News RSS</a></li></ul></div>
+    <template data-rich-source data-source-fallback>模型、公司、政策与基础设施层面的行业动向。（本日 3 条）
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud更新agent 与开发者工具能力</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：阿里云 Qwen 团队 6 月 25 日发布 Qwen-AgentWorld，这是一个用语言模拟 agent 环境的 world model，覆盖七个领域，用来支持通用 agent 的训练和评估。</li><li>为什么值得看：工程侧价值集中在 agent、开发工具和自动化工作流接入</li><li>来源：<a href="https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud Blog</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud更新agent 与开发者工具能力](https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：阿里云 Qwen 团队 6 月 25 日发布 Qwen-AgentWorld，这是一个用语言模拟 agent 环境的 world model，覆盖七个领域，用来支持通用 agent 的训练和评估。
-- 为什么值得看：工程侧价值集中在 agent、开发工具和自动化工作流接入
-- 来源：[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud Blog](https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-5" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Google 为 Gemini 模型新增电脑操作能力</span>
-      <span class="collapsible-subtitle">信号集中在 AI 产品、模型或平台策略的实际变化</span>
-    </span>
+**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud更新agent 与开发者工具能力](https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304)** ==tag-general|一般== ==tag-topic|topic|primary==
+- 阿里云 Qwen 团队 6 月 25 日发布 Qwen-AgentWorld，这是一个用语言模拟 agent 环境的 world model，覆盖七个领域，用来支持通用 agent 的训练和评估。
+- 工程侧价值集中在 agent、开发工具和自动化工作流接入
+- 来源：[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud Blog](https://www.alibabacloud.com/blog/qwen-agentworld-language-world-models-for-general-agents_603304)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-computer-use-gemini-3-5-flash/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" loading="lazy"> Google 为 Gemini 模型新增电脑操作能力</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：Google 在 Keyword 博客介绍 Gemini 3.5 Flash 的 computer use 能力，公开入口指向模型在网页和工具操作类任务中的使用方式；具体可用范围、权限和限制仍需要回到原文核对。</li><li>为什么值得看：信号集中在 AI 产品、模型或平台策略的实际变化</li><li>来源：<a href="https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-computer-use-gemini-3-5-flash/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==" alt="Google Keyword Blog" loading="lazy"> Google Keyword Blog</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==) Google 为 Gemini 模型新增电脑操作能力](https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-computer-use-gemini-3-5-flash/)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：Google 在 Keyword 博客介绍 Gemini 3.5 Flash 的 computer use 能力，公开入口指向模型在网页和工具操作类任务中的使用方式；具体可用范围、权限和限制仍需要回到原文核对。
-- 为什么值得看：信号集中在 AI 产品、模型或平台策略的实际变化
-- 来源：[![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==) Google Keyword Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-computer-use-gemini-3-5-flash/)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-7" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">OpenAI公布模型能力和推理入口变化</span>
-      <span class="collapsible-subtitle">信号集中在 AI 产品、模型或平台策略的实际变化</span>
-    </span>
+**[![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==) Google 为 Gemini 模型新增电脑操作能力](https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-computer-use-gemini-3-5-flash/)** ==tag-general|一般== ==tag-topic|topic|primary==
+- Google 在 Keyword 博客介绍 Gemini 3.5 Flash 的 computer use 能力，公开入口指向模型在网页和工具操作类任务中的使用方式；具体可用范围、权限和限制仍需要回到原文核对。
+- 信号集中在 AI 产品、模型或平台策略的实际变化
+- 来源：[![Google Keyword Blog](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkdLPC90ZXh0Pjwvc3ZnPg==) Google Keyword Blog](https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-computer-use-gemini-3-5-flash/)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://openai.com/index/openai-broadcom-jalapeno-inference-chip" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" loading="lazy"> OpenAI公布模型能力和推理入口变化</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|multi_source</mark></p>
-<ul><li>发生了什么：OpenAI 与 Broadcom 介绍面向 LLM 推理优化的定制 AI 芯片 Jalapeno，目标是提升 AI 系统的性能、效率和规模化能力。</li><li>为什么值得看：信号集中在 AI 产品、模型或平台策略的实际变化</li><li>来源：<a href="https://openai.com/index/openai-broadcom-jalapeno-inference-chip" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI News RSS" loading="lazy"> OpenAI News RSS</a> / <a href="https://openai.com/index/openai-broadcom-jalapeno-inference-chip" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Blog RSS" loading="lazy"> OpenAI Blog RSS</a> / <a href="https://openai.com/index/openai-broadcom-jalapeno-inference-chip" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=" alt="OpenAI Company News RSS" loading="lazy"> OpenAI Company News RSS</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI公布模型能力和推理入口变化](https://openai.com/index/openai-broadcom-jalapeno-inference-chip)** ==tag-general|一般== ==tag-topic|topic|multi_source==
-- 发生了什么：OpenAI 与 Broadcom 介绍面向 LLM 推理优化的定制 AI 芯片 Jalapeno，目标是提升 AI 系统的性能、效率和规模化能力。
-- 为什么值得看：信号集中在 AI 产品、模型或平台策略的实际变化
+**[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI公布模型能力和推理入口变化](https://openai.com/index/openai-broadcom-jalapeno-inference-chip)** ==tag-general|一般== ==tag-topic|topic|multi_source==
+- OpenAI 与 Broadcom 介绍面向 LLM 推理优化的定制 AI 芯片 Jalapeno，目标是提升 AI 系统的性能、效率和规模化能力。
+- 信号集中在 AI 产品、模型或平台策略的实际变化
 - 来源：[![OpenAI News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI News RSS](https://openai.com/index/openai-broadcom-jalapeno-inference-chip) / [![OpenAI Blog RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI Blog RSS](https://openai.com/index/openai-broadcom-jalapeno-inference-chip) / [![OpenAI Company News RSS](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAY1BMVEX///8AAACYmJj5+fnz8/P29vaOjo4YGBjQ0NDDw8Pl5eXX19dQUFDLy8t1dXWfn5+tra0uLi47Ozu2trZfX19oaGhLS0s0NDQmJiaHh4dubm4gICBGRkbt7e0KCgoSEhJ+fn57FpRlAAACjUlEQVRYhe1WW4OyIBB1Ak0EL3kpM63+/6/8mAGR6kPdfdqHzsPGKnPmdhiMoi+++OPgaZ7L35tXJyB0v+MQN3Ao2M/tS213SoTMK4Wrqhjrc1tNu+0rgEdj19nZi4Xvs8+009gFc0fTizI55bsIdNizvXhoK5XSOh/1ugmbOUiAyoZCFVi86tQg2yY4ANAve2LQlf+qAai3zKfkCK3dDPC0ucxi0Jxi3f6KZom1bzPn+GbsOBj2EHgNM8HB+ZIjPVTE1gGs6Ir1AGfZzwT0LC4oFfxzZSSxFT0NWitRdPQJKiugSb+DexPlAGnQPqcEmUeQYkqXbMlE6QjCp0uLlvsEbDAKdrUkUUJQz5NONfIJEGVJ2dst9DBYA2HS8wlQBrGvJ95qaYbaUJnoFoLOhp7p3kFta5cADHsJlleUzWBib4N9aEx6/yegqXDA9RQUY260xx5wzD8ISoaCOuM/Q0iMzGaHZ1hN5SuBdp6dTI4iOFdae9qpc/UHAQbFTQ6BsaIniaIFp86FCPjbkPBQuBZJLJqyopXqnSA42PTO0TafpiGOYV7MDbAE+cpsjedT60phpPxCUCwz9wOT2T3r1pQCBuYTZGtDCQeyWnQr8X4c5WsRx7UDnaJM6V7spojTaaZ6OQKGvS6C9hheE9mTOHj1mAmO4mLlGEBs6Xn3OklcBLBuT2I0FdbDrLfNkrXNJHEHKgyxTB/rnWTQ04Tv4HbYvOLHN5mVnletii1zKqO3TfTLIMGBs+NmxSSgbqgQKUriMjd961ZzkFTru7rgT+/y4f3qneSDXZePmnr2L+6b97KHuHm2Z3UVNd1FjRTJ6f1L4eex3PZ9Hr0jsxSnX7h3HPqDN3j+v/jir+AfWRkZ4tp3YAUAAAAASUVORK5CYII=) OpenAI Company News RSS](https://openai.com/index/openai-broadcom-jalapeno-inference-chip)</template>
-  </details>
+  </section>
 <section class="panel rich-section" id="section-track-engineering" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
@@ -3139,81 +3249,37 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>面向开发者的产品、工具与工程实践更新。（本日 4 条）</p></div>
-    <template data-rich-source data-source-fallback>面向开发者的产品、工具与工程实践更新。（本日 4 条）</template>
-  </section>
-<details class="panel rich-section collapsible-panel" id="section-story-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Meta Newsroom发布 Claude Code agent 工具工作流</span>
-      <span class="collapsible-subtitle">工程侧价值集中在 agent、开发工具和自动化工作流接入</span>
-    </span>
+    <div class="rendered-markdown"><p>面向开发者的产品、工具与工程实践更新。（本日 4 条）</p>
+<p><strong><a href="https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==" alt="Meta Newsroom" loading="lazy"> Meta Newsroom发布 Claude Code agent 工具工作流</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 9x/3d</mark></p>
+<ul><li>Meta 6 月 23 日宣布在亚太推出 Small Business Growth Academy，面向小企业提供 AI 工具、广告和跨境增长培训，目标是帮助商家提升数字技能并扩大业务。</li><li>工程侧价值集中在 agent、开发工具和自动化工作流接入</li><li>来源：<a href="https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==" alt="Meta Newsroom" loading="lazy"> Meta Newsroom</a></li></ul>
+<p><strong><a href="https://www.alibabacloud.com/blog/fully-managed-polardb-x-mem0-service-enabling-infinite-ai-memory-extension-and-dual-use-integration_603303" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud更新agent 与开发者工具能力</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>阿里云介绍全托管 PolarDB-X Mem0 服务，为 AI agent 提供长期记忆，采用语义数据和结构化数据的双通道架构，面向记忆扩展与双用途集成场景。</li><li>工程侧价值集中在 agent、开发工具和自动化工作流接入</li><li>来源：<a href="https://www.alibabacloud.com/blog/fully-managed-polardb-x-mem0-service-enabling-infinite-ai-memory-extension-and-dual-use-integration_603303" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud Blog</a></li></ul>
+<p><strong><a href="https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud更新agent 与开发者工具能力</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>阿里云介绍 Agent Infra 上的约束基础设施，强调让 AI agent 的运行时行为可控、可观测并持续演进，用于约束和监控 agent 执行过程。</li><li>工程侧价值集中在 agent、开发工具和自动化工作流接入</li><li>来源：<a href="https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud Blog</a></li></ul>
+<p><strong><a href="https://blogs.microsoft.com/blog/2026/06/24/inside-microsofts-two-decade-push-to-cut-water-intensity-while-scaling-for-growth/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Official Microsoft Blog" loading="lazy"> 微软回顾降低数据中心用水强度的长期工程实践</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>微软官方博客回顾在云和 AI 服务需求增长下减少数据中心用水强度的长期工程实践，并解释基础设施扩张与本地水资源影响之间的关系。</li><li>信号集中在 AI 产品、模型或平台策略的实际变化</li><li>来源：<a href="https://blogs.microsoft.com/blog/2026/06/24/inside-microsofts-two-decade-push-to-cut-water-intensity-while-scaling-for-growth/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Official Microsoft Blog" loading="lazy"> Official Microsoft Blog</a></li></ul></div>
+    <template data-rich-source data-source-fallback>面向开发者的产品、工具与工程实践更新。（本日 4 条）
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==" alt="Meta Newsroom" loading="lazy"> Meta Newsroom发布 Claude Code agent 工具工作流</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">coding agent: 7d 9x/3d</mark></p>
-<ul><li>发生了什么：Meta 6 月 23 日宣布在亚太推出 Small Business Growth Academy，面向小企业提供 AI 工具、广告和跨境增长培训，目标是帮助商家提升数字技能并扩大业务。</li><li>为什么值得看：工程侧价值集中在 agent、开发工具和自动化工作流接入</li><li>来源：<a href="https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==" alt="Meta Newsroom" loading="lazy"> Meta Newsroom</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Meta Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==) Meta Newsroom发布 Claude Code agent 工具工作流](https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/)** ==tag-general|一般== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 9x/3d==
-- 发生了什么：Meta 6 月 23 日宣布在亚太推出 Small Business Growth Academy，面向小企业提供 AI 工具、广告和跨境增长培训，目标是帮助商家提升数字技能并扩大业务。
-- 为什么值得看：工程侧价值集中在 agent、开发工具和自动化工作流接入
-- 来源：[![Meta Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==) Meta Newsroom](https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-4" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Alibaba Cloud更新agent 与开发者工具能力</span>
-      <span class="collapsible-subtitle">工程侧价值集中在 agent、开发工具和自动化工作流接入</span>
-    </span>
+**[![Meta Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==) Meta Newsroom发布 Claude Code agent 工具工作流](https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/)** ==tag-general|一般== ==tag-topic|topic|primary== ==tag-topic|coding agent: 7d 9x/3d==
+- Meta 6 月 23 日宣布在亚太推出 Small Business Growth Academy，面向小企业提供 AI 工具、广告和跨境增长培训，目标是帮助商家提升数字技能并扩大业务。
+- 工程侧价值集中在 agent、开发工具和自动化工作流接入
+- 来源：[![Meta Newsroom](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzJmNWJlYSIvPjx0ZXh0IHg9IjMyIiB5PSIzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPk1OPC90ZXh0Pjwvc3ZnPg==) Meta Newsroom](https://about.fb.com/news/2026/06/launch-of-metas-small-business-growth-academy-across-asia-pacific/)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/fully-managed-polardb-x-mem0-service-enabling-infinite-ai-memory-extension-and-dual-use-integration_603303" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud更新agent 与开发者工具能力</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：阿里云介绍全托管 PolarDB-X Mem0 服务，为 AI agent 提供长期记忆，采用语义数据和结构化数据的双通道架构，面向记忆扩展与双用途集成场景。</li><li>为什么值得看：工程侧价值集中在 agent、开发工具和自动化工作流接入</li><li>来源：<a href="https://www.alibabacloud.com/blog/fully-managed-polardb-x-mem0-service-enabling-infinite-ai-memory-extension-and-dual-use-integration_603303" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud Blog</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud更新agent 与开发者工具能力](https://www.alibabacloud.com/blog/fully-managed-polardb-x-mem0-service-enabling-infinite-ai-memory-extension-and-dual-use-integration_603303)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：阿里云介绍全托管 PolarDB-X Mem0 服务，为 AI agent 提供长期记忆，采用语义数据和结构化数据的双通道架构，面向记忆扩展与双用途集成场景。
-- 为什么值得看：工程侧价值集中在 agent、开发工具和自动化工作流接入
-- 来源：[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud Blog](https://www.alibabacloud.com/blog/fully-managed-polardb-x-mem0-service-enabling-infinite-ai-memory-extension-and-dual-use-integration_603303)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-6" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Alibaba Cloud更新agent 与开发者工具能力</span>
-      <span class="collapsible-subtitle">工程侧价值集中在 agent、开发工具和自动化工作流接入</span>
-    </span>
+**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud更新agent 与开发者工具能力](https://www.alibabacloud.com/blog/fully-managed-polardb-x-mem0-service-enabling-infinite-ai-memory-extension-and-dual-use-integration_603303)** ==tag-general|一般== ==tag-topic|topic|primary==
+- 阿里云介绍全托管 PolarDB-X Mem0 服务，为 AI agent 提供长期记忆，采用语义数据和结构化数据的双通道架构，面向记忆扩展与双用途集成场景。
+- 工程侧价值集中在 agent、开发工具和自动化工作流接入
+- 来源：[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud Blog](https://www.alibabacloud.com/blog/fully-managed-polardb-x-mem0-service-enabling-infinite-ai-memory-extension-and-dual-use-integration_603303)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud更新agent 与开发者工具能力</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：阿里云介绍 Agent Infra 上的约束基础设施，强调让 AI agent 的运行时行为可控、可观测并持续演进，用于约束和监控 agent 执行过程。</li><li>为什么值得看：工程侧价值集中在 agent、开发工具和自动化工作流接入</li><li>来源：<a href="https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=" alt="Alibaba Cloud Blog" loading="lazy"> Alibaba Cloud Blog</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud更新agent 与开发者工具能力](https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：阿里云介绍 Agent Infra 上的约束基础设施，强调让 AI agent 的运行时行为可控、可观测并持续演进，用于约束和监控 agent 执行过程。
-- 为什么值得看：工程侧价值集中在 agent、开发工具和自动化工作流接入
-- 来源：[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud Blog](https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305)</template>
-  </details>
-<details class="panel rich-section collapsible-panel" id="section-story-8" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">微软回顾降低数据中心用水强度的长期工程实践</span>
-      <span class="collapsible-subtitle">信号集中在 AI 产品、模型或平台策略的实际变化</span>
-    </span>
+**[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud更新agent 与开发者工具能力](https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305)** ==tag-general|一般== ==tag-topic|topic|primary==
+- 阿里云介绍 Agent Infra 上的约束基础设施，强调让 AI agent 的运行时行为可控、可观测并持续演进，用于约束和监控 agent 执行过程。
+- 工程侧价值集中在 agent、开发工具和自动化工作流接入
+- 来源：[![Alibaba Cloud Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXklEQVRYhe2XP27CMBSHvyDkld6AI3CFdKoHS8AJSNcs9AblCHCChhMQpAzZmitwg/QG7ZolHfrSoZjYoCCQmjdF8fPv+/k5/pPg6cVwyxjclN4b6A0Aw+Yhr7IZsAImjj6PWpnC1pBXWQi8O/ofgJVWJgWpQF5lCbDzgG9OwQGkbePQmAA7YRLUMRHw5uj0BaRamciRB/wOaAaMHKnPQR1TAmNL4weQAkVTrnNDpjUUM1ZGUMfUNmdameQSaIuZCEulbatg3zUcQDT3PgairuFt2kcGtDKf16LbtIe2RFvIGg8904u25XqRAYG/npHvZeB+tmKPSPAcFVB2bkArU54j7BtHU5BX2UPXkDZt2zeQXMuATdtmYCrbZqchmtO/7+/iMIq44XE8kENi60gcAYu8ytYe8DWw8IBvtTLJAEBGNufnutQWS9mST8FDYOnQOADzpppB/2fUG/j3Br4BcNt6bXIMKf0AAAAASUVORK5CYII=) Alibaba Cloud Blog](https://www.alibabacloud.com/blog/the-constraint-infrastructure-growing-on-alibaba-cloud-agent-infra_603305)
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://blogs.microsoft.com/blog/2026/06/24/inside-microsofts-two-decade-push-to-cut-water-intensity-while-scaling-for-growth/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Official Microsoft Blog" loading="lazy"> 微软回顾降低数据中心用水强度的长期工程实践</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：微软官方博客回顾在云和 AI 服务需求增长下减少数据中心用水强度的长期工程实践，并解释基础设施扩张与本地水资源影响之间的关系。</li><li>为什么值得看：信号集中在 AI 产品、模型或平台策略的实际变化</li><li>来源：<a href="https://blogs.microsoft.com/blog/2026/06/24/inside-microsofts-two-decade-push-to-cut-water-intensity-while-scaling-for-growth/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Official Microsoft Blog" loading="lazy"> Official Microsoft Blog</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Official Microsoft Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC) 微软回顾降低数据中心用水强度的长期工程实践](https://blogs.microsoft.com/blog/2026/06/24/inside-microsofts-two-decade-push-to-cut-water-intensity-while-scaling-for-growth/)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：微软官方博客回顾在云和 AI 服务需求增长下减少数据中心用水强度的长期工程实践，并解释基础设施扩张与本地水资源影响之间的关系。
-- 为什么值得看：信号集中在 AI 产品、模型或平台策略的实际变化
+**[![Official Microsoft Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC) 微软回顾降低数据中心用水强度的长期工程实践](https://blogs.microsoft.com/blog/2026/06/24/inside-microsofts-two-decade-push-to-cut-water-intensity-while-scaling-for-growth/)** ==tag-general|一般== ==tag-topic|topic|primary==
+- 微软官方博客回顾在云和 AI 服务需求增长下减少数据中心用水强度的长期工程实践，并解释基础设施扩张与本地水资源影响之间的关系。
+- 信号集中在 AI 产品、模型或平台策略的实际变化
 - 来源：[![Official Microsoft Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC) Official Microsoft Blog](https://blogs.microsoft.com/blog/2026/06/24/inside-microsofts-two-decade-push-to-cut-water-intensity-while-scaling-for-growth/)</template>
-  </details>
+  </section>
 <section class="panel rich-section" id="section-track-opensource" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
     <div class="section-heading split-row">
     <div>
@@ -3223,27 +3289,16 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>值得关注的开源模型与项目动态。（本日 1 条）</p></div>
-    <template data-rich-source data-source-fallback>值得关注的开源模型与项目动态。（本日 1 条）</template>
-  </section>
-<details class="panel rich-section collapsible-panel" id="section-story-3" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">微软研究院用 Talos 自动化基因组再分析扩展罕见病诊断</span>
-      <span class="collapsible-subtitle">工程价值集中在代码、权重、示例和生态复用条件</span>
-    </span>
+    <div class="rendered-markdown"><p>值得关注的开源模型与项目动态。（本日 1 条）</p>
+<p><strong><a href="https://www.microsoft.com/en-us/research/blog/talos-scaling-rare-disease-diagnosis-with-automated-iterative-genomic-reanalysis/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Microsoft Research Blog" loading="lazy"> 微软研究院用 Talos 自动化基因组再分析扩展罕见病诊断</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>微软研究院介绍 Talos，用自动化、迭代的基因组再分析缓解罕见病诊断中的人工审阅瓶颈；公开材料称它在范围内诊断中恢复了 90%，平均每位患者只向专家呈现 1.3 个候选变异。</li><li>工程价值集中在代码、权重、示例和生态复用条件</li><li>来源：<a href="https://www.microsoft.com/en-us/research/blog/talos-scaling-rare-disease-diagnosis-with-automated-iterative-genomic-reanalysis/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Microsoft Research Blog" loading="lazy"> Microsoft Research Blog</a></li></ul></div>
+    <template data-rich-source data-source-fallback>值得关注的开源模型与项目动态。（本日 1 条）
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://www.microsoft.com/en-us/research/blog/talos-scaling-rare-disease-diagnosis-with-automated-iterative-genomic-reanalysis/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Microsoft Research Blog" loading="lazy"> 微软研究院用 Talos 自动化基因组再分析扩展罕见病诊断</a></strong> <mark class="text-highlight text-highlight-tag-general" data-highlight-kind="tag-general">一般</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：微软研究院介绍 Talos，用自动化、迭代的基因组再分析缓解罕见病诊断中的人工审阅瓶颈；公开材料称它在范围内诊断中恢复了 90%，平均每位患者只向专家呈现 1.3 个候选变异。</li><li>为什么值得看：工程价值集中在代码、权重、示例和生态复用条件</li><li>来源：<a href="https://www.microsoft.com/en-us/research/blog/talos-scaling-rare-disease-diagnosis-with-automated-iterative-genomic-reanalysis/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC" alt="Microsoft Research Blog" loading="lazy"> Microsoft Research Blog</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Microsoft Research Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC) 微软研究院用 Talos 自动化基因组再分析扩展罕见病诊断](https://www.microsoft.com/en-us/research/blog/talos-scaling-rare-disease-diagnosis-with-automated-iterative-genomic-reanalysis/)** ==tag-general|一般== ==tag-topic|topic|primary==
-- 发生了什么：微软研究院介绍 Talos，用自动化、迭代的基因组再分析缓解罕见病诊断中的人工审阅瓶颈；公开材料称它在范围内诊断中恢复了 90%，平均每位患者只向专家呈现 1.3 个候选变异。
-- 为什么值得看：工程价值集中在代码、权重、示例和生态复用条件
+**[![Microsoft Research Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC) 微软研究院用 Talos 自动化基因组再分析扩展罕见病诊断](https://www.microsoft.com/en-us/research/blog/talos-scaling-rare-disease-diagnosis-with-automated-iterative-genomic-reanalysis/)** ==tag-general|一般== ==tag-topic|topic|primary==
+- 微软研究院介绍 Talos，用自动化、迭代的基因组再分析缓解罕见病诊断中的人工审阅瓶颈；公开材料称它在范围内诊断中恢复了 90%，平均每位患者只向专家呈现 1.3 个候选变异。
+- 工程价值集中在代码、权重、示例和生态复用条件
 - 来源：[![Microsoft Research Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC) Microsoft Research Blog](https://www.microsoft.com/en-us/research/blog/talos-scaling-rare-disease-diagnosis-with-automated-iterative-genomic-reanalysis/)</template>
-  </details>
+  </section>
 <section class="panel" id="section-official-blog-updates" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>
@@ -3738,7 +3793,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     <div class="card-tags"><span class="chip chip-notable">值得关注</span><span class="chip chip-topic">中文 AI 媒体动态</span></div>
 
 
-    <p>风暖鸟声碎，日高花影重：我的昆明与腾冲行记：云南气候实在是太好了，昆明海拔将近两千，每次出门都有一种凉爽感包裹全身。而腾冲太适合旅居了，既有中高端的酒店可供享受奢靡之风，也有历史文化供我们反思来时的路，更好的去面对未来，还有拿上衣服就可以随地大小泡的温泉，美哉！ 查看全文。This is an intermediary/self-media lead; t。这条 RSS 适合观察国内 AI 产品、产业反馈和工程实践的讨论方向；读者若要引用事实、数据或公司动作，仍应点开原文并继续追溯一手来源核对。</p>
+    <p>风暖鸟声碎，日高花影重：我的昆明与腾冲行记：云南气候实在是太好了，昆明海拔将近两千，每次出门都有一种凉爽感包裹全身。而腾冲太适合旅居了，既有中高端的酒店可供享受奢靡之风，也有历史文化供我们反思来时的路，更好的去面对未来，还有拿上衣服就可以随地大小泡的温泉，美哉！ 查看全文。; t。这条 RSS 适合观察国内 AI 产品、产业反馈和工程实践的讨论方向；读者若要引用事实、数据或公司动作，仍应点开原文并继续追溯一手来源核对。</p>
 
   </article>
 <article class="interactive-card evidence-card evidence-spotlight blog-card chinese-media-card" data-evidence-spotlight data-filter-target="section-chinese-media-rss" data-filter-value="中文 AI 媒体动态" data-search-target="section-chinese-media-rss">

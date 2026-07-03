@@ -37,6 +37,23 @@ test("structural page-check failure still blocks", () => {
   assert.deepEqual(c.blocking_checks, ["daily_report_hero"]);
 });
 
+test("visual hierarchy and status page-check failures block", () => {
+  const c = classifyDailyPageCheckResults([{
+    checks: [
+      { id: "source_icon_size_stable", ok: false },
+      { id: "tag_visual_treatment_stable", ok: false },
+      { id: "left_nav_group_hierarchy", ok: false },
+      { id: "report_quality_status_visible", ok: false }
+    ]
+  }]);
+  assert.equal(c.ok, false);
+  assert(c.blocking_checks.includes("source_icon_size_stable"));
+  assert(c.blocking_checks.includes("tag_visual_treatment_stable"));
+  assert(c.blocking_checks.includes("left_nav_group_hierarchy"));
+  assert(c.blocking_checks.includes("report_quality_status_visible"));
+  assert.deepEqual(c.degraded_checks, []);
+});
+
 test("hot blog reader-facing weakness degrades", () => {
   const c = classifyDailyPageCheckResults([{ checks: [{ id: "hot_blog_cards_reader_facing", ok: false }] }]);
   assert.equal(c.ok, true);

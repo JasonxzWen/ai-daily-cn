@@ -1360,7 +1360,10 @@ function stripDraftPublicBodyNoise(value, item = {}) {
     .replace(/\s*Community lead unless backed by a primary source\.?/gi, "")
     .replace(/\s*This is a community lead unless it is backed by a primary source\.?/gi, "")
     .replace(/\s*[A-Za-z][A-Za-z0-9 .&/_'()-]{1,60}\s+latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion\.?/gi, "")
+    .replace(/\s*[A-Za-z][A-Za-z0-9 .&/_'()-]{1,80}\s+published this intermediary lead entry\.?/gi, "")
+    .replace(/\s*published this intermediary lead entry\.?/gi, "")
     .replace(/\s*This is an intermediary\/self-media lead; trace it to a primary source before[^。.;\n]*(?:[。.;]|$)/gi, "")
+    .replace(/\s*This is an intermediary\/self-media le(?:ad[^。.;\n]*)?/gi, "")
     .replace(/\bintermediary_url=\S+/gi, "")
     .replace(/\bsource_report_url=\S+/gi, "")
     .replace(/\bprimary_url=\S+/gi, "")
@@ -4908,12 +4911,12 @@ function englishPublicSignal(candidate) {
   const actor = publicActorLabel(candidate);
   const profile = englishSignalProfile(text);
   const headline = `${actor}${profile.verb}${profile.topic}`;
-  const summary = `${actor}${profile.verb}${profile.topic}，材料覆盖${profile.scope}，边界落在${profile.boundary}`;
-  const detail = `材料把${profile.topic}落到${profile.scope}，已披露事实集中在${profile.factFocus}`;
+  const summary = `${actor}${profile.verb}${profile.topic}，重点包括${profile.scope}，使用前提是${profile.boundary}`;
+  const detail = `${profile.topic}对应${profile.scope}，可核对事实包括${profile.factFocus}`;
   const points = [
-    `原文说明${profile.topic}的核心变化，范围包括${profile.scope}`,
-    `可核对的硬信息集中在${profile.factFocus}`,
-    `边界主要是${profile.boundary}`
+    `核心变化围绕${profile.topic}，范围包括${profile.scope}`,
+    `可核对信息包括${profile.factFocus}`,
+    `使用前提是${profile.boundary}`
   ];
   return { headline, summary, detail, points };
 }
@@ -5108,10 +5111,10 @@ function englishSignalProfile(text) {
   }
   return {
     verb: "更新",
-    topic: "AI 产品、平台或工程实践",
-    scope: "功能变化、使用场景、接入方式、限制条件和后续部署边界",
-    boundary: "公开材料仍需要回到原文核对入口、权限、价格和适用范围",
-    factFocus: "功能变化、适用场景、接入方式和限制条件"
+    topic: "公开产品或工程信息",
+    scope: "标题、适用场景、访问条件、限制说明和后续链接",
+    boundary: "读者还要查看原文中的访问条件、地区范围、价格和使用限制",
+    factFocus: "标题、适用场景、访问条件和限制说明"
   };
 }
 
@@ -5176,9 +5179,12 @@ function huggingFaceModelDescription(candidate, repo, metrics) {
     Number.isFinite(downloads) && downloads > 0 ? `${downloads} downloads` : "",
     Number.isFinite(likes) && likes > 0 ? `${likes} likes` : ""
   ].filter(Boolean);
-  const metricText = metricParts.length > 0 ? `，热度指标是 ${metricParts.join("、")}` : "";
-  const sourceText = metrics ? `；页面还标出 ${metrics}` : "";
-  return trimText(`${repo} 是 Hugging Face 上的${taskLabel}${metricText}${sourceText}。`, 150);
+  const metricText = metricParts.length > 0
+    ? `本周榜单记录 ${metricParts.join("、")}，可作为社区使用热度参考`
+    : "本周榜单只提供基础排名信息";
+  const taskText = task ? `任务类型是 ${task}` : "任务类型需要回到模型卡核对";
+  const metricsHint = metrics ? `；榜单元数据包括 ${metrics}` : "";
+  return trimText(`${repo} 是 Hugging Face 上的${taskLabel}。${metricText}；${taskText}${metricsHint}。选型前还要看模型卡、许可证、推理成本和适用限制。`, 190);
 }
 
 function huggingFaceTaskLabel(task) {
@@ -5815,9 +5821,9 @@ function githubProjectUseCase(candidate, meta, repo) {
     .join(" ");
   const pitch = githubPitchFromDescription(basis, repo);
   if (pitch && pitch !== "AI 工程工具") {
-    return `可用于比较${pitch}相关能力、接口形态和与现有工具链的衔接方式。`;
+    return `公开 README 信息显示它聚焦${pitch}，适合从示例、许可证和近期维护记录判断能否进入 PoC。`;
   }
-  return "可用于了解项目代码入口、示例覆盖、维护节奏和同类方案差异。";
+  return "公开 README 信息应优先说明项目目标、示例、许可证和近期维护记录，避免只复述 Trending 排名。";
 }
 
 function genericFactScope({ category, text }) {
@@ -5839,27 +5845,27 @@ function genericFactScope({ category, text }) {
 function readerImpactForCandidate(candidate, category) {
   const text = candidateText(candidate);
   if (category === "company_business") {
-    return "信号集中在大厂资源投入、组织重心和商业优先级变化";
+    return "可观察的是资源投入、组织重心和合作优先级是否同时变化";
   }
   if (category === "product_radar") {
-    return "信号集中在产品入口、采购时机和路线图影响";
+    return "可观察的是产品入口、目标用户、上线范围和采购节奏";
   }
   if (category === "open_source") {
-    return "工程价值集中在代码、权重、示例和生态复用条件";
+    return "可观察的是代码、权重、示例、许可证和生态复用条件";
   }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
-    return "内容侧价值集中在素材生成、创作者工具链成本和交付方式";
+    return "可观察的是素材生成质量、创作者工具链成本和交付方式";
   }
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
-    return "工程侧价值集中在 agent、开发工具和自动化工作流接入";
+    return "可观察的是 agent、开发工具和自动化工作流的接入成本";
   }
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
-    return "研究价值集中在评测设置、能力边界和内部实验参照";
+    return "可观察的是评测设置、能力边界和内部实验参照价值";
   }
   if (/policy|safety|governance|regulation|security/i.test(text)) {
-    return "风险价值集中在合规、安全和平台治理口径变化";
+    return "可观察的是合规、安全和平台治理口径变化";
   }
-  return "信号集中在 AI 产品、模型或平台策略的实际变化";
+  return "可观察的是 AI 产品、模型或平台策略的实际变化";
 }
 
 function readerWatchForCandidate(candidate, category) {

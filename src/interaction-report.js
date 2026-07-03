@@ -564,7 +564,7 @@ export function reportToInteractionInput(report, options = {}) {
     ],
     hideNavigation: false,
     hideHeroSummary: false,
-    status: "complete",
+    status: dailyInteractionStatus(report),
     renderMode: "pre-rendered",
     generatedAt: report.generated_at,
     sourceFirstPresentationContract: sourceFirstPresentation,
@@ -587,6 +587,14 @@ export function reportToInteractionInput(report, options = {}) {
     sections: publicSections,
     nextActions: []
   };
+}
+
+function dailyInteractionStatus(report) {
+  const status = String(report?.quality_status?.status || "ok").trim();
+  if (status === "degraded" || status === "blocked") {
+    return status;
+  }
+  return "complete";
 }
 
 function filterPublicInteractionSections(sections = []) {
@@ -1194,9 +1202,10 @@ const STORY_TRACKS = [
 const DEFAULT_STORY_TRACK_KEY = "industry";
 const STORY_TRACK_MAX_ITEMS = 10;
 
-// Story-first sections render as a Feishu-style dense doc: stories are grouped
-// into editorial tracks, and each story is its own collapsed panel whose summary
-// is a ~100-char teaser (collapsed) and whose content is the full read (expanded).
+// Story-first sections render as a dense reader doc: each editorial track is one
+// expanded cell that contains all stories for that track. Per-story details stay
+// inside the cell so the left rail remains a category navigation, not a mixed
+// list of categories and child headings.
 function formatStoryFirstSections(stories, context = {}) {
   if (!Array.isArray(stories) || stories.length === 0) {
     return formatMainItemSections([], context);
@@ -1215,17 +1224,19 @@ function formatStoryFirstSections(stories, context = {}) {
     if (entries.length === 0) {
       continue;
     }
+    const trackContent = [
+      `${track.intro}（本日 ${entries.length} 条）`,
+      ...entries.map(({ story, index }) => formatStoryDigest(story, index, context))
+    ].filter(Boolean).join("\n\n");
     sections.push({
       type: "markdown",
       title: track.title,
       richId: `track-${track.key}`,
       group: "main",
       collapsed: false,
-      content: `${track.intro}（本日 ${entries.length} 条）`
+      open: true,
+      content: trackContent
     });
-    for (const { story, index } of entries) {
-      sections.push(formatStoryDetailSection(story, index, context));
-    }
   }
   return sections.length > 0 ? sections : formatMainItemSections([], context);
 }
@@ -1252,7 +1263,7 @@ function storyTrackKey(story, mainItem) {
   return matched ? matched.key : DEFAULT_STORY_TRACK_KEY;
 }
 
-function formatStoryDetailSection(story, index, context = {}) {
+function formatStoryDigest(story, index, context = {}) {
   const link = storyPrimaryLink(story);
   const storyTitle = readerFacingStoryTitle(story.title);
   const titleMarkdown = link
@@ -1270,28 +1281,18 @@ function formatStoryDetailSection(story, index, context = {}) {
     evidenceForUrl(context.evidenceByUrl, link?.url),
     context.mediaOptions
   );
-  const content = [
+  const bullets = [
+    formatDailyInlineText(story.what_happened || "", story),
+    formatDailyInlineText(story.why_it_matters || "", story)
+  ]
+    .map((value) => String(value || "").replace(/\s+/g, " ").trim())
+    .filter((value) => value.length >= 12);
+  return [
     `**${titleMarkdown}**${tags}`,
-    `- 发生了什么：${formatDailyInlineText(story.what_happened || "", story)}`,
-    `- 为什么值得看：${formatDailyInlineText(story.why_it_matters || "", story)}`,
+    ...bullets.map((value) => `- ${value}`),
     sources ? `- 来源：${sources}` : "",
     evidence ? `\n${evidence}` : ""
   ].filter(Boolean).join("\n");
-  return {
-    type: "markdown",
-    title: storyTitle,
-    richId: `story-${index + 1}`,
-    group: "main",
-    collapsed: true,
-    open: false,
-    summary: storyTeaser(story),
-    content
-  };
-}
-
-function storyTeaser(story) {
-  const raw = String(story?.why_it_matters || story?.what_happened || "").replace(/\s+/g, " ").trim();
-  return trimText(stripPublicBodySourcePrefix(raw, story), 100);
 }
 
 function storyPrimaryLink(story) {
@@ -1652,6 +1653,7 @@ function cleanGithubTrendCardFragment(value) {
   return String(value || "")
     .replace(/\s+/g, " ")
     .replace(/^README\s*(?:将该仓库定位为|把该仓库定位为|说明该项目是|显示该项目是)?\s*/u, "")
+    .replace(/\s*这类项目不应只看星标变化[^。]*。?/gu, "")
     .replace(/它的价值在于[^。]*。?/gu, "")
     .replace(/具体阅读时还应关注[^。]*。?/gu, "")
     .replace(/优先核对\s*README[^。]*。?/gu, "")
@@ -1683,7 +1685,7 @@ function stripGithubRepoLead(value, repo) {
 }
 
 function isGenericGithubTrendDescription(value) {
-  return /(?:GitHub Trending Top 10|appeared on GitHub Trending|Today entered|rank #|stars today|stars this week|公开描述指向|关键词包括|ranked\s+(?:model|repo|repository)\s+entry|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|README\s*显示核心能力|读者应先确认|适合先从|优先核对|重点看 README|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README)/i.test(String(value || ""));
+  return /(?:GitHub Trending Top 10|appeared on GitHub Trending|Today entered|rank #|stars today|stars this week|公开描述指向|关键词包括|ranked\s+(?:model|repo|repository)\s+entry|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|README\s*显示核心能力|读者应先确认|读者应先确认快速开始|适合先从|优先核对|重点看 README|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README|本轮开源榜单|公开页面显示|读者应看项目说明|公开信息只能说明开发者关注度增加|这类项目不应只看星标变化|面向AI\s*工程实践的开源项目|给出README\s*说明和使用入口|这类项目适合先从最小示例复现)/iu.test(String(value || ""));
 }
 
 function formatHuggingFaceTrending(items, context = {}) {
@@ -1696,11 +1698,7 @@ function formatHuggingFaceTrending(items, context = {}) {
       Number(item.downloads) > 0 ? `${item.downloads} downloads` : "",
       ...trendTagsFor(context.trendAnnotations, "huggingface_trending", index)
     ].filter(Boolean));
-    const details = [
-      trimText(huggingFaceTrendingDescription(item), 120),
-      Number(item.likes) > 0 ? `likes ${item.likes}` : "",
-      Number(item.downloads) > 0 ? `downloads ${item.downloads}` : ""
-    ].filter(Boolean).join(" / ");
+    const details = trimText(huggingFaceTrendingDescription(item), 140);
     return `${Number(item.rank || index + 1)}. **${markdownLink(item.url, item.name || item.repo)}**${tagText}${details ? `: ${details}` : ""}`;
   });
   return rows.join("\n");
@@ -1714,15 +1712,22 @@ function huggingFaceTrendingDescription(item = {}) {
   const name = String(item.name || item.repo || "该模型").trim();
   const task = String(item.task || "").trim();
   const taskLabel = huggingFaceTaskLabel(task);
-  const metrics = [
-    Number(item.downloads) > 0 ? `${Number(item.downloads)} downloads` : "",
-    Number(item.likes) > 0 ? `${Number(item.likes)} likes` : ""
-  ].filter(Boolean).join("、");
-  return `${name} 是 Hugging Face 上的${taskLabel}${metrics ? `，当前热度指标是 ${metrics}` : ""}。`;
+  const useCase = huggingFaceReaderUseCase(task);
+  return `${name} 是 Hugging Face 上的${taskLabel}，榜单信号说明它仍被社区频繁试用；${useCase}。选型前应回到模型卡核对许可证、限制和部署成本。`;
 }
 
 function isGenericHuggingFaceTrendingDescription(value) {
-  return /trending entry|verify model card|discovery lead|before factual inclusion|ranked\s+model\s+entry|README|公开描述指向|关键词包括|优先核对|准入|复现门槛|只记录排名|公开描述暂未给出足够功能细节/i.test(String(value || ""));
+  return /trending entry|verify model card|discovery lead|before factual inclusion|ranked\s+model\s+entry|README|公开描述指向|关键词包括|优先核对|准入|复现门槛|只记录排名|公开描述暂未给出足够功能细节|本周榜单记录|downloads、likes|社区使用热度/i.test(String(value || ""));
+}
+
+function huggingFaceReaderUseCase(task) {
+  const text = String(task || "").toLowerCase();
+  if (/text-generation|conversational|chat/.test(text)) return "可作为文本生成或推理基线候选";
+  if (/image-to-text|vision|visual-question-answering/.test(text)) return "适合关注视觉理解链路的模型对比";
+  if (/text-to-image|image-generation|diffusion/.test(text)) return "适合关注图像生成工作流的模型对比";
+  if (/speech|audio|automatic-speech-recognition|text-to-speech/.test(text)) return "适合关注语音和音频链路的模型对比";
+  if (/embedding|retrieval|sentence-similarity/.test(text)) return "适合关注检索、嵌入和语义匹配链路";
+  return "适合作为同类模型的对比入口";
 }
 
 function huggingFaceTaskLabel(task) {
@@ -2436,7 +2441,10 @@ function hotBlogCardBody(item = {}) {
   const source = String(item.publisher || item.source || "中文媒体").trim();
   const title = String(item.title || "这条动态").replace(/\s+/g, " ").trim();
   const cleaned = body
+    .replace(/\s*[A-Za-z][A-Za-z0-9 .&/_'()-]{1,80}\s+published this intermediary lead entry\.?/gi, "")
+    .replace(/\s*published this intermediary lead entry\.?/gi, "")
     .replace(/This is an intermediary\/self-media lead; trace it to a primary source before treating it as a reported fact\.?/gi, "")
+    .replace(/This is an intermediary\/self-media le(?:ad[^。.;\n]*)?/gi, "")
     .replace(/\s+/g, " ")
     .trim();
   const lead = cleaned && /[\p{Script=Han}]/u.test(cleaned)
@@ -2693,7 +2701,7 @@ function hotBlogPointTexts(itemOrSummary) {
 
 function isPublicBoilerplatePoint(value) {
   const text = String(value || "").trim();
-  return /(?:intermediary\/self-media lead|trace it to a primary source|backed by a primary source|discovery lead|verify with the original source)/i.test(text);
+  return /(?:intermediary\/self-media lead|This is an intermediary\/self-media le|published this intermediary lead entry|trace it to a primary source|backed by a primary source|discovery lead|verify with the original source)/i.test(text);
 }
 
 function editorialBullets(item) {

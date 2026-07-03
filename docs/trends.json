@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-02T09:01:28.139Z",
+  "generated_at": "2026-07-03T02:35:05.954Z",
   "window_days": 7,
   "source": {
     "report_count": 43,
@@ -33,15 +33,18 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 19,
+      "occurrences": 40,
       "active_days": 6,
       "sections": [
         "builder_observations",
-        "main_items"
+        "github_trending",
+        "projects"
       ],
       "entities": [
         "Claude Code",
         "Codex",
+        "GitHub",
+        "Google",
         "OpenAI"
       ],
       "dates": [
@@ -65,14 +68,17 @@
       "id": "mcp",
       "label": "MCP",
       "status": "hot",
-      "occurrences": 13,
+      "occurrences": 19,
       "active_days": 6,
       "sections": [
         "builder_observations",
         "github_trending",
+        "main_items",
         "projects"
       ],
       "entities": [
+        "Claude Code",
+        "Codex",
         "GitHub",
         "Google"
       ],
@@ -1837,40 +1843,172 @@
       ]
     },
     "2026-07-01": {
-      "main_items": [
+      "main_items": [],
+      "github_trending": [
         {
-          "index": 6,
+          "index": 2,
           "tags": [
             {
               "topic_id": "coding-agent",
               "label": "coding agent",
               "status": "hot",
-              "text": "coding agent: 7d 19x/6d",
+              "text": "coding agent: 7d 28x/6d",
               "window_days": 7,
-              "occurrences": 19,
+              "occurrences": 28,
               "active_days": 6,
               "entities": [
                 "Claude Code",
                 "Codex",
-                "OpenAI"
+                "GitHub",
+                "Google"
               ]
             }
           ]
-        }
-      ],
-      "github_trending": [
+        },
         {
           "index": 3,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 28x/6d",
+              "window_days": 7,
+              "occurrences": 28,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            },
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 16x/6d",
+              "window_days": 7,
+              "occurrences": 16,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 28x/6d",
+              "window_days": 7,
+              "occurrences": 28,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 8,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 28x/6d",
+              "window_days": 7,
+              "occurrences": 28,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 9,
           "tags": [
             {
               "topic_id": "mcp",
               "label": "MCP",
               "status": "hot",
-              "text": "MCP: 7d 13x/6d",
+              "text": "MCP: 7d 16x/6d",
               "window_days": 7,
-              "occurrences": 13,
+              "occurrences": 16,
               "active_days": 6,
               "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 11,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 28x/6d",
+              "window_days": 7,
+              "occurrences": 28,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            },
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 16x/6d",
+              "window_days": 7,
+              "occurrences": 16,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 17,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 28x/6d",
+              "window_days": 7,
+              "occurrences": 28,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
                 "GitHub",
                 "Google"
               ]
@@ -1885,17 +2023,18 @@
           "index": 3,
           "tags": [
             {
-              "topic_id": "coding-agent",
-              "label": "coding agent",
+              "topic_id": "mcp",
+              "label": "MCP",
               "status": "hot",
-              "text": "coding agent: 7d 19x/6d",
+              "text": "MCP: 7d 19x/6d",
               "window_days": 7,
               "occurrences": 19,
               "active_days": 6,
               "entities": [
                 "Claude Code",
                 "Codex",
-                "OpenAI"
+                "GitHub",
+                "Google"
               ]
             }
           ]
@@ -1903,17 +2042,209 @@
       ],
       "github_trending": [
         {
+          "index": 0,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 40x/6d",
+              "window_days": 7,
+              "occurrences": 40,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 40x/6d",
+              "window_days": 7,
+              "occurrences": 40,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
           "index": 4,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 40x/6d",
+              "window_days": 7,
+              "occurrences": 40,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            },
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 19x/6d",
+              "window_days": 7,
+              "occurrences": 19,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 6,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 40x/6d",
+              "window_days": 7,
+              "occurrences": 40,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 9,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 40x/6d",
+              "window_days": 7,
+              "occurrences": 40,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 10,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 40x/6d",
+              "window_days": 7,
+              "occurrences": 40,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 11,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 40x/6d",
+              "window_days": 7,
+              "occurrences": 40,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            },
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 19x/6d",
+              "window_days": 7,
+              "occurrences": 19,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 16,
           "tags": [
             {
               "topic_id": "mcp",
               "label": "MCP",
               "status": "hot",
-              "text": "MCP: 7d 13x/6d",
+              "text": "MCP: 7d 19x/6d",
               "window_days": 7,
-              "occurrences": 13,
+              "occurrences": 19,
               "active_days": 6,
               "entities": [
+                "Claude Code",
+                "Codex",
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 17,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 40x/6d",
+              "window_days": 7,
+              "occurrences": 40,
+              "active_days": 6,
+              "entities": [
+                "Claude Code",
+                "Codex",
                 "GitHub",
                 "Google"
               ]

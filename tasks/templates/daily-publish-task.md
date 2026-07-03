@@ -6,11 +6,11 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 
 ## Runner
 
-- Start from the launcher worktree with `npm run daily:run -- --date YYYY-MM-DD`.
-- Use `npm run daily:run -- --date YYYY-MM-DD --publish` only when real publish is explicitly allowed.
-- Read `.tmp/run-summary-YYYY-MM-DD.json` for `final_status` and `next_action`.
-- If `next_action.kind` is `codex_ai_repair_contract`, write the requested contract with `status:"ready"` and non-empty `edits`, then resume with the same `daily:run` command. If the runner provided a `status:"template"` file, fill edits in that new attempt file instead of overwriting prior attempts.
-- Use `--restart` only when intentionally discarding same-date runner state.
+- Start from the launcher worktree with `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
+- Use `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish` only when real publish is explicitly allowed.
+- Read `.tmp/run-summary-YYYY-MM-DD.json` for `final_status`, `completed_stages`, and `next_action`.
+- If `next_action` requests repair, fix the reported public text or blocker, then rerun the same `daily:codex-pipeline` command.
+- To intentionally discard same-date pipeline state, delete or replace `.tmp/daily-codex-pipeline/YYYY-MM-DD` before rerunning.
 - Scheduled dry-run uses `publish:dry-run:daily`.
 - 21:30 status self-check uses `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json` and treats `multiple_active_daily_publish_automations` as blocking.
 - Daily resilience policy lives in `config/daily-resilience-policy.json`; changed workflows must pass `npm run resilience:validate`. Safe public source/coverage failures can publish as `published_degraded`; exhausted publish infrastructure reports `infrastructure_blocked_after_fallback_exhausted`.
@@ -32,7 +32,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 ## Worktree / Branch
 
 - Record `git status --short --branch`.
-- Automation and publish runs start from the launcher worktree by invoking `daily:run`; the runner prepares and uses the clean publish checkout internally.
+- Automation and publish runs start from the launcher worktree by invoking `daily:codex-pipeline`; the pipeline prepares and uses the clean publish checkout internally.
 - Use `npm run publish:prepare-clean-worktree` only for manual checkout diagnostics.
 - Record whether the run is local generation only, dry-run only, or real publish.
 

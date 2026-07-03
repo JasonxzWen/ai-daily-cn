@@ -18,11 +18,33 @@ const PUBLIC_COPY_BANNED_TERMS = [
   "已披露细节覆盖",
   "更新AI 产品、平台或工程实践",
   "更新 AI 产品、平台或工程实践",
+  "说明 AI 产品、平台或工程变化",
+  "内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界",
+  "公开材料仍需要回到原文核对入口",
+  "仍需要回到原文核对入口",
+  "今天最值得看的主线有",
+  "信号集中在",
+  "价值集中在",
+  "可用于比较",
+  "接口形态",
+  "可用于了解项目代码入口",
+  "同类方案差异",
   "README 主要围绕",
   "阅读时先看",
   "需要结合仓库页面确认",
   "进入 GitHub Trending Top",
-  "今天进入 GitHub Trending"
+  "今天进入 GitHub Trending",
+  "面向agent 工作流和自动化工程",
+  "面向 agent 工作流和自动化工程",
+  "核心能力是",
+  "沉淀为代码、示例和集成入口",
+  "方便和同类方案做功能与工程成本比较",
+  "热度指标是",
+  "页面还标出",
+  "published this intermediary lead entry",
+  "This is an intermediary/self-media lead",
+  "This is an intermediary/self-media le",
+  "trace it to a primary source"
 ];
 const PUBLIC_COPY_BANNED_PATTERN = new RegExp(PUBLIC_COPY_BANNED_TERMS.map(escapeRegex).join("|"), "i");
 const PUBLIC_COPY_GATE_START_DATE = "2026-07-01";
@@ -76,7 +98,7 @@ const HOT_BLOG_COVERAGE_PATTERNS = [
   /(?:\u4f9d\u636e|\u8bc1\u636e|\u65b9\u6cd5|\u5b9e\u9a8c|\u6848\u4f8b|\u4ee3\u7801|\u63a5\u53e3|\u6570\u636e|\u5bf9\u6bd4|\u9650\u5236|\u6743\u9650|\u5931\u8d25|\u6d41\u7a0b|\u95e8\u69db|\u8fb9\u754c)/u,
   /(?:\u8bfb\u8005|\u56e2\u961f|\u5173\u6ce8|\u7559\u610f|\u6838\u5bf9|\u5224\u65ad|\u8bd5\u70b9|\u91c7\u8d2d|\u843d\u5730|\u98ce\u9669|\u5c40\u9650|\u8def\u7ebf\u56fe|\u53c2\u8003|\u5b89\u5168\u95e8)/u
 ];
-const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:==(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:影响|留意|变化|落点|判断点|为什么重要))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向|这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补|这条内容涉及[^。；;\n]*读者可重点核对|目前最需要补看的信息是|可先关注适用对象、落地边界和后续变化|进入 GitHub Trending Top 10，可作为|优先核对 README|重点看 README、许可证、近期维护和可复现门槛|AI 工程工具方向的开源项目观察|读者可用它快速判断|先核对[^。；;\n]*再判断是否值得进入主体跟进|要核对|适合[^。；;\n]{0,24}(?:判断|试水)|记录了一条[^。；;\n]*(?:公开条目|公开动态)|详情需回到原文链接核对)/u;
+const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:==(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:影响|留意|变化|落点|判断点|为什么重要))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向|这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补|这条内容涉及[^。；;\n]*读者可重点核对|目前最需要补看的信息是|可先关注适用对象、落地边界和后续变化|进入 GitHub Trending Top 10，可作为|优先核对 README|重点看 README、许可证、近期维护和可复现门槛|AI 工程工具方向的开源项目观察|读者可用它快速判断|先核对[^。；;\n]*再判断是否值得进入主体跟进|要核对|适合[^。；;\n]{0,24}(?:判断|试水)|记录了一条[^。；;\n]*(?:公开条目|公开动态)|详情需回到原文链接核对|说明 AI 产品、平台或工程变化|内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界|仍需要回到原文核对入口|信号集中在|价值集中在|可用于比较[^。；;\n]*接口形态|可用于了解项目代码入口|同类方案差异)/u;
 const BUILDER_TEMPLATE_TRANSLATION_RE = /(?:这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补)/u;
 // Common English verbs/nouns/function words that, left untranslated (in any
 // case, incl. Title-Case like "Launch"), signal a short Builder card was not
@@ -736,7 +758,44 @@ function collectMainItemDensityIssues(report, issues, aiReviewTasks = []) {
         instruction: "Expand this main item summary in Chinese with compact source-backed facts so summary plus bullets meet the report:write density gate. Keep the same source fact and do not add unverified claims."
       });
     }
+    collectMainItemReaderSummaryIssues(item, index, issues, aiReviewTasks);
     collectMainItemLanguageIssues(item, index, issues, aiReviewTasks);
+  });
+}
+
+function collectMainItemReaderSummaryIssues(item, index, issues, aiReviewTasks) {
+  const title = stripMarkup(item?.title).replace(/\s+/g, " ").trim();
+  const summary = stripMarkup(item?.summary).replace(/\s+/g, " ").trim();
+  if (!summary) {
+    return;
+  }
+  const normalizedTitle = title.replace(/[。.!！?？\s]+$/u, "").toLowerCase();
+  const normalizedSummary = summary.replace(/[。.!！?？\s]+$/u, "").toLowerCase();
+  const titleOnly =
+    normalizedTitle &&
+    normalizedSummary &&
+    (normalizedSummary === normalizedTitle || normalizedSummary === `${normalizedTitle}。`);
+  const repoNameOnly = /^[\w.-]+\/[\w.-]+[。.]?$/u.test(summary);
+  const chineseChars = (summary.match(/\p{Script=Han}/gu) || []).length;
+  if (!titleOnly && !repoNameOnly && chineseChars >= 18) {
+    return;
+  }
+  issues.push({
+    code: "main_item_reader_summary_not_authored",
+    severity: "error",
+    path: `main_items[${index}].summary`,
+    message: "Main item summary must be authored as reader-facing news copy, not a title repeat, repo slug, or nearly empty placeholder.",
+    repairable: true,
+    details: {
+      title_only: titleOnly,
+      repo_name_only: repoNameOnly,
+      chinese_chars: chineseChars
+    }
+  });
+  aiReviewTasks.push({
+    kind: "main_item_editorial_rewrite",
+    path: `main_items[${index}].summary`,
+    instruction: "Rewrite this summary as concrete reader-facing Chinese news copy with the disclosed actor, action, date or scope, and reader-relevant outcome. Do not repeat only the title or repo name."
   });
 }
 
@@ -1182,8 +1241,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "main_item_editorial_quality",
-      ok: !failedCodes.has("main_item_untranslated") && !failedCodes.has("main_item_template_bullet") && !failedCodes.has("main_item_report_write_too_thin"),
-      status: failedCodes.has("main_item_untranslated") || failedCodes.has("main_item_template_bullet") || failedCodes.has("main_item_report_write_too_thin") ? "failed" : "passed"
+      ok: !failedCodes.has("main_item_untranslated") && !failedCodes.has("main_item_template_bullet") && !failedCodes.has("main_item_report_write_too_thin") && !failedCodes.has("main_item_reader_summary_not_authored"),
+      status: failedCodes.has("main_item_untranslated") || failedCodes.has("main_item_template_bullet") || failedCodes.has("main_item_report_write_too_thin") || failedCodes.has("main_item_reader_summary_not_authored") ? "failed" : "passed"
     },
     {
       id: "public_editorial_quality",

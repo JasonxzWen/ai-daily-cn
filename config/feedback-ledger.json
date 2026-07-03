@@ -1236,6 +1236,40 @@
       }
     },
     {
+      "id": "feedback/p1-reader-summary-independent-pipeline",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Separate admission from reader summaries",
+      "problem": "The generated daily report can pass structure while publishing source-first machine logs as reader copy, mixing admission rationale into summaries, default-folding each story into an overdesigned detail panel, flattening left-rail hierarchy, and regressing icon/tag/type scale.",
+      "expected_behavior": "Daily generation separates information collection, admission, per-item reader summary, and assembly into independently debuggable stages. Admission reasons, candidate scores, source audit, and watch-next stay internal. Public story sections render as expanded track cells with concrete reader-facing bullets and source links, no visible `发生了什么：` / `为什么值得看：` labels, no per-story default collapse, compact icons, styled tags with hover states, and left-rail hierarchy that distinguishes categories from sections.",
+      "scope": [
+        "DESIGN.md",
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "docs/daily-codex-pipeline.md",
+        "package.json",
+        "prompts/ai-daily/modules/plain-language.md",
+        "prompts/ai-daily/modules/selection-rules.md",
+        "prompts/ai-daily/modules/output-html.md",
+        "prompts/ai-daily/modules/effective-interact-output.md",
+        "prompts/ai-daily/modules/publish-workflow.md",
+        "scripts/run-daily-codex-pipeline.mjs",
+        "src/interaction-report.js",
+        "src/page-checklist.js",
+        "src/quality-loop.js",
+        "src/site.js",
+        "tests/content-contract.test.js",
+        "tests/daily-codex-pipeline.test.js",
+        "tests/generation-first.test.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "npm run test",
+        "test_name": "daily codex pipeline plans independent codex contexts per stage",
+        "gate": "npm run validate"
+      }
+    },
+    {
       "id": "feedback/p1-automation-role-explicit-contract",
       "severity": "P1",
       "status": "implemented",
