@@ -31,6 +31,7 @@ let dagNodeResultValidator = null;
 
 test("daily codex DAG manifest validates target node contract", async () => {
   const result = await validateDailyCodexDag({ rootDir });
+  const manifest = await loadManifest();
 
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert.equal(result.node_ids.length, 16);
@@ -38,6 +39,11 @@ test("daily codex DAG manifest validates target node contract", async () => {
   assert(result.node_ids.includes("publish-cleanup"));
   assert(result.checked_files.some((file) => file.endsWith("config/daily-codex-dag.json")));
   assert(result.checked_files.some((file) => file.endsWith("config/daily-resilience-policy.json")));
+  assert.equal(
+    manifest.nodes.some((item) => Object.hasOwn(item.execution_contract || {}, "node_execution_spec")),
+    false,
+    "production manifest must not carry node_execution_spec before executor migration"
+  );
 });
 
 test("daily codex DAG plan projection is deterministic and topological", async () => {
@@ -201,7 +207,7 @@ test("daily codex DAG future node execution preflight accepts safe paths but kee
         cwd,
         invocation: {
           kind: "codex_cli",
-          prompt_template: "prompts/future-dag-node.md",
+          prompt_template: "prompts/ai-daily/modules/base.md",
           args: ["--node", codexNode.id]
         }
       })
@@ -216,6 +222,10 @@ test("daily codex DAG future node execution preflight accepts safe paths but kee
     assert(
       !result.failures.some((failure) => failure.includes("node_execution_spec.cwd") || failure.includes("node_execution_spec.invocation.prompt_template")),
       result.failures.join("\n")
+    );
+    assert(
+      result.checked_files.some((filePath) => filePath.endsWith("prompts/ai-daily/modules/base.md")),
+      result.checked_files.join("\n")
     );
   }
 });
@@ -1492,8 +1502,72 @@ test("daily codex DAG validator catches structural and boundary regressions", as
           }
         });
       },
-      expected: "node classify-tag-entity node_execution_spec.invocation.prompt_template must be a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments"
+      expected: "node classify-tag-entity node_execution_spec.invocation.prompt_template must be a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments",
+      notExpected: "node classify-tag-entity node_execution_spec.invocation.prompt_template missing",
+      uncheckedPath: promptTemplate.replace(/\\/g, "/")
     })),
+    {
+      name: "execution spec codex prompt template must exist",
+      mutate(manifest) {
+        const target = node(manifest, "classify-tag-entity");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          executor: "codex_cli",
+          invocation: {
+            kind: "codex_cli",
+            prompt_template: "prompts/ai-daily/modules/missing-future-node.md",
+            args: ["--node", target.id]
+          }
+        });
+      },
+      expected: "node classify-tag-entity node_execution_spec.invocation.prompt_template missing prompts/ai-daily/modules/missing-future-node.md"
+    },
+    {
+      name: "execution spec codex prompt template must be a file",
+      mutate(manifest) {
+        const target = node(manifest, "classify-tag-entity");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          executor: "codex_cli",
+          invocation: {
+            kind: "codex_cli",
+            prompt_template: "prompts/ai-daily/modules",
+            args: ["--node", target.id]
+          }
+        });
+      },
+      expected: "node classify-tag-entity node_execution_spec.invocation.prompt_template must be a file prompts/ai-daily/modules"
+    },
+    {
+      name: "execution spec command argv rejects blank token",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          invocation: {
+            kind: "command",
+            argv: ["node", " "]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.invocation.argv entries must be non-empty strings"
+    },
+    {
+      name: "execution spec codex args reject blank token",
+      mutate(manifest) {
+        const target = node(manifest, "classify-tag-entity");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          executor: "codex_cli",
+          invocation: {
+            kind: "codex_cli",
+            prompt_template: "prompts/ai-daily/modules/base.md",
+            args: ["--node", " "]
+          }
+        });
+      },
+      expected: "node classify-tag-entity node_execution_spec.invocation.args entries must be non-empty strings"
+    },
     {
       name: "missing resilience policy stage",
       mutate(manifest) {
@@ -1628,6 +1702,18 @@ test("daily codex DAG validator catches structural and boundary regressions", as
       result.failures.some((failure) => failure.includes(item.expected)),
       `${item.name}\nexpected: ${item.expected}\nactual:\n${result.failures.join("\n")}`
     );
+    if (item.notExpected) {
+      assert(
+        !result.failures.some((failure) => failure.includes(item.notExpected)),
+        `${item.name}\nunexpected: ${item.notExpected}\nactual:\n${result.failures.join("\n")}`
+      );
+    }
+    if (item.uncheckedPath) {
+      assert(
+        !result.checked_files.some((filePath) => filePath.includes(item.uncheckedPath)),
+        `${item.name}\nunexpected checked file: ${item.uncheckedPath}\nactual:\n${result.checked_files.join("\n")}`
+      );
+    }
   }
 });
 

@@ -401,7 +401,7 @@ async function validateDagSemantics({ rootDir, manifest, resiliencePolicy, ajv, 
     if (!node?.id) continue;
     validateNodeDependencies({ node, nodeById, failures });
     await validateNodeRefsAndPaths({ rootDir, node, ajv, failures, checkedFiles });
-    validateNodeExecutionPolicy({ node, resiliencePolicy, failures });
+    await validateNodeExecutionPolicy({ rootDir, node, resiliencePolicy, failures, checkedFiles });
     validateFanoutBarrier({ node, nodeById, failures });
   }
 
@@ -1811,12 +1811,12 @@ function validateOutputOwnership({ node, artifactPath, failures }) {
   }
 }
 
-function validateNodeExecutionPolicy({ node, resiliencePolicy, failures }) {
+async function validateNodeExecutionPolicy({ rootDir, node, resiliencePolicy, failures, checkedFiles }) {
   const policyStageIds = new Set((resiliencePolicy?.stages || []).map((stage) => stage?.id).filter(Boolean));
   const policyMode = node.failure_policy?.mode;
   const readiness = node.execution_contract?.readiness;
   const hasNodeExecutionSpec = Object.prototype.hasOwnProperty.call(node.execution_contract || {}, "node_execution_spec");
-  validateNodeExecutionSpecReferences({ node, failures });
+  await validateNodeExecutionSpecReferences({ rootDir, node, failures, checkedFiles });
   if (node.resilience_policy_ref && !policyStageIds.has(node.resilience_policy_ref)) {
     failures.push(`config/daily-codex-dag.json: node ${node.id} references missing resilience policy stage ${node.resilience_policy_ref}.`);
   }
@@ -1852,11 +1852,11 @@ function validateNodeExecutionPolicy({ node, resiliencePolicy, failures }) {
   }
 }
 
-function validateNodeExecutionSpecReferences({ node, failures }) {
+async function validateNodeExecutionSpecReferences({ rootDir, node, failures, checkedFiles }) {
   const spec = node.execution_contract?.node_execution_spec;
   if (!spec) return;
 
-  validateNodeExecutionSpecPreflight({ node, spec, failures });
+  await validateNodeExecutionSpecPreflight({ rootDir, node, spec, failures, checkedFiles });
 
   const inputPaths = new Set((node.inputs || []).map((artifact) => artifact.path));
   const outputPaths = new Set((node.outputs || []).map((artifact) => artifact.path));
@@ -1872,12 +1872,51 @@ function validateNodeExecutionSpecReferences({ node, failures }) {
   }
 }
 
-function validateNodeExecutionSpecPreflight({ node, spec, failures }) {
+async function validateNodeExecutionSpecPreflight({ rootDir, node, spec, failures, checkedFiles }) {
   if (!isSafeExecutionRelativePath(spec.cwd, { allowDot: true })) {
     failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.cwd must be "." or a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments.`);
   }
-  if (spec.invocation?.kind === "codex_cli" && !isSafeExecutionRelativePath(spec.invocation.prompt_template)) {
-    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation.prompt_template must be a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments.`);
+  if (spec.invocation?.kind === "command") {
+    validateExecutionStringArray({
+      values: spec.invocation.argv,
+      label: `config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation.argv`,
+      failures,
+      requireNonEmptyArray: true
+    });
+  }
+  if (spec.invocation?.kind === "codex_cli") {
+    const promptTemplate = spec.invocation.prompt_template;
+    if (!isSafeExecutionRelativePath(promptTemplate)) {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation.prompt_template must be a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments.`);
+    } else {
+      await validateExistingRelativeFile({
+        rootDir,
+        relativePath: promptTemplate,
+        label: `node ${node.id} node_execution_spec.invocation.prompt_template`,
+        failures,
+        checkedFiles
+      });
+    }
+    validateExecutionStringArray({
+      values: spec.invocation.args,
+      label: `config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation.args`,
+      failures
+    });
+  }
+}
+
+function validateExecutionStringArray({ values, label, failures, requireNonEmptyArray = false }) {
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array of non-empty strings.`);
+    return;
+  }
+  if (requireNonEmptyArray && values.length === 0) {
+    failures.push(`${label} must be a non-empty array of non-empty strings.`);
+  }
+  for (const value of values) {
+    if (!nonBlankString(value)) {
+      failures.push(`${label} entries must be non-empty strings.`);
+    }
   }
 }
 
@@ -2025,8 +2064,13 @@ async function validateExistingRelativeFile({ rootDir, relativePath, label, fail
     return false;
   }
   try {
-    await fs.access(path.resolve(rootDir, relativePath));
-    checkedFiles.push(toPortablePath(path.resolve(rootDir, relativePath)));
+    const filePath = path.resolve(rootDir, relativePath);
+    const stats = await fs.stat(filePath);
+    if (!stats.isFile()) {
+      failures.push(`config/daily-codex-dag.json: ${label} must be a file ${relativePath}.`);
+      return false;
+    }
+    checkedFiles.push(toPortablePath(filePath));
     return true;
   } catch (error) {
     failures.push(`config/daily-codex-dag.json: ${label} missing ${relativePath}: ${error.message}`);
@@ -2312,6 +2356,10 @@ function validateStringArray(values, label, failures) {
 
 function nonEmptyString(value) {
   return typeof value === "string" && value.length > 0;
+}
+
+function nonBlankString(value) {
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 function isNodeId(value) {
