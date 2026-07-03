@@ -16,14 +16,14 @@ Update after material sessions, before a new phase, or when validation evidence 
 | Area | Rating | P0/P1/P2 validation status | Browser acceptance status | Agent readability | Test stability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Public article index artifact | A | P0 passed: article contract, privacy scan, build-clean, regular and daily publish-plan assertions, full validate | Deferred; no UI behavior changed | Good | Stable in `tests/article-index.test.js` and `tests/publish.test.js` | Future DAG execution still needs live per-node replay | 2026-07-03 |
-| Daily Codex DAG manifest contract | B | P0 targeted readiness checks passed and full `npm run validate` passed for this slice | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest/run-summary readiness projection, mismatch rejection, and no-execution contract-run semantics; `tests/unit.test.js` guards the npm/workflow entrypoint against package-script drift | Full executable 16-node runner migration and live per-node command/Codex execution remain future work | 2026-07-03 |
+| Daily Codex DAG manifest contract | B | P0 targeted future execution-spec checks passed and full `npm run validate` passed for this slice | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest/run-summary readiness projection, future node execution spec shape, executor/invocation pairing, mismatch rejection, no-execution contract-run semantics, and artifact binding guards; `tests/unit.test.js` guards the npm/workflow entrypoint against package-script drift | Full executable 16-node runner migration and live per-node command/Codex execution remain future work; no production node may carry `node_execution_spec` yet | 2026-07-03 |
 
 ## Architecture Layers
 
 | Layer | Rating | Boundary health | Agent readability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- |
 | Public/private artifact boundary | A | `docs/articles.json` is now included in public scans with internal audit field denylist coverage; node result audit metadata is schema-whitelisted before live execution exists | Good | Node result audit is not manifest-aware ownership enforcement; future live node execution still needs artifact emission, manifest/path-scope checks, and privacy checks against real outputs | 2026-07-03 |
-| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, requires per-node `execution_contract.readiness`, projects deterministic execution levels and readiness into dry-run/contract-run summaries, validates run-summary envelopes with a dedicated schema plus semantic validators, defines schema/semantic validation for executable node result contracts, and exposes the non-publishing contract-run through a workflow-validated npm script | Good | Contract-run deliberately emits skipped node-scope results only; `node_executable` readiness is reserved and rejected until a complete execution spec exists; real command/Codex execution, artifact existence/schema proof, retry execution, fanout item expansion, barrier aggregation, package/workflow production migration, and npm argument ergonomics remain future work | 2026-07-03 |
+| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, requires per-node `execution_contract.readiness`, projects deterministic execution levels and readiness into dry-run/contract-run summaries, validates run-summary envelopes with a dedicated schema plus semantic validators, defines schema/semantic validation for executable node result contracts, defines a future `execution_contract.node_execution_spec` shape, and exposes the non-publishing contract-run through a workflow-validated npm script | Good | Contract-run deliberately emits skipped node-scope results only; `node_executable` readiness is reserved and rejected even with a schema-valid future execution spec until executor migration enables standalone node execution; real command/Codex execution, artifact existence/schema proof, retry execution, fanout item expansion, barrier aggregation, package/workflow production migration, and npm argument ergonomics remain future work | 2026-07-03 |
 
 ## Change History
 
@@ -37,10 +37,18 @@ Update after material sessions, before a new phase, or when validation evidence 
 
 ### 2026-07-03
 
-- Change: Added explicit DAG node execution readiness contracts.
-- Improved: Every manifest node now declares `execution_contract.readiness`; planned nodes must be `planned_only`, legacy mapped nodes must be `legacy_mapped`, and `node_executable` is reserved but rejected by semantic validation until a complete node-level execution spec exists. Plan projection, dry-run/contract-run schema validation, semantic validators, fixture replay, and negative tests all carry the same readiness contract.
+- Change: Added a future DAG node execution spec contract shape without enabling node execution.
+- Improved: `execution_contract.node_execution_spec` now has a schema-backed shape for executor type, cwd, command or Codex CLI invocation, declared input/output artifact bindings, timeout, retry policy, concurrency group, sandbox, artifact verification, idempotency key, resume policy, and publish boundary. Semantic validation keeps `node_executable` reserved, rejects specs on `planned_only` and `legacy_mapped` production nodes, and checks spec bindings against declared node inputs and outputs.
 - Regressed: None known.
-- New gaps: This still does not execute DAG nodes. Future work must define the complete node execution spec before enabling `node_executable`, including command/Codex invocation, cwd, sandbox/network/secrets policy, artifact verification, timeout/retry/concurrency, result envelope, resume/idempotency, and publish boundaries.
+- New gaps: No production node may carry the spec yet, dry-run/contract-run summaries do not project it, and the runner still does not execute command or Codex node specs. Future slices must enable standalone node execution, instantiate specs per node, verify real outputs, and migrate publish orchestration deliberately.
+- Closed gaps: The next executor migration now has a durable manifest-level contract shape and negative tests instead of an undefined `node_executable` payload.
+
+### 2026-07-03
+
+- Change: Added explicit DAG node execution readiness contracts.
+- Improved: Every manifest node now declares `execution_contract.readiness`; planned nodes must be `planned_only`, legacy mapped nodes must be `legacy_mapped`, and `node_executable` is reserved until executor migration enables standalone node execution. Plan projection, dry-run/contract-run schema validation, semantic validators, fixture replay, and negative tests all carry the same readiness contract.
+- Regressed: None known.
+- New gaps: This still does not execute DAG nodes. Future work must enable the now-defined node execution spec deliberately before accepting `node_executable`, including real command/Codex invocation, artifact verification, retry/concurrency behavior, result envelopes, resume/idempotency behavior, and publish boundaries.
 - Closed gaps: Planned and legacy-mapped DAG nodes can no longer be mistaken for standalone executable nodes by manifest or run-summary consumers.
 
 ### 2026-07-03

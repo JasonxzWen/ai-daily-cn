@@ -19,11 +19,13 @@ import {
 const rootDir = process.cwd();
 const manifestPath = path.join(rootDir, "config", "daily-codex-dag.json");
 const dagCliPath = path.join(rootDir, "scripts", "run-daily-codex-dag.mjs");
+const dagSchemaPath = path.join(rootDir, "schemas", "daily-codex-dag.schema.json");
 const dagRunSchemaPath = path.join(rootDir, "schemas", "daily-codex-dag-run.schema.json");
 const dagNodeResultSchemaPath = path.join(rootDir, "schemas", "daily-codex-dag-node-result.schema.json");
 const dryRunSummaryFixturePath = path.join(rootDir, "tests", "fixtures", "daily-codex-dag", "dry-run-summary.json");
 const nodeResultSuccessFixturePath = path.join(rootDir, "tests", "fixtures", "daily-codex-dag", "node-result-success.json");
 const fixedNow = "2026-07-03T08:00:00.000Z";
+let dagManifestValidator = null;
 let dagRunSummaryValidator = null;
 let dagNodeResultValidator = null;
 
@@ -131,6 +133,60 @@ test("daily codex DAG plan projection refuses invalid manifests without throwing
     structuralResult.failures.some((failure) => failure.includes("/nodes/4/inputs must be array")),
     structuralResult.failures.join("\n")
   );
+});
+
+test("daily codex DAG future node execution spec is schema-recognized but still disabled", async () => {
+  const manifest = await loadManifest();
+  const score = node(manifest, "score");
+  score.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic future executable node for schema-only coverage.",
+    node_execution_spec: buildFutureNodeExecutionSpec(score)
+  };
+
+  await assertValidDagManifestSchemaOnly(manifest);
+
+  const result = await validateDailyCodexDag({ rootDir, manifest });
+  assert.equal(result.ok, false);
+  assert(
+    result.failures.some((failure) => failure.includes("node score execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution")),
+    result.failures.join("\n")
+  );
+});
+
+test("daily codex DAG future node execution spec validates executor invocation pairing", async () => {
+  const codexManifest = await loadManifest();
+  const codexNode = node(codexManifest, "classify-tag-entity");
+  codexNode.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic future Codex CLI node for schema-only coverage.",
+    node_execution_spec: buildFutureNodeExecutionSpec(codexNode, {
+      executor: "codex_cli",
+      invocation: {
+        kind: "codex_cli",
+        prompt_template: "prompts/future-dag-node.md",
+        args: ["--node", codexNode.id]
+      }
+    })
+  };
+  await assertValidDagManifestSchemaOnly(codexManifest);
+
+  const mismatchedManifest = await loadManifest();
+  const score = node(mismatchedManifest, "score");
+  score.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic mismatched execution spec.",
+    node_execution_spec: buildFutureNodeExecutionSpec(score, {
+      executor: "command",
+      invocation: {
+        kind: "codex_cli",
+        prompt_template: "prompts/future-dag-node.md",
+        args: ["--node", score.id]
+      }
+    })
+  };
+
+  await assertInvalidDagManifestSchemaOnly(mismatchedManifest);
 });
 
 test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {
@@ -514,7 +570,7 @@ test("daily codex DAG contract-run semantic validator rejects misleading executi
       mutate(value) {
         value.plan.nodes.find((item) => item.id === "admit-reject").execution_contract.readiness = "node_executable";
       },
-      failure: "execution_contract.readiness node_executable requires a complete node-level execution spec"
+      failure: "execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution"
     }
   ];
 
@@ -1340,11 +1396,47 @@ test("daily codex DAG validator catches structural and boundary regressions", as
       expected: "mapped node admit-reject must use execution_contract.readiness legacy_mapped"
     },
     {
-      name: "node executable readiness requires future execution spec",
+      name: "node executable readiness is reserved until executor migration",
       mutate(manifest) {
         node(manifest, "admit-reject").execution_contract.readiness = "node_executable";
       },
-      expected: "node admit-reject execution_contract.readiness node_executable requires a complete node-level execution spec"
+      expected: "node admit-reject execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution"
+    },
+    {
+      name: "planned-only node cannot carry execution spec",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target);
+      },
+      expected: "node score execution_contract.node_execution_spec is only allowed for future node_executable nodes"
+    },
+    {
+      name: "legacy-mapped node cannot carry execution spec",
+      mutate(manifest) {
+        const target = node(manifest, "admit-reject");
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target);
+      },
+      expected: "node admit-reject execution_contract.node_execution_spec is only allowed for future node_executable nodes"
+    },
+    {
+      name: "execution spec input binding must reference declared input artifact",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target);
+        target.execution_contract.node_execution_spec.inputs[0].artifact_path = ".tmp/daily-codex-pipeline/{report_date}/artifacts/not-declared.json";
+      },
+      expected: "node score node_execution_spec.inputs references undeclared input artifact .tmp/daily-codex-pipeline/{report_date}/artifacts/not-declared.json"
+    },
+    {
+      name: "execution spec output binding must reference declared output artifact",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target);
+        target.execution_contract.node_execution_spec.outputs[0].artifact_path = ".tmp/daily-codex-pipeline/{report_date}/artifacts/not-declared-output.json";
+      },
+      expected: "node score node_execution_spec.outputs references undeclared output artifact .tmp/daily-codex-pipeline/{report_date}/artifacts/not-declared-output.json"
     },
     {
       name: "missing resilience policy stage",
@@ -1528,6 +1620,20 @@ function assertInvalidSemanticDagRunSummary(value, expectedFailure, label) {
   );
 }
 
+async function assertValidDagManifestSchemaOnly(value) {
+  const validate = await getDagManifestValidator();
+  if (!validate(value)) {
+    assert.fail(`daily codex DAG manifest should match schema:\n${formatAjvErrors(validate.errors)}`);
+  }
+}
+
+async function assertInvalidDagManifestSchemaOnly(value) {
+  const validate = await getDagManifestValidator();
+  if (validate(value)) {
+    assert.fail("daily codex DAG manifest schema accepted an invalid manifest");
+  }
+}
+
 async function assertValidDagNodeResult(value) {
   await assertValidDagNodeResultSchemaOnly(value);
   const semanticResult = validateDailyCodexDagNodeResult(value);
@@ -1559,6 +1665,15 @@ function assertInvalidSemanticDagNodeResult(value, expectedFailure, label) {
     result.failures.some((failure) => failure.includes(expectedFailure)),
     `${label} failures:\n${result.failures.join("\n")}`
   );
+}
+
+async function getDagManifestValidator() {
+  if (!dagManifestValidator) {
+    const schema = JSON.parse(await fs.readFile(dagSchemaPath, "utf8"));
+    const ajv = new Ajv({ allErrors: true, strict: false });
+    dagManifestValidator = ajv.compile(schema);
+  }
+  return dagManifestValidator;
 }
 
 async function getDagRunSummaryValidator() {
@@ -1593,6 +1708,39 @@ function formatAjvErrors(errors = []) {
 
 function structuredCloneJson(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function buildFutureNodeExecutionSpec(manifestNode, overrides = {}) {
+  return {
+    executor: "command",
+    cwd: ".",
+    invocation: {
+      kind: "command",
+      argv: ["node", "scripts/future-dag-node.mjs", manifestNode.id]
+    },
+    inputs: (manifestNode.inputs || []).map((artifact) => ({ artifact_path: artifact.path })),
+    outputs: (manifestNode.outputs || []).map((artifact) => ({ artifact_path: artifact.path })),
+    timeout_seconds: 300,
+    retry_policy: {
+      max_attempts: 1,
+      backoff_seconds: [0]
+    },
+    concurrency_group: manifestNode.parallel_group || "serial",
+    sandbox: {
+      filesystem: "workspace_write",
+      network: "disabled",
+      secrets: "none"
+    },
+    artifact_verification: {
+      schema: "declared_outputs",
+      existence: "required_outputs",
+      privacy_scan: manifestNode.public_artifact ? "public_outputs" : "none"
+    },
+    idempotency_key: `daily-codex-dag:{report_date}:${manifestNode.id}`,
+    resume_policy: "reuse_valid_outputs",
+    publish_boundary: manifestNode.public_artifact ? "public_artifacts" : "internal_only",
+    ...overrides
+  };
 }
 
 function buildNodeResult(overrides = {}) {

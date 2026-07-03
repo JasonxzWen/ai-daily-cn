@@ -1463,7 +1463,7 @@ function validateExecutionReadiness({ nodeId, executionStatus, readiness, label,
     failures.push(`${label} ${formatSummaryValue(nodeId)} with execution_status mapped must use execution_contract.readiness legacy_mapped; legacy mapped is not node-level execution.`);
   }
   if (readiness === "node_executable") {
-    failures.push(`${label} ${formatSummaryValue(nodeId)} execution_contract.readiness node_executable requires a complete node-level execution spec before DAG execution can run.`);
+    failures.push(`${label} ${formatSummaryValue(nodeId)} execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution.`);
   }
 }
 
@@ -1815,6 +1815,8 @@ function validateNodeExecutionPolicy({ node, resiliencePolicy, failures }) {
   const policyStageIds = new Set((resiliencePolicy?.stages || []).map((stage) => stage?.id).filter(Boolean));
   const policyMode = node.failure_policy?.mode;
   const readiness = node.execution_contract?.readiness;
+  const hasNodeExecutionSpec = Object.prototype.hasOwnProperty.call(node.execution_contract || {}, "node_execution_spec");
+  validateNodeExecutionSpecReferences({ node, failures });
   if (node.resilience_policy_ref && !policyStageIds.has(node.resilience_policy_ref)) {
     failures.push(`config/daily-codex-dag.json: node ${node.id} references missing resilience policy stage ${node.resilience_policy_ref}.`);
   }
@@ -1833,7 +1835,9 @@ function validateNodeExecutionPolicy({ node, resiliencePolicy, failures }) {
     }
   }
   if (readiness === "node_executable") {
-    failures.push(`config/daily-codex-dag.json: node ${node.id} execution_contract.readiness node_executable requires a complete node-level execution spec before DAG execution can run.`);
+    failures.push(`config/daily-codex-dag.json: node ${node.id} execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution.`);
+  } else if (hasNodeExecutionSpec) {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} execution_contract.node_execution_spec is only allowed for future node_executable nodes.`);
   }
   if (readiness === "legacy_mapped" && !node.runner_stage_ref) {
     failures.push(`config/daily-codex-dag.json: node ${node.id} legacy_mapped readiness requires runner_stage_ref because legacy mapped is not node-level execution.`);
@@ -1845,6 +1849,24 @@ function validateNodeExecutionPolicy({ node, resiliencePolicy, failures }) {
   }
   if (policyMode === "planned" && !node.failure_policy?.summary) {
     failures.push(`config/daily-codex-dag.json: planned node ${node.id} requires failure_policy.summary.`);
+  }
+}
+
+function validateNodeExecutionSpecReferences({ node, failures }) {
+  const spec = node.execution_contract?.node_execution_spec;
+  if (!spec) return;
+
+  const inputPaths = new Set((node.inputs || []).map((artifact) => artifact.path));
+  const outputPaths = new Set((node.outputs || []).map((artifact) => artifact.path));
+  for (const binding of spec.inputs || []) {
+    if (!inputPaths.has(binding.artifact_path)) {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.inputs references undeclared input artifact ${binding.artifact_path}.`);
+    }
+  }
+  for (const binding of spec.outputs || []) {
+    if (!outputPaths.has(binding.artifact_path)) {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.outputs references undeclared output artifact ${binding.artifact_path}.`);
+    }
   }
 }
 

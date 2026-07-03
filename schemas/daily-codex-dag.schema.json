@@ -110,7 +110,140 @@
       "required": ["readiness", "summary"],
       "properties": {
         "readiness": { "enum": ["planned_only", "legacy_mapped", "node_executable"] },
-        "summary": { "type": "string", "minLength": 1 }
+        "summary": { "type": "string", "minLength": 1 },
+        "node_execution_spec": { "$ref": "#/$defs/nodeExecutionSpec" }
+      }
+    },
+    "nodeExecutionSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": { "executor": { "const": "command" } },
+            "required": ["executor"]
+          },
+          "then": {
+            "properties": {
+              "invocation": { "$ref": "#/$defs/commandInvocation" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "executor": { "const": "codex_cli" } },
+            "required": ["executor"]
+          },
+          "then": {
+            "properties": {
+              "invocation": { "$ref": "#/$defs/codexCliInvocation" }
+            }
+          }
+        }
+      ],
+      "required": [
+        "executor",
+        "cwd",
+        "invocation",
+        "inputs",
+        "outputs",
+        "timeout_seconds",
+        "retry_policy",
+        "concurrency_group",
+        "sandbox",
+        "artifact_verification",
+        "idempotency_key",
+        "resume_policy",
+        "publish_boundary"
+      ],
+      "properties": {
+        "executor": { "enum": ["command", "codex_cli"] },
+        "cwd": { "type": "string", "minLength": 1 },
+        "invocation": {
+          "oneOf": [
+            { "$ref": "#/$defs/commandInvocation" },
+            { "$ref": "#/$defs/codexCliInvocation" }
+          ]
+        },
+        "inputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifactBinding" }
+        },
+        "outputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifactBinding" }
+        },
+        "timeout_seconds": { "type": "integer", "minimum": 1 },
+        "retry_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_attempts", "backoff_seconds"],
+          "properties": {
+            "max_attempts": { "type": "integer", "minimum": 1 },
+            "backoff_seconds": {
+              "type": "array",
+              "items": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "concurrency_group": { "type": "string", "minLength": 1 },
+        "sandbox": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["filesystem", "network", "secrets"],
+          "properties": {
+            "filesystem": { "enum": ["read_only", "workspace_write", "public_artifact_write"] },
+            "network": { "enum": ["disabled", "source_allowlist", "enabled"] },
+            "secrets": { "enum": ["none", "runtime_scoped"] }
+          }
+        },
+        "artifact_verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema", "existence", "privacy_scan"],
+          "properties": {
+            "schema": { "enum": ["declared_outputs", "none"] },
+            "existence": { "enum": ["required_outputs", "none"] },
+            "privacy_scan": { "enum": ["public_outputs", "none"] }
+          }
+        },
+        "idempotency_key": { "type": "string", "minLength": 1 },
+        "resume_policy": { "enum": ["rerun", "reuse_valid_outputs", "manual_only"] },
+        "publish_boundary": { "enum": ["none", "internal_only", "public_artifacts"] }
+      }
+    },
+    "commandInvocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "argv"],
+      "properties": {
+        "kind": { "const": "command" },
+        "argv": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "codexCliInvocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "prompt_template", "args"],
+      "properties": {
+        "kind": { "const": "codex_cli" },
+        "prompt_template": { "type": "string", "minLength": 1 },
+        "args": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "artifactBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_path"],
+      "properties": {
+        "artifact_path": { "type": "string", "minLength": 1 }
       }
     },
     "artifact": {
