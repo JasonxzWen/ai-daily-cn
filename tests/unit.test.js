@@ -8397,6 +8397,13 @@ test("status:self-check runs publish checks from the prepared clean worktree", a
 });
 
 test("daily workflow contract validates repository workflow markers", async () => {
+  const expectedDagContractRunCommand = "node scripts/run-daily-codex-dag.mjs --contract-run --json";
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-workflow-contract.json"), "utf8"));
+  const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
+  assert.equal(contract.required_package_scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
+  assert.equal(manifest.scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
+  assert(!contract.daily_runner || contract.daily_runner.script !== "daily:codex-dag:contract-run");
+
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-"));
   const automationsDir = path.join(tmp, "automations");
   const promptPath = path.join(automationsDir, "ai-daily", "automation.toml");
@@ -8434,6 +8441,47 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert(result.checked_files.some((file) => file.endsWith("tasks/daily-publish-runbook.md")));
   assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
+});
+
+test("daily workflow contract rejects DAG contract-run package script drift", async () => {
+  const expectedDagContractRunCommand = "node scripts/run-daily-codex-dag.mjs --contract-run --json";
+  const cases = [
+    {
+      name: "missing",
+      scripts: {}
+    },
+    {
+      name: "wrong-command",
+      scripts: {
+        "daily:codex-dag:contract-run": "node scripts/run-daily-codex-dag.mjs --dry-run --json"
+      }
+    }
+  ];
+
+  for (const item of cases) {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), `ai-daily-workflow-dag-entrypoint-${item.name}-`));
+    await fs.mkdir(path.join(tmp, "config"), { recursive: true });
+    await fs.writeFile(
+      path.join(tmp, "package.json"),
+      JSON.stringify({ type: "module", scripts: item.scripts }, null, 2),
+      "utf8"
+    );
+    await fs.writeFile(
+      path.join(tmp, "config", "daily-workflow-contract.json"),
+      JSON.stringify({
+        schema_version: 1,
+        required_package_scripts: {
+          "daily:codex-dag:contract-run": expectedDagContractRunCommand
+        }
+      }, null, 2),
+      "utf8"
+    );
+
+    const result = await validateDailyWorkflowContract({ rootDir: tmp });
+
+    assert.equal(result.ok, false, item.name);
+    assert(result.failures.some((failure) => failure.includes("package.json scripts.daily:codex-dag:contract-run")), result.failures.join("\n"));
+  }
 });
 
 test("daily resilience policy validates current runner stages and workflow gates", async () => {

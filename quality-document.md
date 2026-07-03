@@ -16,14 +16,14 @@ Update after material sessions, before a new phase, or when validation evidence 
 | Area | Rating | P0/P1/P2 validation status | Browser acceptance status | Agent readability | Test stability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Public article index artifact | A | P0 passed: article contract, privacy scan, build-clean, regular and daily publish-plan assertions, full validate | Deferred; no UI behavior changed | Good | Stable in `tests/article-index.test.js` and `tests/publish.test.js` | Future DAG execution still needs live per-node replay | 2026-07-03 |
-| Daily Codex DAG manifest contract | B | P0 targeted contract-run adapter tests, `dag:validate`, pipeline compatibility, harness validation, `git diff --check`, and full `npm run validate` passed for this slice | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest, lineage, plan projection, dry-run CLI, dry-run summary schema, semantic summary regressions, executable node result contracts, and non-executing contract-run adapter regressions | Full executable 16-node runner migration and live per-node command/Codex execution remain future work | 2026-07-03 |
+| Daily Codex DAG manifest contract | B | P0 contract-run package/workflow entrypoint checks and full `npm run validate` passed for this slice | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest/runner contracts; `tests/unit.test.js` now guards the npm/workflow entrypoint against package-script drift | Full executable 16-node runner migration and live per-node command/Codex execution remain future work | 2026-07-03 |
 
 ## Architecture Layers
 
 | Layer | Rating | Boundary health | Agent readability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- |
 | Public/private artifact boundary | A | `docs/articles.json` is now included in public scans with internal audit field denylist coverage; node result audit metadata is schema-whitelisted before live execution exists | Good | Node result audit is not manifest-aware ownership enforcement; future live node execution still needs artifact emission, manifest/path-scope checks, and privacy checks against real outputs | 2026-07-03 |
-| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, projects deterministic execution levels, exposes opt-in `.tmp/daily-codex-pipeline/**/*.json` dry-run/contract-run summaries, validates dry-run and contract-run run-summary envelopes with a dedicated schema plus semantic validators, and defines schema/semantic validation for executable node result contracts | Good | Contract-run deliberately emits skipped node-scope results only; real command/Codex execution, artifact existence/schema proof, retry execution, fanout item expansion, barrier aggregation, package/workflow wiring, and production runner migration remain future work | 2026-07-03 |
+| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, projects deterministic execution levels, exposes opt-in `.tmp/daily-codex-pipeline/**/*.json` dry-run/contract-run summaries, validates dry-run and contract-run run-summary envelopes with a dedicated schema plus semantic validators, defines schema/semantic validation for executable node result contracts, and exposes the non-publishing contract-run through a workflow-validated npm script | Good | Contract-run deliberately emits skipped node-scope results only; real command/Codex execution, artifact existence/schema proof, retry execution, fanout item expansion, barrier aggregation, package/workflow production migration, and npm argument ergonomics remain future work | 2026-07-03 |
 
 ## Change History
 
@@ -34,6 +34,14 @@ Update after material sessions, before a new phase, or when validation evidence 
 - Regressed:
 - New gaps:
 - Closed gaps:
+
+### 2026-07-03
+
+- Change: Added a workflow-validated npm entrypoint for the daily Codex DAG contract-run.
+- Improved: `daily:codex-dag:contract-run` now runs `scripts/run-daily-codex-dag.mjs --contract-run --json`, `config/daily-workflow-contract.json` requires that exact script, and unit tests prove both the production contract registration and missing/wrong command drift failures.
+- Regressed: None known.
+- New gaps: The entrypoint remains contract validation only; it does not execute real DAG nodes or publish. In the current npm/PowerShell environment the smoke command uses `npm run daily:codex-dag:contract-run -- -- --date YYYY-MM-DD`; future human-facing ergonomics can improve separately.
+- Closed gaps: The contract-run is no longer only a direct script flag; it has a stable npm-level bridge guarded by workflow validation.
 
 ### 2026-07-03
 

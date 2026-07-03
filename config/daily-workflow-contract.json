@@ -26,6 +26,7 @@
   },
   "required_package_scripts": {
     "daily:codex-pipeline": "node scripts/run-daily-codex-pipeline.mjs",
+    "daily:codex-dag:contract-run": "node scripts/run-daily-codex-dag.mjs --contract-run --json",
     "daily:run": "node src/cli.js daily:run",
     "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
     "workflow:validate": "node scripts/validate-daily-workflow-contract.mjs",
