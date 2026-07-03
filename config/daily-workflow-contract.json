@@ -30,9 +30,11 @@
     "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
     "workflow:validate": "node scripts/validate-daily-workflow-contract.mjs",
     "resilience:validate": "node scripts/validate-daily-resilience-policy.mjs",
+    "dag:validate": "node scripts/validate-daily-codex-dag.mjs",
     "publish:dry-run:daily": "node src/cli.js publish:dry-run:daily --data-input reports-data --input reports-source --out docs"
   },
   "validate_must_include": [
+    "npm run dag:validate",
     "npm run workflow:validate",
     "npm run resilience:validate"
   ],
