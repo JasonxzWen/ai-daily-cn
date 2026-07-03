@@ -9,6 +9,7 @@ const NODE_RESULT_STATUSES = ["success", "failure", "blocked", "skipped"];
 const NODE_RESULT_SCOPES = ["node", "fanout_item", "barrier"];
 const NODE_RESULT_DOWNSTREAM_DISPOSITIONS = ["continue", "block"];
 const NODE_KINDS = ["command", "codex_exec", "fanout", "barrier"];
+const EXECUTION_READINESS_VALUES = ["planned_only", "legacy_mapped", "node_executable"];
 
 const REQUIRED_NODE_IDS = [
   "fetch-source-health",
@@ -467,6 +468,7 @@ function projectPlanNode({ node, level }) {
     title: node.title,
     kind: node.kind,
     execution_status: node.execution_status,
+    execution_contract: copyExecutionContract(node.execution_contract),
     plan_status: node.execution_status === "mapped" ? "mapped" : "planned",
     level,
     dependencies: [...(node.dependencies || [])],
@@ -483,6 +485,13 @@ function copyArtifact(artifact) {
   return {
     path: artifact.path,
     required: artifact.required
+  };
+}
+
+function copyExecutionContract(contract) {
+  return {
+    readiness: contract.readiness,
+    summary: contract.summary
   };
 }
 
@@ -1390,6 +1399,7 @@ function validatePlanNodeShape(node, failures) {
       "title",
       "kind",
       "execution_status",
+      "execution_contract",
       "plan_status",
       "level",
       "dependencies",
@@ -1407,6 +1417,14 @@ function validatePlanNodeShape(node, failures) {
   if (!nonEmptyString(node.title)) failures.push(`${label}.title must be a non-empty string.`);
   if (!["command", "codex_exec", "fanout", "barrier"].includes(node.kind)) failures.push(`${label}.kind is invalid.`);
   if (!["planned", "mapped"].includes(node.execution_status)) failures.push(`${label}.execution_status is invalid.`);
+  validateExecutionContractShape(node.execution_contract, `${label}.execution_contract`, failures);
+  validateExecutionReadiness({
+    nodeId: node.id,
+    executionStatus: node.execution_status,
+    readiness: node.execution_contract?.readiness,
+    label,
+    failures
+  });
   if (!["planned", "mapped"].includes(node.plan_status)) failures.push(`${label}.plan_status is invalid.`);
   if (!Number.isInteger(node.level) || node.level < 0) failures.push(`${label}.level must be a non-negative integer.`);
   validateNodeIdArray(node.dependencies, `${label}.dependencies`, failures);
@@ -1416,6 +1434,37 @@ function validatePlanNodeShape(node, failures) {
   if (typeof node.parallel_group !== "string") failures.push(`${label}.parallel_group must be a string.`);
   if (typeof node.public_artifact !== "boolean") failures.push(`${label}.public_artifact must be a boolean.`);
   if (!["internal_workdir", "docs", "reports_data", "none"].includes(node.owner_path_scope)) failures.push(`${label}.owner_path_scope is invalid.`);
+}
+
+function validateExecutionContractShape(contract, label, failures) {
+  if (!isPlainObject(contract)) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  validateExactKeys({
+    value: contract,
+    allowed: ["readiness", "summary"],
+    label,
+    failures
+  });
+  if (!EXECUTION_READINESS_VALUES.includes(contract.readiness)) {
+    failures.push(`${label}.readiness is invalid.`);
+  }
+  if (!nonEmptyString(contract.summary)) {
+    failures.push(`${label}.summary must be a non-empty string.`);
+  }
+}
+
+function validateExecutionReadiness({ nodeId, executionStatus, readiness, label, failures }) {
+  if (executionStatus === "planned" && readiness !== "planned_only") {
+    failures.push(`${label} ${formatSummaryValue(nodeId)} with execution_status planned must use execution_contract.readiness planned_only.`);
+  }
+  if (executionStatus === "mapped" && readiness !== "legacy_mapped") {
+    failures.push(`${label} ${formatSummaryValue(nodeId)} with execution_status mapped must use execution_contract.readiness legacy_mapped; legacy mapped is not node-level execution.`);
+  }
+  if (readiness === "node_executable") {
+    failures.push(`${label} ${formatSummaryValue(nodeId)} execution_contract.readiness node_executable requires a complete node-level execution spec before DAG execution can run.`);
+  }
 }
 
 function validateRunShape(run, failures) {
@@ -1765,16 +1814,29 @@ function validateOutputOwnership({ node, artifactPath, failures }) {
 function validateNodeExecutionPolicy({ node, resiliencePolicy, failures }) {
   const policyStageIds = new Set((resiliencePolicy?.stages || []).map((stage) => stage?.id).filter(Boolean));
   const policyMode = node.failure_policy?.mode;
+  const readiness = node.execution_contract?.readiness;
   if (node.resilience_policy_ref && !policyStageIds.has(node.resilience_policy_ref)) {
     failures.push(`config/daily-codex-dag.json: node ${node.id} references missing resilience policy stage ${node.resilience_policy_ref}.`);
   }
+  if (node.execution_status === "planned" && readiness !== "planned_only") {
+    failures.push(`config/daily-codex-dag.json: planned node ${node.id} must use execution_contract.readiness planned_only.`);
+  }
   if (node.execution_status === "mapped") {
+    if (readiness !== "legacy_mapped") {
+      failures.push(`config/daily-codex-dag.json: mapped node ${node.id} must use execution_contract.readiness legacy_mapped; legacy mapped is not node-level execution.`);
+    }
     if (!node.runner_stage_ref) {
       failures.push(`config/daily-codex-dag.json: mapped node ${node.id} requires runner_stage_ref.`);
     }
     if (policyMode !== "resilience_policy_ref") {
       failures.push(`config/daily-codex-dag.json: mapped node ${node.id} must use failure_policy.mode resilience_policy_ref.`);
     }
+  }
+  if (readiness === "node_executable") {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} execution_contract.readiness node_executable requires a complete node-level execution spec before DAG execution can run.`);
+  }
+  if (readiness === "legacy_mapped" && !node.runner_stage_ref) {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} legacy_mapped readiness requires runner_stage_ref because legacy mapped is not node-level execution.`);
   }
   if (policyMode === "resilience_policy_ref") {
     if (!node.resilience_policy_ref) {
