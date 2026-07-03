@@ -1456,13 +1456,14 @@ function validateExecutionContractShape(contract, label, failures) {
 }
 
 function validateExecutionReadiness({ nodeId, executionStatus, readiness, label, failures }) {
-  if (executionStatus === "planned" && readiness !== "planned_only") {
+  const reservedNodeExecutable = readiness === "node_executable";
+  if (executionStatus === "planned" && readiness !== "planned_only" && !reservedNodeExecutable) {
     failures.push(`${label} ${formatSummaryValue(nodeId)} with execution_status planned must use execution_contract.readiness planned_only.`);
   }
-  if (executionStatus === "mapped" && readiness !== "legacy_mapped") {
+  if (executionStatus === "mapped" && readiness !== "legacy_mapped" && !reservedNodeExecutable) {
     failures.push(`${label} ${formatSummaryValue(nodeId)} with execution_status mapped must use execution_contract.readiness legacy_mapped; legacy mapped is not node-level execution.`);
   }
-  if (readiness === "node_executable") {
+  if (reservedNodeExecutable) {
     failures.push(`${label} ${formatSummaryValue(nodeId)} execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution.`);
   }
 }
@@ -1820,11 +1821,12 @@ async function validateNodeExecutionPolicy({ rootDir, node, resiliencePolicy, fa
   if (node.resilience_policy_ref && !policyStageIds.has(node.resilience_policy_ref)) {
     failures.push(`config/daily-codex-dag.json: node ${node.id} references missing resilience policy stage ${node.resilience_policy_ref}.`);
   }
-  if (node.execution_status === "planned" && readiness !== "planned_only") {
+  const reservedNodeExecutable = readiness === "node_executable";
+  if (node.execution_status === "planned" && readiness !== "planned_only" && !reservedNodeExecutable) {
     failures.push(`config/daily-codex-dag.json: planned node ${node.id} must use execution_contract.readiness planned_only.`);
   }
   if (node.execution_status === "mapped") {
-    if (readiness !== "legacy_mapped") {
+    if (readiness !== "legacy_mapped" && !reservedNodeExecutable) {
       failures.push(`config/daily-codex-dag.json: mapped node ${node.id} must use execution_contract.readiness legacy_mapped; legacy mapped is not node-level execution.`);
     }
     if (!node.runner_stage_ref) {
@@ -1834,7 +1836,7 @@ async function validateNodeExecutionPolicy({ rootDir, node, resiliencePolicy, fa
       failures.push(`config/daily-codex-dag.json: mapped node ${node.id} must use failure_policy.mode resilience_policy_ref.`);
     }
   }
-  if (readiness === "node_executable") {
+  if (reservedNodeExecutable) {
     failures.push(`config/daily-codex-dag.json: node ${node.id} execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution.`);
   } else if (hasNodeExecutionSpec) {
     failures.push(`config/daily-codex-dag.json: node ${node.id} execution_contract.node_execution_spec is only allowed for future node_executable nodes.`);
@@ -1903,6 +1905,7 @@ async function validateNodeExecutionSpecPreflight({ rootDir, node, spec, failure
       failures
     });
   }
+  validateNodeExecutionRuntimePolicy({ node, spec, failures });
 }
 
 function validateExecutionStringArray({ values, label, failures, requireNonEmptyArray = false }) {
@@ -1917,6 +1920,80 @@ function validateExecutionStringArray({ values, label, failures, requireNonEmpty
     if (!nonBlankString(value)) {
       failures.push(`${label} entries must be non-empty strings.`);
     }
+  }
+}
+
+function validateNodeExecutionRuntimePolicy({ node, spec, failures }) {
+  const expectedIdempotencyKey = `daily-codex-dag:{report_date}:${node.id}`;
+  if (spec.idempotency_key !== expectedIdempotencyKey) {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.idempotency_key must be ${expectedIdempotencyKey}.`);
+  }
+  if (spec.concurrency_group !== node.parallel_group) {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.concurrency_group must match node parallel_group ${node.parallel_group}.`);
+  }
+  validateRetryPolicyShape({ node, retryPolicy: spec.retry_policy, failures });
+  validateArtifactRuntimePolicy({ node, spec, failures });
+  validateSandboxRuntimePolicy({ node, spec, failures });
+}
+
+function validateRetryPolicyShape({ node, retryPolicy, failures }) {
+  if (!retryPolicy || !Array.isArray(retryPolicy.backoff_seconds)) return;
+  if (retryPolicy.backoff_seconds.length !== retryPolicy.max_attempts) {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.retry_policy.backoff_seconds must contain one entry per max_attempts, including 0 for the first attempt.`);
+  }
+  if (retryPolicy.backoff_seconds[0] !== 0) {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.retry_policy.backoff_seconds must start with 0 for the first attempt.`);
+  }
+  for (let index = 1; index < retryPolicy.backoff_seconds.length; index += 1) {
+    if (retryPolicy.backoff_seconds[index] < retryPolicy.backoff_seconds[index - 1]) {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.retry_policy.backoff_seconds must be nondecreasing.`);
+      break;
+    }
+  }
+}
+
+function validateArtifactRuntimePolicy({ node, spec, failures }) {
+  const verification = spec.artifact_verification || {};
+  const hasManifestOutputs = (node.outputs || []).length > 0;
+  if (hasManifestOutputs && spec.resume_policy === "reuse_valid_outputs") {
+    if (verification.schema !== "declared_outputs") {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.artifact_verification.schema must be declared_outputs when reuse_valid_outputs is used for a node with manifest outputs.`);
+    }
+    if (verification.existence !== "required_outputs") {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.artifact_verification.existence must be required_outputs when reuse_valid_outputs is used for a node with manifest outputs.`);
+    }
+  }
+  if (node.public_artifact) {
+    if (spec.publish_boundary !== "public_artifacts") {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.publish_boundary must be public_artifacts for public artifact nodes.`);
+    }
+    if (verification.privacy_scan !== "public_outputs") {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.artifact_verification.privacy_scan must be public_outputs for public artifact nodes.`);
+    }
+  } else {
+    if (spec.publish_boundary === "public_artifacts") {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.publish_boundary cannot be public_artifacts for non-public nodes.`);
+    }
+    if (verification.privacy_scan === "public_outputs") {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.artifact_verification.privacy_scan cannot be public_outputs for non-public nodes.`);
+    }
+  }
+}
+
+function validateSandboxRuntimePolicy({ node, spec, failures }) {
+  const sandbox = spec.sandbox || {};
+  if (node.public_artifact) {
+    if (sandbox.filesystem !== "public_artifact_write") {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.sandbox.filesystem must be public_artifact_write for public artifact nodes.`);
+    }
+  } else if (sandbox.filesystem === "public_artifact_write") {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.sandbox.filesystem cannot be public_artifact_write for non-public nodes.`);
+  }
+  if (sandbox.network === "source_allowlist" || sandbox.network === "enabled") {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.sandbox.network ${sandbox.network} is reserved until live executor network policy is defined.`);
+  }
+  if (sandbox.secrets === "runtime_scoped") {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.sandbox.secrets runtime_scoped is reserved until live executor secret policy is defined.`);
   }
 }
 
