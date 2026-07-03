@@ -230,6 +230,41 @@ test("daily codex DAG future node execution preflight accepts safe paths but kee
   }
 });
 
+test("daily codex DAG future node execution runtime policy accepts valid synthetic specs but keeps execution disabled", async () => {
+  const cases = [
+    {
+      nodeId: "score",
+      specOverrides: {}
+    },
+    {
+      nodeId: "persist-article-db",
+      specOverrides: {
+        sandbox: {
+          filesystem: "public_artifact_write",
+          network: "disabled",
+          secrets: "none"
+        }
+      }
+    }
+  ];
+
+  for (const item of cases) {
+    const manifest = await loadManifest();
+    const target = node(manifest, item.nodeId);
+    target.execution_contract = {
+      readiness: "node_executable",
+      summary: "Synthetic future executable node for runtime-policy coverage.",
+      node_execution_spec: buildFutureNodeExecutionSpec(target, item.specOverrides)
+    };
+
+    const result = await validateDailyCodexDag({ rootDir, manifest });
+    assert.equal(result.ok, false);
+    assert.deepEqual(result.failures, [
+      `config/daily-codex-dag.json: node ${item.nodeId} execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution.`
+    ]);
+  }
+});
+
 test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {
   const manifest = await loadManifest();
   const first = await createDailyCodexDagDryRun({
@@ -1567,6 +1602,233 @@ test("daily codex DAG validator catches structural and boundary regressions", as
         });
       },
       expected: "node classify-tag-entity node_execution_spec.invocation.args entries must be non-empty strings"
+    },
+    {
+      name: "execution spec idempotency key must be node scoped and deterministic",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          idempotency_key: "daily-codex-dag:{report_date}:wrong-node"
+        });
+      },
+      expected: "node score node_execution_spec.idempotency_key must be daily-codex-dag:{report_date}:score"
+    },
+    {
+      name: "execution spec concurrency group must match node parallel group",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          concurrency_group: "serial"
+        });
+      },
+      expected: "node score node_execution_spec.concurrency_group must match node parallel_group item-lanes"
+    },
+    {
+      name: "execution spec retry backoff length must match attempts",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          retry_policy: {
+            max_attempts: 3,
+            backoff_seconds: [0, 5]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.retry_policy.backoff_seconds must contain one entry per max_attempts"
+    },
+    {
+      name: "execution spec retry backoff must start at zero",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          retry_policy: {
+            max_attempts: 2,
+            backoff_seconds: [1, 5]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.retry_policy.backoff_seconds must start with 0"
+    },
+    {
+      name: "execution spec retry backoff must be nondecreasing",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          retry_policy: {
+            max_attempts: 3,
+            backoff_seconds: [0, 10, 5]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.retry_policy.backoff_seconds must be nondecreasing"
+    },
+    {
+      name: "execution spec reuse valid outputs requires declared output schema from manifest outputs",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          outputs: [],
+          artifact_verification: {
+            schema: "none",
+            existence: "required_outputs",
+            privacy_scan: "none"
+          }
+        });
+      },
+      expected: "node score node_execution_spec.artifact_verification.schema must be declared_outputs when reuse_valid_outputs is used for a node with manifest outputs"
+    },
+    {
+      name: "execution spec reuse valid outputs requires output existence from manifest outputs",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          outputs: [],
+          artifact_verification: {
+            schema: "declared_outputs",
+            existence: "none",
+            privacy_scan: "none"
+          }
+        });
+      },
+      expected: "node score node_execution_spec.artifact_verification.existence must be required_outputs when reuse_valid_outputs is used for a node with manifest outputs"
+    },
+    {
+      name: "execution spec public artifact node requires public publish boundary",
+      mutate(manifest) {
+        const target = node(manifest, "persist-article-db");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          sandbox: {
+            filesystem: "public_artifact_write",
+            network: "disabled",
+            secrets: "none"
+          },
+          publish_boundary: "internal_only"
+        });
+      },
+      expected: "node persist-article-db node_execution_spec.publish_boundary must be public_artifacts for public artifact nodes"
+    },
+    {
+      name: "execution spec public artifact node requires public filesystem sandbox",
+      mutate(manifest) {
+        const target = node(manifest, "persist-article-db");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target);
+      },
+      expected: "node persist-article-db node_execution_spec.sandbox.filesystem must be public_artifact_write for public artifact nodes"
+    },
+    {
+      name: "execution spec public artifact node requires public privacy scan",
+      mutate(manifest) {
+        const target = node(manifest, "persist-article-db");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          sandbox: {
+            filesystem: "public_artifact_write",
+            network: "disabled",
+            secrets: "none"
+          },
+          artifact_verification: {
+            schema: "declared_outputs",
+            existence: "required_outputs",
+            privacy_scan: "none"
+          }
+        });
+      },
+      expected: "node persist-article-db node_execution_spec.artifact_verification.privacy_scan must be public_outputs for public artifact nodes"
+    },
+    {
+      name: "execution spec non public node rejects public publish boundary",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          publish_boundary: "public_artifacts"
+        });
+      },
+      expected: "node score node_execution_spec.publish_boundary cannot be public_artifacts for non-public nodes"
+    },
+    {
+      name: "execution spec non public node rejects public filesystem sandbox",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          sandbox: {
+            filesystem: "public_artifact_write",
+            network: "disabled",
+            secrets: "none"
+          }
+        });
+      },
+      expected: "node score node_execution_spec.sandbox.filesystem cannot be public_artifact_write for non-public nodes"
+    },
+    {
+      name: "execution spec non public node rejects public privacy scan",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          artifact_verification: {
+            schema: "declared_outputs",
+            existence: "required_outputs",
+            privacy_scan: "public_outputs"
+          }
+        });
+      },
+      expected: "node score node_execution_spec.artifact_verification.privacy_scan cannot be public_outputs for non-public nodes"
+    },
+    {
+      name: "execution spec source allowlist network is reserved",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          sandbox: {
+            filesystem: "workspace_write",
+            network: "source_allowlist",
+            secrets: "none"
+          }
+        });
+      },
+      expected: "node score node_execution_spec.sandbox.network source_allowlist is reserved until live executor network policy is defined"
+    },
+    {
+      name: "execution spec enabled network is reserved",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          sandbox: {
+            filesystem: "workspace_write",
+            network: "enabled",
+            secrets: "none"
+          }
+        });
+      },
+      expected: "node score node_execution_spec.sandbox.network enabled is reserved until live executor network policy is defined"
+    },
+    {
+      name: "execution spec runtime scoped secrets are reserved",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          sandbox: {
+            filesystem: "workspace_write",
+            network: "disabled",
+            secrets: "runtime_scoped"
+          }
+        });
+      },
+      expected: "node score node_execution_spec.sandbox.secrets runtime_scoped is reserved until live executor secret policy is defined"
     },
     {
       name: "missing resilience policy stage",
