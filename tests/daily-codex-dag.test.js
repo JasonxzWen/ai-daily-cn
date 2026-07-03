@@ -1,0 +1,192 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import path from "node:path";
+import test from "node:test";
+import { validateDailyCodexDag } from "../src/daily-codex-dag.js";
+
+const rootDir = process.cwd();
+const manifestPath = path.join(rootDir, "config", "daily-codex-dag.json");
+
+test("daily codex DAG manifest validates target node contract", async () => {
+  const result = await validateDailyCodexDag({ rootDir });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.node_ids.length, 16);
+  assert(result.node_ids.includes("fetch-source-health"));
+  assert(result.node_ids.includes("publish-cleanup"));
+  assert(result.checked_files.some((file) => file.endsWith("config/daily-codex-dag.json")));
+  assert(result.checked_files.some((file) => file.endsWith("config/daily-resilience-policy.json")));
+});
+
+test("daily codex DAG validator catches structural and boundary regressions", async () => {
+  const cases = [
+    {
+      name: "duplicate node id",
+      mutate(manifest) {
+        manifest.nodes[1].id = manifest.nodes[0].id;
+      },
+      expected: "duplicate node id"
+    },
+    {
+      name: "missing dependency",
+      mutate(manifest) {
+        node(manifest, "parse-extract").dependencies = ["missing-node"];
+      },
+      expected: "depends on missing node missing-node"
+    },
+    {
+      name: "dependency cycle",
+      mutate(manifest) {
+        node(manifest, "fetch-source-health").dependencies = ["publish-cleanup"];
+      },
+      expected: "dependency cycle detected"
+    },
+    {
+      name: "missing schema ref",
+      mutate(manifest) {
+        node(manifest, "score").schemas.output = "schemas/missing-dag-output.schema.json";
+      },
+      expected: "node score.schemas.output failed to read JSON"
+    },
+    {
+      name: "missing schema fragment",
+      mutate(manifest) {
+        node(manifest, "score").schemas.output = "schemas/daily-codex-dag.schema.json#/$defs/doesNotExist";
+      },
+      expected: "node score.schemas.output references missing schema fragment /$defs/doesNotExist"
+    },
+    {
+      name: "prototype schema fragment",
+      mutate(manifest) {
+        node(manifest, "score").schemas.output = "schemas/daily-codex-dag.schema.json#/__proto__";
+      },
+      expected: "node score.schemas.output references missing schema fragment /__proto__"
+    },
+    {
+      name: "missing fixture ref",
+      mutate(manifest) {
+        node(manifest, "score").fixture = "tests/fixtures/daily-codex-dag/missing.json";
+      },
+      expected: "node score.fixture missing"
+    },
+    {
+      name: "unsafe absolute artifact path",
+      mutate(manifest) {
+        node(manifest, "score").outputs[0].path = "C:/temp/score.json";
+      },
+      expected: "must be a safe repo-relative template path"
+    },
+    {
+      name: "unsafe parent artifact path",
+      mutate(manifest) {
+        node(manifest, "score").outputs[0].path = "../score.json";
+      },
+      expected: "must be a safe repo-relative template path"
+    },
+    {
+      name: "public output marked private",
+      mutate(manifest) {
+        node(manifest, "persist-article-db").public_artifact = false;
+      },
+      expected: "has public_artifact false but writes docs/articles.json"
+    },
+    {
+      name: "mapped node without resilience policy mode",
+      mutate(manifest) {
+        node(manifest, "admit-reject").failure_policy.mode = "planned";
+      },
+      expected: "mapped node admit-reject must use failure_policy.mode resilience_policy_ref"
+    },
+    {
+      name: "mapped node without resilience policy ref",
+      mutate(manifest) {
+        node(manifest, "admit-reject").resilience_policy_ref = "";
+      },
+      expected: "node admit-reject uses resilience_policy_ref mode without resilience_policy_ref"
+    },
+    {
+      name: "missing resilience policy stage",
+      mutate(manifest) {
+        node(manifest, "admit-reject").resilience_policy_ref = "missing_policy_stage";
+      },
+      expected: "references missing resilience policy stage missing_policy_stage"
+    },
+    {
+      name: "planned node missing resilience policy stage",
+      mutate(manifest) {
+        node(manifest, "fetch-source-health").resilience_policy_ref = "missing_policy_stage";
+      },
+      expected: "references missing resilience policy stage missing_policy_stage"
+    },
+    {
+      name: "fanout without fanout config",
+      mutate(manifest) {
+        delete node(manifest, "per-item-summary").fanout;
+      },
+      expected: "fanout node per-item-summary requires fanout config"
+    },
+    {
+      name: "fanout references missing source",
+      mutate(manifest) {
+        node(manifest, "per-item-summary").fanout.from = "missing-fanout-source";
+      },
+      expected: "fanout node per-item-summary references missing source missing-fanout-source"
+    },
+    {
+      name: "non fanout declares fanout config",
+      mutate(manifest) {
+        node(manifest, "score").fanout = { from: "admit-reject", item_id_field: "accepted_items[].id" };
+      },
+      expected: "non-fanout node score cannot declare fanout config"
+    },
+    {
+      name: "barrier without wait config",
+      mutate(manifest) {
+        delete node(manifest, "quality-audit").barrier;
+      },
+      expected: "barrier node quality-audit requires barrier config"
+    },
+    {
+      name: "barrier waits for missing source",
+      mutate(manifest) {
+        node(manifest, "quality-audit").barrier.wait_for = ["missing-barrier-source"];
+      },
+      expected: "barrier node quality-audit waits for missing node missing-barrier-source"
+    },
+    {
+      name: "non barrier declares barrier config",
+      mutate(manifest) {
+        node(manifest, "score").barrier = { wait_for: ["admit-reject"] };
+      },
+      expected: "non-barrier node score cannot declare barrier config"
+    },
+    {
+      name: "publish without public quality gate",
+      mutate(manifest) {
+        node(manifest, "publish-cleanup").dependencies = [];
+      },
+      expected: "publish-cleanup must transitively depend on quality-audit"
+    }
+  ];
+
+  for (const item of cases) {
+    const manifest = await loadManifest();
+    item.mutate(manifest);
+    const result = await validateDailyCodexDag({ rootDir, manifest });
+    assert.equal(result.ok, false, item.name);
+    assert(
+      result.failures.some((failure) => failure.includes(item.expected)),
+      `${item.name}\nexpected: ${item.expected}\nactual:\n${result.failures.join("\n")}`
+    );
+  }
+});
+
+async function loadManifest() {
+  return JSON.parse(await fs.readFile(manifestPath, "utf8"));
+}
+
+function node(manifest, id) {
+  const found = manifest.nodes.find((item) => item.id === id);
+  assert(found, `missing fixture node ${id}`);
+  return found;
+}

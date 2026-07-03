@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "name": "daily-codex-dag-contract",
+  "description": "Target Codex CLI DAG contract for the daily generation flow. This is a manifest contract slice; planned nodes are not yet standalone runner stages.",
+  "resilience_policy_path": "config/daily-resilience-policy.json",
+  "nodes": [
+    {
+      "id": "fetch-source-health",
+      "title": "Fetch source health and raw candidate lanes",
+      "kind": "command",
+      "execution_status": "planned",
+      "dependencies": [],
+      "inputs": [],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "source-lanes",
+      "runner_stage_ref": "collect",
+      "resilience_policy_ref": "sources_health",
+      "failure_policy": {
+        "mode": "planned",
+        "summary": "Will derive retry/degrade/block behavior from source lane policies when this node becomes executable."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "parse-extract",
+      "title": "Parse source payloads into extracted candidate records",
+      "kind": "command",
+      "execution_status": "planned",
+      "dependencies": ["fetch-source-health"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "source-lanes",
+      "runner_stage_ref": "collect",
+      "resilience_policy_ref": "discover_content_sources",
+      "failure_policy": {
+        "mode": "planned",
+        "summary": "Will derive parse fallback behavior from source-specific discovery policies."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "normalize-canonicalize",
+      "title": "Normalize URLs and canonical candidate identities",
+      "kind": "command",
+      "execution_status": "planned",
+      "dependencies": ["parse-extract"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "source-lanes",
+      "runner_stage_ref": "collect",
+      "resilience_policy_ref": "",
+      "failure_policy": {
+        "mode": "planned",
+        "summary": "Will block on unrecoverable schema or identity normalization errors."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "classify-tag-entity",
+      "title": "Classify domain, flavor, channel, tags, and entities",
+      "kind": "codex_exec",
+      "execution_status": "planned",
+      "dependencies": ["normalize-canonicalize"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "item-lanes",
+      "runner_stage_ref": "admit",
+      "resilience_policy_ref": "",
+      "failure_policy": {
+        "mode": "planned",
+        "summary": "Will require schema-valid taxonomy fields before scoring."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "score",
+      "title": "Score candidate relevance and public value",
+      "kind": "command",
+      "execution_status": "planned",
+      "dependencies": ["classify-tag-entity"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/scored-candidates.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "item-lanes",
+      "runner_stage_ref": "admit",
+      "resilience_policy_ref": "",
+      "failure_policy": {
+        "mode": "planned",
+        "summary": "Will stop or repair when score output cannot satisfy admission contract."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "dedupe-cross-language",
+      "title": "Dedupe same story across languages and source variants",
+      "kind": "command",
+      "execution_status": "planned",
+      "dependencies": ["score"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/scored-candidates.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/deduped-candidates.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "item-lanes",
+      "runner_stage_ref": "admit",
+      "resilience_policy_ref": "",
+      "failure_policy": {
+        "mode": "planned",
+        "summary": "Will keep canonical candidates and block only on unrecoverable identity conflicts."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "freshness-history-check",
+      "title": "Check freshness and recent publication history",
+      "kind": "command",
+      "execution_status": "planned",
+      "dependencies": ["dedupe-cross-language"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/deduped-candidates.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/fresh-candidates.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "item-lanes",
+      "runner_stage_ref": "admit",
+      "resilience_policy_ref": "",
+      "failure_policy": {
+        "mode": "planned",
+        "summary": "Will reject stale items and preserve audit evidence in internal artifacts."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "verify-source-authority",
+      "title": "Verify primary source authority and evidence links",
+      "kind": "codex_exec",
+      "execution_status": "planned",
+      "dependencies": ["freshness-history-check"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/fresh-candidates.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/verified-candidates.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "item-lanes",
+      "runner_stage_ref": "admit",
+      "resilience_policy_ref": "report_draft",
+      "failure_policy": {
+        "mode": "planned",
+        "summary": "Will block high-risk unverified facts and degrade only source-lane outages."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "admit-reject",
+      "title": "Admit or reject report-worthy items",
+      "kind": "codex_exec",
+      "execution_status": "mapped",
+      "dependencies": ["verify-source-authority"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/verified-candidates.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/admission.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "serial",
+      "runner_stage_ref": "admit",
+      "resilience_policy_ref": "report_draft",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Current admission behavior is covered through the report_draft resilience policy until this node is split out."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "per-item-summary",
+      "title": "Summarize each admitted item in isolated Codex contexts",
+      "kind": "fanout",
+      "execution_status": "mapped",
+      "dependencies": ["admit-reject"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/admission.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/summaries/{item_id}.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "item-lanes",
+      "runner_stage_ref": "summarize:*",
+      "resilience_policy_ref": "quality_review",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Current summary output is validated by the Codex pipeline and quality review gates."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir",
+      "fanout": {
+        "from": "admit-reject",
+        "item_id_field": "accepted_items[].id"
+      }
+    },
+    {
+      "id": "quality-audit",
+      "title": "Audit summary quality and public copy safety",
+      "kind": "barrier",
+      "execution_status": "mapped",
+      "dependencies": ["per-item-summary"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/summaries/{item_id}.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/quality-audit.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "serial",
+      "runner_stage_ref": "quality-review",
+      "resilience_policy_ref": "quality_review",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Current quality-review resilience policy controls repair/degrade/block behavior."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir",
+      "barrier": {
+        "wait_for": ["per-item-summary"]
+      }
+    },
+    {
+      "id": "repair-regenerate",
+      "title": "Repair or regenerate scoped public text defects",
+      "kind": "codex_exec",
+      "execution_status": "mapped",
+      "dependencies": ["quality-audit"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/quality-audit.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/repair-result.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "serial",
+      "runner_stage_ref": "quality-review",
+      "resilience_policy_ref": "quality_ai_repair",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Current quality_ai_repair policy controls ready-gated repair contracts."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
+      "id": "persist-article-db",
+      "title": "Persist public article library data",
+      "kind": "command",
+      "execution_status": "planned",
+      "dependencies": ["repair-regenerate"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/repair-result.json", "required": true }],
+      "outputs": [{ "path": "docs/articles.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/articles.schema.json"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "serial",
+      "runner_stage_ref": "build",
+      "resilience_policy_ref": "build",
+      "failure_policy": {
+        "mode": "planned",
+        "summary": "Will inherit build/public privacy gates as article DB persistence becomes explicit."
+      },
+      "public_artifact": true,
+      "owner_path_scope": "docs"
+    },
+    {
+      "id": "assemble-daily-edition",
+      "title": "Assemble normalized daily report JSON",
+      "kind": "codex_exec",
+      "execution_status": "mapped",
+      "dependencies": ["repair-regenerate"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/repair-result.json", "required": true }],
+      "outputs": [{ "path": "reports-data/{yyyy}/{mm}/{report_date}.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/report.schema.json"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "serial",
+      "runner_stage_ref": "write-report",
+      "resilience_policy_ref": "report_write",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Current report_write policy controls schema-aware normalization and public degraded fields."
+      },
+      "public_artifact": true,
+      "owner_path_scope": "reports_data"
+    },
+    {
+      "id": "build-cards-page",
+      "title": "Build public cards, pages, feed, and indexes",
+      "kind": "command",
+      "execution_status": "mapped",
+      "dependencies": ["persist-article-db", "assemble-daily-edition"],
+      "inputs": [
+        { "path": "docs/articles.json", "required": true },
+        { "path": "reports-data/{yyyy}/{mm}/{report_date}.json", "required": true }
+      ],
+      "outputs": [
+        { "path": "docs/index.html", "required": true },
+        { "path": "docs/reports/{yyyy}/{mm}/{report_date}.html", "required": true }
+      ],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "serial",
+      "runner_stage_ref": "build",
+      "resilience_policy_ref": "build",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Current build policy blocks unrenderable public artifacts and internal leakage."
+      },
+      "public_artifact": true,
+      "owner_path_scope": "docs"
+    },
+    {
+      "id": "publish-cleanup",
+      "title": "Validate publish plan, publish, verify, and clean up",
+      "kind": "command",
+      "execution_status": "mapped",
+      "dependencies": ["build-cards-page"],
+      "inputs": [{ "path": "docs/reports/{yyyy}/{mm}/{report_date}.html", "required": true }],
+      "outputs": [],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "serial",
+      "runner_stage_ref": "publish",
+      "resilience_policy_ref": "publish_real",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Current publish and Pages verification policies control publish fallback and pending verification."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "none"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "daily-codex-dag.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "name", "description", "resilience_policy_path", "nodes"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "name": { "const": "daily-codex-dag-contract" },
+    "description": { "type": "string", "minLength": 1 },
+    "resilience_policy_path": { "type": "string", "minLength": 1 },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/node" }
+    }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "kind",
+        "execution_status",
+        "dependencies",
+        "inputs",
+        "outputs",
+        "schemas",
+        "fixture",
+        "parallel_group",
+        "runner_stage_ref",
+        "resilience_policy_ref",
+        "failure_policy",
+        "public_artifact",
+        "owner_path_scope"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*(?::[a-z0-9-]+)?$" },
+        "title": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["command", "codex_exec", "fanout", "barrier"] },
+        "execution_status": { "enum": ["planned", "mapped"] },
+        "dependencies": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "inputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "outputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "schemas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["input", "output"],
+          "properties": {
+            "input": { "type": "string", "minLength": 1 },
+            "output": { "type": "string", "minLength": 1 }
+          }
+        },
+        "fixture": { "type": "string", "minLength": 1 },
+        "parallel_group": { "type": "string" },
+        "runner_stage_ref": { "type": "string" },
+        "resilience_policy_ref": { "type": "string" },
+        "failure_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "summary"],
+          "properties": {
+            "mode": { "enum": ["planned", "resilience_policy_ref"] },
+            "summary": { "type": "string", "minLength": 1 }
+          }
+        },
+        "public_artifact": { "type": "boolean" },
+        "owner_path_scope": { "enum": ["internal_workdir", "docs", "reports_data", "none"] },
+        "fanout": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from", "item_id_field"],
+          "properties": {
+            "from": { "type": "string", "minLength": 1 },
+            "item_id_field": { "type": "string", "minLength": 1 }
+          }
+        },
+        "barrier": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wait_for"],
+          "properties": {
+            "wait_for": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            }
+          }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "required"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" }
+      }
+    },
+    "plannedNodeInput": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "plannedNodeOutput": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
