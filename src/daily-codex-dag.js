@@ -178,6 +178,28 @@ export async function createDailyCodexDagDryRun(options = {}) {
   };
 }
 
+export function validateDailyCodexDagDryRunSummary(summary) {
+  const failures = [];
+  const warnings = [];
+
+  if (!isPlainObject(summary)) {
+    failures.push("daily codex DAG dry-run summary must be an object.");
+    return { ok: false, failures, warnings };
+  }
+
+  if (summary.ok === false) {
+    validateDryRunFailureSummary(summary, failures);
+    return { ok: failures.length === 0, failures, warnings };
+  }
+  if (summary.ok !== true) {
+    failures.push("daily codex DAG dry-run summary ok must be true or false.");
+    return { ok: false, failures, warnings };
+  }
+
+  validateDryRunSuccessSummary(summary, failures);
+  return { ok: failures.length === 0, failures, warnings };
+}
+
 async function validateDagSemantics({ rootDir, manifest, resiliencePolicy, ajv, failures, checkedFiles }) {
   const nodes = manifest.nodes;
   if (!Array.isArray(nodes)) return;
@@ -292,6 +314,375 @@ function copyLevel(level) {
     level: level.level,
     node_ids: [...level.node_ids]
   };
+}
+
+function validateDryRunFailureSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: ["ok", "failures", "warnings", "validation", "plan", "run"],
+    label: "daily codex DAG dry-run failure summary",
+    failures
+  });
+  if (!Array.isArray(summary.failures) || summary.failures.length === 0) {
+    failures.push("daily codex DAG dry-run failure summary must include at least one failure.");
+  } else {
+    validateMessageArray(summary.failures, "daily codex DAG dry-run failure summary failures", failures);
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG dry-run failure summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG dry-run failure summary warnings", failures);
+  }
+  if (summary.plan !== null) {
+    failures.push("daily codex DAG dry-run failure summary plan must be null.");
+  }
+  if (summary.run !== null) {
+    failures.push("daily codex DAG dry-run failure summary run must be null.");
+  }
+  if (summary.validation !== null && !isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG dry-run failure summary validation must be null or an object.");
+  } else if (isPlainObject(summary.validation)) {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: false,
+      label: "daily codex DAG dry-run failure summary validation",
+      failures
+    });
+  }
+}
+
+function validateDryRunSuccessSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "ok",
+      "failures",
+      "warnings",
+      "validation",
+      "mode",
+      "report_date",
+      "generated_at",
+      "plan",
+      "run",
+      "next_action"
+    ],
+    label: "daily codex DAG dry-run success summary",
+    failures
+  });
+  if (!Array.isArray(summary.failures) || summary.failures.length !== 0) {
+    failures.push("daily codex DAG dry-run success summary failures must be empty.");
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG dry-run success summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG dry-run success summary warnings", failures);
+  }
+  if (summary.mode !== "daily_codex_dag_dry_run") {
+    failures.push("daily codex DAG dry-run success summary mode must be daily_codex_dag_dry_run.");
+  }
+  if (!isStrictIsoDate(summary.report_date)) {
+    failures.push("daily codex DAG dry-run success summary report_date must be a real YYYY-MM-DD date.");
+  }
+  if (!isCanonicalIsoTimestamp(summary.generated_at)) {
+    failures.push("daily codex DAG dry-run success summary generated_at must be a canonical UTC Date#toISOString() string.");
+  }
+  if (!isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG dry-run success summary validation must be an object.");
+  } else {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: true,
+      label: "daily codex DAG dry-run success summary validation",
+      failures
+    });
+  }
+  validateNextActionShape(summary.next_action, failures);
+
+  const plan = isPlainObject(summary.plan) ? summary.plan : null;
+  const run = isPlainObject(summary.run) ? summary.run : null;
+  if (!plan) {
+    failures.push("daily codex DAG dry-run success summary plan must be an object.");
+  }
+  if (!run) {
+    failures.push("daily codex DAG dry-run success summary run must be an object.");
+  }
+  if (!plan || !run) return;
+
+  validatePlanShape(plan, failures);
+  validateRunShape(run, failures);
+
+  const planNodes = Array.isArray(plan.nodes) ? plan.nodes : null;
+  const planLevels = Array.isArray(plan.levels) ? plan.levels : null;
+  if (!planNodes) {
+    failures.push("daily codex DAG dry-run success summary plan.nodes must be an array.");
+  }
+  if (!planLevels) {
+    failures.push("daily codex DAG dry-run success summary plan.levels must be an array.");
+  }
+  if (!planNodes || !planLevels) return;
+
+  const planNodeIds = planNodes.map((node) => isPlainObject(node) ? node.id : undefined);
+  if (plan.node_count !== planNodes.length) {
+    failures.push("daily codex DAG dry-run success summary plan.node_count must equal plan.nodes.length.");
+  }
+
+  const levelPartition = validatePlanLevelPartition({ planNodes, planLevels, failures });
+  validateDryRunSuccessRun({ run, planLevels, planNodeIds, failures });
+  validatePlanDependencyLevels({ planNodes, levelByNodeId: levelPartition.levelByNodeId, failures });
+}
+
+function validateValidationShape({ validation, expectedOk, label, failures }) {
+  validateExactKeys({
+    value: validation,
+    allowed: ["ok", "failures", "warnings", "node_ids", "checked_files"],
+    label,
+    failures
+  });
+  if (validation.ok !== expectedOk) {
+    failures.push(`${label}.ok must be ${expectedOk}.`);
+  }
+  if (!Array.isArray(validation.failures)) {
+    failures.push(`${label}.failures must be an array.`);
+  } else {
+    validateMessageArray(validation.failures, `${label}.failures`, failures);
+    if (expectedOk === true && validation.failures.length !== 0) {
+      failures.push(`${label}.failures must be empty when validation.ok is true.`);
+    }
+  }
+  if (!Array.isArray(validation.warnings)) {
+    failures.push(`${label}.warnings must be an array.`);
+  } else {
+    validateMessageArray(validation.warnings, `${label}.warnings`, failures);
+  }
+  validateNodeIdArray(validation.node_ids, `${label}.node_ids`, failures);
+  validateStringArray(validation.checked_files, `${label}.checked_files`, failures);
+}
+
+function validatePlanShape(plan, failures) {
+  validateExactKeys({
+    value: plan,
+    allowed: ["schema_version", "manifest_name", "description", "node_count", "levels", "nodes"],
+    label: "daily codex DAG dry-run success summary plan",
+    failures
+  });
+  if (plan.schema_version !== 1) {
+    failures.push("daily codex DAG dry-run success summary plan.schema_version must be 1.");
+  }
+  if (!nonEmptyString(plan.manifest_name)) {
+    failures.push("daily codex DAG dry-run success summary plan.manifest_name must be a non-empty string.");
+  }
+  if (!nonEmptyString(plan.description)) {
+    failures.push("daily codex DAG dry-run success summary plan.description must be a non-empty string.");
+  }
+  if (!Number.isInteger(plan.node_count) || plan.node_count < 0) {
+    failures.push("daily codex DAG dry-run success summary plan.node_count must be a non-negative integer.");
+  }
+  if (Array.isArray(plan.levels)) {
+    for (const level of plan.levels) {
+      validateLevelShape(level, "daily codex DAG dry-run success summary plan.levels entry", failures);
+    }
+  }
+  if (Array.isArray(plan.nodes)) {
+    for (const node of plan.nodes) {
+      validatePlanNodeShape(node, failures);
+    }
+  }
+}
+
+function validatePlanNodeShape(node, failures) {
+  const label = "daily codex DAG dry-run success summary plan.nodes entry";
+  if (!isPlainObject(node)) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  validateExactKeys({
+    value: node,
+    allowed: [
+      "id",
+      "title",
+      "kind",
+      "execution_status",
+      "plan_status",
+      "level",
+      "dependencies",
+      "inputs",
+      "outputs",
+      "runner_stage_ref",
+      "parallel_group",
+      "public_artifact",
+      "owner_path_scope"
+    ],
+    label,
+    failures
+  });
+  if (!isNodeId(node.id)) failures.push(`${label}.id must be a node id.`);
+  if (!nonEmptyString(node.title)) failures.push(`${label}.title must be a non-empty string.`);
+  if (!["command", "codex_exec", "fanout", "barrier"].includes(node.kind)) failures.push(`${label}.kind is invalid.`);
+  if (!["planned", "mapped"].includes(node.execution_status)) failures.push(`${label}.execution_status is invalid.`);
+  if (!["planned", "mapped"].includes(node.plan_status)) failures.push(`${label}.plan_status is invalid.`);
+  if (!Number.isInteger(node.level) || node.level < 0) failures.push(`${label}.level must be a non-negative integer.`);
+  validateNodeIdArray(node.dependencies, `${label}.dependencies`, failures);
+  validateArtifactArray(node.inputs, `${label}.inputs`, failures);
+  validateArtifactArray(node.outputs, `${label}.outputs`, failures);
+  if (typeof node.runner_stage_ref !== "string") failures.push(`${label}.runner_stage_ref must be a string.`);
+  if (typeof node.parallel_group !== "string") failures.push(`${label}.parallel_group must be a string.`);
+  if (typeof node.public_artifact !== "boolean") failures.push(`${label}.public_artifact must be a boolean.`);
+  if (!["internal_workdir", "docs", "reports_data", "none"].includes(node.owner_path_scope)) failures.push(`${label}.owner_path_scope is invalid.`);
+}
+
+function validateRunShape(run, failures) {
+  validateExactKeys({
+    value: run,
+    allowed: ["final_status", "levels", "planned_nodes", "completed_nodes", "blocked_nodes"],
+    label: "daily codex DAG dry-run success summary run",
+    failures
+  });
+  if (Array.isArray(run.levels)) {
+    for (const level of run.levels) {
+      validateLevelShape(level, "daily codex DAG dry-run success summary run.levels entry", failures);
+    }
+  }
+  validateNodeIdArray(run.planned_nodes, "daily codex DAG dry-run success summary run.planned_nodes", failures);
+  validateNodeIdArray(run.completed_nodes, "daily codex DAG dry-run success summary run.completed_nodes", failures);
+  validateNodeIdArray(run.blocked_nodes, "daily codex DAG dry-run success summary run.blocked_nodes", failures);
+}
+
+function validateNextActionShape(nextAction, failures) {
+  const label = "daily codex DAG dry-run success summary next_action";
+  if (!isPlainObject(nextAction)) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  validateExactKeys({
+    value: nextAction,
+    allowed: ["kind", "message"],
+    label,
+    failures
+  });
+  if (nextAction.kind !== "implement_executable_node_runner") {
+    failures.push(`${label}.kind must be implement_executable_node_runner.`);
+  }
+  if (!nonEmptyString(nextAction.message)) {
+    failures.push(`${label}.message must be a non-empty string.`);
+  }
+}
+
+function validateLevelShape(level, label, failures) {
+  if (!isPlainObject(level)) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  validateExactKeys({ value: level, allowed: ["level", "node_ids"], label, failures });
+  if (!Number.isInteger(level.level) || level.level < 0) {
+    failures.push(`${label}.level must be a non-negative integer.`);
+  }
+  validateNodeIdArray(level.node_ids, `${label}.node_ids`, failures, { minItems: 1 });
+}
+
+function validateArtifactArray(artifacts, label, failures) {
+  if (!Array.isArray(artifacts)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  for (const artifact of artifacts) {
+    if (!isPlainObject(artifact)) {
+      failures.push(`${label} entries must be objects.`);
+      continue;
+    }
+    validateExactKeys({ value: artifact, allowed: ["path", "required"], label: `${label} entry`, failures });
+    if (!nonEmptyString(artifact.path)) failures.push(`${label} entry.path must be a non-empty string.`);
+    if (typeof artifact.required !== "boolean") failures.push(`${label} entry.required must be a boolean.`);
+  }
+}
+
+function validatePlanLevelPartition({ planNodes, planLevels, failures }) {
+  const planNodeIds = planNodes.map((node) => isPlainObject(node) ? node.id : undefined);
+  const planNodeIdSet = new Set(planNodeIds.filter((id) => typeof id === "string"));
+  const levelByNodeId = new Map();
+  const flattened = [];
+  const levelValues = new Set();
+
+  for (const level of planLevels) {
+    if (!isPlainObject(level)) {
+      failures.push("daily codex DAG dry-run success summary plan.levels entries must be objects.");
+      continue;
+    }
+    if (!Number.isInteger(level.level)) {
+      failures.push("daily codex DAG dry-run success summary plan.levels entries must have integer level.");
+    } else if (levelValues.has(level.level)) {
+      failures.push(`daily codex DAG dry-run success summary plan.levels duplicate level ${level.level}.`);
+    } else {
+      levelValues.add(level.level);
+    }
+    if (!Array.isArray(level.node_ids)) {
+      failures.push("daily codex DAG dry-run success summary plan.levels entries must include node_ids arrays.");
+      continue;
+    }
+    for (const nodeId of level.node_ids) {
+      flattened.push(nodeId);
+      if (!planNodeIdSet.has(nodeId)) {
+        failures.push(`daily codex DAG dry-run success summary plan.levels references unknown node ${formatSummaryValue(nodeId)}.`);
+        continue;
+      }
+      if (levelByNodeId.has(nodeId)) {
+        failures.push(`daily codex DAG dry-run success summary plan.levels repeats node ${nodeId}.`);
+        continue;
+      }
+      levelByNodeId.set(nodeId, level.level);
+    }
+  }
+
+  if (!sameOrderedStringArray(flattened, planNodeIds)) {
+    failures.push("daily codex DAG dry-run success summary plan.levels flattened node_ids must equal plan.nodes ids.");
+  }
+
+  for (const node of planNodes) {
+    if (!isPlainObject(node) || typeof node.id !== "string") {
+      failures.push("daily codex DAG dry-run success summary plan.nodes entries must include string ids.");
+      continue;
+    }
+    if (levelByNodeId.get(node.id) !== node.level) {
+      failures.push(`daily codex DAG dry-run success summary plan node ${node.id} level must match plan.levels.`);
+    }
+  }
+
+  return { levelByNodeId };
+}
+
+function validateDryRunSuccessRun({ run, planLevels, planNodeIds, failures }) {
+  if (run.final_status !== "dry_run_only") {
+    failures.push("daily codex DAG dry-run success summary run.final_status must be dry_run_only.");
+  }
+  if (!sameOrderedStringArray(run.planned_nodes, planNodeIds)) {
+    failures.push("daily codex DAG dry-run success summary run.planned_nodes must equal plan.nodes ids.");
+  }
+  if (!Array.isArray(run.completed_nodes) || run.completed_nodes.length !== 0) {
+    failures.push("daily codex DAG dry-run success summary run.completed_nodes must be empty.");
+  }
+  if (!Array.isArray(run.blocked_nodes) || run.blocked_nodes.length !== 0) {
+    failures.push("daily codex DAG dry-run success summary run.blocked_nodes must be empty.");
+  }
+  if (!levelsMatch(run.levels, planLevels)) {
+    failures.push("daily codex DAG dry-run success summary run.levels must equal plan.levels.");
+  }
+}
+
+function validatePlanDependencyLevels({ planNodes, levelByNodeId, failures }) {
+  for (const node of planNodes) {
+    if (!isPlainObject(node) || typeof node.id !== "string" || !Array.isArray(node.dependencies)) continue;
+    const nodeLevel = levelByNodeId.get(node.id);
+    if (!Number.isInteger(nodeLevel)) continue;
+    for (const dependencyId of node.dependencies) {
+      const dependencyLevel = levelByNodeId.get(dependencyId);
+      if (!Number.isInteger(dependencyLevel)) {
+        failures.push(`daily codex DAG dry-run success summary plan node ${node.id} dependency ${formatSummaryValue(dependencyId)} is missing from plan.levels.`);
+        continue;
+      }
+      if (dependencyLevel >= nodeLevel) {
+        failures.push(`daily codex DAG dry-run success summary plan node ${node.id} dependency ${formatSummaryValue(dependencyId)} must be in an earlier level.`);
+      }
+    }
+  }
 }
 
 function validateNodeDependencies({ node, nodeById, failures }) {
@@ -606,6 +997,121 @@ function toIsoTimestamp(value) {
     throw new Error("daily codex DAG dry run requires a valid timestamp");
   }
   return date.toISOString();
+}
+
+function isStrictIsoDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return false;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+function isCanonicalIsoTimestamp(value) {
+  if (typeof value !== "string") return false;
+  const date = new Date(value);
+  return !Number.isNaN(date.getTime()) && date.toISOString() === value;
+}
+
+function sameOrderedStringArray(left, right) {
+  if (!Array.isArray(left) || !Array.isArray(right)) return false;
+  if (left.length !== right.length) return false;
+  return left.every((value, index) => typeof value === "string" && value === right[index]);
+}
+
+function levelsMatch(left, right) {
+  if (!Array.isArray(left) || !Array.isArray(right)) return false;
+  if (left.length !== right.length) return false;
+  return left.every((level, index) => {
+    const expected = right[index];
+    return isPlainObject(level)
+      && isPlainObject(expected)
+      && level.level === expected.level
+      && sameOrderedStringArray(level.node_ids, expected.node_ids);
+  });
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function validateExactKeys({ value, allowed, label, failures }) {
+  if (!isPlainObject(value)) return;
+  const allowedSet = new Set(allowed);
+  for (const key of allowed) {
+    if (!Object.prototype.hasOwnProperty.call(value, key)) {
+      failures.push(`${label} missing required field ${key}.`);
+    }
+  }
+  for (const key of Object.keys(value)) {
+    if (!allowedSet.has(key)) {
+      failures.push(`${label} must not include additional field ${key}.`);
+    }
+  }
+}
+
+function validateMessageArray(values, label, failures) {
+  if (!Array.isArray(values)) return;
+  for (const value of values) {
+    if (!nonEmptyString(value)) {
+      failures.push(`${label} entries must be non-empty strings.`);
+    }
+  }
+}
+
+function validateNodeIdArray(values, label, failures, options = {}) {
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  if (options.minItems && values.length < options.minItems) {
+    failures.push(`${label} must contain at least ${options.minItems} item.`);
+  }
+  const seen = new Set();
+  for (const value of values) {
+    if (!isNodeId(value)) {
+      failures.push(`${label} entries must be node ids.`);
+      continue;
+    }
+    if (seen.has(value)) {
+      failures.push(`${label} entries must be unique.`);
+    }
+    seen.add(value);
+  }
+}
+
+function validateStringArray(values, label, failures) {
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  const seen = new Set();
+  for (const value of values) {
+    if (!nonEmptyString(value)) {
+      failures.push(`${label} entries must be non-empty strings.`);
+      continue;
+    }
+    if (seen.has(value)) {
+      failures.push(`${label} entries must be unique.`);
+    }
+    seen.add(value);
+  }
+}
+
+function nonEmptyString(value) {
+  return typeof value === "string" && value.length > 0;
+}
+
+function isNodeId(value) {
+  return typeof value === "string" && /^[a-z][a-z0-9-]*(?::[a-z0-9-]+)?$/.test(value);
+}
+
+function formatSummaryValue(value) {
+  if (typeof value === "bigint") return `${value.toString()}n`;
+  if (typeof value === "symbol") return value.toString();
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
 }
 
 function uniqueSorted(values) {
