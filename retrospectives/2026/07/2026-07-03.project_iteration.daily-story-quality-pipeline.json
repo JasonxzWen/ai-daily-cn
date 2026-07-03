@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-03.project_iteration.daily-story-quality-pipeline",
+  "run_type": "project_iteration",
+  "date": "2026-07-03",
+  "title": "Daily story quality pipeline and public copy reset",
+  "slug": "daily-story-quality-pipeline",
+  "status": "completed",
+  "summary": "This iteration repaired the AI daily public reader surface after the generation workflow returned to the main path but still shipped source-first prose and frontend regressions. It adds a root design contract, a staged Codex CLI pipeline with isolated collect/admit/summarize/assemble phases, stricter public-copy gates, page-check coverage for navigation/layout/style, GitHub and Hugging Face summary guards, active automation workflow validation, and regenerated public artifacts for the latest affected reports.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "npm run validate",
+      "node --test tests/daily-codex-pipeline.test.js",
+      "npm run workflow:validate",
+      "npm run content:contract",
+      "npm run quality:page-check -- --date 2026-06-30 --output .tmp/page-check-2026-06-30-final-after-copy.json",
+      "npm run quality:page-check -- --date 2026-07-01 --output .tmp/page-check-2026-07-01-final-after-copy.json",
+      "npm run quality:page-check -- --date 2026-07-02 --output .tmp/page-check-2026-07-02-final-after-copy.json",
+      "npm run daily:codex-pipeline -- --date 2026-07-02 --dry-run --work-dir .tmp/daily-codex-pipeline-final-dry-run-3",
+      "node scripts/run-daily-codex-pipeline.mjs --date 2026-07-02 --dry-run --publish=false --work-dir .tmp/daily-codex-pipeline-final-publish-false-check",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Admission rationale and reader summaries must run as separate workflow products.",
+      "evidence": "The new daily Codex pipeline has separate collect, admit, per-item summarize, assemble, source audit, validation, and publish verification stages.",
+      "scope": "daily_generation_pipeline",
+      "persistence": "implemented",
+      "recommended_action": "Keep public summaries generated and reviewed independently from selection scoring and source audit artifacts."
+    },
+    {
+      "lesson": "Reader-facing copy regressions need artifact-level gates, not only prompt wording.",
+      "evidence": "The public content contract now rejects source-first labels, machine-audit wording, GitHub/Hugging Face metric templates, and known bad truncation patterns across recent public artifacts.",
+      "scope": "public_daily_copy",
+      "persistence": "implemented",
+      "recommended_action": "Extend the banned-pattern fixtures whenever a user flags a new concrete public prose regression."
+    },
+    {
+      "lesson": "Frontend style regressions need a durable design source and browser-backed checks.",
+      "evidence": "DESIGN.md now defines the daily report layout contract, and page-check/e2e tests cover left-rail hierarchy, expanded story cells, tag hover/style, source icon sizing, and typography-sensitive layout.",
+      "scope": "public_daily_frontend",
+      "persistence": "implemented",
+      "recommended_action": "Treat any renderer or effective-interact style change as requiring page-check plus screenshot review for the latest affected report."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The active automation keeps a temporary legacy fallback until this branch reaches main.",
+      "evidence": "The active ai-2 prompt prefers daily:codex-pipeline but falls back to the old daily runner when the new script is not present on main.",
+      "module": "active_daily_publish_automation_prompt",
+      "suggestion": "After merging this branch, run the next scheduled dry run or manual smoke to confirm automation_pipeline_mode is daily_codex_pipeline.",
+      "expected_benefit": "Confirms the daily automation is using the independently debuggable pipeline rather than the compatibility path.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Next daily automation status check.",
+      "ledger_links": [
+        "feedback/p1-reader-summary-independent-pipeline",
+        "feedback/p1-daily-resilience-contract"
+      ],
+      "validation_evidence": [
+        "npm run workflow:validate",
+        "daily codex pipeline dry run"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-public-daily-content-contract",
+    "feedback/p1-story-centered-daily-contract",
+    "feedback/p1-public-surface-diet-source-reset",
+    "feedback/p1-public-daily-not-machine-log",
+    "feedback/p1-public-reader-section-quality",
+    "feedback/p1-public-daily-followup-contracts",
+    "feedback/p1-reader-summary-independent-pipeline",
+    "feedback/p1-feedback-memory-self-check"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "After merge, confirm the active automation summary reports automation_pipeline_mode=daily_codex_pipeline and contains completed_stages from the new runner.",
+      "owner": "project"
+    }
+  ]
+}

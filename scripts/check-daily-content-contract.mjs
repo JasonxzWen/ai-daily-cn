@@ -8,13 +8,12 @@ const REQUIRED_GITHUB_LANGUAGES = ["all", "Python", "TypeScript", "Rust", "Go", 
 const DEFAULT_DATA_INPUT = "reports-data";
 const DEFAULT_HTML_INPUT = path.join("docs", "reports");
 const DEFAULT_LATEST_COUNT = 3;
-const MAIN_FILLER_PATTERN = /材料覆盖|边界落在|后续观察|读者可核对|可继续关注|本轮材料|信息较为有限|公开描述提到|需要结合/i;
-const HOT_BLOG_FILLER_PATTERN = /原文说明|读者可核对|继续留意|本文可作为|信息较为有限|后续观察|可继续关注|材料覆盖/i;
-const GITHUB_FILLER_PATTERN = /公开描述提到|进入 GitHub Trending|需要结合仓库页面确认|优先核对 README|实现线索|值得关注的项目/i;
+const MAIN_FILLER_PATTERN = /材料覆盖|边界落在|后续观察|读者可核对|可继续关注|本轮材料|信息较为有限|公开描述提到|需要结合|已披露事实集中在|已披露细节覆盖|公开材料仍需要回到原文核对|更新agent\s*工作流和开发工具能力|更新AI\s*产品、平台或工程实践|当前公开的是代码接口|当前公开的是实验设置|这会影响研发团队是否|这会影响产品团队判断|这会改变模型和平台团队/i;
+const HOT_BLOG_FILLER_PATTERN = /原文说明|读者可核对|继续留意|本文可作为|信息较为有限|后续观察|可继续关注|材料覆盖|\u66f4\u6709\u4ef7\u503c\u7684\u4fe1\u606f\u662f|\u5224\u65ad\u8fd9\u7c7b\u65b9\u6848\u65f6\u8fd8\u8981\u770b|\u6587\u7ae0\u68b3\u7406\u4e00\u4e2a AI \u4ea7\u54c1|\u6587\u7ae0\u62c6\u89e3 agent/i;
+const GITHUB_FILLER_PATTERN = /公开描述提到|进入 GitHub Trending|需要结合仓库页面确认|优先核对 README|实现线索|值得关注的项目|本轮开源榜单|公开页面显示|读者应看项目说明|公开信息只能说明开发者关注度增加|这类项目不应只看星标变化/i;
 const TRACKING_FAKE_PATTERN = /openrouter-mini-card|artificial-analysis-mini-card|local_simplified|simplified_metric|simplified_bars|fake benchmark|toy component/i;
-const PUBLIC_COPY_GATE_START_DATE = "2026-07-01";
+const PUBLIC_COPY_GATE_START_DATE = "2026-06-30";
 const PUBLIC_COPY_BANNED_TERMS = [
-  "披露",
   "准入门槛",
   "候选池",
   "信源审计",
@@ -34,11 +33,61 @@ const PUBLIC_COPY_BANNED_TERMS = [
   "更新 AI 产品、平台或工程实践",
   "\u66f4\u65b0AI \u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b",
   "\u66f4\u65b0 AI \u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b",
+  "说明 AI 产品、平台或工程变化",
+  "内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界",
+  "公开材料仍需要回到原文核对入口",
+  "仍需要回到原文核对入口",
+  "今天最值得看的主线有",
+  "信号集中在",
+  "价值集中在",
+  "可用于比较",
+  "接口形态",
+  "可用于了解项目代码入口",
+  "同类方案差异",
+  "面向AI 工程实践的开源项目",
+  "面向 AI 工程实践的开源项目",
+  "README 显示核心能力",
+  "给出README 说明和使用入口",
+  "给出 README 说明和使用入口",
+  "读者应先确认快速开始",
+  "这类项目适合先从最小示例复现",
+  "测试或评估资产",
   "README 主要围绕",
   "阅读时先看",
   "需要结合仓库页面确认",
   "进入 GitHub Trending Top",
-  "今天进入 GitHub Trending"
+  "今天进入 GitHub Trending",
+  "本轮开源榜单",
+  "公开页面显示",
+  "读者应看项目说明",
+  "公开信息只能说明开发者关注度增加",
+  "这类项目不应只看星标变化",
+  "面向agent 工作流和自动化工程",
+  "面向 agent 工作流和自动化工程",
+  "核心能力是",
+  "沉淀为代码、示例和集成入口",
+  "方便和同类方案做功能与工程成本比较",
+  "热度指标是",
+  "页面还标出",
+  "\u672c\u5468\u699c\u5355\u8bb0\u5f55",
+  "downloads\u3001likes",
+  "\u793e\u533a\u4f7f\u7528\u70ed\u5ea6",
+  "\u5931\u8d25\u6062\u3002",
+  "\u914d\u5408\u3002\u6210\u672c",
+  "published this intermediary lead entry",
+  "This is an intermediary/self-media lead",
+  "This is an intermediary/self-media le",
+  "trace it to a primary source",
+  "\u66f4\u6709\u4ef7\u503c\u7684\u4fe1\u606f\u662f",
+  "\u5224\u65ad\u8fd9\u7c7b\u65b9\u6848\u65f6\u8fd8\u8981\u770b",
+  "\u6587\u7ae0\u68b3\u7406\u4e00\u4e2a AI \u4ea7\u54c1",
+  "\u6587\u7ae0\u62c6\u89e3 agent",
+  "\u5df2\u62ab\u9732\u4e8b\u5b9e\u96c6\u4e2d\u5728",
+  "\u5df2\u62ab\u9732\u7ec6\u8282\u8986\u76d6",
+  "\u516c\u5f00\u6750\u6599\u4ecd\u9700\u8981\u56de\u5230\u539f\u6587\u6838\u5bf9",
+  "\u66f4\u65b0agent \u5de5\u4f5c\u6d41\u548c\u5f00\u53d1\u5de5\u5177\u80fd\u529b",
+  "\u66f4\u65b0AI \u4ea7\u54c1\u3001\u5e73\u53f0\u6216\u5de5\u7a0b\u5b9e\u8df5",
+  "No previous component snapshot was available for comparison."
 ];
 const PUBLIC_COPY_BANNED_PATTERN = new RegExp(PUBLIC_COPY_BANNED_TERMS.map(escapeRegExp).join("|"), "i");
 
@@ -372,6 +421,34 @@ function checkMainItems(report, issues) {
       examples: failing.slice(0, 3).map((item) => textValue(item?.title) || textValue(item?.url))
     }));
   }
+
+  const unauthoredSummaries = mainItems.filter((item) => mainItemSummaryNotAuthored(item));
+  if (unauthoredSummaries.length > 0) {
+    issues.push(blockingIssue({
+      code: "main_news_summary_not_authored",
+      requirement: "REQ-001",
+      section: "main_items",
+      message: "Main news summaries must be reader-facing news copy, not a title repeat, repo slug, or nearly empty placeholder.",
+      count: unauthoredSummaries.length,
+      examples: unauthoredSummaries.slice(0, 5).map((item) => textValue(item?.title) || textValue(item?.url))
+    }));
+  }
+}
+
+function mainItemSummaryNotAuthored(item) {
+  const title = normalizeWhitespace(textValue(item?.title)).replace(/[。.!！?？\s]+$/u, "").toLowerCase();
+  const summary = normalizeWhitespace(textValue(item?.summary)).replace(/[。.!！?？\s]+$/u, "");
+  const normalizedSummary = summary.toLowerCase();
+  if (!summary) {
+    return true;
+  }
+  if (title && normalizedSummary === title) {
+    return true;
+  }
+  if (/^[\w.-]+\/[\w.-]+$/u.test(summary)) {
+    return true;
+  }
+  return chineseCharCount(summary) < 18;
 }
 
 function checkGitHubTrending(report, issues) {
@@ -668,7 +745,7 @@ function collectPublicItemFields(fields, basePath, item) {
 }
 
 function isInternalPublicCopyKey(key) {
-  return /^(?:candidate_id|source_audit|self_check|quality_status|selection_snapshot|debug|raw|notes|status|source_id|rule_id|verification_status|verification_note|matched_terms|included_in|published_by|degraded_sections|evidence_assets)$/i.test(String(key || ""));
+  return /^(?:candidate_id|source_audit|self_check|quality_status|selection_snapshot|debug|raw|notes|status|source_id|rule_id|verification_status|verification_note|matched_terms|included_in|published_by|degraded_sections|evidence|evidence_assets)$/i.test(String(key || ""));
 }
 
 function pushPublicText(fields, pathName, value) {
@@ -1020,6 +1097,7 @@ function selfTestReport() {
         title: "Content platform signal",
         url: "https://example.com/news",
         source: "Example",
+        summary: "平台发布新的个性化控制功能，并披露内容分发入口出现可观察变化。对产品和内容团队来说，这会影响用户停留、创作者分发和广告库存，需要继续跟踪推荐权重和功能使用数据。",
         bullets: [
           "平台发布新的个性化控制功能，并披露关键增长数据，说明内容分发入口正在发生可观察变化。",
           "该变化会影响用户停留、创作者分发和广告库存，产品与内容团队需要跟踪后续推荐权重。"

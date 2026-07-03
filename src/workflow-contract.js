@@ -151,7 +151,13 @@ async function validateExternalAutomationPrompt({ contract, options, failures, w
   const external = contract.external_automation_prompt;
   if (!external) return;
 
-  const automationPromptPath = options.automationPromptPath || defaultAutomationPromptPath();
+  const automationPromptPath = options.automationPromptPath || await resolveExternalAutomationPromptPath({
+    contract,
+    external,
+    options,
+    warnings,
+    checkedFiles
+  });
   if (!automationPromptPath) return;
 
   try {
@@ -173,6 +179,30 @@ async function validateExternalAutomationPrompt({ contract, options, failures, w
       failures.push(`${automationPromptPath}: forbidden marker still present ${JSON.stringify(marker)}.`);
     }
   }
+}
+
+async function resolveExternalAutomationPromptPath({ contract, external, options, warnings, checkedFiles }) {
+  if (external.target === "active_daily_publish") {
+    const inventory = await inspectAutomationInventory({
+      automationsDir: options.automationsDir,
+      projectCwds: external.project_cwds || contract.external_automation_inventory?.project_cwds || options.projectCwds
+    });
+    if (!inventory.available) {
+      warnings.push(`external automation inventory not found for prompt target: ${inventory.automations_dir || inventory.error}`);
+      return "";
+    }
+    for (const automation of inventory.automations || []) {
+      checkedFiles.push(toPortablePath(automation.path));
+    }
+    const activePublish = inventory.active_publish_automations || [];
+    if (activePublish.length !== 1 || !activePublish[0]?.path) {
+      warnings.push(`external automation prompt target active_daily_publish expected one active publish automation, found ${activePublish.length}.`);
+      return "";
+    }
+    return activePublish[0].path;
+  }
+
+  return defaultAutomationPromptPath();
 }
 
 async function readTextOrFailure(filePath, failures) {

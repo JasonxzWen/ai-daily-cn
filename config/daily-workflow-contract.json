@@ -1,19 +1,18 @@
 {
   "schema_version": 1,
-  "name": "codex-native-daily-runner",
+  "name": "codex-native-daily-pipeline",
   "daily_runner": {
-    "script": "daily:run",
+    "script": "daily:codex-pipeline",
+    "legacy_script": "daily:run",
     "launcher_only": true,
     "summary_path_template": ".tmp/run-summary-YYYY-MM-DD.json",
     "modes": {
       "dry_run": {
         "publish_allowed": false,
-        "max_review_repair_loops": 1,
         "terminal_status": "generated_only"
       },
       "publish": {
         "publish_allowed": true,
-        "max_review_repair_loops": 5,
         "terminal_status": "published"
       }
     },
@@ -26,6 +25,7 @@
     "blocking_issue": "multiple_active_daily_publish_automations"
   },
   "required_package_scripts": {
+    "daily:codex-pipeline": "node scripts/run-daily-codex-pipeline.mjs",
     "daily:run": "node src/cli.js daily:run",
     "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
     "workflow:validate": "node scripts/validate-daily-workflow-contract.mjs",
@@ -40,11 +40,12 @@
     {
       "path": "tasks/daily-publish-runbook.md",
       "contains": [
-        "npm run daily:run",
+        "npm run daily:codex-pipeline",
+        "--execute",
+        "--publish",
+        "completed_stages",
         "publish:dry-run:daily",
         ".tmp/run-summary-YYYY-MM-DD.json",
-        "quality-ai-repair-YYYY-MM-DD.json",
-        "status:\"ready\"",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
@@ -52,15 +53,18 @@
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         "21:30",
-        "multiple_active_daily_publish_automations",
-        "--restart",
-        "max 5"
+        "multiple_active_daily_publish_automations"
       ]
     },
     {
       "path": "prompts/ai-daily/modules/publish-workflow.md",
       "contains": [
-        "npm run daily:run",
+        "npm run daily:codex-pipeline",
+        "--execute",
+        "--publish",
+        "completed_stages",
+        ".tmp/daily-codex-pipeline/YYYY-MM-DD",
+        "legacy_daily_run_compatibility",
         "publish:dry-run:daily",
         "sources:phase5-audit",
         "status:self-check",
@@ -70,15 +74,17 @@
         "infrastructure_blocked_after_fallback_exhausted",
         ".tmp/run-summary-YYYY-MM-DD.json",
         "next_action",
-        "Codex-native runner",
-        "status:\"ready\"",
-        "--restart"
+        "Codex-native runner"
       ]
     },
     {
       "path": "docs/codex-automation-setup.md",
       "contains": [
-        "npm run daily:run",
+        "npm run daily:codex-pipeline",
+        "--execute",
+        "--publish",
+        "completed_stages",
+        ".tmp/daily-codex-pipeline/YYYY-MM-DD",
         "publish:dry-run:daily",
         "sources:phase5-audit",
         "status:self-check",
@@ -89,15 +95,17 @@
         "21:30",
         "multiple_active_daily_publish_automations",
         ".tmp/run-summary-YYYY-MM-DD.json",
-        "next_action",
-        "status:\"ready\"",
-        "--restart"
+        "next_action"
       ]
     },
     {
       "path": "tasks/templates/daily-publish-task.md",
       "contains": [
-        "npm run daily:run",
+        "npm run daily:codex-pipeline",
+        "--execute",
+        "--publish",
+        "completed_stages",
+        ".tmp/daily-codex-pipeline/YYYY-MM-DD",
         "publish:dry-run:daily",
         "sources:phase5-audit",
         "status:self-check",
@@ -105,18 +113,47 @@
         "npm run resilience:validate",
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
-        ".tmp/run-summary-YYYY-MM-DD.json",
-        "status:\"ready\"",
-        "--restart"
+        ".tmp/run-summary-YYYY-MM-DD.json"
+      ]
+    }
+  ],
+  "forbidden_markers": [
+    {
+      "path": "docs/codex-automation-setup.md",
+      "not_contains": [
+        "source_reset_preflight",
+        "codex_ai_repair_contract"
+      ]
+    },
+    {
+      "path": "tasks/daily-publish-runbook.md",
+      "not_contains": [
+        "source_reset_preflight",
+        "codex_ai_repair_contract"
+      ]
+    },
+    {
+      "path": "tasks/templates/daily-publish-task.md",
+      "not_contains": [
+        "source_reset_preflight",
+        "codex_ai_repair_contract"
       ]
     }
   ],
   "external_automation_prompt": {
+    "target": "active_daily_publish",
     "contains": [
-      "node src/cli.js daily:run",
+      "npm run daily:codex-pipeline",
+      "--execute",
+      "--publish",
       ".tmp/run-summary-YYYY-MM-DD.json",
-      "next_action",
+      "completed_stages",
+      "automation_pipeline_mode",
       "publish:dry-run:daily"
+    ],
+    "not_contains": [
+      "publish:prepare-worktree",
+      "npm run publish:dry-run --"
     ]
   },
   "external_automation_inventory": {

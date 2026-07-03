@@ -64,7 +64,8 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     publicImageMinHeight,
     publicImageMinArea,
     publicSurfaceDietStartReportDate,
-    publicSurfaceDietStartGeneratedAt
+    publicSurfaceDietStartGeneratedAt,
+    expectedQualityStatus
   }) => {
     const checks = [];
     const issues = [];
@@ -97,17 +98,29 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     const trackSections = Array.from(document.querySelectorAll("[id^='section-track-']"));
     const storyPanels = Array.from(document.querySelectorAll("details.collapsible-panel[id^='section-story-']"));
     const collapsedStoryPanels = storyPanels.filter((panel) => !panel.open);
-    const storyPanelWithTeaser = storyPanels.some((panel) =>
-      Boolean(panel.querySelector(".collapsible-subtitle")?.textContent?.trim())
-    );
     const trackText = trackSections.map((node) => (node.textContent || "").trim()).join("");
+    const trackSectionsWithStoryLists = trackSections.filter((node) => {
+      const text = node.textContent || "";
+      return node.querySelectorAll(".rendered-markdown li").length >= 2 && /来源[:：]/.test(text);
+    });
+    const weakStoryBullets = trackSections.flatMap((section, sectionIndex) =>
+      Array.from(section.querySelectorAll(".rendered-markdown li"))
+        .map((item, bulletIndex) => ({
+          section: section.id || sectionIndex,
+          index: bulletIndex,
+          text: item.textContent?.replace(/\s+/g, " ").trim() || ""
+        }))
+        .filter((item) => item.text && !/^来源[:：]/.test(item.text) && item.text.length < 12)
+    );
+    const visibleBackendLabels = /发生了什么[:：]|为什么值得看[:：]/.test(trackText);
     const promptLayerTheme = document.documentElement.getAttribute("data-ai-daily-theme") === "promptlayer-inspired";
     const ticketCards = document.querySelectorAll(".main-ticket-card, .main-ticket-card-grid, #section-main-signal-cards").length;
     const storyFirstOk = trackSections.length >= 1 &&
       Boolean(trackText) &&
-      storyPanels.length >= 1 &&
-      collapsedStoryPanels.length >= 1 &&
-      storyPanelWithTeaser &&
+      storyPanels.length === 0 &&
+      trackSectionsWithStoryLists.length >= 1 &&
+      weakStoryBullets.length === 0 &&
+      !visibleBackendLabels &&
       !legacyTriple;
     addCheck(
       "today_must_read_not_required",
@@ -120,14 +133,16 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     addCheck(
       "story_first_sections_expanded",
       !compactMainList && storyFirstOk && !promptLayerTheme && ticketCards === 0,
-      "The public page should group stories into editorial track sections with per-story collapsible detail, not the legacy 今日判断/趋势主题/今日主线 triple.",
+      "The public page should group stories into expanded editorial track cells, not default-collapsed per-story panels or the legacy 今日判断/趋势主题/今日主线 triple.",
       {
         compact_list_present: Boolean(compactMainList),
         legacy_triple_present: Boolean(legacyTriple),
         track_sections: trackSections.length,
         story_panels: storyPanels.length,
         collapsed_story_panels: collapsedStoryPanels.length,
-        story_panel_with_teaser: storyPanelWithTeaser,
+        track_sections_with_story_lists: trackSectionsWithStoryLists.length,
+        weak_story_bullets: weakStoryBullets.slice(0, 8),
+        visible_backend_labels: visibleBackendLabels,
         promptlayer_theme: promptLayerTheme,
         ticket_cards: ticketCards
       }
@@ -176,6 +191,16 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       { label: "AI 工程工具方向的开源项目观察", test: () => bodyText.includes("AI 工程工具方向的开源项目观察") },
       { label: "今天进入 GitHub Trending Top 10", test: () => bodyText.includes("今天进入 GitHub Trending Top 10") },
       { label: "进入 GitHub Trending Top 10", test: () => bodyText.includes("进入 GitHub Trending Top 10") },
+      { label: "本轮开源榜单", test: () => bodyText.includes("本轮开源榜单") },
+      { label: "公开页面显示", test: () => bodyText.includes("公开页面显示") },
+      { label: "读者应看项目说明", test: () => bodyText.includes("读者应看项目说明") },
+      { label: "公开信息只能说明开发者关注度增加", test: () => bodyText.includes("公开信息只能说明开发者关注度增加") },
+      { label: "这类项目不应只看星标变化", test: () => bodyText.includes("这类项目不应只看星标变化") },
+      { label: "面向AI 工程实践的开源项目", test: () => bodyText.includes("面向AI 工程实践的开源项目") },
+      { label: "README 显示核心能力", test: () => bodyText.includes("README 显示核心能力") },
+      { label: "给出README 说明和使用入口", test: () => bodyText.includes("给出README 说明和使用入口") },
+      { label: "读者应先确认快速开始", test: () => bodyText.includes("读者应先确认快速开始") },
+      { label: "这类项目适合先从最小示例复现", test: () => bodyText.includes("这类项目适合先从最小示例复现") },
       { label: "序号 1", test: () => bodyText.includes("序号 1") },
       { label: "序号 2", test: () => bodyText.includes("序号 2") },
       { label: "序号 3", test: () => bodyText.includes("序号 3") },
@@ -200,6 +225,99 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "inline_highlights_rendered",
       document.querySelectorAll(".text-keyword, .text-highlight, .keyword-major, .keyword-notable, .keyword-general, .daily-tag, .tag-highlight, .tag-stars, .tag-topic, .tag-major, .tag-notable, .tag-general").length > 0,
       "Inline highlights and typed tags should render as styled elements."
+    );
+    const iconSizeViolations = Array.from(document.querySelectorAll("main img.inline-site-icon, main img.card-title-icon"))
+      .map((image) => {
+        const box = image.getBoundingClientRect();
+        return {
+          width: Math.round(box.width),
+          height: Math.round(box.height),
+          alt: image.getAttribute("alt") || "",
+          src: image.getAttribute("src") || ""
+        };
+      })
+      .filter((image) => image.width > 22 || image.height > 22);
+    addCheck(
+      "source_icon_size_stable",
+      iconSizeViolations.length === 0,
+      "Source and avatar icons should stay compact in titles and markdown, not dominate the text.",
+      { oversized_icons: iconSizeViolations.slice(0, 8) }
+    );
+    const chipStyleViolations = Array.from(document.querySelectorAll(".chip, .text-highlight, .daily-tag, .tag-topic, .tag-major, .tag-notable"))
+      .map((chip) => {
+        const style = getComputedStyle(chip);
+        return {
+          text: chip.textContent?.replace(/\s+/g, " ").trim().slice(0, 80) || "",
+          font_size: Number.parseFloat(style.fontSize || "0"),
+          background: style.backgroundColor,
+          transition: style.transitionProperty
+        };
+      })
+      .filter((chip) => chip.font_size > 14 || chip.background === "rgba(0, 0, 0, 0)" || chip.background === "transparent");
+    addCheck(
+      "tag_visual_treatment_stable",
+      chipStyleViolations.length === 0,
+      "Tags and chips should retain compact typography and visible color treatment.",
+      { weak_tags: chipStyleViolations.slice(0, 8) }
+    );
+    const requiredNavGroups = [
+      ["#section-track-industry", "正文主线"],
+      ["#section-github-trending", "开源与模型"],
+      ["#section-trend-tracking", "趋势追踪"],
+      ["#section-subscribed-rss", "媒体与订阅"]
+    ];
+    const desktopLeftNav = window.innerWidth >= 761;
+    const navGroupIssues = requiredNavGroups
+      .map(([href, label]) => {
+        const anchor = document.querySelector(`.report-nav a[href="${href}"]`);
+        if (!anchor) return { href, label, missing: true };
+        const before = getComputedStyle(anchor, "::before").content.replace(/^["']|["']$/g, "");
+        return before === label ? null : { href, label, before };
+      })
+      .filter(Boolean);
+    const navTrackAnchors = Array.from(document.querySelectorAll(".report-nav a[href^=\"#section-track-\"]"));
+    const navSubAnchors = Array.from(document.querySelectorAll(".report-nav a"))
+      .filter((anchor) => !anchor.getAttribute("href")?.startsWith("#section-track-"))
+      .filter((anchor) => anchor.offsetParent !== null);
+    const navSubStyleOk = navTrackAnchors.length === 0 || navSubAnchors.length === 0 || navSubAnchors.every((anchor) => {
+      const style = getComputedStyle(anchor);
+      const trackStyle = getComputedStyle(navTrackAnchors[0]);
+      return Number.parseFloat(style.fontSize || "0") <= Number.parseFloat(trackStyle.fontSize || "0") &&
+        Number.parseFloat(style.paddingLeft || "0") >= Number.parseFloat(trackStyle.paddingLeft || "0");
+    });
+    addCheck(
+      "left_nav_group_hierarchy",
+      !desktopLeftNav || (navGroupIssues.length === 0 && navSubStyleOk),
+      "Left navigation should visibly separate top-level report groups from subsection anchors.",
+      {
+        desktop_left_nav: desktopLeftNav,
+        group_issues: navGroupIssues,
+        track_anchor_count: navTrackAnchors.length,
+        visible_sub_anchor_count: navSubAnchors.length,
+        sub_style_ok: navSubStyleOk
+      }
+    );
+    const expectedQuality = String(expectedQualityStatus || "").trim();
+    const pageStatus = document.documentElement.getAttribute("data-status") || "";
+    const toolbarText = document.querySelector("#report-top .toolbar")?.textContent?.replace(/\s+/g, " ").trim() || "";
+    const statusPill = document.querySelector("#report-top .toolbar .status-pill");
+    const statusPillClass = statusPill?.getAttribute("class") || "";
+    const expectedLabel = expectedQuality === "blocked" ? "阻塞" : expectedQuality === "degraded" ? "降级" : "";
+    const qualityStatusOk = !["degraded", "blocked"].includes(expectedQuality) || (
+      pageStatus === expectedQuality &&
+      toolbarText.includes(`状态：${expectedLabel}`) &&
+      (expectedQuality === "blocked" ? statusPillClass.includes("status-danger") : statusPillClass.includes("status-warn"))
+    );
+    addCheck(
+      "report_quality_status_visible",
+      qualityStatusOk,
+      "Degraded or blocked source data should render a matching visible status on the single report page.",
+      {
+        expected_quality_status: expectedQuality,
+        html_status: pageStatus,
+        toolbar_text: toolbarText,
+        status_pill_class: statusPillClass
+      }
     );
     addCheck(
       "project_cards_absent",
@@ -568,7 +686,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       "X/Twitter builder cards should render the original post text in the body, not a translated/generic summary with the original buried in details.",
       { weak_cards: weakBuilderCards }
     );
-    const internalReviewLanguageRe = /(?:待确认|Treat this as a community lead|unless it is backed by a primary source|仅作(?:发现|社区)?线索|仅作为?线索|事实性结论(?:仍需|需要)|不得仅凭该线索写入主体|(?:不进入|未进入)\s*AI\s*主体事实|当前作为[^。；;\n]*(?:线索|观察)|这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)|边界\s*[：:])/i;
+    const internalReviewLanguageRe = /(?:待确认|Treat this as a community lead|unless it is backed by a primary source|published this intermediary lead entry|This is an intermediary\/self-media le|trace it to a primary source|仅作(?:发现|社区)?线索|仅作为?线索|事实性结论(?:仍需|需要)|不得仅凭该线索写入主体|(?:不进入|未进入)\s*AI\s*主体事实|当前作为[^。；;\n]*(?:线索|观察)|这是[^。；;\n]*(?:线索|观察)[^。；;\n]*(?:不进入|未进入)|边界\s*[：:])/i;
     const internalReviewTextHits = Array.from(document.querySelectorAll(".interactive-card > p, .interactive-card .card-detail-list dd"))
       .map((node, index) => ({
         index,
@@ -614,6 +732,36 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       weakCommunityCards.length === 0,
       "Community cards should render Chinese reader-facing summaries, not raw English excerpts.",
       { weak_cards: weakCommunityCards }
+    );
+    const weakChineseMediaCards = Array.from(document.querySelectorAll(".interactive-card.blog-card.chinese-media-card"))
+      .map((card, index) => {
+        const bodyText = card.querySelector(":scope > p")?.textContent?.replace(/\s+/g, " ").trim() || "";
+        const plain = bodyText.replace(/[#*_=`~]/g, "").trim();
+        const chineseChars = (plain.match(/\p{Script=Han}/gu) || []).length;
+        const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
+        const ratioBase = chineseChars + latinChars;
+        const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+        const fallbackLeak = /(?:published this intermediary lead entry|This is an intermediary\/self-media le|trace it to a primary source)/i.test(plain);
+        const longEnglishRun = /[A-Za-z@][A-Za-z0-9 @_,;:'"()[\]\/.!?+~`#-]{45,}/.test(plain);
+        const ok = plain.length >= 50 && chineseChars >= 24 && chineseRatio >= 0.35 && !fallbackLeak && !longEnglishRun;
+        return ok
+          ? null
+          : {
+              index,
+              title: card.querySelector("h3")?.textContent?.replace(/\s+/g, " ").trim() || "",
+              body: bodyText.slice(0, 180),
+              chinese_chars: chineseChars,
+              chinese_ratio: Number(chineseRatio.toFixed(3)),
+              fallback_leak: fallbackLeak,
+              long_english_run: longEnglishRun
+            };
+      })
+      .filter(Boolean);
+    addCheck(
+      "chinese_media_cards_reader_facing",
+      weakChineseMediaCards.length === 0,
+      "Chinese media RSS cards should expose a Chinese reader-facing summary and must not leak English intermediary boilerplate.",
+      { weak_cards: weakChineseMediaCards }
     );
     const communityAggregatorFillerHits = Array.from(document.querySelectorAll(".community-card"))
       .map((card, index) => {
@@ -825,7 +973,8 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     publicImageMinHeight: PUBLIC_CONTENT_IMAGE_MIN_HEIGHT,
     publicImageMinArea: PUBLIC_CONTENT_IMAGE_MIN_AREA,
     publicSurfaceDietStartReportDate: PUBLIC_SURFACE_DIET_START_REPORT_DATE,
-    publicSurfaceDietStartGeneratedAt: PUBLIC_SURFACE_DIET_START_GENERATED_AT
+    publicSurfaceDietStartGeneratedAt: PUBLIC_SURFACE_DIET_START_GENERATED_AT,
+    expectedQualityStatus: options.expectedQualityStatus || options.qualityStatus || ""
   });
 
   return {

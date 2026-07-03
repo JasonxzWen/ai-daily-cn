@@ -2,32 +2,32 @@
   "schema_version": 1,
   "report_date": "2026-07-02",
   "title": "AI 日报 2026-07-02",
-  "summary": "今天最值得看的主线有 Google Keyword说明 AI 产品、平台或工程变化；microsoft/HARC-Qwen2.5-7B-Instruct；Google Keyword说明 AI 产品、平台或工程变化；热门博客这轮主要看 agent 和开发工具的落地边界。",
+  "summary": "今天的主线集中在三类可执行更新：Google 把纽约 150 人 AI 教育峰会和 B3 的 Android Enterprise 案例写进公开博客；Alibaba Cloud 给出 DAS Agent + MCP Server + Dify 的跨账号数据库运维方案和云上 CI/CD 流水线；研究与模型侧则有 OpenAI 新经济分析、Claude Sonnet 5 开发者记录，以及 Microsoft HARC-Qwen2.5 模型页。",
   "hero_highlights": [
     {
-      "title": "OpenAI 新经济分析聚焦 AI 对工作和生产率的影响",
+      "title": "OpenAI 新经济分析聚焦 AI 在工作场景中的采用率",
       "url": "https://openai.com/global-affairs/new-economic-analysis/",
-      "reason": "研究价值集中在评测设置、能力边界和内部实验参照",
+      "reason": "OpenAI 把美国在职成年人工作中使用 ChatGPT 的比例与 2023 年数据对比，适合关注 AI 采纳率和生产率衡量的人先看方法和样本。",
       "what_happened": "OpenAI 发布新的经济分析，讨论 AI 在不同职业任务中的采用、生产率影响和衡量方法，并提醒读者关注样本、评估方法和现实部署差异。",
-      "why_watch": "研究价值集中在评测设置、能力边界和内部实验参照",
+      "why_watch": "OpenAI 把美国在职成年人工作中使用 ChatGPT 的比例与 2023 年数据对比，适合关注 AI 采纳率和生产率衡量的人先看方法和样本。",
       "category": "model_platform",
       "source_item_ref": "https://openai.com/global-affairs/new-economic-analysis/"
     },
     {
       "title": "B3 用 Android Enterprise 支撑安全 AI 办公",
       "url": "https://blog.google/products-and-platforms/products/android-enterprise/b3-android-enterprise/",
-      "reason": "信号集中在产品入口、采购时机和路线图影响",
+      "reason": "B3 案例把 AI 办公落到受管 Android 设备、企业移动管理和安全部署，采购方可以对照设备生命周期和合规要求。",
       "what_happened": "Google 介绍 B3 选择 Android Enterprise 支撑安全、可管理的 AI 办公设备，重点是企业移动设备管理、合规和生产力场景。",
-      "why_watch": "信号集中在产品入口、采购时机和路线图影响",
+      "why_watch": "B3 案例把 AI 办公落到受管 Android 设备、企业移动管理和安全部署，采购方可以对照设备生命周期和合规要求。",
       "category": "product_tool",
       "source_item_ref": "https://blog.google/products-and-platforms/products/android-enterprise/b3-android-enterprise/"
     },
     {
-      "title": "微软 HARC Qwen2.5 7B 指令模型上架 Hugging Face",
+      "title": "Microsoft HARC Qwen2.5 7B 指令模型上架 Hugging Face",
       "url": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct",
-      "reason": "工程价值集中在代码、权重、示例和生态复用条件",
-      "what_happened": "microsoft/HARC-Qwen2.5-7B-Instruct",
-      "why_watch": "工程价值集中在代码、权重、示例和生态复用条件",
+      "reason": "模型评估和工程团队可以进入模型卡查看任务说明、权重许可、下载限制和推理成本，再决定是否纳入 PoC。",
+      "what_happened": "Microsoft 在 Hugging Face 上架 HARC-Qwen2.5-7B-Instruct 模型页，公开入口显示其基座为 Qwen2.5-7B-Instruct。",
+      "why_watch": "模型评估和工程团队可以进入模型卡查看任务说明、权重许可、下载限制和推理成本，再决定是否纳入 PoC。",
       "category": "china_open_source_community",
       "source_item_ref": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct"
     }
@@ -35,15 +35,15 @@
   "stories": [
     {
       "story_id": "story-content-google-keyword-new-york-city-educators-and-industry-leaders-gathered-at",
-      "title": "Google Keyword Blog: Nyc AI Summit",
+      "title": "Google 与纽约教育伙伴办 AI 课堂峰会，150 名教育和行业负责人参会",
       "importance": "general",
       "trend": "AI business",
       "event_date": "2026-07-01",
       "primary_entity": "Google Keyword Blog",
       "event_type": "signal",
-      "object": "Google Keyword说明 AI 产品、平台或工程变化",
-      "what_happened": "Google Keyword说明 AI 产品、平台或工程变化，内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界，判断时还要看公开材料仍需要回到原文核对入口、权限、价格和适用范围。",
-      "why_it_matters": "教育机构和供应商把 AI 培训、课堂试点和行业合作放到同一张桌上，便于学校判断采购节奏和教师支持需求。",
+      "object": "纽约 AI 教育峰会",
+      "what_happened": "Google、New York Jobs CEO Council 和 Urban Assembly 在 Google 办公室举办 AI 教育峰会，聚集 150 名教育与行业负责人，讨论课堂 AI 培训、学校试点和产业合作。",
+      "why_it_matters": "这条更新把教育机构、供应商和学校负责人放到同一场讨论里，能帮助学校判断教师支持、课堂试点和采购节奏。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -55,15 +55,15 @@
     },
     {
       "story_id": "story-content-huggingface-microsoft-microsoft-harc-qwen2-5-7b-instruct",
-      "title": "microsoft/HARC-Qwen2.5-7B-Instruct",
+      "title": "Microsoft 在 Hugging Face 发布 HARC-Qwen2.5-7B-Instruct 模型页",
       "importance": "general",
       "trend": "open source AI",
       "event_date": "2026-07-01",
       "primary_entity": "Microsoft Hugging Face Organization",
       "event_type": "signal",
-      "object": "microsoft/HARC-Qwen2.5-7B-Instruct",
-      "what_happened": "microsoft/HARC-Qwen2.5-7B-Instruct。",
-      "why_it_matters": "开源权重进入 Hugging Face 后，研发团队可以直接评估许可、推理成本和适配难度，缩短模型 PoC 周期。",
+      "object": "HARC-Qwen2.5-7B-Instruct",
+      "what_happened": "Microsoft 在 Hugging Face 上架 HARC-Qwen2.5-7B-Instruct 模型页，公开入口显示其基座为 Qwen2.5-7B-Instruct。",
+      "why_it_matters": "模型评估和工程团队可以进入模型卡查看任务说明、权重许可、下载限制和推理成本，再决定是否纳入 PoC。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -75,15 +75,15 @@
     },
     {
       "story_id": "story-content-google-keyword-why-b3-chose-android-for-secure-ai-enabled-productivity",
-      "title": "Google Keyword Blog: B3 Android Enterprise",
+      "title": "B3 用 Android Enterprise 构建受管 AI 办公设备",
       "importance": "general",
       "trend": "AI products and developer workflow",
       "event_date": "2026-07-01",
       "primary_entity": "Google Keyword Blog",
       "event_type": "signal",
-      "object": "Google Keyword说明 AI 产品、平台或工程变化",
-      "what_happened": "Google 介绍 B3 选择 Android Enterprise 构建安全、可管理的 AI 办公体验，文章聚焦设备管理、企业部署和生产力场景。",
-      "why_it_matters": "企业移动设备的安全管理会影响 AI 办公工具是否能进入受管终端，采购方需要同步评估权限、设备生命周期和合规要求。",
+      "object": "B3 Android Enterprise 案例",
+      "what_happened": "Google 介绍 B3 选择 Android Enterprise 来部署安全、可管理的 AI 办公体验，重点落在设备注册、企业移动管理和生产力场景。",
+      "why_it_matters": "企业把 AI 办公带进受管终端时，采购方需要同时评估权限、设备生命周期、合规和远程管理成本。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -95,15 +95,15 @@
     },
     {
       "story_id": "story-content-alibaba-cloud-blog-cross-account-intelligent-database-operations-integra",
-      "title": "Alibaba Cloud发布 Claude Code agent 工具工作流",
+      "title": "Alibaba Cloud 用 DAS Agent、MCP Server 和 Dify 做跨账号数据库运维",
       "importance": "general",
       "trend": "AI products and developer workflow",
       "event_date": "2026-07-01",
       "primary_entity": "Alibaba Cloud Blog",
       "event_type": "signal",
-      "object": "Alibaba Cloud说明 Claude Code agent 工具工作流",
-      "what_happened": "Alibaba Cloud 介绍把 DAS Agent、MCP Server 与 Dify 接在一起做跨账号智能数据库运维，文章聚焦部署步骤、权限连接和数据库操作流程。",
-      "why_it_matters": "数据库运维场景显示 agent 接入企业系统时需要同时处理账号隔离、权限授予和可回放操作。",
+      "object": "跨账号智能数据库运维",
+      "what_happened": "Alibaba Cloud 介绍把 DAS Agent、MCP Server 与 Dify 连接起来，对多个阿里云账号下的数据库实例做统一智能运维。",
+      "why_it_matters": "数据库运维是 agent 接入企业系统的高风险场景，文章把账号隔离、权限连接和操作流程放到同一个方案里。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -115,15 +115,15 @@
     },
     {
       "story_id": "story-content-mit-technology-review-the-download-anthropic-launches-claude-science-and",
-      "title": "MIT Technology Review: The Download Anthropic Claude Science California Carbon Manure",
+      "title": "MIT Technology Review 简报同屏追踪 Claude Science 与加州减碳议题",
       "importance": "general",
       "trend": "AI industry",
       "event_date": "2026-07-01",
       "primary_entity": "MIT Technology Review",
       "event_type": "signal",
-      "object": "MIT Technology Review更新agent 工作流和开发工具能力",
-      "what_happened": "MIT Technology Review 的 The Download 汇总 Anthropic 推出 Claude Science，以及加州利用粪肥减碳等科技议题。",
-      "why_it_matters": "这类行业摘要把模型公司产品动作与更广泛科技政策放在一起，便于产品和研究人员判断哪些议题正在进入公共讨论。",
+      "object": "The Download 科技简报",
+      "what_happened": "MIT Technology Review 的 The Download 这期提到 Anthropic 推出 Claude Science，同时追踪加州利用粪肥减碳等科技政策议题。",
+      "why_it_matters": "这类简报能帮助读者看到模型公司产品动作如何进入更广泛的科技、医疗和气候讨论。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -135,15 +135,15 @@
     },
     {
       "story_id": "story-content-builder-simon-willison-what-s-new-in-claude-sonnet-5",
-      "title": "Simon Willison 详解 Claude Sonnet 5 的开发者体验",
+      "title": "Simon Willison 逐条记录 Claude Sonnet 5 的开发者变化",
       "importance": "general",
       "trend": "AI industry",
       "event_date": "2026-06-30",
       "primary_entity": "Simon Willison's Weblog",
       "event_type": "signal",
-      "object": "Simon Willison's Weblog说明 agent 与开发者工具能力",
-      "what_happened": "Simon Willison 记录 Claude Sonnet 5 的新变化，重点观察开发者在工具调用、上下文和代码辅助上的实际体验。",
-      "why_it_matters": "独立开发者的细节记录能帮助工程团队在正式接入前预判工具限制、迁移成本和测试重点。",
+      "object": "Claude Sonnet 5 开发者体验",
+      "what_happened": "Simon Willison 记录 Claude Sonnet 5 发布后的开发者文档变化，重点查看工具调用、上下文、代码辅助和开发体验。",
+      "why_it_matters": "独立开发者的逐条记录能帮助工程团队在正式接入前预判工具限制、迁移成本和测试重点。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -155,15 +155,15 @@
     },
     {
       "story_id": "story-content-alibaba-cloud-blog-ci-cd-pipelines-on-alibaba-cloud-complete-devops-work",
-      "title": "Alibaba Cloud 介绍云上 CI/CD 与 DevOps 工作流",
+      "title": "Alibaba Cloud 讲解云上 CI/CD 与 DevOps 流水线",
       "importance": "general",
       "trend": "AI products and developer workflow",
       "event_date": "2026-07-01",
       "primary_entity": "Alibaba Cloud Blog",
       "event_type": "signal",
-      "object": "Alibaba Cloud说明 agent 与开发者工具能力",
-      "what_happened": "Alibaba Cloud 介绍在其云上搭建 CI/CD 流水线的完整 DevOps 工作流，内容覆盖代码提交、构建、部署和流程自动化。",
-      "why_it_matters": "云厂商给出的 DevOps 路径会影响团队选择托管服务、权限配置和自动化发布方式。",
+      "object": "云上 CI/CD 流水线",
+      "what_happened": "Alibaba Cloud 介绍如何用云原生 DevOps 与容器服务搭建生产级 CI/CD 流水线，覆盖代码提交、构建、部署和流程自动化。",
+      "why_it_matters": "云厂商给出的 DevOps 路径会影响团队选择托管服务、权限配置、自动化发布方式和运维边界。",
       "evidence_level": "primary",
       "sources": [
         {
@@ -175,15 +175,15 @@
     },
     {
       "story_id": "story-content-salvatorera-ml-news-week-openai-s-new-economic-analysis",
-      "title": "ML & AI News of the Week公布模型评估和研究结果",
+      "title": "OpenAI 新经济分析称 28% 美国在职成年人用 ChatGPT 工作",
       "importance": "general",
       "trend": "AI industry",
       "event_date": "2026-07-02",
       "primary_entity": "ML & AI News of the Week",
       "event_type": "research",
-      "object": "ML & AI News of the Week说明模型评估和研究结果",
-      "what_happened": "OpenAI说明模型能力和评估方法更新，内容包括能力边界、评估设置、数据来源、使用场景和限制说明，判断时还要看结论仍要依赖可复现评测、真实任务和公开限制。",
-      "why_it_matters": "OpenAI 的经济分析为企业和研究者提供了观察 AI 对工作、生产率和劳动力调整影响的参考，但仍需要结合原文方法和样本限制使用。",
+      "object": "OpenAI 经济分析",
+      "what_happened": "OpenAI 发布新的经济分析，称美国在职成年人中用 ChatGPT 工作的比例从 2023 年 8% 升至 28%，并讨论 AI 采用率、工作任务和生产率衡量。",
+      "why_it_matters": "这份分析给企业和研究者提供了观察 AI 进入工作场景的指标，但解读时仍要结合样本、方法和实际部署差异。",
       "evidence_level": "multi_source",
       "sources": [
         {
@@ -201,7 +201,7 @@
   ],
   "main_items": [
     {
-      "title": "Google Keyword Blog: Nyc AI Summit",
+      "title": "Google 与纽约教育伙伴办 AI 课堂峰会，150 名教育和行业负责人参会",
       "editorial_category": "company_business",
       "event_date": "2026-07-01",
       "url": "https://blog.google/products-and-platforms/products/education/nyc-ai-summit/",
@@ -210,17 +210,17 @@
       "entities": [
         "Google Keyword Blog"
       ],
-      "summary": "Google Keyword说明 AI 产品、平台或工程变化，内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界，判断时还要看公开材料仍需要回到原文核对入口、权限、价格和适用范围。",
+      "summary": "Google、New York Jobs CEO Council 和 Urban Assembly 在 Google 办公室举办 AI 教育峰会，聚集 150 名教育与行业负责人，讨论课堂 AI 培训、学校试点和产业合作。",
       "bullets": [
-        "**Google Keyword说明 AI 产品、平台或工程变化**：这条信息把AI 产品、平台或工程实践落到功能变化、使用场景、接入方式、限制条件和后续部署边界，可核对信息集中在功能变化、适用场景、接入方式和限制条件。",
-        "细节包括投入方向、合作节奏、组织动作、执行安排和后续资源配置。",
-        "这会影响市场对供应商投入方向、合作优先级和组织重心的判断。"
+        "Google、New York Jobs CEO Council 和 Urban Assembly 在 Google 办公室举办 AI 教育峰会，聚集 150 名教育与行业负责人，讨论课堂 AI 培训、学校试点和产业合作。",
+        "这条更新把教育机构、供应商和学校负责人放到同一场讨论里，能帮助学校判断教师支持、课堂试点和采购节奏。",
+        "来源为 Google Keyword Blog，原文链接已保留在标题中。"
       ],
       "importance": "general",
       "image_urls": []
     },
     {
-      "title": "microsoft/HARC-Qwen2.5-7B-Instruct",
+      "title": "Microsoft 在 Hugging Face 发布 HARC-Qwen2.5-7B-Instruct 模型页",
       "editorial_category": "open_source",
       "event_date": "2026-07-01",
       "url": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct",
@@ -229,17 +229,17 @@
       "entities": [
         "Microsoft Hugging Face Organization"
       ],
-      "summary": "microsoft/HARC-Qwen2.5-7B-Instruct。",
+      "summary": "Microsoft 在 Hugging Face 上架 HARC-Qwen2.5-7B-Instruct 模型页，公开入口显示其基座为 Qwen2.5-7B-Instruct，并提供查看模型卡、权重、许可证和推理限制的入口。",
       "bullets": [
-        "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
-        "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。",
-        "**microsoft/HARC-Qwen2.5-7B-I**：microsoft/HARC-Qwen2.5-7B-Instruct。"
+        "微软在 Hugging Face 的官方模型托管页发布该模型条目，名称显示它属于 HARC 系列，并基于 Qwen2.5-7B-Instruct 指令模型。",
+        "工程团队查看模型卡时，应同时确认任务说明、权重许可、下载限制、推理成本和可商用边界。",
+        "来源为 Microsoft Hugging Face Organization，原文链接已保留在标题中。"
       ],
       "importance": "general",
       "image_urls": []
     },
     {
-      "title": "Google Keyword Blog: B3 Android Enterprise",
+      "title": "B3 用 Android Enterprise 构建受管 AI 办公设备",
       "editorial_category": "product_radar",
       "event_date": "2026-07-01",
       "url": "https://blog.google/products-and-platforms/products/android-enterprise/b3-android-enterprise/",
@@ -248,17 +248,17 @@
       "entities": [
         "Google Keyword Blog"
       ],
-      "summary": "Google Keyword说明 AI 产品、平台或工程变化，内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界，判断时还要看公开材料仍需要回到原文核对入口、权限、价格和适用范围。",
+      "summary": "Google 介绍 B3 选择 Android Enterprise 来部署安全、可管理的 AI 办公体验，重点落在设备注册、企业移动管理和生产力场景。",
       "bullets": [
-        "**Google Keyword说明 AI 产品、平台或工程变化**：这条信息把AI 产品、平台或工程实践落到功能变化、使用场景、接入方式、限制条件和后续部署边界，可核对信息集中在功能变化、适用场景、接入方式和限制条件。",
-        "当前公开的是产品入口、适用对象、价格地区限制、权限要求和后续上线节奏。",
-        "这会改变产品和采购团队安排试用、预算审批、替换工具和风险复盘的优先级。"
+        "Google 介绍 B3 选择 Android Enterprise 来部署安全、可管理的 AI 办公体验，重点落在设备注册、企业移动管理和生产力场景。",
+        "企业把 AI 办公带进受管终端时，采购方需要同时评估权限、设备生命周期、合规和远程管理成本。",
+        "来源为 Google Keyword Blog，原文链接已保留在标题中。"
       ],
       "importance": "general",
       "image_urls": []
     },
     {
-      "title": "Alibaba Cloud发布 Claude Code agent 工具工作流",
+      "title": "Alibaba Cloud 用 DAS Agent、MCP Server 和 Dify 做跨账号数据库运维",
       "editorial_category": "engineering_toolchain",
       "event_date": "2026-07-01",
       "url": "https://www.alibabacloud.com/blog/cross-account-intelligent-database-operations-integrating-das-agent-mcp-server-and-dify_603320",
@@ -267,17 +267,17 @@
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "Alibaba Cloud更新agent 工作流和开发工具能力，内容包括任务编排、上下文、权限控制、工程集成和失败恢复，实际效果还要看权限模型、评估回放、团队流程和可观测性。",
+      "summary": "Alibaba Cloud 介绍把 DAS Agent、MCP Server 与 Dify 连接起来，对多个阿里云账号下的数据库实例做统一智能运维。",
       "bullets": [
-        "**Alibaba Cloud说明 Claude Code**：这条信息把agent 工作流和开发工具能力落到任务编排、上下文、权限控制、工程集成和失败恢复，可核对信息集中在agent 工作流、开发工具入口、权限控制和工程集成。",
-        "当前公开的是部署方式、权限、上下文管理和失败恢复边界。",
-        "这会影响研发团队安排 agent 工具接入顺序、权限设计、评估回放和落地成本。"
+        "Alibaba Cloud 介绍把 DAS Agent、MCP Server 与 Dify 连接起来，对多个阿里云账号下的数据库实例做统一智能运维。",
+        "数据库运维是 agent 接入企业系统的高风险场景，文章把账号隔离、权限连接和操作流程放到同一个方案里。",
+        "来源为 Alibaba Cloud Blog，原文链接已保留在标题中。"
       ],
       "importance": "general",
       "image_urls": []
     },
     {
-      "title": "MIT Technology Review: The Download Anthropic Claude Science California Carbon Manure",
+      "title": "MIT Technology Review 简报同屏追踪 Claude Science 与加州减碳议题",
       "editorial_category": "ai_industry",
       "event_date": "2026-07-01",
       "url": "https://www.technologyreview.com/2026/07/01/1139996/the-download-anthropic-claude-science-california-carbon-manure/",
@@ -286,17 +286,17 @@
       "entities": [
         "MIT Technology Review"
       ],
-      "summary": "MIT Technology Review更新agent 工作流和开发工具能力，内容包括任务编排、上下文、权限控制、工程集成和失败恢复，实际效果还要看权限模型、评估回放、团队流程和可观测性。",
+      "summary": "MIT Technology Review 的 The Download 这期提到 Anthropic 推出 Claude Science，同时追踪加州利用粪肥减碳等科技政策议题。",
       "bullets": [
-        "**MIT Technology Review更新agen**：这条信息把agent 工作流和开发工具能力落到任务编排、上下文、权限控制、工程集成和失败恢复，可核对信息集中在agent 工作流、开发工具入口、权限控制和工程集成。",
-        "细节包括适用对象、证据来源、执行安排、后续时间表和风险边界。",
-        "这会影响产品团队判断路线优先级、接入时机、资源投入和后续风险预案。"
+        "MIT Technology Review 的 The Download 这期提到 Anthropic 推出 Claude Science，同时追踪加州利用粪肥减碳等科技政策议题。",
+        "这类简报能帮助读者看到模型公司产品动作如何进入更广泛的科技、医疗和气候讨论。",
+        "来源为 MIT Technology Review，原文链接已保留在标题中。"
       ],
       "importance": "general",
       "image_urls": []
     },
     {
-      "title": "Simon Willison 详解 Claude Sonnet 5 的开发者体验",
+      "title": "Simon Willison 逐条记录 Claude Sonnet 5 的开发者变化",
       "editorial_category": "ai_industry",
       "event_date": "2026-06-30",
       "url": "https://simonwillison.net/2026/Jun/30/claude-sonnet-5/#atom-everything",
@@ -305,17 +305,17 @@
       "entities": [
         "Simon Willison's Weblog"
       ],
-      "summary": "Simon Willison's Weblog更新agent 工作流和开发工具能力，内容包括任务编排、上下文、权限控制、工程集成和失败恢复，实际效果还要看权限模型、评估回放、团队流程和可观测性。",
+      "summary": "Simon Willison 记录 Claude Sonnet 5 发布后的开发者文档变化，重点查看工具调用、上下文、代码辅助和开发体验。",
       "bullets": [
-        "**Simon Willison's Weblog说明 a**：这条信息把agent 工作流和开发工具能力落到任务编排、上下文、权限控制、工程集成和失败恢复，可核对信息集中在agent 工作流、开发工具入口、权限控制和工程集成。",
-        "当前公开的是部署方式、权限、上下文管理和失败恢复边界。",
-        "这会影响研发团队安排 agent 工具接入顺序、权限设计、评估回放和落地成本。"
+        "Simon Willison 记录 Claude Sonnet 5 发布后的开发者文档变化，重点查看工具调用、上下文、代码辅助和开发体验。",
+        "独立开发者的逐条记录能帮助工程团队在正式接入前预判工具限制、迁移成本和测试重点。",
+        "来源为 Simon Willison's Weblog，原文链接已保留在标题中。"
       ],
       "importance": "general",
       "image_urls": []
     },
     {
-      "title": "Alibaba Cloud 介绍云上 CI/CD 与 DevOps 工作流",
+      "title": "Alibaba Cloud 讲解云上 CI/CD 与 DevOps 流水线",
       "editorial_category": "product_radar",
       "event_date": "2026-07-01",
       "url": "https://www.alibabacloud.com/blog/cicd-pipelines-on-alibaba-cloud-complete-devops-workflow_603318",
@@ -324,17 +324,17 @@
       "entities": [
         "Alibaba Cloud Blog"
       ],
-      "summary": "Alibaba Cloud更新agent 工作流和开发工具能力，内容包括任务编排、上下文、权限控制、工程集成和失败恢复，实际效果还要看权限模型、评估回放、团队流程和可观测性。",
+      "summary": "Alibaba Cloud 介绍如何用云原生 DevOps 与容器服务搭建生产级 CI/CD 流水线，覆盖代码提交、构建、部署和流程自动化。",
       "bullets": [
-        "**Alibaba Cloud说明 agent 与开发者工**：这条信息把agent 工作流和开发工具能力落到任务编排、上下文、权限控制、工程集成和失败恢复，可核对信息集中在agent 工作流、开发工具入口、权限控制和工程集成。",
-        "当前公开的是产品入口、适用对象、价格地区限制、权限要求和后续上线节奏。",
-        "这会改变产品和采购团队安排试用、预算审批、替换工具和风险复盘的优先级。"
+        "Alibaba Cloud 介绍如何用云原生 DevOps 与容器服务搭建生产级 CI/CD 流水线，覆盖代码提交、构建、部署和流程自动化。",
+        "云厂商给出的 DevOps 路径会影响团队选择托管服务、权限配置、自动化发布方式和运维边界。",
+        "来源为 Alibaba Cloud Blog，原文链接已保留在标题中。"
       ],
       "importance": "general",
       "image_urls": []
     },
     {
-      "title": "ML & AI News of the Week公布模型评估和研究结果",
+      "title": "OpenAI 新经济分析称 28% 美国在职成年人用 ChatGPT 工作",
       "editorial_category": "ai_industry",
       "event_date": "2026-07-02",
       "url": "https://openai.com/global-affairs/new-economic-analysis/",
@@ -343,11 +343,11 @@
       "entities": [
         "ML & AI News of the Week"
       ],
-      "summary": "OpenAI说明模型能力和评估方法更新，内容包括能力边界、评估设置、数据来源、使用场景和限制说明，判断时还要看结论仍要依赖可复现评测、真实任务和公开限制。",
+      "summary": "OpenAI 发布新的经济分析，称美国在职成年人中用 ChatGPT 工作的比例从 2023 年 8% 升至 28%，并讨论 AI 采用率、工作任务和生产率衡量。",
       "bullets": [
-        "**ML & AI News of the Week说明模**：这条信息把模型能力和评估方法更新落到能力边界、评估设置、数据来源、使用场景和限制说明，可核对信息集中在模型能力、评估设置、数据来源和限制说明。",
-        "当前公开的是实验设置、数据范围、对比基线、复现材料和作者承认的限制。",
-        "这会改变模型和平台团队对能力边界、推理成本、可靠性和内部实验设计的预期。"
+        "OpenAI 发布新的经济分析，称美国在职成年人中用 ChatGPT 工作的比例从 2023 年 8% 升至 28%，并讨论 AI 采用率、工作任务和生产率衡量。",
+        "这份分析给企业和研究者提供了观察 AI 进入工作场景的指标，但解读时仍要结合样本、方法和实际部署差异。",
+        "来源为 ML & AI News of the Week，原文链接已保留在标题中。"
       ],
       "importance": "general",
       "image_urls": []
@@ -357,6 +357,7 @@
     {
       "name": "xbtlin/ai-berkshire",
       "repo": "xbtlin/ai-berkshire",
+      "description": "ai-berkshire 是基于 Claude Code/Codex 的价值投资研究框架，把投资大师方法论、多 agent 对抗分析、公司资料整理和投资假设检查放进同一流程；适合关注 AI 投研的人看它如何产出可复核的研究结论与风险提示。落地时还要看数据来源、模型推理记录、投资建议边界和人工复核责任。",
       "readme_cache": {
         "key": "github-readme/xbtlin/ai-berkshire/main/unknown",
         "hit": true,
@@ -377,12 +378,12 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "importance": "notable",
-      "description": "xbtlin/ai-berkshire 当前进入 GitHub Trending weekly #1，本周 +6,758 stars。"
+      "importance": "notable"
     },
     {
       "name": "simplex-chat/simplex-chat",
       "repo": "simplex-chat/simplex-chat",
+      "description": "SimpleX Chat 是隐私即时通讯项目，重点是不用手机号或全局用户 ID 建立连接；适合关注端到端加密、去中心化通信和多端客户端工程的人看。评估时要看客户端覆盖、密钥恢复、群组能力和自托管服务的维护成本。",
       "readme_cache": {
         "key": "github-readme/simplex-chat/simplex-chat/master/unknown",
         "hit": true,
@@ -403,13 +404,12 @@
       "previous_rank": 2,
       "rank_delta": 0,
       "trend": "same",
-      "importance": "general",
-      "description": "simplex-chat/simplex-chat 当前进入 GitHub Trending weekly #2，本周 +6,289 stars。"
+      "importance": "general"
     },
     {
       "name": "calesthio/OpenMontage",
       "repo": "calesthio/OpenMontage",
-      "description": "openmontage 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、工具调用和工作流编排；项目提供部署说明，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+      "description": "OpenMontage 面向视频和多媒体剪辑自动化；适合关注 AI 辅助素材整理、片段拼接和创作工具链的读者先看输入格式、部署方式和示例。真正接入前还要核对它对素材时长、导出格式、字幕和批处理任务的支持程度。",
       "readme_cache": {
         "key": "github-readme/calesthio/openmontage/main/unknown",
         "hit": true,
@@ -435,6 +435,7 @@
     {
       "name": "google-labs-code/design.md",
       "repo": "google-labs-code/design.md",
+      "description": "design.md 是 Google Labs Code 给 coding agents 使用的设计契约规范，把视觉识别、交互约束、品牌语气和验收标准写成仓库内文档；它对本项目的启发是把前端风格、内容边界和截图验收沉到版本化设计文件，而不是留在对话记忆里。后续应把它转化为本仓库 DESIGN.md 的必检项和页面验收用例。",
       "readme_cache": {
         "key": "github-readme/google-labs-code/design.md/main/unknown",
         "hit": true,
@@ -455,12 +456,12 @@
       "previous_rank": 3,
       "rank_delta": -1,
       "trend": "down",
-      "importance": "general",
-      "description": "google-labs-code/design.md 当前进入 GitHub Trending weekly #4，本周 +7,186 stars。"
+      "importance": "general"
     },
     {
       "name": "DeusData/codebase-memory-mcp",
       "repo": "DeusData/codebase-memory-mcp",
+      "description": "codebase-memory-mcp 把代码库索引成持久知识图谱并通过 MCP 暴露查询能力，重点是多语言解析、SQLite 存储和低 token 上下文复用；适合评估 coding agent 跨会话理解架构、检索符号和避免重复读仓库的接入方式。落地时还要看索引增量更新、隐私边界、查询准确率和现有 codegraph 的重叠。",
       "readme_cache": {
         "key": "github-readme/deusdata/codebase-memory-mcp/main/unknown",
         "hit": true,
@@ -481,12 +482,12 @@
       "previous_rank": 4,
       "rank_delta": -1,
       "trend": "down",
-      "importance": "general",
-      "description": "DeusData/codebase-memory-mcp 当前进入 GitHub Trending weekly #5，本周 +9,697 stars。"
+      "importance": "general"
     },
     {
       "name": "kunchenguid/no-mistakes",
       "repo": "kunchenguid/no-mistakes",
+      "description": "no-mistakes 围绕 git push 前的失误拦截和工程预检查展开，关注点不是再写一段提示词，而是把常见错误、执行前验证和提交约束变成可运行规则；适合看 agent 工作流能否把事故复盘沉淀成自动化 guardrail。落地时应关注规则如何配置、误报怎么处理，以及是否能接进 CI 或 pre-push 钩子。",
       "readme_cache": {
         "key": "github-readme/kunchenguid/no-mistakes/main/unknown",
         "hit": true,
@@ -507,13 +508,12 @@
       "previous_rank": 5,
       "rank_delta": -1,
       "trend": "down",
-      "importance": "general",
-      "description": "kunchenguid/no-mistakes 当前进入 GitHub Trending weekly #6，本周 +2,887 stars。"
+      "importance": "general"
     },
     {
       "name": "JCodesMore/ai-website-cloner-template",
       "repo": "JCodesMore/ai-website-cloner-template",
-      "description": "ai-website-cloner-template 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建；项目提供示例，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本。",
+      "description": "ai-website-cloner-template 是用 AI coding agents 复刻网站的模板工程，覆盖抓取、页面还原和 Next.js/React 输出；前端团队更应关注布局还原、素材版权、响应式状态、组件可维护性和生成后能否进入正常工程迭代。真正使用时还要把原站授权、图片来源和设计差异审查纳入流程。",
       "readme_cache": {
         "key": "github-readme/jcodesmore/ai-website-cloner-template/master/unknown",
         "hit": true,
@@ -539,6 +539,7 @@
     {
       "name": "Robbyant/lingbot-map",
       "repo": "Robbyant/lingbot-map",
+      "description": "lingbot-map 是用于从流式数据重建场景的 feed-forward 3D foundation model，重点在连续输入下恢复空间结构；适合关注 3D 重建、实时场景理解和机器人数据管线的人检查输入模态、推理成本、可视化结果和示例可复现性。落地时还要看流式延迟、场景尺度和对真实传感器噪声的鲁棒性。",
       "readme_cache": {
         "key": "github-readme/robbyant/lingbot-map/main/unknown",
         "hit": true,
@@ -559,12 +560,12 @@
       "previous_rank": 11,
       "rank_delta": 3,
       "trend": "up",
-      "importance": "general",
-      "description": "Robbyant/lingbot-map 当前进入 GitHub Trending weekly #8，本周 +1,823 stars。"
+      "importance": "general"
     },
     {
       "name": "ripienaar/free-for-dev",
       "repo": "ripienaar/free-for-dev",
+      "description": "free-for-dev 是开发者免费资源清单，不是 AI 专项项目；上榜价值在于给原型或小团队查托管、数据库、监控等免费额度限制。它更适合作为工程采购前的成本索引，不能替代对服务条款、地区可用性和退出成本的核对。",
       "readme_cache": {
         "key": "github-readme/ripienaar/free-for-dev/master/unknown",
         "hit": true,
@@ -585,12 +586,12 @@
       "previous_rank": null,
       "rank_delta": null,
       "trend": "new",
-      "importance": "general",
-      "description": "ripienaar/free-for-dev 当前进入 GitHub Trending weekly #9，本周 +4,268 stars。"
+      "importance": "general"
     },
     {
       "name": "stablyai/orca",
       "repo": "stablyai/orca",
+      "description": "orca 是面向并行 coding agents 的 agent development environment，可在桌面和移动端调度多个 agent 与 worktree；适合评估团队如何同时运行多条编码任务、隔离会话状态、复用订阅额度，并在移动端接管长任务。关键还在于长任务中断恢复、并发结果对比和远程环境权限控制。",
       "readme_cache": {
         "key": "github-readme/stablyai/orca/main/unknown",
         "hit": true,
@@ -611,12 +612,12 @@
       "previous_rank": 9,
       "rank_delta": -1,
       "trend": "down",
-      "importance": "general",
-      "description": "stablyai/orca 当前进入 GitHub Trending weekly #10，本周 +3,537 stars。"
+      "importance": "general"
     },
     {
       "name": "browser-use/video-use",
       "repo": "browser-use/video-use",
+      "description": "video-use 是让 coding agents 参与视频编辑的 Python 项目，目标是把剪辑需求转成可执行的素材处理步骤；适合关注自动剪辑的人验证它如何描述视频任务、调用编辑工具、处理素材路径、保留中间产物并生成可复现输出。落地时还要看素材版权、渲染耗时和编辑结果是否便于人工微调。",
       "readme_cache": {
         "key": "github-readme/browser-use/video-use/main/unknown",
         "hit": true,
@@ -637,12 +638,12 @@
       "previous_rank": 13,
       "rank_delta": 1,
       "trend": "up",
-      "importance": "general",
-      "description": "browser-use/video-use 当前进入 GitHub Trending Python weekly #11，本周 +3,000 stars。"
+      "importance": "general"
     },
     {
       "name": "diegosouzapw/OmniRoute",
       "repo": "diegosouzapw/OmniRoute",
+      "description": "OmniRoute 是 AI gateway，提供统一 endpoint、模型供应商路由、token 压缩、fallback、MCP/A2A 和桌面/PWA 接入；适合工程团队评估多模型接入时的免费额度、自动降级、可靠性、隐私边界和与 Claude Code/Codex 等工具的兼容性。",
       "readme_cache": {
         "key": "github-readme/diegosouzapw/omniroute/main/unknown",
         "hit": true,
@@ -663,12 +664,12 @@
       "previous_rank": 12,
       "rank_delta": 5,
       "trend": "up",
-      "importance": "general",
-      "description": "diegosouzapw/OmniRoute 当前进入 GitHub Trending TypeScript weekly #12，本周 +2,497 stars。"
+      "importance": "general"
     },
     {
       "name": "googleworkspace/cli",
       "repo": "googleworkspace/cli",
+      "description": "Google Workspace CLI 是用一条命令操作 Drive、Gmail、Calendar、Sheets、Docs、Chat、Admin 等服务的 Rust CLI，并带 AI agent skills；适合评估企业协作系统自动化时的 OAuth 权限、审计边界、批量操作能力和 agent 工具接入方式。",
       "readme_cache": {
         "key": "github-readme/googleworkspace/cli/main/unknown",
         "hit": true,
@@ -689,13 +690,12 @@
       "previous_rank": 13,
       "rank_delta": 12,
       "trend": "up",
-      "importance": "general",
-      "description": "googleworkspace/cli 当前进入 GitHub Trending Rust weekly #13，本周 +1,126 stars。"
+      "importance": "general"
     },
     {
       "name": "IceWhaleTech/CasaOS",
       "repo": "IceWhaleTech/CasaOS",
-      "description": "casaos 是面向知识检索、上下文记忆和 RAG 应用的开源项目，核心能力是记忆或知识检索；项目提供示例，主要用于组织知识检索、上下文记忆和 RAG 应用。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+      "description": "CasaOS 是家庭服务器和自托管管理系统；与 AI 的关系更多在本地服务承载，适合查部署、插件生态和资源占用。若团队想把本地模型、检索服务或自动化任务放到自托管环境，它的账户、权限和备份能力才是重点。",
       "readme_cache": {
         "key": "github-readme/icewhaletech/casaos/main/unknown",
         "hit": true,
@@ -721,7 +721,7 @@
     {
       "name": "Stirling-Tools/Stirling-PDF",
       "repo": "Stirling-Tools/Stirling-PDF",
-      "description": "stirling-pdf 是面向agent 工作流和自动化工程的开源项目，核心能力是工具调用和工作流编排、API/SDK 适配；项目提供部署说明，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+      "description": "Stirling-PDF 是自托管 PDF 工具箱，覆盖编辑、转换、合并、OCR 等文档处理任务；对 AI 工作流的价值在于把文档拆分、压缩、转换、预处理和权限隔离留在本地环境，适合评估批处理接口和部署维护成本。如果接入 agent pipeline，应先明确文件存储、任务队列和敏感文档删除策略。",
       "readme_cache": {
         "key": "github-readme/stirling-tools/stirling-pdf/main/unknown",
         "hit": true,
@@ -747,6 +747,7 @@
     {
       "name": "commaai/openpilot",
       "repo": "commaai/openpilot",
+      "description": "openpilot 是开源驾驶辅助项目，参考价值在真实设备、感知控制链路、模型更新和长期维护实践；它不适合被简化成普通 AI 应用项目，读者更应关注硬件适配、安全边界、测试数据和道路部署责任。如果借鉴其工程模式，应关注安全验证、回滚流程和真实道路数据闭环。",
       "readme_cache": {
         "key": "github-readme/commaai/openpilot/master/unknown",
         "hit": true,
@@ -767,12 +768,12 @@
       "previous_rank": 12,
       "rank_delta": -1,
       "trend": "down",
-      "importance": "general",
-      "description": "commaai/openpilot 当前进入 GitHub Trending Python weekly #16，本周 +1,424 stars。"
+      "importance": "general"
     },
     {
       "name": "every-app/open-seo",
       "repo": "every-app/open-seo",
+      "description": "open-seo 是开源 SEO 工具，定位为 Semrush/Ahrefs 替代，覆盖关键词、反链、站点审计和 Google Search Console MCP；适合增长和内容工程团队评估数据来源、索引范围、审计准确性、自动化接入和与现有 CMS 的衔接。使用前还要确认爬取限制、搜索数据来源、反链质量和报告导出能力。",
       "readme_cache": {
         "key": "github-readme/every-app/open-seo/main/unknown",
         "hit": true,
@@ -793,12 +794,12 @@
       "previous_rank": 10,
       "rank_delta": 2,
       "trend": "up",
-      "importance": "general",
-      "description": "every-app/open-seo 当前进入 GitHub Trending TypeScript weekly #17，本周 +1,630 stars。"
+      "importance": "general"
     },
     {
       "name": "ogulcancelik/herdr",
       "repo": "ogulcancelik/herdr",
+      "description": "herdr 是终端里的 agent multiplexer，用 Rust/TUI 管理多个 coding agents 与工作区；适合评估多 agent 并行编码时的任务隔离、终端调度、会话切换、输出可见性和与 tmux/CLI 工具链的集成。真正可用性取决于任务面板、日志保留、失败恢复和与本地 worktree 策略的配合与集成成本。",
       "readme_cache": {
         "key": "github-readme/ogulcancelik/herdr/master/unknown",
         "hit": true,
@@ -819,12 +820,12 @@
       "previous_rank": 18,
       "rank_delta": 16,
       "trend": "up",
-      "importance": "general",
-      "description": "ogulcancelik/herdr 当前进入 GitHub Trending Rust weekly #18，本周 +2,401 stars。"
+      "importance": "general"
     },
     {
       "name": "voocel/ainovel-cli",
       "repo": "voocel/ainovel-cli",
+      "description": "ainovel-cli 用多 agent 自动生成 AI 小说，覆盖题材设定、大纲、章节和正文生成流程；适合内容工具团队观察长文本创作链路如何保持角色一致性、剧情连续性、人工审校入口和版权风险边界。真正产品化还要看章节记忆、风格控制、事实一致性和敏感内容处理。",
       "readme_cache": {
         "key": "github-readme/voocel/ainovel-cli/main/unknown",
         "hit": true,
@@ -845,12 +846,12 @@
       "previous_rank": 19,
       "rank_delta": 16,
       "trend": "up",
-      "importance": "general",
-      "description": "voocel/ainovel-cli 当前进入 GitHub Trending Go weekly #19，本周 +246 stars。"
+      "importance": "general"
     },
     {
       "name": "keycloak/keycloak",
       "repo": "keycloak/keycloak",
+      "description": "Keycloak 是身份与访问管理项目；它不是 AI 专项项目，但对需要把 AI 应用接入企业认证的团队仍有参考价值。评估时应看单点登录、角色权限、审计日志、部署复杂度，以及 agent 工具调用时的权限隔离和撤销能力。接入 AI 平台时还要验证服务账号、短期凭证、审计追踪和多租户隔离。",
       "readme_cache": {
         "key": "github-readme/keycloak/keycloak/main/unknown",
         "hit": true,
@@ -871,15 +872,14 @@
       "previous_rank": 20,
       "rank_delta": 18,
       "trend": "up",
-      "importance": "general",
-      "description": "keycloak/keycloak 当前进入 GitHub Trending Java weekly #20，本周 +418 stars。"
+      "importance": "general"
     }
   ],
   "huggingface_trending": [
     {
       "name": "black-forest-labs/FLUX.1-dev",
       "repo": "black-forest-labs/FLUX.1-dev",
-      "description": "black-forest-labs/FLUX.1-dev 是 Hugging Face 上的图像生成模型，热度指标是 1085982 downloads、13440 likes；页面还标出 13440 likes; 1085982 downloads; task: text-to-image。",
+      "description": "FLUX.1-dev 是图像生成模型，适合作为高质量文生图工作流里的画质、提示词和风格控制对照基线。落地时要重点核对模型卡、许可证、商业使用限制、推理成本和生成内容安全边界。",
       "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -894,7 +894,7 @@
     {
       "name": "deepseek-ai/DeepSeek-R1",
       "repo": "deepseek-ai/DeepSeek-R1",
-      "description": "deepseek-ai/DeepSeek-R1 是 Hugging Face 上的文本生成模型，热度指标是 7849894 downloads、13425 likes；页面还标出 13425 likes; 7849894 downloads; task: text-generation。",
+      "description": "DeepSeek-R1 是推理取向的文本生成模型，适合放进中文、英文复杂问答和代码推理评测里做基线。使用前要核对上下文长度、部署方式、许可证、蒸馏版本差异和真实任务上的稳定性。",
       "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -909,7 +909,7 @@
     {
       "name": "stabilityai/stable-diffusion-xl-base-1.0",
       "repo": "stabilityai/stable-diffusion-xl-base-1.0",
-      "description": "stabilityai/stable-diffusion-xl-base-1.0 是 Hugging Face 上的图像生成模型，热度指标是 1348068 downloads、7874 likes；页面还标出 7874 likes; 1348068 downloads; task: text-t...",
+      "description": "SDXL base 1.0 是成熟的图像生成基础模型，价值在于生态、插件和工作流兼容性仍然丰富。读者可把它作为 ControlNet、LoRA、ComfyUI 等链路的稳定对照，而不是只看榜单热度。",
       "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -924,7 +924,7 @@
     {
       "name": "CompVis/stable-diffusion-v1-4",
       "repo": "CompVis/stable-diffusion-v1-4",
-      "description": "CompVis/stable-diffusion-v1-4 是 Hugging Face 上的图像生成模型，热度指标是 426835 downloads、7028 likes；页面还标出 7028 likes; 426835 downloads; task: text-to-image。",
+      "description": "Stable Diffusion v1-4 是较早期但生态广泛的扩散模型，更适合作为兼容性、轻量工作流和历史基线参考。若追求最新画质，应同时比较 SDXL、FLUX 等更新模型。",
       "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -939,7 +939,7 @@
     {
       "name": "meta-llama/Meta-Llama-3-8B",
       "repo": "meta-llama/Meta-Llama-3-8B",
-      "description": "meta-llama/Meta-Llama-3-8B 是 Hugging Face 上的文本生成模型，热度指标是 1237078 downloads、6582 likes；页面还标出 6582 likes; 1237078 downloads; task: text-generation。",
+      "description": "Meta-Llama-3-8B 是 8B 级文本生成基础模型，适合做轻量部署、微调实验和本地推理基线。评估时要把显存、量化效果、许可证和指令微调版本一起看。",
       "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -954,7 +954,7 @@
     {
       "name": "hexgrad/Kokoro-82M",
       "repo": "hexgrad/Kokoro-82M",
-      "description": "hexgrad/Kokoro-82M 是 Hugging Face 上的语音或音频模型，热度指标是 14354455 downloads、6421 likes；页面还标出 6421 likes; 14354455 downloads; task: text-to-speech。",
+      "description": "Kokoro-82M 是小型语音生成模型，适合关注低成本 TTS、旁白生成和本地语音链路的人快速试验。落地前要核对语种、音色授权、延迟、音质和长文本稳定性。",
       "url": "https://huggingface.co/hexgrad/Kokoro-82M",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -969,7 +969,7 @@
     {
       "name": "meta-llama/Llama-3.1-8B-Instruct",
       "repo": "meta-llama/Llama-3.1-8B-Instruct",
-      "description": "meta-llama/Llama-3.1-8B-Instruct 是 Hugging Face 上的文本生成模型，热度指标是 9688941 downloads、6202 likes；页面还标出 6202 likes; 9688941 downloads; task: text-generatio...",
+      "description": "Llama-3.1-8B-Instruct 是 8B 级指令模型，适合做本地助手、工具调用前置评测和轻量 RAG 对话基线。使用时要重点比较指令遵循、中文效果、量化后质量和部署成本。",
       "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -984,7 +984,7 @@
     {
       "name": "openai/whisper-large-v3",
       "repo": "openai/whisper-large-v3",
-      "description": "openai/whisper-large-v3 是 Hugging Face 上的语音或音频模型，热度指标是 5797940 downloads、5902 likes；页面还标出 5902 likes; 5797940 downloads; task: automatic-speech-recog...",
+      "description": "whisper-large-v3 是多语种语音识别模型，适合会议转写、字幕、音频资料整理和语音数据预处理。真正投入生产前，要测试领域词、噪声场景、长音频切分和隐私处理。",
       "url": "https://huggingface.co/openai/whisper-large-v3",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -999,7 +999,7 @@
     {
       "name": "black-forest-labs/FLUX.1-schnell",
       "repo": "black-forest-labs/FLUX.1-schnell",
-      "description": "black-forest-labs/FLUX.1-schnell 是 Hugging Face 上的图像生成模型，热度指标是 240253 downloads、5257 likes；页面还标出 5257 likes; 240253 downloads; task: text-to-image。",
+      "description": "FLUX.1-schnell 侧重更快的图像生成体验，适合原型、批量草图和低延迟创意工作流。它应和 FLUX.1-dev 等高质量模型配合比较，重点看速度、画质和授权边界。",
       "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -1014,7 +1014,7 @@
     {
       "name": "deepseek-ai/DeepSeek-V4-Pro",
       "repo": "deepseek-ai/DeepSeek-V4-Pro",
-      "description": "deepseek-ai/DeepSeek-V4-Pro 是 Hugging Face 上的文本生成模型，热度指标是 1140384 downloads、5130 likes；页面还标出 5130 likes; 1140384 downloads; task: text-generation。",
+      "description": "DeepSeek-V4-Pro 是文本生成模型条目，适合先作为社区模型卡线索纳入观察，再用真实问答、代码和推理任务验证效果。采用前要核对来源、许可证、部署条件和与正式发布版本的关系。",
       "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
       "event_date": "2026-07-02",
       "source": "Hugging Face Trending Models",
@@ -1030,7 +1030,7 @@
   "model_releases": [],
   "hot_blogs": [
     {
-      "title": "Alibaba Cloud说明 agent 可观测平台更新",
+      "title": "Alibaba Cloud 讨论企业 agent 后半场：越用越聪明",
       "editorial_category": "viewpoint_analysis",
       "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
       "image_alt": "The Second Half of the Enterprise Agent Era: How to Make Agents Smarter the More They Are Used?",
@@ -1040,13 +1040,13 @@
       "author": "Alibaba Cloud Blog",
       "event_date": "2026-07-01",
       "topic": "AI engineering tools",
-      "summary": "Alibaba Cloud推出企业 agent 工作流系统，重点落在任务路由、业务流程自动化、护栏和组织集成入口。更有价值的信息是任务路由、业务流程、组织护栏和系统集成点，判断这类方案时还要看企业采用时仍要处理权限、审计、流程接入和失败恢复。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "Alibaba Cloud 讨论企业 agent 从演示走向持续使用后的系统能力，重点是任务路由、业务流程自动化、护栏和组织集成。文章把 agent 可用性放到数据回流、流程接入和治理能力上，说明企业要让 agent 长期有效，不能只看单次演示，而要看它是否能进入真实业务流程、持续学习并接受权限约束。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "Google Keyword说明 AI 产品、平台或工程变化",
+      "title": "Google 汇总 2026 年 6 月 AI 更新",
       "editorial_category": "viewpoint_analysis",
       "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/260701_ICYMI-June-AI_Thumb.max-600x600.format-webp.webp",
       "image_alt": "The latest AI news we announced in June 2026",
@@ -1056,65 +1056,65 @@
       "author": "Google Keyword Blog",
       "event_date": "2026-07-01",
       "topic": "AI industry",
-      "summary": "Google Keyword说明 AI 产品、平台或工程变化，重点落在功能变化、使用场景、接入方式、限制条件和后续部署边界。更有价值的信息是功能变化、适用场景、接入方式和限制条件，判断这类方案时还要看公开材料仍需要回到原文核对入口、权限、价格和适用范围。文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。",
+      "summary": "Google 这篇月度索引按产品、研究和平台把 6 月 AI 公告串起来，列出 Gemini、开发者工具、Workspace、教育和实验项目等入口。它的用法不是替代原文，而是帮助读者按产品线回查发布日期、可用范围、目标用户、接入条件和限制，适合团队整理 6 月 Google AI 路线、试点清单、采购讨论和培训材料。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "Hugging Face说明模型权重和使用说明",
+      "title": "IBM Research 在 Hugging Face 介绍 ScarfBench 企业 Java agent 基准",
       "editorial_category": "viewpoint_analysis",
       "url": "https://huggingface.co/blog/ibm-research/scarfbench",
       "publisher": "Hugging Face Blog",
       "author": "Hugging Face Blog",
       "event_date": "2026-06-30",
       "topic": "AI engineering tools",
-      "summary": "Hugging Face说明Blackwell MLPerf 训练性能结果，重点落在训练基准、硬件吞吐、模型规模、对比设置和数据中心部署前提。更有价值的信息是Blackwell、MLPerf Training、吞吐指标和训练基准设置，判断这类方案时还要看benchmark 结果仍要结合任务类型、集群配置、能耗和真实训练负载判断。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "IBM Research 在 Hugging Face Blog 介绍 ScarfBench，用企业 Java 场景评测 AI agent 处理代码库任务的能力。文章重点放在基准任务、企业代码环境、回归测试和 agent 评测设计，而不是单个模型分数，适合关注真实仓库任务评测的人细读。对平台团队来说，它提供了把 agent 放进企业遗留代码环境测试的参照，也能帮助评估内部代码助手是否真的能处理维护型任务。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "GitHub Changelog说明模型能力和推理入口变化",
+      "title": "GitHub Enterprise 可默认启用 Copilot 自动选模型",
       "editorial_category": "viewpoint_analysis",
       "url": "https://github.blog/changelog/2026-07-01-enterprises-can-default-to-auto-model-selection",
       "publisher": "GitHub Changelog",
       "author": "GitHub Changelog",
       "event_date": "2026-07-01",
       "topic": "AI industry",
-      "summary": "该开源项目说明模型能力和评估方法更新，重点落在能力边界、评估设置、数据来源、使用场景和限制说明。更有价值的信息是模型能力、评估设置、数据来源和限制说明，判断这类方案时还要看结论仍要依赖可复现评测、真实任务和公开限制。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "GitHub Changelog 说明企业管理员可以把 Copilot 的模型选择交给自动模式，系统会在可用模型中为请求选择合适选项。对企业开发平台来说，这减少了逐团队指定模型的运维负担，也让策略重点转向权限、计费、审计和默认体验。需要关注的是自动选择是否覆盖组织内所有 Copilot 场景，以及管理员还能否按合规要求限制模型范围。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "Meta Engineering说明模型能力和推理入口变化",
+      "title": "Meta 公开大规模 AI 存储蓝图",
       "editorial_category": "viewpoint_analysis",
       "url": "https://engineering.fb.com/2026/07/01/data-infrastructure/metas-ai-storage-blueprint-at-scale/",
       "publisher": "Meta Engineering",
       "author": "Meta Engineering",
       "event_date": "2026-07-01",
       "topic": "AI industry",
-      "summary": "Meta Engineering说明模型能力和评估方法更新，重点落在能力边界、评估设置、数据来源、使用场景和限制说明。更有价值的信息是模型能力、评估设置、数据来源和限制说明，判断这类方案时还要看结论仍要依赖可复现评测、真实任务和公开限制。文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。",
+      "summary": "Meta Engineering 介绍其面向 AI 负载的存储架构，重点放在训练、推理和数据基础设施如何共同支撑更大的吞吐与更低延迟。文章适合基础设施团队查看大规模集群下的数据布局、冷热分层、可靠性和成本取舍。它的价值不在于给出可直接复制的产品，而是展示 AI 平台扩容时存储系统会怎样成为模型迭代速度的关键约束。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "Cloudflare说明 AI 搜索界面变化",
+      "title": "Cloudflare 解释如何让 AI 搜索更聪明",
       "editorial_category": "viewpoint_analysis",
       "url": "https://blog.cloudflare.com/making-ai-search-smarter/",
       "publisher": "Cloudflare Blog",
       "author": "Cloudflare Blog",
       "event_date": "2026-07-01",
       "topic": "AI engineering tools",
-      "summary": "Cloudflare更新agent 工作流和开发工具能力，重点落在任务编排、上下文、权限控制、工程集成和失败恢复。更有价值的信息是agent 工作流、开发工具入口、权限控制和工程集成，判断这类方案时还要看实际效果取决于权限模型、评估回放、团队流程和可观测性。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "Cloudflare 讨论 AI 搜索结果如何结合网页抓取、内容理解和站点控制，避免只把传统搜索摘要包装成聊天答案。文章把重点放在发布者、搜索代理和基础设施平台之间的关系：网站需要控制访问和计费，搜索体验需要更准确地引用来源，平台则要处理抓取频率、内容授权和回答质量。对内容站和平台团队来说，这是观察 AI 搜索商业边界的一篇材料。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA说明模型能力和推理入口变化",
+      "title": "NVIDIA 拆解降低推理 token 成本的软件栈",
       "editorial_category": "viewpoint_analysis",
       "image_url": "https://iprsoftwaremedia.com/219/files/202606/46eca8102541963ace8bb69d9d7d8481/6a43da813d6332962ecebe9c_press-inference-ai-aws-beat-1920x1080-1-842x450/press-inference-ai-aws-beat-1920x1080-1-842x450_thmb.jpg",
       "image_alt": "How NVIDIA’s Inference Software Stack Powers the Lowest Token Cost",
@@ -1124,20 +1124,20 @@
       "author": "NVIDIA Newsroom RSS",
       "event_date": "2026-06-30",
       "topic": "AI industry",
-      "summary": "NVIDIA更新agent 工作流和开发工具能力，重点落在任务编排、上下文、权限控制、工程集成和失败恢复。更有价值的信息是agent 工作流、开发工具入口、权限控制和工程集成，判断这类方案时还要看实际效果取决于权限模型、评估回放、团队流程和可观测性。文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。",
+      "summary": "NVIDIA Newsroom 这篇文章用推理部署成本拆解软件栈作用，重点写模型服务、批处理、内存管理、GPU 利用率和云端调度如何影响每 token 成本。它把对比维度从硬件规格拉到吞吐、延迟、调度和运行数据，适合平台团队评估线上大模型服务时检查优化流程、成本归因和采购方案，而不是只看芯片型号或模型压缩。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
     },
     {
-      "title": "NVIDIA说明 agent 与开发者工具能力",
+      "title": "NVIDIA Developer Blog 讲解 agent 强化学习技巧",
       "editorial_category": "viewpoint_analysis",
       "url": "https://developer.nvidia.com/blog/mastering-agentic-techniques-ai-agent-reinforcement-learning/",
       "publisher": "NVIDIA Developer Blog",
       "author": "NVIDIA Developer Blog",
       "event_date": "2026-07-01",
       "topic": "AI engineering tools",
-      "summary": "NVIDIA更新agent 工作流和开发工具能力，重点落在任务编排、上下文、权限控制、工程集成和失败恢复。更有价值的信息是agent 工作流、开发工具入口、权限控制和工程集成，判断这类方案时还要看实际效果取决于权限模型、评估回放、团队流程和可观测性。文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复。",
+      "summary": "NVIDIA Developer Blog 讲解把强化学习用于 AI agent 的训练与优化，重点是奖励设计、环境反馈、任务成功率和多步决策。文章适合已经在做工具调用或自动化 agent 的工程团队，用来理解为什么仅靠提示词很难稳定解决长链路任务。它把 agent 训练拆到可评估的动作、状态和反馈循环上，便于后续设计实验、回放失败案例和比较策略改进效果。",
       "content_type": "blog",
       "importance": "notable",
       "image_urls": []
@@ -1153,8 +1153,7 @@
       "topic": "中文 AI 媒体动态",
       "summary": "天工AI业务ARR突破8亿美元，向中国首个非BAT10亿美元ARR的AI公司迈进：其中AI短剧平台业务ARR超过7亿美元。",
       "key_points": [
-        "天工AI业务ARR突破8亿美元，向中国首个非BAT10亿美元ARR的AI公司迈进：其中AI短剧平台业务ARR超过7亿美元",
-        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+        "天工AI业务ARR突破8亿美元，向中国首个非BAT10亿美元ARR的AI公司迈进：其中AI短剧平台业务ARR超过7亿美元"
       ],
       "importance": "notable",
       "image_urls": []
@@ -1168,8 +1167,7 @@
       "topic": "中文 AI 媒体动态",
       "summary": "训练世界模型，开始从人类的肌肉和脑子里偷师了：具身智能数采迎来了新范式。",
       "key_points": [
-        "训练世界模型，开始从人类的肌肉和脑子里偷师了：具身智能数采迎来了新范式",
-        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+        "训练世界模型，开始从人类的肌肉和脑子里偷师了：具身智能数采迎来了新范式"
       ],
       "importance": "notable",
       "image_urls": []
@@ -1184,8 +1182,7 @@
       "summary": "2000+智算产业代表齐聚深圳，2026 中国智算产业生态发展年会成功举办！：AI入场景，Token大时代。",
       "key_points": [
         "2000+智算产业代表齐聚深圳，2026 中国智算产业生态发展年会成功举办",
-        "：AI入场景，Token大时代",
-        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+        "：AI入场景，Token大时代"
       ],
       "importance": "notable",
       "image_urls": []
@@ -1197,10 +1194,10 @@
       "author": "QbitAI",
       "event_date": "2026-07-02",
       "topic": "中文 AI 媒体动态",
-      "summary": "世界模型来了因果技术标杆！具身大脑真要长脑子了：QbitAI published this intermediary lead entry.",
+      "summary": "世界模型来了因果技术标杆！具身大脑真要长脑子了：",
       "key_points": [
         "世界模型来了因果技术标杆",
-        "具身大脑真要长脑子了：QbitAI published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+        "具身大脑真要长脑子了："
       ],
       "importance": "notable",
       "image_urls": []
@@ -1215,8 +1212,7 @@
       "summary": "AI眼镜不再依赖手机！这次真要单飞了：AI时代自己的操作系统来了。",
       "key_points": [
         "AI眼镜不再依赖手机",
-        "这次真要单飞了：AI时代自己的操作系统来了",
-        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+        "这次真要单飞了：AI时代自己的操作系统来了"
       ],
       "importance": "notable",
       "image_urls": []
@@ -1231,8 +1227,7 @@
       "summary": "7月14日悉尼RSS’26，线下Social Mixer晚宴报名中！：机器人顶会RSS 2026就要来了！",
       "key_points": [
         "7月14日悉尼RSS’26，线下Social Mixer晚宴报名中",
-        "：机器人顶会RSS 2026就要来了",
-        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+        "：机器人顶会RSS 2026就要来了"
       ],
       "importance": "notable",
       "image_urls": []
@@ -1247,8 +1242,7 @@
       "summary": "人才黑洞！UC伯克利系主任都加入A社了：加盟预训练团队。",
       "key_points": [
         "人才黑洞",
-        "UC伯克利系主任都加入A社了：加盟预训练团队",
-        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact."
+        "UC伯克利系主任都加入A社了：加盟预训练团队"
       ],
       "importance": "notable",
       "image_urls": []
@@ -1260,11 +1254,10 @@
       "author": "SSPAI",
       "event_date": "2026-07-02",
       "topic": "中文 AI 媒体动态",
-      "summary": "共创试读 | 给童年一份礼物：从是什么到为什么，找到合适的掌机：近年来，伴随着复古浪潮的席卷而来，许多玩家似乎又重新关注起了一些老游戏、老设备。从2022年的3DS涨价风波，到后来层出不穷的所谓「开源掌机」，大家似乎都在寻找一个通往童年的入口，重新回味那些历久弥新 ... 查看全文。This is an intermediary/self-media le。",
+      "summary": "共创试读 | 给童年一份礼物：从是什么到为什么，找到合适的掌机：近年来，伴随着复古浪潮的席卷而来，许多玩家似乎又重新关注起了一些老游戏、老设备。从2022年的3DS涨价风波，到后来层出不穷的所谓「开源掌机」，大家似乎都在寻找一个通往童年的入口，重新回味那些历久弥新 ... 查看全文。。",
       "key_points": [
         "共创试读 | 给童年一份礼物：从是什么到为什么，找到合适的掌机：近年来，伴随着复古浪潮的席卷而来，许多玩家似乎又重新关注起了一些老游戏、老设备",
-        "从2022年的3DS涨价风波，到后来层出不穷的所谓「开源掌机」，大家似乎都在寻找一个通往童年的入口，重新回味那些历久弥新 ... 查看全文",
-        "This is an intermediary/self-media le"
+        "从2022年的3DS涨价风波，到后来层出不穷的所谓「开源掌机」，大家似乎都在寻找一个通往童年的入口，重新回味那些历久弥新 ... 查看全文"
       ],
       "importance": "notable",
       "image_urls": []
@@ -1279,8 +1272,7 @@
       "summary": "派早报：WhatsApp 开放用户名预留、PS 将取消实体光盘等：Gmail Live 进入测试阶段、大我推出 B251 PRO 显示器等。 查看全文。",
       "key_points": [
         "派早报：WhatsApp 开放用户名预留、PS 将取消实体光盘等：Gmail Live 进入测试阶段、大我推出 B251 PRO 显示器等",
-        "查看全文",
-        "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported"
+        "查看全文"
       ],
       "importance": "notable",
       "image_urls": []
@@ -1753,7 +1745,7 @@
         ],
         "previous_snapshot": null,
         "diff": {
-          "summary": "No previous component snapshot was available for comparison.",
+          "summary": "暂无上一版组件快照可对比。",
           "changed_rows": [],
           "new_entries": [
             "DeepSeek V4 Flash",
@@ -1860,7 +1852,7 @@
             }
           ],
           "diff": {
-            "summary": "No previous component snapshot was available for comparison.",
+            "summary": "暂无上一版组件快照可对比。",
             "changed_rows": [],
             "new_entries": [
               "DeepSeek V4 Flash",
@@ -2357,7 +2349,7 @@
         ],
         "previous_snapshot": null,
         "diff": {
-          "summary": "No previous component snapshot was available for comparison.",
+          "summary": "暂无上一版组件快照可对比。",
           "changed_rows": [],
           "new_entries": [
             "Claude Fable 5 (with fallback)",
@@ -2464,7 +2456,7 @@
             }
           ],
           "diff": {
-            "summary": "No previous component snapshot was available for comparison.",
+            "summary": "暂无上一版组件快照可对比。",
             "changed_rows": [],
             "new_entries": [
               "Claude Fable 5 (with fallback)",
@@ -2775,7 +2767,7 @@
         ],
         "previous_snapshot": null,
         "diff": {
-          "summary": "No previous component snapshot was available for comparison.",
+          "summary": "暂无上一版组件快照可对比。",
           "changed_rows": [],
           "new_entries": [
             "SWE-Agent + claude-4-5-Sonnet",
@@ -2858,7 +2850,7 @@
             }
           ],
           "diff": {
-            "summary": "No previous component snapshot was available for comparison.",
+            "summary": "暂无上一版组件快照可对比。",
             "changed_rows": [],
             "new_entries": [
               "SWE-Agent + claude-4-5-Sonnet",
@@ -2880,10 +2872,12 @@
     {
       "name": "xbtlin/ai-berkshire",
       "editorial_category": "open_source",
+      "description": "ai-berkshire 是基于 Claude Code/Codex 的价值投资研究框架，把投资大师方法论、多 agent 对抗分析、公司资料整理和投资假设检查放进同一流程；适合关注 AI 投研的人看它如何产出可复核的研究结论与风险提示。落地时还要看数据来源、模型推理记录、投资建议边界和人工复核责任。",
+      "readme_summary": "ai-berkshire 是基于 Claude Code/Codex 的价值投资研究框架，把投资大师方法论、多 agent 对抗分析、公司资料整理和投资假设检查放进同一流程；适合关注 AI 投研的人看它如何产出可复核的研究结论与风险提示。落地时还要看数据来源、模型推理记录、投资建议边界和人工复核责任。",
       "domains": [
         "agent"
       ],
-      "use_case": "可用于比较ai-berkshire 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建；项目提供READ...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "ai-berkshire 是基于 Claude Code/Codex 的价值投资研究框架，把投资大师方法论、多 agent 对抗分析、公司资料整理和投资假设检查放进同一流程；适合关注 AI 投研的人看它如何产出可复核的研究结论与风险提示。落地时还要看数据来源、模型推理记录、投资建议边界和人工复核责任。",
       "url": "https://github.com/xbtlin/ai-berkshire",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",
@@ -2893,10 +2887,12 @@
     {
       "name": "simplex-chat/simplex-chat",
       "editorial_category": "open_source",
+      "description": "SimpleX Chat 是隐私即时通讯项目，重点是不用手机号或全局用户 ID 建立连接；适合关注端到端加密、去中心化通信和多端客户端工程的人看。评估时要看客户端覆盖、密钥恢复、群组能力和自托管服务的维护成本。",
+      "readme_summary": "SimpleX Chat 是隐私即时通讯项目，重点是不用手机号或全局用户 ID 建立连接；适合关注端到端加密、去中心化通信和多端客户端工程的人看。评估时要看客户端覆盖、密钥恢复、群组能力和自托管服务的维护成本。",
       "domains": [
         "AI tooling"
       ],
-      "use_case": "可用于比较simplex-chat 是面向AI 工程实践的开源项目，核心能力是项目框架、示例代码和可复用工具链；项目提供READ...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "SimpleX Chat 是隐私即时通讯项目，重点是不用手机号或全局用户 ID 建立连接；适合关注端到端加密、去中心化通信和多端客户端工程的人看。评估时要看客户端覆盖、密钥恢复、群组能力和自托管服务的维护成本。",
       "url": "https://github.com/simplex-chat/simplex-chat",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",
@@ -2906,12 +2902,12 @@
     {
       "name": "calesthio/OpenMontage",
       "editorial_category": "open_source",
-      "description": "openmontage 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、工具调用和工作流编排；项目提供部署说明，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
-      "readme_summary": "openmontage 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、工具调用和工作流编排；项目提供部署说明，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+      "description": "OpenMontage 面向视频和多媒体剪辑自动化；适合关注 AI 辅助素材整理、片段拼接和创作工具链的读者先看输入格式、部署方式和示例。真正接入前还要核对它对素材时长、导出格式、字幕和批处理任务的支持程度。",
+      "readme_summary": "OpenMontage 面向视频和多媒体剪辑自动化；适合关注 AI 辅助素材整理、片段拼接和创作工具链的读者先看输入格式、部署方式和示例。真正接入前还要核对它对素材时长、导出格式、字幕和批处理任务的支持程度。",
       "domains": [
         "agent"
       ],
-      "use_case": "可用于比较openmontage 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、工具调用和工作流编...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "OpenMontage 面向视频和多媒体剪辑自动化；适合关注 AI 辅助素材整理、片段拼接和创作工具链的读者先看输入格式、部署方式和示例。真正接入前还要核对它对素材时长、导出格式、字幕和批处理任务的支持程度。",
       "url": "https://github.com/calesthio/OpenMontage",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",
@@ -2921,10 +2917,12 @@
     {
       "name": "google-labs-code/design.md",
       "editorial_category": "open_source",
+      "description": "design.md 是 Google Labs Code 给 coding agents 使用的设计契约规范，把视觉识别、交互约束、品牌语气和验收标准写成仓库内文档；它对本项目的启发是把前端风格、内容边界和截图验收沉到版本化设计文件，而不是留在对话记忆里。后续应把它转化为本仓库 DESIGN.md 的必检项和页面验收用例。",
+      "readme_summary": "design.md 是 Google Labs Code 给 coding agents 使用的设计契约规范，把视觉识别、交互约束、品牌语气和验收标准写成仓库内文档；它对本项目的启发是把前端风格、内容边界和截图验收沉到版本化设计文件，而不是留在对话记忆里。后续应把它转化为本仓库 DESIGN.md 的必检项和页面验收用例。",
       "domains": [
         "agent"
       ],
-      "use_case": "可用于比较design.md 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、评测与回归；项目提供测...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "design.md 是 Google Labs Code 给 coding agents 使用的设计契约规范，把视觉识别、交互约束、品牌语气和验收标准写成仓库内文档；它对本项目的启发是把前端风格、内容边界和截图验收沉到版本化设计文件，而不是留在对话记忆里。后续应把它转化为本仓库 DESIGN.md 的必检项和页面验收用例。",
       "url": "https://github.com/google-labs-code/design.md",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",
@@ -2934,10 +2932,12 @@
     {
       "name": "DeusData/codebase-memory-mcp",
       "editorial_category": "open_source",
+      "description": "codebase-memory-mcp 把代码库索引成持久知识图谱并通过 MCP 暴露查询能力，重点是多语言解析、SQLite 存储和低 token 上下文复用；适合评估 coding agent 跨会话理解架构、检索符号和避免重复读仓库的接入方式。落地时还要看索引增量更新、隐私边界、查询准确率和现有 codegraph 的重叠。",
+      "readme_summary": "codebase-memory-mcp 把代码库索引成持久知识图谱并通过 MCP 暴露查询能力，重点是多语言解析、SQLite 存储和低 token 上下文复用；适合评估 coding agent 跨会话理解架构、检索符号和避免重复读仓库的接入方式。落地时还要看索引增量更新、隐私边界、查询准确率和现有 codegraph 的重叠。",
       "domains": [
         "agent"
       ],
-      "use_case": "可用于比较codebase-memory-mcp 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、评...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "codebase-memory-mcp 把代码库索引成持久知识图谱并通过 MCP 暴露查询能力，重点是多语言解析、SQLite 存储和低 token 上下文复用；适合评估 coding agent 跨会话理解架构、检索符号和避免重复读仓库的接入方式。落地时还要看索引增量更新、隐私边界、查询准确率和现有 codegraph 的重叠。",
       "url": "https://github.com/DeusData/codebase-memory-mcp",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",
@@ -2947,10 +2947,12 @@
     {
       "name": "kunchenguid/no-mistakes",
       "editorial_category": "open_source",
+      "description": "no-mistakes 围绕 git push 前的失误拦截和工程预检查展开，关注点不是再写一段提示词，而是把常见错误、执行前验证和提交约束变成可运行规则；适合看 agent 工作流能否把事故复盘沉淀成自动化 guardrail。落地时应关注规则如何配置、误报怎么处理，以及是否能接进 CI 或 pre-push 钩子。",
+      "readme_summary": "no-mistakes 围绕 git push 前的失误拦截和工程预检查展开，关注点不是再写一段提示词，而是把常见错误、执行前验证和提交约束变成可运行规则；适合看 agent 工作流能否把事故复盘沉淀成自动化 guardrail。落地时应关注规则如何配置、误报怎么处理，以及是否能接进 CI 或 pre-push 钩子。",
       "domains": [
         "agent"
       ],
-      "use_case": "可用于比较no-mistakes 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建；项目提供READM...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "no-mistakes 围绕 git push 前的失误拦截和工程预检查展开，关注点不是再写一段提示词，而是把常见错误、执行前验证和提交约束变成可运行规则；适合看 agent 工作流能否把事故复盘沉淀成自动化 guardrail。落地时应关注规则如何配置、误报怎么处理，以及是否能接进 CI 或 pre-push 钩子。",
       "url": "https://github.com/kunchenguid/no-mistakes",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",
@@ -2960,12 +2962,12 @@
     {
       "name": "JCodesMore/ai-website-cloner-template",
       "editorial_category": "open_source",
-      "description": "ai-website-cloner-template 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建；项目提供示例，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本。",
-      "readme_summary": "ai-website-cloner-template 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建；项目提供示例，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本。",
+      "description": "ai-website-cloner-template 是用 AI coding agents 复刻网站的模板工程，覆盖抓取、页面还原和 Next.js/React 输出；前端团队更应关注布局还原、素材版权、响应式状态、组件可维护性和生成后能否进入正常工程迭代。真正使用时还要把原站授权、图片来源和设计差异审查纳入流程。",
+      "readme_summary": "ai-website-cloner-template 是用 AI coding agents 复刻网站的模板工程，覆盖抓取、页面还原和 Next.js/React 输出；前端团队更应关注布局还原、素材版权、响应式状态、组件可维护性和生成后能否进入正常工程迭代。真正使用时还要把原站授权、图片来源和设计差异审查纳入流程。",
       "domains": [
         "agent"
       ],
-      "use_case": "可用于比较ai-website-cloner-template 是面向agent 工作流和自动化工程的开源项目，核心能力是Age...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "ai-website-cloner-template 是用 AI coding agents 复刻网站的模板工程，覆盖抓取、页面还原和 Next.js/React 输出；前端团队更应关注布局还原、素材版权、响应式状态、组件可维护性和生成后能否进入正常工程迭代。真正使用时还要把原站授权、图片来源和设计差异审查纳入流程。",
       "url": "https://github.com/JCodesMore/ai-website-cloner-template",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",
@@ -2975,10 +2977,12 @@
     {
       "name": "Robbyant/lingbot-map",
       "editorial_category": "open_source",
+      "description": "lingbot-map 是用于从流式数据重建场景的 feed-forward 3D foundation model，重点在连续输入下恢复空间结构；适合关注 3D 重建、实时场景理解和机器人数据管线的人检查输入模态、推理成本、可视化结果和示例可复现性。落地时还要看流式延迟、场景尺度和对真实传感器噪声的鲁棒性。",
+      "readme_summary": "lingbot-map 是用于从流式数据重建场景的 feed-forward 3D foundation model，重点在连续输入下恢复空间结构；适合关注 3D 重建、实时场景理解和机器人数据管线的人检查输入模态、推理成本、可视化结果和示例可复现性。落地时还要看流式延迟、场景尺度和对真实传感器噪声的鲁棒性。",
       "domains": [
         "AI tooling"
       ],
-      "use_case": "可用于比较lingbot-map 是面向模型评测、回归验证和工程质量控制的开源项目，核心能力是评测与回归、记忆或知识检索；项目提...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "lingbot-map 是用于从流式数据重建场景的 feed-forward 3D foundation model，重点在连续输入下恢复空间结构；适合关注 3D 重建、实时场景理解和机器人数据管线的人检查输入模态、推理成本、可视化结果和示例可复现性。落地时还要看流式延迟、场景尺度和对真实传感器噪声的鲁棒性。",
       "url": "https://github.com/Robbyant/lingbot-map",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",
@@ -2988,10 +2992,12 @@
     {
       "name": "ripienaar/free-for-dev",
       "editorial_category": "open_source",
+      "description": "free-for-dev 是开发者免费资源清单，不是 AI 专项项目；上榜价值在于给原型或小团队查托管、数据库、监控等免费额度限制。它更适合作为工程采购前的成本索引，不能替代对服务条款、地区可用性和退出成本的核对。",
+      "readme_summary": "free-for-dev 是开发者免费资源清单，不是 AI 专项项目；上榜价值在于给原型或小团队查托管、数据库、监控等免费额度限制。它更适合作为工程采购前的成本索引，不能替代对服务条款、地区可用性和退出成本的核对。",
       "domains": [
         "AI tooling"
       ],
-      "use_case": "可用于比较free-for-dev 是面向模型评测、回归验证和工程质量控制的开源项目，核心能力是评测与回归；项目提供测试或评估资...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "free-for-dev 是开发者免费资源清单，不是 AI 专项项目；上榜价值在于给原型或小团队查托管、数据库、监控等免费额度限制。它更适合作为工程采购前的成本索引，不能替代对服务条款、地区可用性和退出成本的核对。",
       "url": "https://github.com/ripienaar/free-for-dev",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",
@@ -3001,10 +3007,12 @@
     {
       "name": "stablyai/orca",
       "editorial_category": "open_source",
+      "description": "orca 是面向并行 coding agents 的 agent development environment，可在桌面和移动端调度多个 agent 与 worktree；适合评估团队如何同时运行多条编码任务、隔离会话状态、复用订阅额度，并在移动端接管长任务。关键还在于长任务中断恢复、并发结果对比和远程环境权限控制。",
+      "readme_summary": "orca 是面向并行 coding agents 的 agent development environment，可在桌面和移动端调度多个 agent 与 worktree；适合评估团队如何同时运行多条编码任务、隔离会话状态、复用订阅额度，并在移动端接管长任务。关键还在于长任务中断恢复、并发结果对比和远程环境权限控制。",
       "domains": [
         "agent"
       ],
-      "use_case": "可用于比较orca 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、评测与回归；项目提供测试或评估资...相关能力、接口形态和与现有工具链的衔接方式。",
+      "use_case": "orca 是面向并行 coding agents 的 agent development environment，可在桌面和移动端调度多个 agent 与 worktree；适合评估团队如何同时运行多条编码任务、隔离会话状态、复用订阅额度，并在移动端接管长任务。关键还在于长任务中断恢复、并发结果对比和远程环境权限控制。",
       "url": "https://github.com/stablyai/orca",
       "event_date": "2026-07-02",
       "source": "GitHub Trending weekly",

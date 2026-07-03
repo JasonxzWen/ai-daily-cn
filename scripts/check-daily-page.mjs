@@ -24,6 +24,8 @@ if (!reportDate) {
 const server = await startStaticServer(outDir);
 const browser = await chromium.launch();
 const results = [];
+const publicReportData = await readPublicReportData(outDir, reportDate);
+const expectedQualityStatus = String(publicReportData?.quality_status?.status || "").trim();
 
 try {
   for (const viewport of viewports) {
@@ -31,7 +33,7 @@ try {
     const [year, month] = reportDate.split("-");
     await page.goto(`${server.url}/reports/${year}/${month}/${reportDate}.html`, { waitUntil: "domcontentloaded" });
     await eagerLoadImages(page);
-    results.push(await evaluateDailyPageChecklist(page, { reportDate }));
+    results.push(await evaluateDailyPageChecklist(page, { reportDate, expectedQualityStatus }));
     await page.close();
   }
 } finally {
@@ -47,6 +49,7 @@ const payload = {
   degraded_checks: classification.degraded_checks,
   degraded_sections: classification.degraded_sections,
   report_date: reportDate,
+  expected_quality_status: expectedQualityStatus,
   results
 };
 const json = `${JSON.stringify(payload, null, 2)}\n`;
@@ -90,6 +93,16 @@ async function startStaticServer(root) {
     url: `http://127.0.0.1:${address.port}`,
     close: (callback) => server.close(callback)
   };
+}
+
+async function readPublicReportData(outDir, reportDate) {
+  const [year, month] = reportDate.split("-");
+  const dataPath = path.join(outDir, "data", year, month, `${reportDate}.json`);
+  try {
+    return JSON.parse(await fs.readFile(dataPath, "utf8"));
+  } catch {
+    return null;
+  }
 }
 
 async function eagerLoadImages(page) {

@@ -10,7 +10,7 @@ import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import { defaultGeneratedAt } from "./time.js";
 import { validateFeed, validateReport, validateTrends } from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
-import { deriveQualityStatus } from "./quality-status.js";
+import { deriveQualityStatus, normalizeQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 import { withDefaultImportance } from "./importance.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
@@ -136,8 +136,105 @@ const DAILY_REPORT_HTML_OVERRIDES = `<style data-ai-daily-css-overrides>
   color: var(--muted);
 }
 
-/* Stage D: Feishu-style left-rail table of contents (desktop only; mobile keeps
-   the engine's horizontal nav so the per-story TOC stays contained). */
+.report-shell {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.report-section-stack > section[id^="section-track-"] {
+  border-radius: 8px;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown {
+  font-size: 0.95rem;
+  line-height: 1.66;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown > p:first-child {
+  margin-top: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown strong {
+  display: block;
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.38;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown ul {
+  margin: 6px 0 14px;
+  padding-left: 1.15rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown li {
+  margin: 4px 0;
+}
+
+.inline-site-icon {
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: cover;
+}
+
+.card-title-icon {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px;
+  max-height: 18px;
+  flex: 0 0 18px;
+}
+
+.chip,
+.text-highlight,
+.daily-tag,
+.tag-highlight,
+.tag-stars,
+.tag-topic,
+.tag-major,
+.tag-notable,
+.tag-general {
+  font-size: 0.78rem;
+  line-height: 1.2;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.chip:hover,
+a.chip:hover,
+.text-highlight:hover,
+.daily-tag:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 44%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 76%, #ffffff);
+  color: var(--accent);
+}
+
+.chip-topic,
+.tag-topic {
+  border-color: #adc4ce;
+  background: #edf3f5;
+  color: #31586a;
+}
+
+.chip-major,
+.tag-major {
+  border-color: #d7a06a;
+  background: #fff1df;
+  color: #8a431c;
+}
+
+.chip-notable,
+.tag-notable {
+  border-color: #b7c68f;
+  background: #eef4df;
+  color: #526a2d;
+}
+
+/* Reader report left rail: desktop keeps category-level anchors; mobile keeps
+   the engine's horizontal nav. */
 @media (min-width: 761px) {
   .report-layout {
     grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
@@ -165,6 +262,60 @@ const DAILY_REPORT_HTML_OVERRIDES = `<style data-ai-daily-css-overrides>
   .report-nav a {
     white-space: normal;
     border-radius: 6px;
+  }
+
+  .report-nav a[href^="#section-track-"] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    justify-content: flex-start;
+    border-left: 3px solid transparent;
+    margin-top: 8px;
+    font-size: 0.88rem;
+    font-weight: 760;
+  }
+
+  .report-nav a[href^="#section-track-"]::before {
+    display: block;
+    content: "正文主线";
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .report-nav a[href="#section-github-trending"]::before,
+  .report-nav a[href="#section-huggingface-trending"]::before {
+    content: "开源与模型";
+  }
+
+  .report-nav a[href="#section-trend-tracking"]::before,
+  .report-nav a[href="#section-model-releases"]::before {
+    content: "趋势追踪";
+  }
+
+  .report-nav a[href="#section-subscribed-rss"]::before,
+  .report-nav a[href="#section-hot-blogs"]::before,
+  .report-nav a[href="#section-chinese-media-dynamics"]::before {
+    content: "媒体与订阅";
+  }
+
+  .report-nav a[href^="#section-track-"]:hover,
+  .report-nav a[href^="#section-track-"][aria-current="true"] {
+    border-left-color: var(--accent);
+  }
+
+  .report-nav a:not([href^="#section-track-"]) {
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .report-nav a[href^="#section-story-"] {
+    display: none;
   }
 
   .report-nav a + a {
@@ -1038,6 +1189,7 @@ function applyDailyReportHtmlOverrides(html, reportDate) {
 async function readReportJson(filePath) {
   const raw = await fs.readFile(filePath, "utf8");
   const candidate = JSON.parse(raw);
+  const hasExplicitQualityStatus = Object.prototype.hasOwnProperty.call(candidate, "quality_status");
   const validation = validateReport(candidate);
   if (!validation.valid) {
     throw new PublisherError("schema_validation_failed", `结构化日报 JSON 未通过 schema 校验：${filePath}`, {
@@ -1045,10 +1197,11 @@ async function readReportJson(filePath) {
     });
   }
 
+  const reportWithDefaults = withDefaultImportanceForReport(validation.value);
   const report = normalizeStoryFirstReport({
-    ...withDefaultImportanceForReport(validation.value),
+    ...reportWithDefaults,
     evidence_assets: Array.isArray(validation.value.evidence_assets) ? validation.value.evidence_assets : [],
-    quality_status: deriveQualityStatus(validation.value, null)
+    quality_status: qualityStatusForPublishedReport(reportWithDefaults, { preserveExplicit: hasExplicitQualityStatus })
   });
   const finalValidation = validateReport(report);
   if (!finalValidation.valid) {
@@ -1058,6 +1211,12 @@ async function readReportJson(filePath) {
   }
 
   return finalValidation.value;
+}
+
+function qualityStatusForPublishedReport(report, options = {}) {
+  return options.preserveExplicit && normalizeQualityStatus(report?.quality_status)
+    ? normalizeQualityStatus(report.quality_status)
+    : deriveQualityStatus(report, null);
 }
 
 function withDefaultImportanceForReport(report) {
@@ -1174,12 +1333,18 @@ function publicHuggingFaceTrending(items = []) {
 function huggingFacePublicDescription(item = {}) {
   const name = firstNonEmpty(item.name, item.repo, "该模型");
   const taskLabel = huggingFaceTaskLabel(item.task);
-  const metricParts = [
-    Number(item.downloads) > 0 ? `${Number(item.downloads)} downloads` : "",
-    Number(item.likes) > 0 ? `${Number(item.likes)} likes` : ""
-  ].filter(Boolean);
-  const metricText = metricParts.length > 0 ? `，当前热度指标是 ${metricParts.join("、")}` : "";
-  return `${name} 是 Hugging Face 上的${taskLabel}${metricText}。`;
+  const useCase = huggingFacePublicUseCase(item.task);
+  return `${name} 是 Hugging Face 上的${taskLabel}，${useCase}；榜单数据只代表社区关注和调用热度，选型前仍要核对模型卡、许可证、限制和部署成本。`;
+}
+
+function huggingFacePublicUseCase(task) {
+  const text = String(task || "").toLowerCase();
+  if (/text-generation|conversational|chat/.test(text)) return "可作为文本生成或推理基线候选";
+  if (/image-to-text|vision|visual-question-answering/.test(text)) return "适合关注视觉理解链路的模型对比";
+  if (/text-to-image|image-generation|diffusion/.test(text)) return "适合关注图像生成工作流的模型对比";
+  if (/speech|audio|automatic-speech-recognition|text-to-speech/.test(text)) return "适合关注语音和音频链路的模型对比";
+  if (/embedding|retrieval|sentence-similarity/.test(text)) return "适合关注检索、嵌入和语义匹配链路";
+  return "适合作为同类模型的对比入口";
 }
 
 function huggingFaceTaskLabel(task) {
@@ -1195,11 +1360,11 @@ function huggingFaceTaskLabel(task) {
 }
 
 function isGenericHuggingFacePublicText(value) {
-  return /(?:trending entry|verify model card|discovery lead|before factual inclusion|ranked\s+model\s+entry|公开描述指向|关键词包括|优先核对|准入|复现门槛|只记录排名|公开描述暂未给出足够功能细节)/iu.test(String(value || ""));
+  return /(?:trending entry|verify model card|discovery lead|before factual inclusion|ranked\s+model\s+entry|公开描述指向|关键词包括|优先核对|准入|复现门槛|只记录排名|公开描述暂未给出足够功能细节|本周榜单记录|downloads、likes|社区使用热度)/iu.test(String(value || ""));
 }
 
 function isGenericGithubPublicText(value) {
-  return /(?:公开描述指向|关键词包括|ranked\s+(?:model|repo|repository)\s+entry|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|README\s*显示核心能力|读者应先确认|适合先从|优先核对|重点看 README|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README)/iu.test(String(value || ""));
+  return /(?:公开描述指向|关键词包括|ranked\s+(?:model|repo|repository)\s+entry|README\s*主要围绕|阅读时先看|提供README|提供可复用包|测试或评估资产|README 将该仓库定位为|README\s*显示核心能力|读者应先确认|读者应先确认快速开始|适合先从|优先核对|重点看 README|核心能力集中在|它的价值在于|具体阅读时|适合评估[^。]*README|本轮开源榜单|公开页面显示|读者应看项目说明|公开信息只能说明开发者关注度增加|这类项目不应只看星标变化|面向AI\s*工程实践的开源项目|给出README\s*说明和使用入口|这类项目适合先从最小示例复现)/iu.test(String(value || ""));
 }
 
 function githubTrendingFactSummary(item = {}) {
@@ -1209,8 +1374,9 @@ function githubTrendingFactSummary(item = {}) {
   const stars = evidence.match(/with\s+([0-9,]+)\s+stars\s+(today|this week)/i);
   const starsText = stars ? `${stars[2].toLowerCase() === "today" ? "今日" : "本周"} +${stars[1]} stars` : "";
   const repo = firstNonEmpty(item.repo, item.name, "该项目");
-  const rankText = rank ? `${source} ${rank}` : source;
-  return `${repo} 当前进入 ${rankText}${starsText ? `，${starsText}` : ""}。`;
+  const scope = source.replace(/GitHub\s*Trending/ig, "开源榜单").replace(/\s+/g, " ").trim() || "开源榜单";
+  const rankText = rank ? `${scope} ${rank}` : scope;
+  return `${repo} 本周出现在${rankText}${starsText ? `，${starsText}` : ""}；当前只能确认榜单动量，正式采用前还要核对 README、许可证、维护状态和 issue 反馈。`;
 }
 
 function publicStories(stories = []) {

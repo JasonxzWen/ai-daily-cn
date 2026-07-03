@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-artifact-kind="research" data-status="complete" data-runtime-state="not-runtime">
+<html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-artifact-kind="research" data-status="degraded" data-runtime-state="not-runtime">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -2943,8 +2943,105 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   color: var(--muted);
 }
 
-/* Stage D: Feishu-style left-rail table of contents (desktop only; mobile keeps
-   the engine's horizontal nav so the per-story TOC stays contained). */
+.report-shell {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.report-section-stack > section[id^="section-track-"] {
+  border-radius: 8px;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown {
+  font-size: 0.95rem;
+  line-height: 1.66;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown > p:first-child {
+  margin-top: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown strong {
+  display: block;
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.38;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown ul {
+  margin: 6px 0 14px;
+  padding-left: 1.15rem;
+}
+
+.report-section-stack > section[id^="section-track-"] .rendered-markdown li {
+  margin: 4px 0;
+}
+
+.inline-site-icon {
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: cover;
+}
+
+.card-title-icon {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px;
+  max-height: 18px;
+  flex: 0 0 18px;
+}
+
+.chip,
+.text-highlight,
+.daily-tag,
+.tag-highlight,
+.tag-stars,
+.tag-topic,
+.tag-major,
+.tag-notable,
+.tag-general {
+  font-size: 0.78rem;
+  line-height: 1.2;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.chip:hover,
+a.chip:hover,
+.text-highlight:hover,
+.daily-tag:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 44%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 76%, #ffffff);
+  color: var(--accent);
+}
+
+.chip-topic,
+.tag-topic {
+  border-color: #adc4ce;
+  background: #edf3f5;
+  color: #31586a;
+}
+
+.chip-major,
+.tag-major {
+  border-color: #d7a06a;
+  background: #fff1df;
+  color: #8a431c;
+}
+
+.chip-notable,
+.tag-notable {
+  border-color: #b7c68f;
+  background: #eef4df;
+  color: #526a2d;
+}
+
+/* Reader report left rail: desktop keeps category-level anchors; mobile keeps
+   the engine's horizontal nav. */
 @media (min-width: 761px) {
   .report-layout {
     grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
@@ -2972,6 +3069,60 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
   .report-nav a {
     white-space: normal;
     border-radius: 6px;
+  }
+
+  .report-nav a[href^="#section-track-"] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    justify-content: flex-start;
+    border-left: 3px solid transparent;
+    margin-top: 8px;
+    font-size: 0.88rem;
+    font-weight: 760;
+  }
+
+  .report-nav a[href^="#section-track-"]::before {
+    display: block;
+    content: "正文主线";
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .report-nav a[href="#section-github-trending"]::before,
+  .report-nav a[href="#section-huggingface-trending"]::before {
+    content: "开源与模型";
+  }
+
+  .report-nav a[href="#section-trend-tracking"]::before,
+  .report-nav a[href="#section-model-releases"]::before {
+    content: "趋势追踪";
+  }
+
+  .report-nav a[href="#section-subscribed-rss"]::before,
+  .report-nav a[href="#section-hot-blogs"]::before,
+  .report-nav a[href="#section-chinese-media-dynamics"]::before {
+    content: "媒体与订阅";
+  }
+
+  .report-nav a[href^="#section-track-"]:hover,
+  .report-nav a[href^="#section-track-"][aria-current="true"] {
+    border-left-color: var(--accent);
+  }
+
+  .report-nav a:not([href^="#section-track-"]) {
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .report-nav a[href^="#section-story-"] {
+    display: none;
   }
 
   .report-nav a + a {
@@ -3020,7 +3171,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
           <div class="eyebrow">AI 日报 · 覆盖 2026-06-07</div>
           <h1 class="report-title">2026-06-07</h1>
         </div>
-        <div class="toolbar"><span class="status-pill status-ok">状态：完成</span></div>
+        <div class="toolbar"><span class="status-pill status-warn">状态：降级</span></div>
       </div>
       <div class="hero-brief">
         <p class="hero-summary-text">今天最值得看的主线是 Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本；另外保留 10 个 GitHub Trending Top 10 项目，用来补开源侧信号；技不止术补了 3 条深读，用来承接产品拆解、平台策略和工作流观察。</p>
@@ -3045,11 +3196,10 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
       <div class="report-nav-group-title">阅读顺序</div>
       <a href="#report-top" title="返回总览" data-nav-link data-nav-home data-nav-index="0" data-nav-group-name="overview" data-nav-status="info"><span>总览</span></a>
       <a href="#section-track-engineering" title="工程与开发者动态" data-nav-link data-nav-index="1" data-nav-group-name="main" data-nav-status="info"><span>工程与开发者动态</span></a>
-<a href="#section-story-1" title="Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本</span></a>
-<a href="#section-official-blog-updates" title="官方 Blog 更新" data-nav-link data-nav-index="3" data-nav-group-name="main" data-nav-status="info"><span>官方 Blog 更新</span></a>
-<a href="#section-github-trending" title="GitHub Trending · Top 8" data-nav-link data-nav-index="4" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
-<a href="#section-trend-tracking" title="趋势追踪" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>趋势追踪</span></a>
-<a href="#section-twitter-discussion" title="X/Twitter 讨论" data-nav-link data-nav-index="6" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
+<a href="#section-official-blog-updates" title="官方 Blog 更新" data-nav-link data-nav-index="2" data-nav-group-name="main" data-nav-status="info"><span>官方 Blog 更新</span></a>
+<a href="#section-github-trending" title="GitHub Trending · Top 8" data-nav-link data-nav-index="3" data-nav-group-name="projects" data-nav-status="info"><span>GitHub Trending · Top 8</span></a>
+<a href="#section-trend-tracking" title="趋势追踪" data-nav-link data-nav-index="4" data-nav-group-name="signals" data-nav-status="info"><span>趋势追踪</span></a>
+<a href="#section-twitter-discussion" title="X/Twitter 讨论" data-nav-link data-nav-index="5" data-nav-group-name="signals" data-nav-status="info"><span>X/Twitter 讨论</span></a>
     </div>
   </nav>
       <div class="report-section-stack" data-report-region="sections">
@@ -3062,27 +3212,16 @@ table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{bo
     </div>
 
   </div>
-    <div class="rendered-markdown"><p>面向开发者的产品、工具与工程实践更新。（本日 1 条）</p></div>
-    <template data-rich-source data-source-fallback>面向开发者的产品、工具与工程实践更新。（本日 1 条）</template>
-  </section>
-<details class="panel rich-section collapsible-panel" id="section-story-1" data-section-type="markdown" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust" data-rich-section data-rich-kind="markdown" data-render-state="ready" data-source-fallback>
-    <summary class="collapsible-summary">
-    <span>
-      <span class="meta">正文</span>
-      <span class="collapsible-title">Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本</span>
-      <span class="collapsible-subtitle">==落点==：它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢。</span>
-    </span>
+    <div class="rendered-markdown"><p>面向开发者的产品、工具与工程实践更新。（本日 1 条）</p>
+<p><strong><a href="https://blog.cloudflare.com/ai-gateway-spend-limits/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==" alt="Cloudflare Blog" loading="lazy"> Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
+<ul><li>Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本。它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢</li><li><mark class="text-highlight text-highlight-keyword-major" data-highlight-kind="keyword-major">落点</mark>：它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢。</li><li>来源：<a href="https://blog.cloudflare.com/ai-gateway-spend-limits/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==" alt="Cloudflare Blog" loading="lazy"> Cloudflare Blog</a></li></ul></div>
+    <template data-rich-source data-source-fallback>面向开发者的产品、工具与工程实践更新。（本日 1 条）
 
-  </summary>
-    <div class="collapsible-content" data-collapsible-content>
-      <div class="rendered-markdown"><p><strong><a href="https://blog.cloudflare.com/ai-gateway-spend-limits/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==" alt="Cloudflare Blog" loading="lazy"> Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本</a></strong> <mark class="text-highlight text-highlight-tag-major" data-highlight-kind="tag-major">重大</mark> <mark class="text-highlight text-highlight-tag-topic" data-highlight-kind="tag-topic">topic|primary</mark></p>
-<ul><li>发生了什么：Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本。它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢</li><li>为什么值得看：<mark class="text-highlight text-highlight-keyword-major" data-highlight-kind="keyword-major">落点</mark>：它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢。</li><li>来源：<a href="https://blog.cloudflare.com/ai-gateway-spend-limits/" target="_blank" rel="noopener noreferrer"><img class="inline-site-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==" alt="Cloudflare Blog" loading="lazy"> Cloudflare Blog</a></li></ul></div>
-    </div>
-    <template data-rich-source data-source-fallback>**[![Cloudflare Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==) Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本](https://blog.cloudflare.com/ai-gateway-spend-limits/)** ==tag-major|重大== ==tag-topic|topic|primary==
-- 发生了什么：Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本。它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢
-- 为什么值得看：==keyword-major|落点==：它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢。
+**[![Cloudflare Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==) Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本](https://blog.cloudflare.com/ai-gateway-spend-limits/)** ==tag-major|重大== ==tag-topic|topic|primary==
+- Cloudflare 给 AI Gateway 加上实时预算阈值，重点看多模型调用怎么控成本。它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢
+- ==keyword-major|落点==：它把 spend limit、身份权限和多供应商调用放进同一套控制面里，团队可以更早拦住 token 失控和预算外溢。
 - 来源：[![Cloudflare Blog](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACCElEQVRYhe3Vz0sUcRjH8dfobq6mZLV4CfpBHoJ+HSMIIqOQiCiwQxH4B5QQRRBdZKBDeAqiukWdgtqo/gGDLp2KDgVBVEQJFUoJ1ojr7nSYiTbdtVX7cdk3fJmZ7zzzfD7f7zzzDA0aNGjwnwkW8lAU6sRGrEUzRvAMn1oHxX/NQBRqwSEcx1a0p7cm8RLXcL110PgfNxCFcjiH02irETaNmzjVOmi0nrxN9RpAP87MIQ4ZHMPZKJSpJ2nVoCgUYAN2SFb1BgPI1ZEzSM3ewaMFGcBeXMZ6lPEZnXWI/yCP3tKD/sflsXeyfcNTc7n9hSjUgfvYNQ/BmcRBrn2ouXvbOnHcjoe4le0bfjMzsFoN5CUrX4S81035NR/F9mMfLuB+sdCzp6aBKLQsCh3FeaxchHwkdilY1jVKXFkzm3G5WOjZUhkcpOJduIg+ZGck/IIPklooozTjWDlGcTv+qpDdtnuFOB6U9Is2rMZyXMWJbN9wmZ9FOIAjNVY0iueSr6FYMUrp3HTF+VPcaxsyVSzELen1N8mOLk0N7ERXuiiZKLQKB2uIQ3c66mFCbLx4d++E0vQVbDK70POpkcRAOpGvU+B35ILWjm7l0mHJO6/G5Mh4U9y778D2JRkvMniLk5Itms+PZHYbj00F7SueSPrGjWrPBIy9Gmt6n2lWRs3+0KBBgwb/jO/e2pI72KgHtwAAAABJRU5ErkJggg==) Cloudflare Blog](https://blog.cloudflare.com/ai-gateway-spend-limits/)</template>
-  </details>
+  </section>
 <section class="panel" id="section-official-blog-updates" data-section-type="filterable-cards" data-section-group="main" data-section-status="info" data-trust-level="mixed-trust">
     <div class="section-heading split-row">
     <div>

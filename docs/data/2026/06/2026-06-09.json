@@ -992,43 +992,12 @@
     "status": "degraded",
     "public_note": "本轮每日追踪源部分受阻；受影响榜单只保留抓取状态，不写入未核验的新事实。",
     "affected_sections": [
-      "hot_blogs",
       "daily_tracking"
     ],
     "degraded_events": [
       {
         "section": "daily_tracking",
         "message": "每日追踪固定源部分不可用；受影响榜单只保留抓取状态，不进入公开正文。",
-        "severity": "degraded"
-      },
-      {
-        "section": "hot_blogs",
-        "message": "hot_blogs coverage is degraded and should be disclosed in the public report.",
-        "severity": "degraded"
-      },
-      {
-        "section": "huggingface_trending",
-        "message": "huggingface_trending below strict publish minimum: 0/10.",
-        "severity": "degraded"
-      },
-      {
-        "section": "hot_blogs",
-        "message": "hot_blogs below strict publish minimum: 3/6.",
-        "severity": "degraded"
-      },
-      {
-        "section": "builder_observations",
-        "message": "Non-primary sources in viewpoint, product, Builder, or community sections must disclose source level and verification/risk notes.",
-        "severity": "degraded"
-      },
-      {
-        "section": "source_status",
-        "message": "E. public APIs and paper sources missing from final source_status: arXiv cs.CL, arXiv cs.LG.",
-        "severity": "degraded"
-      },
-      {
-        "section": "evidence_assets",
-        "message": "Public evidence media includes invalid icons, unreadable images, missing files, or full-page screenshots.",
         "severity": "degraded"
       }
     ]

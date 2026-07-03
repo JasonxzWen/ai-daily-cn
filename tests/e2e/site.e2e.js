@@ -546,6 +546,10 @@ try {
   const desktopChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
   assert.equal(desktopChecklist.ok, true, JSON.stringify(desktopChecklist.issues, null, 2));
   assert.equal(desktopChecklist.checks.find((check) => check.id === "story_first_sections_expanded")?.ok, true);
+  assert.equal(desktopChecklist.checks.find((check) => check.id === "source_icon_size_stable")?.ok, true);
+  assert.equal(desktopChecklist.checks.find((check) => check.id === "tag_visual_treatment_stable")?.ok, true);
+  assert.equal(desktopChecklist.checks.find((check) => check.id === "left_nav_group_hierarchy")?.ok, true);
+  assert.equal(desktopChecklist.checks.find((check) => check.id === "report_quality_status_visible")?.ok, true);
   assert.equal(desktopChecklist.checks.find((check) => check.id === "public_source_audit_sections_absent")?.ok, true);
   await page.evaluate(() => {
     const stack = document.querySelector(".report-section-stack");
@@ -599,14 +603,10 @@ try {
   const firstTrackSection = page.locator("[id^='section-track-']").first();
   assert.equal(await firstTrackSection.evaluate((node) => node.tagName), "SECTION");
   const storyPanels = page.locator("details.collapsible-panel[id^='section-story-']");
-  assert(await storyPanels.count() >= 1, "per-story collapsible panels render");
-  assert.equal(await storyPanels.first().evaluate((node) => node.tagName), "DETAILS");
-  assert.equal(await storyPanels.first().evaluate((node) => node.open), false);
-  assert(await storyPanels.first().locator(".collapsible-subtitle").count() >= 1, "collapsed story shows a teaser");
+  assert.equal(await storyPanels.count(), 0, "stories should render inside expanded track cells, not collapsed panels");
   assert.equal(await page.locator("#section-today-judgment, #section-trend-themes, #section-story-list").count(), 0);
-  await storyPanels.first().locator("summary").click();
-  assert.equal(await storyPanels.first().evaluate((node) => node.open), true);
-  assert.match(await storyPanels.first().textContent(), /发生了什么|为什么值得看/);
+  assert.match(await firstTrackSection.textContent(), /来源/);
+  assert.doesNotMatch(await firstTrackSection.textContent(), /发生了什么|为什么值得看/);
   assert.equal(await page.locator('section[data-section-type="filterable-cards"]').count() > 0, true);
   assert.doesNotMatch(reportBody, /模型发布|ExampleModel 2|信源审计|自检与产物|发布质量说明|source_audit|self_check|candidate_id|quality_status|degraded_sections|remediation/);
   assert.match(reportBody, /订阅 RSS/);

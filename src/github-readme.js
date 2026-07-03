@@ -87,7 +87,7 @@ export function normalizeGithubReadmeSummary(value, repo = "", maxChars = DEFAUL
   const label = repoDisplayName(repo || parsed.label);
   const projectLabel = label ? `${label} 是` : "该仓库是";
   const audience = pickAudienceFromChinese(subject);
-  return finalizeGithubSummary(`${projectLabel}面向${audience}的开源项目，核心能力是${subject}；项目提供${deliverables}，主要用于${pickProjectUsageFromChinese(subject)}。`, maxChars);
+  return finalizeGithubSummary(`${projectLabel}${audience}相关的开源项目，公开说明提到${subject}等能力，并提供${deliverables}；评估时核对安装步骤、许可证、示例质量、近期维护和接入边界。`, maxChars);
 }
 
 function isLegacyGithubSummary(value) {
@@ -134,7 +134,7 @@ function parseLegacyGithubSummary(value) {
 function pickAudienceFromChinese(subject) {
   const text = String(subject || "");
   if (/Agent|工具调用|工作流/u.test(text)) {
-    return "agent 工作流和自动化工程";
+    return "代理式自动化、工具调用和开发者工作流";
   }
   if (/评测|回归|测试/u.test(text)) {
     return "模型评测、回归验证和工程质量控制";
@@ -305,7 +305,23 @@ function clampChineseSummary(text, maxChars) {
   }
   const target = Math.max(80, maxChars);
   const sliced = clean.slice(0, target).replace(/[\uff0c\u3002\uff1b\u3001\uff1a,.;:\s]+$/u, "");
-  return `${sliced}\u3002`;
+  const boundary = Math.max(
+    sliced.lastIndexOf("\u3002"),
+    sliced.lastIndexOf("\uff1b"),
+    sliced.lastIndexOf(";")
+  );
+  if (boundary >= 80) {
+    return sliced.slice(0, boundary + 1);
+  }
+  const softBoundary = Math.max(
+    sliced.lastIndexOf("\uff0c"),
+    sliced.lastIndexOf("\u3001"),
+    sliced.lastIndexOf(",")
+  );
+  if (softBoundary >= 80) {
+    return `${sliced.slice(0, softBoundary)}\u3002`;
+  }
+  return `${sliced}\u2026`;
 }
 
 function unique(values) {
