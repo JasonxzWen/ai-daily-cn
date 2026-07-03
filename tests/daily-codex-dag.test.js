@@ -5,7 +5,12 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import Ajv from "ajv/dist/2020.js";
-import { createDailyCodexDagDryRun, createDailyCodexDagPlan, validateDailyCodexDag } from "../src/daily-codex-dag.js";
+import {
+  createDailyCodexDagDryRun,
+  createDailyCodexDagPlan,
+  validateDailyCodexDag,
+  validateDailyCodexDagDryRunSummary
+} from "../src/daily-codex-dag.js";
 
 const rootDir = process.cwd();
 const manifestPath = path.join(rootDir, "config", "daily-codex-dag.json");
@@ -175,6 +180,172 @@ test("daily codex DAG dry-run summary schema validates fixture and rejects mixed
     run: fixture.run
   };
   await assertInvalidDagRunSummary(failureWithRunObject);
+});
+
+test("daily codex DAG dry-run summary semantic validator rejects schema-valid contradictions", async () => {
+  const fixture = await loadDryRunSummaryFixture();
+  const fullSummary = await createDailyCodexDagDryRun({
+    rootDir,
+    manifest: await loadManifest(),
+    reportDate: "2026-07-03",
+    now: fixedNow
+  });
+  const cases = [
+    {
+      name: "non-real report date",
+      mutate: (value) => {
+        value.report_date = "2026-02-31";
+      },
+      failure: "report_date must be a real YYYY-MM-DD date"
+    },
+    {
+      name: "non-canonical generated_at",
+      mutate: (value) => {
+        value.generated_at = "2026-07-03T16:00:00+08:00";
+      },
+      failure: "generated_at must be a canonical UTC Date#toISOString() string"
+    },
+    {
+      name: "node count mismatch",
+      mutate: (value) => {
+        value.plan.node_count += 1;
+      },
+      failure: "plan.node_count must equal plan.nodes.length"
+    },
+    {
+      name: "planned node mismatch",
+      mutate: (value) => {
+        value.run.planned_nodes = [...value.run.planned_nodes, "unknown-node"];
+      },
+      failure: "run.planned_nodes must equal plan.nodes ids"
+    },
+    {
+      name: "run levels mismatch",
+      mutate: (value) => {
+        value.run.levels[0].node_ids = [...value.run.levels[0].node_ids, "unknown-node"];
+      },
+      failure: "run.levels must equal plan.levels"
+    },
+    {
+      name: "plan levels unknown node",
+      mutate: (value) => {
+        value.plan.levels[0].node_ids = [...value.plan.levels[0].node_ids, "unknown-node"];
+      },
+      failure: "plan.levels references unknown node"
+    },
+    {
+      name: "plan levels duplicate node across levels",
+      mutate: (value) => {
+        value.plan.levels.push({ level: 1, node_ids: [value.plan.nodes[0].id] });
+      },
+      failure: "plan.levels repeats node"
+    },
+    {
+      name: "plan levels missing node",
+      base: "full",
+      mutate: (value) => {
+        const level = value.plan.levels.find((item) => item.node_ids.length > 1);
+        assert(level, "fixture must include a multi-node level for schema-valid missing-node case");
+        level.node_ids = level.node_ids.slice(1);
+      },
+      failure: "plan.levels flattened node_ids must equal plan.nodes ids"
+    },
+    {
+      name: "plan node level mismatch",
+      mutate: (value) => {
+        value.plan.nodes[0].level += 1;
+      },
+      failure: "level must match plan.levels"
+    },
+    {
+      name: "completed nodes are non-empty",
+      mutate: (value) => {
+        value.run.completed_nodes = [value.plan.nodes[0].id];
+      },
+      failure: "run.completed_nodes must be empty"
+    },
+    {
+      name: "failure envelope validation claims success",
+      value: {
+        ok: false,
+        failures: ["forced failure"],
+        warnings: [],
+        validation: {
+          ok: true,
+          failures: [],
+          warnings: [],
+          node_ids: [],
+          checked_files: []
+        },
+        plan: null,
+        run: null
+      },
+      failure: "validation.ok must be false"
+    }
+  ];
+
+  for (const item of cases) {
+    const base = item.base === "full" ? fullSummary : fixture;
+    const value = item.value || structuredCloneJson(base);
+    if (item.mutate) item.mutate(value);
+    await assertValidDagRunSummarySchemaOnly(value);
+    assertInvalidSemanticDagRunSummary(value, item.failure, item.name);
+  }
+});
+
+test("daily codex DAG dry-run summary semantic validator does not throw on malformed inputs", async () => {
+  const fixture = await loadDryRunSummaryFixture();
+  const failureValidationMissingFields = {
+    ok: false,
+    failures: ["forced failure"],
+    warnings: [],
+    validation: { ok: false },
+    plan: null,
+    run: null
+  };
+  const successValidationMissingFields = structuredCloneJson(fixture);
+  successValidationMissingFields.validation = { ok: true };
+  const successMissingNextAction = structuredCloneJson(fixture);
+  delete successMissingNextAction.next_action;
+  const successPlanNodeMissingTitle = structuredCloneJson(fixture);
+  delete successPlanNodeMissingTitle.plan.nodes[0].title;
+  const successBigIntLevelNodeId = structuredCloneJson(fixture);
+  successBigIntLevelNodeId.plan.levels[0].node_ids = [1n];
+  const successSymbolDependency = structuredCloneJson(fixture);
+  successSymbolDependency.plan.nodes[0].dependencies = [Symbol("dep")];
+  const cases = [
+    null,
+    [],
+    "not an object",
+    { ok: true },
+    { ok: false, failures: [], validation: null, plan: {}, run: {} },
+    { ok: false, failures: ["forced failure"], validation: "bad", plan: null, run: null },
+    { ok: false, failures: ["forced failure"], validation: null, plan: null, run: null },
+    {
+      ...structuredCloneJson(fixture),
+      validation: null
+    },
+    {
+      ...structuredCloneJson(fixture),
+      failures: ["unexpected success failure"]
+    },
+    {
+      ...structuredCloneJson(fixture),
+      warnings: "bad"
+    },
+    failureValidationMissingFields,
+    successValidationMissingFields,
+    successMissingNextAction,
+    successPlanNodeMissingTitle,
+    successBigIntLevelNodeId,
+    successSymbolDependency
+  ];
+
+  for (const value of cases) {
+    const result = validateDailyCodexDagDryRunSummary(value);
+    assert.equal(result.ok, false);
+    assert(result.failures.length > 0);
+  }
 });
 
 test("daily codex DAG dry-run helper refuses invalid manifests without throwing", async () => {
@@ -574,6 +745,14 @@ async function loadDryRunSummaryFixture() {
 }
 
 async function assertValidDagRunSummary(value) {
+  await assertValidDagRunSummarySchemaOnly(value);
+  const semanticResult = validateDailyCodexDagDryRunSummary(value);
+  if (!semanticResult.ok) {
+    assert.fail(`daily codex DAG run summary should pass semantic validation:\n${semanticResult.failures.join("\n")}`);
+  }
+}
+
+async function assertValidDagRunSummarySchemaOnly(value) {
   const validate = await getDagRunSummaryValidator();
   if (!validate(value)) {
     assert.fail(`daily codex DAG run summary should match schema:\n${formatAjvErrors(validate.errors)}`);
@@ -585,6 +764,17 @@ async function assertInvalidDagRunSummary(value) {
   if (validate(value)) {
     assert.fail("daily codex DAG run summary schema accepted an invalid envelope");
   }
+}
+
+function assertInvalidSemanticDagRunSummary(value, expectedFailure, label) {
+  const result = validateDailyCodexDagDryRunSummary(value);
+  if (result.ok) {
+    assert.fail(`daily codex DAG run summary semantic validator accepted invalid case: ${label}`);
+  }
+  assert(
+    result.failures.some((failure) => failure.includes(expectedFailure)),
+    `${label} failures:\n${result.failures.join("\n")}`
+  );
 }
 
 async function getDagRunSummaryValidator() {

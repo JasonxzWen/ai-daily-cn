@@ -16,14 +16,14 @@ Update after material sessions, before a new phase, or when validation evidence 
 | Area | Rating | P0/P1/P2 validation status | Browser acceptance status | Agent readability | Test stability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Public article index artifact | A | P0 passed: article contract, privacy scan, build-clean, regular and daily publish-plan assertions, full validate | Deferred; no UI behavior changed | Good | Stable in `tests/article-index.test.js` and `tests/publish.test.js` | Future DAG node schemas still need per-node replay | 2026-07-03 |
-| Daily Codex DAG manifest contract | B | P0 targeted manifest validator, lineage negative tests, deterministic plan projection tests, guarded dry-run summary tests, dry-run summary schema tests, existing workflow contract, pipeline compatibility, and full validate passed | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest, lineage, plan projection, dry-run CLI, and dry-run summary schema regressions | Full executable 16-node runner migration and per-node real schemas remain future work | 2026-07-03 |
+| Daily Codex DAG manifest contract | B | P0 targeted manifest validator, lineage negative tests, deterministic plan projection tests, guarded dry-run summary tests, dry-run summary schema tests, dry-run semantic validator tests, existing workflow contract, pipeline compatibility, and full validate passed | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest, lineage, plan projection, dry-run CLI, dry-run summary schema, and semantic summary regressions | Full executable 16-node runner migration and per-node real schemas remain future work | 2026-07-03 |
 
 ## Architecture Layers
 
 | Layer | Rating | Boundary health | Agent readability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- |
 | Public/private artifact boundary | A | `docs/articles.json` is now included in public scans with internal audit field denylist coverage | Good | DAG audit artifacts are not yet formalized per node | 2026-07-03 |
-| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, projects deterministic execution levels, exposes opt-in `.tmp/daily-codex-pipeline/**/*.json` dry-run summaries, and validates dry-run run-summary envelopes with a dedicated schema | Good | Dry-run CLI does not execute nodes; production runner still uses coarse stages | 2026-07-03 |
+| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, projects deterministic execution levels, exposes opt-in `.tmp/daily-codex-pipeline/**/*.json` dry-run summaries, validates dry-run run-summary envelopes with a dedicated schema, and checks strict dates plus plan/run invariants with a semantic validator | Good | Dry-run CLI does not execute nodes; production runner still uses coarse stages | 2026-07-03 |
 
 ## Change History
 
@@ -34,6 +34,14 @@ Update after material sessions, before a new phase, or when validation evidence 
 - Regressed:
 - New gaps:
 - Closed gaps:
+
+### 2026-07-03
+
+- Change: Added a dry-run summary semantic validator for daily Codex DAG artifacts.
+- Improved: Dry-run summaries now reject schema-invalid direct-call envelopes, non-real `report_date` values, non-canonical UTC `Date#toISOString()` timestamps, inconsistent plan/run node lists, malformed level partitions, dependency-level regressions, and non-throw malformed JS inputs.
+- Regressed: None known.
+- New gaps: The dry-run validator is intentionally scoped to dry-run summaries; executable node results, per-node artifacts, and production DAG runner migration remain future work.
+- Closed gaps: PR #213's deferred stricter date-format and cross-field invariant risks are now covered by targeted semantic tests.
 
 ### 2026-07-03
 
