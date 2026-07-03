@@ -4,11 +4,11 @@ import { createHash } from "node:crypto";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { parseDailyMarkdown } from "./parser.js";
-import { defaultStyleCss, renderIndexHtml, renderOfficialBlogsHtml } from "./render.js";
+import { defaultStyleCss, renderIndexHtml, renderOfficialBlogsHtml, renderOpsIndexHtml } from "./render.js";
 import { renderReportWithEffectiveInteract } from "./interaction-report.js";
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import { defaultGeneratedAt } from "./time.js";
-import { validateFeed, validateReport, validateTrends } from "./schema.js";
+import { validateArticles, validateFeed, validateReport, validateTrends } from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
 import { deriveQualityStatus, normalizeQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
@@ -78,6 +78,84 @@ const LEGACY_REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ru
 const REMOVED_PUBLIC_SOURCE_RE = /(?:hellogithub|hello\s*github|ruanyf|ruan\s*yf)/i;
 const COMMUNITY_HOTSPOT_SOURCE_RE = /(?:hnrss|hacker news|news\.ycombinator|reddit\.com\/r\/(?:machinelearning|localllama|singularity|artificial)|r\/(?:machinelearning|localllama|singularity|artificial))/i;
 const PUBLIC_DISCOVERY_DEGRADED_NOTE = "Some discovery coverage is degraded; this report may be incomplete.";
+
+const ARTICLE_SECTIONS = [
+  "stories",
+  "main_items",
+  "hot_blogs",
+  "github_trending",
+  "huggingface_trending",
+  "daily_tracking",
+  "projects",
+  "builder_observations",
+  "community_leads",
+  "official_org_updates",
+  "chinese_media_dynamics"
+];
+const ARTICLE_SECTION_BASE_SCORE = {
+  stories: 88,
+  main_items: 86,
+  hot_blogs: 76,
+  github_trending: 72,
+  huggingface_trending: 72,
+  daily_tracking: 80,
+  projects: 70,
+  builder_observations: 68,
+  community_leads: 60,
+  official_org_updates: 82,
+  chinese_media_dynamics: 72
+};
+const ARTICLE_DOMAIN_ORDER = [
+  "AI 产品与应用工具",
+  "AI 用法与实践方法",
+  "企业落地与业务应用",
+  "行业动态与政策地缘",
+  "基础模型与算力技术栈",
+  "多模态与具身等前沿"
+];
+const ARTICLE_FLAVORS = ["快讯", "论文", "技术拆解", "商业洞察", "报告", "实战方法", "观点专访"];
+const KNOWN_AI_COMPANIES = [
+  "OpenAI",
+  "Anthropic",
+  "Google",
+  "Microsoft",
+  "Meta",
+  "Apple",
+  "NVIDIA",
+  "GitHub",
+  "Hugging Face",
+  "ByteDance",
+  "Mistral",
+  "xAI",
+  "Perplexity",
+  "Vercel",
+  "Cloudflare",
+  "LangChain",
+  "DeepSeek",
+  "Alibaba",
+  "Tencent",
+  "Baidu",
+  "Moonshot",
+  "Zhipu"
+];
+const KNOWN_AI_PRODUCTS = [
+  "ChatGPT",
+  "Claude",
+  "Gemini",
+  "Codex",
+  "Copilot",
+  "Sora",
+  "Llama",
+  "GPT",
+  "DeepSeek",
+  "Qwen",
+  "Kimi",
+  "LangGraph",
+  "LangChain",
+  "SGLang",
+  "vLLM",
+  "MCP"
+];
 const PUBLIC_QUALITY_SECTION_ALIASES = new Map([
   ["source_audit.github_trending", "github_trending"],
   ["source_audit.huggingface_trending", "huggingface_trending"],
@@ -418,6 +496,17 @@ export async function buildSite(options = {}) {
     reports
   });
   const dateIndex = buildDateIndex(feedValidation.value, reports, trendValidation.value);
+  const articles = buildArticleIndex(reports, {
+    siteTitle,
+    siteUrl,
+    updatedAt: feedValidation.value.updated_at
+  });
+  const articleValidation = validateArticles(articles);
+  if (!articleValidation.valid) {
+    throw new PublisherError("articles_schema_validation_failed", "生成的 articles.json 未通过 schema 校验。", {
+      errors: articleValidation.errors
+    });
+  }
   const reportNavigationByDate = buildReportNavigation(feedValidation.value.reports, dateIndex.items);
   const trackingHistoryByDate = buildDailyTrackingHistoryByReportDate(reports);
 
@@ -434,20 +523,27 @@ export async function buildSite(options = {}) {
   }
 
   await writeJsonTracked(outDir, "feed.json", feedValidation.value, writtenFiles);
+  await writeJsonTracked(outDir, "articles.json", articleValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "data/official-blogs.json", officialBlogKnowledge, writtenFiles);
   await writeFileTracked(outDir, "official-blogs/index.html", renderOfficialBlogsHtml(officialBlogKnowledge, {
     styleHref: `../assets/style.css?v=${encodeURIComponent(indexStyleVersion)}`
   }), writtenFiles);
-  await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value, dateIndex, {
+  await writeFileTracked(outDir, "ops.html", renderOpsIndexHtml(feedValidation.value, trendValidation.value, dateIndex, {
     styleVersion: indexStyleVersion,
     officialBlogKnowledge
+  }), writtenFiles);
+  await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value, dateIndex, {
+    styleVersion: indexStyleVersion,
+    officialBlogKnowledge,
+    articles: articleValidation.value
   }), writtenFiles);
 
   return {
     outDir,
     reports,
     feed: feedValidation.value,
+    articles: articleValidation.value,
     trends: trendValidation.value,
     officialBlogKnowledge,
     dateIndex,
@@ -502,7 +598,17 @@ export async function planGeneratedFiles(options = {}) {
   const generatedAt = options.generatedAt || defaultGeneratedAt();
   const markdownFiles = await collectMarkdownFiles(inputDir);
   const reportJsonFiles = await collectJsonFiles(dataInputDir);
-  const files = [".nojekyll", "assets/style.css", "feed.json", "index.html", "trends.json", "data/official-blogs.json", "official-blogs/index.html"];
+  const files = [
+    ".nojekyll",
+    "assets/style.css",
+    "feed.json",
+    "articles.json",
+    "index.html",
+    "ops.html",
+    "trends.json",
+    "data/official-blogs.json",
+    "official-blogs/index.html"
+  ];
   const reports = [];
 
   for (const file of markdownFiles) {
@@ -575,6 +681,412 @@ export function mergeFeed(existingFeed, reports, options = {}) {
     updated_at: updatedAt,
     reports: mergedReports
   };
+}
+
+export function buildArticleIndex(reports = [], options = {}) {
+  const byUrl = new Map();
+  const orderedReports = [...(Array.isArray(reports) ? reports : [])]
+    .filter((report) => report?.report_date)
+    .sort((a, b) => String(b.report_date || "").localeCompare(String(a.report_date || "")));
+
+  for (const report of orderedReports) {
+    for (const section of ARTICLE_SECTIONS) {
+      const items = Array.isArray(report[section]) ? report[section] : [];
+      for (const item of items) {
+        const article = articleFromReportItem(report, section, item, options);
+        if (!article) {
+          continue;
+        }
+        const key = articleUrlKey(article.url);
+        if (!key) {
+          continue;
+        }
+        byUrl.set(key, byUrl.has(key) ? mergeArticleRecords(byUrl.get(key), article) : article);
+      }
+    }
+  }
+
+  return [...byUrl.values()].sort((a, b) =>
+    String(b.date).localeCompare(String(a.date)) ||
+    Number(b.quality_score || 0) - Number(a.quality_score || 0) ||
+    String(a.title).localeCompare(String(b.title), "zh-Hans-CN")
+  );
+}
+
+function articleFromReportItem(report, section, item, options = {}) {
+  if (!item || typeof item !== "object") {
+    return null;
+  }
+  const url = articleItemUrl(section, item);
+  if (!isHttpUrl(url)) {
+    return null;
+  }
+  const title = articleItemTitle(section, item);
+  const summary = articleItemSummary(section, item);
+  const source = articleItemSource(section, item);
+  if (!title || !summary || !source) {
+    return null;
+  }
+  const date = normalizeArticleDate(item.event_date || item.date || report.report_date, report.report_date);
+  const paths = reportRelativePaths(report.report_date);
+  const importance = normalizeArticleImportance(item.importance || (section === "stories" ? item.importance : ""));
+  const rawText = [
+    section,
+    title,
+    summary,
+    source,
+    item.editorial_category,
+    item.topic,
+    item.trend,
+    item.content_type,
+    item.language,
+    item.task,
+    item.role,
+    item.primary_entity,
+    item.object,
+    ...(Array.isArray(item.entities) ? item.entities : [])
+  ].filter(Boolean).join(" ");
+  const taxonomy = classifyArticleTaxonomy(section, rawText);
+  const entities = extractArticleEntities(item, rawText);
+  return {
+    id: articleId(url),
+    title,
+    url,
+    summary,
+    date,
+    month: date.slice(0, 7),
+    source,
+    section,
+    report_date: report.report_date,
+    report_url: paths.htmlPath,
+    data_url: paths.dataPath,
+    quality_score: scoreArticle(section, item, importance, summary),
+    importance,
+    domain: taxonomy.domain,
+    flavors: taxonomy.flavors,
+    channels_l1: taxonomy.channels_l1,
+    channels_l2: taxonomy.channels_l2,
+    companies: entities.companies,
+    products: entities.products
+  };
+}
+
+function articleItemUrl(section, item) {
+  if (section === "stories") {
+    return item.sources?.find((source) => isHttpUrl(source?.url))?.url || item.url || "";
+  }
+  return item.url || item.html_url || item.source_url || "";
+}
+
+function articleItemTitle(section, item) {
+  if (section === "stories") {
+    return cleanArticleText(item.object || item.title);
+  }
+  if (section === "builder_observations") {
+    const author = cleanArticleText(item.author || item.handle || "Builder");
+    const text = cleanArticleText(item.original_text || item.content || item.translation || "");
+    return `${author}: ${truncateArticleText(text, 42)}`;
+  }
+  if (section === "daily_tracking") {
+    return cleanArticleText(item.name || item.title);
+  }
+  if (section === "projects" || section === "github_trending" || section === "huggingface_trending") {
+    return cleanArticleText(item.name || item.repo || item.title);
+  }
+  return cleanArticleText(item.title || item.name);
+}
+
+function articleItemSummary(section, item) {
+  if (section === "stories") {
+    return cleanArticleText([item.what_happened, item.why_it_matters].filter(Boolean).join(" "));
+  }
+  if (section === "github_trending" || section === "huggingface_trending" || section === "projects") {
+    return cleanArticleText(item.readme_summary || item.description || item.summary || item.evidence);
+  }
+  if (section === "builder_observations") {
+    return cleanArticleText(item.original_text || item.content || item.translation);
+  }
+  if (section === "daily_tracking") {
+    return cleanArticleText(item.summary || item.change_summary || firstString(item.watch_points) || item.evidence);
+  }
+  if (section === "community_leads") {
+    return cleanArticleText(item.content || item.summary);
+  }
+  return cleanArticleText(item.summary || item.content || item.description || item.evidence);
+}
+
+function articleItemSource(section, item) {
+  if (section === "stories") {
+    return cleanArticleText(item.sources?.[0]?.label || item.primary_entity || item.source || "AI Daily");
+  }
+  if (section === "hot_blogs") {
+    return cleanArticleText(item.publisher || item.source || item.author || "Blog");
+  }
+  if (section === "builder_observations") {
+    return cleanArticleText(item.author || item.handle || item.source || "Builder/X");
+  }
+  return cleanArticleText(item.source || item.publisher || item.author || item.repo || item.name || "AI Daily");
+}
+
+function classifyArticleTaxonomy(section, textValue) {
+  const text = String(textValue || "");
+  const lower = text.toLowerCase();
+  let domain = "行业动态与政策地缘";
+  const flavors = new Set();
+  const channelsL1 = new Set();
+  const channelsL2 = new Set();
+
+  if (/(?:\b(?:video|image|audio|multimodal|vision|3d|robot|embodied)\b|多模态|视频|图像|语音|具身|机器人)/i.test(text)) {
+    domain = "多模态与具身等前沿";
+    channelsL1.add("多模态 AI");
+    channelsL2.add(/(?:\b(?:robot|embodied)\b|具身|机器人)/i.test(text) ? "具身智能" : "多模态生成");
+  } else if (/(?:\b(?:github|repo|open source|oss|cuda|kernel|inference|vector|rag|sdk|api|developer|benchmark|eval)\b|开源|推理|向量|检索|开发者|基准|评测|算力)/i.test(text)) {
+    domain = "基础模型与算力技术栈";
+    channelsL1.add(/(?:\b(?:inference|cuda|gpu|nvidia)\b|推理|算力)/i.test(text) ? "AI 算力与推理服务" : "AI 工程栈");
+    channelsL2.add(/(?:\b(?:rag|vector)\b|检索|向量)/i.test(text) ? "RAG 与检索" : "开发者工具");
+  } else if (/(?:\b(?:enterprise|business|cost|pricing|adoption|governance|organization|frontier company)\b|企业|组织|治理|成本|预算|商业|落地|采纳)/i.test(text)) {
+    domain = "企业落地与业务应用";
+    channelsL1.add("企业 AI 采纳");
+    channelsL2.add(/(?:\b(?:cost|pricing)\b|成本|预算)/i.test(text) ? "成本与用量治理" : "企业治理与落地");
+  } else if (/(?:\b(?:workflow|playbook|practice|method|guide|how to|skill|agent workflow)\b|实践|方法|教程|工作流|经验)/i.test(text)) {
+    domain = "AI 用法与实践方法";
+    channelsL1.add("AI 实践方法");
+    channelsL2.add("Agent 工作流");
+  } else if (/(?:\b(?:product|tool|app|assistant|copilot|codex|plugin)\b|产品|工具|助手|应用)/i.test(text)) {
+    domain = "AI 产品与应用工具";
+    channelsL1.add(/(?:\b(?:agent|assistant|copilot|codex)\b|助手|智能体)/i.test(text) ? "AI 助手与 Agent" : "工作场景 AI 软件");
+    channelsL2.add(/(?:\b(?:code|coding|codex|copilot)\b|编程|代码)/i.test(text) ? "AI 编程" : "AI 应用工具");
+  }
+
+  if (/(?:\b(?:policy|regulation|law|geopolitic)\b|safety rule|监管|政策|地缘|法规)/i.test(text)) {
+    domain = "行业动态与政策地缘";
+    channelsL1.add("AI 政策与地缘");
+    channelsL2.add("监管与政策");
+  }
+
+  if (/(?:\b(?:agent|copilot|codex|assistant)\b|智能体|助手)/i.test(text)) {
+    channelsL1.add("AI 助手与 Agent");
+    channelsL2.add(/(?:\b(?:code|coding|codex|copilot)\b|编程|代码)/i.test(text) ? "AI 编程" : "Agent 产品");
+  }
+  if (/(?:\b(?:model|llm|gpt|claude|gemini|llama|qwen|deepseek)\b|模型|大模型|基础模型)/i.test(text)) {
+    channelsL1.add("基础模型");
+    channelsL2.add("模型能力");
+  }
+  if (/(?:\b(?:market|funding|startup|revenue)\b|融资|市场|收入|公司动态)/i.test(text)) {
+    channelsL1.add("AI 市场动态");
+    channelsL2.add("市场与商业化");
+  }
+
+  if (/(?:\b(?:paper|arxiv|research)\b|论文|研究)/i.test(text)) {
+    flavors.add("论文");
+  }
+  if (/(?:\b(?:report|whitepaper|survey)\b|报告|白皮书|调研)/i.test(text)) {
+    flavors.add("报告");
+  }
+  if (section === "builder_observations" || /(?:\b(?:interview|podcast|opinion)\b|观点|访谈|播客)/i.test(text)) {
+    flavors.add("观点专访");
+  }
+  if (section === "hot_blogs" || /(?:\b(?:deep dive|analysis|benchmark|eval)\b|拆解|解析|架构|调优|内核)/i.test(text)) {
+    flavors.add("技术拆解");
+  }
+  if (/(?:\b(?:workflow|practice|guide|how to|playbook)\b|方法|实践|教程|工作流)/i.test(text)) {
+    flavors.add("实战方法");
+  }
+  if (/(?:\b(?:business|market|enterprise|cost|pricing|adoption)\b|商业|市场|企业|成本|治理)/i.test(text)) {
+    flavors.add("商业洞察");
+  }
+  if (flavors.size === 0 || section === "github_trending" || section === "huggingface_trending" || section === "daily_tracking") {
+    flavors.add("快讯");
+  }
+
+  if (channelsL1.size === 0) {
+    channelsL1.add(domain === "行业动态与政策地缘" ? "AI 市场动态" : "AI 工程栈");
+  }
+  if (channelsL2.size === 0) {
+    channelsL2.add(defaultArticleChannelL2(domain));
+  }
+
+  return {
+    domain: ARTICLE_DOMAIN_ORDER.includes(domain) ? domain : ARTICLE_DOMAIN_ORDER[0],
+    flavors: orderedKnownValues(flavors, ARTICLE_FLAVORS),
+    channels_l1: uniqueSorted([...channelsL1]),
+    channels_l2: uniqueSorted([...channelsL2])
+  };
+}
+
+function defaultArticleChannelL2(domain) {
+  if (domain === "AI 产品与应用工具") return "AI 应用工具";
+  if (domain === "AI 用法与实践方法") return "实践方法";
+  if (domain === "企业落地与业务应用") return "企业落地";
+  if (domain === "行业动态与政策地缘") return "行业动态";
+  if (domain === "多模态与具身等前沿") return "多模态生成";
+  return "开发者工具";
+}
+
+function scoreArticle(section, item = {}, importance, summary) {
+  let score = ARTICLE_SECTION_BASE_SCORE[section] ?? 60;
+  if (importance === "major") score += 8;
+  if (importance === "notable") score += 4;
+  if (String(item.evidence_level || "").toLowerCase() === "primary") score += 4;
+  if (String(item.evidence_level || "").toLowerCase() === "multi_source") score += 3;
+  if (String(item.tier || "").toUpperCase() === "T0") score += 4;
+  if (String(item.tier || "").toUpperCase() === "T1") score += 2;
+  if (String(item.source_level || "").toUpperCase() === "T0") score += 3;
+  if (String(item.verification_status || "").toLowerCase() === "verified") score += 3;
+  if (String(summary || "").length >= 120) score += 2;
+  if (section === "community_leads") score -= 4;
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function extractArticleEntities(item = {}, textValue = "") {
+  const text = String(textValue || "");
+  const companies = new Set();
+  const products = new Set();
+  const entityValues = Array.isArray(item.entities) ? item.entities : [];
+  for (const entity of entityValues) {
+    const value = cleanArticleText(entity);
+    if (!value || /^https?:\/\//i.test(value) || value.includes("/")) {
+      continue;
+    }
+    if (matchesKnown(value, KNOWN_AI_PRODUCTS)) {
+      products.add(canonicalKnown(value, KNOWN_AI_PRODUCTS));
+    } else if (matchesKnown(value, KNOWN_AI_COMPANIES)) {
+      companies.add(canonicalKnown(value, KNOWN_AI_COMPANIES));
+    }
+  }
+  for (const company of KNOWN_AI_COMPANIES) {
+    if (new RegExp(escapeRegExp(company), "i").test(text)) {
+      companies.add(company);
+    }
+  }
+  for (const product of KNOWN_AI_PRODUCTS) {
+    if (new RegExp(escapeRegExp(product), "i").test(text)) {
+      products.add(product);
+    }
+  }
+  const repo = cleanArticleText(item.repo || item.name || "");
+  const repoOwner = repo.includes("/") ? repo.split("/")[0] : "";
+  if (repoOwner) {
+    const ownerCompany = canonicalKnown(repoOwner, KNOWN_AI_COMPANIES);
+    if (ownerCompany) {
+      companies.add(ownerCompany);
+    }
+  }
+  return {
+    companies: uniqueSorted([...companies]),
+    products: uniqueSorted([...products])
+  };
+}
+
+function mergeArticleRecords(existing, incoming) {
+  return {
+    ...existing,
+    quality_score: Math.max(existing.quality_score, incoming.quality_score),
+    importance: articleImportanceRank(incoming.importance) > articleImportanceRank(existing.importance)
+      ? incoming.importance
+      : existing.importance,
+    flavors: uniqueSorted([...existing.flavors, ...incoming.flavors]),
+    channels_l1: uniqueSorted([...existing.channels_l1, ...incoming.channels_l1]),
+    channels_l2: uniqueSorted([...existing.channels_l2, ...incoming.channels_l2]),
+    companies: uniqueSorted([...existing.companies, ...incoming.companies]),
+    products: uniqueSorted([...existing.products, ...incoming.products])
+  };
+}
+
+function articleImportanceRank(value) {
+  if (value === "major") return 3;
+  if (value === "notable") return 2;
+  return 1;
+}
+
+function normalizeArticleImportance(value) {
+  const normalized = String(value || "").toLowerCase();
+  if (normalized === "major" || normalized === "high") return "major";
+  if (normalized === "notable" || normalized === "medium") return "notable";
+  return "general";
+}
+
+function normalizeArticleDate(value, fallback) {
+  const candidate = String(value || "").slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(candidate)) {
+    return candidate;
+  }
+  return String(fallback || "").slice(0, 10);
+}
+
+function articleUrlKey(value) {
+  try {
+    const url = new URL(String(value || ""));
+    url.hash = "";
+    for (const key of [...url.searchParams.keys()]) {
+      if (/^(utm_|fbclid$|gclid$|igshid$|mc_cid$|mc_eid$)/i.test(key)) {
+        url.searchParams.delete(key);
+      }
+    }
+    url.hostname = url.hostname.toLowerCase();
+    if (url.pathname.length > 1) {
+      url.pathname = url.pathname.replace(/\/+$/, "");
+    }
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+function articleId(url) {
+  return `article-${createHash("sha256").update(articleUrlKey(url) || String(url)).digest("hex").slice(0, 16)}`;
+}
+
+function cleanArticleText(value) {
+  return String(value || "")
+    .replace(/\*\*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function truncateArticleText(value, maxLength) {
+  const text = cleanArticleText(value);
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, Math.max(0, maxLength - 1)).trim()}…`;
+}
+
+function firstString(values) {
+  return (Array.isArray(values) ? values : []).find((value) => typeof value === "string" && value.trim());
+}
+
+function isHttpUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function orderedKnownValues(values, order) {
+  const set = new Set(values);
+  const ordered = order.filter((value) => set.has(value));
+  for (const value of set) {
+    if (!ordered.includes(value)) {
+      ordered.push(value);
+    }
+  }
+  return ordered;
+}
+
+function matchesKnown(value, knownValues) {
+  return Boolean(canonicalKnown(value, knownValues));
+}
+
+function canonicalKnown(value, knownValues) {
+  const normalized = String(value || "").toLowerCase();
+  return knownValues.find((known) => known.toLowerCase() === normalized || normalized.includes(known.toLowerCase())) || "";
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 export function buildDateIndex(feed = {}, reports = [], trends = null) {

@@ -12504,7 +12504,9 @@ test("buildSite preserves explicit report quality status in docs data and homepa
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/07/2026-07-02.json"), "utf8"));
   assert.equal(publicData.quality_status.status, "degraded");
   const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert.match(indexHtml, /data-quality-status="degraded"/);
+  assert.match(indexHtml, /data-article-index="aify-style"/);
+  const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
+  assert.match(opsHtml, /data-quality-status="degraded"/);
   assert.doesNotMatch(indexHtml, /Report generation is blocked by validation failure/);
 });
 
@@ -13258,11 +13260,14 @@ test("buildSite writes trend index and injects scoped trend tags without mutatin
   assert(html.includes("日报导航"));
 
   const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert(indexHtml.includes('id="topic-radar"'));
-  assert(indexHtml.includes('id="signal-heat-strip"'));
-  assert(!indexHtml.includes("近 7 日趋势"));
-  assert(!indexHtml.includes("按年月周导航"));
-  assert(indexHtml.includes("coding agent"));
+  assert(indexHtml.includes('data-article-index="aify-style"'));
+  assert(indexHtml.includes("articles.json"));
+  const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
+  assert(opsHtml.includes('id="topic-radar"'));
+  assert(opsHtml.includes('id="signal-heat-strip"'));
+  assert(!opsHtml.includes("近 7 日趋势"));
+  assert(!opsHtml.includes("按年月周导航"));
+  assert(opsHtml.includes("coding agent"));
 
   const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-29.json"), "utf8"));
   assert.equal(data.annotations_by_date, undefined);
@@ -13699,7 +13704,7 @@ test("official blog related report dates generated file public projection is gen
   assert(!serialized.includes("rationale"));
   assert(!serialized.includes("source_audit"));
   assert(!serialized.includes("self_check"));
-  const html = await fs.readFile(path.join(outDir, "index.html"), "utf8");
+  const html = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
   assert(html.includes('id="official-blog-knowledge"'));
   assert(html.includes('href="data/official-blogs.json"'));
   assert(html.includes('href="official-blogs/"'));
@@ -13720,6 +13725,8 @@ test("official blog related report dates generated file public projection is gen
     siteUrl,
     generatedAt: fixedGeneratedAt
   });
+  assert(generated.files.includes("articles.json"));
+  assert(generated.files.includes("ops.html"));
   assert(generated.files.includes("data/official-blogs.json"));
   assert(generated.files.includes("official-blogs/index.html"));
 });
@@ -13857,14 +13864,17 @@ test("buildSite writes date index homepage without exposing private report field
   });
 
   assert(result.writtenFiles.includes("index.html"));
+  assert(result.writtenFiles.includes("ops.html"));
   assert.equal(result.dateIndex.items.length, 2);
   const html = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert(html.includes('id="date-research-index"'));
-  assert(html.includes('data-date-card="2026-05-13"'));
-  assert(html.includes('data-date-card="2026-05-14"'));
-  assert(html.indexOf('data-date-card="2026-05-13"') < html.indexOf('data-date-card="2026-05-14"'));
-  assert(html.includes('data-strength-level="strong"'));
-  assert(html.includes("透明统计"));
+  assert(html.includes('data-article-index="aify-style"'));
+  const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
+  assert(opsHtml.includes('id="date-research-index"'));
+  assert(opsHtml.includes('data-date-card="2026-05-13"'));
+  assert(opsHtml.includes('data-date-card="2026-05-14"'));
+  assert(opsHtml.indexOf('data-date-card="2026-05-13"') < opsHtml.indexOf('data-date-card="2026-05-14"'));
+  assert(opsHtml.includes('data-strength-level="strong"'));
+  assert(opsHtml.includes("透明统计"));
   assert(!html.includes("source_audit"));
   assert(!html.includes("self_check"));
   assert(!html.includes("candidate_pool"));
