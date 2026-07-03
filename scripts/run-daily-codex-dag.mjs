@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createDailyCodexDagDryRun } from "../src/daily-codex-dag.js";
+import { createDailyCodexDagContractRun, createDailyCodexDagDryRun } from "../src/daily-codex-dag.js";
 
 function parseArgs(argv) {
   const args = {
     dryRun: false,
+    contractRun: false,
+    execute: false,
+    publish: false,
     json: false,
     date: "",
     summaryPath: ""
@@ -15,6 +18,12 @@ function parseArgs(argv) {
     const arg = argv[index];
     if (arg === "--dry-run") {
       args.dryRun = true;
+    } else if (arg === "--contract-run") {
+      args.contractRun = true;
+    } else if (arg === "--execute") {
+      args.execute = true;
+    } else if (arg === "--publish") {
+      args.publish = true;
     } else if (arg === "--json") {
       args.json = true;
     } else if (arg === "--date") {
@@ -31,8 +40,17 @@ function parseArgs(argv) {
     }
   }
 
-  if (!args.dryRun) {
+  if (!args.dryRun && !args.contractRun) {
     throw new Error("daily codex DAG CLI requires --dry-run");
+  }
+  if (args.dryRun && args.contractRun) {
+    throw new Error("daily codex DAG CLI cannot combine --dry-run and --contract-run");
+  }
+  if (!args.contractRun && (args.execute || args.publish)) {
+    throw new Error(`Unsupported argument: ${args.execute ? "--execute" : "--publish"}`);
+  }
+  if (args.contractRun && (args.execute || args.publish)) {
+    throw new Error("daily codex DAG CLI contract-run does not support --execute or --publish");
   }
   if (!args.json) {
     throw new Error("daily codex DAG CLI requires --json");
@@ -68,7 +86,9 @@ async function main() {
   try {
     const args = parseArgs(process.argv.slice(2));
     const summaryPath = resolveSummaryPath(process.cwd(), args.summaryPath);
-    const result = await createDailyCodexDagDryRun({ reportDate: args.date });
+    const result = args.contractRun
+      ? await createDailyCodexDagContractRun({ reportDate: args.date })
+      : await createDailyCodexDagDryRun({ reportDate: args.date });
     if (result.ok) {
       await writeSummaryFile(summaryPath, result);
     }
