@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-03.project_iteration.article-index-aify-home",
+  "run_type": "project_iteration",
+  "date": "2026-07-03",
+  "title": "Aify-style article index homepage",
+  "slug": "article-index-aify-home",
+  "status": "completed",
+  "summary": "This iteration lands the first agreed Aify-inspired slice after PR204: the homepage becomes a compact article library backed by public articles.json, the previous operational dashboard moves to ops.html, article records gain category, flavor, score, channel, company, and product metadata, and schema/unit/e2e/browser checks guard the new public contract.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/article-index.test.js",
+      "npm run build",
+      "npm run content:contract",
+      "npm run privacy:validate",
+      "npm run test",
+      "npm run test:e2e",
+      "npm run validate",
+      "node scripts/harness-validate.mjs",
+      "node scripts/validate-retrospectives.mjs"
+    ]
+  },
+  "blockers": [],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "The public reader surface needs an article-level database before deeper multi-agent workflow changes can show value.",
+      "evidence": "The new build extracts and deduplicates article records across reports into docs/articles.json, then renders index.html from that normalized public contract instead of only from daily report pages.",
+      "scope": "public_article_library",
+      "persistence": "implemented",
+      "recommended_action": "Keep articles.json as the stable public data surface when implementing the next pipeline DAG stages."
+    },
+    {
+      "lesson": "Aify-style taxonomy is useful immediately even when generated heuristically from existing report artifacts.",
+      "evidence": "Article records now carry domain, flavor, quality_score, importance, channels_l1, channels_l2, companies, and products, and tests verify the public schema does not leak internal generation fields.",
+      "scope": "taxonomy_scoring_contract",
+      "persistence": "implemented",
+      "recommended_action": "Promote taxonomy and score assignment into isolated candidate-scoring and classification agents in the next workflow PR."
+    },
+    {
+      "lesson": "Homepage and operations dashboard should be separate products.",
+      "evidence": "index.html now serves the reader-oriented article library, while ops.html preserves the prior dashboard for source, trend, and run-state inspection.",
+      "scope": "frontend_information_architecture",
+      "persistence": "implemented",
+      "recommended_action": "Keep daily report pages focused on narrative synthesis and keep operational diagnostics out of the first public viewport."
+    }
+  ],
+  "suggestions": [
+    {
+      "status": "recommended",
+      "issue": "The production workflow is still not split into the full 15+ isolated stages requested by the product direction.",
+      "evidence": "This iteration intentionally limits scope to the article-index contract and frontend, while PR204 only partially stages collect, admit, summarize, assemble, audit, validate, and publish verification.",
+      "module": "daily_generation_pipeline",
+      "suggestion": "Implement the next PR as a pipeline DAG/state-machine refactor with explicit fetch, parse, score, classify, dedupe, cross-language matching, timeliness, quality review, correction, storage, card/page generation, delivery, and cleanup stages.",
+      "expected_benefit": "Reduces context contamination, increases parallelism, and makes failures inspectable at the same granularity as the Aify reference.",
+      "requires_user_confirmation": false,
+      "promotion_path": "Next project iteration after article-index homepage lands.",
+      "ledger_links": [
+        "feedback/p1-reader-summary-independent-pipeline",
+        "feedback/p1-daily-resilience-contract"
+      ],
+      "validation_evidence": [
+        "tests/daily-codex-pipeline.test.js",
+        "scripts/validate-daily-workflow-contract.mjs"
+      ]
+    }
+  ],
+  "ledger_links": [
+    "feedback/p1-reader-summary-independent-pipeline",
+    "feedback/p1-daily-resilience-contract",
+    "feedback/p1-public-daily-content-contract"
+  ],
+  "followups": [
+    {
+      "status": "recommended",
+      "action": "Build the full multi-agent production DAG/state-machine on top of the new article-level contract, then re-check whether smaller source-quality followups still matter.",
+      "owner": "project"
+    }
+  ]
+}

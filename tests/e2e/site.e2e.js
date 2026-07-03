@@ -462,6 +462,25 @@ const browser = await chromium.launch();
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await page.goto(`${server.url}/index.html`);
+  assert.match(await page.locator("h1").textContent(), /AI 资讯库/);
+  assert.equal(await hasRemoteScripts(page), false);
+  assert.equal(await page.locator('[data-article-index="aify-style"]').count(), 1);
+  assert.equal(await page.locator('a[href="ops.html"]').count(), 1);
+  assert.equal(await page.locator('a[href="articles.json"]').count(), 1);
+  assert.equal(await page.locator('[data-article-filter="today"]').count(), 1);
+  assert.equal(await page.locator('[data-article-filter="all"]').count(), 1);
+  assert.equal(await page.locator("#articleSearch").count(), 1);
+  assert.equal(await page.locator("[data-article-card]").count() >= 2, true);
+  await page.locator("#articleSearch").fill("harness");
+  assert.equal(await page.locator("[data-article-card]").count() >= 1, true);
+  await page.locator("#articleSearch").fill("");
+  await page.locator('[data-article-filter="all"]').click();
+  assert.equal(await page.locator("#article-results-title").textContent(), "全部资讯");
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await hasHorizontalOverflow(page), false);
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  await page.goto(`${server.url}/ops.html`);
   assert.match(await page.locator("h1").textContent(), /AI 日报/);
   assert.equal(await hasRemoteScripts(page), false);
   assert((await page.locator("a[href='reports/2026/05/2026-05-13.html']").count()) >= 1);

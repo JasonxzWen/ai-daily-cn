@@ -155,6 +155,102 @@ function affectedSectionIssues(status) {
 }
 
 export function renderIndexHtml(feed, trends = null, dateIndex = null, options = {}) {
+  const articles = Array.isArray(options.articles) ? options.articles : [];
+  if (articles.length === 0) {
+    return renderOpsIndexHtml(feed, trends, dateIndex, options);
+  }
+  return renderArticleIndexHtml(feed, articles, options);
+}
+
+function renderArticleIndexHtml(feed, articles, options = {}) {
+  const sortedArticles = sortArticlesForIndex(articles);
+  const latestDate = sortedArticles[0]?.date || feed.reports?.[0]?.report_date || "";
+  const todayArticles = todayArticleSelection(sortedArticles);
+  const domains = uniqueRenderValues(sortedArticles.map((article) => article.domain));
+  const channels = uniqueRenderValues(sortedArticles.flatMap((article) => article.channels_l1 || []));
+  const entities = uniqueRenderValues(sortedArticles.flatMap((article) => [
+    ...(article.companies || []),
+    ...(article.products || [])
+  ])).slice(0, 80);
+  const months = uniqueRenderValues(sortedArticles.map((article) => article.month));
+  const stats = {
+    articles: sortedArticles.length,
+    sources: uniqueRenderValues(sortedArticles.map((article) => article.source)).length,
+    domains: domains.length,
+    latestDate
+  };
+  const articleJson = JSON.stringify(sortedArticles).replace(/</g, "\\u003c");
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escapeHtml(feed.site_title || "AI 资讯库")}</title>
+  <link rel="stylesheet" href="${escapeAttribute(indexStyleHref(options.styleVersion))}">
+</head>
+<body>
+  <header class="site-header article-site-header">
+    <a class="site-title" href="index.html">AI 资讯库</a>
+    <nav class="article-top-links" aria-label="站点入口">
+      <a href="ops.html">运行看板</a>
+      <a href="${escapeAttribute(feed.reports?.[0]?.url || "#")}">最新日报</a>
+      <a href="articles.json">articles.json</a>
+    </nav>
+  </header>
+  <main class="report-shell article-index-page" data-article-index="aify-style">
+    <section class="article-hero" id="article-home" aria-labelledby="article-home-title">
+      <div class="article-hero-copy">
+        <p class="eyebrow">AI Feed</p>
+        <h1 class="report-title" id="article-home-title">AI 资讯库</h1>
+        <p class="article-hero-summary">把每日 AI 日报拆成可检索、可筛选、可回链的文章级资讯流，优先展示高质量、低噪声、可直接阅读的信号。</p>
+      </div>
+      <div class="article-stat-grid" aria-label="资讯库统计">
+        ${renderArticleStat("资讯", stats.articles)}
+        ${renderArticleStat("信源", stats.sources)}
+        ${renderArticleStat("分类", stats.domains)}
+        ${renderArticleStat("最新", stats.latestDate || "-")}
+      </div>
+    </section>
+
+    <section class="article-control-panel" aria-label="资讯筛选">
+      <div class="article-tab-row" role="tablist" aria-label="资讯口味">
+        ${renderArticleFilterButton("today", "今日精选", true)}
+        ${renderArticleFilterButton("all", "全部资讯")}
+        ${["快讯", "商业洞察", "实战方法", "技术拆解", "观点专访", "论文", "报告"].map((flavor) => renderArticleFilterButton(flavor, flavor)).join("")}
+      </div>
+      <div class="article-filter-grid">
+        <label class="article-search">
+          <span>搜索</span>
+          <input type="search" id="articleSearch" placeholder="公司、产品、主题、来源" autocomplete="off">
+        </label>
+        ${renderArticleSelect("articleDomain", "领域", domains)}
+        ${renderArticleSelect("articleChannel", "频道", channels)}
+        ${renderArticleSelect("articleEntity", "公司/产品", entities)}
+        ${renderArticleSelect("articleMonth", "月份", months)}
+      </div>
+    </section>
+
+    <section class="article-results" aria-labelledby="article-results-title">
+      <div class="section-heading split-row">
+        <div>
+          <p class="eyebrow">Today Selection</p>
+          <h2 id="article-results-title">今日精选</h2>
+        </div>
+        <span class="chip status-info" id="articleResultMeta">${escapeHtml(todayArticles.length)} 条</span>
+      </div>
+      <div id="articleGroups" class="article-domain-stack">
+        ${renderArticleGroups(todayArticles, { perDomainCap: 4 })}
+      </div>
+    </section>
+  </main>
+  <script>window.__ARTICLE_INDEX__=${articleJson};</script>
+  <script>${articleIndexScript()}</script>
+</body>
+</html>
+`;
+}
+
+export function renderOpsIndexHtml(feed, trends = null, dateIndex = null, options = {}) {
   const latest = feed.reports[0];
   const dateItems = Array.isArray(dateIndex?.items) ? dateIndex.items : [];
   const latestItem = dateItems.find((item) => item.date === latest?.report_date) || dateItems.at(-1) || null;
@@ -193,6 +289,214 @@ export function renderIndexHtml(feed, trends = null, dateIndex = null, options =
 </body>
 </html>
 `;
+}
+
+function renderArticleStat(label, value) {
+  return `<div class="article-stat"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
+}
+
+function renderArticleFilterButton(value, label, active = false) {
+  return `<button class="article-tab${active ? " is-active" : ""}" type="button" data-article-filter="${escapeAttribute(value)}" aria-pressed="${active ? "true" : "false"}">${escapeHtml(label)}</button>`;
+}
+
+function renderArticleSelect(id, label, options) {
+  const items = Array.isArray(options) ? options : [];
+  return `<label class="article-select">
+      <span>${escapeHtml(label)}</span>
+      <select id="${escapeAttribute(id)}">
+        <option value="">全部</option>
+        ${items.map((item) => `<option value="${escapeAttribute(item)}">${escapeHtml(item)}</option>`).join("")}
+      </select>
+    </label>`;
+}
+
+function renderArticleGroups(articles, options = {}) {
+  const groups = groupArticlesByDomain(articles);
+  const perDomainCap = Number(options.perDomainCap || 0);
+  if (groups.length === 0) {
+    return `<p class="article-empty">暂无匹配资讯</p>`;
+  }
+  return groups.map(([domain, items]) => {
+    const visibleItems = perDomainCap > 0 ? items.slice(0, perDomainCap) : items;
+    return `<section class="article-domain-group" data-domain="${escapeAttribute(domain)}">
+        <div class="article-domain-heading">
+          <h3>${escapeHtml(domain)}</h3>
+          <span>${escapeHtml(items.length)} 条</span>
+        </div>
+        <div class="article-card-grid">
+          ${visibleItems.map((article) => renderArticleCard(article)).join("")}
+        </div>
+      </section>`;
+  }).join("");
+}
+
+function renderArticleCard(article) {
+  const tags = [
+    ...(article.flavors || []),
+    ...(article.channels_l1 || []).slice(0, 2),
+    ...(article.companies || []).slice(0, 2),
+    ...(article.products || []).slice(0, 2)
+  ].slice(0, 6);
+  return `<article class="article-card" data-article-card>
+      <div class="article-card-meta">
+        <span>${escapeHtml(article.source)}</span>
+        <strong>${escapeHtml(article.quality_score)}</strong>
+      </div>
+      <h4><a href="${escapeAttribute(article.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(article.title)}</a></h4>
+      <p>${escapeHtml(article.summary)}</p>
+      <div class="article-tag-row">
+        ${tags.map((tag) => `<span class="tag tag-topic">${escapeHtml(tag)}</span>`).join("")}
+      </div>
+      <div class="article-card-footer">
+        <span>${escapeHtml(article.date)}</span>
+        <a href="${escapeAttribute(article.report_url)}">当日日报</a>
+      </div>
+    </article>`;
+}
+
+function todayArticleSelection(articles) {
+  const sorted = sortArticlesForIndex(articles);
+  const latestDate = sorted[0]?.date || "";
+  const today = sorted.filter((article) => article.date === latestDate);
+  const selected = today.length >= 24 ? today : [...today, ...sorted.filter((article) => article.date !== latestDate).slice(0, 80 - today.length)];
+  return selected.slice(0, 80);
+}
+
+function sortArticlesForIndex(articles) {
+  return [...(Array.isArray(articles) ? articles : [])].sort((a, b) =>
+    String(b.date || "").localeCompare(String(a.date || "")) ||
+    Number(b.quality_score || 0) - Number(a.quality_score || 0) ||
+    String(a.title || "").localeCompare(String(b.title || ""), "zh-Hans-CN")
+  );
+}
+
+function groupArticlesByDomain(articles) {
+  const order = [
+    "AI 产品与应用工具",
+    "AI 用法与实践方法",
+    "企业落地与业务应用",
+    "行业动态与政策地缘",
+    "基础模型与算力技术栈",
+    "多模态与具身等前沿"
+  ];
+  const byDomain = new Map();
+  for (const article of sortArticlesForIndex(articles)) {
+    const domain = article.domain || "其他";
+    if (!byDomain.has(domain)) {
+      byDomain.set(domain, []);
+    }
+    byDomain.get(domain).push(article);
+  }
+  return [...byDomain.entries()].sort((a, b) => {
+    const ai = order.includes(a[0]) ? order.indexOf(a[0]) : 99;
+    const bi = order.includes(b[0]) ? order.indexOf(b[0]) : 99;
+    return ai - bi || a[0].localeCompare(b[0], "zh-Hans-CN");
+  });
+}
+
+function uniqueRenderValues(values) {
+  return [...new Set((Array.isArray(values) ? values : []).map((value) => String(value || "").trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "zh-Hans-CN"));
+}
+
+function articleIndexScript() {
+  return `(() => {
+  const articles = Array.isArray(window.__ARTICLE_INDEX__) ? window.__ARTICLE_INDEX__ : [];
+  const groups = document.getElementById("articleGroups");
+  const title = document.getElementById("article-results-title");
+  const meta = document.getElementById("articleResultMeta");
+  const controls = {
+    search: document.getElementById("articleSearch"),
+    domain: document.getElementById("articleDomain"),
+    channel: document.getElementById("articleChannel"),
+    entity: document.getElementById("articleEntity"),
+    month: document.getElementById("articleMonth")
+  };
+  const state = { mode: "today", search: "", domain: "", channel: "", entity: "", month: "" };
+  const domainOrder = ["AI 产品与应用工具", "AI 用法与实践方法", "企业落地与业务应用", "行业动态与政策地缘", "基础模型与算力技术栈", "多模态与具身等前沿"];
+  const escapeHtml = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+  const sortArticles = (items) => [...items].sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")) || Number(b.quality_score || 0) - Number(a.quality_score || 0) || String(a.title || "").localeCompare(String(b.title || ""), "zh-Hans-CN"));
+  const todaySelection = (items) => {
+    const sorted = sortArticles(items);
+    const latest = sorted[0]?.date || "";
+    const today = sorted.filter((article) => article.date === latest);
+    return (today.length >= 24 ? today : [...today, ...sorted.filter((article) => article.date !== latest).slice(0, 80 - today.length)]).slice(0, 80);
+  };
+  const matches = (article) => {
+    if (state.domain && article.domain !== state.domain) return false;
+    if (state.month && article.month !== state.month) return false;
+    if (state.channel && !(article.channels_l1 || []).includes(state.channel)) return false;
+    if (state.entity && ![...(article.companies || []), ...(article.products || [])].includes(state.entity)) return false;
+    if (state.mode !== "today" && state.mode !== "all" && !(article.flavors || []).includes(state.mode)) return false;
+    if (state.search) {
+      const haystack = [article.title, article.summary, article.source, article.domain, ...(article.flavors || []), ...(article.channels_l1 || []), ...(article.channels_l2 || []), ...(article.companies || []), ...(article.products || [])].join(" ").toLowerCase();
+      if (!haystack.includes(state.search.toLowerCase())) return false;
+    }
+    return true;
+  };
+  const groupByDomain = (items) => {
+    const map = new Map();
+    for (const article of sortArticles(items)) {
+      const domain = article.domain || "其他";
+      if (!map.has(domain)) map.set(domain, []);
+      map.get(domain).push(article);
+    }
+    return [...map.entries()].sort((a, b) => {
+      const ai = domainOrder.includes(a[0]) ? domainOrder.indexOf(a[0]) : 99;
+      const bi = domainOrder.includes(b[0]) ? domainOrder.indexOf(b[0]) : 99;
+      return ai - bi || a[0].localeCompare(b[0], "zh-Hans-CN");
+    });
+  };
+  const renderCard = (article) => {
+    const tags = [...(article.flavors || []), ...(article.channels_l1 || []).slice(0, 2), ...(article.companies || []).slice(0, 2), ...(article.products || []).slice(0, 2)].slice(0, 6);
+    return '<article class="article-card" data-article-card>' +
+      '<div class="article-card-meta"><span>' + escapeHtml(article.source) + '</span><strong>' + escapeHtml(article.quality_score) + '</strong></div>' +
+      '<h4><a href="' + escapeHtml(article.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(article.title) + '</a></h4>' +
+      '<p>' + escapeHtml(article.summary) + '</p>' +
+      '<div class="article-tag-row">' + tags.map((tag) => '<span class="tag tag-topic">' + escapeHtml(tag) + '</span>').join("") + '</div>' +
+      '<div class="article-card-footer"><span>' + escapeHtml(article.date) + '</span><a href="' + escapeHtml(article.report_url) + '">当日日报</a></div>' +
+    '</article>';
+  };
+  const renderGroups = (items) => {
+    if (!groups) return;
+    const grouped = groupByDomain(items);
+    if (grouped.length === 0) {
+      groups.innerHTML = '<p class="article-empty">暂无匹配资讯</p>';
+      return;
+    }
+    const cap = state.mode === "today" ? 4 : 0;
+    groups.innerHTML = grouped.map(([domain, domainItems]) => {
+      const visible = cap ? domainItems.slice(0, cap) : domainItems.slice(0, 120);
+      return '<section class="article-domain-group" data-domain="' + escapeHtml(domain) + '">' +
+        '<div class="article-domain-heading"><h3>' + escapeHtml(domain) + '</h3><span>' + escapeHtml(domainItems.length) + ' 条</span></div>' +
+        '<div class="article-card-grid">' + visible.map(renderCard).join("") + '</div>' +
+      '</section>';
+    }).join("");
+  };
+  const update = () => {
+    const base = state.mode === "today" ? todaySelection(articles) : articles;
+    const filtered = sortArticles(base.filter(matches));
+    if (title) title.textContent = state.mode === "today" ? "今日精选" : (state.mode === "all" ? "全部资讯" : state.mode);
+    if (meta) meta.textContent = filtered.length + " 条";
+    renderGroups(filtered);
+  };
+  document.querySelectorAll("[data-article-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.mode = button.getAttribute("data-article-filter") || "today";
+      document.querySelectorAll("[data-article-filter]").forEach((item) => {
+        const active = item === button;
+        item.classList.toggle("is-active", active);
+        item.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      update();
+    });
+  });
+  controls.search?.addEventListener("input", (event) => { state.search = event.target.value.trim(); update(); });
+  controls.domain?.addEventListener("change", (event) => { state.domain = event.target.value; update(); });
+  controls.channel?.addEventListener("change", (event) => { state.channel = event.target.value; update(); });
+  controls.entity?.addEventListener("change", (event) => { state.entity = event.target.value; update(); });
+  controls.month?.addEventListener("change", (event) => { state.month = event.target.value; update(); });
+})();`;
 }
 
 function indexStyleHref(styleVersion) {
@@ -1291,6 +1595,273 @@ h3 {
   border-style: dashed;
   border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
   background: #fbf1ec;
+}
+
+.article-site-header {
+  gap: 16px;
+}
+
+.article-top-links {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.article-top-links a {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 760;
+  text-decoration: none;
+}
+
+.article-top-links a:hover {
+  color: var(--accent);
+}
+
+.article-index-page {
+  display: grid;
+  gap: 18px;
+}
+
+.article-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+  gap: 16px;
+  align-items: end;
+  padding: 18px 0 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.article-hero-copy {
+  min-width: 0;
+}
+
+.article-hero-summary {
+  max-width: 860px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.article-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.article-stat {
+  display: grid;
+  gap: 4px;
+  min-height: 72px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.article-stat span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 760;
+}
+
+.article-stat strong {
+  color: var(--ink);
+  font-size: 1.18rem;
+  line-height: 1.2;
+}
+
+.article-control-panel {
+  display: grid;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.article-tab-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.article-tab {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 780;
+  cursor: pointer;
+}
+
+.article-tab:hover,
+.article-tab.is-active {
+  border-color: color-mix(in srgb, var(--accent) 58%, var(--line));
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.article-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.3fr) repeat(4, minmax(130px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.article-search,
+.article-select {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.article-search span,
+.article-select span {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 760;
+}
+
+.article-search input,
+.article-select select {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.article-search input {
+  padding: 8px 10px;
+}
+
+.article-select select {
+  padding: 8px 9px;
+}
+
+.article-results {
+  display: grid;
+  gap: 14px;
+}
+
+.article-domain-stack {
+  display: grid;
+  gap: 22px;
+}
+
+.article-domain-group {
+  display: grid;
+  gap: 10px;
+}
+
+.article-domain-heading {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.article-domain-heading h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.06rem;
+}
+
+.article-domain-heading span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 760;
+}
+
+.article-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.article-card {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  gap: 9px;
+  min-height: 236px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 1px 0 rgba(61, 61, 58, 0.04);
+}
+
+.article-card-meta,
+.article-card-footer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+.article-card-meta strong {
+  min-width: 34px;
+  padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--line));
+  border-radius: 999px;
+  color: var(--accent);
+  text-align: center;
+}
+
+.article-card h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.02rem;
+  line-height: 1.36;
+}
+
+.article-card h4 a,
+.article-card-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.article-card h4 a:hover,
+.article-card-footer a:hover {
+  color: var(--accent);
+}
+
+.article-card p {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.94rem;
+  line-height: 1.58;
+}
+
+.article-tag-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.article-empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  text-align: center;
 }
 
 .chip,
@@ -2426,6 +2997,19 @@ select:focus-visible {
 }
 
 @media (max-width: 900px) {
+  .article-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .article-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .article-search {
+    grid-column: 1 / -1;
+  }
+
   .hero-brief {
     grid-template-columns: 1fr;
   }
@@ -2483,6 +3067,29 @@ select:focus-visible {
 
   .hero-stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .article-site-header {
+    align-items: flex-start;
+  }
+
+  .article-top-links {
+    width: 100%;
+  }
+
+  .article-stat-grid,
+  .article-filter-grid,
+  .article-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .article-tab-row {
+    margin-inline: -9px;
+    padding-inline: 9px;
+  }
+
+  .article-card {
+    min-height: 0;
   }
 
   .report-nav {
