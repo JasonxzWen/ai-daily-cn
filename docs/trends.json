@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-02T09:01:28.139Z",
+  "generated_at": "2026-07-03T02:11:27.564Z",
   "window_days": 7,
   "source": {
-    "report_count": 43,
-    "date_from": "2026-06-26",
-    "date_to": "2026-07-02"
+    "report_count": 44,
+    "date_from": "2026-06-27",
+    "date_to": "2026-07-03"
   },
   "thresholds": {
     "watching": {
@@ -33,10 +33,11 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 19,
+      "occurrences": 20,
       "active_days": 6,
       "sections": [
         "builder_observations",
+        "hot_blogs",
         "main_items"
       ],
       "entities": [
@@ -45,20 +46,20 @@
         "OpenAI"
       ],
       "dates": [
-        "2026-06-26",
         "2026-06-28",
         "2026-06-29",
         "2026-06-30",
         "2026-07-01",
-        "2026-07-02"
+        "2026-07-02",
+        "2026-07-03"
       ],
       "related_reports": [
-        "2026-06-26",
         "2026-06-28",
         "2026-06-29",
         "2026-06-30",
         "2026-07-01",
-        "2026-07-02"
+        "2026-07-02",
+        "2026-07-03"
       ]
     },
     {
@@ -77,39 +78,39 @@
         "Google"
       ],
       "dates": [
-        "2026-06-26",
         "2026-06-28",
         "2026-06-29",
         "2026-06-30",
         "2026-07-01",
-        "2026-07-02"
+        "2026-07-02",
+        "2026-07-03"
       ],
       "related_reports": [
-        "2026-06-26",
         "2026-06-28",
         "2026-06-29",
         "2026-06-30",
         "2026-07-01",
-        "2026-07-02"
+        "2026-07-02",
+        "2026-07-03"
       ]
     }
   ],
   "candidate_topics": [
     {
       "term": "this",
-      "occurrences": 193,
+      "occurrences": 192,
       "active_days": 6,
       "display": false
     },
     {
       "term": "with",
-      "occurrences": 190,
+      "occurrences": 189,
       "active_days": 6,
       "display": false
     },
     {
       "term": "github",
-      "occurrences": 186,
+      "occurrences": 188,
       "active_days": 6,
       "display": false
     },
@@ -181,37 +182,37 @@
     },
     {
       "term": "release",
-      "occurrences": 157,
+      "occurrences": 163,
       "active_days": 6,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在",
-      "occurrences": 156,
+      "occurrences": 162,
       "active_days": 6,
       "display": false
     },
     {
       "term": "今日需要复核它是否仍在 github",
-      "occurrences": 156,
+      "occurrences": 162,
       "active_days": 6,
       "display": false
     },
     {
       "term": "是否有",
-      "occurrences": 156,
+      "occurrences": 162,
       "active_days": 6,
       "display": false
     },
     {
       "term": "是否有 release",
-      "occurrences": 156,
+      "occurrences": 162,
       "active_days": 6,
       "display": false
     },
     {
       "term": "天本地记录曾在",
-      "occurrences": 156,
+      "occurrences": 162,
       "active_days": 6,
       "display": false
     }
@@ -1904,6 +1905,29 @@
       "github_trending": [
         {
           "index": 4,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 13x/6d",
+              "window_days": 7,
+              "occurrences": 13,
+              "active_days": 6,
+              "entities": [
+                "GitHub",
+                "Google"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "2026-07-03": {
+      "main_items": [],
+      "github_trending": [
+        {
+          "index": 3,
           "tags": [
             {
               "topic_id": "mcp",
