@@ -16,14 +16,14 @@ Update after material sessions, before a new phase, or when validation evidence 
 | Area | Rating | P0/P1/P2 validation status | Browser acceptance status | Agent readability | Test stability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Public article index artifact | A | P0 passed: article contract, privacy scan, build-clean, regular and daily publish-plan assertions, full validate | Deferred; no UI behavior changed | Good | Stable in `tests/article-index.test.js` and `tests/publish.test.js` | Future DAG node schemas still need per-node replay | 2026-07-03 |
-| Daily Codex DAG manifest contract | B | P0 targeted manifest validator, lineage negative tests, deterministic plan projection tests, stdout-only dry-run runner tests, existing workflow contract, and existing pipeline compatibility passed | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest, lineage, plan projection, and dry-run CLI regressions | Full executable 16-node runner migration and per-node real schemas remain future work | 2026-07-03 |
+| Daily Codex DAG manifest contract | B | P0 targeted manifest validator, lineage negative tests, deterministic plan projection tests, guarded dry-run summary tests, existing workflow contract, and existing pipeline compatibility passed | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest, lineage, plan projection, and dry-run CLI regressions | Full executable 16-node runner migration and per-node real schemas remain future work | 2026-07-03 |
 
 ## Architecture Layers
 
 | Layer | Rating | Boundary health | Agent readability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- |
 | Public/private artifact boundary | A | `docs/articles.json` is now included in public scans with internal audit field denylist coverage | Good | DAG audit artifacts are not yet formalized per node | 2026-07-03 |
-| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, projects deterministic execution levels, and exposes a stdout-only dry-run summary | Good | Dry-run CLI does not execute nodes; production runner still uses coarse stages | 2026-07-03 |
+| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, projects deterministic execution levels, and exposes opt-in `.tmp/daily-codex-pipeline/**/*.json` dry-run summaries | Good | Dry-run CLI does not execute nodes; production runner still uses coarse stages | 2026-07-03 |
 
 ## Change History
 
@@ -34,6 +34,14 @@ Update after material sessions, before a new phase, or when validation evidence 
 - Regressed:
 - New gaps:
 - Closed gaps:
+
+### 2026-07-03
+
+- Change: Added guarded opt-in summary-file output for the daily Codex DAG dry-run CLI.
+- Improved: Dry-run summaries can now be persisted under `.tmp/daily-codex-pipeline/**/*.json` for local replay and debugging while stdout remains the primary machine-readable result.
+- Regressed: None known.
+- New gaps: The CLI still does not execute Codex, shell commands, production publish, or per-node real replay fixtures; symlink hardening under `.tmp` is deferred until the runner accepts less-trusted paths.
+- Closed gaps: The DAG dry-run runner can now produce a controlled local artifact without changing production runner or public artifact behavior.
 
 ### 2026-07-03
 

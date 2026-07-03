@@ -202,9 +202,89 @@ test("daily codex DAG dry-run CLI rejects invalid invocations with structured JS
   assert.equal(JSON.parse(invalidDate.stdout).failures[0], "daily codex DAG CLI requires --date YYYY-MM-DD");
 });
 
+test("daily codex DAG dry-run CLI writes opt-in summaries under .tmp only", async () => {
+  const tempName = `summary-${process.pid}-${Date.now()}.json`;
+  const summaryPath = path.join(".tmp", "daily-codex-pipeline", "dag-dry-run-test", tempName);
+  const absoluteSummaryPath = path.join(rootDir, summaryPath);
+  await fs.rm(absoluteSummaryPath, { force: true });
+
+  const result = await runDagCli([
+    "--dry-run",
+    "--date",
+    "2026-07-03",
+    "--json",
+    "--summary-path",
+    summaryPath
+  ]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const stdoutJson = JSON.parse(result.stdout);
+  const fileJson = JSON.parse(await fs.readFile(absoluteSummaryPath, "utf8"));
+  assert.deepEqual(fileJson, stdoutJson);
+  assert.equal(fileJson.ok, true);
+
+  await fs.rm(absoluteSummaryPath, { force: true });
+});
+
+test("daily codex DAG dry-run CLI rejects unsafe summary paths", async () => {
+  const cases = [
+    {
+      args: ["--summary-path"],
+      expected: "daily codex DAG CLI requires --summary-path value"
+    },
+    {
+      args: ["--summary-path", "--json"],
+      expected: "daily codex DAG CLI requires --summary-path value"
+    },
+    {
+      args: ["--summary-path", "../x.json"],
+      expected: "daily codex DAG summary path must stay under .tmp/daily-codex-pipeline"
+    },
+    {
+      args: ["--summary-path", ".tmp/daily-codex-pipeline/../../x.json"],
+      expected: "daily codex DAG summary path must stay under .tmp/daily-codex-pipeline"
+    },
+    {
+      args: ["--summary-path", path.resolve(rootDir, "..", "x.json")],
+      expected: "daily codex DAG summary path must stay under .tmp/daily-codex-pipeline"
+    },
+    {
+      args: ["--summary-path", path.join("docs", "reports", "dag-summary.json")],
+      expected: "daily codex DAG summary path must stay under .tmp/daily-codex-pipeline"
+    },
+    {
+      args: ["--summary-path", path.join("reports-data", "dag-summary.json")],
+      expected: "daily codex DAG summary path must stay under .tmp/daily-codex-pipeline"
+    },
+    {
+      args: ["--summary-path", path.join(".tmp", "daily-codex-pipeline", "dag-summary.txt")],
+      expected: "daily codex DAG summary path must end with .json"
+    }
+  ];
+
+  for (const item of cases) {
+    const forbiddenBefore = await forbiddenPathSnapshot();
+    const result = await runDagCli(["--dry-run", "--date", "2026-07-03", "--json", ...item.args]);
+    assert.equal(result.code, 1, item.expected);
+    assert.equal(result.stderr, "");
+    assert.equal(JSON.parse(result.stdout).failures[0], item.expected);
+    assert.deepEqual(await forbiddenPathSnapshot(), forbiddenBefore, item.expected);
+  }
+});
+
 test("daily codex DAG dry-run CLI returns structured JSON for invalid manifest roots", async () => {
   const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-dag-"));
-  const result = await runDagCli(["--dry-run", "--date", "2026-07-03", "--json"], { cwd: tempRoot });
+  const summaryPath = path.join(".tmp", "daily-codex-pipeline", "dag-summary.json");
+  const absoluteSummaryPath = path.join(tempRoot, summaryPath);
+  const result = await runDagCli([
+    "--dry-run",
+    "--date",
+    "2026-07-03",
+    "--json",
+    "--summary-path",
+    summaryPath
+  ], { cwd: tempRoot });
 
   assert.equal(result.code, 1);
   assert.equal(result.stderr, "");
@@ -216,6 +296,7 @@ test("daily codex DAG dry-run CLI returns structured JSON for invalid manifest r
     parsed.failures.some((failure) => failure.includes("config") && failure.includes("daily-codex-dag.json")),
     parsed.failures.join("\n")
   );
+  assert.equal(await pathExists(absoluteSummaryPath), false, "invalid manifest dry-run must not write summary");
 });
 
 test("daily codex DAG validator catches structural and boundary regressions", async () => {
@@ -470,15 +551,29 @@ async function forbiddenPathSnapshot() {
 
 async function pathSnapshot(filePath) {
   try {
-    const stat = await fs.stat(filePath);
+    const stat = await fs.lstat(filePath);
     if (!stat.isDirectory()) {
       return { exists: true, kind: "file", entries: [] };
     }
-    const entries = await fs.readdir(filePath);
-    return { exists: true, kind: "dir", entries: entries.sort() };
+    const entries = await recursiveEntries(filePath);
+    return { exists: true, kind: "dir", entries };
   } catch {
     return { exists: false, kind: "", entries: [] };
   }
+}
+
+async function recursiveEntries(baseDir, prefix = "") {
+  const entries = await fs.readdir(path.join(baseDir, prefix), { withFileTypes: true });
+  const results = [];
+  for (const entry of entries.sort((left, right) => left.name.localeCompare(right.name))) {
+    const relativePath = path.join(prefix, entry.name);
+    const normalizedPath = relativePath.split(path.sep).join("/");
+    results.push(normalizedPath);
+    if (entry.isDirectory()) {
+      results.push(...await recursiveEntries(baseDir, relativePath));
+    }
+  }
+  return results;
 }
 
 function runDagCli(args, options = {}) {
