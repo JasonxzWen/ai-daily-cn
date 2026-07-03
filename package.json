@@ -14,6 +14,7 @@
     "quality:page-check": "node scripts/check-daily-page.mjs",
     "daily:run": "node src/cli.js daily:run",
     "daily:codex-pipeline": "node scripts/run-daily-codex-pipeline.mjs",
+    "daily:codex-dag:contract-run": "node scripts/run-daily-codex-dag.mjs --contract-run --json",
     "preflight:worktree": "node src/cli.js preflight:worktree",
     "source-reset:preflight": "node src/cli.js source-reset:preflight",
     "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
