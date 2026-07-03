@@ -1885,6 +1885,13 @@ async function validateNodeExecutionSpecPreflight({ rootDir, node, spec, failure
       failures,
       requireNonEmptyArray: true
     });
+    await validateCommandInvocationPolicy({
+      rootDir,
+      node,
+      argv: spec.invocation.argv,
+      failures,
+      checkedFiles
+    });
   }
   if (spec.invocation?.kind === "codex_cli") {
     const promptTemplate = spec.invocation.prompt_template;
@@ -1921,6 +1928,51 @@ function validateExecutionStringArray({ values, label, failures, requireNonEmpty
       failures.push(`${label} entries must be non-empty strings.`);
     }
   }
+}
+
+async function validateCommandInvocationPolicy({ rootDir, node, argv, failures, checkedFiles }) {
+  if (!Array.isArray(argv) || argv.length === 0) return;
+  const label = `config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation.argv`;
+  for (const token of argv) {
+    if (typeof token === "string" && isShellishCommandToken(token)) {
+      failures.push(`${label} entries must not contain shell control operators or redirection tokens.`);
+      break;
+    }
+  }
+  const runner = argv[0];
+  if (runner !== "node") {
+    failures.push(`${label}[0] must be node until live executor command policy supports additional runners.`);
+    return;
+  }
+  const scriptPath = argv[1];
+  if (!nonBlankString(scriptPath)) {
+    failures.push(`${label}[1] must be a repo-relative Node script path under scripts/.`);
+    return;
+  }
+  if (!isSafeExecutionRelativePath(scriptPath)) {
+    failures.push(`${label}[1] must be a repo-relative Node script path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments.`);
+    return;
+  }
+  const underScripts = scriptPath === "scripts" || scriptPath.startsWith("scripts/");
+  if (!underScripts) {
+    failures.push(`${label}[1] must be under scripts/.`);
+  }
+  if (underScripts) {
+    await validateExistingRelativeFile({
+      rootDir,
+      relativePath: scriptPath,
+      label: `node ${node.id} node_execution_spec.invocation.argv[1]`,
+      failures,
+      checkedFiles
+    });
+  }
+  if (!scriptPath.endsWith(".mjs") && !scriptPath.endsWith(".js")) {
+    failures.push(`${label}[1] must end with .mjs or .js.`);
+  }
+}
+
+function isShellishCommandToken(token) {
+  return /&&|\|\||;|\||&|`|<|>|\r|\n|\$\(/.test(token);
 }
 
 function validateNodeExecutionRuntimePolicy({ node, spec, failures }) {

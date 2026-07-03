@@ -25,6 +25,7 @@ const dagNodeResultSchemaPath = path.join(rootDir, "schemas", "daily-codex-dag-n
 const dryRunSummaryFixturePath = path.join(rootDir, "tests", "fixtures", "daily-codex-dag", "dry-run-summary.json");
 const nodeResultSuccessFixturePath = path.join(rootDir, "tests", "fixtures", "daily-codex-dag", "node-result-success.json");
 const fixedNow = "2026-07-03T08:00:00.000Z";
+const shellishCommandTokens = ["&&", "||", ";", "|", "&", "`cmd`", "<", ">", "line\rbreak", "line\nbreak", "$(whoami)"];
 let dagManifestValidator = null;
 let dagRunSummaryValidator = null;
 let dagNodeResultValidator = null;
@@ -1588,6 +1589,104 @@ test("daily codex DAG validator catches structural and boundary regressions", as
       expected: "node score node_execution_spec.invocation.argv entries must be non-empty strings"
     },
     {
+      name: "execution spec command argv rejects unsupported runner",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          invocation: {
+            kind: "command",
+            argv: ["npm", "run", "future-node"]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.invocation.argv[0] must be node until live executor command policy supports additional runners"
+    },
+    ...shellishCommandTokens.map((token) => ({
+      name: `execution spec command argv rejects shell-ish token ${JSON.stringify(token)}`,
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          invocation: {
+            kind: "command",
+            argv: ["node", "scripts/validate-daily-codex-dag.mjs", token]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.invocation.argv entries must not contain shell control operators or redirection tokens"
+    })),
+    {
+      name: "execution spec command argv requires safe node script path",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          invocation: {
+            kind: "command",
+            argv: ["node", "../scripts/validate-daily-codex-dag.mjs"]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.invocation.argv[1] must be a repo-relative Node script path without absolute paths"
+    },
+    {
+      name: "execution spec command argv requires scripts path",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          invocation: {
+            kind: "command",
+            argv: ["node", "src/daily-codex-dag.js"]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.invocation.argv[1] must be under scripts/"
+    },
+    {
+      name: "execution spec command argv requires javascript script extension",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          invocation: {
+            kind: "command",
+            argv: ["node", "scripts/future-dag-node.txt"]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.invocation.argv[1] must end with .mjs or .js"
+    },
+    {
+      name: "execution spec command argv requires existing node script",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          invocation: {
+            kind: "command",
+            argv: ["node", "scripts/missing-future-dag-node.mjs"]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.invocation.argv[1] missing scripts/missing-future-dag-node.mjs"
+    },
+    {
+      name: "execution spec command argv requires node script file",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          invocation: {
+            kind: "command",
+            argv: ["node", "scripts"]
+          }
+        });
+      },
+      expected: "node score node_execution_spec.invocation.argv[1] must be a file scripts"
+    },
+    {
       name: "execution spec codex args reject blank token",
       mutate(manifest) {
         const target = node(manifest, "classify-tag-entity");
@@ -2120,7 +2219,7 @@ function buildFutureNodeExecutionSpec(manifestNode, overrides = {}) {
     cwd: ".",
     invocation: {
       kind: "command",
-      argv: ["node", "scripts/future-dag-node.mjs", manifestNode.id]
+      argv: ["node", "scripts/validate-daily-codex-dag.mjs", manifestNode.id]
     },
     inputs: (manifestNode.inputs || []).map((artifact) => ({ artifact_path: artifact.path })),
     outputs: (manifestNode.outputs || []).map((artifact) => ({ artifact_path: artifact.path })),
