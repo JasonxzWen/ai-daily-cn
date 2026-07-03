@@ -6,9 +6,11 @@ import path from "node:path";
 import test from "node:test";
 import Ajv from "ajv/dist/2020.js";
 import {
+  createDailyCodexDagNodeResult,
   createDailyCodexDagDryRun,
   createDailyCodexDagPlan,
   validateDailyCodexDag,
+  validateDailyCodexDagNodeResult,
   validateDailyCodexDagDryRunSummary
 } from "../src/daily-codex-dag.js";
 
@@ -16,9 +18,12 @@ const rootDir = process.cwd();
 const manifestPath = path.join(rootDir, "config", "daily-codex-dag.json");
 const dagCliPath = path.join(rootDir, "scripts", "run-daily-codex-dag.mjs");
 const dagRunSchemaPath = path.join(rootDir, "schemas", "daily-codex-dag-run.schema.json");
+const dagNodeResultSchemaPath = path.join(rootDir, "schemas", "daily-codex-dag-node-result.schema.json");
 const dryRunSummaryFixturePath = path.join(rootDir, "tests", "fixtures", "daily-codex-dag", "dry-run-summary.json");
+const nodeResultSuccessFixturePath = path.join(rootDir, "tests", "fixtures", "daily-codex-dag", "node-result-success.json");
 const fixedNow = "2026-07-03T08:00:00.000Z";
 let dagRunSummaryValidator = null;
+let dagNodeResultValidator = null;
 
 test("daily codex DAG manifest validates target node contract", async () => {
   const result = await validateDailyCodexDag({ rootDir });
@@ -343,6 +348,387 @@ test("daily codex DAG dry-run summary semantic validator does not throw on malfo
 
   for (const value of cases) {
     const result = validateDailyCodexDagDryRunSummary(value);
+    assert.equal(result.ok, false);
+    assert(result.failures.length > 0);
+  }
+});
+
+test("daily codex DAG node result helper and fixture validate executable result contract", async () => {
+  const fixture = await loadNodeResultSuccessFixture();
+  await assertValidDagNodeResult(fixture);
+
+  const options = {
+    reportDate: fixture.report_date,
+    runId: fixture.run_id,
+    manifestName: fixture.manifest_name,
+    manifestSchemaVersion: fixture.manifest_schema_version,
+    nodeId: fixture.node_id,
+    nodeKind: fixture.node_kind,
+    runnerStageRef: fixture.runner_stage_ref,
+    resultScope: fixture.result_scope,
+    status: fixture.status,
+    startedAt: fixture.started_at,
+    finishedAt: fixture.finished_at,
+    maxAttempts: fixture.max_attempts,
+    attemptsExhausted: fixture.attempts_exhausted,
+    dependencyResults: fixture.dependency_results,
+    declaredInputs: fixture.declared_inputs,
+    declaredOutputs: fixture.declared_outputs,
+    resolvedInputs: fixture.resolved_inputs,
+    resolvedOutputs: fixture.resolved_outputs,
+    failures: fixture.failures,
+    warnings: fixture.warnings,
+    audit: fixture.audit
+  };
+  const originalOptions = structuredCloneJson(options);
+  const helperResult = createDailyCodexDagNodeResult(options);
+
+  assert.deepEqual(helperResult, fixture);
+  assert.deepEqual(options, originalOptions, "node result helper must not mutate input options");
+  await assertValidDagNodeResult(helperResult);
+});
+
+test("daily codex DAG node result contract supports failure, blocked, skipped, fanout, and barrier results", async () => {
+  const failure = buildNodeResult({
+    status: "failure",
+    attemptsStarted: 2,
+    maxAttempts: 2,
+    attemptsExhausted: true,
+    downstreamDisposition: "block",
+    failures: [nodeResultIssue("score_failed", "Scoring command failed.", "runner", false)],
+    resolvedOutputs: []
+  });
+  await assertValidDagNodeResult(failure);
+
+  const blocked = buildNodeResult({
+    status: "blocked",
+    startedAt: null,
+    finishedAt: null,
+    dependencyResults: [{
+      node_id: "classify-tag-entity",
+      execution_id: "daily-codex-dag:2026-07-03:test:classify-tag-entity:node",
+      status: "failure",
+      required: true,
+      downstream_disposition: "block"
+    }],
+    failures: [nodeResultIssue("dependency_blocked", "Required dependency failed.", "dependency", false)],
+    resolvedOutputs: []
+  });
+  await assertValidDagNodeResult(blocked);
+
+  const skipped = buildNodeResult({
+    status: "skipped",
+    startedAt: null,
+    finishedAt: null,
+    declaredInputs: [],
+    declaredOutputs: [],
+    resolvedInputs: [],
+    resolvedOutputs: [],
+    dependencyResults: [],
+    warnings: [nodeResultIssue("skip_no_items", "No admitted items require this node.", "policy", false)]
+  });
+  await assertValidDagNodeResult(skipped);
+
+  const fanoutItem = buildNodeResult({
+    nodeId: "per-item-summary",
+    nodeKind: "fanout",
+    runnerStageRef: "summarize:*",
+    resultScope: "fanout_item",
+    executionId: "daily-codex-dag:2026-07-03:test:per-item-summary:fanout_item:item-001",
+    fanout: {
+      item_id: "item-001",
+      fanout_key: "item-001"
+    },
+    declaredInputs: [{
+      path: ".tmp/daily-codex-pipeline/2026-07-03/artifacts/admission.json",
+      required: true
+    }],
+    declaredOutputs: [{
+      path: ".tmp/daily-codex-pipeline/2026-07-03/artifacts/summaries/item-001.json",
+      required: true
+    }],
+    resolvedInputs: [resolvedArtifact(".tmp/daily-codex-pipeline/2026-07-03/artifacts/admission.json")],
+    resolvedOutputs: [resolvedArtifact(".tmp/daily-codex-pipeline/2026-07-03/artifacts/summaries/item-001.json")],
+    audit: {
+      parallel_group: "item-lanes",
+      resilience_policy_ref: "quality_review",
+      owner_path_scope: "internal_workdir",
+      public_artifact: false,
+      validator_version: "daily-codex-dag-node-result-v1"
+    }
+  });
+  await assertValidDagNodeResult(fanoutItem);
+
+  const expectedFanoutExecutions = [
+    "daily-codex-dag:2026-07-03:test:per-item-summary:fanout_item:item-001",
+    "daily-codex-dag:2026-07-03:test:per-item-summary:fanout_item:item-002"
+  ];
+  const barrier = buildNodeResult({
+    nodeId: "quality-audit",
+    nodeKind: "barrier",
+    runnerStageRef: "quality-review",
+    resultScope: "barrier",
+    executionId: "daily-codex-dag:2026-07-03:test:quality-audit:barrier",
+    dependencyResults: expectedFanoutExecutions.map((executionId) => ({
+      node_id: "per-item-summary",
+      execution_id: executionId,
+      status: "success",
+      required: true,
+      downstream_disposition: "continue"
+    })),
+    declaredInputs: expectedFanoutExecutions.map((_, index) => ({
+      path: `.tmp/daily-codex-pipeline/2026-07-03/artifacts/summaries/item-00${index + 1}.json`,
+      required: true
+    })),
+    declaredOutputs: [{
+      path: ".tmp/daily-codex-pipeline/2026-07-03/artifacts/quality-audit.json",
+      required: true
+    }],
+    resolvedInputs: expectedFanoutExecutions.map((_, index) => resolvedArtifact(`.tmp/daily-codex-pipeline/2026-07-03/artifacts/summaries/item-00${index + 1}.json`)),
+    resolvedOutputs: [resolvedArtifact(".tmp/daily-codex-pipeline/2026-07-03/artifacts/quality-audit.json")],
+    barrier: {
+      expected_execution_ids: expectedFanoutExecutions,
+      observed_execution_ids: expectedFanoutExecutions,
+      missing_execution_ids: []
+    },
+    audit: {
+      parallel_group: "serial",
+      resilience_policy_ref: "quality_review",
+      owner_path_scope: "internal_workdir",
+      public_artifact: false,
+      validator_version: "daily-codex-dag-node-result-v1"
+    }
+  });
+  await assertValidDagNodeResult(barrier);
+});
+
+test("daily codex DAG node result schema rejects invalid envelopes", async () => {
+  const fixture = await loadNodeResultSuccessFixture();
+  const additionalTopLevel = structuredCloneJson(fixture);
+  additionalTopLevel.prompt = "must not be stored in node results";
+  await assertInvalidDagNodeResult(additionalTopLevel);
+
+  const looseAudit = structuredCloneJson(fixture);
+  looseAudit.audit.stdout = "must not be stored in audit metadata";
+  await assertInvalidDagNodeResult(looseAudit);
+
+  const stringFailure = structuredCloneJson(fixture);
+  stringFailure.failures = ["plain strings are not executable result issues"];
+  await assertInvalidDagNodeResult(stringFailure);
+});
+
+test("daily codex DAG node result semantic validator rejects schema-valid contradictions", async () => {
+  const fixture = await loadNodeResultSuccessFixture();
+  const barrierBase = buildNodeResult({
+    nodeId: "quality-audit",
+    nodeKind: "barrier",
+    runnerStageRef: "quality-review",
+    resultScope: "barrier",
+    executionId: "daily-codex-dag:2026-07-03:test:quality-audit:barrier",
+    dependencyResults: [
+      "fanout:item-001",
+      "fanout:item-002"
+    ].map((executionId) => ({
+      node_id: "per-item-summary",
+      execution_id: executionId,
+      status: "success",
+      required: true,
+      downstream_disposition: "continue"
+    })),
+    barrier: {
+      expected_execution_ids: ["fanout:item-001", "fanout:item-002"],
+      observed_execution_ids: ["fanout:item-001"],
+      missing_execution_ids: ["fanout:item-002"]
+    }
+  });
+  const cases = [
+    {
+      name: "non-real report date",
+      mutate: (value) => {
+        value.report_date = "2026-02-31";
+      },
+      failure: "report_date must be a real YYYY-MM-DD date"
+    },
+    {
+      name: "non-canonical started_at",
+      mutate: (value) => {
+        value.started_at = "2026-07-03T16:00:00+08:00";
+      },
+      failure: "started_at must be a canonical UTC"
+    },
+    {
+      name: "duration mismatch",
+      mutate: (value) => {
+        value.duration_ms += 1;
+      },
+      failure: "duration_ms must equal finished_at - started_at"
+    },
+    {
+      name: "success has failures",
+      mutate: (value) => {
+        value.failures = [nodeResultIssue("unexpected_failure", "Unexpected failure.", "validator", false)];
+      },
+      failure: "success failures must be empty"
+    },
+    {
+      name: "success attempts exhausted",
+      mutate: (value) => {
+        value.attempts_exhausted = true;
+      },
+      failure: "success attempts_exhausted must be false"
+    },
+    {
+      name: "failure is not exhausted",
+      mutate: (value) => {
+        value.status = "failure";
+        value.downstream_disposition = "block";
+        value.failures = [nodeResultIssue("failed", "Node failed.", "runner", true)];
+        value.attempts_exhausted = false;
+      },
+      failure: "failure attempts_exhausted must be true"
+    },
+    {
+      name: "blocked has execution timestamps",
+      mutate: (value) => {
+        value.status = "blocked";
+        value.downstream_disposition = "block";
+        value.failures = [nodeResultIssue("blocked", "Dependency blocked.", "dependency", false)];
+        value.attempts_started = 0;
+      },
+      failure: "blocked must not include execution timestamps"
+    },
+    {
+      name: "blocked attempts exhausted",
+      mutate: (value) => {
+        value.status = "blocked";
+        value.downstream_disposition = "block";
+        value.started_at = null;
+        value.finished_at = null;
+        value.duration_ms = 0;
+        value.attempts_started = 0;
+        value.attempts_exhausted = true;
+        value.failures = [nodeResultIssue("blocked", "Dependency blocked.", "dependency", false)];
+      },
+      failure: "blocked attempts_exhausted must be false"
+    },
+    {
+      name: "skipped blocks downstream",
+      mutate: (value) => {
+        value.status = "skipped";
+        value.downstream_disposition = "block";
+        value.started_at = null;
+        value.finished_at = null;
+        value.duration_ms = 0;
+        value.attempts_started = 0;
+        value.warnings = [nodeResultIssue("skip", "Skipped by policy.", "policy", false)];
+      },
+      failure: "skipped downstream_disposition must be continue"
+    },
+    {
+      name: "success missing required output",
+      mutate: (value) => {
+        value.resolved_outputs = [];
+      },
+      failure: "resolved_outputs must include required artifact"
+    },
+    {
+      name: "success dependency blocks downstream",
+      mutate: (value) => {
+        value.dependency_results[0].downstream_disposition = "block";
+      },
+      failure: "success requires required dependency"
+    },
+    {
+      name: "success dependency failed but continues",
+      mutate: (value) => {
+        value.dependency_results[0].status = "failure";
+      },
+      failure: "success requires required dependency"
+    },
+    {
+      name: "dependency result status disposition mismatch",
+      mutate: (value) => {
+        value.dependency_results[0].status = "failure";
+        value.dependency_results[0].downstream_disposition = "continue";
+      },
+      failure: "dependency_results entry.failure downstream_disposition must be block"
+    },
+    {
+      name: "fanout item missing fanout metadata",
+      mutate: (value) => {
+        value.result_scope = "fanout_item";
+        value.node_kind = "fanout";
+        value.fanout = null;
+      },
+      failure: "fanout_item requires fanout metadata"
+    },
+    {
+      name: "barrier missing list mismatch",
+      value: structuredCloneJson(barrierBase),
+      mutate: (value) => {
+        value.barrier.missing_execution_ids = [];
+      },
+      failure: "missing_execution_ids must equal expected minus observed"
+    },
+    {
+      name: "barrier missing dependency evidence",
+      value: structuredCloneJson(barrierBase),
+      mutate: (value) => {
+        value.dependency_results = [];
+        value.barrier.observed_execution_ids = value.barrier.expected_execution_ids;
+        value.barrier.missing_execution_ids = [];
+      },
+      failure: "expected_execution_ids must have matching dependency_results entries"
+    },
+    {
+      name: "barrier observed dependency blocks",
+      value: structuredCloneJson(barrierBase),
+      mutate: (value) => {
+        value.dependency_results = value.barrier.expected_execution_ids.map((executionId) => ({
+          node_id: "per-item-summary",
+          execution_id: executionId,
+          status: "failure",
+          required: true,
+          downstream_disposition: "block"
+        }));
+        value.barrier.observed_execution_ids = value.barrier.expected_execution_ids;
+        value.barrier.missing_execution_ids = [];
+      },
+      failure: "observed_execution_ids must reference successful dependency results"
+    }
+  ];
+
+  for (const item of cases) {
+    const value = item.value || structuredCloneJson(fixture);
+    if (item.mutate) item.mutate(value);
+    await assertValidDagNodeResultSchemaOnly(value);
+    assertInvalidSemanticDagNodeResult(value, item.failure, item.name);
+  }
+});
+
+test("daily codex DAG node result semantic validator does not throw on malformed inputs", async () => {
+  const fixture = await loadNodeResultSuccessFixture();
+  const malformedBarrierIds = structuredCloneJson(fixture);
+  malformedBarrierIds.result_scope = "barrier";
+  malformedBarrierIds.node_kind = "barrier";
+  malformedBarrierIds.barrier = {
+    expected_execution_ids: [1n],
+    observed_execution_ids: [Symbol("observed")],
+    missing_execution_ids: []
+  };
+  const cases = [
+    null,
+    [],
+    "not an object",
+    { schema_version: 1 },
+    { ...structuredCloneJson(fixture), audit: null },
+    { ...structuredCloneJson(fixture), dependency_results: [{ execution_id: 1n }] },
+    { ...structuredCloneJson(fixture), resolved_outputs: [{ path: Symbol("artifact") }] },
+    malformedBarrierIds
+  ];
+
+  for (const value of cases) {
+    const result = validateDailyCodexDagNodeResult(value);
     assert.equal(result.ok, false);
     assert(result.failures.length > 0);
   }
@@ -744,6 +1130,10 @@ async function loadDryRunSummaryFixture() {
   return JSON.parse(await fs.readFile(dryRunSummaryFixturePath, "utf8"));
 }
 
+async function loadNodeResultSuccessFixture() {
+  return JSON.parse(await fs.readFile(nodeResultSuccessFixturePath, "utf8"));
+}
+
 async function assertValidDagRunSummary(value) {
   await assertValidDagRunSummarySchemaOnly(value);
   const semanticResult = validateDailyCodexDagDryRunSummary(value);
@@ -777,6 +1167,39 @@ function assertInvalidSemanticDagRunSummary(value, expectedFailure, label) {
   );
 }
 
+async function assertValidDagNodeResult(value) {
+  await assertValidDagNodeResultSchemaOnly(value);
+  const semanticResult = validateDailyCodexDagNodeResult(value);
+  if (!semanticResult.ok) {
+    assert.fail(`daily codex DAG node result should pass semantic validation:\n${semanticResult.failures.join("\n")}`);
+  }
+}
+
+async function assertValidDagNodeResultSchemaOnly(value) {
+  const validate = await getDagNodeResultValidator();
+  if (!validate(value)) {
+    assert.fail(`daily codex DAG node result should match schema:\n${formatAjvErrors(validate.errors)}`);
+  }
+}
+
+async function assertInvalidDagNodeResult(value) {
+  const validate = await getDagNodeResultValidator();
+  if (validate(value)) {
+    assert.fail("daily codex DAG node result schema accepted an invalid envelope");
+  }
+}
+
+function assertInvalidSemanticDagNodeResult(value, expectedFailure, label) {
+  const result = validateDailyCodexDagNodeResult(value);
+  if (result.ok) {
+    assert.fail(`daily codex DAG node result semantic validator accepted invalid case: ${label}`);
+  }
+  assert(
+    result.failures.some((failure) => failure.includes(expectedFailure)),
+    `${label} failures:\n${result.failures.join("\n")}`
+  );
+}
+
 async function getDagRunSummaryValidator() {
   if (!dagRunSummaryValidator) {
     const schema = JSON.parse(await fs.readFile(dagRunSchemaPath, "utf8"));
@@ -789,6 +1212,18 @@ async function getDagRunSummaryValidator() {
   return dagRunSummaryValidator;
 }
 
+async function getDagNodeResultValidator() {
+  if (!dagNodeResultValidator) {
+    const schema = JSON.parse(await fs.readFile(dagNodeResultSchemaPath, "utf8"));
+    const ajv = new Ajv({ allErrors: true, strict: false });
+    for (const format of ["date", "date-time", "uri", "uri-reference", "email"]) {
+      ajv.addFormat(format, true);
+    }
+    dagNodeResultValidator = ajv.compile(schema);
+  }
+  return dagNodeResultValidator;
+}
+
 function formatAjvErrors(errors = []) {
   return errors
     .map((error) => `${error.instancePath || "/"} ${error.message}`)
@@ -797,6 +1232,63 @@ function formatAjvErrors(errors = []) {
 
 function structuredCloneJson(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function buildNodeResult(overrides = {}) {
+  return createDailyCodexDagNodeResult({
+    reportDate: "2026-07-03",
+    runId: "daily-codex-dag:2026-07-03:test",
+    manifestName: "daily-codex-dag-contract",
+    manifestSchemaVersion: 1,
+    nodeId: "score",
+    nodeKind: "command",
+    runnerStageRef: "admit",
+    resultScope: "node",
+    status: "success",
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    maxAttempts: 2,
+    dependencyResults: [{
+      node_id: "classify-tag-entity",
+      execution_id: "daily-codex-dag:2026-07-03:test:classify-tag-entity:node",
+      status: "success",
+      required: true,
+      downstream_disposition: "continue"
+    }],
+    declaredInputs: [{
+      path: ".tmp/daily-codex-pipeline/2026-07-03/artifacts/classified-candidates.json",
+      required: true
+    }],
+    declaredOutputs: [{
+      path: ".tmp/daily-codex-pipeline/2026-07-03/artifacts/scored-candidates.json",
+      required: true
+    }],
+    resolvedInputs: [resolvedArtifact(".tmp/daily-codex-pipeline/2026-07-03/artifacts/classified-candidates.json")],
+    resolvedOutputs: [resolvedArtifact(".tmp/daily-codex-pipeline/2026-07-03/artifacts/scored-candidates.json")],
+    audit: {
+      parallel_group: "item-lanes",
+      resilience_policy_ref: "",
+      owner_path_scope: "internal_workdir",
+      public_artifact: false,
+      validator_version: "daily-codex-dag-node-result-v1"
+    },
+    ...overrides
+  });
+}
+
+function resolvedArtifact(artifactPath) {
+  return {
+    path: artifactPath,
+    required: true,
+    exists: true,
+    schema_valid: true,
+    bytes: 128,
+    sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  };
+}
+
+function nodeResultIssue(code, message, source, retryable) {
+  return { code, message, source, retryable };
 }
 
 function node(manifest, id) {

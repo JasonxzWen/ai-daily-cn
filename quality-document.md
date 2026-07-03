@@ -15,15 +15,15 @@ Update after material sessions, before a new phase, or when validation evidence 
 
 | Area | Rating | P0/P1/P2 validation status | Browser acceptance status | Agent readability | Test stability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Public article index artifact | A | P0 passed: article contract, privacy scan, build-clean, regular and daily publish-plan assertions, full validate | Deferred; no UI behavior changed | Good | Stable in `tests/article-index.test.js` and `tests/publish.test.js` | Future DAG node schemas still need per-node replay | 2026-07-03 |
-| Daily Codex DAG manifest contract | B | P0 targeted manifest validator, lineage negative tests, deterministic plan projection tests, guarded dry-run summary tests, dry-run summary schema tests, dry-run semantic validator tests, existing workflow contract, pipeline compatibility, and full validate passed | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest, lineage, plan projection, dry-run CLI, dry-run summary schema, and semantic summary regressions | Full executable 16-node runner migration and per-node real schemas remain future work | 2026-07-03 |
+| Public article index artifact | A | P0 passed: article contract, privacy scan, build-clean, regular and daily publish-plan assertions, full validate | Deferred; no UI behavior changed | Good | Stable in `tests/article-index.test.js` and `tests/publish.test.js` | Future DAG execution still needs live per-node replay | 2026-07-03 |
+| Daily Codex DAG manifest contract | B | P0 targeted node result contract tests, `dag:validate`, pipeline compatibility, harness validation, and full `npm run validate` passed for this slice | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest, lineage, plan projection, dry-run CLI, dry-run summary schema, semantic summary regressions, and executable node result contract regressions | Full executable 16-node runner migration and live per-node execution remain future work | 2026-07-03 |
 
 ## Architecture Layers
 
 | Layer | Rating | Boundary health | Agent readability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- |
-| Public/private artifact boundary | A | `docs/articles.json` is now included in public scans with internal audit field denylist coverage | Good | DAG audit artifacts are not yet formalized per node | 2026-07-03 |
-| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, projects deterministic execution levels, exposes opt-in `.tmp/daily-codex-pipeline/**/*.json` dry-run summaries, validates dry-run run-summary envelopes with a dedicated schema, and checks strict dates plus plan/run invariants with a semantic validator | Good | Dry-run CLI does not execute nodes; production runner still uses coarse stages | 2026-07-03 |
+| Public/private artifact boundary | A | `docs/articles.json` is now included in public scans with internal audit field denylist coverage; node result audit metadata is schema-whitelisted before live execution exists | Good | Node result audit is not manifest-aware ownership enforcement; future live node execution still needs artifact emission, manifest/path-scope checks, and privacy checks against real outputs | 2026-07-03 |
+| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, projects deterministic execution levels, exposes opt-in `.tmp/daily-codex-pipeline/**/*.json` dry-run summaries, validates dry-run run-summary envelopes with a dedicated schema, checks strict dates plus plan/run invariants with a semantic validator, and defines schema/semantic validation for executable node result contracts | Good | Dry-run CLI does not execute nodes; node result validation is not manifest-aware for artifact ownership; production runner still uses coarse stages | 2026-07-03 |
 
 ## Change History
 
@@ -34,6 +34,14 @@ Update after material sessions, before a new phase, or when validation evidence 
 - Regressed:
 - New gaps:
 - Closed gaps:
+
+### 2026-07-03
+
+- Change: Added a standalone executable daily Codex DAG node result contract.
+- Improved: Node results now have a schema, fixture, helper, and semantic validator for run/date identity, normal/fanout/barrier scopes, final-result retry fields, status/downstream semantics, declared/resolved artifacts, dependency snapshots, issue objects, strict timing, and whitelisted audit metadata.
+- Regressed: None known.
+- New gaps: The contract is not yet wired into a live node executor, package script, workflow gate, or production runner; real per-node artifact writes and replay remain future work; node result audit/path fields are not yet checked against the manifest's owner path scope.
+- Closed gaps: The previous executable-node-result gap now has a deterministic schema-backed object model before side effects are introduced.
 
 ### 2026-07-03
 

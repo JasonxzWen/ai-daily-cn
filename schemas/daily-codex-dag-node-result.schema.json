@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/daily-codex-dag-node-result.schema.json",
+  "title": "Daily Codex DAG Node Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "mode",
+    "report_date",
+    "run_id",
+    "manifest_name",
+    "manifest_schema_version",
+    "node_id",
+    "node_kind",
+    "runner_stage_ref",
+    "result_scope",
+    "execution_id",
+    "status",
+    "downstream_disposition",
+    "started_at",
+    "finished_at",
+    "duration_ms",
+    "attempts_started",
+    "max_attempts",
+    "attempts_exhausted",
+    "dependency_results",
+    "declared_inputs",
+    "declared_outputs",
+    "resolved_inputs",
+    "resolved_outputs",
+    "fanout",
+    "barrier",
+    "failures",
+    "warnings",
+    "audit"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "mode": { "const": "daily_codex_dag_node_result" },
+    "report_date": { "type": "string", "format": "date" },
+    "run_id": { "$ref": "#/$defs/stable_identifier" },
+    "manifest_name": { "type": "string", "minLength": 1 },
+    "manifest_schema_version": { "const": 1 },
+    "node_id": { "$ref": "#/$defs/node_id" },
+    "node_kind": { "enum": ["command", "codex_exec", "fanout", "barrier"] },
+    "runner_stage_ref": { "type": "string" },
+    "result_scope": { "enum": ["node", "fanout_item", "barrier"] },
+    "execution_id": { "$ref": "#/$defs/stable_identifier" },
+    "status": { "enum": ["success", "failure", "blocked", "skipped"] },
+    "downstream_disposition": { "enum": ["continue", "block"] },
+    "started_at": { "$ref": "#/$defs/nullable_timestamp" },
+    "finished_at": { "$ref": "#/$defs/nullable_timestamp" },
+    "duration_ms": { "type": "integer", "minimum": 0 },
+    "attempts_started": { "type": "integer", "minimum": 0 },
+    "max_attempts": { "type": "integer", "minimum": 1 },
+    "attempts_exhausted": { "type": "boolean" },
+    "dependency_results": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/dependency_result" }
+    },
+    "declared_inputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/declared_artifact" }
+    },
+    "declared_outputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/declared_artifact" }
+    },
+    "resolved_inputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/resolved_artifact" }
+    },
+    "resolved_outputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/resolved_artifact" }
+    },
+    "fanout": {
+      "anyOf": [
+        { "$ref": "#/$defs/fanout_result" },
+        { "type": "null" }
+      ]
+    },
+    "barrier": {
+      "anyOf": [
+        { "$ref": "#/$defs/barrier_result" },
+        { "type": "null" }
+      ]
+    },
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/issue" }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/issue" }
+    },
+    "audit": { "$ref": "#/$defs/audit" }
+  },
+  "$defs": {
+    "node_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(?::[a-z0-9-]+)?$"
+    },
+    "stable_identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "nullable_timestamp": {
+      "anyOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "dependency_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "execution_id", "status", "required", "downstream_disposition"],
+      "properties": {
+        "node_id": { "$ref": "#/$defs/node_id" },
+        "execution_id": { "$ref": "#/$defs/stable_identifier" },
+        "status": { "enum": ["success", "failure", "blocked", "skipped"] },
+        "required": { "type": "boolean" },
+        "downstream_disposition": { "enum": ["continue", "block"] }
+      }
+    },
+    "declared_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "required"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" }
+      }
+    },
+    "resolved_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "required", "exists", "schema_valid", "bytes", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" },
+        "exists": { "type": "boolean" },
+        "schema_valid": { "type": "boolean" },
+        "bytes": {
+          "anyOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "sha256": {
+          "anyOf": [
+            { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "fanout_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_id", "fanout_key"],
+      "properties": {
+        "item_id": { "type": "string", "minLength": 1 },
+        "fanout_key": { "$ref": "#/$defs/stable_identifier" }
+      }
+    },
+    "barrier_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected_execution_ids", "observed_execution_ids", "missing_execution_ids"],
+      "properties": {
+        "expected_execution_ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stable_identifier" },
+          "uniqueItems": true
+        },
+        "observed_execution_ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stable_identifier" },
+          "uniqueItems": true
+        },
+        "missing_execution_ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stable_identifier" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "source", "retryable"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "retryable": { "type": "boolean" }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parallel_group", "resilience_policy_ref", "owner_path_scope", "public_artifact", "validator_version"],
+      "properties": {
+        "parallel_group": { "type": "string" },
+        "resilience_policy_ref": { "type": "string" },
+        "owner_path_scope": { "enum": ["internal_workdir", "docs", "reports_data", "none"] },
+        "public_artifact": { "type": "boolean" },
+        "validator_version": { "const": "daily-codex-dag-node-result-v1" }
+      }
+    }
+  }
+}

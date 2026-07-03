@@ -4,6 +4,11 @@ import Ajv from "ajv/dist/2020.js";
 
 const DEFAULT_DAG_PATH = path.join("config", "daily-codex-dag.json");
 const DAG_SCHEMA_PATH = path.join("schemas", "daily-codex-dag.schema.json");
+const NODE_RESULT_VALIDATOR_VERSION = "daily-codex-dag-node-result-v1";
+const NODE_RESULT_STATUSES = ["success", "failure", "blocked", "skipped"];
+const NODE_RESULT_SCOPES = ["node", "fanout_item", "barrier"];
+const NODE_RESULT_DOWNSTREAM_DISPOSITIONS = ["continue", "block"];
+const NODE_KINDS = ["command", "codex_exec", "fanout", "barrier"];
 
 const REQUIRED_NODE_IDS = [
   "fetch-source-health",
@@ -197,6 +202,80 @@ export function validateDailyCodexDagDryRunSummary(summary) {
   }
 
   validateDryRunSuccessSummary(summary, failures);
+  return { ok: failures.length === 0, failures, warnings };
+}
+
+export function createDailyCodexDagNodeResult(options = {}) {
+  const status = options.status || "success";
+  const reportDate = requiredReportDate(options.reportDate || options.report_date || options.date);
+  const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}`;
+  const nodeId = options.nodeId || options.node_id;
+  const resultScope = options.resultScope || options.result_scope || "node";
+  const executionId = options.executionId || options.execution_id || defaultNodeExecutionId({ runId, nodeId, resultScope, options });
+  const startedAt = toNullableIsoTimestamp(options.startedAt ?? options.started_at ?? null);
+  const finishedAt = toNullableIsoTimestamp(options.finishedAt ?? options.finished_at ?? null);
+  const durationMs = options.durationMs ?? options.duration_ms ?? durationBetweenTimestamps(startedAt, finishedAt) ?? 0;
+  const attemptsStarted = options.attemptsStarted ?? options.attempts_started ?? (status === "blocked" || status === "skipped" ? 0 : 1);
+  const maxAttempts = options.maxAttempts ?? options.max_attempts ?? Math.max(1, attemptsStarted);
+  const attemptsExhausted = options.attemptsExhausted ?? options.attempts_exhausted ?? (status === "failure");
+  const downstreamDisposition = options.downstreamDisposition
+    || options.downstream_disposition
+    || (status === "success" || status === "skipped" ? "continue" : "block");
+  const runnerStageRef = options.runnerStageRef || options.runner_stage_ref || "";
+  const declaredInputs = copyDeclaredArtifacts(options.declaredInputs || options.declared_inputs || []);
+  const declaredOutputs = copyDeclaredArtifacts(options.declaredOutputs || options.declared_outputs || []);
+
+  return {
+    schema_version: 1,
+    mode: "daily_codex_dag_node_result",
+    report_date: reportDate,
+    run_id: runId,
+    manifest_name: options.manifestName || options.manifest_name || "daily-codex-dag-contract",
+    manifest_schema_version: options.manifestSchemaVersion || options.manifest_schema_version || 1,
+    node_id: nodeId,
+    node_kind: options.nodeKind || options.node_kind || "command",
+    runner_stage_ref: runnerStageRef,
+    result_scope: resultScope,
+    execution_id: executionId,
+    status,
+    downstream_disposition: downstreamDisposition,
+    started_at: startedAt,
+    finished_at: finishedAt,
+    duration_ms: durationMs,
+    attempts_started: attemptsStarted,
+    max_attempts: maxAttempts,
+    attempts_exhausted: attemptsExhausted,
+    dependency_results: copyDependencyResults(options.dependencyResults || options.dependency_results || []),
+    declared_inputs: declaredInputs,
+    declared_outputs: declaredOutputs,
+    resolved_inputs: copyResolvedArtifacts(options.resolvedInputs || options.resolved_inputs || []),
+    resolved_outputs: copyResolvedArtifacts(options.resolvedOutputs || options.resolved_outputs || []),
+    fanout: copyFanoutResult(options.fanout || null),
+    barrier: copyBarrierResult(options.barrier || null),
+    failures: copyIssueObjects(options.failures || []),
+    warnings: copyIssueObjects(options.warnings || []),
+    audit: copyNodeResultAudit({
+      ...(options.audit || {}),
+      parallel_group: options.parallelGroup ?? options.parallel_group ?? options.audit?.parallel_group,
+      resilience_policy_ref: options.resiliencePolicyRef ?? options.resilience_policy_ref ?? options.audit?.resilience_policy_ref,
+      owner_path_scope: options.ownerPathScope ?? options.owner_path_scope ?? options.audit?.owner_path_scope,
+      public_artifact: options.publicArtifact ?? options.public_artifact ?? options.audit?.public_artifact,
+      validator_version: options.validatorVersion ?? options.validator_version ?? options.audit?.validator_version
+    })
+  };
+}
+
+export function validateDailyCodexDagNodeResult(result) {
+  const failures = [];
+  const warnings = [];
+
+  if (!isPlainObject(result)) {
+    failures.push("daily codex DAG node result must be an object.");
+    return { ok: false, failures, warnings };
+  }
+
+  validateNodeResultShape(result, failures);
+  validateNodeResultSemantics(result, failures);
   return { ok: failures.length === 0, failures, warnings };
 }
 
@@ -429,6 +508,396 @@ function validateDryRunSuccessSummary(summary, failures) {
   const levelPartition = validatePlanLevelPartition({ planNodes, planLevels, failures });
   validateDryRunSuccessRun({ run, planLevels, planNodeIds, failures });
   validatePlanDependencyLevels({ planNodes, levelByNodeId: levelPartition.levelByNodeId, failures });
+}
+
+function validateNodeResultShape(result, failures) {
+  const label = "daily codex DAG node result";
+  validateExactKeys({
+    value: result,
+    allowed: [
+      "schema_version",
+      "mode",
+      "report_date",
+      "run_id",
+      "manifest_name",
+      "manifest_schema_version",
+      "node_id",
+      "node_kind",
+      "runner_stage_ref",
+      "result_scope",
+      "execution_id",
+      "status",
+      "downstream_disposition",
+      "started_at",
+      "finished_at",
+      "duration_ms",
+      "attempts_started",
+      "max_attempts",
+      "attempts_exhausted",
+      "dependency_results",
+      "declared_inputs",
+      "declared_outputs",
+      "resolved_inputs",
+      "resolved_outputs",
+      "fanout",
+      "barrier",
+      "failures",
+      "warnings",
+      "audit"
+    ],
+    label,
+    failures
+  });
+  if (result.schema_version !== 1) failures.push(`${label}.schema_version must be 1.`);
+  if (result.mode !== "daily_codex_dag_node_result") failures.push(`${label}.mode must be daily_codex_dag_node_result.`);
+  if (!isStrictIsoDate(result.report_date)) failures.push(`${label}.report_date must be a real YYYY-MM-DD date.`);
+  if (!isStableIdentifier(result.run_id)) failures.push(`${label}.run_id must be a stable identifier.`);
+  if (!nonEmptyString(result.manifest_name)) failures.push(`${label}.manifest_name must be a non-empty string.`);
+  if (result.manifest_schema_version !== 1) failures.push(`${label}.manifest_schema_version must be 1.`);
+  if (!isNodeId(result.node_id)) failures.push(`${label}.node_id must be a node id.`);
+  if (!NODE_KINDS.includes(result.node_kind)) failures.push(`${label}.node_kind is invalid.`);
+  if (typeof result.runner_stage_ref !== "string") failures.push(`${label}.runner_stage_ref must be a string.`);
+  if (!NODE_RESULT_SCOPES.includes(result.result_scope)) failures.push(`${label}.result_scope is invalid.`);
+  if (!isStableIdentifier(result.execution_id)) failures.push(`${label}.execution_id must be a stable identifier.`);
+  if (!NODE_RESULT_STATUSES.includes(result.status)) failures.push(`${label}.status is invalid.`);
+  if (!NODE_RESULT_DOWNSTREAM_DISPOSITIONS.includes(result.downstream_disposition)) failures.push(`${label}.downstream_disposition is invalid.`);
+  validateNullableTimestamp(result.started_at, `${label}.started_at`, failures);
+  validateNullableTimestamp(result.finished_at, `${label}.finished_at`, failures);
+  if (!Number.isInteger(result.duration_ms) || result.duration_ms < 0) failures.push(`${label}.duration_ms must be a non-negative integer.`);
+  if (!Number.isInteger(result.attempts_started) || result.attempts_started < 0) failures.push(`${label}.attempts_started must be a non-negative integer.`);
+  if (!Number.isInteger(result.max_attempts) || result.max_attempts < 1) failures.push(`${label}.max_attempts must be a positive integer.`);
+  if (typeof result.attempts_exhausted !== "boolean") failures.push(`${label}.attempts_exhausted must be a boolean.`);
+  validateDependencyResultArray(result.dependency_results, `${label}.dependency_results`, failures);
+  validateNodeResultDeclaredArtifactArray(result.declared_inputs, `${label}.declared_inputs`, failures);
+  validateNodeResultDeclaredArtifactArray(result.declared_outputs, `${label}.declared_outputs`, failures);
+  validateNodeResultResolvedArtifactArray(result.resolved_inputs, `${label}.resolved_inputs`, failures);
+  validateNodeResultResolvedArtifactArray(result.resolved_outputs, `${label}.resolved_outputs`, failures);
+  validateIssueObjectArray(result.failures, `${label}.failures`, failures);
+  validateIssueObjectArray(result.warnings, `${label}.warnings`, failures);
+  validateFanoutResultShape(result.fanout, `${label}.fanout`, failures);
+  validateBarrierResultShape(result.barrier, `${label}.barrier`, failures);
+  validateNodeResultAuditShape(result.audit, `${label}.audit`, failures);
+}
+
+function validateNodeResultSemantics(result, failures) {
+  const label = "daily codex DAG node result";
+  if (Number.isInteger(result.attempts_started) && Number.isInteger(result.max_attempts) && result.attempts_started > result.max_attempts) {
+    failures.push(`${label}.attempts_started must not exceed max_attempts.`);
+  }
+
+  validateNodeResultTiming(result, failures);
+  validateNodeResultStatusSemantics(result, failures);
+  validateNodeResultScopeSemantics(result, failures);
+
+  if (result.status === "success") {
+    validateRequiredArtifactsResolved({
+      declared: result.declared_inputs,
+      resolved: result.resolved_inputs,
+      label: `${label}.resolved_inputs`,
+      failures
+    });
+    validateRequiredArtifactsResolved({
+      declared: result.declared_outputs,
+      resolved: result.resolved_outputs,
+      label: `${label}.resolved_outputs`,
+      failures
+    });
+    if (Array.isArray(result.dependency_results)) {
+      for (const dependency of result.dependency_results) {
+        if (dependency?.required && (dependency.status !== "success" || dependency.downstream_disposition !== "continue")) {
+          failures.push(`${label} success requires required dependency ${formatSummaryValue(dependency.node_id)} to allow downstream continuation.`);
+        }
+      }
+    }
+  }
+}
+
+function validateNodeResultTiming(result, failures) {
+  const label = "daily codex DAG node result";
+  const hasStarted = isCanonicalIsoTimestamp(result.started_at);
+  const hasFinished = isCanonicalIsoTimestamp(result.finished_at);
+  if (result.status === "success" || result.status === "failure") {
+    if (!hasStarted) failures.push(`${label}.${result.status} started_at must be a canonical UTC Date#toISOString() string.`);
+    if (!hasFinished) failures.push(`${label}.${result.status} finished_at must be a canonical UTC Date#toISOString() string.`);
+  }
+  if (result.status === "blocked" || result.status === "skipped") {
+    if (result.started_at !== null || result.finished_at !== null) {
+      failures.push(`${label}.${result.status} must not include execution timestamps.`);
+    }
+    if (result.duration_ms !== 0) {
+      failures.push(`${label}.${result.status} duration_ms must be 0.`);
+    }
+  }
+  if (hasStarted && hasFinished) {
+    const durationMs = Date.parse(result.finished_at) - Date.parse(result.started_at);
+    if (durationMs < 0) {
+      failures.push(`${label}.finished_at must be greater than or equal to started_at.`);
+    } else if (result.duration_ms !== durationMs) {
+      failures.push(`${label}.duration_ms must equal finished_at - started_at.`);
+    }
+  }
+}
+
+function validateNodeResultStatusSemantics(result, failures) {
+  const label = "daily codex DAG node result";
+  if (!NODE_RESULT_STATUSES.includes(result.status)) return;
+  const failureCount = Array.isArray(result.failures) ? result.failures.length : 0;
+  const warningCount = Array.isArray(result.warnings) ? result.warnings.length : 0;
+
+  if (result.status === "success") {
+    if (failureCount !== 0) failures.push(`${label}.success failures must be empty.`);
+    if (result.downstream_disposition !== "continue") failures.push(`${label}.success downstream_disposition must be continue.`);
+    if (!Number.isInteger(result.attempts_started) || result.attempts_started < 1) failures.push(`${label}.success attempts_started must be at least 1.`);
+    if (result.attempts_exhausted !== false) failures.push(`${label}.success attempts_exhausted must be false.`);
+  }
+  if (result.status === "failure") {
+    if (failureCount === 0) failures.push(`${label}.failure failures must be non-empty.`);
+    if (result.downstream_disposition !== "block") failures.push(`${label}.failure downstream_disposition must be block.`);
+    if (!Number.isInteger(result.attempts_started) || result.attempts_started < 1) failures.push(`${label}.failure attempts_started must be at least 1.`);
+    if (result.attempts_exhausted !== true) failures.push(`${label}.failure attempts_exhausted must be true.`);
+  }
+  if (result.status === "blocked") {
+    if (failureCount === 0) failures.push(`${label}.blocked failures must be non-empty.`);
+    if (result.downstream_disposition !== "block") failures.push(`${label}.blocked downstream_disposition must be block.`);
+    if (result.attempts_started !== 0) failures.push(`${label}.blocked attempts_started must be 0.`);
+    if (result.attempts_exhausted !== false) failures.push(`${label}.blocked attempts_exhausted must be false.`);
+  }
+  if (result.status === "skipped") {
+    if (failureCount !== 0) failures.push(`${label}.skipped failures must be empty.`);
+    if (result.downstream_disposition !== "continue") failures.push(`${label}.skipped downstream_disposition must be continue.`);
+    if (warningCount === 0) failures.push(`${label}.skipped warnings must include a skip reason.`);
+    if (result.attempts_started !== 0) failures.push(`${label}.skipped attempts_started must be 0.`);
+    if (result.attempts_exhausted !== false) failures.push(`${label}.skipped attempts_exhausted must be false.`);
+  }
+}
+
+function validateNodeResultScopeSemantics(result, failures) {
+  const label = "daily codex DAG node result";
+  if (result.result_scope === "fanout_item") {
+    if (result.node_kind !== "fanout") failures.push(`${label}.fanout_item node_kind must be fanout.`);
+    if (!isPlainObject(result.fanout)) {
+      failures.push(`${label}.fanout_item requires fanout metadata.`);
+    }
+  } else if (result.fanout !== null) {
+    failures.push(`${label}.fanout must be null unless result_scope is fanout_item.`);
+  }
+
+  if (result.result_scope === "barrier") {
+    if (result.node_kind !== "barrier") failures.push(`${label}.barrier node_kind must be barrier.`);
+    if (!isPlainObject(result.barrier)) {
+      failures.push(`${label}.barrier result requires barrier metadata.`);
+    } else {
+      validateBarrierResultSemantics(result, failures);
+    }
+  } else if (result.barrier !== null) {
+    failures.push(`${label}.barrier must be null unless result_scope is barrier.`);
+  }
+}
+
+function validateBarrierResultSemantics(result, failures) {
+  const label = "daily codex DAG node result.barrier";
+  const expected = result.barrier.expected_execution_ids;
+  const observed = result.barrier.observed_execution_ids;
+  const missing = result.barrier.missing_execution_ids;
+  if (!Array.isArray(expected) || !Array.isArray(observed) || !Array.isArray(missing)) return;
+
+  const expectedSet = new Set(expected);
+  const dependencyResults = Array.isArray(result.dependency_results) ? result.dependency_results : [];
+  const dependencyByExecutionId = new Map();
+  for (const dependency of dependencyResults) {
+    if (isPlainObject(dependency) && isStableIdentifier(dependency.execution_id)) {
+      dependencyByExecutionId.set(dependency.execution_id, dependency);
+    }
+  }
+  for (const executionId of expected) {
+    if (!dependencyByExecutionId.has(executionId)) {
+      failures.push(`${label}.expected_execution_ids must have matching dependency_results entries.`);
+      break;
+    }
+  }
+  for (const executionId of observed) {
+    if (!expectedSet.has(executionId)) {
+      failures.push(`${label}.observed_execution_ids must be a subset of expected_execution_ids.`);
+      break;
+    }
+    const dependency = dependencyByExecutionId.get(executionId);
+    if (!dependency) {
+      failures.push(`${label}.observed_execution_ids must have matching dependency_results entries.`);
+      break;
+    }
+    if (dependency.downstream_disposition !== "continue" || dependency.status !== "success") {
+      failures.push(`${label}.observed_execution_ids must reference successful dependency results that allow downstream continuation.`);
+      break;
+    }
+  }
+  const expectedMissing = expected.filter((executionId) => !observed.includes(executionId));
+  if (!sameOrderedStringArray(missing, expectedMissing)) {
+    failures.push(`${label}.missing_execution_ids must equal expected minus observed execution ids.`);
+  }
+  if (result.status === "success" && missing.length !== 0) {
+    failures.push(`${label}.success must not have missing execution ids.`);
+  }
+}
+
+function validateRequiredArtifactsResolved({ declared, resolved, label, failures }) {
+  if (!Array.isArray(declared) || !Array.isArray(resolved)) return;
+  for (const artifact of declared) {
+    if (!isPlainObject(artifact) || artifact.required !== true || !nonEmptyString(artifact.path)) continue;
+    const resolvedArtifact = resolved.find((item) => isPlainObject(item) && item.path === artifact.path);
+    if (!resolvedArtifact) {
+      failures.push(`${label} must include required artifact ${artifact.path}.`);
+      continue;
+    }
+    if (resolvedArtifact.exists !== true) {
+      failures.push(`${label} required artifact ${artifact.path} must exist.`);
+    }
+    if (resolvedArtifact.schema_valid !== true) {
+      failures.push(`${label} required artifact ${artifact.path} must be schema_valid.`);
+    }
+  }
+}
+
+function validateDependencyResultArray(values, label, failures) {
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  const executionIds = new Set();
+  for (const value of values) {
+    if (!isPlainObject(value)) {
+      failures.push(`${label} entries must be objects.`);
+      continue;
+    }
+    validateExactKeys({
+      value,
+      allowed: ["node_id", "execution_id", "status", "required", "downstream_disposition"],
+      label: `${label} entry`,
+      failures
+    });
+    if (!isNodeId(value.node_id)) failures.push(`${label} entry.node_id must be a node id.`);
+    if (!isStableIdentifier(value.execution_id)) failures.push(`${label} entry.execution_id must be a stable identifier.`);
+    if (!NODE_RESULT_STATUSES.includes(value.status)) failures.push(`${label} entry.status is invalid.`);
+    if (typeof value.required !== "boolean") failures.push(`${label} entry.required must be a boolean.`);
+    if (!NODE_RESULT_DOWNSTREAM_DISPOSITIONS.includes(value.downstream_disposition)) failures.push(`${label} entry.downstream_disposition is invalid.`);
+    if (value.status === "success" && value.downstream_disposition !== "continue") {
+      failures.push(`${label} entry.success downstream_disposition must be continue.`);
+    }
+    if ((value.status === "failure" || value.status === "blocked") && value.downstream_disposition !== "block") {
+      failures.push(`${label} entry.${value.status} downstream_disposition must be block.`);
+    }
+    if (value.status === "skipped" && value.downstream_disposition !== "continue") {
+      failures.push(`${label} entry.skipped downstream_disposition must be continue.`);
+    }
+    if (isStableIdentifier(value.execution_id)) {
+      if (executionIds.has(value.execution_id)) failures.push(`${label} entry.execution_id values must be unique.`);
+      executionIds.add(value.execution_id);
+    }
+  }
+}
+
+function validateNodeResultDeclaredArtifactArray(values, label, failures) {
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  for (const artifact of values) {
+    if (!isPlainObject(artifact)) {
+      failures.push(`${label} entries must be objects.`);
+      continue;
+    }
+    validateExactKeys({ value: artifact, allowed: ["path", "required"], label: `${label} entry`, failures });
+    if (!nonEmptyString(artifact.path)) failures.push(`${label} entry.path must be a non-empty string.`);
+    if (typeof artifact.required !== "boolean") failures.push(`${label} entry.required must be a boolean.`);
+  }
+}
+
+function validateNodeResultResolvedArtifactArray(values, label, failures) {
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  for (const artifact of values) {
+    if (!isPlainObject(artifact)) {
+      failures.push(`${label} entries must be objects.`);
+      continue;
+    }
+    validateExactKeys({
+      value: artifact,
+      allowed: ["path", "required", "exists", "schema_valid", "bytes", "sha256"],
+      label: `${label} entry`,
+      failures
+    });
+    if (!nonEmptyString(artifact.path)) failures.push(`${label} entry.path must be a non-empty string.`);
+    if (typeof artifact.required !== "boolean") failures.push(`${label} entry.required must be a boolean.`);
+    if (typeof artifact.exists !== "boolean") failures.push(`${label} entry.exists must be a boolean.`);
+    if (typeof artifact.schema_valid !== "boolean") failures.push(`${label} entry.schema_valid must be a boolean.`);
+    if (artifact.bytes !== null && (!Number.isInteger(artifact.bytes) || artifact.bytes < 0)) failures.push(`${label} entry.bytes must be null or a non-negative integer.`);
+    if (artifact.sha256 !== null && !(typeof artifact.sha256 === "string" && /^[a-f0-9]{64}$/.test(artifact.sha256))) failures.push(`${label} entry.sha256 must be null or a lowercase sha256 hex string.`);
+  }
+}
+
+function validateIssueObjectArray(values, label, failures) {
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  for (const issue of values) {
+    if (!isPlainObject(issue)) {
+      failures.push(`${label} entries must be objects.`);
+      continue;
+    }
+    validateExactKeys({ value: issue, allowed: ["code", "message", "source", "retryable"], label: `${label} entry`, failures });
+    if (!nonEmptyString(issue.code)) failures.push(`${label} entry.code must be a non-empty string.`);
+    if (!nonEmptyString(issue.message)) failures.push(`${label} entry.message must be a non-empty string.`);
+    if (!nonEmptyString(issue.source)) failures.push(`${label} entry.source must be a non-empty string.`);
+    if (typeof issue.retryable !== "boolean") failures.push(`${label} entry.retryable must be a boolean.`);
+  }
+}
+
+function validateFanoutResultShape(value, label, failures) {
+  if (value === null) return;
+  if (!isPlainObject(value)) {
+    failures.push(`${label} must be null or an object.`);
+    return;
+  }
+  validateExactKeys({ value, allowed: ["item_id", "fanout_key"], label, failures });
+  if (!nonEmptyString(value.item_id)) failures.push(`${label}.item_id must be a non-empty string.`);
+  if (!isStableIdentifier(value.fanout_key)) failures.push(`${label}.fanout_key must be a stable identifier.`);
+}
+
+function validateBarrierResultShape(value, label, failures) {
+  if (value === null) return;
+  if (!isPlainObject(value)) {
+    failures.push(`${label} must be null or an object.`);
+    return;
+  }
+  validateExactKeys({
+    value,
+    allowed: ["expected_execution_ids", "observed_execution_ids", "missing_execution_ids"],
+    label,
+    failures
+  });
+  validateStableIdentifierArray(value.expected_execution_ids, `${label}.expected_execution_ids`, failures);
+  validateStableIdentifierArray(value.observed_execution_ids, `${label}.observed_execution_ids`, failures);
+  validateStableIdentifierArray(value.missing_execution_ids, `${label}.missing_execution_ids`, failures);
+}
+
+function validateNodeResultAuditShape(value, label, failures) {
+  if (!isPlainObject(value)) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  validateExactKeys({
+    value,
+    allowed: ["parallel_group", "resilience_policy_ref", "owner_path_scope", "public_artifact", "validator_version"],
+    label,
+    failures
+  });
+  if (typeof value.parallel_group !== "string") failures.push(`${label}.parallel_group must be a string.`);
+  if (typeof value.resilience_policy_ref !== "string") failures.push(`${label}.resilience_policy_ref must be a string.`);
+  if (!["internal_workdir", "docs", "reports_data", "none"].includes(value.owner_path_scope)) failures.push(`${label}.owner_path_scope is invalid.`);
+  if (typeof value.public_artifact !== "boolean") failures.push(`${label}.public_artifact must be a boolean.`);
+  if (value.validator_version !== NODE_RESULT_VALIDATOR_VERSION) failures.push(`${label}.validator_version must be ${NODE_RESULT_VALIDATOR_VERSION}.`);
 }
 
 function validateValidationShape({ validation, expectedOk, label, failures }) {
@@ -999,6 +1468,114 @@ function toIsoTimestamp(value) {
   return date.toISOString();
 }
 
+function toNullableIsoTimestamp(value) {
+  if (value === null || value === undefined) return null;
+  return toIsoTimestamp(value);
+}
+
+function durationBetweenTimestamps(startedAt, finishedAt) {
+  if (!isCanonicalIsoTimestamp(startedAt) || !isCanonicalIsoTimestamp(finishedAt)) return null;
+  return Date.parse(finishedAt) - Date.parse(startedAt);
+}
+
+function defaultNodeExecutionId({ runId, nodeId, resultScope, options }) {
+  const fanoutKey = options.fanoutKey
+    || options.fanout_key
+    || options.itemId
+    || options.item_id
+    || options.fanout?.fanout_key
+    || options.fanout?.item_id
+    || "";
+  const suffix = resultScope === "fanout_item" && fanoutKey ? `:${fanoutKey}` : "";
+  return `${runId}:${nodeId || "unknown-node"}:${resultScope}${suffix}`;
+}
+
+function copyDeclaredArtifacts(values) {
+  if (!Array.isArray(values)) return values;
+  return values.map((artifact) => isPlainObject(artifact)
+    ? {
+        path: artifact.path,
+        required: artifact.required
+      }
+    : artifact);
+}
+
+function copyResolvedArtifacts(values) {
+  if (!Array.isArray(values)) return values;
+  return values.map((artifact) => isPlainObject(artifact)
+    ? {
+        path: artifact.path,
+        required: artifact.required,
+        exists: artifact.exists,
+        schema_valid: artifact.schema_valid,
+        bytes: artifact.bytes ?? null,
+        sha256: artifact.sha256 ?? null
+      }
+    : artifact);
+}
+
+function copyDependencyResults(values) {
+  if (!Array.isArray(values)) return values;
+  return values.map((dependency) => isPlainObject(dependency)
+    ? {
+        node_id: dependency.node_id,
+        execution_id: dependency.execution_id,
+        status: dependency.status,
+        required: dependency.required,
+        downstream_disposition: dependency.downstream_disposition
+      }
+    : dependency);
+}
+
+function copyIssueObjects(values) {
+  if (!Array.isArray(values)) return values;
+  return values.map((issue) => {
+    if (isPlainObject(issue)) {
+      return {
+        code: issue.code,
+        message: issue.message,
+        source: issue.source,
+        retryable: issue.retryable
+      };
+    }
+    return {
+      code: "message",
+      message: String(issue || ""),
+      source: "unknown",
+      retryable: false
+    };
+  });
+}
+
+function copyFanoutResult(value) {
+  if (value === null || value === undefined) return null;
+  if (!isPlainObject(value)) return value;
+  return {
+    item_id: value.item_id,
+    fanout_key: value.fanout_key
+  };
+}
+
+function copyBarrierResult(value) {
+  if (value === null || value === undefined) return null;
+  if (!isPlainObject(value)) return value;
+  return {
+    expected_execution_ids: Array.isArray(value.expected_execution_ids) ? [...value.expected_execution_ids] : value.expected_execution_ids,
+    observed_execution_ids: Array.isArray(value.observed_execution_ids) ? [...value.observed_execution_ids] : value.observed_execution_ids,
+    missing_execution_ids: Array.isArray(value.missing_execution_ids) ? [...value.missing_execution_ids] : value.missing_execution_ids
+  };
+}
+
+function copyNodeResultAudit(value) {
+  return {
+    parallel_group: typeof value.parallel_group === "string" ? value.parallel_group : "",
+    resilience_policy_ref: typeof value.resilience_policy_ref === "string" ? value.resilience_policy_ref : "",
+    owner_path_scope: typeof value.owner_path_scope === "string" ? value.owner_path_scope : "internal_workdir",
+    public_artifact: typeof value.public_artifact === "boolean" ? value.public_artifact : false,
+    validator_version: typeof value.validator_version === "string" ? value.validator_version : NODE_RESULT_VALIDATOR_VERSION
+  };
+}
+
 function isStrictIsoDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return false;
   const date = new Date(`${value}T00:00:00.000Z`);
@@ -1102,6 +1679,34 @@ function nonEmptyString(value) {
 
 function isNodeId(value) {
   return typeof value === "string" && /^[a-z][a-z0-9-]*(?::[a-z0-9-]+)?$/.test(value);
+}
+
+function isStableIdentifier(value) {
+  return typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(value);
+}
+
+function validateNullableTimestamp(value, label, failures) {
+  if (value !== null && !isCanonicalIsoTimestamp(value)) {
+    failures.push(`${label} must be null or a canonical UTC Date#toISOString() string.`);
+  }
+}
+
+function validateStableIdentifierArray(values, label, failures) {
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  const seen = new Set();
+  for (const value of values) {
+    if (!isStableIdentifier(value)) {
+      failures.push(`${label} entries must be stable identifiers.`);
+      continue;
+    }
+    if (seen.has(value)) {
+      failures.push(`${label} entries must be unique.`);
+    }
+    seen.add(value);
+  }
 }
 
 function formatSummaryValue(value) {
