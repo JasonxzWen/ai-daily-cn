@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/daily-codex-dag-run.schema.json",
+  "title": "Daily Codex DAG Run Summary",
+  "oneOf": [
+    { "$ref": "#/$defs/success" },
+    { "$ref": "#/$defs/failure" }
+  ],
+  "$defs": {
+    "success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "failures",
+        "warnings",
+        "validation",
+        "mode",
+        "report_date",
+        "generated_at",
+        "plan",
+        "run",
+        "next_action"
+      ],
+      "properties": {
+        "ok": { "const": true },
+        "failures": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "string" }
+        },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "validation": { "$ref": "#/$defs/success_validation" },
+        "mode": { "const": "daily_codex_dag_dry_run" },
+        "report_date": { "type": "string", "format": "date" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "plan": { "$ref": "#/$defs/plan" },
+        "run": { "$ref": "#/$defs/run" },
+        "next_action": { "$ref": "#/$defs/next_action" }
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "failures", "warnings", "validation", "plan", "run"],
+      "properties": {
+        "ok": { "const": false },
+        "failures": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "validation": {
+          "anyOf": [
+            { "$ref": "#/$defs/validation" },
+            { "type": "null" }
+          ]
+        },
+        "plan": { "type": "null" },
+        "run": { "type": "null" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "failures", "warnings", "node_ids", "checked_files"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "failures": { "$ref": "#/$defs/messages" },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "node_ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        },
+        "checked_files": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "success_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "failures", "warnings", "node_ids", "checked_files"],
+      "properties": {
+        "ok": { "const": true },
+        "failures": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "string" }
+        },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "node_ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        },
+        "checked_files": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "manifest_name", "description", "node_count", "levels", "nodes"],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "manifest_name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "node_count": { "type": "integer", "minimum": 0 },
+        "levels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/level" }
+        },
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/plan_node" }
+        }
+      }
+    },
+    "plan_node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "kind",
+        "execution_status",
+        "plan_status",
+        "level",
+        "dependencies",
+        "inputs",
+        "outputs",
+        "runner_stage_ref",
+        "parallel_group",
+        "public_artifact",
+        "owner_path_scope"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/node_id" },
+        "title": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["command", "codex_exec", "fanout", "barrier"] },
+        "execution_status": { "enum": ["planned", "mapped"] },
+        "plan_status": { "enum": ["planned", "mapped"] },
+        "level": { "type": "integer", "minimum": 0 },
+        "dependencies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        },
+        "inputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "outputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "runner_stage_ref": { "type": "string" },
+        "parallel_group": { "type": "string" },
+        "public_artifact": { "type": "boolean" },
+        "owner_path_scope": { "enum": ["internal_workdir", "docs", "reports_data", "none"] }
+      }
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["final_status", "levels", "planned_nodes", "completed_nodes", "blocked_nodes"],
+      "properties": {
+        "final_status": { "const": "dry_run_only" },
+        "levels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/level" }
+        },
+        "planned_nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        },
+        "completed_nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        },
+        "blocked_nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "level": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "node_ids"],
+      "properties": {
+        "level": { "type": "integer", "minimum": 0 },
+        "node_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "required"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" }
+      }
+    },
+    "next_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "message"],
+      "properties": {
+        "kind": { "const": "implement_executable_node_runner" },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "messages": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "node_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(?::[a-z0-9-]+)?$"
+    }
+  }
+}
