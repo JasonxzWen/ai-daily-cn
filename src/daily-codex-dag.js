@@ -60,12 +60,15 @@ export async function validateDailyCodexDag(options = {}) {
     failures,
     checkedFiles
   });
+  let manifestSchemaValid = false;
   if (manifest && dagSchema) {
+    const failureCount = failures.length;
     validateAgainstDagSchema({ manifest, schema: dagSchema, ajv, failures });
+    manifestSchemaValid = failures.length === failureCount;
   }
 
   let resiliencePolicy = null;
-  if (manifest?.resilience_policy_path) {
+  if (manifestSchemaValid && manifest?.resilience_policy_path) {
     resiliencePolicy = await readJsonFile({
       rootDir,
       relativePath: manifest.resilience_policy_path,
@@ -74,7 +77,7 @@ export async function validateDailyCodexDag(options = {}) {
     });
   }
 
-  if (manifest?.nodes) {
+  if (manifestSchemaValid && manifest?.nodes) {
     await validateDagSemantics({
       rootDir,
       manifest,
@@ -92,6 +95,46 @@ export async function validateDailyCodexDag(options = {}) {
     warnings,
     node_ids: Array.isArray(manifest?.nodes) ? manifest.nodes.map((node) => node?.id).filter(Boolean).sort() : [],
     checked_files: uniqueSorted(checkedFiles)
+  };
+}
+
+export async function createDailyCodexDagPlan(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  let manifest = options.manifest || null;
+
+  if (!manifest) {
+    try {
+      const loaded = await loadDailyCodexDag({ rootDir, dagPath: options.dagPath });
+      manifest = loaded.manifest;
+    } catch (error) {
+      const failure = `${DEFAULT_DAG_PATH}: ${error.message}`;
+      return {
+        ok: false,
+        failures: [failure],
+        warnings: [],
+        validation: null,
+        plan: null
+      };
+    }
+  }
+
+  const validation = await validateDailyCodexDag({ rootDir, dagPath: options.dagPath, manifest });
+  if (!validation.ok) {
+    return {
+      ok: false,
+      failures: validation.failures,
+      warnings: validation.warnings,
+      validation,
+      plan: null
+    };
+  }
+
+  return {
+    ok: true,
+    failures: [],
+    warnings: validation.warnings,
+    validation,
+    plan: projectDailyCodexDagPlan(manifest)
   };
 }
 
@@ -125,6 +168,83 @@ async function validateDagSemantics({ rootDir, manifest, resiliencePolicy, ajv, 
   validateAcyclicGraph({ nodes, nodeById, failures });
   validateInputLineage({ nodes, nodeById, failures });
   validatePublishCleanupGate({ nodeById, failures });
+}
+
+function projectDailyCodexDagPlan(manifest) {
+  const nodes = Array.isArray(manifest.nodes) ? manifest.nodes : [];
+  const nodeById = new Map(nodes.map((node) => [node.id, node]));
+  const manifestIndex = new Map(nodes.map((node, index) => [node.id, index]));
+  const levelById = new Map();
+
+  const computeLevel = (nodeId) => {
+    if (levelById.has(nodeId)) return levelById.get(nodeId);
+    const node = nodeById.get(nodeId);
+    const dependencies = node?.dependencies || [];
+    const level = dependencies.length === 0
+      ? 0
+      : Math.max(...dependencies.map((dep) => computeLevel(dep) + 1));
+    levelById.set(nodeId, level);
+    return level;
+  };
+
+  for (const node of nodes) {
+    computeLevel(node.id);
+  }
+
+  const comparePlanNodeOrder = (left, right) => {
+    const leftIndex = manifestIndex.get(left.id) ?? Number.MAX_SAFE_INTEGER;
+    const rightIndex = manifestIndex.get(right.id) ?? Number.MAX_SAFE_INTEGER;
+    return leftIndex - rightIndex || left.id.localeCompare(right.id);
+  };
+
+  const projectedNodes = nodes
+    .map((node) => projectPlanNode({ node, level: levelById.get(node.id) ?? 0 }))
+    .sort(comparePlanNodeOrder);
+  const maxLevel = Math.max(...projectedNodes.map((node) => node.level));
+  const levels = [];
+  for (let level = 0; level <= maxLevel; level += 1) {
+    const nodeIds = projectedNodes
+      .filter((node) => node.level === level)
+      .sort(comparePlanNodeOrder)
+      .map((node) => node.id);
+    if (nodeIds.length > 0) {
+      levels.push({ level, node_ids: nodeIds });
+    }
+  }
+
+  return {
+    schema_version: 1,
+    manifest_name: manifest.name,
+    description: manifest.description,
+    node_count: projectedNodes.length,
+    levels,
+    nodes: projectedNodes
+  };
+}
+
+function projectPlanNode({ node, level }) {
+  return {
+    id: node.id,
+    title: node.title,
+    kind: node.kind,
+    execution_status: node.execution_status,
+    plan_status: node.execution_status === "mapped" ? "mapped" : "planned",
+    level,
+    dependencies: [...(node.dependencies || [])],
+    inputs: (node.inputs || []).map(copyArtifact),
+    outputs: (node.outputs || []).map(copyArtifact),
+    runner_stage_ref: node.runner_stage_ref,
+    parallel_group: node.parallel_group,
+    public_artifact: node.public_artifact,
+    owner_path_scope: node.owner_path_scope
+  };
+}
+
+function copyArtifact(artifact) {
+  return {
+    path: artifact.path,
+    required: artifact.required
+  };
 }
 
 function validateNodeDependencies({ node, nodeById, failures }) {

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
-import { validateDailyCodexDag } from "../src/daily-codex-dag.js";
+import { createDailyCodexDagPlan, validateDailyCodexDag } from "../src/daily-codex-dag.js";
 
 const rootDir = process.cwd();
 const manifestPath = path.join(rootDir, "config", "daily-codex-dag.json");
@@ -16,6 +16,91 @@ test("daily codex DAG manifest validates target node contract", async () => {
   assert(result.node_ids.includes("publish-cleanup"));
   assert(result.checked_files.some((file) => file.endsWith("config/daily-codex-dag.json")));
   assert(result.checked_files.some((file) => file.endsWith("config/daily-resilience-policy.json")));
+});
+
+test("daily codex DAG plan projection is deterministic and topological", async () => {
+  const manifest = await loadManifest();
+  const originalManifest = JSON.stringify(manifest);
+  const first = await createDailyCodexDagPlan({ rootDir, manifest });
+  const second = await createDailyCodexDagPlan({ rootDir, manifest });
+
+  assert.equal(first.ok, true, first.failures.join("\n"));
+  assert.equal(second.ok, true, second.failures.join("\n"));
+  assert.deepEqual(first.plan, second.plan);
+  assert.equal(JSON.stringify(manifest), originalManifest, "planner must not mutate manifest input");
+
+  const plan = first.plan;
+  assert.equal(plan.node_count, 16);
+  assert.equal(plan.nodes.length, 16);
+  assert.equal(new Set(plan.nodes.map((item) => item.id)).size, 16);
+
+  const levelById = new Map(plan.nodes.map((item) => [item.id, item.level]));
+  for (const item of plan.nodes) {
+    for (const dep of item.dependencies) {
+      assert(
+        levelById.get(dep) < item.level,
+        `${item.id} should be after dependency ${dep}`
+      );
+    }
+  }
+
+  const articleAndEditionLevel = plan.levels.find((level) => level.node_ids.includes("persist-article-db"));
+  assert.deepEqual(
+    articleAndEditionLevel.node_ids.filter((id) => id === "persist-article-db" || id === "assemble-daily-edition"),
+    ["persist-article-db", "assemble-daily-edition"],
+    "same-level nodes should preserve manifest order"
+  );
+
+  assert(levelById.get("per-item-summary") > levelById.get("admit-reject"));
+  assert(levelById.get("quality-audit") > levelById.get("per-item-summary"));
+  assert(levelById.get("build-cards-page") > levelById.get("persist-article-db"));
+  assert(levelById.get("build-cards-page") > levelById.get("assemble-daily-edition"));
+
+  const score = plan.nodes.find((item) => item.id === "score");
+  assert.deepEqual(Object.keys(score).sort(), [
+    "dependencies",
+    "execution_status",
+    "id",
+    "inputs",
+    "kind",
+    "level",
+    "outputs",
+    "owner_path_scope",
+    "parallel_group",
+    "plan_status",
+    "public_artifact",
+    "runner_stage_ref",
+    "title"
+  ]);
+  assert.equal(score.plan_status, "planned");
+  assert.equal(plan.nodes.find((item) => item.id === "admit-reject").plan_status, "mapped");
+});
+
+test("daily codex DAG plan projection refuses invalid manifests without throwing", async () => {
+  const manifest = await loadManifest();
+  node(manifest, "score").inputs[0].path = ".tmp/daily-codex-pipeline/{report_date}/artifacts/missing-plan-input.json";
+
+  const result = await createDailyCodexDagPlan({ rootDir, manifest });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.plan, null);
+  assert(result.validation);
+  assert(
+    result.failures.some((failure) => failure.includes("node score input .tmp/daily-codex-pipeline/{report_date}/artifacts/missing-plan-input.json is not produced")),
+    result.failures.join("\n")
+  );
+
+  const structurallyInvalid = await loadManifest();
+  node(structurallyInvalid, "score").inputs = { path: "not-an-array.json", required: true };
+  const structuralResult = await createDailyCodexDagPlan({ rootDir, manifest: structurallyInvalid });
+
+  assert.equal(structuralResult.ok, false);
+  assert.equal(structuralResult.plan, null);
+  assert(structuralResult.validation);
+  assert(
+    structuralResult.failures.some((failure) => failure.includes("/nodes/4/inputs must be array")),
+    structuralResult.failures.join("\n")
+  );
 });
 
 test("daily codex DAG validator catches structural and boundary regressions", async () => {
