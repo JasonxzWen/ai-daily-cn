@@ -5,6 +5,7 @@ export const PUBLIC_ARTIFACT_PATHS = [
   "docs/reports",
   "docs/data",
   "docs/feed.json",
+  "docs/articles.json",
   "docs/index.html",
   "docs/trends.json",
   "reports-data"
@@ -25,6 +26,7 @@ const PUBLIC_DOCS_FORBIDDEN_PATTERNS = [
   { name: "public_source_coverage_wording", pattern: /\bsource\s+coverage\b/i },
   { name: "public_source_audit", pattern: /\bsource_audit\b/i },
   { name: "public_self_check", pattern: /\bself_check\b/i },
+  { name: "public_internal_audit_field", pattern: /"(?:candidate_id|candidate_pool_path|publish_status|selection_snapshot|automation_revision|reader_relevance|admission|rationale|debug|raw|notes)"\s*:/i },
   { name: "public_retired_platform_section", pattern: /\b(?:wechat_items|zhihu_items|reddit_items)\b/i },
   { name: "public_retired_platform_degradation", pattern: /\b(?:wechat_sources_blocked|zhihu_sources_blocked|reddit_sources_blocked)\b/i },
   { name: "public_source_blocked_code", pattern: /\b[a-z0-9_]+_sources_blocked\b/i }

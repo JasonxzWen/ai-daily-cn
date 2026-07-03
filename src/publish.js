@@ -860,6 +860,7 @@ function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
   const paths = reportRelativePaths(reportDate);
   const keep = new Set([
     `${outPrefix}/.nojekyll`,
+    `${outPrefix}/articles.json`,
     `${outPrefix}/assets/style.css`,
     `${outPrefix}/feed.json`,
     `${outPrefix}/index.html`,
@@ -1172,6 +1173,7 @@ export function parsePorcelain(output) {
 function isPublisherOwnedPath(filePath) {
   return (
     filePath === "docs/.nojekyll" ||
+    filePath === "docs/articles.json" ||
     filePath === "docs/feed.json" ||
     filePath === "docs/index.html" ||
     filePath === "docs/trends.json" ||

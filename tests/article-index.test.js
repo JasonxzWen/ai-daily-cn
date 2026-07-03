@@ -3,7 +3,11 @@
 // Run: node --test tests/article-index.test.js
 
 import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import test from "node:test";
+import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildArticleIndex } from "../src/site.js";
 import { renderIndexHtml } from "../src/render.js";
 import { validateArticles } from "../src/schema.js";
@@ -155,6 +159,58 @@ test("article index does not leak internal generation fields", () => {
   ]) {
     assert.equal(serialized.includes(forbidden), false, `public articles.json leaked ${forbidden}`);
   }
+});
+
+test("article schema rejects invalid public records", () => {
+  const [validArticle] = buildArticleIndex([sampleReport()], {
+    updatedAt: "2026-07-03T08:00:00.000Z"
+  });
+
+  const withInternalField = validateArticles([{ ...validArticle, candidate_id: "internal" }]);
+  assert.equal(withInternalField.valid, false, "schema should reject unexpected internal fields");
+  assert(withInternalField.errors.some((error) => error.keyword === "additionalProperties"));
+
+  const missingRequired = { ...validArticle };
+  delete missingRequired.quality_score;
+  const missingResult = validateArticles([missingRequired]);
+  assert.equal(missingResult.valid, false, "schema should reject missing quality_score");
+  assert(missingResult.errors.some((error) => error.keyword === "required"));
+
+  const invalidTaxonomy = validateArticles([{ ...validArticle, domain: "invalid-domain" }]);
+  assert.equal(invalidTaxonomy.valid, false, "schema should reject invalid taxonomy enum");
+  assert(invalidTaxonomy.errors.some((error) => error.keyword === "enum"));
+
+  const invalidScore = validateArticles([{ ...validArticle, quality_score: 101 }]);
+  assert.equal(invalidScore.valid, false, "schema should reject out-of-range quality_score");
+  assert(invalidScore.errors.some((error) => error.keyword === "maximum"));
+});
+
+test("article index generation is deterministic for identical input", () => {
+  const options = { updatedAt: "2026-07-03T08:00:00.000Z" };
+  const first = buildArticleIndex([sampleReport()], options);
+  const second = buildArticleIndex([sampleReport()], options);
+
+  assert.deepEqual(second, first);
+  assert.equal(JSON.stringify(second), JSON.stringify(first));
+});
+
+test("public artifact scan includes docs/articles.json internal fields", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "article-public-scan-"));
+  await fs.mkdir(path.join(rootDir, "docs"), { recursive: true });
+  await fs.writeFile(
+    path.join(rootDir, "docs", "articles.json"),
+    `${JSON.stringify([{ id: "article-1", candidate_id: "internal-candidate" }], null, 2)}\n`,
+    "utf8"
+  );
+
+  const result = await scanPublicArtifactsForLocalInfo({ rootDir });
+  assert.equal(result.ok, false);
+  assert(
+    result.findings.some((finding) =>
+      finding.file === "docs/articles.json" && finding.pattern === "public_internal_audit_field"
+    ),
+    JSON.stringify(result.findings, null, 2)
+  );
 });
 
 test("homepage renders the article library as the primary surface", () => {
