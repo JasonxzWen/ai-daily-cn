@@ -166,6 +166,66 @@ test("daily codex DAG validator catches structural and boundary regressions", as
         node(manifest, "publish-cleanup").dependencies = [];
       },
       expected: "publish-cleanup must transitively depend on quality-audit"
+    },
+    {
+      name: "input without dependencies",
+      mutate(manifest) {
+        node(manifest, "parse-extract").dependencies = [];
+      },
+      expected: "node parse-extract declares inputs but has no dependency outputs to read from"
+    },
+    {
+      name: "input missing upstream output",
+      mutate(manifest) {
+        node(manifest, "score").inputs[0].path = ".tmp/daily-codex-pipeline/{report_date}/artifacts/missing-scored-input.json";
+      },
+      expected: "node score input .tmp/daily-codex-pipeline/{report_date}/artifacts/missing-scored-input.json is not produced by any direct or transitive dependency output"
+    },
+    {
+      name: "input from non ancestor sibling",
+      mutate(manifest) {
+        node(manifest, "build-cards-page").dependencies = ["assemble-daily-edition"];
+      },
+      expected: "node build-cards-page input docs/articles.json is not produced by any direct or transitive dependency output"
+    },
+    {
+      name: "self output does not satisfy input lineage",
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.inputs[0].path = target.outputs[0].path;
+      },
+      expected: "node score input .tmp/daily-codex-pipeline/{report_date}/artifacts/scored-candidates.json is not produced by any direct or transitive dependency output"
+    },
+    {
+      name: "fanout input template is exact",
+      mutate(manifest) {
+        node(manifest, "quality-audit").inputs[0].path = ".tmp/daily-codex-pipeline/{report_date}/artifacts/summaries/{candidate_id}.json";
+      },
+      expected: "node quality-audit input .tmp/daily-codex-pipeline/{report_date}/artifacts/summaries/{candidate_id}.json is not produced by any direct or transitive dependency output"
+    },
+    {
+      name: "input path cannot prefix match upstream output",
+      mutate(manifest) {
+        node(manifest, "score").inputs[0].path = ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json.backup";
+      },
+      expected: "node score input .tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json.backup is not produced by any direct or transitive dependency output"
+    },
+    {
+      name: "input path cannot be prefix of upstream output",
+      mutate(manifest) {
+        node(manifest, "score").inputs[0].path = ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates";
+      },
+      expected: "node score input .tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates is not produced by any direct or transitive dependency output"
+    },
+    {
+      name: "optional input still needs upstream output",
+      mutate(manifest) {
+        node(manifest, "score").inputs.push({
+          path: ".tmp/daily-codex-pipeline/{report_date}/artifacts/optional-sidecar.json",
+          required: false
+        });
+      },
+      expected: "node score input .tmp/daily-codex-pipeline/{report_date}/artifacts/optional-sidecar.json is not produced by any direct or transitive dependency output"
     }
   ];
 

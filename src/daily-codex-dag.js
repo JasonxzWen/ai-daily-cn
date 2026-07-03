@@ -123,6 +123,7 @@ async function validateDagSemantics({ rootDir, manifest, resiliencePolicy, ajv, 
   }
 
   validateAcyclicGraph({ nodes, nodeById, failures });
+  validateInputLineage({ nodes, nodeById, failures });
   validatePublishCleanupGate({ nodeById, failures });
 }
 
@@ -307,6 +308,32 @@ function validatePublishCleanupGate({ nodeById, failures }) {
   for (const required of ["build-cards-page", "quality-audit"]) {
     if (!reachable.has(required)) {
       failures.push(`config/daily-codex-dag.json: publish-cleanup must transitively depend on ${required}.`);
+    }
+  }
+}
+
+function validateInputLineage({ nodes, nodeById, failures }) {
+  for (const node of nodes) {
+    if (!node?.id) continue;
+    const inputs = node.inputs || [];
+    if (inputs.length === 0) continue;
+    const ancestors = transitiveDependencies(node.id, nodeById);
+    if (ancestors.size === 0) {
+      failures.push(`config/daily-codex-dag.json: node ${node.id} declares inputs but has no dependency outputs to read from.`);
+      continue;
+    }
+    const upstreamOutputs = new Set();
+    for (const ancestorId of ancestors) {
+      const ancestor = nodeById.get(ancestorId);
+      for (const output of ancestor?.outputs || []) {
+        upstreamOutputs.add(normalizePortablePath(output.path));
+      }
+    }
+    for (const input of inputs) {
+      const inputPath = normalizePortablePath(input.path);
+      if (!upstreamOutputs.has(inputPath)) {
+        failures.push(`config/daily-codex-dag.json: node ${node.id} input ${input.path} is not produced by any direct or transitive dependency output.`);
+      }
     }
   }
 }
