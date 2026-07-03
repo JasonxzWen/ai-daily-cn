@@ -138,6 +138,46 @@ export async function createDailyCodexDagPlan(options = {}) {
   };
 }
 
+export async function createDailyCodexDagDryRun(options = {}) {
+  const reportDate = requiredReportDate(options.reportDate || options.date);
+  const generatedAt = toIsoTimestamp(options.now || new Date());
+  const planResult = await createDailyCodexDagPlan(options);
+
+  if (!planResult.ok) {
+    return {
+      ok: false,
+      failures: planResult.failures,
+      warnings: planResult.warnings,
+      validation: planResult.validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const plan = planResult.plan;
+  return {
+    ok: true,
+    failures: [],
+    warnings: planResult.warnings,
+    validation: planResult.validation,
+    mode: "daily_codex_dag_dry_run",
+    report_date: reportDate,
+    generated_at: generatedAt,
+    plan,
+    run: {
+      final_status: "dry_run_only",
+      levels: plan.levels.map(copyLevel),
+      planned_nodes: plan.nodes.map((node) => node.id),
+      completed_nodes: [],
+      blocked_nodes: []
+    },
+    next_action: {
+      kind: "implement_executable_node_runner",
+      message: "Dry-run only; implement executable DAG node execution before using this as a production runner."
+    }
+  };
+}
+
 async function validateDagSemantics({ rootDir, manifest, resiliencePolicy, ajv, failures, checkedFiles }) {
   const nodes = manifest.nodes;
   if (!Array.isArray(nodes)) return;
@@ -244,6 +284,13 @@ function copyArtifact(artifact) {
   return {
     path: artifact.path,
     required: artifact.required
+  };
+}
+
+function copyLevel(level) {
+  return {
+    level: level.level,
+    node_ids: [...level.node_ids]
   };
 }
 
@@ -544,6 +591,21 @@ function isSafeRelativeTemplatePath(value) {
 
 function normalizePortablePath(value) {
   return String(value || "").replace(/\\/g, "/");
+}
+
+function requiredReportDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) {
+    throw new Error("daily codex DAG dry run requires --date YYYY-MM-DD");
+  }
+  return String(value);
+}
+
+function toIsoTimestamp(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error("daily codex DAG dry run requires a valid timestamp");
+  }
+  return date.toISOString();
 }
 
 function uniqueSorted(values) {

@@ -1,11 +1,15 @@
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { createDailyCodexDagPlan, validateDailyCodexDag } from "../src/daily-codex-dag.js";
+import { createDailyCodexDagDryRun, createDailyCodexDagPlan, validateDailyCodexDag } from "../src/daily-codex-dag.js";
 
 const rootDir = process.cwd();
 const manifestPath = path.join(rootDir, "config", "daily-codex-dag.json");
+const dagCliPath = path.join(rootDir, "scripts", "run-daily-codex-dag.mjs");
+const fixedNow = "2026-07-03T08:00:00.000Z";
 
 test("daily codex DAG manifest validates target node contract", async () => {
   const result = await validateDailyCodexDag({ rootDir });
@@ -100,6 +104,117 @@ test("daily codex DAG plan projection refuses invalid manifests without throwing
   assert(
     structuralResult.failures.some((failure) => failure.includes("/nodes/4/inputs must be array")),
     structuralResult.failures.join("\n")
+  );
+});
+
+test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {
+  const manifest = await loadManifest();
+  const first = await createDailyCodexDagDryRun({
+    rootDir,
+    manifest,
+    reportDate: "2026-07-03",
+    now: fixedNow
+  });
+  const second = await createDailyCodexDagDryRun({
+    rootDir,
+    manifest,
+    reportDate: "2026-07-03",
+    now: fixedNow
+  });
+
+  assert.equal(first.ok, true, first.failures.join("\n"));
+  assert.deepEqual(first, second);
+  assert.equal(first.mode, "daily_codex_dag_dry_run");
+  assert.equal(first.report_date, "2026-07-03");
+  assert.equal(first.generated_at, fixedNow);
+  assert.equal(first.run.final_status, "dry_run_only");
+  assert.equal(first.plan.node_count, 16);
+  assert.deepEqual(first.run.levels, first.plan.levels);
+  assert.deepEqual(first.run.completed_nodes, []);
+  assert.deepEqual(first.run.blocked_nodes, []);
+  assert.deepEqual(first.run.planned_nodes, first.plan.nodes.map((item) => item.id));
+  assert.equal(first.next_action.kind, "implement_executable_node_runner");
+
+  const levelById = new Map();
+  for (const level of first.run.levels) {
+    for (const nodeId of level.node_ids) {
+      levelById.set(nodeId, level.level);
+    }
+  }
+  for (const item of first.plan.nodes) {
+    for (const dep of item.dependencies) {
+      assert(levelById.get(dep) < levelById.get(item.id), `${item.id} should follow ${dep}`);
+    }
+  }
+});
+
+test("daily codex DAG dry-run helper refuses invalid manifests without throwing", async () => {
+  const manifest = await loadManifest();
+  node(manifest, "score").inputs[0].path = ".tmp/daily-codex-pipeline/{report_date}/artifacts/missing-dry-run-input.json";
+
+  const result = await createDailyCodexDagDryRun({
+    rootDir,
+    manifest,
+    reportDate: "2026-07-03",
+    now: fixedNow
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.plan, null);
+  assert.equal(result.run, null);
+  assert.deepEqual(result.warnings, []);
+  assert(result.validation);
+  assert(
+    result.failures.some((failure) => failure.includes("missing-dry-run-input.json is not produced")),
+    result.failures.join("\n")
+  );
+});
+
+test("daily codex DAG dry-run CLI writes JSON to stdout only", async () => {
+  const forbiddenBefore = await forbiddenPathSnapshot();
+  const result = await runDagCli(["--dry-run", "--date", "2026-07-03", "--json"]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, true, parsed.failures?.join("\n"));
+  assert.equal(parsed.mode, "daily_codex_dag_dry_run");
+  assert.equal(parsed.report_date, "2026-07-03");
+  assert.equal(parsed.run.final_status, "dry_run_only");
+  assert.equal(parsed.plan.node_count, 16);
+  assert.deepEqual(await forbiddenPathSnapshot(), forbiddenBefore, "stdout-only dry-run must not mutate production or scratch paths");
+});
+
+test("daily codex DAG dry-run CLI rejects invalid invocations with structured JSON", async () => {
+  const missingDryRun = await runDagCli(["--date", "2026-07-03", "--json"]);
+  assert.equal(missingDryRun.code, 1);
+  assert.equal(missingDryRun.stderr, "");
+  assert.equal(JSON.parse(missingDryRun.stdout).failures[0], "daily codex DAG CLI requires --dry-run");
+
+  const missingJson = await runDagCli(["--dry-run", "--date", "2026-07-03"]);
+  assert.equal(missingJson.code, 1);
+  assert.equal(missingJson.stderr, "");
+  assert.equal(JSON.parse(missingJson.stdout).failures[0], "daily codex DAG CLI requires --json");
+
+  const invalidDate = await runDagCli(["--dry-run", "--date", "20260703", "--json"]);
+  assert.equal(invalidDate.code, 1);
+  assert.equal(invalidDate.stderr, "");
+  assert.equal(JSON.parse(invalidDate.stdout).failures[0], "daily codex DAG CLI requires --date YYYY-MM-DD");
+});
+
+test("daily codex DAG dry-run CLI returns structured JSON for invalid manifest roots", async () => {
+  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-dag-"));
+  const result = await runDagCli(["--dry-run", "--date", "2026-07-03", "--json"], { cwd: tempRoot });
+
+  assert.equal(result.code, 1);
+  assert.equal(result.stderr, "");
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, false);
+  assert.equal(parsed.plan, null);
+  assert.equal(parsed.run, null);
+  assert(
+    parsed.failures.some((failure) => failure.includes("config") && failure.includes("daily-codex-dag.json")),
+    parsed.failures.join("\n")
   );
 });
 
@@ -334,4 +449,55 @@ function node(manifest, id) {
   const found = manifest.nodes.find((item) => item.id === id);
   assert(found, `missing fixture node ${id}`);
   return found;
+}
+
+async function pathExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function forbiddenPathSnapshot() {
+  return {
+    tmp: await pathSnapshot(path.join(rootDir, ".tmp")),
+    docsReports: await pathSnapshot(path.join(rootDir, "docs", "reports")),
+    reportsData: await pathSnapshot(path.join(rootDir, "reports-data"))
+  };
+}
+
+async function pathSnapshot(filePath) {
+  try {
+    const stat = await fs.stat(filePath);
+    if (!stat.isDirectory()) {
+      return { exists: true, kind: "file", entries: [] };
+    }
+    const entries = await fs.readdir(filePath);
+    return { exists: true, kind: "dir", entries: entries.sort() };
+  } catch {
+    return { exists: false, kind: "", entries: [] };
+  }
+}
+
+function runDagCli(args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [dagCliPath, ...args], {
+      cwd: options.cwd || rootDir,
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      resolve({ code, stdout, stderr });
+    });
+  });
 }
