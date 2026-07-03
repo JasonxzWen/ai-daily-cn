@@ -1856,6 +1856,8 @@ function validateNodeExecutionSpecReferences({ node, failures }) {
   const spec = node.execution_contract?.node_execution_spec;
   if (!spec) return;
 
+  validateNodeExecutionSpecPreflight({ node, spec, failures });
+
   const inputPaths = new Set((node.inputs || []).map((artifact) => artifact.path));
   const outputPaths = new Set((node.outputs || []).map((artifact) => artifact.path));
   for (const binding of spec.inputs || []) {
@@ -1867,6 +1869,15 @@ function validateNodeExecutionSpecReferences({ node, failures }) {
     if (!outputPaths.has(binding.artifact_path)) {
       failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.outputs references undeclared output artifact ${binding.artifact_path}.`);
     }
+  }
+}
+
+function validateNodeExecutionSpecPreflight({ node, spec, failures }) {
+  if (!isSafeExecutionRelativePath(spec.cwd, { allowDot: true })) {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.cwd must be "." or a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments.`);
+  }
+  if (spec.invocation?.kind === "codex_cli" && !isSafeExecutionRelativePath(spec.invocation.prompt_template)) {
+    failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation.prompt_template must be a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments.`);
   }
 }
 
@@ -2052,6 +2063,15 @@ function isSafeRelativeTemplatePath(value) {
   if (!normalized || normalized.startsWith("/") || /^[a-zA-Z]:/.test(normalized)) return false;
   if (normalized.includes("\\")) return false;
   return normalized.split("/").every((part) => part && part !== "." && part !== "..");
+}
+
+function isSafeExecutionRelativePath(value, options = {}) {
+  if (!nonEmptyString(value)) return false;
+  if (value.includes("\\")) return false;
+  if (options.allowDot && value === ".") return true;
+  if (value === "." || value.startsWith("/") || /^[a-zA-Z]:/.test(value)) return false;
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)) return false;
+  return value.split("/").every((part) => part && part !== "." && part !== ".." && !part.includes(":"));
 }
 
 function normalizePortablePath(value) {

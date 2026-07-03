@@ -189,6 +189,37 @@ test("daily codex DAG future node execution spec validates executor invocation p
   await assertInvalidDagManifestSchemaOnly(mismatchedManifest);
 });
 
+test("daily codex DAG future node execution preflight accepts safe paths but keeps execution disabled", async () => {
+  for (const cwd of [".", "scripts"]) {
+    const manifest = await loadManifest();
+    const codexNode = node(manifest, "classify-tag-entity");
+    codexNode.execution_contract = {
+      readiness: "node_executable",
+      summary: "Synthetic future Codex CLI node for preflight coverage.",
+      node_execution_spec: buildFutureNodeExecutionSpec(codexNode, {
+        executor: "codex_cli",
+        cwd,
+        invocation: {
+          kind: "codex_cli",
+          prompt_template: "prompts/future-dag-node.md",
+          args: ["--node", codexNode.id]
+        }
+      })
+    };
+
+    const result = await validateDailyCodexDag({ rootDir, manifest });
+    assert.equal(result.ok, false);
+    assert(
+      result.failures.some((failure) => failure.includes("node classify-tag-entity execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution")),
+      result.failures.join("\n")
+    );
+    assert(
+      !result.failures.some((failure) => failure.includes("node_execution_spec.cwd") || failure.includes("node_execution_spec.invocation.prompt_template")),
+      result.failures.join("\n")
+    );
+  }
+});
+
 test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {
   const manifest = await loadManifest();
   const first = await createDailyCodexDagDryRun({
@@ -1438,6 +1469,31 @@ test("daily codex DAG validator catches structural and boundary regressions", as
       },
       expected: "node score node_execution_spec.outputs references undeclared output artifact .tmp/daily-codex-pipeline/{report_date}/artifacts/not-declared-output.json"
     },
+    ...["/tmp", "C:/tmp", "../x", "a/../b", "a//b", "https://x", "a\\b", "foo/C:/bar", "foo/a:b"].map((cwd) => ({
+      name: `execution spec cwd rejects unsafe path ${cwd}`,
+      mutate(manifest) {
+        const target = node(manifest, "score");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, { cwd });
+      },
+      expected: "node score node_execution_spec.cwd must be \".\" or a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments"
+    })),
+    ...["/tmp/prompt.md", "C:/tmp/prompt.md", "../prompt.md", "a/../prompt.md", "a//prompt.md", "https://example.test/prompt.md", "prompts\\future.md", "prompts/C:/future.md", "prompts/future:node.md"].map((promptTemplate) => ({
+      name: `execution spec codex prompt rejects unsafe path ${promptTemplate}`,
+      mutate(manifest) {
+        const target = node(manifest, "classify-tag-entity");
+        target.execution_contract.readiness = "node_executable";
+        target.execution_contract.node_execution_spec = buildFutureNodeExecutionSpec(target, {
+          executor: "codex_cli",
+          invocation: {
+            kind: "codex_cli",
+            prompt_template: promptTemplate,
+            args: ["--node", target.id]
+          }
+        });
+      },
+      expected: "node classify-tag-entity node_execution_spec.invocation.prompt_template must be a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments"
+    })),
     {
       name: "missing resilience policy stage",
       mutate(manifest) {
