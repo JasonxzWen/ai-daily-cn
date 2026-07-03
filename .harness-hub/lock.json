@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-03T06:20:38.160Z",
+  "hubVersion": "0.1.0",
+  "agents": [
+    "standard"
+  ],
+  "components": [
+    {
+      "id": "harness:minimal",
+      "version": "0.9.0",
+      "agent": "standard",
+      "kind": "harness-template",
+      "source": "harness/minimal",
+      "dest": ".",
+      "files": [
+        {
+          "path": ".harness-hub/.gitignore",
+          "sha256": "358fe63bee5c2341b3c67f54313c431a2ef00ec0ff08742cb03a737a5d550e96",
+          "size": 16
+        },
+        {
+          "path": ".harness-hub/context/AGENTS.md",
+          "sha256": "8fea9f43bf76d6e8e016d511b69b06af792c669f41dc0c5e31a927afaaafba51",
+          "size": 2513
+        },
+        {
+          "path": ".harness-hub/context/llm-wiki-schema.md",
+          "sha256": "6dc1c6f94bd1551c56f5163b0669668938e1e36c335e3f5aacd5c609c621a85e",
+          "size": 3956
+        },
+        {
+          "path": ".harness-hub/context/README.md",
+          "sha256": "42148162ffa50dd7ca525c1f4f82ce9878df1e013e4a9e9a0082fa8f86c68bae",
+          "size": 1857
+        },
+        {
+          "path": ".harness-hub/context/wiki/.obsidian/app.json",
+          "sha256": "159c2fad5da24322ffb7ab9a4a4d0572505bbc30c559be1fa3165f56a9f5712e",
+          "size": 157
+        },
+        {
+          "path": ".harness-hub/context/wiki/.obsidian/core-plugins.json",
+          "sha256": "65ea0aed6d75fb14a79b8e81a9ea088eea05db10a1551fd62fffa02333d602f8",
+          "size": 146
+        },
+        {
+          "path": ".harness-hub/context/wiki/.obsidian/graph.json",
+          "sha256": "35f51d7ca2aead797410b458af33f9750f00bc5baee03e1db0d29bc2c1d6d02e",
+          "size": 495
+        },
+        {
+          "path": ".harness-hub/context/wiki/concepts/README.md",
+          "sha256": "72eda89235945512b06530c3d15789bb5b96c75f083946818e7dff85f30d0b10",
+          "size": 372,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/context/wiki/contradictions.md",
+          "sha256": "44696a3ecb9ae7f45c5e9a316f70936cdf9b46552e479325a915d975cf761036",
+          "size": 455,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/context/wiki/index.md",
+          "sha256": "f4a547153a0cd8ffff29230b69ec842a0779464e002c81b6e0996b4f2799c839",
+          "size": 831,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/context/wiki/people/README.md",
+          "sha256": "00e770b09d25c7b2b6f073e02875bc5460e6402e9a6118e31ccf506987d8d8eb",
+          "size": 241,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/context/wiki/sources/README.md",
+          "sha256": "fcd2b535f2e97f1c26ad176b8148597218a240cbcd799a957b6fda43f3b1d5aa",
+          "size": 470,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/context/wiki/templates/wiki-page.md",
+          "sha256": "94d0a441d79e66d9dd6f78f0e7c4966e2486a9e6791c1bf9dd9b3148b59b54e6",
+          "size": 343,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/context/wiki/topics/README.md",
+          "sha256": "7565511ab007a9a94f2703889c683bd42414387a643fd4fcd39d180f7e763d40",
+          "size": 371,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/context/wiki/update-log.md",
+          "sha256": "02d83f8c0ff7c6bc627336d4d799f455aab451eaa6a2659d0f21b8726c4b302c",
+          "size": 435,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/loop/evals/interrupt-policy/bad-cases.jsonl",
+          "sha256": "1a2ca924764694a75688bb856a6b7dbcc5322b1ee746f90d56b4a3d4654b86e6",
+          "size": 1211
+        },
+        {
+          "path": ".harness-hub/loop/evals/interrupt-policy/good-cases.jsonl",
+          "sha256": "eb09cb1eb19b8a58c23680a503e8d5fdc0e0f3bbca2117fe8c0e99bf45893986",
+          "size": 1268
+        },
+        {
+          "path": ".harness-hub/loop/evals/interrupt-policy/regression-cases.jsonl",
+          "sha256": "616c416a0fad7d52623cf18e6eddc8622bbaaf38ced0ad8154d31658b644f734",
+          "size": 847
+        },
+        {
+          "path": ".harness-hub/loop/policies/action-audit-schema.md",
+          "sha256": "9b54bb4bf4b824341169db0bcb39ae2fd51ed0b7b8a9264692e5be3e45e13fdb",
+          "size": 1831
+        },
+        {
+          "path": ".harness-hub/loop/policies/interrupt-policy.md",
+          "sha256": "8da270ee3f0f082751778a2da02c4f1ceb14dbb4667dc40be45afdfcdaa8300b",
+          "size": 2724
+        },
+        {
+          "path": ".harness-hub/state/capability-events.jsonl",
+          "sha256": "f132d52e6c17a63a656b803bf0c4f27e34772f688373693d3dd34b3bdbaecff0",
+          "size": 169,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/state/current-task.md",
+          "sha256": "2219ef53d14ed5f68b8b0e2e2e545afbc543800d2ec1c4ca47758b1967052ce9",
+          "size": 7888,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/state/decisions.md",
+          "sha256": "c7df1151cc0c56a0c7225e0eb130c42752c82a9113e328bf1024586fe7edb14b",
+          "size": 219,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/state/interrupt-decisions.jsonl",
+          "sha256": "50c8b8b435d005520d345913d3fd45dd05d662a57282a2ebfc773ef0581d70c5",
+          "size": 174,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/state/loop-runs.jsonl",
+          "sha256": "adfbbd48a8a5ed2ff494df5e6179aaa57d992d459641bd03e0181194e3583721",
+          "size": 162,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/state/progress.md",
+          "sha256": "03361766050e738941b25ca0dfd3cec1e3b3ad30feaa401e18da408b99b1c618",
+          "size": 3380,
+          "role": "local-state"
+        },
+        {
+          "path": ".harness-hub/state/session-handoff.md",
+          "sha256": "539fad9cfa2a7457f104caafe5eb0bf526be0d59b62180ae29fa689460545062",
+          "size": 2785,
+          "role": "local-state"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "9f70cfa945e20c84e20058f4a964043609fe3cbab6ae74e4f6ea35cbdc128d69",
+          "size": 8138
+        },
+        {
+          "path": "clean-state-checklist.md",
+          "sha256": "ce72a0276fd394db77701e4b7a67758b49445f4fb90babc121e76c1904b5a314",
+          "size": 3156
+        },
+        {
+          "path": "definition-of-done.md",
+          "sha256": "dfee54822f619bac892d911d182b3bd7b6827faf79cf9acfcd0bf9f95822d02c",
+          "size": 2664
+        },
+        {
+          "path": "evaluator-rubric.md",
+          "sha256": "26b3207b225c70e53d7280dc99f2034a2b1f46aee4caa1768a48bfc52f3c2a29",
+          "size": 1754
+        },
+        {
+          "path": "quality-document.md",
+          "sha256": "b5df48fb81cc331ba9f64c13630e0e8eeea2a4b3b5d65f6a68fde1ba02013394",
+          "size": 1078
+        },
+        {
+          "path": "scripts/harness-validate.mjs",
+          "sha256": "f74f3178a99b78319e5515cc46705367ff6dc3d77ae77a166f3a60971f1272df",
+          "size": 16604
+        }
+      ],
+      "installedAt": "2026-07-03T06:20:38.160Z",
+      "status": "installed"
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 ## Goal
 
-State the concrete outcome for the active agent task.
+State the concrete outcome for the active Codex goal.
 
 ## Assumptions
 
@@ -103,7 +103,7 @@ Use host-neutral loop roles from `skills/workflow-router/references/agentic-loop
 
 | Stage | Loop | Iteration | Max iterations | Producer | Verifier | Arbiter | Evidence | Stop condition |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Add stage. | plan-review / test-design / implementation-review / frontend-acceptance / diagnosis-regression / docs-consistency / pr-closeout / process-retro | 1 | 1-3, or leave blank for a single-pass loop | Add owner. | delegated-agent / deterministic-check / browser / CI / explicit skip | delegated-agent arbiter / local read-only arbiter / explicit skip | Add evidence path or summary. | continue / revise / interrupt / deliver / handoff / complete |
+| Add stage. | plan-review / test-design / implementation-review / frontend-acceptance / diagnosis-regression / docs-consistency / pr-closeout / insight-retro | 1 | 1-3, or leave blank for a single-pass loop | Add owner. | delegated-agent / deterministic-check / browser / CI / explicit skip | delegated-agent arbiter / local read-only arbiter / explicit skip | Add evidence path or summary. | continue / revise / interrupt / deliver / handoff / complete |
 
 When a loop may repeat, record `iteration`, `maxIterations`, and a stop condition. Single-pass loops may leave those fields blank in Markdown records; JSON loop records should omit unused fields rather than write `n/a`. Do not continue another loop iteration after the maximum is reached without interrupting for a user-visible decision.
 
@@ -146,9 +146,9 @@ When a loop may repeat, record `iteration`, `maxIterations`, and a stop conditio
 - Review focus: technical debt, first-principles implementation fit, project-rule drift, refactor or warning recommendations.
 - Review findings:
 - Insight audit required: yes/no.
-- Insight focus: tool-calling quality, repeated low-value lookup loops, misleading evidence, docs/code conflicts, AI infrastructure lessons, and project process improvements.
+- Insight focus: tool-calling quality, repeated low-value lookup loops, misleading evidence, docs/code conflicts, AI infrastructure lessons, workflow/skill extraction candidates.
 - Insight recommendations:
-- Process improvement candidate: none / project rule / validation case / documentation / automation check / follow-up task.
+- Skill or workflow candidate: none / source record / eval case / new skill / existing workflow change.
 - PR or merge readiness:
 - Conflict decisions surfaced to user:
 - Closeout blockers:

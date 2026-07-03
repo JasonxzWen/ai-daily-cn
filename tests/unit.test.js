@@ -8508,80 +8508,55 @@ test("daily resilience policy rejects retired platform discovery stages", async 
   assert(result.failures.some((failure) => failure.includes("retired platform discovery stage discover_wechat_platform")));
 });
 
-test("harness init recreates ignored local state files before validation", async () => {
+test("harness init recreates ignored harness state files before validation", async () => {
   const tmp = await createHarnessFixture();
-  await fs.rm(path.join(tmp, "progress.md"));
-  await fs.rm(path.join(tmp, "session-handoff.md"));
-  await fs.rm(path.join(tmp, "tasks", "current-task.md"));
+  await fs.rm(path.join(tmp, ".harness-hub", "state", "current-task.md"));
+  await fs.rm(path.join(tmp, ".harness-hub", "state", "progress.md"));
+  await fs.rm(path.join(tmp, ".harness-hub", "state", "session-handoff.md"));
 
   const missing = await runHarnessValidate(tmp);
   assert.notEqual(missing.code, 0);
-  assert.match(missing.stderr, /npm run harness:init/);
+  assert.match(missing.stderr, /missing required harness file/);
 
   const initialized = await runHarnessInit(tmp, ["--json"]);
   assert.equal(initialized.code, 0, initialized.stderr);
   const initResult = JSON.parse(initialized.stdout);
   assert.equal(initResult.ok, true);
-  assert.deepEqual(
-    initResult.results.map((entry) => entry.status),
-    ["created", "created", "created"]
-  );
+  for (const target of [
+    ".harness-hub/state/current-task.md",
+    ".harness-hub/state/progress.md",
+    ".harness-hub/state/session-handoff.md"
+  ]) {
+    assert(initResult.results.some((entry) => entry.target === target && entry.status === "created"));
+  }
 
   const validated = await runHarnessValidate(tmp);
   assert.equal(validated.code, 0, validated.stderr);
 });
 
-test("harness init keeps existing local state unless forced", async () => {
+test("harness init keeps existing harness state unless forced", async () => {
   const tmp = await createHarnessFixture();
-  const progressPath = path.join(tmp, "progress.md");
-  await fs.writeFile(progressPath, "# Progress\n\n## Current State\n\n- Keep this local note.\n", "utf8");
+  const progressPath = path.join(tmp, ".harness-hub", "state", "progress.md");
+  await fs.writeFile(progressPath, "# Harness Hub Progress\n\n## Recent Validation\n\n- Keep this local note.\n", "utf8");
 
   const kept = await runHarnessInit(tmp, ["--json"]);
   assert.equal(kept.code, 0, kept.stderr);
   assert.match(await fs.readFile(progressPath, "utf8"), /Keep this local note/);
-  assert(JSON.parse(kept.stdout).results.some((entry) => entry.target === "progress.md" && entry.status === "kept"));
+  assert(JSON.parse(kept.stdout).results.some((entry) => entry.target === ".harness-hub/state/progress.md" && entry.status === "kept"));
 
   const forced = await runHarnessInit(tmp, ["--force", "--json"]);
   assert.equal(forced.code, 0, forced.stderr);
   assert.doesNotMatch(await fs.readFile(progressPath, "utf8"), /Keep this local note/);
 });
 
-test("harness SDD TDD rejects non-trivial current task without red test", async () => {
+test("harness validator rejects stale current task state missing loop closeout markers", async () => {
   const tmp = await createHarnessFixture({
     currentTask: [
       "# Current Task",
       "",
-      "## Task Class",
+      "## Goal",
       "",
-      "non-trivial",
-      "",
-      "## Spec",
-      "",
-      "A non-trivial implementation task.",
-      "",
-      "## Acceptance Criteria",
-      "",
-      "- Harness enforces the SDD/TDD contract.",
-      "",
-      "## Allowed Paths",
-      "",
-      "- `scripts/harness-validate.mjs`",
-      "",
-      "## Forbidden Paths",
-      "",
-      "- Do not modify generated reports.",
-      "",
-      "## Validation Commands",
-      "",
-      "- `node scripts/harness-validate.mjs`",
-      "",
-      "## Parallel Writes",
-      "",
-      "- No parallel writes.",
-      "",
-      "## Handoff Requirements",
-      "",
-      "- Report validation evidence.",
+      "A stale task file without the loop engineering fields.",
       ""
     ].join("\n")
   });
@@ -8589,392 +8564,25 @@ test("harness SDD TDD rejects non-trivial current task without red test", async 
   const result = await runHarnessValidate(tmp);
 
   assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /Red Test|Deterministic Substitute/);
+  assert.match(result.stderr, /Validation tiers|PR closeout|Insight audit/);
 });
 
-test("harness SDD TDD rejects red test without failing result evidence", async () => {
-  const tmp = await createHarnessFixture({
-    currentTask: [
-      "# Current Task",
-      "",
-      "## Task Class",
-      "",
-      "non-trivial",
-      "",
-      "## Spec",
-      "",
-      "A non-trivial implementation task.",
-      "",
-      "## Acceptance Criteria",
-      "",
-      "- Harness enforces red-test evidence.",
-      "",
-      "## Red Test",
-      "",
-      "```powershell",
-      "node scripts/harness-validate.mjs",
-      "```",
-      "",
-      "## Allowed Paths",
-      "",
-      "- `scripts/harness-validate.mjs`",
-      "",
-      "## Forbidden Paths",
-      "",
-      "- Do not modify generated reports.",
-      "",
-      "## Validation Commands",
-      "",
-      "- `node scripts/harness-validate.mjs`",
-      "",
-      "## Parallel Writes",
-      "",
-      "- No parallel writes.",
-      "",
-      "## Handoff Requirements",
-      "",
-      "- Report validation evidence.",
-      ""
-    ].join("\n")
-  });
+test("harness validator rejects non-Codex platform instruction files", async () => {
+  const tmp = await createHarnessFixture();
+  await fs.writeFile(path.join(tmp, "CLAUDE.md"), "# Claude fixture\n", "utf8");
 
   const result = await runHarnessValidate(tmp);
 
   assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /failing result/);
+  assert.match(result.stderr, /CLAUDE\.md/);
 });
 
-test("harness SDD TDD accepts trivial current task only with justification", async () => {
-  const missingJustificationRoot = await createHarnessFixture({
-    currentTask: [
-      "# Current Task",
-      "",
-      "## Task Class",
-      "",
-      "trivial",
-      "",
-      "## Spec",
-      "",
-      "Fix a typo.",
-      "",
-      "## Acceptance Criteria",
-      "",
-      "- Typo is fixed.",
-      "",
-      "## Feedback Ledger Review",
-      "",
-      "- Reviewed `config/feedback-ledger.json`; no feedback-ledger item applies to this typo-only fixture.",
-      "",
-      "## Regression Self-Check",
-      "",
-      "- Self-check confirms this trivial fixture does not touch behavior, validation gates, or generated reports.",
-      "",
-      "## Retrospective Plan",
-      "",
-      "- Trivial fixture only documents no retrospective record requirement; retrospectives/index.json stays unchanged.",
-      "",
-      "## Allowed Paths",
-      "",
-      "- `docs/example.md`",
-      "",
-      "## Forbidden Paths",
-      "",
-      "- Do not change code.",
-      "",
-      "## Validation Commands",
-      "",
-      "- `git diff --check`",
-      "",
-      "## Parallel Writes",
-      "",
-      "- No parallel writes.",
-      "",
-      "## Handoff Requirements",
-      "",
-      "- Report the edit.",
-      ""
-    ].join("\n")
-  });
-  const missingJustification = await runHarnessValidate(missingJustificationRoot);
-
-  assert.notEqual(missingJustification.code, 0);
-  assert.match(missingJustification.stderr, /Trivial Justification/);
-
-  const justifiedRoot = await createHarnessFixture({
-    currentTask: [
-      "# Current Task",
-      "",
-      "## Task Class",
-      "",
-      "trivial",
-      "",
-      "## Trivial Justification",
-      "",
-      "Documentation-only typo fix with no behavior, contract, validation, publication, or automation impact.",
-      "",
-      "## Spec",
-      "",
-      "Fix a typo.",
-      "",
-      "## Acceptance Criteria",
-      "",
-      "- Typo is fixed.",
-      "",
-      "## Feedback Ledger Review",
-      "",
-      "- Reviewed `config/feedback-ledger.json`; no feedback-ledger item applies to this typo-only fixture.",
-      "",
-      "## Regression Self-Check",
-      "",
-      "- Self-check confirms this trivial fixture does not touch behavior, validation gates, or generated reports.",
-      "",
-      "## Retrospective Plan",
-      "",
-      "- Trivial fixture only documents no retrospective record requirement; retrospectives/index.json stays unchanged.",
-      "",
-      "## Allowed Paths",
-      "",
-      "- `docs/example.md`",
-      "",
-      "## Forbidden Paths",
-      "",
-      "- Do not change code.",
-      "",
-      "## Validation Commands",
-      "",
-      "- `git diff --check`",
-      "",
-      "## Parallel Writes",
-      "",
-      "- No parallel writes.",
-      "",
-      "## Handoff Requirements",
-      "",
-      "- Report the edit.",
-      ""
-    ].join("\n")
-  });
-  const justified = await runHarnessValidate(justifiedRoot);
-
-  assert.equal(justified.code, 0, justified.stderr);
-});
-
-test("harness SDD TDD accepts task class followed by template guidance", async () => {
-  const tmp = await createHarnessFixture({
-    currentTask: [
-      "# Current Task",
-      "",
-      "## Task Class",
-      "",
-      "non-trivial",
-      "",
-      "Use `trivial` only for typo, pure copy, one-line no-behavior config, or read-only diagnostic tasks.",
-      "",
-      "## Spec",
-      "",
-      "A non-trivial implementation task.",
-      "",
-      "## Acceptance Criteria",
-      "",
-      "- Harness accepts task templates with guidance text.",
-      "",
-      "## Feedback Ledger Review",
-      "",
-      "- Reviewed `config/feedback-ledger.json` and confirmed this fixture exercises the feedback-ledger review contract.",
-      "",
-      "## Regression Self-Check",
-      "",
-      "- Self-check confirms the fixture still contains the required regression review before handoff validation.",
-      "",
-      "## Retrospective Plan",
-      "",
-      "- This non-trivial fixture records a project_iteration retrospective plan and keeps retrospectives/index.json aligned.",
-      "",
-      "## Red Test",
-      "",
-      "Run before implementation:",
-      "",
-      "```powershell",
-      "node scripts/harness-validate.mjs",
-      "```",
-      "",
-      "Expected initial failure:",
-      "",
-      "- The pre-change harness rejects the task fixture.",
-      "",
-      "## Allowed Paths",
-      "",
-      "- `scripts/harness-validate.mjs`",
-      "",
-      "## Forbidden Paths",
-      "",
-      "- Do not modify generated reports.",
-      "",
-      "## Validation Commands",
-      "",
-      "- `node scripts/harness-validate.mjs`",
-      "",
-      "## Parallel Writes",
-      "",
-      "- No parallel writes.",
-      "",
-      "## Handoff Requirements",
-      "",
-      "- Report validation evidence.",
-      ""
-    ].join("\n")
-  });
+test("harness validator accepts current loop engineering state template", async () => {
+  const tmp = await createHarnessFixture();
 
   const result = await runHarnessValidate(tmp);
 
   assert.equal(result.code, 0, result.stderr);
-});
-
-test("harness requires content contract validation for daily content contract tasks", async () => {
-  const missingContractCommand = validDailyContentContractTask({
-    validationCommands: ["- `node scripts/harness-validate.mjs`"]
-  });
-  const rejectedRoot = await createHarnessFixture({ currentTask: missingContractCommand });
-  const rejected = await runHarnessValidate(rejectedRoot);
-
-  assert.notEqual(rejected.code, 0);
-  assert.match(rejected.stderr, /check-daily-content-contract/);
-
-  const acceptedRoot = await createHarnessFixture({
-    currentTask: validDailyContentContractTask({
-      validationCommands: [
-        "- `npm run content:contract`",
-        "- `node scripts/harness-validate.mjs`"
-      ]
-    })
-  });
-  const accepted = await runHarnessValidate(acceptedRoot);
-
-  assert.equal(accepted.code, 0, accepted.stderr);
-});
-
-test("feedback memory self-check rejects non-trivial current task without feedback ledger review", async () => {
-  const tmp = await createHarnessFixture({
-    currentTask: [
-      "# Current Task",
-      "",
-      "## Task Class",
-      "",
-      "non-trivial",
-      "",
-      "## Spec",
-      "",
-      "A non-trivial implementation task.",
-      "",
-      "## Acceptance Criteria",
-      "",
-      "- Harness enforces feedback-memory review.",
-      "",
-      "## Regression Self-Check",
-      "",
-      "- Compare the implementation against prior feedback items before handoff.",
-      "",
-      "## Red Test",
-      "",
-      "Run before implementation:",
-      "",
-      "```powershell",
-      "node scripts/harness-validate.mjs",
-      "```",
-      "",
-      "Expected initial failure:",
-      "",
-      "- The pre-change harness rejects this fixture.",
-      "",
-      "## Allowed Paths",
-      "",
-      "- `scripts/harness-validate.mjs`",
-      "",
-      "## Forbidden Paths",
-      "",
-      "- Do not modify generated reports.",
-      "",
-      "## Validation Commands",
-      "",
-      "- `node scripts/harness-validate.mjs`",
-      "",
-      "## Parallel Writes",
-      "",
-      "- No parallel writes.",
-      "",
-      "## Handoff Requirements",
-      "",
-      "- Report validation evidence.",
-      ""
-    ].join("\n")
-  });
-
-  const result = await runHarnessValidate(tmp);
-
-  assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /Feedback Ledger Review/);
-});
-
-test("feedback memory self-check rejects non-trivial current task without regression self-check", async () => {
-  const tmp = await createHarnessFixture({
-    currentTask: [
-      "# Current Task",
-      "",
-      "## Task Class",
-      "",
-      "non-trivial",
-      "",
-      "## Spec",
-      "",
-      "A non-trivial implementation task.",
-      "",
-      "## Acceptance Criteria",
-      "",
-      "- Harness enforces regression self-checks.",
-      "",
-      "## Feedback Ledger Review",
-      "",
-      "- Reviewed `config/feedback-ledger.json` and the quick reference for applicable regressions.",
-      "",
-      "## Red Test",
-      "",
-      "Run before implementation:",
-      "",
-      "```powershell",
-      "node scripts/harness-validate.mjs",
-      "```",
-      "",
-      "Expected initial failure:",
-      "",
-      "- The pre-change harness rejects this fixture.",
-      "",
-      "## Allowed Paths",
-      "",
-      "- `scripts/harness-validate.mjs`",
-      "",
-      "## Forbidden Paths",
-      "",
-      "- Do not modify generated reports.",
-      "",
-      "## Validation Commands",
-      "",
-      "- `node scripts/harness-validate.mjs`",
-      "",
-      "## Parallel Writes",
-      "",
-      "- No parallel writes.",
-      "",
-      "## Handoff Requirements",
-      "",
-      "- Report validation evidence.",
-      ""
-    ].join("\n")
-  });
-
-  const result = await runHarnessValidate(tmp);
-
-  assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /Regression Self-Check/);
 });
 
 test("feedback memory self-check ledger item is bound to harness validation", async () => {
@@ -9173,7 +8781,7 @@ test("daily content contract accepts aligned generated shape", () => {
   assert.deepEqual(result.issues, []);
 });
 
-test("feedback memory self-check rejects quick reference missing ledger item", async () => {
+test("feedback contract rejects quick reference missing ledger item", async () => {
   const tmp = await createHarnessFixture({
     feedbackLedger: {
       schema_version: 1,
@@ -9216,10 +8824,10 @@ test("feedback memory self-check rejects quick reference missing ledger item", a
     ].join("\n")
   });
 
-  const result = await runHarnessValidate(tmp);
+  const result = await validateFeedbackContract({ rootDir: tmp });
 
-  assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /feedback\/missing-from-quick-reference/);
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("feedback/missing-from-quick-reference")));
 });
 
 test("retrospective validation accepts sanitized records and index", async () => {
@@ -9336,70 +8944,16 @@ test("retrospective validation rejects implemented suggestions without durable e
   assert.match(result.stdout, /implemented_suggestion_missing_evidence/);
 });
 
-test("harness rejects non-trivial current task without retrospective plan", async () => {
+test("harness rejects current task state missing PR closeout marker", async () => {
+  const staleCurrentTask = (await validHarnessStateCurrentTask()).replace("## PR closeout", "## PR handoff");
   const tmp = await createHarnessFixture({
-    currentTask: [
-      "# Current Task",
-      "",
-      "## Task Class",
-      "",
-      "non-trivial",
-      "",
-      "## Spec",
-      "",
-      "A non-trivial implementation task.",
-      "",
-      "## Acceptance Criteria",
-      "",
-      "- Harness enforces retrospective planning.",
-      "",
-      "## Feedback Ledger Review",
-      "",
-      "- Reviewed `config/feedback-ledger.json` and the quick reference for applicable regressions.",
-      "",
-      "## Regression Self-Check",
-      "",
-      "- Self-check verifies validation, harness, and retrospective regression coverage before handoff.",
-      "",
-      "## Red Test",
-      "",
-      "Run before implementation:",
-      "",
-      "```powershell",
-      "node scripts/harness-validate.mjs",
-      "```",
-      "",
-      "Expected initial failure:",
-      "",
-      "- The pre-change harness rejects this fixture.",
-      "",
-      "## Allowed Paths",
-      "",
-      "- `scripts/harness-validate.mjs`",
-      "",
-      "## Forbidden Paths",
-      "",
-      "- Do not modify generated reports.",
-      "",
-      "## Validation Commands",
-      "",
-      "- `node scripts/harness-validate.mjs`",
-      "",
-      "## Parallel Writes",
-      "",
-      "- No parallel writes.",
-      "",
-      "## Handoff Requirements",
-      "",
-      "- Report validation evidence.",
-      ""
-    ].join("\n")
+    currentTask: staleCurrentTask
   });
 
   const result = await runHarnessValidate(tmp);
 
   assert.notEqual(result.code, 0);
-  assert.match(result.stderr, /Retrospective Plan/);
+  assert.match(result.stderr, /PR closeout/);
 });
 
 test("retrospective ledger item is bound to validation", async () => {
@@ -26416,6 +25970,7 @@ function retrospectiveRecordPath(root, record) {
 
 async function createHarnessFixture(options = {}) {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-"));
+  await fs.mkdir(path.join(tmp, ".harness-hub"), { recursive: true });
   await fs.mkdir(path.join(tmp, "config"), { recursive: true });
   await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
   await fs.mkdir(path.join(tmp, "prompts", "ai-daily", "modules"), { recursive: true });
@@ -26424,24 +25979,39 @@ async function createHarnessFixture(options = {}) {
   await fs.mkdir(path.join(tmp, "retrospectives", "2026", "06"), { recursive: true });
   await fs.mkdir(path.join(tmp, "tasks", "templates"), { recursive: true });
 
+  await fs.copyFile(path.join(rootDir, "AGENTS.md"), path.join(tmp, "AGENTS.md"));
+  await fs.copyFile(path.join(rootDir, ".harness-hub", ".gitignore"), path.join(tmp, ".harness-hub", ".gitignore"));
+  await fs.cp(path.join(rootDir, ".harness-hub", "context"), path.join(tmp, ".harness-hub", "context"), { recursive: true });
+  await fs.cp(path.join(rootDir, ".harness-hub", "loop"), path.join(tmp, ".harness-hub", "loop"), { recursive: true });
+  await fs.cp(path.join(rootDir, ".harness-hub", "state-templates"), path.join(tmp, ".harness-hub", "state-templates"), { recursive: true });
+  await fs.mkdir(path.join(tmp, ".harness-hub", "state"), { recursive: true });
+  for (const stateFile of [
+    "decisions.md",
+    "progress.md",
+    "session-handoff.md",
+    "loop-runs.jsonl",
+    "interrupt-decisions.jsonl",
+    "capability-events.jsonl"
+  ]) {
+    await fs.copyFile(
+      path.join(tmp, ".harness-hub", "state-templates", stateFile),
+      path.join(tmp, ".harness-hub", "state", stateFile)
+    );
+  }
+  const harnessStateCurrentTask = options.currentTask || await validHarnessStateCurrentTask();
   await fs.writeFile(
-    path.join(tmp, "AGENTS.md"),
-    [
-      "# AGENTS.md",
-      "",
-      "Codex worktree session-handoff tasks/daily-publish-runbook.md publish:dry-run",
-      "SDD/TDD Red Test",
-      "Feedback Ledger Review Regression Self-Check",
-      ""
-    ].join("\n"),
+    path.join(tmp, ".harness-hub", "state", "current-task.md"),
+    harnessStateCurrentTask,
     "utf8"
   );
   await fs.writeFile(path.join(tmp, "progress.md"), "# Progress\n\n## Current State\n\n- Fixture.\n", "utf8");
   await fs.writeFile(path.join(tmp, "session-handoff.md"), "# Session Handoff\n\n## Current Status\n\n- Fixture.\n", "utf8");
   await fs.writeFile(path.join(tmp, "progress.example.md"), "# Progress\n\n## Current State\n\n- Example fixture.\n", "utf8");
   await fs.writeFile(path.join(tmp, "session-handoff.example.md"), "# Session Handoff\n\n## Current Status\n\n- Example fixture.\n", "utf8");
-  await fs.writeFile(path.join(tmp, "clean-state-checklist.md"), "# Clean State Checklist\n\n- Fixture.\n", "utf8");
-  await fs.writeFile(path.join(tmp, "definition-of-done.md"), "# Definition Of Done\n\n- Fixture.\n", "utf8");
+  await fs.copyFile(path.join(rootDir, "clean-state-checklist.md"), path.join(tmp, "clean-state-checklist.md"));
+  await fs.copyFile(path.join(rootDir, "definition-of-done.md"), path.join(tmp, "definition-of-done.md"));
+  await fs.copyFile(path.join(rootDir, "evaluator-rubric.md"), path.join(tmp, "evaluator-rubric.md"));
+  await fs.copyFile(path.join(rootDir, "quality-document.md"), path.join(tmp, "quality-document.md"));
   await fs.writeFile(
     path.join(tmp, "config", "feedback-ledger.json"),
     JSON.stringify(options.feedbackLedger || {
@@ -26605,34 +26175,13 @@ async function createHarnessFixture(options = {}) {
     }, null, 2),
     "utf8"
   );
-  await fs.writeFile(
-    path.join(tmp, "feature_list.json"),
-    JSON.stringify({
-      features: [
-        "daily-source-discovery",
-        "structured-report-write",
-        "static-html-build",
-        "publish-preflight",
-        "publish-dry-run",
-        "publish-execute",
-        "daily-publish-harness"
-      ].map((id) => ({
-        id,
-        status: "active",
-        summary: `${id} fixture`,
-        commands: ["npm run validate"],
-        artifacts: ["fixture"],
-        acceptance: ["fixture acceptance 1", "fixture acceptance 2"],
-        stop_conditions: ["fixture stop"]
-      })),
-      parallel_write_policy: {
-        default: "blocked"
-      }
-    }, null, 2),
-    "utf8"
-  );
+  await fs.copyFile(path.join(rootDir, "feature_list.json"), path.join(tmp, "feature_list.json"));
 
   return tmp;
+}
+
+async function validHarnessStateCurrentTask() {
+  return fs.readFile(path.join(rootDir, ".harness-hub", "state-templates", "current-task.md"), "utf8");
 }
 
 function validNonTrivialCurrentTask() {

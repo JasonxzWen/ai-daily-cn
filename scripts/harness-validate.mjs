@@ -5,16 +5,14 @@ import path from 'node:path';
 const root = process.cwd();
 const requiredFiles = [
   'AGENTS.md',
-  'CLAUDE.md',
   'feature_list.json',
   '.harness-hub/.gitignore',
-  '.harness-hub/state-templates/current-task.md',
-  '.harness-hub/state-templates/decisions.md',
-  '.harness-hub/state-templates/progress.md',
-  '.harness-hub/state-templates/session-handoff.md',
-  '.harness-hub/state-templates/loop-runs.jsonl',
-  '.harness-hub/state-templates/interrupt-decisions.jsonl',
-  '.harness-hub/state-templates/capability-events.jsonl',
+  '.harness-hub/state/decisions.md',
+  '.harness-hub/state/progress.md',
+  '.harness-hub/state/session-handoff.md',
+  '.harness-hub/state/loop-runs.jsonl',
+  '.harness-hub/state/interrupt-decisions.jsonl',
+  '.harness-hub/state/capability-events.jsonl',
   '.harness-hub/loop/policies/interrupt-policy.md',
   '.harness-hub/loop/policies/action-audit-schema.md',
   '.harness-hub/loop/evals/interrupt-policy/good-cases.jsonl',
@@ -34,48 +32,16 @@ const requiredFiles = [
   '.harness-hub/context/wiki/.obsidian/app.json',
   '.harness-hub/context/wiki/.obsidian/core-plugins.json',
   '.harness-hub/context/wiki/.obsidian/graph.json',
-  'config/feedback-ledger.json',
-  'docs/feedback-buglist-quick-reference.md',
-  'progress.example.md',
-  'session-handoff.example.md',
   'clean-state-checklist.md',
   'definition-of-done.md',
   'evaluator-rubric.md',
   'quality-document.md',
-  'tasks/current-task.example.md',
-  'tasks/daily-publish-runbook.md',
-  'tasks/templates/daily-publish-task.md',
-  'tasks/templates/sdd-tdd-task.md',
-  'schemas/retrospective.schema.json',
-  'scripts/validate-retrospectives.mjs',
-  'scripts/check-daily-content-contract.mjs',
-  'retrospectives/index.json',
-  'prompts/ai-daily/modules/editorial-authority.md',
-  'scripts/harness-init.mjs',
+  '.harness-hub/state/current-task.md',
   'scripts/harness-validate.mjs',
 ];
-const requiredLocalStateFiles = [
-  'progress.md',
-  'session-handoff.md',
-  'tasks/current-task.md',
-  '.harness-hub/state/current-task.md',
-  '.harness-hub/state/decisions.md',
-  '.harness-hub/state/progress.md',
-  '.harness-hub/state/session-handoff.md',
-  '.harness-hub/state/loop-runs.jsonl',
-  '.harness-hub/state/interrupt-decisions.jsonl',
-  '.harness-hub/state/capability-events.jsonl',
-];
-const forbiddenPaths = [
-  { path: 'openspec', reason: 'OpenSpec workflow artifacts must be removed from the active repository' },
-  { path: 'scripts/validate-openspec.mjs', reason: 'OpenSpec validator must be removed from the active workflow' },
-  { path: 'tests/openspec.test.js', reason: 'OpenSpec tests must be removed from the active workflow' },
-];
+const forbiddenFiles = ['CLAUDE.md'];
 const sizeLimits = {
   'AGENTS.md': 32 * 1024,
-  'progress.md': 16 * 1024,
-  'session-handoff.md': 16 * 1024,
-  'tasks/current-task.md': 16 * 1024,
   '.harness-hub/state/decisions.md': 16 * 1024,
   '.harness-hub/state/progress.md': 16 * 1024,
   '.harness-hub/state/session-handoff.md': 16 * 1024,
@@ -85,39 +51,7 @@ const sizeLimits = {
   '.harness-hub/state/capability-events.jsonl': 64 * 1024,
 };
 const requiredMarkers = {
-  'AGENTS.md': [
-    'Codex',
-    'worktree',
-    'session-handoff',
-    'tasks/daily-publish-runbook.md',
-    'publish:dry-run',
-    'SDD/TDD',
-    'Red Test',
-    'Feedback Ledger Review',
-    'Regression Self-Check',
-  ],
-  'tasks/current-task.md': [
-    'Task Class',
-    'Spec',
-    'Acceptance Criteria',
-    'Allowed Paths',
-    'Forbidden Paths',
-    'Validation Commands',
-    'Parallel Writes',
-    'Retrospective Plan',
-    'Handoff Requirements',
-  ],
-  'tasks/current-task.example.md': [
-    'Task Class',
-    'Spec',
-    'Acceptance Criteria',
-    'Allowed Paths',
-    'Forbidden Paths',
-    'Validation Commands',
-    'Parallel Writes',
-    'Retrospective Plan',
-    'Handoff Requirements',
-  ],
+  'AGENTS.md': ['Codex', 'Initialization Gate', 'Loop Control Plane', 'Interrupt Policy', 'harness-validate.mjs', 'harness-hub check', 'LLM Wiki', '.harness-hub/context/wiki', 'current-task.md', 'checkpoint commit', 'quality snapshot', 'worktree', 'decisions.md', 'session-handoff', 'P0/P1/P2', 'agent-run browser', 'PR status', 'PR handoff', 'mergeability', 'CI/check-run', 'agentic loops', 'delegated-agent', 'Arbiters are read-only', 'finish closeout', 'insight'],
   '.harness-hub/.gitignore': ['state/', 'reports/'],
   '.harness-hub/context/AGENTS.md': ['LLM Wiki', 'Raw sources', 'No Redundant Facts', 'human confirmation', 'Contradiction Register'],
   '.harness-hub/context/README.md': ['Agent Context Pack', 'Raw sources', 'Wiki pages', 'Obsidian', 'Update Flow'],
@@ -127,119 +61,67 @@ const requiredMarkers = {
   '.harness-hub/context/wiki/update-log.md': ['Update Log', 'Human confirmation', 'Sources consulted'],
   '.harness-hub/loop/policies/interrupt-policy.md': ['Interrupt Policy', 'standalone', 'composable', 'loop-participant', 'Continue By Default', 'Interrupt', 'Audit Requirement'],
   '.harness-hub/loop/policies/action-audit-schema.md': ['Runtime Ledgers', 'loop-runs.jsonl', 'interrupt-decisions.jsonl', 'capability-events.jsonl', 'continue|interrupt'],
-  '.harness-hub/state-templates/decisions.md': ['Active Decisions', 'Resolved Decisions', 'Decision', 'Rationale', 'Status', 'Follow-up'],
-  '.harness-hub/state-templates/progress.md': ['Recent Validation', 'Validation Records', 'Command', 'Status', 'Exit code', 'Runtime Signals', 'Agentic Loop Records', 'Finish Closeout', 'Insight Recommendations'],
-  '.harness-hub/state-templates/session-handoff.md': ['Validation Evidence', 'Validation Records', 'Command', 'Status', 'Exit code', 'Runtime Signals', 'Agentic Loop Records', 'Finish Closeout', 'Insight Recommendations'],
-  '.harness-hub/state-templates/current-task.md': ['Goal', 'Assumptions', 'Non-goals', 'Allowed paths', 'Forbidden paths', 'Acceptance criteria', 'Validation commands', 'P0', 'P1', 'P2', 'Agentic loops', 'Finish closeout', 'Parallel writes', 'Handoff requirements'],
-  'evaluator-rubric.md': ['Correctness', 'Verification', 'Scope discipline', 'Runtime reliability', 'Agentic loops', 'Finish closeout', 'Insight recommendations', 'Handoff readiness', 'Verdict'],
+  '.harness-hub/state/decisions.md': ['Active Decisions', 'Resolved Decisions', 'Decision', 'Rationale', 'Status', 'Follow-up'],
+  '.harness-hub/state/progress.md': ['Recent Validation', 'Validation Records', 'Command', 'Status', 'Exit code', 'Passed', 'Failed', 'Evidence', 'Commit', 'Runtime Signals', 'Web browser acceptance', 'PR Status', 'Mergeability', 'CI/check runs', 'Agentic Loop Records', 'Main Agent Decision', 'Finish Closeout', 'Insight Recommendations', 'Review Feedback To Rules'],
+  '.harness-hub/state/session-handoff.md': ['Validation Evidence', 'Validation Records', 'Command', 'Status', 'Exit code', 'Passed', 'Failed', 'Evidence', 'Commit', 'Runtime Signals', 'Web browser acceptance', 'PR Status', 'Mergeability', 'CI/check runs', 'Agentic Loop Records', 'Main Agent Decision', 'Finish Closeout', 'Insight Recommendations', 'Review Feedback To Rules'],
+  '.harness-hub/state/current-task.md': [
+    'Goal',
+    'Assumptions',
+    'Non-goals',
+    'Allowed paths',
+    'Forbidden paths',
+    'Acceptance criteria',
+    'Standard startup path',
+    'harness-hub check',
+    'Validation commands',
+    'Validation tiers',
+    'P0',
+    'P1',
+    'P2',
+    'Web browser acceptance',
+    'agent-run browser',
+    'Runtime signals',
+    'Agentic loops',
+    'Producer',
+    'Verifier',
+    'Arbiter',
+    'Main Agent Decision',
+    'PR closeout',
+    'Mergeability',
+    'CI/check-run status',
+    'Finish closeout',
+    'Insight audit',
+    'Checkpoint policy',
+    'Spec updates',
+    'Decision log',
+    'Parallel writes',
+    'Handoff requirements',
+  ],
+  'clean-state-checklist.md': ['Standard startup path', 'harness-hub check', 'Runtime signals', 'P0', 'P1', 'P2', 'Web browser acceptance', 'Agentic loop records', 'main-agent decision', 'PR status', 'PR URL', 'mergeability', 'CI/check-run', 'Finish closeout', 'insight', 'Review Feedback', 'evaluator-rubric.md', 'quality-document.md'],
+  'definition-of-done.md': ['Static checks', 'runtime checks', 'end-to-end', 'P0', 'P1', 'P2', 'agent-run browser', 'Standard startup path', 'harness-hub check', 'Runtime logs', 'Agentic loop evidence', 'producer/verifier/arbiter', 'PR status', 'mergeability', 'CI/check-run', 'finish closeout', 'insight', 'evaluator rubric', 'quality snapshot'],
+  'evaluator-rubric.md': ['Correctness', 'Verification', 'Scope discipline', 'Runtime reliability', 'Browser acceptance', 'Agentic loops', 'Finish closeout', 'Insight recommendations', 'Handoff readiness', 'Verdict'],
   'quality-document.md': ['Quality Snapshot', 'Rating Standard', 'Product Areas', 'P0/P1/P2 validation status', 'Browser acceptance status', 'Architecture Layers', 'Change History'],
-  'tasks/daily-publish-runbook.md': [
-    'Preflight',
-    'Source Discovery',
-    'Report Write',
-    'Build And Validate',
-    'Dry Run',
-    'Real Publish',
-    'GitHub API Fallback',
-    'Handoff',
-    'npm run publish:dry-run',
-    'npm run publish -- confirm-push YYYY-MM-DD',
-    'npm run publish:github-api -- confirm-push YYYY-MM-DD',
-    'editorial-authority.md',
-  ],
-  'tasks/templates/daily-publish-task.md': [
-    'YYYY-MM-DD',
-    'Asia/Shanghai',
-    'Real publish requires explicit confirmation',
-    'npm run validate',
-    'npm run publish:dry-run',
-    'editorial-authority.md',
-  ],
-  'tasks/templates/sdd-tdd-task.md': [
-    'Task Class',
-    'Trivial Justification',
-    'Spec',
-    'Acceptance Criteria',
-    'Red Test',
-    'Deterministic Substitute',
-    'Feedback Ledger Review',
-    'Regression Self-Check',
-    'Retrospective Plan',
-    'Allowed Paths',
-    'Forbidden Paths',
-    'Validation Commands',
-    'Handoff Requirements',
-  ],
-  'prompts/ai-daily/modules/editorial-authority.md': [
-    '迭代维护机制',
-    '本轮修改清单',
-    'Good Case',
-    'Bad Case',
-    '迭代历史',
-  ],
 };
-const requiredPackageScripts = {
-  'prompt:build': ['src/cli.js', 'prompt:build'],
-  'report:write': ['src/cli.js', 'report:write'],
-  build: ['src/cli.js', 'build', '--out docs'],
-  'preflight:worktree': ['src/cli.js', 'preflight:worktree'],
-  test: ['node --test'],
-  'test:e2e': ['scripts/run-e2e.mjs'],
-  'harness:init': ['scripts/harness-init.mjs'],
-  'harness:validate': ['scripts/harness-validate.mjs'],
-  'retrospectives:validate': ['scripts/validate-retrospectives.mjs'],
-  'content:contract': ['scripts/check-daily-content-contract.mjs'],
-  'content:contract:self-test': ['scripts/check-daily-content-contract.mjs', '--self-test'],
-  'validate:docs': ['npm run harness:init', 'npm run harness:validate', 'npm run retrospectives:validate', 'npm run privacy:validate', 'git diff --check'],
-  validate: ['npm run harness:init', 'npm run harness:validate', 'npm run retrospectives:validate', 'npm run content:contract && npm run content:contract:self-test', 'npm run test', 'npm run build', 'npm run test:e2e', 'git diff --check'],
-  'publish:prepare-worktree': ['src/cli.js', 'publish:prepare-worktree'],
-  'publish:prepare-clean-worktree': ['src/cli.js', 'publish:prepare-clean-worktree'],
-  'publish:preflight': ['src/cli.js', 'publish:preflight'],
-  'publish:dry-run': ['src/cli.js', 'publish:dry-run', '--out docs'],
-  'publish:github-api': ['src/cli.js', 'publish:github-api'],
-  publish: ['src/cli.js', 'publish'],
-  'discover:github-trending': ['src/cli.js', 'discover:github-trending'],
-  'discover:builders': ['src/cli.js', 'discover:builders'],
-  'discover:content-sources': ['src/cli.js', 'discover:content-sources'],
-  'discover:statuspage-incidents': ['src/cli.js', 'discover:statuspage-incidents'],
-};
-const requiredFeatureIds = [
-  'daily-source-discovery',
-  'structured-report-write',
-  'static-html-build',
-  'publish-preflight',
-  'publish-dry-run',
-  'publish-execute',
-  'daily-publish-harness',
+const agentArchitectureMarkers = [
+  'worktree_policy',
+  'parallel_write_policy',
+  'read_only_parallel_work',
+  'single integration review point',
+  'non-overlapping',
 ];
 
 const failures = [];
-const harnessHubEnabled = fs.existsSync(path.join(root, '.harness-hub'));
-const enhancedHarnessFiles = new Set(['CLAUDE.md', 'evaluator-rubric.md', 'quality-document.md']);
 
 for (const file of requiredFiles) {
-  if (!harnessHubEnabled && (file.startsWith('.harness-hub/') || enhancedHarnessFiles.has(file))) {
-    continue;
-  }
   const filePath = path.join(root, file);
   if (!fs.existsSync(filePath)) {
     failures.push(`${file}: missing required harness file`);
   }
 }
 
-for (const file of requiredLocalStateFiles) {
-  if (!harnessHubEnabled && file.startsWith('.harness-hub/')) {
-    continue;
-  }
-  const filePath = path.join(root, file);
-  if (!fs.existsSync(filePath)) {
-    failures.push(`${file}: missing local harness state; run npm run harness:init`);
-  }
-}
-
-for (const entry of forbiddenPaths) {
-  if (fs.existsSync(path.join(root, entry.path))) {
-    failures.push(`${entry.path}: ${entry.reason}`);
+for (const file of forbiddenFiles) {
+  if (fs.existsSync(path.join(root, file))) {
+    failures.push(`${file}: non-Codex platform instruction file is present`);
   }
 }
 
@@ -265,6 +147,49 @@ for (const [file, markers] of Object.entries(requiredMarkers)) {
   }
 }
 
+const architectureText = [
+  'AGENTS.md',
+  '.harness-hub/state/current-task.md',
+  'feature_list.json',
+]
+  .map((file) => {
+    const filePath = path.join(root, file);
+    return fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
+  })
+  .join('\n');
+const missingArchitectureMarkers = agentArchitectureMarkers.filter((marker) => !architectureText.includes(marker));
+if (missingArchitectureMarkers.length > 0) {
+  failures.push(`agent architecture boundary: missing markers ${missingArchitectureMarkers.join(', ')}`);
+}
+
+const skillsDir = path.join(root, 'skills');
+if (fs.existsSync(skillsDir) && fs.statSync(skillsDir).isDirectory()) {
+  const triggerIssues = [];
+  for (const entry of fs.readdirSync(skillsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) {
+      continue;
+    }
+    const skillPath = path.join(skillsDir, entry.name, 'SKILL.md');
+    if (!fs.existsSync(skillPath)) {
+      continue;
+    }
+    const description = parseSkillDescription(fs.readFileSync(skillPath, 'utf8'));
+    if (!description) {
+      triggerIssues.push(`${entry.name}: missing description`);
+      continue;
+    }
+    if (!/(load when|use when|when|asks|needs|requests|trigger)/i.test(description)) {
+      triggerIssues.push(`${entry.name}: description lacks an activation condition`);
+    }
+    if (/(always use|every request|all requests|all tasks|any task|whenever possible)/i.test(description)) {
+      triggerIssues.push(`${entry.name}: description uses broad activation wording`);
+    }
+  }
+  if (triggerIssues.length > 0) {
+    failures.push(`skill trigger hygiene: ${triggerIssues.slice(0, 8).join('; ')}${triggerIssues.length > 8 ? `; +${triggerIssues.length - 8} more` : ''}`);
+  }
+}
+
 const featureStatePath = path.join(root, 'feature_list.json');
 if (fs.existsSync(featureStatePath)) {
   try {
@@ -273,79 +198,76 @@ if (fs.existsSync(featureStatePath)) {
     if (!isRecord(featureState) || !Array.isArray(featureState.features)) {
       missing.push('features array');
     }
-    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.feature_state_policy))) {
+    if (!isRecord(featureState) || !isRecord(featureState.feature_state_policy)) {
       missing.push('feature_state_policy object');
     }
-    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.validation_priority_policy))) {
+    if (!isRecord(featureState) || !isRecord(featureState.validation_priority_policy)) {
       missing.push('validation_priority_policy object');
     }
-    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.web_acceptance_policy))) {
+    if (!isRecord(featureState) || !isRecord(featureState.web_acceptance_policy)) {
       missing.push('web_acceptance_policy object');
     }
-    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.pr_closeout_policy))) {
+    if (!isRecord(featureState) || !isRecord(featureState.pr_closeout_policy)) {
       missing.push('pr_closeout_policy object');
     }
-    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.finish_closeout_policy))) {
+    if (!isRecord(featureState) || !isRecord(featureState.finish_closeout_policy)) {
       missing.push('finish_closeout_policy object');
     }
-    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.agentic_loop_policy))) {
+    if (!isRecord(featureState) || !isRecord(featureState.agentic_loop_policy)) {
       missing.push('agentic_loop_policy object');
     }
-    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.loop_control_policy))) {
+    if (!isRecord(featureState) || !isRecord(featureState.loop_control_policy)) {
       missing.push('loop_control_policy object');
     }
-    if (harnessHubEnabled && (!isRecord(featureState) || !isRecord(featureState.context_engineering_policy))) {
+    if (!isRecord(featureState) || !isRecord(featureState.context_engineering_policy)) {
       missing.push('context_engineering_policy object');
     }
     if (!isRecord(featureState) || !isRecord(featureState.parallel_write_policy)) {
       missing.push('parallel_write_policy object');
     }
-    if (missing.length > 0) {
-      failures.push(`feature_list.json: missing required structure ${missing.join(', ')}`);
-    }
     if (isRecord(featureState) && Array.isArray(featureState.features)) {
-      validateFeatureList(featureState.features, failures);
+      const invalidFeatures = featureState.features
+        .map((feature, index) => ({ feature, index }))
+        .filter(({ feature }) => !isValidFeatureRecord(feature))
+        .map(({ index }) => `features[${index}]`);
+      if (invalidFeatures.length > 0) {
+        missing.push(`valid feature records ${invalidFeatures.join(', ')}`);
+      }
+    }
+    if (missing.length > 0) {
+        failures.push(`feature_list.json: missing required structure ${missing.join(', ')}`);
     }
   } catch {
     failures.push('feature_list.json: must be valid JSON');
   }
 }
 
-if (harnessHubEnabled) {
-  for (const file of [
-    '.harness-hub/state-templates/loop-runs.jsonl',
-    '.harness-hub/state-templates/interrupt-decisions.jsonl',
-    '.harness-hub/state-templates/capability-events.jsonl',
-    '.harness-hub/state/loop-runs.jsonl',
-    '.harness-hub/state/interrupt-decisions.jsonl',
-    '.harness-hub/state/capability-events.jsonl',
-  ]) {
-    const issues = parseJsonlIssues(file);
-    if (issues.length > 0) {
-      failures.push(`${file}: invalid JSONL ${issues.join(', ')}`);
-    }
-  }
-
-  for (const evalCase of [
-    { file: '.harness-hub/loop/evals/interrupt-policy/good-cases.jsonl', expectedDecision: 'continue' },
-    { file: '.harness-hub/loop/evals/interrupt-policy/bad-cases.jsonl', expectedDecision: 'interrupt' },
-    { file: '.harness-hub/loop/evals/interrupt-policy/regression-cases.jsonl' },
-  ]) {
-    const issues = validateInterruptEvalFile(evalCase.file, evalCase.expectedDecision);
-    if (issues.length > 0) {
-      failures.push(`${evalCase.file}: interrupt policy eval issues ${issues.slice(0, 6).join('; ')}${issues.length > 6 ? `; +${issues.length - 6} more` : ''}`);
-    }
-  }
-
-  const obsidianIssues = validateObsidianPortableProfile();
-  if (obsidianIssues.length > 0) {
-    failures.push(`.harness-hub/context/wiki/.obsidian: ${obsidianIssues.join('; ')}`);
+for (const file of [
+  '.harness-hub/state/loop-runs.jsonl',
+  '.harness-hub/state/interrupt-decisions.jsonl',
+  '.harness-hub/state/capability-events.jsonl',
+]) {
+  const issues = parseJsonlIssues(file);
+  if (issues.length > 0) {
+    failures.push(`${file}: invalid JSONL ${issues.join(', ')}`);
   }
 }
 
-validatePackageScripts(failures);
-validateFeedbackQuickReference(failures);
-validateCurrentTask(failures);
+for (const evalCase of [
+  { file: '.harness-hub/loop/evals/interrupt-policy/good-cases.jsonl', expectedDecision: 'continue' },
+  { file: '.harness-hub/loop/evals/interrupt-policy/bad-cases.jsonl', expectedDecision: 'interrupt' },
+  { file: '.harness-hub/loop/evals/interrupt-policy/regression-cases.jsonl' },
+]) {
+  const issues = validateInterruptEvalFile(evalCase.file, evalCase.expectedDecision);
+  if (issues.length > 0) {
+    failures.push(`${evalCase.file}: interrupt policy eval issues ${issues.slice(0, 6).join('; ')}${issues.length > 6 ? `; +${issues.length - 6} more` : ''}`);
+  }
+}
+
+const obsidianIssues = validateObsidianPortableProfile();
+if (obsidianIssues.length > 0) {
+  failures.push(`.harness-hub/context/wiki/.obsidian: ${obsidianIssues.join('; ')}`);
+}
 
 if (failures.length > 0) {
   console.error('Harness validation failed:');
@@ -359,47 +281,6 @@ console.log('Harness validation passed.');
 
 function isRecord(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function validateFeatureList(features, failures) {
-  const featureById = new Map();
-
-  for (const feature of features) {
-    if (!isRecord(feature) || typeof feature.id !== 'string') {
-      failures.push('feature_list.json: every feature must be an object with a string id');
-      continue;
-    }
-    featureById.set(feature.id, feature);
-  }
-
-  for (const id of requiredFeatureIds) {
-    if (!featureById.has(id)) {
-      failures.push(`feature_list.json: missing required daily publish feature ${id}`);
-    }
-  }
-
-  for (const id of requiredFeatureIds) {
-    const feature = featureById.get(id);
-    if (!feature) continue;
-    if (!['active', 'planned', 'blocked', 'complete'].includes(feature.status)) {
-      failures.push(`feature_list.json: ${id} has invalid status`);
-    }
-    if (typeof feature.summary !== 'string' || feature.summary.trim().length === 0) {
-      failures.push(`feature_list.json: ${id} must include a summary`);
-    }
-    if (!Array.isArray(feature.commands) || feature.commands.length === 0) {
-      failures.push(`feature_list.json: ${id} must list commands`);
-    }
-    if (!Array.isArray(feature.artifacts) || feature.artifacts.length === 0) {
-      failures.push(`feature_list.json: ${id} must list artifacts`);
-    }
-    if (!Array.isArray(feature.acceptance) || feature.acceptance.length < 2) {
-      failures.push(`feature_list.json: ${id} must include at least two acceptance checks`);
-    }
-    if (!Array.isArray(feature.stop_conditions) || feature.stop_conditions.length === 0) {
-      failures.push(`feature_list.json: ${id} must include stop conditions`);
-    }
-  }
 }
 
 function parseJsonlIssues(relativePath) {
@@ -493,193 +374,25 @@ function validateObsidianPortableProfile() {
   return issues;
 }
 
-function validatePackageScripts(failures) {
-  const packagePath = path.join(root, 'package.json');
-  if (!fs.existsSync(packagePath)) {
-    failures.push('package.json: missing required project manifest');
-    return;
+function parseSkillDescription(content) {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) {
+    return null;
   }
-
-  let manifest;
-  try {
-    manifest = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-  } catch {
-    failures.push('package.json: must be valid JSON');
-    return;
-  }
-
-  const scripts = isRecord(manifest.scripts) ? manifest.scripts : {};
-  for (const [scriptName, command] of Object.entries(scripts)) {
-    if (scriptName.toLowerCase().includes('openspec')) {
-      failures.push(`package.json#scripts.${scriptName}: OpenSpec scripts are not part of the active workflow`);
-    }
-    if (typeof command === 'string' && /openspec/i.test(command)) {
-      failures.push(`package.json#scripts.${scriptName}: OpenSpec command references are not part of the active workflow`);
-    }
-  }
-  for (const [scriptName, markers] of Object.entries(requiredPackageScripts)) {
-    const command = scripts[scriptName];
-    if (typeof command !== 'string' || command.trim().length === 0) {
-      failures.push(`package.json: missing required script ${scriptName}`);
-      continue;
-    }
-    const missing = markers.filter((marker) => !command.includes(marker));
-    if (missing.length > 0) {
-      failures.push(`package.json#scripts.${scriptName}: missing markers ${missing.join(', ')}`);
-    }
-  }
+  const descriptionMatch = match[1].match(/^description:\s*(.+)$/m);
+  return descriptionMatch ? descriptionMatch[1].replace(/^['"]|['"]$/g, '').trim() : null;
 }
 
-function validateFeedbackQuickReference(failures) {
-  const ledgerPath = path.join(root, 'config', 'feedback-ledger.json');
-  const quickReferencePath = path.join(root, 'docs', 'feedback-buglist-quick-reference.md');
-  if (!fs.existsSync(ledgerPath) || !fs.existsSync(quickReferencePath)) {
-    return;
+function isValidFeatureRecord(value) {
+  if (!isRecord(value)) {
+    return false;
   }
-
-  let ledger;
-  try {
-    ledger = JSON.parse(fs.readFileSync(ledgerPath, 'utf8'));
-  } catch {
-    failures.push('config/feedback-ledger.json: must be valid JSON');
-    return;
-  }
-
-  const items = Array.isArray(ledger.items) ? ledger.items : [];
-  const quickReference = fs.readFileSync(quickReferencePath, 'utf8');
-  const missingIds = items
-    .map((item) => String(item?.id || '').trim())
-    .filter(Boolean)
-    .filter((id) => !quickReference.includes(id));
-
-  if (missingIds.length > 0) {
-    failures.push(`docs/feedback-buglist-quick-reference.md: missing feedback ledger IDs ${missingIds.join(', ')}`);
-  }
-}
-
-function validateCurrentTask(failures) {
-  const taskPath = path.join(root, 'tasks/current-task.md');
-  if (!fs.existsSync(taskPath)) return;
-
-  const content = fs.readFileSync(taskPath, 'utf8');
-  const taskClass = firstNonEmptyLine(sectionText(content, 'Task Class')).toLowerCase();
-  if (!['non-trivial', 'trivial'].includes(taskClass)) {
-    failures.push('tasks/current-task.md: first non-empty Task Class line must be "non-trivial" or "trivial"');
-    return;
-  }
-
-  validateFeedbackMemorySections(content, failures);
-
-  if (taskClass === 'trivial') {
-    const justification = sectionText(content, 'Trivial Justification').trim();
-    if (justification.length < 20) {
-      failures.push('tasks/current-task.md: trivial tasks require a meaningful Trivial Justification');
-    }
-    return;
-  }
-
-  const redTest = sectionText(content, 'Red Test').trim();
-  const substitute = sectionText(content, 'Deterministic Substitute').trim();
-  if (redTest.length === 0 && substitute.length === 0) {
-    failures.push('tasks/current-task.md: non-trivial tasks require Red Test or Deterministic Substitute');
-  }
-  if (redTest.length > 0 && !/(node|npm|git|pwsh|powershell|curl|Invoke-)/i.test(redTest)) {
-    failures.push('tasks/current-task.md: Red Test must include an executable command or deterministic check');
-  }
-  if (redTest.length > 0 && !hasFailureEvidence(redTest)) {
-    failures.push('tasks/current-task.md: Red Test must record the expected or actual failing result');
-  }
-  if (redTest.length === 0 && substitute.length > 0 && !/reason|\u7406\u7531|\u4e0d\u53ef|\u65e0\u6cd5|\u56e0\u4e3a|not practical|not feasible/i.test(substitute)) {
-    failures.push('tasks/current-task.md: Deterministic Substitute must explain why a direct red test is not practical');
-  }
-  validateRetrospectivePlanSection(content, failures);
-  validateDailyContentContractTask(content, failures);
-}
-
-function validateFeedbackMemorySections(content, failures) {
-  const feedbackReview = sectionText(content, 'Feedback Ledger Review').trim();
-  const regressionSelfCheck = sectionText(content, 'Regression Self-Check').trim();
-
-  if (!hasMeaningfulFeedbackReview(feedbackReview)) {
-    failures.push('tasks/current-task.md: Feedback Ledger Review must record reviewed feedback-ledger items or explain why none apply');
-  }
-  if (!hasMeaningfulRegressionSelfCheck(regressionSelfCheck)) {
-    failures.push('tasks/current-task.md: Regression Self-Check must record the task-specific checks that prevent known feedback regressions');
-  }
-}
-
-function hasMeaningfulFeedbackReview(value) {
-  const text = normalizedSectionText(value);
-  return text.length >= 40 && /(config\/feedback-ledger\.json|feedback-ledger|反馈|ledger)/i.test(text);
-}
-
-function hasMeaningfulRegressionSelfCheck(value) {
-  const text = normalizedSectionText(value);
-  return text.length >= 40 && /(自检|self-check|regression|回归|检查|validate|harness|验证)/i.test(text);
-}
-
-function validateRetrospectivePlanSection(content, failures) {
-  const retrospectivePlan = sectionText(content, 'Retrospective Plan').trim();
-  if (!hasMeaningfulRetrospectivePlan(retrospectivePlan)) {
-    failures.push('tasks/current-task.md: non-trivial tasks require a meaningful Retrospective Plan covering retrospective records, run_type, or index updates');
-  }
-}
-
-function validateDailyContentContractTask(content, failures) {
-  const normalized = normalizedSectionText(content);
-  const touchesDailyContentContract = /(daily content contract|REQ-00[1678]|REQ-010|GitHub Trending|Builder\/X|hot blogs|daily_tracking|daily tracking|每日追踪|今日判断|趋势主题|重点 story|精选博客)/i.test(normalized);
-  if (!touchesDailyContentContract) {
-    return;
-  }
-
-  const validationCommands = sectionText(content, 'Validation Commands');
-  if (!/check-daily-content-contract\.mjs|content:contract/i.test(validationCommands)) {
-    failures.push('tasks/current-task.md: daily content contract work must list scripts/check-daily-content-contract.mjs or npm run content:contract in Validation Commands');
-  }
-}
-
-function hasMeaningfulRetrospectivePlan(value) {
-  const text = normalizedSectionText(value);
-  return text.length >= 40
-    && /(retrospective|retrospectives|\u590d\u76d8|run_type|daily_publish|project_iteration|rollup)/i.test(text)
-    && /(retrospectives\/index\.json|record|index|daily_publish|project_iteration|rollup|non-trivial|\u975e\u5e73\u51e1)/i.test(text);
-}
-
-function normalizedSectionText(value) {
-  return String(value)
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/`[^`]*`/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function hasFailureEvidence(value) {
-  return /fail|failed|failing|red evidence|expected initial|not ok|AssertionError|ERR_|exit code|non-zero|\u5931\u8d25|\u672a\u901a\u8fc7/i.test(value);
-}
-
-function firstNonEmptyLine(value) {
-  return String(value)
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .find((line) => line.length > 0) || '';
-}
-
-function sectionText(content, heading) {
-  const lines = content.split(/\r?\n/);
-  const headingPattern = new RegExp(`^##\\s+${escapeRegExp(heading)}\\s*$`, 'i');
-  const nextHeadingPattern = /^##\s+\S/;
-  const start = lines.findIndex((line) => headingPattern.test(line));
-  if (start === -1) return '';
-
-  const collected = [];
-  for (let index = start + 1; index < lines.length; index += 1) {
-    if (nextHeadingPattern.test(lines[index])) break;
-    collected.push(lines[index]);
-  }
-  return collected.join('\n');
-}
-
-function escapeRegExp(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return typeof value.id === 'string'
+    && value.id.trim().length > 0
+    && typeof value.behavior === 'string'
+    && value.behavior.trim().length > 0
+    && typeof value.status === 'string'
+    && Object.prototype.hasOwnProperty.call(value, 'acceptance')
+    && Object.prototype.hasOwnProperty.call(value, 'validation')
+    && Object.prototype.hasOwnProperty.call(value, 'evidence');
 }

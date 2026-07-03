@@ -24,7 +24,27 @@
       "stop_conditions": [
         "Required source audit fields cannot be reconstructed.",
         "The draft would bypass candidate-pool or freshness gates."
-      ]
+      ],
+      "behavior": "Collect and audit daily AI sources before writing the structured report.",
+      "validation": {
+        "commands": [
+          "npm run prompt:build -- YYYY-MM-DD",
+          "npm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
+          "npm run discover:builders -- --date YYYY-MM-DD --limit 20",
+          "npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
+          "npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          ".tmp/source-candidates-YYYY-MM-DD.json",
+          ".tmp/daily-report.json"
+        ],
+        "stop_conditions": [
+          "Required source audit fields cannot be reconstructed.",
+          "The draft would bypass candidate-pool or freshness gates."
+        ]
+      }
     },
     {
       "id": "structured-report-write",
@@ -44,7 +64,22 @@
       ],
       "stop_conditions": [
         "`candidate_pool_missing`, `candidate_pool_reference_invalid`, or `freshness_gate_failed` is returned."
-      ]
+      ],
+      "behavior": "Normalize the structured draft into report data and candidate audit files.",
+      "validation": {
+        "commands": [
+          "npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "reports-data/YYYY/MM/YYYY-MM-DD.json",
+          "reports-data/YYYY/MM/YYYY-MM-DD.candidates.json"
+        ],
+        "stop_conditions": [
+          "`candidate_pool_missing`, `candidate_pool_reference_invalid`, or `freshness_gate_failed` is returned."
+        ]
+      }
     },
     {
       "id": "feedback-durability-gate",
@@ -68,7 +103,26 @@
       "stop_conditions": [
         "A user-confirmed persistent feedback item has no real scope file, executable validate-chain command, or existing test assertion.",
         "Prompt module metadata drifts from the manifest."
-      ]
+      ],
+      "behavior": "Turn user-confirmed recurring feedback into durable validation-backed project behavior.",
+      "validation": {
+        "commands": [
+          "npm run feedback:validate",
+          "npm run validate"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "config/feedback-ledger.json",
+          "scripts/validate-feedback-contract.mjs",
+          "prompts/ai-daily/modules.json",
+          "schemas/report.schema.json"
+        ],
+        "stop_conditions": [
+          "A user-confirmed persistent feedback item has no real scope file, executable validate-chain command, or existing test assertion.",
+          "Prompt module metadata drifts from the manifest."
+        ]
+      }
     },
     {
       "id": "static-html-build",
@@ -93,7 +147,27 @@
       "stop_conditions": [
         "The report renderer falls back to a hand-written daily template.",
         "`npm run validate` fails."
-      ]
+      ],
+      "behavior": "Render the daily report to static GitHub Pages output through effective-interact.",
+      "validation": {
+        "commands": [
+          "npm run build",
+          "npm run validate"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "docs/reports/YYYY/MM/YYYY-MM-DD.html",
+          "docs/data/YYYY/MM/YYYY-MM-DD.json",
+          "docs/data/YYYY/MM/YYYY-MM-DD.candidates.json",
+          "docs/feed.json",
+          "docs/index.html"
+        ],
+        "stop_conditions": [
+          "The report renderer falls back to a hand-written daily template.",
+          "`npm run validate` fails."
+        ]
+      }
     },
     {
       "id": "publish-preflight",
@@ -115,7 +189,24 @@
       "stop_conditions": [
         "Local changes cannot be preserved safely.",
         "The task would require `git reset --hard`, force push, or overwriting user work."
-      ]
+      ],
+      "behavior": "Prepare or inspect the publish worktree before publishing artifacts.",
+      "validation": {
+        "commands": [
+          "npm run publish:prepare-worktree -- --message \"chore: save local changes before AI daily report YYYY-MM-DD\"",
+          "npm run publish:preflight"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "git status --short --branch output",
+          "publish_status.publish_error when present"
+        ],
+        "stop_conditions": [
+          "Local changes cannot be preserved safely.",
+          "The task would require `git reset --hard`, force push, or overwriting user work."
+        ]
+      }
     },
     {
       "id": "publish-dry-run",
@@ -136,7 +227,23 @@
       "stop_conditions": [
         "Dry-run reports non-publisher-managed changes.",
         "Dry-run cannot determine the publish plan."
-      ]
+      ],
+      "behavior": "Preview publish artifacts, commit message, and expected Pages URL.",
+      "validation": {
+        "commands": [
+          "npm run publish:dry-run"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "dry-run file plan",
+          "expected GitHub Pages URL"
+        ],
+        "stop_conditions": [
+          "Dry-run reports non-publisher-managed changes.",
+          "Dry-run cannot determine the publish plan."
+        ]
+      }
     },
     {
       "id": "publish-execute",
@@ -159,7 +266,25 @@
         "The user has not explicitly authorized real publish.",
         "The publish would write non-publisher-managed files.",
         "No suitable GitHub token is available for API fallback."
-      ]
+      ],
+      "behavior": "Publish generated artifacts to `main` only after explicit confirmation.",
+      "validation": {
+        "commands": [
+          "npm run publish -- confirm-push YYYY-MM-DD",
+          "npm run publish:github-api -- confirm-push YYYY-MM-DD"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "remote `main` commit containing publisher-managed files",
+          "GitHub Pages URL verification result"
+        ],
+        "stop_conditions": [
+          "The user has not explicitly authorized real publish.",
+          "The publish would write non-publisher-managed files.",
+          "No suitable GitHub token is available for API fallback."
+        ]
+      }
     },
     {
       "id": "daily-publish-harness",
@@ -186,7 +311,28 @@
       "stop_conditions": [
         "Harness files no longer match the daily publishing scripts.",
         "Validation evidence is missing from the handoff."
-      ]
+      ],
+      "behavior": "Keep Codex task state, runbook, and validation gates aligned with the daily publishing workflow.",
+      "validation": {
+        "commands": [
+          "npm run harness:init",
+          "node scripts/harness-validate.mjs",
+          "npm run validate"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "tasks/current-task.example.md",
+          "tasks/daily-publish-runbook.md",
+          "tasks/templates/daily-publish-task.md",
+          "progress.example.md",
+          "session-handoff.example.md"
+        ],
+        "stop_conditions": [
+          "Harness files no longer match the daily publishing scripts.",
+          "Validation evidence is missing from the handoff."
+        ]
+      }
     }
   ],
   "worktree_policy": {
