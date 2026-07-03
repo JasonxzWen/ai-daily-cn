@@ -10,6 +10,7 @@ import {
   createDailyCodexDagNodeResult,
   createDailyCodexDagDryRun,
   createDailyCodexDagPlan,
+  resolveDailyCodexDagCommandRuntimePlan,
   validateDailyCodexDag,
   validateDailyCodexDagNodeResult,
   validateDailyCodexDagRunSummary,
@@ -266,6 +267,146 @@ test("daily codex DAG future node execution runtime policy accepts valid synthet
   }
 });
 
+test("daily codex DAG command runtime plan resolves controlled node runtime without execution", async () => {
+  const manifest = await loadManifest();
+  const score = node(manifest, "score");
+  const spec = buildFutureNodeExecutionSpec(score, {
+    cwd: "scripts",
+    invocation: {
+      kind: "command",
+      argv: ["node", "scripts/validate-daily-codex-dag.mjs", "--node", score.id]
+    }
+  });
+
+  const result = resolveDailyCodexDagCommandRuntimePlan({
+    rootDir,
+    node: score,
+    spec,
+    nodeExecutablePath: process.execPath
+  });
+
+  const expectedScriptPath = path.resolve(rootDir, "scripts", "validate-daily-codex-dag.mjs");
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.deepEqual(result.plan, {
+    runner: "node",
+    command: process.execPath,
+    args: [expectedScriptPath, "--node", score.id],
+    cwd: path.resolve(rootDir, "scripts"),
+    shell: false,
+    script_path: expectedScriptPath,
+    argv_tail: ["--node", score.id]
+  });
+  assert.notEqual(result.plan.script_path, path.resolve(rootDir, "scripts", "scripts", "validate-daily-codex-dag.mjs"));
+});
+
+test("daily codex DAG command runtime plan rejects unsafe or unsupported command inputs", async () => {
+  const manifest = await loadManifest();
+  const score = node(manifest, "score");
+  const baseSpec = buildFutureNodeExecutionSpec(score);
+  const cases = [
+    {
+      name: "mismatched executor",
+      overrides: {
+        executor: "codex_cli",
+        invocation: {
+          kind: "command",
+          argv: ["node", "scripts/validate-daily-codex-dag.mjs", score.id]
+        }
+      },
+      expected: "executor must be command"
+    },
+    {
+      name: "unsupported runner",
+      overrides: {
+        invocation: {
+          kind: "command",
+          argv: ["npm", "run", "future-node"]
+        }
+      },
+      expected: "invocation.argv[0] must be node"
+    },
+    {
+      name: "shell-ish token",
+      overrides: {
+        invocation: {
+          kind: "command",
+          argv: ["node", "scripts/validate-daily-codex-dag.mjs", "$(whoami)"]
+        }
+      },
+      expected: "entries must not contain shell control operators"
+    },
+    {
+      name: "unsafe script path",
+      overrides: {
+        invocation: {
+          kind: "command",
+          argv: ["node", "../scripts/validate-daily-codex-dag.mjs"]
+        }
+      },
+      expected: "invocation.argv[1] must be a repo-relative Node script path"
+    },
+    {
+      name: "non-scripts path",
+      overrides: {
+        invocation: {
+          kind: "command",
+          argv: ["node", "src/daily-codex-dag.js"]
+        }
+      },
+      expected: "invocation.argv[1] must be under scripts/"
+    },
+    {
+      name: "invalid script extension",
+      overrides: {
+        invocation: {
+          kind: "command",
+          argv: ["node", "scripts/future-dag-node.txt"]
+        }
+      },
+      expected: "invocation.argv[1] must end with .mjs or .js"
+    },
+    {
+      name: "unsafe cwd",
+      overrides: {
+        cwd: "../outside"
+      },
+      expected: 'cwd must be "." or a safe repo-relative path'
+    }
+  ];
+
+  for (const item of cases) {
+    const result = resolveDailyCodexDagCommandRuntimePlan({
+      rootDir,
+      node: score,
+      spec: {
+        ...baseSpec,
+        ...item.overrides
+      }
+    });
+    assert.equal(result.ok, false, item.name);
+    assert.equal(result.plan, null, item.name);
+    assert(
+      result.failures.some((failure) => failure.includes(item.expected)),
+      `${item.name}\nexpected: ${item.expected}\nactual:\n${result.failures.join("\n")}`
+    );
+  }
+
+  for (const nodeExecutablePath of ["node", ""]) {
+    const invalidRuntime = resolveDailyCodexDagCommandRuntimePlan({
+      rootDir,
+      node: score,
+      spec: baseSpec,
+      nodeExecutablePath
+    });
+    assert.equal(invalidRuntime.ok, false);
+    assert.equal(invalidRuntime.plan, null);
+    assert(
+      invalidRuntime.failures.some((failure) => failure.includes("nodeExecutablePath must be an absolute path")),
+      invalidRuntime.failures.join("\n")
+    );
+  }
+});
+
 test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {
   const manifest = await loadManifest();
   const first = await createDailyCodexDagDryRun({
@@ -284,6 +425,7 @@ test("daily codex DAG dry-run helper is deterministic and level ordered", async 
   assert.equal(first.ok, true, first.failures.join("\n"));
   assert.deepEqual(first, second);
   assert.equal(first.mode, "daily_codex_dag_dry_run");
+  assert.equal(Object.hasOwn(first, "node_runtime_plans"), false);
   assert.equal(first.report_date, "2026-07-03");
   assert.equal(first.generated_at, fixedNow);
   assert.equal(first.run.final_status, "dry_run_only");
@@ -529,6 +671,7 @@ test("daily codex DAG contract-run helper emits validated skipped node results",
   assert.deepEqual(result.run.skipped_nodes, result.run.planned_nodes);
   assert.deepEqual(result.run.blocked_nodes, []);
   assert(!Object.prototype.hasOwnProperty.call(result.run, "completed_nodes"));
+  assert.equal(Object.hasOwn(result, "node_runtime_plans"), false);
   assert.deepEqual(result.executed_commands, []);
   assert.deepEqual(result.codex_invocations, []);
   await assertValidDagRunSummary(result);

@@ -144,6 +144,85 @@ export async function createDailyCodexDagPlan(options = {}) {
   };
 }
 
+export function resolveDailyCodexDagCommandRuntimePlan(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const node = options.node || {};
+  const spec = options.spec || options.nodeExecutionSpec || node.execution_contract?.node_execution_spec;
+  const nodeId = nonEmptyString(node.id) ? node.id : "<unknown>";
+  const failures = [];
+  const label = `daily codex DAG command runtime plan node ${nodeId}`;
+
+  if (!isPlainObject(spec)) {
+    failures.push(`${label} spec must be an object.`);
+    return { ok: false, failures, plan: null };
+  }
+  if (spec.executor !== "command") {
+    failures.push(`${label} executor must be command.`);
+  }
+  if (spec.invocation?.kind !== "command") {
+    failures.push(`${label} invocation.kind must be command.`);
+    return { ok: false, failures, plan: null };
+  }
+
+  validateExecutionStringArray({
+    values: spec.invocation.argv,
+    label: `${label} invocation.argv`,
+    failures,
+    requireNonEmptyArray: true
+  });
+  const commandPolicy = validateCommandInvocationPolicyShape({
+    argv: spec.invocation.argv,
+    failures,
+    label: `${label} invocation.argv`
+  });
+
+  if (!isSafeExecutionRelativePath(spec.cwd, { allowDot: true })) {
+    failures.push(`${label} cwd must be "." or a safe repo-relative path.`);
+  }
+
+  const nodeExecutablePath = Object.prototype.hasOwnProperty.call(options, "nodeExecutablePath")
+    ? options.nodeExecutablePath
+    : process.execPath;
+  if (!nonEmptyString(nodeExecutablePath) || !path.isAbsolute(nodeExecutablePath)) {
+    failures.push(`${label} nodeExecutablePath must be an absolute path.`);
+  }
+
+  const cwdRelativePath = spec.cwd === "." ? "." : spec.cwd;
+  const resolvedCwd = isSafeExecutionRelativePath(cwdRelativePath, { allowDot: true })
+    ? path.resolve(rootDir, cwdRelativePath)
+    : null;
+  if (resolvedCwd && !isPathWithinOrEqual({ parent: rootDir, child: resolvedCwd })) {
+    failures.push(`${label} cwd must resolve inside the repository root.`);
+  }
+
+  const scriptRelativePath = commandPolicy.scriptPath;
+  const resolvedScriptPath = scriptRelativePath && isSafeExecutionRelativePath(scriptRelativePath)
+    ? path.resolve(rootDir, scriptRelativePath)
+    : null;
+  if (resolvedScriptPath && !isPathWithinOrEqual({ parent: rootDir, child: resolvedScriptPath })) {
+    failures.push(`${label} script_path must resolve inside the repository root.`);
+  }
+
+  if (failures.length > 0) {
+    return { ok: false, failures, plan: null };
+  }
+
+  const argvTail = spec.invocation.argv.slice(2);
+  return {
+    ok: true,
+    failures,
+    plan: {
+      runner: "node",
+      command: nodeExecutablePath,
+      args: [resolvedScriptPath, ...argvTail],
+      cwd: resolvedCwd,
+      shell: false,
+      script_path: resolvedScriptPath,
+      argv_tail: argvTail
+    }
+  };
+}
+
 export async function createDailyCodexDagDryRun(options = {}) {
   const reportDate = requiredReportDate(options.reportDate || options.date);
   const generatedAt = toIsoTimestamp(options.now || new Date());
@@ -1933,42 +2012,65 @@ function validateExecutionStringArray({ values, label, failures, requireNonEmpty
 async function validateCommandInvocationPolicy({ rootDir, node, argv, failures, checkedFiles }) {
   if (!Array.isArray(argv) || argv.length === 0) return;
   const label = `config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation.argv`;
+  const commandPolicy = validateCommandInvocationPolicyShape({ argv, failures, label });
+  if (commandPolicy.shouldCheckExistingFile) {
+    await validateExistingRelativeFile({
+      rootDir,
+      relativePath: commandPolicy.scriptPath,
+      label: `node ${node.id} node_execution_spec.invocation.argv[1]`,
+      failures,
+      checkedFiles
+    });
+  }
+}
+
+function validateCommandInvocationPolicyShape({ argv, failures, label }) {
+  const result = {
+    ok: true,
+    scriptPath: null,
+    shouldCheckExistingFile: false
+  };
+  if (!Array.isArray(argv) || argv.length === 0) {
+    result.ok = false;
+    return result;
+  }
   for (const token of argv) {
     if (typeof token === "string" && isShellishCommandToken(token)) {
       failures.push(`${label} entries must not contain shell control operators or redirection tokens.`);
+      result.ok = false;
       break;
     }
   }
   const runner = argv[0];
   if (runner !== "node") {
     failures.push(`${label}[0] must be node until live executor command policy supports additional runners.`);
-    return;
+    result.ok = false;
+    return result;
   }
   const scriptPath = argv[1];
+  result.scriptPath = scriptPath;
   if (!nonBlankString(scriptPath)) {
     failures.push(`${label}[1] must be a repo-relative Node script path under scripts/.`);
-    return;
+    result.ok = false;
+    return result;
   }
   if (!isSafeExecutionRelativePath(scriptPath)) {
     failures.push(`${label}[1] must be a repo-relative Node script path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments.`);
-    return;
+    result.ok = false;
+    return result;
   }
   const underScripts = scriptPath === "scripts" || scriptPath.startsWith("scripts/");
   if (!underScripts) {
     failures.push(`${label}[1] must be under scripts/.`);
-  }
-  if (underScripts) {
-    await validateExistingRelativeFile({
-      rootDir,
-      relativePath: scriptPath,
-      label: `node ${node.id} node_execution_spec.invocation.argv[1]`,
-      failures,
-      checkedFiles
-    });
+    result.ok = false;
+  } else {
+    result.shouldCheckExistingFile = true;
   }
   if (!scriptPath.endsWith(".mjs") && !scriptPath.endsWith(".js")) {
     failures.push(`${label}[1] must end with .mjs or .js.`);
+    result.ok = false;
   }
+  return result;
 }
 
 function isShellishCommandToken(token) {
@@ -2245,6 +2347,13 @@ function isSafeExecutionRelativePath(value, options = {}) {
   if (value === "." || value.startsWith("/") || /^[a-zA-Z]:/.test(value)) return false;
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)) return false;
   return value.split("/").every((part) => part && part !== "." && part !== ".." && !part.includes(":"));
+}
+
+function isPathWithinOrEqual({ parent, child }) {
+  const resolvedParent = path.resolve(parent);
+  const resolvedChild = path.resolve(child);
+  const relative = path.relative(resolvedParent, resolvedChild);
+  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }
 
 function normalizePortablePath(value) {
