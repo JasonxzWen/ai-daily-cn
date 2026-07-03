@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "mode": "daily_codex_dag_node_result",
+  "report_date": "2026-07-03",
+  "run_id": "daily-codex-dag:2026-07-03:fixture",
+  "manifest_name": "daily-codex-dag-contract",
+  "manifest_schema_version": 1,
+  "node_id": "score",
+  "node_kind": "command",
+  "runner_stage_ref": "admit",
+  "result_scope": "node",
+  "execution_id": "daily-codex-dag:2026-07-03:fixture:score:node",
+  "status": "success",
+  "downstream_disposition": "continue",
+  "started_at": "2026-07-03T08:00:00.000Z",
+  "finished_at": "2026-07-03T08:00:02.500Z",
+  "duration_ms": 2500,
+  "attempts_started": 1,
+  "max_attempts": 2,
+  "attempts_exhausted": false,
+  "dependency_results": [
+    {
+      "node_id": "classify-tag-entity",
+      "execution_id": "daily-codex-dag:2026-07-03:fixture:classify-tag-entity:node",
+      "status": "success",
+      "required": true,
+      "downstream_disposition": "continue"
+    }
+  ],
+  "declared_inputs": [
+    {
+      "path": ".tmp/daily-codex-pipeline/2026-07-03/artifacts/classified-candidates.json",
+      "required": true
+    }
+  ],
+  "declared_outputs": [
+    {
+      "path": ".tmp/daily-codex-pipeline/2026-07-03/artifacts/scored-candidates.json",
+      "required": true
+    }
+  ],
+  "resolved_inputs": [
+    {
+      "path": ".tmp/daily-codex-pipeline/2026-07-03/artifacts/classified-candidates.json",
+      "required": true,
+      "exists": true,
+      "schema_valid": true,
+      "bytes": 4096,
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    }
+  ],
+  "resolved_outputs": [
+    {
+      "path": ".tmp/daily-codex-pipeline/2026-07-03/artifacts/scored-candidates.json",
+      "required": true,
+      "exists": true,
+      "schema_valid": true,
+      "bytes": 2048,
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ],
+  "fanout": null,
+  "barrier": null,
+  "failures": [],
+  "warnings": [],
+  "audit": {
+    "parallel_group": "item-lanes",
+    "resilience_policy_ref": "",
+    "owner_path_scope": "internal_workdir",
+    "public_artifact": false,
+    "validator_version": "daily-codex-dag-node-result-v1"
+  }
+}
