@@ -16,14 +16,14 @@ Update after material sessions, before a new phase, or when validation evidence 
 | Area | Rating | P0/P1/P2 validation status | Browser acceptance status | Agent readability | Test stability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Public article index artifact | A | P0 passed: article contract, privacy scan, build-clean, regular and daily publish-plan assertions, full validate | Deferred; no UI behavior changed | Good | Stable in `tests/article-index.test.js` and `tests/publish.test.js` | Future DAG execution still needs live per-node replay | 2026-07-03 |
-| Daily Codex DAG manifest contract | B | P0/P1 passed: targeted future execution preflight checks and full `npm run validate` passed for this slice | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest/run-summary readiness projection, future node execution spec shape, executor/invocation pairing, cwd/prompt path preflight, mismatch rejection, no-execution contract-run semantics, and artifact binding guards; full regression reported 702 tests, 700 passed, 2 skipped | Full executable 16-node runner migration and live per-node command/Codex execution remain future work; no production node may carry `node_execution_spec` yet | 2026-07-03 |
+| Daily Codex DAG manifest contract | B | P0/P1 passed: targeted future invocation policy checks and full `npm run validate` passed for this slice | Deferred; no UI behavior changed | Good | `tests/daily-codex-dag.test.js` covers manifest/run-summary readiness projection, future node execution spec shape, executor/invocation pairing, cwd/prompt path preflight, Codex prompt existence and file-type rejection, blank argv/args token rejection, production manifest spec absence, mismatch rejection, no-execution contract-run semantics, and artifact binding guards; full regression reported 702 tests, 700 passed, 2 skipped | Full executable 16-node runner migration and live per-node command/Codex execution remain future work; no production node may carry `node_execution_spec` yet | 2026-07-03 |
 
 ## Architecture Layers
 
 | Layer | Rating | Boundary health | Agent readability | Key gaps | Last updated |
 | --- | --- | --- | --- | --- | --- |
 | Public/private artifact boundary | A | `docs/articles.json` is now included in public scans with internal audit field denylist coverage; node result audit metadata is schema-whitelisted before live execution exists | Good | Node result audit is not manifest-aware ownership enforcement; future live node execution still needs artifact emission, manifest/path-scope checks, and privacy checks against real outputs | 2026-07-03 |
-| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, requires per-node `execution_contract.readiness`, projects deterministic execution levels and readiness into dry-run/contract-run summaries, validates run-summary envelopes with a dedicated schema plus semantic validators, defines schema/semantic validation for executable node result contracts, defines a future `execution_contract.node_execution_spec` shape with semantic cwd/prompt path preflight, and exposes the non-publishing contract-run through a workflow-validated npm script | Good | Contract-run deliberately emits skipped node-scope results only; `node_executable` readiness is reserved and rejected even with a schema-valid future execution spec until executor migration enables standalone node execution; real command/Codex execution, artifact existence/schema proof, retry execution, fanout item expansion, barrier aggregation, package/workflow production migration, and npm argument ergonomics remain future work | 2026-07-03 |
+| DAG contract layer | B | `config/daily-codex-dag.json` references resilience policy instead of duplicating failure rules, validates artifact path ownership, checks input paths against upstream outputs, requires per-node `execution_contract.readiness`, projects deterministic execution levels and readiness into dry-run/contract-run summaries, validates run-summary envelopes with a dedicated schema plus semantic validators, defines schema/semantic validation for executable node result contracts, defines a future `execution_contract.node_execution_spec` shape with semantic cwd/prompt path preflight and invocation input policy, and exposes the non-publishing contract-run through a workflow-validated npm script | Good | Contract-run deliberately emits skipped node-scope results only; `node_executable` readiness is reserved and rejected even with a schema-valid future execution spec until executor migration enables standalone node execution; real command/Codex execution, command allowlists or executable lookup, artifact existence/schema proof from real outputs, retry execution, fanout item expansion, barrier aggregation, package/workflow production migration, and npm argument ergonomics remain future work | 2026-07-03 |
 
 ## Change History
 
@@ -37,10 +37,18 @@ Update after material sessions, before a new phase, or when validation evidence 
 
 ### 2026-07-03
 
+- Change: Added semantic invocation input policy for future DAG node execution specs without enabling execution.
+- Improved: Future Codex CLI `invocation.prompt_template` now must be a safe repo-relative path that exists as a repository file, unsafe prompt paths do not fall through to existence checks, command `argv` and Codex `args` reject blank tokens, and the production manifest is explicitly tested to carry no `node_execution_spec`.
+- Regressed: None known.
+- New gaps: This still does not execute DAG nodes, does not check command executability or allowlists, does not parse command flags, and does not define sandbox/publish combinations, retry/idempotency runtime behavior, real artifact verification, or production manifest specs.
+- Closed gaps: The previously deferred prompt-existence, prompt file-type, and blank invocation-token semantic checks are now covered by targeted DAG tests.
+
+### 2026-07-03
+
 - Change: Added semantic preflight guards for future DAG node execution spec paths without enabling execution.
 - Improved: Future `node_execution_spec.cwd` now accepts only `.` or deterministic repo-relative paths, and Codex CLI `invocation.prompt_template` must also be repo-relative. The validator rejects absolute paths, Windows drive paths, URL-like paths, parent traversal, empty segments, raw backslashes, and colon-containing path segments before any later executor migration can run commands.
 - Regressed: None known.
-- New gaps: This still does not execute DAG nodes and does not check command argv, prompt file existence, sandbox/publish combinations, retry/idempotency runtime behavior, or production manifest specs.
+- New gaps: Previous slice gap at the time: this still did not execute DAG nodes and did not check command argv, prompt file existence, sandbox/publish combinations, retry/idempotency runtime behavior, or production manifest specs. The later invocation-policy slice closes prompt existence and blank invocation-token checks.
 - Closed gaps: The previously noted cwd/path preflight gap is now covered by semantic validation, targeted DAG tests, and full validation.
 
 ### 2026-07-03
