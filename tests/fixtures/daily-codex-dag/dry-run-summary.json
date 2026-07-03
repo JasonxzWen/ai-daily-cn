@@ -29,6 +29,10 @@
         "title": "Fetch source health and raw candidate lanes",
         "kind": "command",
         "execution_status": "planned",
+        "execution_contract": {
+          "readiness": "planned_only",
+          "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+        },
         "plan_status": "planned",
         "level": 0,
         "dependencies": [],

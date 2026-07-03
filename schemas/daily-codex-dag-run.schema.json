@@ -194,6 +194,7 @@
         "title",
         "kind",
         "execution_status",
+        "execution_contract",
         "plan_status",
         "level",
         "dependencies",
@@ -209,6 +210,7 @@
         "title": { "type": "string", "minLength": 1 },
         "kind": { "enum": ["command", "codex_exec", "fanout", "barrier"] },
         "execution_status": { "enum": ["planned", "mapped"] },
+        "execution_contract": { "$ref": "#/$defs/execution_contract" },
         "plan_status": { "enum": ["planned", "mapped"] },
         "level": { "type": "integer", "minimum": 0 },
         "dependencies": {
@@ -228,6 +230,15 @@
         "parallel_group": { "type": "string" },
         "public_artifact": { "type": "boolean" },
         "owner_path_scope": { "enum": ["internal_workdir", "docs", "reports_data", "none"] }
+      }
+    },
+    "execution_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["readiness", "summary"],
+      "properties": {
+        "readiness": { "enum": ["planned_only", "legacy_mapped", "node_executable"] },
+        "summary": { "type": "string", "minLength": 1 }
       }
     },
     "run": {

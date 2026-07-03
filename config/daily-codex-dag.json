@@ -9,6 +9,10 @@
       "title": "Fetch source health and raw candidate lanes",
       "kind": "command",
       "execution_status": "planned",
+      "execution_contract": {
+        "readiness": "planned_only",
+        "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+      },
       "dependencies": [],
       "inputs": [],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json", "required": true }],
@@ -32,6 +36,10 @@
       "title": "Parse source payloads into extracted candidate records",
       "kind": "command",
       "execution_status": "planned",
+      "execution_contract": {
+        "readiness": "planned_only",
+        "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+      },
       "dependencies": ["fetch-source-health"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json", "required": true }],
@@ -55,6 +63,10 @@
       "title": "Normalize URLs and canonical candidate identities",
       "kind": "command",
       "execution_status": "planned",
+      "execution_contract": {
+        "readiness": "planned_only",
+        "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+      },
       "dependencies": ["parse-extract"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json", "required": true }],
@@ -78,6 +90,10 @@
       "title": "Classify domain, flavor, channel, tags, and entities",
       "kind": "codex_exec",
       "execution_status": "planned",
+      "execution_contract": {
+        "readiness": "planned_only",
+        "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+      },
       "dependencies": ["normalize-canonicalize"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json", "required": true }],
@@ -101,6 +117,10 @@
       "title": "Score candidate relevance and public value",
       "kind": "command",
       "execution_status": "planned",
+      "execution_contract": {
+        "readiness": "planned_only",
+        "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+      },
       "dependencies": ["classify-tag-entity"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/scored-candidates.json", "required": true }],
@@ -124,6 +144,10 @@
       "title": "Dedupe same story across languages and source variants",
       "kind": "command",
       "execution_status": "planned",
+      "execution_contract": {
+        "readiness": "planned_only",
+        "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+      },
       "dependencies": ["score"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/scored-candidates.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/deduped-candidates.json", "required": true }],
@@ -147,6 +171,10 @@
       "title": "Check freshness and recent publication history",
       "kind": "command",
       "execution_status": "planned",
+      "execution_contract": {
+        "readiness": "planned_only",
+        "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+      },
       "dependencies": ["dedupe-cross-language"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/deduped-candidates.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/fresh-candidates.json", "required": true }],
@@ -170,6 +198,10 @@
       "title": "Verify primary source authority and evidence links",
       "kind": "codex_exec",
       "execution_status": "planned",
+      "execution_contract": {
+        "readiness": "planned_only",
+        "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+      },
       "dependencies": ["freshness-history-check"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/fresh-candidates.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/verified-candidates.json", "required": true }],
@@ -193,6 +225,10 @@
       "title": "Admit or reject report-worthy items",
       "kind": "codex_exec",
       "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Legacy mapped runner stage; contract-run validates declared shape but this is not standalone node execution."
+      },
       "dependencies": ["verify-source-authority"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/verified-candidates.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/admission.json", "required": true }],
@@ -216,6 +252,10 @@
       "title": "Summarize each admitted item in isolated Codex contexts",
       "kind": "fanout",
       "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Legacy mapped runner stage; contract-run validates declared shape but this is not standalone node execution."
+      },
       "dependencies": ["admit-reject"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/admission.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/summaries/{item_id}.json", "required": true }],
@@ -243,6 +283,10 @@
       "title": "Audit summary quality and public copy safety",
       "kind": "barrier",
       "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Legacy mapped runner stage; contract-run validates declared shape but this is not standalone node execution."
+      },
       "dependencies": ["per-item-summary"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/summaries/{item_id}.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/quality-audit.json", "required": true }],
@@ -269,6 +313,10 @@
       "title": "Repair or regenerate scoped public text defects",
       "kind": "codex_exec",
       "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Legacy mapped runner stage; contract-run validates declared shape but this is not standalone node execution."
+      },
       "dependencies": ["quality-audit"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/quality-audit.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/repair-result.json", "required": true }],
@@ -292,6 +340,10 @@
       "title": "Persist public article library data",
       "kind": "command",
       "execution_status": "planned",
+      "execution_contract": {
+        "readiness": "planned_only",
+        "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+      },
       "dependencies": ["repair-regenerate"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/repair-result.json", "required": true }],
       "outputs": [{ "path": "docs/articles.json", "required": true }],
@@ -315,6 +367,10 @@
       "title": "Assemble normalized daily report JSON",
       "kind": "codex_exec",
       "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Legacy mapped runner stage; contract-run validates declared shape but this is not standalone node execution."
+      },
       "dependencies": ["repair-regenerate"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/repair-result.json", "required": true }],
       "outputs": [{ "path": "reports-data/{yyyy}/{mm}/{report_date}.json", "required": true }],
@@ -338,6 +394,10 @@
       "title": "Build public cards, pages, feed, and indexes",
       "kind": "command",
       "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Legacy mapped runner stage; contract-run validates declared shape but this is not standalone node execution."
+      },
       "dependencies": ["persist-article-db", "assemble-daily-edition"],
       "inputs": [
         { "path": "docs/articles.json", "required": true },
@@ -367,6 +427,10 @@
       "title": "Validate publish plan, publish, verify, and clean up",
       "kind": "command",
       "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Legacy mapped runner stage; contract-run validates declared shape but this is not standalone node execution."
+      },
       "dependencies": ["build-cards-page"],
       "inputs": [{ "path": "docs/reports/{yyyy}/{mm}/{report_date}.html", "required": true }],
       "outputs": [],

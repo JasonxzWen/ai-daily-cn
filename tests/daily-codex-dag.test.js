@@ -79,6 +79,7 @@ test("daily codex DAG plan projection is deterministic and topological", async (
   const score = plan.nodes.find((item) => item.id === "score");
   assert.deepEqual(Object.keys(score).sort(), [
     "dependencies",
+    "execution_contract",
     "execution_status",
     "id",
     "inputs",
@@ -93,7 +94,16 @@ test("daily codex DAG plan projection is deterministic and topological", async (
     "title"
   ]);
   assert.equal(score.plan_status, "planned");
-  assert.equal(plan.nodes.find((item) => item.id === "admit-reject").plan_status, "mapped");
+  assert.deepEqual(score.execution_contract, {
+    readiness: "planned_only",
+    summary: "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
+  });
+  const admitReject = plan.nodes.find((item) => item.id === "admit-reject");
+  assert.equal(admitReject.plan_status, "mapped");
+  assert.deepEqual(admitReject.execution_contract, {
+    readiness: "legacy_mapped",
+    summary: "Legacy mapped runner stage; contract-run validates declared shape but this is not standalone node execution."
+  });
 });
 
 test("daily codex DAG plan projection refuses invalid manifests without throwing", async () => {
@@ -265,6 +275,13 @@ test("daily codex DAG dry-run summary semantic validator rejects schema-valid co
       failure: "level must match plan.levels"
     },
     {
+      name: "planned node readiness mismatch",
+      mutate: (value) => {
+        value.plan.nodes[0].execution_contract.readiness = "legacy_mapped";
+      },
+      failure: "with execution_status planned must use execution_contract.readiness planned_only"
+    },
+    {
       name: "completed nodes are non-empty",
       mutate: (value) => {
         value.run.completed_nodes = [value.plan.nodes[0].id];
@@ -382,6 +399,8 @@ test("daily codex DAG contract-run helper emits validated skipped node results",
   assert.deepEqual(result.executed_commands, []);
   assert.deepEqual(result.codex_invocations, []);
   await assertValidDagRunSummary(result);
+  assert.equal(result.plan.nodes.find((item) => item.id === "score").execution_contract.readiness, "planned_only");
+  assert.equal(result.plan.nodes.find((item) => item.id === "admit-reject").execution_contract.readiness, "legacy_mapped");
 
   const resultByNodeId = new Map(result.node_results.map((item) => [item.node_id, item]));
   for (const [index, nodeResult] of result.node_results.entries()) {
@@ -489,6 +508,13 @@ test("daily codex DAG contract-run semantic validator rejects misleading executi
         value.fanout_expansions = [];
       },
       failure: "fanout_expansions must list fanout/barrier plan nodes"
+    },
+    {
+      name: "node executable readiness is not allowed",
+      mutate(value) {
+        value.plan.nodes.find((item) => item.id === "admit-reject").execution_contract.readiness = "node_executable";
+      },
+      failure: "execution_contract.readiness node_executable requires a complete node-level execution spec"
     }
   ];
 
@@ -1298,6 +1324,27 @@ test("daily codex DAG validator catches structural and boundary regressions", as
         node(manifest, "admit-reject").resilience_policy_ref = "";
       },
       expected: "node admit-reject uses resilience_policy_ref mode without resilience_policy_ref"
+    },
+    {
+      name: "planned node with legacy mapped readiness",
+      mutate(manifest) {
+        node(manifest, "score").execution_contract.readiness = "legacy_mapped";
+      },
+      expected: "planned node score must use execution_contract.readiness planned_only"
+    },
+    {
+      name: "mapped node with planned-only readiness",
+      mutate(manifest) {
+        node(manifest, "admit-reject").execution_contract.readiness = "planned_only";
+      },
+      expected: "mapped node admit-reject must use execution_contract.readiness legacy_mapped"
+    },
+    {
+      name: "node executable readiness requires future execution spec",
+      mutate(manifest) {
+        node(manifest, "admit-reject").execution_contract.readiness = "node_executable";
+      },
+      expected: "node admit-reject execution_contract.readiness node_executable requires a complete node-level execution spec"
     },
     {
       name: "missing resilience policy stage",

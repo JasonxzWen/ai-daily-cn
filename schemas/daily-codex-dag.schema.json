@@ -24,6 +24,7 @@
         "title",
         "kind",
         "execution_status",
+        "execution_contract",
         "dependencies",
         "inputs",
         "outputs",
@@ -41,6 +42,7 @@
         "title": { "type": "string", "minLength": 1 },
         "kind": { "enum": ["command", "codex_exec", "fanout", "barrier"] },
         "execution_status": { "enum": ["planned", "mapped"] },
+        "execution_contract": { "$ref": "#/$defs/executionContract" },
         "dependencies": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
@@ -100,6 +102,15 @@
             }
           }
         }
+      }
+    },
+    "executionContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["readiness", "summary"],
+      "properties": {
+        "readiness": { "enum": ["planned_only", "legacy_mapped", "node_executable"] },
+        "summary": { "type": "string", "minLength": 1 }
       }
     },
     "artifact": {
