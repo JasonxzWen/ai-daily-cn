@@ -1,27 +1,24 @@
 # Definition Of Done
 
-A Codex task is done only when the repository proves it.
+A Codex task is done only when the worktree proves it.
 
-- `npm run harness:init` has seeded local task-state files when needed.
-- `tasks/current-task.md` is the single authoritative current-task spec for the current worktree.
-- Non-trivial tasks state `Task Class`, spec, acceptance criteria, allowed paths, forbidden paths, validation commands, and handoff requirements before implementation.
-- Non-trivial tasks record a pre-implementation `Red Test` failure, or a justified `Deterministic Substitute` when direct red testing is not practical.
-- Trivial tasks include `Task Class: trivial` and a concrete `Trivial Justification`.
-- Every task that modifies repository files records `Feedback Ledger Review` after checking `config/feedback-ledger.json` and `docs/feedback-buglist-quick-reference.md`.
-- Every handoff records `Regression Self-Check` with concrete checks against applicable user-reported issues.
+- The goal and non-goals are stated in `.harness-hub/state/current-task.md`.
+- Requirement intake, selected direction, rejected alternatives, target spec, open questions, and alignment status are recorded for change work.
 - Acceptance criteria are satisfied by direct evidence.
+- The P0/P1/P2 test matrix was defined before implementation; P0 passed, P1 was run or risk-assessed, and P2 was run or explicitly deferred.
 - Changed files stay within allowed paths and avoid forbidden paths.
-- For material change work, requirement intake, selected direction, rejected alternatives, target spec, open questions, and alignment status are recorded before implementation.
 - P0 validation has passed before handoff; P1 checks are run or risk-assessed; P2 hardening is run or explicitly deferred.
-- The dev server, smoke command, build, test, or equivalent validation path has been run when relevant.
-- Web user-visible changes include browser acceptance against the local app, with URL, scenario, viewport, console/network findings, and screenshot or trace evidence when useful.
-- Harness maintenance runs or explicitly skips a read-only Harness Hub startup check.
-- Material work has agentic loop evidence or an explicit skip reason: producer/verifier/arbiter separation, deterministic check or delegated-agent evidence, and the main agent decision.
-- Material changes have finish closeout evidence: final independent review or explicit skip reason, technical-debt/drift findings, and insight recommendations or explicit skip reason.
+- Static checks, runtime checks, and the relevant user-flow or end-to-end path have been run when relevant.
+- Web user-visible changes include agent-run browser acceptance against the local app, with URL, scenario, viewport, console/network findings, and screenshot or trace evidence when useful.
+- Read-only Harness Hub startup check (`harness-hub check . --json`) has been run or explicitly skipped with a reason.
+- Standard startup path still works or has an explicit, recorded blocker.
+- Validation evidence records each command's status, exit code, passed/failed counts when available, output summary or path, and related checkpoint commit.
+- Runtime logs, health checks, or failure messages that informed the result are captured in progress or handoff state.
+- Material work has Agentic loop evidence or an explicit skip reason: producer/verifier/arbiter separation, delegated-agent or deterministic-check evidence, and the main agent's decision.
+- If a PR was created or updated, PR status records mergeability, CI/check-run status, conflicts, branch-protection blockers, any in-scope fixes, validation reruns, and whether the remaining blocker requires user/external action.
+- Material changes have finish closeout evidence: final independent review or explicit skip reason, technical-debt/drift findings, PR/merge-readiness status, and `insight` audit recommendations or skip reason.
+- If commits are permitted, completed atomic work is saved as verified checkpoint commits instead of one large end-of-task commit.
 - Material implementation or review work has an evaluator rubric verdict and any quality snapshot updates.
-- `session-handoff.md` records the outcome, validation, residual risk, and next action for the current worktree.
-- `node scripts/harness-validate.mjs` passes and enforces the current-task SDD/TDD contract.
-- User-confirmed persistent feedback is recorded in `config/feedback-ledger.json` as P1 by default and is bound to existing scope files, a validation command covered by `npm run validate`, and an existing test assertion or runtime gate.
-- `docs/feedback-buglist-quick-reference.md` stays in sync with `config/feedback-ledger.json` when new durable feedback is added.
-- Daily publish work records source discovery coverage, report-write status, build/validate status, dry-run result, and Pages verification when real publish is approved.
-- Production daily HTML remains generated through `.codex/skills/effective-interact` in `pre-rendered` mode.
+- Decision-level changes are recorded in `.harness-hub/state/decisions.md`.
+- `.harness-hub/state/session-handoff.md` records the outcome, validation, residual risk, and next action.
+- OpenSpec is used only when the task affects public contracts, cross-module architecture, publishing side effects, irreversible decisions, or long-lived specs.
