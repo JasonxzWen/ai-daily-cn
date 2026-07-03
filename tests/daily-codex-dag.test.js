@@ -6,11 +6,13 @@ import path from "node:path";
 import test from "node:test";
 import Ajv from "ajv/dist/2020.js";
 import {
+  createDailyCodexDagContractRun,
   createDailyCodexDagNodeResult,
   createDailyCodexDagDryRun,
   createDailyCodexDagPlan,
   validateDailyCodexDag,
   validateDailyCodexDagNodeResult,
+  validateDailyCodexDagRunSummary,
   validateDailyCodexDagDryRunSummary
 } from "../src/daily-codex-dag.js";
 
@@ -351,6 +353,218 @@ test("daily codex DAG dry-run summary semantic validator does not throw on malfo
     assert.equal(result.ok, false);
     assert(result.failures.length > 0);
   }
+});
+
+test("daily codex DAG contract-run helper emits validated skipped node results", async () => {
+  const manifest = await loadManifest();
+  const result = await createDailyCodexDagContractRun({
+    rootDir,
+    manifest,
+    reportDate: "2026-07-03",
+    now: fixedNow
+  });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.mode, "daily_codex_dag_contract_run");
+  assert.equal(result.report_date, "2026-07-03");
+  assert.equal(result.generated_at, fixedNow);
+  assert.equal(result.run_id, "daily-codex-dag:2026-07-03:contract-run");
+  assert.equal(result.run.final_status, "contract_validated_only");
+  assert.equal(result.plan.node_count, 16);
+  assert.equal(result.node_results.length, result.plan.node_count);
+  assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
+  assert.equal(result.node_result_validation.checked_results, result.node_results.length);
+  assert.deepEqual(result.run.planned_nodes, result.plan.nodes.map((item) => item.id));
+  assert.deepEqual(result.run.contract_validated_nodes, result.run.planned_nodes);
+  assert.deepEqual(result.run.skipped_nodes, result.run.planned_nodes);
+  assert.deepEqual(result.run.blocked_nodes, []);
+  assert(!Object.prototype.hasOwnProperty.call(result.run, "completed_nodes"));
+  assert.deepEqual(result.executed_commands, []);
+  assert.deepEqual(result.codex_invocations, []);
+  await assertValidDagRunSummary(result);
+
+  const resultByNodeId = new Map(result.node_results.map((item) => [item.node_id, item]));
+  for (const [index, nodeResult] of result.node_results.entries()) {
+    const planNode = result.plan.nodes[index];
+    assert.equal(nodeResult.node_id, planNode.id);
+    assert.equal(nodeResult.node_kind, planNode.kind);
+    assert.equal(nodeResult.result_scope, "node");
+    assert.equal(nodeResult.status, "skipped");
+    assert.equal(nodeResult.downstream_disposition, "continue");
+    assert.equal(nodeResult.started_at, null);
+    assert.equal(nodeResult.finished_at, null);
+    assert.equal(nodeResult.attempts_started, 0);
+    assert.deepEqual(nodeResult.resolved_inputs, []);
+    assert.deepEqual(nodeResult.resolved_outputs, []);
+    assert.equal(nodeResult.fanout, null);
+    assert.equal(nodeResult.barrier, null);
+    assert(nodeResult.warnings.some((warning) => warning.code === "contract_only_not_executed"));
+    await assertValidDagNodeResult(nodeResult);
+
+    assert.equal(nodeResult.dependency_results.length, planNode.dependencies.length);
+    for (const [dependencyIndex, dependencyId] of planNode.dependencies.entries()) {
+      const dependencyResult = resultByNodeId.get(dependencyId);
+      const dependencySnapshot = nodeResult.dependency_results[dependencyIndex];
+      assert.equal(dependencySnapshot.node_id, dependencyId);
+      assert.equal(dependencySnapshot.execution_id, dependencyResult.execution_id);
+      assert.equal(dependencySnapshot.status, "skipped");
+      assert.equal(dependencySnapshot.downstream_disposition, "continue");
+      assert.equal(dependencySnapshot.required, true);
+    }
+  }
+
+  const perItemSummary = resultByNodeId.get("per-item-summary");
+  const qualityAudit = resultByNodeId.get("quality-audit");
+  assert.equal(perItemSummary.node_kind, "fanout");
+  assert.equal(perItemSummary.result_scope, "node");
+  assert.equal(perItemSummary.fanout, null);
+  assert.equal(qualityAudit.node_kind, "barrier");
+  assert.equal(qualityAudit.result_scope, "node");
+  assert.equal(qualityAudit.barrier, null);
+  assert.deepEqual(result.fanout_expansions, [
+    {
+      node_id: "per-item-summary",
+      kind: "fanout",
+      status: "not_expanded",
+      item_count: null
+    },
+    {
+      node_id: "quality-audit",
+      kind: "barrier",
+      status: "not_expanded",
+      item_count: null
+    }
+  ]);
+});
+
+test("daily codex DAG contract-run semantic validator rejects misleading execution evidence", async () => {
+  const base = await createDailyCodexDagContractRun({
+    rootDir,
+    manifest: await loadManifest(),
+    reportDate: "2026-07-03",
+    now: fixedNow
+  });
+  assert.equal(base.ok, true, base.failures.join("\n"));
+
+  const cases = [
+    {
+      name: "completed nodes are not allowed",
+      mutate(value) {
+        value.run.completed_nodes = [value.plan.nodes[0].id];
+      },
+      failure: "additional field completed_nodes"
+    },
+    {
+      name: "executed commands are not allowed",
+      mutate(value) {
+        value.executed_commands = [{ command: "npm run build" }];
+      },
+      failure: "executed_commands must be empty"
+    },
+    {
+      name: "node result success is not allowed",
+      mutate(value) {
+        value.node_results[0].status = "success";
+      },
+      failure: "status must be skipped"
+    },
+    {
+      name: "fanout item result is not allowed",
+      mutate(value) {
+        value.node_results.find((item) => item.node_id === "per-item-summary").result_scope = "fanout_item";
+      },
+      failure: "result_scope must be node"
+    },
+    {
+      name: "dependency must reference skipped continue evidence",
+      mutate(value) {
+        const score = value.node_results.find((item) => item.node_id === "score");
+        score.dependency_results[0].status = "success";
+      },
+      failure: "dependency_results must reference skipped dependencies"
+    },
+    {
+      name: "fanout expansions must include dynamic nodes",
+      mutate(value) {
+        value.fanout_expansions = [];
+      },
+      failure: "fanout_expansions must list fanout/barrier plan nodes"
+    }
+  ];
+
+  for (const item of cases) {
+    const value = structuredCloneJson(base);
+    item.mutate(value);
+    assertInvalidSemanticDagRunSummary(value, item.failure, item.name);
+  }
+});
+
+test("daily codex DAG contract-run schema rejects execution-like node result evidence", async () => {
+  const base = await createDailyCodexDagContractRun({
+    rootDir,
+    manifest: await loadManifest(),
+    reportDate: "2026-07-03",
+    now: fixedNow
+  });
+  assert.equal(base.ok, true, base.failures.join("\n"));
+
+  const cases = [
+    {
+      name: "missing started_at",
+      mutate(value) {
+        delete value.node_results[0].started_at;
+      }
+    },
+    {
+      name: "dependency success",
+      mutate(value) {
+        const score = value.node_results.find((item) => item.node_id === "score");
+        score.dependency_results[0].status = "success";
+      }
+    },
+    {
+      name: "fanout metadata",
+      mutate(value) {
+        const fanoutNode = value.node_results.find((item) => item.node_id === "per-item-summary");
+        fanoutNode.fanout = { item_id: "item-001", fanout_key: "item-001" };
+      }
+    },
+    {
+      name: "execution timestamp",
+      mutate(value) {
+        value.node_results[0].started_at = fixedNow;
+      }
+    },
+    {
+      name: "extra node result field",
+      mutate(value) {
+        value.node_results[0].stdout = "leaked execution log";
+      }
+    }
+  ];
+
+  for (const item of cases) {
+    const value = structuredCloneJson(base);
+    item.mutate(value);
+    await assertInvalidDagRunSummary(value);
+  }
+});
+
+test("daily codex DAG contract-run helper returns a standard failure envelope when node result validation fails", async () => {
+  const result = await createDailyCodexDagContractRun({
+    rootDir,
+    manifest: await loadManifest(),
+    reportDate: "2026-07-03",
+    runId: "bad run id",
+    now: fixedNow
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.validation, null);
+  assert.equal(result.plan, null);
+  assert.equal(result.run, null);
+  assert(result.failures.some((failure) => failure.includes("run_id must be a stable identifier")));
+  await assertValidDagRunSummary(result);
 });
 
 test("daily codex DAG node result helper and fixture validate executable result contract", async () => {
@@ -797,6 +1011,16 @@ test("daily codex DAG dry-run CLI rejects invalid invocations with structured JS
   assert.equal(invalidDateJson.failures[0], "daily codex DAG CLI requires --date YYYY-MM-DD");
   assert.equal(invalidDateJson.validation, null);
   await assertValidDagRunSummary(invalidDateJson);
+
+  const dryRunExecute = await runDagCli(["--dry-run", "--execute", "--date", "2026-07-03", "--json"]);
+  assert.equal(dryRunExecute.code, 1);
+  assert.equal(dryRunExecute.stderr, "");
+  assert.equal(JSON.parse(dryRunExecute.stdout).failures[0], "Unsupported argument: --execute");
+
+  const dryRunPublish = await runDagCli(["--dry-run", "--publish", "--date", "2026-07-03", "--json"]);
+  assert.equal(dryRunPublish.code, 1);
+  assert.equal(dryRunPublish.stderr, "");
+  assert.equal(JSON.parse(dryRunPublish.stdout).failures[0], "Unsupported argument: --publish");
 });
 
 test("daily codex DAG dry-run CLI writes opt-in summaries under .tmp only", async () => {
@@ -897,6 +1121,96 @@ test("daily codex DAG dry-run CLI returns structured JSON for invalid manifest r
     parsed.failures.join("\n")
   );
   assert.equal(await pathExists(absoluteSummaryPath), false, "invalid manifest dry-run must not write summary");
+});
+
+test("daily codex DAG contract-run CLI writes JSON to stdout only", async () => {
+  const forbiddenBefore = await forbiddenPathSnapshot();
+  const result = await runDagCli(["--contract-run", "--date", "2026-07-03", "--json"]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, true, parsed.failures?.join("\n"));
+  assert.equal(parsed.mode, "daily_codex_dag_contract_run");
+  assert.equal(parsed.report_date, "2026-07-03");
+  assert.equal(parsed.run.final_status, "contract_validated_only");
+  assert.equal(parsed.node_results.length, parsed.plan.node_count);
+  assert(parsed.node_results.every((item) => item.status === "skipped"));
+  await assertValidDagRunSummary(parsed);
+  assert.deepEqual(await forbiddenPathSnapshot(), forbiddenBefore, "stdout-only contract-run must not mutate production or scratch paths");
+});
+
+test("daily codex DAG contract-run CLI writes opt-in summaries under .tmp only", async () => {
+  const tempName = `contract-summary-${process.pid}-${Date.now()}.json`;
+  const summaryPath = path.join(".tmp", "daily-codex-pipeline", "dag-contract-run-test", tempName);
+  const absoluteSummaryPath = path.join(rootDir, summaryPath);
+  await fs.rm(absoluteSummaryPath, { force: true });
+
+  const result = await runDagCli([
+    "--contract-run",
+    "--date",
+    "2026-07-03",
+    "--json",
+    "--summary-path",
+    summaryPath
+  ]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const stdoutJson = JSON.parse(result.stdout);
+  const fileJson = JSON.parse(await fs.readFile(absoluteSummaryPath, "utf8"));
+  assert.deepEqual(fileJson, stdoutJson);
+  assert.equal(fileJson.ok, true);
+  assert.equal(fileJson.mode, "daily_codex_dag_contract_run");
+  await assertValidDagRunSummary(fileJson);
+
+  await fs.rm(absoluteSummaryPath, { force: true });
+});
+
+test("daily codex DAG contract-run CLI rejects unsafe or executable invocations", async () => {
+  const cases = [
+    {
+      args: ["--summary-path", "../x.json"],
+      expected: "daily codex DAG summary path must stay under .tmp/daily-codex-pipeline"
+    },
+    {
+      args: ["--summary-path", path.join("docs", "reports", "dag-contract-summary.json")],
+      expected: "daily codex DAG summary path must stay under .tmp/daily-codex-pipeline"
+    },
+    {
+      args: ["--summary-path", path.join("reports-data", "dag-contract-summary.json")],
+      expected: "daily codex DAG summary path must stay under .tmp/daily-codex-pipeline"
+    },
+    {
+      args: ["--summary-path", path.join(".tmp", "daily-codex-pipeline", "dag-contract-summary.txt")],
+      expected: "daily codex DAG summary path must end with .json"
+    },
+    {
+      args: ["--execute"],
+      expected: "daily codex DAG CLI contract-run does not support --execute or --publish"
+    },
+    {
+      args: ["--publish"],
+      expected: "daily codex DAG CLI contract-run does not support --execute or --publish"
+    }
+  ];
+
+  for (const item of cases) {
+    const forbiddenBefore = await forbiddenPathSnapshot();
+    const result = await runDagCli(["--contract-run", "--date", "2026-07-03", "--json", ...item.args]);
+    assert.equal(result.code, 1, item.expected);
+    assert.equal(result.stderr, "");
+    assert.equal(JSON.parse(result.stdout).failures[0], item.expected);
+    assert.deepEqual(await forbiddenPathSnapshot(), forbiddenBefore, item.expected);
+  }
+
+  const mixed = await runDagCli(["--dry-run", "--contract-run", "--date", "2026-07-03", "--json"]);
+  assert.equal(mixed.code, 1);
+  assert.equal(JSON.parse(mixed.stdout).failures[0], "daily codex DAG CLI cannot combine --dry-run and --contract-run");
+
+  const executeBeforeMode = await runDagCli(["--execute", "--contract-run", "--date", "2026-07-03", "--json"]);
+  assert.equal(executeBeforeMode.code, 1);
+  assert.equal(JSON.parse(executeBeforeMode.stdout).failures[0], "daily codex DAG CLI contract-run does not support --execute or --publish");
 });
 
 test("daily codex DAG validator catches structural and boundary regressions", async () => {
@@ -1136,7 +1450,7 @@ async function loadNodeResultSuccessFixture() {
 
 async function assertValidDagRunSummary(value) {
   await assertValidDagRunSummarySchemaOnly(value);
-  const semanticResult = validateDailyCodexDagDryRunSummary(value);
+  const semanticResult = validateDailyCodexDagRunSummary(value);
   if (!semanticResult.ok) {
     assert.fail(`daily codex DAG run summary should pass semantic validation:\n${semanticResult.failures.join("\n")}`);
   }
@@ -1157,7 +1471,7 @@ async function assertInvalidDagRunSummary(value) {
 }
 
 function assertInvalidSemanticDagRunSummary(value, expectedFailure, label) {
-  const result = validateDailyCodexDagDryRunSummary(value);
+  const result = validateDailyCodexDagRunSummary(value);
   if (result.ok) {
     assert.fail(`daily codex DAG run summary semantic validator accepted invalid case: ${label}`);
   }

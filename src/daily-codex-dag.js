@@ -183,6 +183,104 @@ export async function createDailyCodexDagDryRun(options = {}) {
   };
 }
 
+export async function createDailyCodexDagContractRun(options = {}) {
+  const reportDate = requiredReportDate(options.reportDate || options.date);
+  const generatedAt = toIsoTimestamp(options.now || new Date());
+  const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}:contract-run`;
+  const planResult = await createDailyCodexDagPlan(options);
+
+  if (!planResult.ok) {
+    return {
+      ok: false,
+      failures: planResult.failures,
+      warnings: planResult.warnings,
+      validation: planResult.validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const plan = planResult.plan;
+  const nodeResults = createContractRunNodeResults({ plan, reportDate, runId });
+  const nodeResultValidation = validateContractRunNodeResults({ plan, reportDate, runId, nodeResults });
+  if (!nodeResultValidation.ok) {
+    return {
+      ok: false,
+      failures: nodeResultValidation.failures,
+      warnings: [...planResult.warnings, ...nodeResultValidation.warnings],
+      validation: null,
+      plan: null,
+      run: null
+    };
+  }
+  const nodeIds = plan.nodes.map((node) => node.id);
+
+  return {
+    ok: true,
+    failures: [],
+    warnings: planResult.warnings,
+    validation: planResult.validation,
+    mode: "daily_codex_dag_contract_run",
+    report_date: reportDate,
+    generated_at: generatedAt,
+    run_id: runId,
+    plan,
+    run: {
+      final_status: "contract_validated_only",
+      levels: plan.levels.map(copyLevel),
+      planned_nodes: nodeIds,
+      contract_validated_nodes: nodeIds,
+      skipped_nodes: nodeIds,
+      blocked_nodes: []
+    },
+    node_results: nodeResults,
+    node_result_validation: nodeResultValidation,
+    fanout_expansions: plan.nodes
+      .filter((node) => node.kind === "fanout" || node.kind === "barrier")
+      .map((node) => ({
+        node_id: node.id,
+        kind: node.kind,
+        status: "not_expanded",
+        item_count: null
+      })),
+    executed_commands: [],
+    codex_invocations: [],
+    next_action: {
+      kind: "implement_executable_node_runner",
+      message: "Contract-run only; no DAG node commands or Codex contexts were executed."
+    }
+  };
+}
+
+export function validateDailyCodexDagRunSummary(summary) {
+  const failures = [];
+  const warnings = [];
+
+  if (!isPlainObject(summary)) {
+    failures.push("daily codex DAG run summary must be an object.");
+    return { ok: false, failures, warnings };
+  }
+
+  if (summary.ok === false) {
+    validateDagRunFailureSummary(summary, failures);
+    return { ok: failures.length === 0, failures, warnings };
+  }
+  if (summary.ok !== true) {
+    failures.push("daily codex DAG run summary ok must be true or false.");
+    return { ok: false, failures, warnings };
+  }
+
+  if (summary.mode === "daily_codex_dag_dry_run") {
+    validateDryRunSuccessSummary(summary, failures);
+  } else if (summary.mode === "daily_codex_dag_contract_run") {
+    validateContractRunSuccessSummary(summary, failures);
+  } else {
+    failures.push("daily codex DAG run summary mode is unsupported.");
+  }
+
+  return { ok: failures.length === 0, failures, warnings };
+}
+
 export function validateDailyCodexDagDryRunSummary(summary) {
   const failures = [];
   const warnings = [];
@@ -395,6 +493,216 @@ function copyLevel(level) {
   };
 }
 
+function createContractRunNodeResults({ plan, reportDate, runId }) {
+  const resultByNodeId = new Map();
+  const results = [];
+
+  for (const node of plan.nodes) {
+    const dependencyResults = node.dependencies.map((dependencyId) => {
+      const dependencyResult = resultByNodeId.get(dependencyId);
+      return {
+        node_id: dependencyId,
+        execution_id: dependencyResult?.execution_id || `${runId}:${dependencyId}:node`,
+        status: dependencyResult?.status || "skipped",
+        required: true,
+        downstream_disposition: dependencyResult?.downstream_disposition || "continue"
+      };
+    });
+    const result = createDailyCodexDagNodeResult({
+      reportDate,
+      runId,
+      manifestName: plan.manifest_name,
+      manifestSchemaVersion: plan.schema_version,
+      nodeId: node.id,
+      nodeKind: node.kind,
+      runnerStageRef: node.runner_stage_ref,
+      resultScope: "node",
+      status: "skipped",
+      downstreamDisposition: "continue",
+      startedAt: null,
+      finishedAt: null,
+      durationMs: 0,
+      attemptsStarted: 0,
+      maxAttempts: 1,
+      attemptsExhausted: false,
+      dependencyResults,
+      declaredInputs: node.inputs,
+      declaredOutputs: node.outputs,
+      resolvedInputs: [],
+      resolvedOutputs: [],
+      fanout: null,
+      barrier: null,
+      failures: [],
+      warnings: [nodeResultIssue({
+        code: "contract_only_not_executed",
+        message: "Contract-run validated runner wiring without executing this DAG node.",
+        source: "contract-run",
+        retryable: false
+      })],
+      audit: {
+        parallel_group: node.parallel_group,
+        resilience_policy_ref: "",
+        owner_path_scope: node.owner_path_scope,
+        public_artifact: node.public_artifact,
+        validator_version: NODE_RESULT_VALIDATOR_VERSION
+      }
+    });
+    resultByNodeId.set(node.id, result);
+    results.push(result);
+  }
+
+  return results;
+}
+
+function validateContractRunNodeResults({ plan, reportDate, runId, nodeResults }) {
+  const failures = [];
+  const warnings = [];
+  if (!Array.isArray(nodeResults)) {
+    failures.push("daily codex DAG contract-run node_results must be an array.");
+    return nodeResultValidationSummary({ failures, warnings, checkedResults: 0 });
+  }
+
+  const planNodes = Array.isArray(plan?.nodes) ? plan.nodes : [];
+  const planNodeById = new Map(planNodes.map((node) => [node.id, node]));
+  const resultByNodeId = new Map();
+
+  if (nodeResults.length !== planNodes.length) {
+    failures.push("daily codex DAG contract-run node_results length must equal plan.node_count.");
+  }
+
+  for (let index = 0; index < nodeResults.length; index += 1) {
+    const result = nodeResults[index];
+    const resultValidation = validateDailyCodexDagNodeResult(result);
+    failures.push(...resultValidation.failures);
+    warnings.push(...resultValidation.warnings);
+
+    const expectedNode = planNodes[index];
+    if (!isPlainObject(result)) continue;
+    if (expectedNode && result.node_id !== expectedNode.id) {
+      failures.push(`daily codex DAG contract-run node_results[${index}].node_id must match plan node order.`);
+    }
+    if (resultByNodeId.has(result.node_id)) {
+      failures.push(`daily codex DAG contract-run node_results duplicate node_id ${formatSummaryValue(result.node_id)}.`);
+    }
+    resultByNodeId.set(result.node_id, result);
+    validateContractRunNodeResultAgainstPlan({
+      result,
+      resultByNodeId,
+      planNode: planNodeById.get(result.node_id),
+      reportDate,
+      runId,
+      failures
+    });
+  }
+
+  for (const node of planNodes) {
+    if (!resultByNodeId.has(node.id)) {
+      failures.push(`daily codex DAG contract-run missing node result for ${node.id}.`);
+    }
+  }
+
+  return nodeResultValidationSummary({ failures, warnings, checkedResults: nodeResults.length });
+}
+
+function validateContractRunNodeResultAgainstPlan({ result, resultByNodeId, planNode, reportDate, runId, failures }) {
+  const label = "daily codex DAG contract-run node result";
+  if (!planNode) {
+    failures.push(`${label} ${formatSummaryValue(result.node_id)} must match a plan node.`);
+    return;
+  }
+  if (result.report_date !== reportDate) failures.push(`${label} ${result.node_id}.report_date must match run report_date.`);
+  if (result.run_id !== runId) failures.push(`${label} ${result.node_id}.run_id must match run_id.`);
+  if (result.manifest_name !== "daily-codex-dag-contract") failures.push(`${label} ${result.node_id}.manifest_name must match DAG manifest.`);
+  if (result.manifest_schema_version !== 1) failures.push(`${label} ${result.node_id}.manifest_schema_version must be 1.`);
+  if (result.node_kind !== planNode.kind) failures.push(`${label} ${result.node_id}.node_kind must match plan node kind.`);
+  if (result.runner_stage_ref !== planNode.runner_stage_ref) failures.push(`${label} ${result.node_id}.runner_stage_ref must match plan node.`);
+  if (result.result_scope !== "node") failures.push(`${label} ${result.node_id}.result_scope must be node.`);
+  if (result.status !== "skipped") failures.push(`${label} ${result.node_id}.status must be skipped.`);
+  if (result.downstream_disposition !== "continue") failures.push(`${label} ${result.node_id}.downstream_disposition must be continue.`);
+  if (result.fanout !== null) failures.push(`${label} ${result.node_id}.fanout must be null in contract-run.`);
+  if (result.barrier !== null) failures.push(`${label} ${result.node_id}.barrier must be null in contract-run.`);
+  if (!sameArtifactArray(result.declared_inputs, planNode.inputs)) failures.push(`${label} ${result.node_id}.declared_inputs must match plan inputs.`);
+  if (!sameArtifactArray(result.declared_outputs, planNode.outputs)) failures.push(`${label} ${result.node_id}.declared_outputs must match plan outputs.`);
+  if (Array.isArray(result.resolved_inputs) && result.resolved_inputs.length !== 0) failures.push(`${label} ${result.node_id}.resolved_inputs must be empty in contract-run.`);
+  if (Array.isArray(result.resolved_outputs) && result.resolved_outputs.length !== 0) failures.push(`${label} ${result.node_id}.resolved_outputs must be empty in contract-run.`);
+  if (!Array.isArray(result.warnings) || !result.warnings.some((warning) => warning?.code === "contract_only_not_executed")) {
+    failures.push(`${label} ${result.node_id}.warnings must include contract_only_not_executed.`);
+  }
+  if (result.audit?.parallel_group !== planNode.parallel_group) failures.push(`${label} ${result.node_id}.audit.parallel_group must match plan node.`);
+  if (result.audit?.owner_path_scope !== planNode.owner_path_scope) failures.push(`${label} ${result.node_id}.audit.owner_path_scope must match plan node.`);
+  if (result.audit?.public_artifact !== planNode.public_artifact) failures.push(`${label} ${result.node_id}.audit.public_artifact must match plan node.`);
+
+  const expectedDependencies = planNode.dependencies || [];
+  const actualDependencies = Array.isArray(result.dependency_results) ? result.dependency_results : [];
+  if (actualDependencies.length !== expectedDependencies.length) {
+    failures.push(`${label} ${result.node_id}.dependency_results must match direct dependencies.`);
+  }
+  for (let index = 0; index < expectedDependencies.length; index += 1) {
+    const expectedDependencyId = expectedDependencies[index];
+    const actualDependency = actualDependencies[index];
+    if (!actualDependency) continue;
+    if (actualDependency.node_id !== expectedDependencyId) {
+      failures.push(`${label} ${result.node_id}.dependency_results must preserve dependency order.`);
+    }
+    const expectedDependencyResult = resultByNodeId.get(expectedDependencyId);
+    if (!expectedDependencyResult || actualDependency.execution_id !== expectedDependencyResult.execution_id) {
+      failures.push(`${label} ${result.node_id}.dependency_results must reference dependency execution_id evidence.`);
+    }
+    if (actualDependency.status !== "skipped" || actualDependency.downstream_disposition !== "continue" || actualDependency.required !== true) {
+      failures.push(`${label} ${result.node_id}.dependency_results must reference skipped dependencies that continue.`);
+    }
+  }
+}
+
+function nodeResultValidationSummary({ failures, warnings, checkedResults }) {
+  return {
+    ok: failures.length === 0,
+    failures: uniqueSorted(failures),
+    warnings: uniqueSorted(warnings),
+    checked_results: checkedResults,
+    validator_version: NODE_RESULT_VALIDATOR_VERSION
+  };
+}
+
+function nodeResultIssue({ code, message, source, retryable }) {
+  return { code, message, source, retryable };
+}
+
+function validateDagRunFailureSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: ["ok", "failures", "warnings", "validation", "plan", "run"],
+    label: "daily codex DAG run failure summary",
+    failures
+  });
+  if (!Array.isArray(summary.failures) || summary.failures.length === 0) {
+    failures.push("daily codex DAG run failure summary must include at least one failure.");
+  } else {
+    validateMessageArray(summary.failures, "daily codex DAG run failure summary failures", failures);
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG run failure summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG run failure summary warnings", failures);
+  }
+  if (summary.plan !== null) {
+    failures.push("daily codex DAG run failure summary plan must be null.");
+  }
+  if (summary.run !== null) {
+    failures.push("daily codex DAG run failure summary run must be null.");
+  }
+  if (summary.validation !== null && !isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG run failure summary validation must be null or an object.");
+  } else if (isPlainObject(summary.validation)) {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: false,
+      label: "daily codex DAG run failure summary validation",
+      failures
+    });
+  }
+}
+
 function validateDryRunFailureSummary(summary, failures) {
   validateExactKeys({
     value: summary,
@@ -508,6 +816,117 @@ function validateDryRunSuccessSummary(summary, failures) {
   const levelPartition = validatePlanLevelPartition({ planNodes, planLevels, failures });
   validateDryRunSuccessRun({ run, planLevels, planNodeIds, failures });
   validatePlanDependencyLevels({ planNodes, levelByNodeId: levelPartition.levelByNodeId, failures });
+}
+
+function validateContractRunSuccessSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "ok",
+      "failures",
+      "warnings",
+      "validation",
+      "mode",
+      "report_date",
+      "generated_at",
+      "run_id",
+      "plan",
+      "run",
+      "node_results",
+      "node_result_validation",
+      "fanout_expansions",
+      "executed_commands",
+      "codex_invocations",
+      "next_action"
+    ],
+    label: "daily codex DAG contract-run success summary",
+    failures
+  });
+  if (!Array.isArray(summary.failures) || summary.failures.length !== 0) {
+    failures.push("daily codex DAG contract-run success summary failures must be empty.");
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG contract-run success summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG contract-run success summary warnings", failures);
+  }
+  if (summary.mode !== "daily_codex_dag_contract_run") {
+    failures.push("daily codex DAG contract-run success summary mode must be daily_codex_dag_contract_run.");
+  }
+  if (!isStrictIsoDate(summary.report_date)) {
+    failures.push("daily codex DAG contract-run success summary report_date must be a real YYYY-MM-DD date.");
+  }
+  if (!isCanonicalIsoTimestamp(summary.generated_at)) {
+    failures.push("daily codex DAG contract-run success summary generated_at must be a canonical UTC Date#toISOString() string.");
+  }
+  if (!isStableIdentifier(summary.run_id)) {
+    failures.push("daily codex DAG contract-run success summary run_id must be a stable identifier.");
+  }
+  if (!isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG contract-run success summary validation must be an object.");
+  } else {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: true,
+      label: "daily codex DAG contract-run success summary validation",
+      failures
+    });
+  }
+  validateNextActionShape(summary.next_action, failures, "daily codex DAG contract-run success summary next_action");
+
+  const plan = isPlainObject(summary.plan) ? summary.plan : null;
+  const run = isPlainObject(summary.run) ? summary.run : null;
+  if (!plan) failures.push("daily codex DAG contract-run success summary plan must be an object.");
+  if (!run) failures.push("daily codex DAG contract-run success summary run must be an object.");
+  if (!plan || !run) return;
+
+  validatePlanShape(plan, failures);
+  validateContractRunShape(run, failures);
+  validateContractRunNodeResultValidation(summary.node_result_validation, failures);
+  validateContractRunExpansionArray(summary.fanout_expansions, failures);
+
+  if (!Array.isArray(summary.executed_commands) || summary.executed_commands.length !== 0) {
+    failures.push("daily codex DAG contract-run success summary executed_commands must be empty.");
+  }
+  if (!Array.isArray(summary.codex_invocations) || summary.codex_invocations.length !== 0) {
+    failures.push("daily codex DAG contract-run success summary codex_invocations must be empty.");
+  }
+  if (!Array.isArray(summary.node_results)) {
+    failures.push("daily codex DAG contract-run success summary node_results must be an array.");
+    return;
+  }
+
+  const planNodes = Array.isArray(plan.nodes) ? plan.nodes : null;
+  const planLevels = Array.isArray(plan.levels) ? plan.levels : null;
+  if (!planNodes) failures.push("daily codex DAG contract-run success summary plan.nodes must be an array.");
+  if (!planLevels) failures.push("daily codex DAG contract-run success summary plan.levels must be an array.");
+  if (!planNodes || !planLevels) return;
+
+  const planNodeIds = planNodes.map((node) => isPlainObject(node) ? node.id : undefined);
+  if (plan.node_count !== planNodes.length) {
+    failures.push("daily codex DAG contract-run success summary plan.node_count must equal plan.nodes.length.");
+  }
+
+  const levelPartition = validatePlanLevelPartition({ planNodes, planLevels, failures });
+  validateContractRunSuccessRun({ run, planLevels, planNodeIds, failures });
+  validatePlanDependencyLevels({ planNodes, levelByNodeId: levelPartition.levelByNodeId, failures });
+  validateContractRunExpansionSemantics({ expansions: summary.fanout_expansions, planNodes, failures });
+
+  const nodeResultValidation = validateContractRunNodeResults({
+    plan,
+    reportDate: summary.report_date,
+    runId: summary.run_id,
+    nodeResults: summary.node_results
+  });
+  failures.push(...nodeResultValidation.failures);
+  if (isPlainObject(summary.node_result_validation)) {
+    if (summary.node_result_validation.ok !== true) {
+      failures.push("daily codex DAG contract-run success summary node_result_validation.ok must be true.");
+    }
+    if (summary.node_result_validation.checked_results !== summary.node_results.length) {
+      failures.push("daily codex DAG contract-run success summary node_result_validation.checked_results must equal node_results length.");
+    }
+  }
 }
 
 function validateNodeResultShape(result, failures) {
@@ -1016,8 +1435,78 @@ function validateRunShape(run, failures) {
   validateNodeIdArray(run.blocked_nodes, "daily codex DAG dry-run success summary run.blocked_nodes", failures);
 }
 
-function validateNextActionShape(nextAction, failures) {
-  const label = "daily codex DAG dry-run success summary next_action";
+function validateContractRunShape(run, failures) {
+  validateExactKeys({
+    value: run,
+    allowed: ["final_status", "levels", "planned_nodes", "contract_validated_nodes", "skipped_nodes", "blocked_nodes"],
+    label: "daily codex DAG contract-run success summary run",
+    failures
+  });
+  if (Array.isArray(run.levels)) {
+    for (const level of run.levels) {
+      validateLevelShape(level, "daily codex DAG contract-run success summary run.levels entry", failures);
+    }
+  }
+  validateNodeIdArray(run.planned_nodes, "daily codex DAG contract-run success summary run.planned_nodes", failures);
+  validateNodeIdArray(run.contract_validated_nodes, "daily codex DAG contract-run success summary run.contract_validated_nodes", failures);
+  validateNodeIdArray(run.skipped_nodes, "daily codex DAG contract-run success summary run.skipped_nodes", failures);
+  validateNodeIdArray(run.blocked_nodes, "daily codex DAG contract-run success summary run.blocked_nodes", failures);
+}
+
+function validateContractRunNodeResultValidation(value, failures) {
+  const label = "daily codex DAG contract-run success summary node_result_validation";
+  if (!isPlainObject(value)) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  validateExactKeys({
+    value,
+    allowed: ["ok", "failures", "warnings", "checked_results", "validator_version"],
+    label,
+    failures
+  });
+  if (value.ok !== true) failures.push(`${label}.ok must be true.`);
+  if (!Array.isArray(value.failures) || value.failures.length !== 0) {
+    failures.push(`${label}.failures must be empty.`);
+  } else {
+    validateMessageArray(value.failures, `${label}.failures`, failures);
+  }
+  if (!Array.isArray(value.warnings)) {
+    failures.push(`${label}.warnings must be an array.`);
+  } else {
+    validateMessageArray(value.warnings, `${label}.warnings`, failures);
+  }
+  if (!Number.isInteger(value.checked_results) || value.checked_results < 0) {
+    failures.push(`${label}.checked_results must be a non-negative integer.`);
+  }
+  if (value.validator_version !== NODE_RESULT_VALIDATOR_VERSION) {
+    failures.push(`${label}.validator_version must be ${NODE_RESULT_VALIDATOR_VERSION}.`);
+  }
+}
+
+function validateContractRunExpansionArray(values, failures) {
+  const label = "daily codex DAG contract-run success summary fanout_expansions";
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  const seen = new Set();
+  for (const value of values) {
+    if (!isPlainObject(value)) {
+      failures.push(`${label} entries must be objects.`);
+      continue;
+    }
+    validateExactKeys({ value, allowed: ["node_id", "kind", "status", "item_count"], label: `${label} entry`, failures });
+    if (!isNodeId(value.node_id)) failures.push(`${label} entry.node_id must be a node id.`);
+    if (!["fanout", "barrier"].includes(value.kind)) failures.push(`${label} entry.kind must be fanout or barrier.`);
+    if (value.status !== "not_expanded") failures.push(`${label} entry.status must be not_expanded.`);
+    if (value.item_count !== null) failures.push(`${label} entry.item_count must be null.`);
+    if (seen.has(value.node_id)) failures.push(`${label} entry.node_id values must be unique.`);
+    seen.add(value.node_id);
+  }
+}
+
+function validateNextActionShape(nextAction, failures, label = "daily codex DAG dry-run success summary next_action") {
   if (!isPlainObject(nextAction)) {
     failures.push(`${label} must be an object.`);
     return;
@@ -1133,6 +1622,38 @@ function validateDryRunSuccessRun({ run, planLevels, planNodeIds, failures }) {
   }
   if (!levelsMatch(run.levels, planLevels)) {
     failures.push("daily codex DAG dry-run success summary run.levels must equal plan.levels.");
+  }
+}
+
+function validateContractRunSuccessRun({ run, planLevels, planNodeIds, failures }) {
+  if (run.final_status !== "contract_validated_only") {
+    failures.push("daily codex DAG contract-run success summary run.final_status must be contract_validated_only.");
+  }
+  if (!sameOrderedStringArray(run.planned_nodes, planNodeIds)) {
+    failures.push("daily codex DAG contract-run success summary run.planned_nodes must equal plan.nodes ids.");
+  }
+  if (!sameOrderedStringArray(run.contract_validated_nodes, planNodeIds)) {
+    failures.push("daily codex DAG contract-run success summary run.contract_validated_nodes must equal plan.nodes ids.");
+  }
+  if (!sameOrderedStringArray(run.skipped_nodes, planNodeIds)) {
+    failures.push("daily codex DAG contract-run success summary run.skipped_nodes must equal plan.nodes ids.");
+  }
+  if (!Array.isArray(run.blocked_nodes) || run.blocked_nodes.length !== 0) {
+    failures.push("daily codex DAG contract-run success summary run.blocked_nodes must be empty.");
+  }
+  if (!levelsMatch(run.levels, planLevels)) {
+    failures.push("daily codex DAG contract-run success summary run.levels must equal plan.levels.");
+  }
+}
+
+function validateContractRunExpansionSemantics({ expansions, planNodes, failures }) {
+  if (!Array.isArray(expansions) || !Array.isArray(planNodes)) return;
+  const expected = planNodes
+    .filter((node) => node.kind === "fanout" || node.kind === "barrier")
+    .map((node) => ({ node_id: node.id, kind: node.kind }));
+  const actual = expansions.map((item) => isPlainObject(item) ? { node_id: item.node_id, kind: item.kind } : item);
+  if (actual.length !== expected.length || !actual.every((item, index) => item?.node_id === expected[index].node_id && item?.kind === expected[index].kind)) {
+    failures.push("daily codex DAG contract-run success summary fanout_expansions must list fanout/barrier plan nodes as not_expanded in plan order.");
   }
 }
 
@@ -1592,6 +2113,18 @@ function sameOrderedStringArray(left, right) {
   if (!Array.isArray(left) || !Array.isArray(right)) return false;
   if (left.length !== right.length) return false;
   return left.every((value, index) => typeof value === "string" && value === right[index]);
+}
+
+function sameArtifactArray(left, right) {
+  if (!Array.isArray(left) || !Array.isArray(right)) return false;
+  if (left.length !== right.length) return false;
+  return left.every((artifact, index) => {
+    const expected = right[index];
+    return isPlainObject(artifact)
+      && isPlainObject(expected)
+      && artifact.path === expected.path
+      && artifact.required === expected.required;
+  });
 }
 
 function levelsMatch(left, right) {
