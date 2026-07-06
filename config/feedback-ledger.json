@@ -1239,7 +1239,7 @@
       "id": "feedback/p1-reader-summary-independent-pipeline",
       "severity": "P1",
       "status": "implemented",
-      "title": "Separate admission from reader summaries",
+      "title": "Keep daily generation split into debuggable MVP stages",
       "problem": "The generated daily report can pass structure while publishing source-first machine logs as reader copy, mixing admission rationale into summaries, default-folding each story into an overdesigned detail panel, flattening left-rail hierarchy, and regressing icon/tag/type scale.",
       "expected_behavior": "Daily generation separates information collection, admission, per-item reader summary, and assembly into independently debuggable stages. Admission reasons, candidate scores, source audit, and watch-next stay internal. Public story sections render as expanded track cells with concrete reader-facing bullets and source links, no visible `发生了什么：` / `为什么值得看：` labels, no per-story default collapse, compact icons, styled tags with hover states, and left-rail hierarchy that distinguishes categories from sections.",
       "scope": [
@@ -1265,7 +1265,7 @@
       ],
       "validation": {
         "command": "npm run test",
-        "test_name": "daily codex pipeline plans independent codex contexts per stage",
+        "test_name": "daily Codex DAG-lite runner plans the six MVP stages",
         "gate": "npm run validate"
       }
     },

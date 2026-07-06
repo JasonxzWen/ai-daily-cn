@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -9,580 +8,293 @@ import { promisify } from "node:util";
 import {
   buildDailyCodexPipelinePlan,
   prepareDailyCodexPipeline,
-  runDailyCodexPipeline
+  runDailyCodexPipeline,
+  validateDailyCodexMvpArtifact
 } from "../scripts/run-daily-codex-pipeline.mjs";
 
 const execFileAsync = promisify(execFile);
+const repoRoot = path.resolve(".");
 
-test("daily codex pipeline plans independent codex contexts per stage", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-"));
-  const workDir = path.join(rootDir, ".tmp", "pipeline");
-  const admissionInput = path.join(workDir, "fixture-admission.json");
-  await fs.mkdir(path.dirname(admissionInput), { recursive: true });
-  await fs.writeFile(admissionInput, JSON.stringify({
-    accepted_items: [
-      { candidate_id: "google-nyc-summit", title: "Google NYC AI Summit", url: "https://example.com/google" },
-      { candidate_id: "microsoft-harc", title: "Microsoft HARC", url: "https://example.com/harc" }
-    ]
-  }), "utf8");
+test("daily Codex DAG-lite runner plans the six MVP stages", () => {
+  const rootDir = path.join(os.tmpdir(), "daily-codex-mvp-plan");
+  const plan = buildDailyCodexPipelinePlan({
+    rootDir,
+    reportDate: "2026-07-06",
+    fixtureMode: "success"
+  });
 
+  assert.equal(plan.mode, "daily_codex_dag_lite");
+  assert.deepEqual(plan.stages.map((stage) => stage.id), [
+    "prepare",
+    "collect-context",
+    "codex-generate",
+    "validate",
+    "repair-once",
+    "summarize"
+  ]);
+  assert(plan.outputs.run_summary.endsWith(path.join(".tmp", "daily-codex-mvp", "2026-07-06", "run-summary.json")));
+});
+
+test("daily Codex DAG-lite runner produces a successful fixture summary", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-success-"));
+  await writeMinimalRepoFiles(rootDir);
   const plan = await prepareDailyCodexPipeline({
     rootDir,
-    reportDate: "2026-07-02",
-    workDir,
-    admissionInputPath: admissionInput,
-    codexBin: "codex-test",
-    model: "gpt-test"
+    reportDate: "2026-07-06",
+    fixtureMode: "success"
   });
 
-  const codexStages = plan.stages.filter((stage) => stage.kind === "codex_exec");
-  assert(codexStages.some((stage) => stage.id === "collect"));
-  assert(codexStages.some((stage) => stage.id === "admit"));
-
-  const summaryStages = codexStages.filter((stage) => stage.id.startsWith("summarize:"));
-  assert.equal(summaryStages.length, 2);
-  assert.deepEqual(summaryStages.map((stage) => stage.item.candidate_id), ["google-nyc-summit", "microsoft-harc"]);
-
-  for (const stage of codexStages) {
-    assert.equal(stage.command[0], "codex-test");
-    assert(stage.command.includes("--ephemeral"));
-    assert(stage.command.includes("--json"));
-    assert(stage.command.includes("-C"));
-    assert(stage.command.includes(rootDir));
-    assert(stage.command.includes("--output-last-message"));
-    assert.equal(stage.command.at(-1), "-");
-    assert.equal(stage.cwd, rootDir);
-    assert.match(stage.prompt, /Execution boundary:/);
-    assert.match(stage.prompt, /OUTPUT_PATH=/);
-    assert.match(stage.prompt, /Do not run harness-hub check\/init\/activate/);
-    assert.match(stage.prompt, /\.harness-hub\/state\/\*\*/);
-    assert.match(stage.prompt, /tasks\/current-task\.md/);
-  }
-
-  for (const stage of summaryStages) {
-    assert(fsSync.existsSync(stage.prompt_path), `${stage.prompt_path} should exist`);
-    assert(fsSync.existsSync(stage.item_path), `${stage.item_path} should exist`);
-    const prompt = await fs.readFile(stage.prompt_path, "utf8");
-    assert(prompt.includes("story-first"));
-    assert(prompt.includes("insufficient_evidence"));
-  }
-
-  const planFile = JSON.parse(await fs.readFile(path.join(workDir, "pipeline-plan.json"), "utf8"));
-  assert.equal(planFile.codex.independent_context_per_stage, true);
-  assert(planFile.stages.every((stage) => !Object.hasOwn(stage, "prompt")));
-});
-
-test("daily codex pipeline dry-run exposes a summary placeholder without admission output", () => {
-  const rootDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "daily-codex-pipeline-placeholder-"));
-  const plan = buildDailyCodexPipelinePlan({
-    rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    includePlaceholderSummaries: true
-  });
-
-  const summaryStages = plan.stages.filter((stage) => stage.id.startsWith("summarize:"));
-  assert.equal(summaryStages.length, 1);
-  assert.equal(summaryStages[0].item.candidate_id, "accepted-item-placeholder");
-  assert(plan.stages.some((stage) => stage.id === "quality-review"));
-  assert(plan.stages.some((stage) => stage.id === "sources-phase5-audit"));
-  assert(plan.stages.some((stage) => stage.command?.includes("content:contract")));
-  assert(plan.stages.some((stage) => stage.command?.includes("quality:page-check")));
-});
-
-test("daily codex pipeline collect prompt uses direct node discovery commands", () => {
-  const rootDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "daily-codex-pipeline-collect-commands-"));
-  const plan = buildDailyCodexPipelinePlan({
-    rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    includePlaceholderSummaries: true
-  });
-
-  const collect = plan.stages.find((stage) => stage.id === "collect");
-  assert(collect.prompt.includes("COLLECT COMMANDS"));
-  assert(collect.prompt.includes("node src/cli.js sources:validate --output"));
-  assert(collect.prompt.includes("node src/cli.js sources:health --date 2026-07-02 --sources config/sources --enablement core,optional,manual --output"));
-  assert(!collect.prompt.includes("npm run sources:health -- --date"));
-  assert(!collect.prompt.includes("npm run sources:validate -- --output"));
-});
-
-test("daily codex pipeline npm commands preserve script option names", () => {
-  const rootDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "daily-codex-pipeline-npm-args-"));
-  const plan = buildDailyCodexPipelinePlan({
-    rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    includePlaceholderSummaries: true,
-    publish: true,
-    npmBin: "npm-test"
-  });
-
-  const commandsWithOptions = plan.stages
-    .filter((stage) => stage.kind === "command")
-    .flatMap((stage) => [stage.command, stage.fallback_command].filter(Boolean))
-    .filter((command) => command.some((token) => String(token).startsWith("--") && token !== "--"));
-
-  assert(commandsWithOptions.length > 0);
-  for (const command of commandsWithOptions) {
-    const runIndex = command.indexOf("run");
-    assert.notEqual(runIndex, -1);
-    assert.equal(command[runIndex + 2], "--");
-    assert.equal(command[runIndex + 3], "--");
-  }
-});
-
-test("daily codex pipeline execute mode without publish skips publish stages", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-generated-only-"));
-  const { fakeCodex, fakeNpm } = await writePipelineCommandShims(rootDir);
-  const plan = await prepareDailyCodexPipeline({
-    rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    codexBin: fakeCodex,
-    npmBin: fakeNpm,
-    publish: false
-  });
-
-  await runDailyCodexPipeline(plan);
-
-  const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
-  const completedIds = summary.completed_stages.map((stage) => stage.id);
+  const { summary } = await runDailyCodexPipeline(plan);
   assert.equal(summary.final_status, "generated_only");
-  assert(completedIds.includes("quality-review"));
-  assert(completedIds.includes("sources-phase5-audit"));
-  assert(completedIds.includes("content-contract"));
-  assert(completedIds.includes("page-check"));
-  assert(!completedIds.includes("publish-dry-run"));
-  assert(!completedIds.includes("publish"));
-  assert(!completedIds.includes("pages-verify"));
+  assert.equal(summary.mode, "daily_codex_dag_lite");
+  assert.equal(summary.completed_stages.length, 6);
+  assert.deepEqual(summary.completed_stages.map((stage) => stage.id), [
+    "prepare",
+    "collect-context",
+    "codex-generate",
+    "validate",
+    "repair-once",
+    "summarize"
+  ]);
+  assert.equal(summary.completed_stages.find((stage) => stage.id === "repair-once").status, "skipped");
+  assert.equal(summary.repair_attempted, false);
+
+  const finalArtifact = JSON.parse(await fs.readFile(plan.outputs.final, "utf8"));
+  const validation = validateDailyCodexMvpArtifact(finalArtifact, { reportDate: "2026-07-06" });
+  assert.equal(validation.ok, true, validation.failures.join("\n"));
 });
 
-test("daily codex pipeline execute mode publishes with fallback and writes run summary", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-execute-"));
-  const binDir = path.join(rootDir, "bin");
-  await fs.mkdir(binDir, { recursive: true });
-  const fakeCodex = await writeNodeCommandShim(binDir, "fake-codex", `
-import fs from "node:fs";
-import path from "node:path";
+test("daily Codex DAG-lite runner rejects unsafe work dirs before cleanup", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-work-dir-"));
+  await writeMinimalRepoFiles(rootDir);
 
-const args = process.argv.slice(2);
-const prompt = await new Promise((resolve) => {
-  let value = "";
-  process.stdin.setEncoding("utf8");
-  process.stdin.on("data", (chunk) => { value += chunk; });
-  process.stdin.on("end", () => resolve(value));
+  await assert.rejects(prepareDailyCodexPipeline({
+    rootDir,
+    reportDate: "2026-07-06",
+    workDir: rootDir,
+    fixtureMode: "success"
+  }), /work dir cannot be the repository root/);
+  await assert.rejects(prepareDailyCodexPipeline({
+    rootDir,
+    reportDate: "2026-07-06",
+    workDir: path.join(rootDir, ".tmp", "daily-codex-mvp"),
+    fixtureMode: "success"
+  }), /work dir must be a child/);
+  await assert.rejects(prepareDailyCodexPipeline({
+    rootDir,
+    reportDate: "2026-07-06",
+    workDir: path.join(rootDir, "..", "outside-daily-codex-mvp"),
+    fixtureMode: "success"
+  }), /work dir must be inside/);
+
+  const packageJson = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
+  assert.equal(packageJson.name, "fixture-daily");
 });
 
-function outputPathFor(label) {
-  const match = prompt.match(new RegExp(label + "\\\\s*([^\\\\n]+)"));
-  return match ? match[1].trim() : "";
-}
-
-function writeJson(filePath, value) {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(value, null, 2) + "\\n", "utf8");
-}
-
-const lastMessageIndex = args.indexOf("--output-last-message");
-if (lastMessageIndex >= 0) {
-  writeJson(args[lastMessageIndex + 1], { ok: true });
-}
-
-if (prompt.includes("信息收集阶段")) {
-  writeJson(outputPathFor("输出文件："), {
-    report_date: "2026-07-02",
-    stage: "collect",
-    raw_candidates: [{ candidate_id: "fixture-item", title: "Fixture Item", url: "https://example.com/item" }],
-    source_audit: {},
-    warnings: []
-  });
-} else if (prompt.includes("信息准入阶段")) {
-  writeJson(outputPathFor("输出准入文件："), {
-    report_date: "2026-07-02",
-    stage: "admit",
-    accepted_items: [{ candidate_id: "fixture-item", title: "Fixture Item", url: "https://example.com/item" }],
-    rejected_items: []
-  });
-} else if (prompt.includes("单条新闻概括阶段")) {
-  writeJson(outputPathFor("条目输出文件："), {
-    candidate_id: "fixture-item",
-    title: "Fixture Item ships a concrete change",
-    summary: "Fixture Item 发布了可验证的新能力。",
-    bullets: ["读者可以看到明确变化。", "来源和范围保持可追溯。"],
-    source: { label: "Fixture", url: "https://example.com/item" },
-    insufficient_evidence: false,
-    evidence_notes: []
-  });
-} else if (prompt.includes("结构化组装阶段")) {
-  writeJson(outputPathFor("输出草稿："), {
-    report_date: "2026-07-02",
-    summary: "Fixture Item 发布了可验证的新能力。",
-    main_items: []
-  });
-}
-
-process.stdout.write(JSON.stringify({ type: "done" }) + "\\n");
-`);
-  const fakeNpm = await writeNodeCommandShim(binDir, "fake-npm", `
-import fs from "node:fs";
-import path from "node:path";
-
-const args = process.argv.slice(2);
-const script = args[0] === "run" ? args[1] : args[0];
-const outputIndex = args.indexOf("--output");
-if (outputIndex >= 0) {
-  const outputPath = args[outputIndex + 1];
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, JSON.stringify({ ok: true, script }, null, 2) + "\\n", "utf8");
-}
-if (script === "publish" && process.env.FAKE_NPM_FAIL_PUBLISH === "1") {
-  process.stderr.write("simulated publish failure\\n");
-  process.exit(2);
-}
-process.stdout.write(JSON.stringify({ ok: true, script }) + "\\n");
-`);
-
+test("daily Codex DAG-lite runner repairs once after validation failure", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-repair-"));
+  await writeMinimalRepoFiles(rootDir);
   const plan = await prepareDailyCodexPipeline({
     rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    codexBin: fakeCodex,
-    npmBin: fakeNpm,
-    publish: true
+    reportDate: "2026-07-06",
+    fixtureMode: "repair-success"
   });
 
-  process.env.FAKE_NPM_FAIL_PUBLISH = "1";
-  try {
-    await runDailyCodexPipeline(plan);
-  } finally {
-    delete process.env.FAKE_NPM_FAIL_PUBLISH;
-  }
+  const { summary } = await runDailyCodexPipeline(plan);
+  const validateStage = summary.completed_stages.find((stage) => stage.id === "validate");
+  const repairStage = summary.completed_stages.find((stage) => stage.id === "repair-once");
 
-  const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
-  assert.equal(summary.final_status, "published");
-  assert.equal(summary.publish.enabled, true);
-  assert(summary.completed_stages.some((stage) => stage.id === "publish-dry-run"));
-  assert(summary.completed_stages.some((stage) => stage.id === "publish" && stage.fallback_used));
-  assert(summary.completed_stages.some((stage) => stage.id === "pages-verify" && stage.result_json?.ok === true));
-  assert.equal(summary.next_action.kind, "none");
+  assert.equal(summary.final_status, "generated_only");
+  assert.equal(validateStage.status, "failure");
+  assert.equal(repairStage.status, "success");
+  assert.equal(summary.repair_attempted, true);
+  assert.equal(summary.validation.ok, true);
+  assert(!JSON.stringify(summary).includes("stdout"));
+  assert(!JSON.stringify(summary).includes("stderr"));
+  assert(!JSON.stringify(summary).includes("prompts"));
+
+  const initialValidation = JSON.parse(await fs.readFile(plan.outputs.validation, "utf8"));
+  const repairValidation = JSON.parse(await fs.readFile(plan.outputs.repair_validation, "utf8"));
+  assert.equal(initialValidation.ok, false);
+  assert.equal(repairValidation.ok, true);
 });
 
-test("daily codex pipeline records published pending when Pages verification is delayed", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-pages-"));
-  const { fakeCodex, fakeNpm } = await writePipelineCommandShims(rootDir);
+test("daily Codex DAG-lite runner rejects Codex repository writes outside work dir", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-codex-guard-"));
+  await writeMinimalRepoFiles(rootDir);
+  const codexBin = await writeFakeCodexCommand(rootDir);
   const plan = await prepareDailyCodexPipeline({
     rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    codexBin: fakeCodex,
-    npmBin: fakeNpm,
-    publish: true
+    reportDate: "2026-07-06",
+    codexBin
   });
 
-  process.env.FAKE_NPM_PAGES_PENDING = "1";
-  try {
-    await runDailyCodexPipeline(plan);
-  } finally {
-    delete process.env.FAKE_NPM_PAGES_PENDING;
-  }
+  await assert.rejects(runDailyCodexPipeline(plan), /modified repository paths outside work dir/);
+  const summary = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
+  const generateStage = summary.completed_stages.find((stage) => stage.id === "codex-generate");
 
-  const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
-  assert.equal(summary.final_status, "published_pending_pages_verification");
-  assert.equal(summary.next_action.kind, "verify_pages_later");
-  const pagesStage = summary.completed_stages.find((stage) => stage.id === "pages-verify");
-  assert.equal(pagesStage.ok, true);
-  assert.equal(pagesStage.result_json.ok, false);
-  assert.equal(pagesStage.result_json.diagnostics.length, 200000);
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(generateStage.status, "failure");
+  assert.match(generateStage.failures[0].message, /package\.json/);
 });
 
-test("daily codex pipeline records published pending when Pages verification lacks JSON evidence", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-pages-no-json-"));
-  const { fakeCodex, fakeNpm } = await writePipelineCommandShims(rootDir);
+test("daily Codex DAG-lite runner fails after one unsuccessful repair", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-failure-"));
+  await writeMinimalRepoFiles(rootDir);
   const plan = await prepareDailyCodexPipeline({
     rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    codexBin: fakeCodex,
-    npmBin: fakeNpm,
-    publish: true
+    reportDate: "2026-07-06",
+    fixtureMode: "failure"
   });
 
-  process.env.FAKE_NPM_PAGES_NO_JSON = "1";
-  try {
-    await runDailyCodexPipeline(plan);
-  } finally {
-    delete process.env.FAKE_NPM_PAGES_NO_JSON;
-  }
-
-  const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
-  assert.equal(summary.final_status, "published_pending_pages_verification");
-  assert.equal(summary.next_action.kind, "verify_pages_later");
-  const pagesStage = summary.completed_stages.find((stage) => stage.id === "pages-verify");
-  assert.equal(pagesStage.ok, true);
-  assert.equal(pagesStage.result_json, null);
+  await assert.rejects(runDailyCodexPipeline(plan), /summary|required|items/i);
+  const summary = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.completed_stages.length, 6);
+  assert.equal(summary.completed_stages.find((stage) => stage.id === "repair-once").status, "failure");
+  assert.equal(summary.completed_stages.find((stage) => stage.id === "summarize").status, "failure");
+  assert.equal(summary.next_action.kind, "inspect_mvp_failure");
 });
 
-test("daily codex pipeline CLI treats --publish=false as false", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-cli-publish-false-"));
-  const workDir = path.join(rootDir, ".tmp", "pipeline");
+test("daily Codex DAG-lite CLI exits zero for fixture success and writes summary", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-success-"));
+  await writeMinimalRepoFiles(rootDir);
   const { stdout } = await execFileAsync(process.execPath, [
-    path.resolve("scripts/run-daily-codex-pipeline.mjs"),
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
     "--repo-root",
     rootDir,
     "--date",
-    "2026-07-02",
-    "--work-dir",
-    workDir,
-    "--dry-run",
-    "--publish=false"
-  ], { cwd: path.resolve(".") });
+    "2026-07-06",
+    "--fixture",
+    "success"
+  ]);
 
   const result = JSON.parse(stdout);
-  assert.equal(result.publish, false);
-  assert(!result.stages.some((stage) => stage.id === "publish-dry-run"));
-  assert(!result.stages.some((stage) => stage.id === "publish"));
-  assert(!result.stages.some((stage) => stage.id === "pages-verify"));
+  assert.equal(result.ok, true);
+  assert.equal(result.final_status, "generated_only");
+  const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
+  assert.equal(summary.completed_stages.length, 6);
 });
 
-test("daily codex pipeline blocks when a codex stage does not write JSON", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-missing-output-"));
-  const binDir = path.join(rootDir, "bin");
-  await fs.mkdir(binDir, { recursive: true });
-  const fakeCodex = await writeNodeCommandShim(binDir, "fake-codex-no-output", `
-process.stdout.write(JSON.stringify({ type: "done_without_output" }) + "\\n");
-`);
-  const fakeNpm = await writeNodeCommandShim(binDir, "fake-npm", `
-process.stdout.write(JSON.stringify({ ok: true }) + "\\n");
-`);
-  const plan = await prepareDailyCodexPipeline({
+test("daily Codex DAG-lite CLI accepts npm-style positional date and fixture", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-positional-"));
+  await writeMinimalRepoFiles(rootDir);
+  const { stdout } = await execFileAsync(process.execPath, [
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+    "--repo-root",
     rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    codexBin: fakeCodex,
-    npmBin: fakeNpm
+    "2026-07-06",
+    "success"
+  ], {
+    env: {
+      ...process.env,
+      npm_config_date: "true",
+      npm_config_fixture: "true"
+    }
   });
 
-  await assert.rejects(runDailyCodexPipeline(plan), /valid JSON|no such file/i);
-  const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
-  assert.equal(summary.final_status, "blocked");
-  assert.equal(summary.next_action.stage_id, "collect");
+  const result = JSON.parse(stdout);
+  assert.equal(result.ok, true);
+  assert.equal(result.final_status, "generated_only");
 });
 
-test("daily codex pipeline blocks codex stage writes to harness state", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-state-write-"));
-  const binDir = path.join(rootDir, "bin");
-  await fs.mkdir(binDir, { recursive: true });
-  const fakeCodex = await writeNodeCommandShim(binDir, "fake-codex-state-write", `
+test("daily Codex DAG-lite CLI exits non-zero for unrepaired fixture failure", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-failure-"));
+  await writeMinimalRepoFiles(rootDir);
+
+  await assert.rejects(execFileAsync(process.execPath, [
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+    "--repo-root",
+    rootDir,
+    "--date",
+    "2026-07-06",
+    "--fixture",
+    "failure"
+  ]), (error) => {
+    const result = JSON.parse(error.stdout);
+    assert.equal(result.ok, false);
+    assert.equal(result.mode, "daily_codex_dag_lite");
+    assert(result.summary_path.endsWith(path.join("run-summary.json")));
+    return true;
+  });
+});
+
+test("daily Codex DAG-lite CLI rejects legacy publish flags", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-legacy-flags-"));
+  await writeMinimalRepoFiles(rootDir);
+
+  for (const legacyFlag of ["--publish", "--execute"]) {
+    await assert.rejects(execFileAsync(process.execPath, [
+      path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+      "--repo-root",
+      rootDir,
+      "--date",
+      "2026-07-06",
+      "--fixture",
+      "success",
+      legacyFlag
+    ]), (error) => {
+      const result = JSON.parse(error.stdout);
+      assert.equal(result.ok, false);
+      assert.match(result.message, new RegExp(`unsupported daily Codex DAG-lite flag: ${legacyFlag}`));
+      return true;
+    });
+  }
+});
+
+test("daily:codex-pipeline remains the production-facing DAG-lite entrypoint", async () => {
+  const packageJson = JSON.parse(await fs.readFile(path.join(repoRoot, "package.json"), "utf8"));
+  assert.equal(packageJson.scripts["daily:codex-pipeline"], "node scripts/run-daily-codex-pipeline.mjs");
+});
+
+async function writeMinimalRepoFiles(rootDir) {
+  await fs.mkdir(path.join(rootDir, "config"), { recursive: true });
+  await fs.writeFile(path.join(rootDir, "package.json"), JSON.stringify({
+    name: "fixture-daily",
+    description: "Fixture daily project",
+    scripts: {
+      "discover:example": "node example.js",
+      "sources:validate": "node sources.js",
+      "quality:review": "node quality.js",
+      "report:write": "node report.js"
+    }
+  }, null, 2), "utf8");
+  await fs.writeFile(path.join(rootDir, "config", "daily-codex-dag.json"), JSON.stringify({
+    nodes: [
+      { id: "prepare" },
+      { id: "codex-generate" }
+    ]
+  }, null, 2), "utf8");
+}
+
+async function writeFakeCodexCommand(rootDir) {
+  const fakeScriptPath = path.join(rootDir, "fake-codex.mjs");
+  await fs.writeFile(fakeScriptPath, `
 import fs from "node:fs";
 import path from "node:path";
 
-const prompt = await new Promise((resolve) => {
-  let value = "";
-  process.stdin.setEncoding("utf8");
-  process.stdin.on("data", (chunk) => { value += chunk; });
-  process.stdin.on("end", () => resolve(value));
-});
-
-const outputMatch = prompt.match(/\\bOUTPUT_PATH=([^\\n]+)/);
-const outputPath = outputMatch ? outputMatch[1].trim() : "";
+const prompt = fs.readFileSync(0, "utf8");
+const match = prompt.match(/OUTPUT_PATH=([^\\r\\n]+)/);
+if (!match) process.exit(2);
+const outputPath = match[1].trim();
+fs.writeFileSync(path.resolve("package.json"), JSON.stringify({ name: "mutated", scripts: {} }, null, 2));
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, JSON.stringify({
-  report_date: "2026-07-02",
-  stage: "collect",
-  raw_candidates: [],
-  source_audit: {},
-  warnings: []
-}, null, 2) + "\\n", "utf8");
+  report_date: "2026-07-06",
+  headline: "Fake Codex output",
+  summary: "This output is valid, but the command also mutates the repository.",
+  items: [{ title: "Mutation", url: "https://example.com/mutation", note: "Repository mutation should be rejected." }]
+}, null, 2));
+`, "utf8");
 
-const forbiddenPath = path.join(process.cwd(), ".harness-hub", "state", "current-task.md");
-fs.mkdirSync(path.dirname(forbiddenPath), { recursive: true });
-fs.writeFileSync(forbiddenPath, "# Current Task\\n\\n- Out of bounds.\\n", "utf8");
-process.stdout.write(JSON.stringify({ type: "done" }) + "\\n");
-process.exitCode = 3;
-`);
-  const fakeNpm = await writeNodeCommandShim(binDir, "fake-npm", `
-process.stdout.write(JSON.stringify({ ok: true }) + "\\n");
-`);
-  const plan = await prepareDailyCodexPipeline({
-    rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    codexBin: fakeCodex,
-    npmBin: fakeNpm
-  });
-
-  await assert.rejects(runDailyCodexPipeline(plan), (error) => {
-    assert.match(error.message, /forbidden paths: created:/);
-    assert(error.message.includes(".harness-hub/state/current-task.md"));
-    return true;
-  });
-  const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
-  assert.equal(summary.final_status, "blocked");
-  assert.equal(summary.failed_stage_id, "collect");
-  assert.equal(summary.error.code, "codex_stage_forbidden_write");
-});
-
-test("daily codex pipeline blocks codex stage writes to public evidence assets", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-evidence-write-"));
-  const binDir = path.join(rootDir, "bin");
-  await fs.mkdir(binDir, { recursive: true });
-  const fakeCodex = await writeNodeCommandShim(binDir, "fake-codex-evidence-write", `
-import fs from "node:fs";
-import path from "node:path";
-
-const prompt = await new Promise((resolve) => {
-  let value = "";
-  process.stdin.setEncoding("utf8");
-  process.stdin.on("data", (chunk) => { value += chunk; });
-  process.stdin.on("end", () => resolve(value));
-});
-
-const outputMatch = prompt.match(/Write only the required JSON output file:\\s*([^\\n]+)/);
-const outputPath = outputMatch ? outputMatch[1].trim() : "";
-fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-fs.writeFileSync(outputPath, JSON.stringify({
-  report_date: "2026-07-02",
-  stage: "collect",
-  raw_candidates: [],
-  source_audit: {},
-  warnings: []
-}, null, 2) + "\\n", "utf8");
-
-const evidencePath = path.join(process.cwd(), "docs", "assets", "evidence", "out-of-bounds.png");
-fs.mkdirSync(path.dirname(evidencePath), { recursive: true });
-fs.writeFileSync(evidencePath, "not really a png", "utf8");
-process.stdout.write(JSON.stringify({ type: "done" }) + "\\n");
-`);
-  const fakeNpm = await writeNodeCommandShim(binDir, "fake-npm", `
-process.stdout.write(JSON.stringify({ ok: true }) + "\\n");
-`);
-  const plan = await prepareDailyCodexPipeline({
-    rootDir,
-    reportDate: "2026-07-02",
-    workDir: path.join(rootDir, ".tmp", "pipeline"),
-    codexBin: fakeCodex,
-    npmBin: fakeNpm
-  });
-
-  await assert.rejects(runDailyCodexPipeline(plan), (error) => {
-    assert.match(error.message, /forbidden paths: created:/);
-    assert(error.message.includes("docs/assets/evidence/out-of-bounds.png"));
-    return true;
-  });
-  const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
-  assert.equal(summary.final_status, "blocked");
-  assert.equal(summary.failed_stage_id, "collect");
-  assert.equal(summary.error.code, "codex_stage_forbidden_write");
-});
-
-async function writeNodeCommandShim(binDir, name, moduleSource) {
-  const modulePath = path.join(binDir, `${name}.mjs`);
-  await fs.writeFile(modulePath, moduleSource, "utf8");
   if (process.platform === "win32") {
-    const commandPath = path.join(binDir, `${name}.cmd`);
-    await fs.writeFile(commandPath, `@echo off\r\n"${process.execPath}" "${modulePath}" %*\r\n`, "utf8");
+    const commandPath = path.join(rootDir, "fake-codex.cmd");
+    await fs.writeFile(commandPath, `@echo off\r\n"${process.execPath}" "%~dp0fake-codex.mjs" %*\r\n`, "utf8");
     return commandPath;
   }
-  const commandPath = path.join(binDir, name);
-  await fs.writeFile(commandPath, `#!/bin/sh\nexec "${process.execPath}" "${modulePath}" "$@"\n`, "utf8");
+
+  const commandPath = path.join(rootDir, "fake-codex");
+  await fs.writeFile(commandPath, `#!/usr/bin/env sh\nexec "${process.execPath}" "$(dirname "$0")/fake-codex.mjs" "$@"\n`, "utf8");
   await fs.chmod(commandPath, 0o755);
   return commandPath;
-}
-
-async function writePipelineCommandShims(rootDir) {
-  const binDir = path.join(rootDir, "bin");
-  await fs.mkdir(binDir, { recursive: true });
-  const fakeCodex = await writeNodeCommandShim(binDir, "fake-codex", `
-import fs from "node:fs";
-import path from "node:path";
-
-const args = process.argv.slice(2);
-const prompt = await new Promise((resolve) => {
-  let value = "";
-  process.stdin.setEncoding("utf8");
-  process.stdin.on("data", (chunk) => { value += chunk; });
-  process.stdin.on("end", () => resolve(value));
-});
-
-function outputPathFor(label) {
-  const match = prompt.match(new RegExp(label + "\\\\s*([^\\\\n]+)"));
-  return match ? match[1].trim() : "";
-}
-
-function writeJson(filePath, value) {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(value, null, 2) + "\\n", "utf8");
-}
-
-const lastMessageIndex = args.indexOf("--output-last-message");
-if (lastMessageIndex >= 0) {
-  writeJson(args[lastMessageIndex + 1], { ok: true });
-}
-
-if (prompt.includes("信息收集阶段")) {
-  writeJson(outputPathFor("输出文件："), {
-    report_date: "2026-07-02",
-    stage: "collect",
-    raw_candidates: [{ candidate_id: "fixture-item", title: "Fixture Item", url: "https://example.com/item" }],
-    source_audit: {},
-    warnings: []
-  });
-} else if (prompt.includes("信息准入阶段")) {
-  writeJson(outputPathFor("输出准入文件："), {
-    report_date: "2026-07-02",
-    stage: "admit",
-    accepted_items: [{ candidate_id: "fixture-item", title: "Fixture Item", url: "https://example.com/item" }],
-    rejected_items: []
-  });
-} else if (prompt.includes("单条新闻概括阶段")) {
-  writeJson(outputPathFor("条目输出文件："), {
-    candidate_id: "fixture-item",
-    title: "Fixture Item ships a concrete change",
-    summary: "Fixture Item 发布了可验证的新能力。",
-    bullets: ["读者可以看到明确变化。", "来源和范围保持可追溯。"],
-    source: { label: "Fixture", url: "https://example.com/item" },
-    insufficient_evidence: false,
-    evidence_notes: []
-  });
-} else if (prompt.includes("结构化组装阶段")) {
-  writeJson(outputPathFor("输出草稿："), {
-    report_date: "2026-07-02",
-    summary: "Fixture Item 发布了可验证的新能力。",
-    main_items: []
-  });
-}
-
-process.stdout.write(JSON.stringify({ type: "done" }) + "\\n");
-`);
-  const fakeNpm = await writeNodeCommandShim(binDir, "fake-npm", `
-import fs from "node:fs";
-import path from "node:path";
-
-const args = process.argv.slice(2);
-const script = args[0] === "run" ? args[1] : args[0];
-const outputIndex = args.indexOf("--output");
-if (outputIndex >= 0) {
-  const outputPath = args[outputIndex + 1];
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, JSON.stringify({ ok: true, script }, null, 2) + "\\n", "utf8");
-}
-if (script === "publish" && process.env.FAKE_NPM_FAIL_PUBLISH === "1") {
-  process.stderr.write("simulated publish failure\\n");
-  process.exit(2);
-}
-if (script === "publish:verify-pages" && process.env.FAKE_NPM_PAGES_PENDING === "1") {
-  process.stdout.write(JSON.stringify({
-    ok: false,
-    script,
-    verification_error: "pages_verification_failed: HTTP 404",
-    diagnostics: "x".repeat(200000)
-  }) + "\\n");
-} else if (script === "publish:verify-pages" && process.env.FAKE_NPM_PAGES_NO_JSON === "1") {
-  process.stdout.write("pages verification produced no structured JSON\\n");
-} else {
-  process.stdout.write(JSON.stringify({ ok: true, script }) + "\\n");
-}
-`);
-  return { fakeCodex, fakeNpm };
 }

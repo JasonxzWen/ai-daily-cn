@@ -7,230 +7,32 @@ import path from "node:path";
 import { finished } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
+const DEFAULT_WORK_DIR = path.join(".tmp", "daily-codex-mvp");
 const DEFAULT_SANDBOX = "workspace-write";
-const DEFAULT_WORK_DIR = path.join(".tmp", "daily-codex-pipeline");
-const CODEX_STAGE_FORBIDDEN_EXACT_PATHS = [
-  ".harness-hub/state/current-task.md",
-  ".harness-hub/state/progress.md",
-  ".harness-hub/state/session-handoff.md",
-  ".harness-hub/state/decisions.md",
-  ".harness-hub/state/loop-runs.jsonl",
-  ".harness-hub/state/interrupt-decisions.jsonl",
-  ".harness-hub/state/capability-events.jsonl",
-  "tasks/current-task.md",
-  "progress.md",
-  "session-handoff.md"
-];
-const CODEX_STAGE_FORBIDDEN_DIRS = [
-  ".harness-hub/state",
-  "docs/assets/evidence",
-  "docs/reports",
-  "reports-data"
-];
+const STAGE_IDS = ["prepare", "collect-context", "codex-generate", "validate", "repair-once", "summarize"];
+const REPOSITORY_GUARD_EXCLUDED_DIRS = new Set([".git", ".codegraph", "node_modules"]);
 
 export async function prepareDailyCodexPipeline(options = {}) {
-  const rootDir = path.resolve(options.rootDir || process.cwd());
-  const reportDate = requiredDate(options.reportDate || options.date);
-  const workDir = path.resolve(rootDir, options.workDir || path.join(DEFAULT_WORK_DIR, reportDate));
-  const admissionInputPath = options.admissionInputPath
-    ? path.resolve(rootDir, options.admissionInputPath)
-    : "";
-  const admittedItems = admissionInputPath ? await loadAdmittedItems(admissionInputPath) : [];
-  const includePlaceholderSummaries = Boolean(options.includePlaceholderSummaries);
-  const publish = Boolean(options.publish);
-  const plan = buildDailyCodexPipelinePlan({
-    ...options,
-    rootDir,
-    reportDate,
-    workDir,
-    admittedItems,
-    includePlaceholderSummaries,
-    publish
-  });
-
-  await writePlanFiles(plan);
+  const plan = buildDailyCodexPipelinePlan(options);
+  assertSafeWorkDir(plan);
+  await fs.rm(plan.work_dir, { recursive: true, force: true });
+  await fs.mkdir(plan.work_dir, { recursive: true });
+  await writePlan(plan);
   return plan;
 }
 
 export function buildDailyCodexPipelinePlan(options = {}) {
-  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const rootDir = path.resolve(options.rootDir || options["repo-root"] || process.cwd());
   const reportDate = requiredDate(options.reportDate || options.date);
-  const workDir = path.resolve(rootDir, options.workDir || path.join(DEFAULT_WORK_DIR, reportDate));
-  const codexBin = options.codexBin || defaultCodexBin();
+  const workDir = path.resolve(rootDir, options.workDir || options["work-dir"] || path.join(DEFAULT_WORK_DIR, reportDate));
+  const codexBin = options.codexBin || options["codex-bin"] || defaultCodexBin();
   const sandbox = options.sandbox || DEFAULT_SANDBOX;
   const model = options.model || "";
-  const npmBin = options.npmBin || "";
-  const publish = Boolean(options.publish);
-  const admittedItems = normalizeAdmittedItems(options.admittedItems || []);
-  const summaryItems = admittedItems.length
-    ? admittedItems
-    : (options.includePlaceholderSummaries ? [placeholderSummaryItem(reportDate)] : []);
-  const outputs = buildOutputs({ rootDir, workDir, reportDate });
-  const codexOptions = { codexBin, rootDir, model, sandbox };
-  const validationStages = [
-    commandStage({
-      id: "content-contract",
-      title: "Run content contract",
-      dependsOn: ["build"],
-      workDir,
-      command: npmRunCommand("content:contract", [], npmBin),
-      cwd: rootDir
-    }),
-    commandStage({
-      id: "page-check",
-      title: "Run browser page checklist",
-      dependsOn: ["build"],
-      workDir,
-      command: npmRunCommand("quality:page-check", [
-        "--date",
-        reportDate,
-        "--output",
-        outputs.pageCheck
-      ], npmBin),
-      cwd: rootDir,
-      outputPath: outputs.pageCheck
-    })
-  ];
-  const publishStages = publish
-    ? [
-        commandStage({
-          id: "publish-dry-run",
-          title: "Validate daily publish plan",
-          dependsOn: ["content-contract", "page-check"],
-          workDir,
-          command: npmRunCommand("publish:dry-run:daily", ["--date", reportDate], npmBin),
-          cwd: rootDir
-        }),
-        commandStage({
-          id: "publish",
-          title: "Publish generated report",
-          dependsOn: ["publish-dry-run"],
-          workDir,
-          command: npmRunCommand("publish", ["--date", reportDate, "--confirm-push", "--skip-pages-verify"], npmBin),
-          fallbackCommand: npmRunCommand("publish:github-api", ["confirm-push", "--date", reportDate, "--skip-pages-verify"], npmBin),
-          fallbackTitle: "Publish generated report through GitHub API fallback",
-          cwd: rootDir
-        }),
-        commandStage({
-          id: "pages-verify",
-          title: "Verify published Pages URL",
-          dependsOn: ["publish"],
-          workDir,
-          command: npmRunCommand("publish:verify-pages", ["--date", reportDate], npmBin),
-          cwd: rootDir,
-          allowFailure: true
-        })
-      ]
-    : [];
-  const stages = [
-    codexStage({
-      id: "collect",
-      title: "Collect raw candidates",
-      promptPath: path.join(workDir, "prompts", "01-collect.md"),
-      outputPath: outputs.candidates,
-      lastMessagePath: path.join(workDir, "logs", "01-collect.last-message.md"),
-      eventsPath: path.join(workDir, "logs", "01-collect.events.jsonl"),
-      stderrPath: path.join(workDir, "logs", "01-collect.stderr.log"),
-      prompt: buildCollectPrompt({ reportDate, rootDir, outputs }),
-      ...codexOptions
-    }),
-    codexStage({
-      id: "admit",
-      title: "Admit report-worthy items",
-      dependsOn: ["collect"],
-      promptPath: path.join(workDir, "prompts", "02-admit.md"),
-      outputPath: outputs.admission,
-      lastMessagePath: path.join(workDir, "logs", "02-admit.last-message.md"),
-      eventsPath: path.join(workDir, "logs", "02-admit.events.jsonl"),
-      stderrPath: path.join(workDir, "logs", "02-admit.stderr.log"),
-      prompt: buildAdmitPrompt({ reportDate, outputs }),
-      ...codexOptions
-    }),
-    ...summaryItems.map((item, index) => summaryStage({
-      item,
-      index,
-      reportDate,
-      outputs,
-      workDir,
-      codexOptions
-    })),
-    codexStage({
-      id: "assemble",
-      title: "Assemble structured report draft",
-      dependsOn: ["admit", ...summaryItems.map((item) => `summarize:${item.id}`)],
-      promptPath: path.join(workDir, "prompts", "90-assemble.md"),
-      outputPath: outputs.draftReport,
-      lastMessagePath: path.join(workDir, "logs", "90-assemble.last-message.md"),
-      eventsPath: path.join(workDir, "logs", "90-assemble.events.jsonl"),
-      stderrPath: path.join(workDir, "logs", "90-assemble.stderr.log"),
-      prompt: buildAssemblePrompt({ reportDate, outputs }),
-      ...codexOptions
-    }),
-    commandStage({
-      id: "quality-review",
-      title: "Review draft quality",
-      dependsOn: ["assemble"],
-      workDir,
-      command: npmRunCommand("quality:review", [
-        "--date",
-        reportDate,
-        "--input",
-        outputs.draftReport,
-        "--candidate-pool",
-        outputs.candidates,
-        "--output",
-        outputs.qualityReview,
-        "--fail-on-issues"
-      ], npmBin),
-      cwd: rootDir,
-      outputPath: outputs.qualityReview
-    }),
-    commandStage({
-      id: "write-report",
-      title: "Normalize report JSON",
-      dependsOn: ["quality-review"],
-      workDir,
-      command: npmRunCommand("report:write", [
-        outputs.draftReport,
-        "reports-data",
-        reportDate,
-        "--candidate-pool",
-        outputs.candidates
-      ], npmBin),
-      cwd: rootDir
-    }),
-    commandStage({
-      id: "sources-phase5-audit",
-      title: "Audit source run history",
-      dependsOn: ["write-report"],
-      workDir,
-      command: npmRunCommand("sources:phase5-audit", [
-        "--date",
-        reportDate,
-        "--history-dir",
-        "reports-data",
-        "--days",
-        "3",
-        "--output",
-        outputs.sourcePhase5Audit
-      ], npmBin),
-      cwd: rootDir,
-      outputPath: outputs.sourcePhase5Audit
-    }),
-    commandStage({
-      id: "build",
-      title: "Build static site",
-      dependsOn: ["sources-phase5-audit"],
-      workDir,
-      command: npmRunCommand("build", [], npmBin),
-      cwd: rootDir
-    }),
-    ...validationStages,
-    ...publishStages
-  ];
-
+  const fixtureMode = normalizeFixtureMode(options.fixtureMode || options.fixture || "");
+  const outputs = buildOutputs({ workDir });
   return {
-    version: 1,
+    version: 2,
+    mode: "daily_codex_dag_lite",
     report_date: reportDate,
     root_dir: rootDir,
     work_dir: workDir,
@@ -238,301 +40,481 @@ export function buildDailyCodexPipelinePlan(options = {}) {
       bin: codexBin,
       model,
       sandbox,
-      ephemeral: true,
-      independent_context_per_stage: true
-    },
-    npm: {
-      bin: npmBin || defaultNpmBin()
-    },
-    publish: {
-      enabled: publish,
-      fallback: publish ? "publish:github-api" : ""
+      fixture_mode: fixtureMode
     },
     outputs,
-    stages
+    stages: STAGE_IDS.map((id) => buildStage({ id, rootDir, workDir, outputs }))
   };
 }
 
-export async function runDailyCodexPipeline(initialPlan, options = {}) {
-  let plan = initialPlan;
-  const completedStages = [];
-  await writeRunSummary(plan, {
-    final_status: "running",
-    next_action: { kind: "none" },
-    completedStages
-  });
-
-  const runAndRecord = async (stage) => {
-    const result = await runStage(stage, options);
-    completedStages.push(await stageResultSummary(stage, result));
-    await writeRunSummary(plan, {
-      final_status: "running",
-      next_action: { kind: "none" },
-      completedStages
-    });
+export async function runDailyCodexPipeline(plan, options = {}) {
+  const state = {
+    plan,
+    completedStages: [],
+    context: null,
+    generation: null,
+    validation: null,
+    repair: null,
+    repairValidation: null,
+    repairAttempted: false,
+    finalArtifactPath: "",
+    finalValidation: null
   };
+  await writeRunSummary(state, { finalStatus: "running" });
 
+  await recordStage(state, "prepare", () => runPrepareStage(state));
+  await recordStage(state, "collect-context", () => runCollectContextStage(state, options));
+  await recordStage(state, "codex-generate", () => runGenerateStage(state, options));
+  await recordStage(state, "validate", () => runValidateStage(state));
+  await recordStage(state, "repair-once", () => runRepairStage(state, options));
+  await recordStage(state, "summarize", () => runSummarizeStage(state));
+
+  const finalStatus = state.finalValidation?.ok ? "generated_only" : "blocked";
+  const summary = await writeRunSummary(state, { finalStatus });
+  return { plan, summary };
+}
+
+export function validateDailyCodexMvpArtifact(value, { reportDate } = {}) {
+  const failures = [];
+  if (!isPlainObject(value)) {
+    return { ok: false, failures: ["artifact must be a JSON object"] };
+  }
+  if (value.report_date !== reportDate) {
+    failures.push(`report_date must be ${reportDate}`);
+  }
+  if (!nonEmptyString(value.headline)) {
+    failures.push("headline is required");
+  }
+  if (!nonEmptyString(value.summary)) {
+    failures.push("summary is required");
+  }
+  if (!Array.isArray(value.items) || value.items.length < 1) {
+    failures.push("items must contain at least one item");
+  } else {
+    value.items.forEach((item, index) => {
+      if (!isPlainObject(item)) {
+        failures.push(`items[${index}] must be an object`);
+        return;
+      }
+      if (!nonEmptyString(item.title)) failures.push(`items[${index}].title is required`);
+      if (!nonEmptyString(item.url)) failures.push(`items[${index}].url is required`);
+      if (!nonEmptyString(item.note)) failures.push(`items[${index}].note is required`);
+    });
+  }
+  return { ok: failures.length === 0, failures };
+}
+
+async function recordStage(state, stageId, fn) {
+  const stage = state.plan.stages.find((item) => item.id === stageId);
+  const startedAt = new Date();
+  let result;
   try {
-    await runAndRecord(plan.stages.find((stage) => stage.id === "collect"));
-    await runAndRecord(plan.stages.find((stage) => stage.id === "admit"));
-
-    const admittedItems = await loadAdmittedItems(plan.outputs.admission);
-    plan = buildDailyCodexPipelinePlan({
-      rootDir: plan.root_dir,
-      reportDate: plan.report_date,
-      workDir: plan.work_dir,
-      codexBin: plan.codex.bin,
-      model: plan.codex.model,
-      sandbox: plan.codex.sandbox,
-      npmBin: plan.npm.bin,
-      publish: Boolean(plan.publish?.enabled),
-      admittedItems
-    });
-    await writePlanFiles(plan);
-
-    for (const stage of plan.stages) {
-      if (stage.id === "collect" || stage.id === "admit") continue;
-      await runAndRecord(stage);
-    }
-
-    const finalOutcome = finalPipelineOutcome(plan, completedStages);
-    await writeRunSummary(plan, {
-      final_status: finalOutcome.final_status,
-      next_action: finalOutcome.next_action,
-      completedStages
-    });
-    return plan;
+    result = await fn(stage);
   } catch (error) {
-    await writeRunSummary(plan, {
-      final_status: "blocked",
-      next_action: {
-        kind: "inspect_pipeline_stage_failure",
-        stage_id: error.stage_id || "",
-        summary_path: plan.outputs.runSummary,
-        message: error.message
-      },
-      completedStages,
-      error
-    });
+    result = {
+      status: "failure",
+      failures: [{ code: error.code || "stage_failed", message: error.message }]
+    };
+  }
+  const finishedAt = new Date();
+  const summary = {
+    id: stageId,
+    status: result.status || "success",
+    started_at: startedAt.toISOString(),
+    finished_at: finishedAt.toISOString(),
+    duration_ms: Math.max(0, finishedAt.getTime() - startedAt.getTime()),
+    artifacts: result.artifacts || [],
+    failures: result.failures || [],
+    skipped_reason: result.skipped_reason || ""
+  };
+  state.completedStages.push(summary);
+  await writeRunSummary(state, {
+    finalStatus: summary.status === "failure" && stageId !== "validate" && stageId !== "repair-once" ? "blocked" : "running"
+  });
+  if (summary.status === "failure" && stageId !== "validate" && stageId !== "repair-once") {
+    const error = new Error(summary.failures[0]?.message || `${stageId} failed`);
+    error.code = summary.failures[0]?.code || "stage_failed";
+    error.stage_id = stageId;
     throw error;
   }
-}
-
-export async function loadAdmittedItems(inputPath) {
-  const content = await fs.readFile(inputPath, "utf8");
-  return normalizeAdmittedItems(extractAdmittedItems(JSON.parse(content)));
-}
-
-async function writePlanFiles(plan) {
-  await fs.mkdir(plan.work_dir, { recursive: true });
-  await Promise.all(plan.stages.map(async (stage) => {
-    if (!stage.prompt_path || !stage.prompt) return;
-    await fs.mkdir(path.dirname(stage.prompt_path), { recursive: true });
-    await fs.writeFile(stage.prompt_path, stage.prompt, "utf8");
-    if (stage.item_path && stage.item) {
-      await fs.mkdir(path.dirname(stage.item_path), { recursive: true });
-      await fs.writeFile(stage.item_path, `${JSON.stringify(stage.item.raw || stage.item, null, 2)}\n`, "utf8");
-    }
-  }));
-  await fs.writeFile(path.join(plan.work_dir, "pipeline-plan.json"), `${JSON.stringify(publicPlan(plan), null, 2)}\n`, "utf8");
-}
-
-async function writeRunSummary(plan, options = {}) {
-  const error = options.error || null;
-  const summary = {
-    report_date: plan.report_date,
-    mode: "codex_pipeline",
-    final_status: options.final_status || "running",
-    next_action: options.next_action || { kind: "none" },
-    pipeline_plan_path: path.join(plan.work_dir, "pipeline-plan.json"),
-    work_dir: plan.work_dir,
-    outputs: plan.outputs,
-    publish: plan.publish || { enabled: false, fallback: "" },
-    completed_stages: options.completedStages || [],
-    failed_stage_id: error?.stage_id || "",
-    error: error ? {
-      message: error.message,
-      code: error.code || "",
-      stage_id: error.stage_id || ""
-    } : null,
-    updated_at: new Date().toISOString()
-  };
-  await fs.mkdir(path.dirname(plan.outputs.runSummary), { recursive: true });
-  await fs.writeFile(plan.outputs.runSummary, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
   return summary;
 }
 
-async function stageResultSummary(stage, result = {}) {
-  const stdoutPath = result.fallback_used ? stage.fallback_stdout_path : (stage.stdout_path || stage.events_path || "");
-  const stderrPath = result.fallback_used ? stage.fallback_stderr_path : (stage.stderr_path || "");
+async function runPrepareStage(state) {
+  await fs.mkdir(path.dirname(state.plan.outputs.run_summary), { recursive: true });
+  await fs.mkdir(path.dirname(state.plan.outputs.context), { recursive: true });
+  await fs.mkdir(path.dirname(state.plan.outputs.generate_stdout), { recursive: true });
+  await fs.mkdir(path.dirname(state.plan.outputs.generate_stderr), { recursive: true });
+  await writePlan(state.plan);
+  return { status: "success", artifacts: await artifactRecords([state.plan.outputs.plan]) };
+}
+
+async function runCollectContextStage(state, options) {
+  const context = options.context || await buildLocalContext(state.plan);
+  state.context = context;
+  await writeJson(state.plan.outputs.context, context);
+  return { status: "success", artifacts: await artifactRecords([state.plan.outputs.context]) };
+}
+
+async function runGenerateStage(state) {
+  if (state.plan.codex.fixture_mode) {
+    state.generation = fixtureGeneration({
+      mode: state.plan.codex.fixture_mode,
+      reportDate: state.plan.report_date,
+      repaired: false
+    });
+    await writeJson(state.plan.outputs.generated, state.generation);
+    return { status: "success", artifacts: await artifactRecords([state.plan.outputs.generated]) };
+  }
+
+  const prompt = buildGeneratePrompt(state);
+  await writeText(state.plan.outputs.generate_prompt, prompt);
+  await runCodexStage({
+    plan: state.plan,
+    prompt,
+    stdoutPath: state.plan.outputs.generate_stdout,
+    stderrPath: state.plan.outputs.generate_stderr
+  });
+  state.generation = await readJson(state.plan.outputs.generated);
   return {
-    id: stage.id,
-    kind: stage.kind,
-    ok: result.ok !== false,
-    allowed_failure: Boolean(result.allowed_failure),
-    fallback_used: Boolean(result.fallback_used),
-    stdout_path: stdoutPath,
-    stderr_path: stderrPath,
-    output_path: stage.output_path || "",
-    error: result.error ? {
-      message: result.error.message,
-      code: result.error.code || ""
-    } : null,
-    result_json: await readStageJson({ stdoutPath, outputPath: stage.output_path || "" })
+    status: "success",
+    artifacts: await artifactRecords([state.plan.outputs.generated])
   };
 }
 
-function finalPipelineOutcome(plan, completedStages = []) {
-  if (!plan.publish?.enabled) {
-    return { final_status: "generated_only", next_action: { kind: "none" } };
-  }
-  const pagesVerify = completedStages.find((stage) => stage.id === "pages-verify");
-  if (pagesVerify && (pagesVerify.ok === false || !pagesVerify.result_json || pagesVerify.result_json?.ok === false || pagesVerify.result_json?.verification_error)) {
+async function runValidateStage(state) {
+  const artifact = state.generation || await readJsonOrNull(state.plan.outputs.generated);
+  const validation = validateDailyCodexMvpArtifact(artifact, { reportDate: state.plan.report_date });
+  state.validation = validation;
+  await writeJson(state.plan.outputs.validation, validation);
+  return {
+    status: validation.ok ? "success" : "failure",
+    artifacts: await artifactRecords([state.plan.outputs.validation]),
+    failures: validation.ok ? [] : validation.failures.map((message) => ({
+      code: "mvp_validation_failed",
+      message
+    }))
+  };
+}
+
+async function runRepairStage(state) {
+  if (state.validation?.ok) {
+    state.finalArtifactPath = state.plan.outputs.generated;
+    state.finalValidation = state.validation;
     return {
-      final_status: "published_pending_pages_verification",
-      next_action: {
-        kind: "verify_pages_later",
-        stage_id: "pages-verify",
-        summary_path: plan.outputs.runSummary,
-        report_date: plan.report_date,
-        message: "Repository publish completed, but Pages verification did not confirm the live page yet."
-      }
+      status: "skipped",
+      skipped_reason: "validation_passed",
+      artifacts: []
     };
   }
-  return { final_status: "published", next_action: { kind: "none" } };
+
+  state.repairAttempted = true;
+  if (state.plan.codex.fixture_mode) {
+    state.repair = fixtureGeneration({
+      mode: state.plan.codex.fixture_mode,
+      reportDate: state.plan.report_date,
+      repaired: true
+    });
+    await writeJson(state.plan.outputs.repaired, state.repair);
+  } else {
+    const prompt = buildRepairPrompt(state);
+    await writeText(state.plan.outputs.repair_prompt, prompt);
+    await runCodexStage({
+      plan: state.plan,
+      prompt,
+      stdoutPath: state.plan.outputs.repair_stdout,
+      stderrPath: state.plan.outputs.repair_stderr
+    });
+    state.repair = await readJson(state.plan.outputs.repaired);
+  }
+
+  state.repairValidation = validateDailyCodexMvpArtifact(state.repair, { reportDate: state.plan.report_date });
+  state.finalArtifactPath = state.plan.outputs.repaired;
+  state.finalValidation = state.repairValidation;
+  await writeJson(state.plan.outputs.repair_validation, state.repairValidation);
+  return {
+    status: state.repairValidation.ok ? "success" : "failure",
+    artifacts: await artifactRecords([state.plan.outputs.repaired, state.plan.outputs.repair_validation]),
+    failures: state.repairValidation.ok ? [] : state.repairValidation.failures.map((message) => ({
+      code: "mvp_repair_validation_failed",
+      message
+    }))
+  };
 }
 
-async function validateCodexStageOutput(stage) {
-  const outputPath = stage.output_path || "";
-  if (!outputPath) {
-    throw stageOutputError(stage, "missing_stage_output_path", "Codex stage has no output path.");
+async function runSummarizeStage(state) {
+  if (state.finalArtifactPath) {
+    await fs.copyFile(state.finalArtifactPath, state.plan.outputs.final);
   }
-  let parsed;
+  const summaryPayload = {
+    ok: Boolean(state.finalValidation?.ok),
+    report_date: state.plan.report_date,
+    final_artifact: state.plan.outputs.final,
+    validation: state.finalValidation || state.validation || { ok: false, failures: ["validation did not run"] },
+    repair_attempted: state.repairAttempted
+  };
+  await writeJson(state.plan.outputs.stage_summary, summaryPayload);
+  return {
+    status: summaryPayload.ok ? "success" : "failure",
+    artifacts: await artifactRecords([state.plan.outputs.final, state.plan.outputs.stage_summary]),
+    failures: summaryPayload.ok ? [] : summaryPayload.validation.failures.map((message) => ({
+      code: "mvp_final_validation_failed",
+      message
+    }))
+  };
+}
+
+async function writeRunSummary(state, { finalStatus }) {
+  const summary = {
+    report_date: state.plan.report_date,
+    mode: "daily_codex_dag_lite",
+    final_status: finalStatus,
+    next_action: nextActionFor({ finalStatus, state }),
+    work_dir: state.plan.work_dir,
+    plan_path: state.plan.outputs.plan,
+    final_artifact: state.plan.outputs.final,
+    completed_stages: state.completedStages,
+    validation: state.finalValidation || state.validation || null,
+    repair_attempted: state.repairAttempted,
+    updated_at: new Date().toISOString()
+  };
+  await writeJson(state.plan.outputs.run_summary, summary);
+  return summary;
+}
+
+function nextActionFor({ finalStatus, state }) {
+  if (finalStatus === "running") return { kind: "none" };
+  if (finalStatus === "generated_only") {
+    return { kind: "promote_mvp_artifact", artifact_path: state.plan.outputs.final };
+  }
+  return {
+    kind: "inspect_mvp_failure",
+    summary_path: state.plan.outputs.run_summary,
+    validation_path: state.repairValidation ? state.plan.outputs.repair_validation : state.plan.outputs.validation
+  };
+}
+
+async function buildLocalContext(plan) {
+  const packageJson = await readJson(path.join(plan.root_dir, "package.json"));
+  const dagManifest = await readJsonOrNull(path.join(plan.root_dir, "config", "daily-codex-dag.json"));
+  return {
+    report_date: plan.report_date,
+    project: {
+      name: packageJson.name || "",
+      description: packageJson.description || ""
+    },
+    available_scripts: Object.keys(packageJson.scripts || {}).filter((name) => (
+      name.startsWith("discover:") ||
+      name.startsWith("sources:") ||
+      name.startsWith("quality:") ||
+      name.startsWith("report:")
+    )).sort(),
+    dag_nodes: Array.isArray(dagManifest?.nodes) ? dagManifest.nodes.map((node) => node.id).filter(Boolean) : [],
+    mvp_contract: {
+      stages: STAGE_IDS,
+      output_schema: {
+        report_date: "YYYY-MM-DD",
+        headline: "string",
+        summary: "string",
+        items: [{ title: "string", url: "string", note: "string" }]
+      }
+    }
+  };
+}
+
+function buildGeneratePrompt(state) {
+  return `${boundaryPrompt(state.plan.outputs.generated)}
+You are running the MVP daily Codex DAG-lite generation stage.
+Read the context JSON at ${state.plan.outputs.context}.
+Write one JSON object to ${state.plan.outputs.generated}.
+Required shape:
+{
+  "report_date": "${state.plan.report_date}",
+  "headline": "short Chinese headline",
+  "summary": "one concise Chinese paragraph",
+  "items": [
+    { "title": "item title", "url": "https://example.com/source", "note": "why this item matters" }
+  ]
+}
+Keep this MVP factual and conservative. If the context lacks live news, state that this is an MVP dry generation artifact and use repository-local context only.
+`;
+}
+
+function buildRepairPrompt(state) {
+  return `${boundaryPrompt(state.plan.outputs.repaired)}
+You are repairing the MVP daily Codex DAG-lite JSON artifact.
+Invalid artifact: ${state.plan.outputs.generated}
+Validation failures: ${JSON.stringify(state.validation?.failures || [], null, 2)}
+Context: ${state.plan.outputs.context}
+Write a corrected JSON object to ${state.plan.outputs.repaired} with:
+{
+  "report_date": "${state.plan.report_date}",
+  "headline": "string",
+  "summary": "string",
+  "items": [
+    { "title": "string", "url": "string", "note": "string" }
+  ]
+}
+Do not edit any other file.
+`;
+}
+
+function boundaryPrompt(outputPath) {
+  return `Execution boundary:
+- OUTPUT_PATH=${outputPath}
+- Write only the required JSON output file.
+- Do not edit repository files, docs, reports-data, output, tasks, progress logs, handoff notes, or harness state.
+- Put scratch files only under the pipeline work directory.
+`;
+}
+
+async function runCodexStage({ plan, prompt, stdoutPath, stderrPath }) {
+  const before = await snapshotRepositoryFiles(plan.root_dir, { allowedDir: plan.work_dir });
+  let spawnError = null;
   try {
-    parsed = JSON.parse(await fs.readFile(outputPath, "utf8"));
+    const args = [
+      "exec",
+      "--ephemeral",
+      "--json",
+      "-C",
+      plan.root_dir,
+      "--sandbox",
+      plan.codex.sandbox,
+      "-"
+    ];
+    if (plan.codex.model) {
+      args.splice(args.length - 1, 0, "--model", plan.codex.model);
+    }
+    await spawnWithPrompt(plan.codex.bin, args, {
+      cwd: plan.root_dir,
+      prompt,
+      stdoutPath,
+      stderrPath
+    });
   } catch (error) {
-    throw stageOutputError(stage, "invalid_stage_output_json", `Codex stage did not write valid JSON to ${outputPath}: ${error.message}`);
+    spawnError = error;
   }
-  const id = String(stage.id || "");
-  if (id === "collect" && !Array.isArray(parsed.raw_candidates)) {
-    throw stageOutputError(stage, "collect_candidates_required", "Collect stage output requires raw_candidates array.");
-  }
-  if (id === "admit" && !Array.isArray(parsed.accepted_items)) {
-    throw stageOutputError(stage, "admission_items_required", "Admission stage output requires accepted_items array.");
-  }
-  if (id.startsWith("summarize:")) {
-    const hasReaderCopy = Boolean(String(parsed.title || "").trim()) &&
-      (Boolean(String(parsed.summary || "").trim()) || (Array.isArray(parsed.bullets) && parsed.bullets.some((item) => String(item || "").trim())));
-    if (!parsed.insufficient_evidence && !hasReaderCopy) {
-      throw stageOutputError(stage, "summary_reader_copy_required", "Summary stage output requires title plus summary or bullets, unless insufficient_evidence is true.");
-    }
-  }
-  return parsed;
-}
-
-function stageOutputError(stage, code, message) {
-  const error = new Error(message);
-  error.code = code;
-  error.stage_id = stage.id;
-  return error;
-}
-
-async function runStage(stage) {
-  if (!stage) {
-    throw new Error("Missing pipeline stage");
-  }
-  try {
-    if (stage.kind === "codex_exec") {
-      await fs.mkdir(path.dirname(stage.events_path), { recursive: true });
-      await fs.mkdir(path.dirname(stage.output_path), { recursive: true });
-      const prompt = await fs.readFile(stage.prompt_path, "utf8");
-      const forbiddenSnapshot = await snapshotCodexStageForbiddenPaths(stage.cwd);
-      let stageError = null;
-      try {
-        await spawnWithPrompt(stage.command[0], stage.command.slice(1), {
-          cwd: stage.cwd,
-          prompt,
-          stdoutPath: stage.events_path,
-          stderrPath: stage.stderr_path
-        });
-      } catch (error) {
-        stageError = error;
-      }
-      const forbiddenChanges = await diffCodexStageForbiddenPaths(stage.cwd, forbiddenSnapshot);
-      if (forbiddenChanges.length) {
-        throw codexStageBoundaryError(stage, forbiddenChanges, stageError);
-      }
-      if (stageError) {
-        throw stageError;
-      }
-      await validateCodexStageOutput(stage);
-      return { fallback_used: false, ok: true };
-    }
-    if (stage.kind === "command") {
-      try {
-        await spawnWithPrompt(stage.command[0], stage.command.slice(1), {
-          cwd: stage.cwd,
-          prompt: "",
-          stdoutPath: stage.stdout_path,
-          stderrPath: stage.stderr_path
-        });
-        return { fallback_used: false, ok: true };
-      } catch (error) {
-        if (stage.allow_failure) {
-          return { fallback_used: false, ok: false, allowed_failure: true, error };
-        }
-        if (!stage.fallback_command) {
-          throw error;
-        }
-        await spawnWithPrompt(stage.fallback_command[0], stage.fallback_command.slice(1), {
-          cwd: stage.cwd,
-          prompt: "",
-          stdoutPath: stage.fallback_stdout_path,
-          stderrPath: stage.fallback_stderr_path
-        });
-        return { fallback_used: true, fallback_command: stage.fallback_command, ok: true };
-      }
-    }
-    throw new Error(`Unsupported stage kind: ${stage.kind}`);
-  } catch (error) {
-    error.stage_id = error.stage_id || stage.id;
+  const changes = await diffRepositoryFiles(plan.root_dir, { allowedDir: plan.work_dir, before });
+  if (changes.length) {
+    const error = new Error(`Codex stage modified repository paths outside work dir: ${changes.map((item) => `${item.change}:${item.path}`).join(", ")}`);
+    error.code = "codex_repository_write";
     throw error;
   }
+  if (spawnError) throw spawnError;
 }
 
-async function snapshotCodexStageForbiddenPaths(rootDir) {
+async function spawnWithPrompt(command, args, options) {
+  await fs.mkdir(path.dirname(options.stdoutPath), { recursive: true });
+  await fs.mkdir(path.dirname(options.stderrPath), { recursive: true });
+  await new Promise((resolve, reject) => {
+    const stdout = fsSync.createWriteStream(options.stdoutPath, { flags: "a" });
+    const stderr = fsSync.createWriteStream(options.stderrPath, { flags: "a" });
+    const stdoutFinished = finished(stdout);
+    const stderrFinished = finished(stderr);
+    const child = spawn(command, args, {
+      cwd: options.cwd,
+      stdio: ["pipe", "pipe", "pipe"],
+      shell: shouldUseShell(command)
+    });
+    child.stdout.pipe(stdout);
+    child.stderr.pipe(stderr);
+    child.on("error", (error) => {
+      stdout.destroy();
+      stderr.destroy();
+      reject(error);
+    });
+    child.on("close", async (code) => {
+      try {
+        await Promise.all([stdoutFinished, stderrFinished]);
+      } catch (error) {
+        reject(error);
+        return;
+      }
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`${command} exited with ${code}`));
+      }
+    });
+    child.stdin.end(options.prompt || "");
+  });
+}
+
+async function snapshotRepositoryFiles(rootDir, { allowedDir }) {
+  const root = path.resolve(rootDir);
+  const allowed = path.resolve(allowedDir);
   const snapshot = new Map();
-  const includePath = async (relativePath) => {
-    const key = normalizeRelativePath(relativePath);
-    if (!key || snapshot.has(key)) return;
-    snapshot.set(key, await fileFingerprint(path.join(rootDir, key)));
-  };
-  for (const relativePath of CODEX_STAGE_FORBIDDEN_EXACT_PATHS) {
-    await includePath(relativePath);
-  }
-  for (const relativeDir of CODEX_STAGE_FORBIDDEN_DIRS) {
-    const dirPath = path.join(rootDir, relativeDir);
-    for (const relativePath of await walkFiles(dirPath, relativeDir)) {
-      await includePath(relativePath);
-    }
-  }
+  await walkRepositoryFiles(root, "", { root, allowed, snapshot });
   return snapshot;
 }
 
-async function diffCodexStageForbiddenPaths(rootDir, beforeSnapshot) {
-  const afterSnapshot = await snapshotCodexStageForbiddenPaths(rootDir);
-  const keys = new Set([...beforeSnapshot.keys(), ...afterSnapshot.keys()]);
+async function diffRepositoryFiles(rootDir, { allowedDir, before }) {
+  const after = await snapshotRepositoryFiles(rootDir, { allowedDir });
+  const keys = new Set([...before.keys(), ...after.keys()]);
   const changes = [];
   for (const key of [...keys].sort()) {
-    const before = beforeSnapshot.get(key) || null;
-    const after = afterSnapshot.get(key) || null;
-    if (before === after) continue;
+    const oldValue = before.get(key) || null;
+    const newValue = after.get(key) || null;
+    if (oldValue === newValue) continue;
     changes.push({
       path: key,
-      change: before === null ? "created" : (after === null ? "deleted" : "modified")
+      change: oldValue === null ? "created" : (newValue === null ? "deleted" : "modified")
     });
   }
   return changes;
+}
+
+async function walkRepositoryFiles(dirPath, relativeDir, context) {
+  let entries;
+  try {
+    entries = await fs.readdir(dirPath, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  }
+  for (const entry of entries) {
+    const relativePath = path.join(relativeDir, entry.name);
+    const absolutePath = path.join(dirPath, entry.name);
+    const normalizedRelativePath = normalizeRelativePath(relativePath);
+    if (isPathInsideOrEqual(context.allowed, absolutePath)) {
+      continue;
+    }
+    if (entry.isDirectory()) {
+      if (REPOSITORY_GUARD_EXCLUDED_DIRS.has(entry.name)) continue;
+      await walkRepositoryFiles(absolutePath, relativePath, context);
+    } else if (entry.isFile()) {
+      context.snapshot.set(normalizedRelativePath, await fileFingerprint(absolutePath));
+    } else if (entry.isSymbolicLink()) {
+      context.snapshot.set(normalizedRelativePath, await symlinkFingerprint(absolutePath));
+    }
+  }
+}
+
+async function artifactRecords(filePaths) {
+  const records = [];
+  for (const filePath of filePaths.filter(Boolean)) {
+    records.push(await artifactRecord(filePath));
+  }
+  return records;
+}
+
+async function artifactRecord(filePath) {
+  try {
+    const bytes = await fs.readFile(filePath);
+    return {
+      path: filePath,
+      exists: true,
+      bytes: bytes.length,
+      sha256: createHash("sha256").update(bytes).digest("hex")
+    };
+  } catch {
+    return {
+      path: filePath,
+      exists: false,
+      bytes: null,
+      sha256: null
+    };
+  }
 }
 
 async function fileFingerprint(filePath) {
@@ -545,482 +527,193 @@ async function fileFingerprint(filePath) {
   }
 }
 
-async function walkFiles(dirPath, relativeDir) {
-  let entries;
+async function symlinkFingerprint(filePath) {
   try {
-    entries = await fs.readdir(dirPath, { withFileTypes: true });
+    return `symlink:${await fs.readlink(filePath)}`;
   } catch (error) {
-    if (error?.code === "ENOENT") return [];
+    if (error?.code === "ENOENT") return null;
     throw error;
   }
-  const files = [];
-  for (const entry of entries) {
-    const relativePath = path.join(relativeDir, entry.name);
-    const absolutePath = path.join(dirPath, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...await walkFiles(absolutePath, relativePath));
-    } else if (entry.isFile()) {
-      files.push(normalizeRelativePath(relativePath));
-    }
-  }
-  return files;
 }
 
-function normalizeRelativePath(relativePath) {
-  return String(relativePath || "").replace(/\\/g, "/").replace(/^\/+/, "");
-}
-
-function codexStageBoundaryError(stage, changes, cause = null) {
-  const preview = changes.slice(0, 8).map((item) => `${item.change}:${item.path}`).join(", ");
-  const suffix = changes.length > 8 ? `, ... ${changes.length - 8} more` : "";
-  const error = new Error(`Codex stage modified forbidden paths: ${preview}${suffix}`);
-  error.code = "codex_stage_forbidden_write";
-  error.stage_id = stage.id;
-  if (cause) error.cause = cause;
-  return error;
-}
-
-async function spawnWithPrompt(command, args, options) {
-  await fs.mkdir(path.dirname(options.stdoutPath), { recursive: true });
-  await fs.mkdir(path.dirname(options.stderrPath), { recursive: true });
-  await new Promise((resolve, reject) => {
-    const stdout = fsSync.createWriteStream(options.stdoutPath, { flags: "a" });
-    const stderr = fsSync.createWriteStream(options.stderrPath, { flags: "a" });
-    const stdoutFinished = finished(stdout);
-    const stderrFinished = finished(stderr);
-    let settled = false;
-    const settle = (handler) => {
-      if (settled) return;
-      settled = true;
-      handler();
+function fixtureGeneration({ mode, reportDate, repaired }) {
+  if (mode === "failure" || (mode === "repair-success" && !repaired)) {
+    return {
+      report_date: reportDate,
+      headline: repaired ? "" : "Fixture invalid MVP artifact",
+      summary: "",
+      items: []
     };
-    const child = spawn(command, args, {
-      cwd: options.cwd,
-      stdio: ["pipe", "pipe", "pipe"],
-      shell: shouldUseShell(command)
-    });
-    child.stdout.pipe(stdout);
-    child.stderr.pipe(stderr);
-    child.on("error", (error) => {
-      stdout.destroy();
-      stderr.destroy();
-      settle(() => reject(error));
-    });
-    child.on("close", async (code) => {
-      try {
-        await Promise.all([stdoutFinished, stderrFinished]);
-      } catch (error) {
-        settle(() => reject(error));
-        return;
+  }
+  return {
+    report_date: reportDate,
+    headline: "DAG-lite MVP generated a bounded daily artifact",
+    summary: "This fixture proves the coarse daily Codex orchestration path can prepare context, generate JSON, validate it, and summarize the run.",
+    items: [
+      {
+        title: "DAG-lite MVP runner",
+        url: "https://example.com/dag-lite-mvp",
+        note: "The artifact is deterministic and validates the MVP execution contract."
       }
-      settle(() => {
-        if (code === 0) {
-          resolve();
-        } else {
-          reject(new Error(`${command} ${args.join(" ")} exited with ${code}`));
-        }
-      });
-    });
-    if (options.prompt) {
-      child.stdin.end(options.prompt);
-    } else {
-      child.stdin.end();
-    }
-  });
+    ]
+  };
 }
 
-function summaryStage({ item, index, reportDate, outputs, workDir, codexOptions }) {
-  const itemPath = path.join(workDir, "summary-inputs", `${pad2(index + 1)}-${item.id}.json`);
-  const outputPath = path.join(outputs.summariesDir, `${pad2(index + 1)}-${item.id}.json`);
-  const promptPath = path.join(workDir, "prompts", `10-summary-${pad2(index + 1)}-${item.id}.md`);
-  return codexStage({
-    id: `summarize:${item.id}`,
-    title: `Summarize ${item.title || item.id}`,
-    dependsOn: ["admit"],
-    item,
-    item_path: itemPath,
-    promptPath,
-    outputPath,
-    lastMessagePath: path.join(workDir, "logs", `10-summary-${pad2(index + 1)}-${item.id}.last-message.md`),
-    eventsPath: path.join(workDir, "logs", `10-summary-${pad2(index + 1)}-${item.id}.events.jsonl`),
-    stderrPath: path.join(workDir, "logs", `10-summary-${pad2(index + 1)}-${item.id}.stderr.log`),
-    prompt: buildSummaryPrompt({ reportDate, item, itemPath, outputPath }),
-    ...codexOptions
-  });
-}
-
-function codexStage({ id, title, dependsOn = [], promptPath, outputPath, lastMessagePath, eventsPath, stderrPath, prompt, item, item_path: itemPath, codexBin, rootDir, model, sandbox }) {
-  const command = [
-    codexBin,
-    "exec",
-    "--ephemeral",
-    "--json",
-    "-C",
-    rootDir,
-    "--sandbox",
-    sandbox,
-    "--output-last-message",
-    lastMessagePath
-  ];
-  if (model) {
-    command.push("--model", model);
-  }
-  command.push("-");
-  const guardedPrompt = `${buildCodexStageBoundaryPrompt({ outputPath })}\n${prompt}`;
-  return {
+function buildStage({ id, rootDir, workDir, outputs }) {
+  const stage = {
     id,
-    title,
-    kind: "codex_exec",
-    depends_on: dependsOn,
+    kind: id === "codex-generate" || id === "repair-once" ? "codex_or_fixture" : "internal",
     cwd: rootDir,
-    command,
-    prompt_path: promptPath,
-    output_path: outputPath,
-    last_message_path: lastMessagePath,
-    events_path: eventsPath,
-    stderr_path: stderrPath,
-    prompt: guardedPrompt,
-    ...(item ? { item } : {}),
-    ...(itemPath ? { item_path: itemPath } : {})
+    work_dir: workDir
   };
+  if (id === "collect-context") stage.output_path = outputs.context;
+  if (id === "codex-generate") stage.output_path = outputs.generated;
+  if (id === "validate") stage.output_path = outputs.validation;
+  if (id === "repair-once") stage.output_path = outputs.repaired;
+  if (id === "summarize") stage.output_path = outputs.stage_summary;
+  return stage;
 }
 
-function buildCodexStageBoundaryPrompt({ outputPath }) {
-  return `Execution boundary:
-- OUTPUT_PATH=${outputPath}
-- Write only the required JSON output file: ${outputPath}
-- Do not edit repository files, public docs, reports-data, tasks, progress logs, handoff notes, or harness state.
-- Do not run harness-hub check/init/activate, npm run harness:init, npm run harness:validate, or node scripts/harness-validate.mjs.
-- Never read or write .harness-hub/state/**, .harness-hub/state/*, .harness-hub/state/current-task.md, .harness-hub/state/progress.md, .harness-hub/state/session-handoff.md, progress.md, session-handoff.md, or tasks/current-task.md.
-- Put any unavoidable scratch files under the pipeline work directory only.
-`;
-}
-
-function commandStage({ id, title, dependsOn = [], command, fallbackCommand = null, fallbackTitle = "", cwd, workDir, outputPath = "", allowFailure = false }) {
-  const base = workDir || path.join(cwd, DEFAULT_WORK_DIR);
+function buildOutputs({ workDir }) {
   return {
-    id,
-    title,
-    kind: "command",
-    depends_on: dependsOn,
-    cwd,
-    command,
-    output_path: outputPath,
-    allow_failure: allowFailure,
-    stdout_path: path.join(base, "logs", `${id}.stdout.log`),
-    stderr_path: path.join(base, "logs", `${id}.stderr.log`),
-    ...(fallbackCommand ? {
-      fallback_title: fallbackTitle,
-      fallback_command: fallbackCommand,
-      fallback_stdout_path: path.join(base, "logs", `${id}.fallback.stdout.log`),
-      fallback_stderr_path: path.join(base, "logs", `${id}.fallback.stderr.log`)
-    } : {})
+    plan: path.join(workDir, "pipeline-plan.json"),
+    context: path.join(workDir, "context.json"),
+    generated: path.join(workDir, "generated.json"),
+    repaired: path.join(workDir, "generated.repaired.json"),
+    final: path.join(workDir, "final.json"),
+    validation: path.join(workDir, "validation.json"),
+    repair_validation: path.join(workDir, "repair-validation.json"),
+    stage_summary: path.join(workDir, "stage-summary.json"),
+    run_summary: path.join(workDir, "run-summary.json"),
+    generate_prompt: path.join(workDir, "prompts", "generate.md"),
+    repair_prompt: path.join(workDir, "prompts", "repair.md"),
+    generate_stdout: path.join(workDir, "logs", "codex-generate.stdout.jsonl"),
+    generate_stderr: path.join(workDir, "logs", "codex-generate.stderr.log"),
+    repair_stdout: path.join(workDir, "logs", "repair-once.stdout.jsonl"),
+    repair_stderr: path.join(workDir, "logs", "repair-once.stderr.log")
   };
 }
 
-function buildOutputs({ rootDir, workDir, reportDate }) {
-  const [year, month] = reportDate.split("-");
-  return {
-    candidates: path.join(workDir, "01-candidates.json"),
-    admission: path.join(workDir, "02-admission.json"),
-    summariesDir: path.join(workDir, "summaries"),
-    draftReport: path.join(workDir, "90-daily-report-draft.json"),
-    qualityReview: path.join(workDir, "91-quality-review.json"),
-    sourcePhase5Audit: path.join(workDir, "91-source-phase5-audit.json"),
-    pageCheck: path.join(workDir, "92-page-check.json"),
-    runSummary: path.join(rootDir, ".tmp", `run-summary-${reportDate}.json`),
-    reportData: path.join(rootDir, "reports-data", year, month, `${reportDate}.json`),
-    reportHtml: path.join(rootDir, "docs", "reports", year, month, `${reportDate}.html`)
-  };
-}
-
-function collectCommandInstructions({ reportDate, outputs }) {
-  const discoveryDir = path.join(path.dirname(outputs.candidates), "discovery");
-  const discoveryPath = (name) => path.join(discoveryDir, name);
-  return `COLLECT COMMANDS:
-Use direct node commands below. Do not convert them to npm run commands; npm on Windows can consume option names such as --date and --output.
-- node src/cli.js sources:validate --output ${discoveryPath("sources-validate.json")}
-- node src/cli.js sources:health --date ${reportDate} --sources config/sources --enablement core,optional,manual --output ${discoveryPath("sources-health.json")}
-- node src/cli.js discover:github-trending --date ${reportDate} --limit 50 --history-root reports-data --output ${discoveryPath("github-trending.json")}
-- node src/cli.js discover:huggingface-trending --date ${reportDate} --limit 20 --output ${discoveryPath("huggingface-trending.json")}
-- node src/cli.js discover:builders --date ${reportDate} --limit 20 --output ${discoveryPath("builders.json")}
-- node src/cli.js discover:china-ai --date ${reportDate} --limit 30 --per-source-limit 3 --output ${discoveryPath("china-ai.json")}
-- node src/cli.js discover:content-sources --date ${reportDate} --limit 80 --per-source-limit 3 --output ${discoveryPath("content-sources.json")}
-- node src/cli.js discover:statuspage-incidents --date ${reportDate} --limit 20 --output ${discoveryPath("statuspage-incidents.json")}
-- node src/cli.js discover:search-news --date ${reportDate} --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --provider-timeout-ms 45000 --shadow --output ${discoveryPath("search-news.json")}
-`;
-}
-
-function buildCollectPrompt({ reportDate, rootDir, outputs }) {
-  return `${collectCommandInstructions({ reportDate, outputs })}
-
-你是 AI 日报的信息收集阶段。只收集事实候选，不做公开文案，不判断入选，不写摘要。
-
-工作目录：${rootDir}
-目标日期：${reportDate}
-输出文件：${outputs.candidates}
-
-请在完全独立上下文内完成：
-1. 运行仓库已有 discovery/source health 命令，优先使用 npm scripts，不修改 product files。
-2. 合并候选为 JSON，保留每条候选的 title、url、source、event_date、source_level、verification_status、raw_text、evidence、section_hint。
-3. 记录命令、失败、跳过原因和源健康状态。
-4. 不要写“为什么值得看”“发生了什么”“入选理由”这类公开文案。
-
-输出必须写入 ${outputs.candidates}，JSON 顶层格式：
-{
-  "report_date": "${reportDate}",
-  "stage": "collect",
-  "commands": [],
-  "raw_candidates": [],
-  "source_audit": {},
-  "warnings": []
-}
-`;
-}
-
-function buildAdmitPrompt({ reportDate, outputs }) {
-  return `你是 AI 日报的信息准入阶段。只判断候选是否值得进入日报，不写公开摘要，不润色标题。
-
-输入候选文件：${outputs.candidates}
-输出准入文件：${outputs.admission}
-目标日期：${reportDate}
-
-请在完全独立上下文内完成：
-1. 读取候选池，只根据事实新鲜度、来源可信度、读者价值、重复度、风险边界做准入。
-2. 输出 accepted_items 和 rejected_items。准入理由只能放在 internal_admission_reason，不能作为公开文案。
-3. 每个 accepted item 必须保留 candidate_id、title、url、source_label、section、evidence_refs。
-4. 不要写“发生了什么”“为什么值得看”“今天最值得看”“信号集中在”等公开摘要或模板句。
-
-输出必须写入 ${outputs.admission}，JSON 顶层格式：
-{
-  "report_date": "${reportDate}",
-  "stage": "admit",
-  "accepted_items": [],
-  "rejected_items": [],
-  "internal_notes": []
-}
-`;
-}
-
-function buildSummaryPrompt({ reportDate, item, itemPath, outputPath }) {
-  return `你是 AI 日报的单条新闻概括阶段。你只处理一个已准入条目，必须面向读者写可发布内容。
-
-目标日期：${reportDate}
-条目输入文件：${itemPath}
-条目输出文件：${outputPath}
-
-待概括条目：
-${JSON.stringify(item, null, 2)}
-
-写作规则：
-1. 信息准入已经完成；不要解释为什么入选，不要写来源审计、候选池、权限边界、后续部署边界。
-2. 用 story-first 方式写：标题要说清楚发生了什么，正文用 2-3 条中文 bullet 交代事实、变化、限制、适用对象或影响。
-3. 每条 bullet 都要给读者信息增量，不能写“为什么值得看”“发生了什么：”“更有价值的信息是”“可用于比较”“接口形态”等后台判断话术。
-4. GitHub/Hugging Face 项目必须说明它是什么、解决什么问题、适合谁看；不能只复读 repo slug。
-5. 如果证据不足，明确写 insufficient_evidence=true，并说明缺什么，不要编造。
-
-输出必须写入 ${outputPath}，JSON 顶层格式：
-{
-  "candidate_id": "${item.id}",
-  "title": "",
-  "summary": "",
-  "bullets": [],
-  "source": { "label": "", "url": "" },
-  "insufficient_evidence": false,
-  "evidence_notes": []
-}
-`;
-}
-
-function buildAssemblePrompt({ reportDate, outputs }) {
-  return `你是 AI 日报的结构化组装阶段。准入和逐条概括已经独立完成；你只把这些结果装配成 report draft JSON。
-
-目标日期：${reportDate}
-候选文件：${outputs.candidates}
-准入文件：${outputs.admission}
-逐条摘要目录：${outputs.summariesDir}
-输出草稿：${outputs.draftReport}
-
-规则：
-1. 不要重新判断准入，不要重写逐条摘要。只在 schema 必需时做字段映射。
-2. public summary 必须从已发布条目的读者摘要归纳，不能写候选池、来源审计、入选理由。
-3. stories/main_items 用已准入条目和逐条 summary/bullets 填充；source audit 留在内部结构字段。
-4. hot_blogs summary 保持 100-200 个中文字符；GitHub/Hugging Face description 保持项目用途说明。
-5. 输出必须能交给 npm run report:write 标准化。
-
-输出必须写入 ${outputs.draftReport}。
-`;
-}
-
-function extractAdmittedItems(json) {
-  if (Array.isArray(json)) return json;
-  for (const key of ["accepted_items", "admitted_items", "included_items", "items", "stories", "main_items"]) {
-    if (Array.isArray(json?.[key])) return json[key];
+function assertSafeWorkDir(plan) {
+  const rootDir = path.resolve(plan.root_dir);
+  const workDir = path.resolve(plan.work_dir);
+  const safeRoot = path.resolve(rootDir, DEFAULT_WORK_DIR);
+  if (samePath(workDir, rootDir)) {
+    throw new Error("daily Codex work dir cannot be the repository root");
   }
-  return [];
+  if (samePath(workDir, safeRoot)) {
+    throw new Error(`daily Codex work dir must be a child of ${path.join(DEFAULT_WORK_DIR, "<run>")}`);
+  }
+  if (!isPathInside(safeRoot, workDir)) {
+    throw new Error(`daily Codex work dir must be inside ${path.join(DEFAULT_WORK_DIR, "<run>")}`);
+  }
 }
 
-function normalizeAdmittedItems(items) {
-  return items
-    .filter((item) => item && item.rejected !== true && item.accepted !== false && item.status !== "rejected")
-    .map((item, index) => {
-      const rawId = item.candidate_id || item.id || item.url || item.title || `item-${index + 1}`;
-      return {
-        id: sanitizeFileName(rawId),
-        candidate_id: item.candidate_id || item.id || "",
-        title: item.title || item.name || "",
-        url: item.url || item.source_url || "",
-        source_label: item.source_label || item.publisher || item.source || "",
-        section: item.section || item.included_in || item.section_hint || "",
-        evidence_refs: item.evidence_refs || item.evidence || [],
-        raw: item
-      };
-    });
-}
-
-function placeholderSummaryItem(reportDate) {
-  return {
-    id: "accepted-item-placeholder",
-    candidate_id: "accepted-item-placeholder",
-    title: `Accepted item placeholder for ${reportDate}`,
-    url: "",
-    source_label: "",
-    section: "",
-    evidence_refs: [],
-    raw: {
-      note: "Dry-run placeholder. Pass --admission-input to materialize one summary stage per accepted item."
-    }
-  };
+async function writePlan(plan) {
+  await writeJson(plan.outputs.plan, publicPlan(plan));
 }
 
 function publicPlan(plan) {
   return {
     ...plan,
-    stages: plan.stages.map((stage) => {
-      const { prompt, ...publicStage } = stage;
-      return publicStage;
-    })
+    stages: plan.stages.map((stage) => ({ ...stage }))
   };
 }
 
-function npmCommand(args, npmBin = "") {
-  return [npmBin || defaultNpmBin(), ...args];
+async function writeJson(filePath, value) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
 
-function npmRunCommand(scriptName, scriptArgs = [], npmBin = "") {
-  const args = ["run", scriptName];
-  if (scriptArgs.length > 0) {
-    args.push("--", "--", ...scriptArgs);
+async function writeText(filePath, value) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, value, "utf8");
+}
+
+async function readJson(filePath) {
+  return JSON.parse(await fs.readFile(filePath, "utf8"));
+}
+
+async function readJsonOrNull(filePath) {
+  try {
+    return await readJson(filePath);
+  } catch {
+    return null;
   }
-  return npmCommand(args, npmBin);
 }
 
-function defaultCodexBin() {
-  return process.platform === "win32" ? "codex.cmd" : "codex";
-}
-
-function defaultNpmBin() {
-  return process.platform === "win32" ? "npm.cmd" : "npm";
-}
-
-function shouldUseShell(command) {
-  return process.platform === "win32" && /\.(cmd|bat)$/i.test(String(command || ""));
-}
-
-async function readStageJson({ stdoutPath = "", outputPath = "" } = {}) {
-  for (const filePath of [outputPath, stdoutPath]) {
-    if (!filePath) continue;
-    try {
-      const content = await fs.readFile(filePath, "utf8");
-      const parsed = parseLastJsonObject(content);
-      if (parsed) return parsed;
-    } catch {
-      // Stage JSON is best-effort summary metadata; logs remain authoritative.
-    }
+function normalizeFixtureMode(value) {
+  const mode = String(value || "").trim();
+  if (!mode) return "";
+  if (!["success", "repair-success", "failure"].includes(mode)) {
+    throw new Error(`unsupported fixture mode: ${mode}`);
   }
-  return null;
-}
-
-function parseLastJsonObject(text) {
-  const input = String(text || "");
-  let last = null;
-  for (let index = 0; index < input.length; index += 1) {
-    if (input[index] !== "{") continue;
-    const candidate = balancedJsonObjectAt(input, index);
-    if (!candidate) continue;
-    try {
-      last = JSON.parse(candidate);
-    } catch {
-      // Keep scanning for the last complete JSON object in mixed npm output.
-    }
-    index += candidate.length - 1;
-  }
-  return last;
-}
-
-function balancedJsonObjectAt(input, startIndex) {
-  let depth = 0;
-  let inString = false;
-  let escaped = false;
-  for (let index = startIndex; index < input.length; index += 1) {
-    const char = input[index];
-    if (inString) {
-      if (escaped) {
-        escaped = false;
-      } else if (char === "\\") {
-        escaped = true;
-      } else if (char === "\"") {
-        inString = false;
-      }
-      continue;
-    }
-    if (char === "\"") {
-      inString = true;
-      continue;
-    }
-    if (char === "{") depth += 1;
-    if (char === "}") {
-      depth -= 1;
-      if (depth === 0) {
-        return input.slice(startIndex, index + 1);
-      }
-    }
-  }
-  return "";
-}
-
-function sanitizeFileName(value) {
-  const cleaned = String(value || "")
-    .trim()
-    .replace(/https?:\/\//gi, "")
-    .replace(/[^a-z0-9._-]+/gi, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
-  return cleaned || "item";
+  return mode;
 }
 
 function requiredDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) {
     throw new Error("daily codex pipeline requires --date YYYY-MM-DD");
   }
-  return value;
+  return String(value);
 }
 
-function pad2(value) {
-  return String(value).padStart(2, "0");
+function defaultCodexBin() {
+  return process.platform === "win32" ? "codex.cmd" : "codex";
+}
+
+function shouldUseShell(command) {
+  return process.platform === "win32" && /\.(cmd|bat)$/i.test(String(command || ""));
+}
+
+function isPathInside(parentPath, childPath) {
+  const relativePath = path.relative(path.resolve(parentPath), path.resolve(childPath));
+  return Boolean(relativePath) && !relativePath.startsWith("..") && !path.isAbsolute(relativePath);
+}
+
+function isPathInsideOrEqual(parentPath, childPath) {
+  return samePath(parentPath, childPath) || isPathInside(parentPath, childPath);
+}
+
+function samePath(left, right) {
+  const normalizedLeft = normalizeComparablePath(path.resolve(left));
+  const normalizedRight = normalizeComparablePath(path.resolve(right));
+  return normalizedLeft === normalizedRight;
+}
+
+function normalizeComparablePath(value) {
+  const normalized = normalizeRelativePath(value);
+  return process.platform === "win32" ? normalized.toLowerCase() : normalized;
+}
+
+function normalizeRelativePath(relativePath) {
+  return String(relativePath || "").replace(/\\/g, "/").replace(/^\/+/, "");
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function nonEmptyString(value) {
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 function parseArgs(argv) {
+  const allowedFlags = new Set(["repo-root", "date", "work-dir", "codex-bin", "model", "sandbox", "fixture"]);
   const parsed = {};
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
+    if (token === "--") continue;
     if (!token.startsWith("--")) continue;
     const equalIndex = token.indexOf("=");
     if (equalIndex > 2) {
-      parsed[token.slice(2, equalIndex)] = token.slice(equalIndex + 1);
+      const key = token.slice(2, equalIndex);
+      if (!allowedFlags.has(key)) throw new Error(`unsupported daily Codex DAG-lite flag: --${key}`);
+      parsed[key] = token.slice(equalIndex + 1);
       continue;
     }
     const key = token.slice(2);
+    if (!allowedFlags.has(key)) throw new Error(`unsupported daily Codex DAG-lite flag: --${key}`);
     const next = argv[index + 1];
     if (!next || next.startsWith("--")) {
       parsed[key] = true;
@@ -1032,15 +725,29 @@ function parseArgs(argv) {
   return parsed;
 }
 
+function dateFromArgs(args) {
+  return validReportDate(args.date)
+    ? args.date
+    : validReportDate(process.env.npm_config_date)
+      ? process.env.npm_config_date
+      : firstDate(process.argv.slice(2));
+}
+
+function fixtureFromArgs(args) {
+  return validFixtureMode(args.fixture)
+    ? args.fixture
+    : validFixtureMode(process.env.npm_config_fixture)
+      ? process.env.npm_config_fixture
+      : firstNonDatePositional(process.argv.slice(2));
+}
+
 function positionalArgs(argv) {
   const values = [];
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
     if (token.startsWith("--")) {
       const next = argv[index + 1];
-      if (next && !next.startsWith("--")) {
-        index += 1;
-      }
+      if (next && !next.startsWith("--")) index += 1;
       continue;
     }
     values.push(token);
@@ -1049,29 +756,19 @@ function positionalArgs(argv) {
 }
 
 function firstDate(argv) {
-  return argv.find((token) => /^\d{4}-\d{2}-\d{2}$/.test(token)) || "";
+  return positionalArgs(argv).find((token) => validReportDate(token)) || "";
 }
 
 function firstNonDatePositional(argv) {
-  return positionalArgs(argv).find((token) => !/^\d{4}-\d{2}-\d{2}$/.test(token) && !/^(execute|dry-run|plan-only)$/i.test(token)) || "";
+  return positionalArgs(argv).find((token) => !validReportDate(token)) || "";
 }
 
-function npmConfig(name) {
-  return process.env[`npm_config_${name.replace(/-/g, "_")}`] || "";
+function validReportDate(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""));
 }
 
-function dateOption(value) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(String(value || "")) ? String(value) : "";
-}
-
-function stringOption(value) {
-  const text = String(value || "");
-  return /^(true|false)$/i.test(text) ? "" : text;
-}
-
-function truthy(value) {
-  if (value === true) return true;
-  return /^(1|true|yes|on)$/i.test(String(value || ""));
+function validFixtureMode(value) {
+  return ["success", "repair-success", "failure"].includes(String(value || "").trim());
 }
 
 function isMainModule(metaUrl) {
@@ -1081,54 +778,36 @@ function isMainModule(metaUrl) {
 if (isMainModule(import.meta.url)) {
   let plan = null;
   try {
-    const argv = process.argv.slice(2);
-    const args = parseArgs(argv);
-    const execute = truthy(args.execute) || truthy(npmConfig("execute")) || positionalArgs(argv).includes("execute");
-    const publish = truthy(args.publish) || truthy(npmConfig("publish")) || positionalArgs(argv).includes("publish");
-    const dryRunFlag = truthy(args["dry-run"]) || truthy(args["plan-only"]) || truthy(npmConfig("dry-run")) || truthy(npmConfig("plan-only")) || positionalArgs(argv).includes("dry-run") || positionalArgs(argv).includes("plan-only");
-    const dryRun = Boolean(dryRunFlag || !execute);
+    const args = parseArgs(process.argv.slice(2));
     plan = await prepareDailyCodexPipeline({
       rootDir: args["repo-root"] || process.cwd(),
-      reportDate: dateOption(args.date) || dateOption(npmConfig("date")) || firstDate(argv),
-      workDir: stringOption(args["work-dir"]) || stringOption(npmConfig("work-dir")) || firstNonDatePositional(argv),
-      codexBin: stringOption(args["codex-bin"]) || stringOption(npmConfig("codex-bin")) || defaultCodexBin(),
-      npmBin: stringOption(args["npm-bin"]) || stringOption(npmConfig("npm-bin")),
-      model: stringOption(args.model) || stringOption(npmConfig("model")) || "",
-      sandbox: stringOption(args.sandbox) || stringOption(npmConfig("sandbox")) || DEFAULT_SANDBOX,
-      publish,
-      admissionInputPath: stringOption(args["admission-input"]) || stringOption(npmConfig("admission-input")),
-      includePlaceholderSummaries: dryRun && !(stringOption(args["admission-input"]) || stringOption(npmConfig("admission-input")))
+      reportDate: dateFromArgs(args),
+      workDir: args["work-dir"] || process.env.npm_config_work_dir || "",
+      codexBin: args["codex-bin"] || process.env.npm_config_codex_bin || "",
+      model: args.model || process.env.npm_config_model || "",
+      sandbox: args.sandbox || process.env.npm_config_sandbox || DEFAULT_SANDBOX,
+      fixtureMode: fixtureFromArgs(args)
     });
-
-    if (dryRun) {
-      process.stdout.write(`${JSON.stringify({
-        ok: true,
-        dry_run: true,
-        publish,
-        plan_path: path.join(plan.work_dir, "pipeline-plan.json"),
-        summary_path: plan.outputs.runSummary,
-        work_dir: plan.work_dir,
-        stages: plan.stages.map((stage) => ({ id: stage.id, kind: stage.kind, prompt_path: stage.prompt_path || "", output_path: stage.output_path || "" }))
-      }, null, 2)}\n`);
-    } else {
-      const executedPlan = await runDailyCodexPipeline(plan);
-      process.stdout.write(`${JSON.stringify({
-        ok: true,
-        dry_run: false,
-        publish,
-        plan_path: path.join(executedPlan.work_dir, "pipeline-plan.json"),
-        summary_path: executedPlan.outputs.runSummary,
-        report_data: executedPlan.outputs.reportData,
-        report_html: executedPlan.outputs.reportHtml
-      }, null, 2)}\n`);
+    const { summary } = await runDailyCodexPipeline(plan);
+    process.stdout.write(`${JSON.stringify({
+      ok: summary.final_status !== "blocked",
+      mode: summary.mode,
+      final_status: summary.final_status,
+      summary_path: plan.outputs.run_summary,
+      final_artifact: summary.final_artifact,
+      work_dir: plan.work_dir
+    }, null, 2)}\n`);
+    if (summary.final_status === "blocked") {
+      process.exitCode = 1;
     }
   } catch (error) {
     process.stdout.write(`${JSON.stringify({
       ok: false,
+      mode: "daily_codex_dag_lite",
       error: error.code || "daily_codex_pipeline_failed",
       message: error.message,
       stage_id: error.stage_id || "",
-      summary_path: plan?.outputs?.runSummary || ""
+      summary_path: plan?.outputs?.run_summary || ""
     }, null, 2)}\n`);
     process.exitCode = 1;
   }
