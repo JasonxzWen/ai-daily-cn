@@ -90,6 +90,48 @@ test("daily codex pipeline dry-run exposes a summary placeholder without admissi
   assert(plan.stages.some((stage) => stage.command?.includes("quality:page-check")));
 });
 
+test("daily codex pipeline collect prompt uses direct node discovery commands", () => {
+  const rootDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "daily-codex-pipeline-collect-commands-"));
+  const plan = buildDailyCodexPipelinePlan({
+    rootDir,
+    reportDate: "2026-07-02",
+    workDir: path.join(rootDir, ".tmp", "pipeline"),
+    includePlaceholderSummaries: true
+  });
+
+  const collect = plan.stages.find((stage) => stage.id === "collect");
+  assert(collect.prompt.includes("COLLECT COMMANDS"));
+  assert(collect.prompt.includes("node src/cli.js sources:validate --output"));
+  assert(collect.prompt.includes("node src/cli.js sources:health --date 2026-07-02 --sources config/sources --enablement core,optional,manual --output"));
+  assert(!collect.prompt.includes("npm run sources:health -- --date"));
+  assert(!collect.prompt.includes("npm run sources:validate -- --output"));
+});
+
+test("daily codex pipeline npm commands preserve script option names", () => {
+  const rootDir = fsSync.mkdtempSync(path.join(os.tmpdir(), "daily-codex-pipeline-npm-args-"));
+  const plan = buildDailyCodexPipelinePlan({
+    rootDir,
+    reportDate: "2026-07-02",
+    workDir: path.join(rootDir, ".tmp", "pipeline"),
+    includePlaceholderSummaries: true,
+    publish: true,
+    npmBin: "npm-test"
+  });
+
+  const commandsWithOptions = plan.stages
+    .filter((stage) => stage.kind === "command")
+    .flatMap((stage) => [stage.command, stage.fallback_command].filter(Boolean))
+    .filter((command) => command.some((token) => String(token).startsWith("--") && token !== "--"));
+
+  assert(commandsWithOptions.length > 0);
+  for (const command of commandsWithOptions) {
+    const runIndex = command.indexOf("run");
+    assert.notEqual(runIndex, -1);
+    assert.equal(command[runIndex + 2], "--");
+    assert.equal(command[runIndex + 3], "--");
+  }
+});
+
 test("daily codex pipeline execute mode without publish skips publish stages", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-generated-only-"));
   const { fakeCodex, fakeNpm } = await writePipelineCommandShims(rootDir);

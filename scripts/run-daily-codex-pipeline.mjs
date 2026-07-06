@@ -73,7 +73,7 @@ export function buildDailyCodexPipelinePlan(options = {}) {
       title: "Run content contract",
       dependsOn: ["build"],
       workDir,
-      command: npmCommand(["run", "content:contract"], npmBin),
+      command: npmRunCommand("content:contract", [], npmBin),
       cwd: rootDir
     }),
     commandStage({
@@ -81,10 +81,7 @@ export function buildDailyCodexPipelinePlan(options = {}) {
       title: "Run browser page checklist",
       dependsOn: ["build"],
       workDir,
-      command: npmCommand([
-        "run",
-        "quality:page-check",
-        "--",
+      command: npmRunCommand("quality:page-check", [
         "--date",
         reportDate,
         "--output",
@@ -101,7 +98,7 @@ export function buildDailyCodexPipelinePlan(options = {}) {
           title: "Validate daily publish plan",
           dependsOn: ["content-contract", "page-check"],
           workDir,
-          command: npmCommand(["run", "publish:dry-run:daily", "--", "--date", reportDate], npmBin),
+          command: npmRunCommand("publish:dry-run:daily", ["--date", reportDate], npmBin),
           cwd: rootDir
         }),
         commandStage({
@@ -109,8 +106,8 @@ export function buildDailyCodexPipelinePlan(options = {}) {
           title: "Publish generated report",
           dependsOn: ["publish-dry-run"],
           workDir,
-          command: npmCommand(["run", "publish", "--", "--date", reportDate, "--confirm-push", "--skip-pages-verify"], npmBin),
-          fallbackCommand: npmCommand(["run", "publish:github-api", "--", "confirm-push", "--date", reportDate, "--skip-pages-verify"], npmBin),
+          command: npmRunCommand("publish", ["--date", reportDate, "--confirm-push", "--skip-pages-verify"], npmBin),
+          fallbackCommand: npmRunCommand("publish:github-api", ["confirm-push", "--date", reportDate, "--skip-pages-verify"], npmBin),
           fallbackTitle: "Publish generated report through GitHub API fallback",
           cwd: rootDir
         }),
@@ -119,7 +116,7 @@ export function buildDailyCodexPipelinePlan(options = {}) {
           title: "Verify published Pages URL",
           dependsOn: ["publish"],
           workDir,
-          command: npmCommand(["run", "publish:verify-pages", "--", "--date", reportDate], npmBin),
+          command: npmRunCommand("publish:verify-pages", ["--date", reportDate], npmBin),
           cwd: rootDir,
           allowFailure: true
         })
@@ -174,10 +171,7 @@ export function buildDailyCodexPipelinePlan(options = {}) {
       title: "Review draft quality",
       dependsOn: ["assemble"],
       workDir,
-      command: npmCommand([
-        "run",
-        "quality:review",
-        "--",
+      command: npmRunCommand("quality:review", [
         "--date",
         reportDate,
         "--input",
@@ -196,10 +190,7 @@ export function buildDailyCodexPipelinePlan(options = {}) {
       title: "Normalize report JSON",
       dependsOn: ["quality-review"],
       workDir,
-      command: npmCommand([
-        "run",
-        "report:write",
-        "--",
+      command: npmRunCommand("report:write", [
         outputs.draftReport,
         "reports-data",
         reportDate,
@@ -213,10 +204,7 @@ export function buildDailyCodexPipelinePlan(options = {}) {
       title: "Audit source run history",
       dependsOn: ["write-report"],
       workDir,
-      command: npmCommand([
-        "run",
-        "sources:phase5-audit",
-        "--",
+      command: npmRunCommand("sources:phase5-audit", [
         "--date",
         reportDate,
         "--history-dir",
@@ -234,7 +222,7 @@ export function buildDailyCodexPipelinePlan(options = {}) {
       title: "Build static site",
       dependsOn: ["sources-phase5-audit"],
       workDir,
-      command: npmCommand(["run", "build"], npmBin),
+      command: npmRunCommand("build", [], npmBin),
       cwd: rootDir
     }),
     ...validationStages,
@@ -746,8 +734,27 @@ function buildOutputs({ rootDir, workDir, reportDate }) {
   };
 }
 
+function collectCommandInstructions({ reportDate, outputs }) {
+  const discoveryDir = path.join(path.dirname(outputs.candidates), "discovery");
+  const discoveryPath = (name) => path.join(discoveryDir, name);
+  return `COLLECT COMMANDS:
+Use direct node commands below. Do not convert them to npm run commands; npm on Windows can consume option names such as --date and --output.
+- node src/cli.js sources:validate --output ${discoveryPath("sources-validate.json")}
+- node src/cli.js sources:health --date ${reportDate} --sources config/sources --enablement core,optional,manual --output ${discoveryPath("sources-health.json")}
+- node src/cli.js discover:github-trending --date ${reportDate} --limit 50 --history-root reports-data --output ${discoveryPath("github-trending.json")}
+- node src/cli.js discover:huggingface-trending --date ${reportDate} --limit 20 --output ${discoveryPath("huggingface-trending.json")}
+- node src/cli.js discover:builders --date ${reportDate} --limit 20 --output ${discoveryPath("builders.json")}
+- node src/cli.js discover:china-ai --date ${reportDate} --limit 30 --per-source-limit 3 --output ${discoveryPath("china-ai.json")}
+- node src/cli.js discover:content-sources --date ${reportDate} --limit 80 --per-source-limit 3 --output ${discoveryPath("content-sources.json")}
+- node src/cli.js discover:statuspage-incidents --date ${reportDate} --limit 20 --output ${discoveryPath("statuspage-incidents.json")}
+- node src/cli.js discover:search-news --date ${reportDate} --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --provider-timeout-ms 45000 --shadow --output ${discoveryPath("search-news.json")}
+`;
+}
+
 function buildCollectPrompt({ reportDate, rootDir, outputs }) {
-  return `你是 AI 日报的信息收集阶段。只收集事实候选，不做公开文案，不判断入选，不写摘要。
+  return `${collectCommandInstructions({ reportDate, outputs })}
+
+你是 AI 日报的信息收集阶段。只收集事实候选，不做公开文案，不判断入选，不写摘要。
 
 工作目录：${rootDir}
 目标日期：${reportDate}
@@ -898,6 +905,14 @@ function publicPlan(plan) {
 
 function npmCommand(args, npmBin = "") {
   return [npmBin || defaultNpmBin(), ...args];
+}
+
+function npmRunCommand(scriptName, scriptArgs = [], npmBin = "") {
+  const args = ["run", scriptName];
+  if (scriptArgs.length > 0) {
+    args.push("--", "--", ...scriptArgs);
+  }
+  return npmCommand(args, npmBin);
 }
 
 function defaultCodexBin() {
