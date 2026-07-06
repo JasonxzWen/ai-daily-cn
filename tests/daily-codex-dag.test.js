@@ -12,6 +12,7 @@ import {
   createDailyCodexDagPlan,
   resolveDailyCodexDagCodexRuntimePlan,
   resolveDailyCodexDagCommandRuntimePlan,
+  resolveDailyCodexDagNodeRuntimePlan,
   validateDailyCodexDag,
   validateDailyCodexDagNodeResult,
   validateDailyCodexDagRunSummary,
@@ -599,6 +600,159 @@ test("daily codex DAG Codex runtime plan rejects unsafe or unsupported Codex inp
       result.failures.join("\n")
     );
   }
+});
+
+test("daily codex DAG node runtime plan dispatches executable command and Codex specs without execution", async () => {
+  const manifest = await loadManifest();
+  const score = structuredCloneJson(node(manifest, "score"));
+  const commandSpec = buildFutureNodeExecutionSpec(score, {
+    cwd: "scripts",
+    invocation: {
+      kind: "command",
+      argv: ["node", "scripts/validate-daily-codex-dag.mjs", "--node", score.id]
+    }
+  });
+  score.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic executable command node for generic runtime-plan dispatch.",
+    node_execution_spec: commandSpec
+  };
+
+  const commandResult = resolveDailyCodexDagNodeRuntimePlan({
+    rootDir,
+    node: score,
+    nodeExecutablePath: process.execPath
+  });
+
+  assert.equal(commandResult.ok, true, commandResult.failures.join("\n"));
+  assert.equal(commandResult.plan.node_id, score.id);
+  assert.equal(commandResult.plan.executor, "command");
+  assert.deepEqual(commandResult.plan.runtime_plan, {
+    runner: "node",
+    command: process.execPath,
+    args: [path.resolve(rootDir, "scripts", "validate-daily-codex-dag.mjs"), "--node", score.id],
+    cwd: path.resolve(rootDir, "scripts"),
+    shell: false,
+    script_path: path.resolve(rootDir, "scripts", "validate-daily-codex-dag.mjs"),
+    argv_tail: ["--node", score.id]
+  });
+
+  const codexNode = structuredCloneJson(node(manifest, "classify-tag-entity"));
+  const codexExecutablePath = path.resolve(rootDir, ".tmp", "codex-bin", "codex");
+  const codexSpec = buildFutureNodeExecutionSpec(codexNode, {
+    executor: "codex_cli",
+    cwd: "scripts",
+    invocation: {
+      kind: "codex_cli",
+      prompt_template: "prompts/future-missing-codex-node.md",
+      args: ["--node", codexNode.id]
+    }
+  });
+  codexNode.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic executable Codex node for generic runtime-plan dispatch.",
+    node_execution_spec: codexSpec
+  };
+
+  const codexResult = resolveDailyCodexDagNodeRuntimePlan({
+    rootDir,
+    node: codexNode,
+    codexExecutablePath
+  });
+
+  assert.equal(codexResult.ok, true, codexResult.failures.join("\n"));
+  assert.equal(codexResult.plan.node_id, codexNode.id);
+  assert.equal(codexResult.plan.executor, "codex_cli");
+  assert.deepEqual(codexResult.plan.runtime_plan, {
+    runner: "codex_cli",
+    command: codexExecutablePath,
+    codex_args: ["--node", codexNode.id],
+    invocation_args: ["--node", codexNode.id],
+    cwd: path.resolve(rootDir, "scripts"),
+    shell: false,
+    prompt_template_path: path.resolve(rootDir, "prompts", "future-missing-codex-node.md"),
+    prompt_template: "prompts/future-missing-codex-node.md"
+  });
+});
+
+test("daily codex DAG node runtime plan rejects non-executable, unsupported, and explicit invalid specs", async () => {
+  const manifest = await loadManifest();
+  const score = structuredCloneJson(node(manifest, "score"));
+  const commandSpec = buildFutureNodeExecutionSpec(score, {
+    invocation: {
+      kind: "command",
+      argv: ["node", "scripts/validate-daily-codex-dag.mjs"]
+    }
+  });
+
+  const plannedNodeResult = resolveDailyCodexDagNodeRuntimePlan({
+    rootDir,
+    node: score,
+    spec: commandSpec,
+    nodeExecutablePath: process.execPath
+  });
+  assert.equal(plannedNodeResult.ok, false);
+  assert.equal(plannedNodeResult.plan, null);
+  assert(
+    plannedNodeResult.failures.some((failure) => failure.includes("execution_contract.readiness must be node_executable")),
+    plannedNodeResult.failures.join("\n")
+  );
+
+  const executableNode = structuredCloneJson(score);
+  executableNode.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic executable node for generic runtime-plan rejection.",
+    node_execution_spec: commandSpec
+  };
+
+  const unsupportedExecutor = resolveDailyCodexDagNodeRuntimePlan({
+    rootDir,
+    node: executableNode,
+    spec: {
+      ...commandSpec,
+      executor: "python"
+    },
+    nodeExecutablePath: process.execPath
+  });
+  assert.equal(unsupportedExecutor.ok, false);
+  assert.equal(unsupportedExecutor.plan, null);
+  assert(
+    unsupportedExecutor.failures.some((failure) => failure.includes("executor must be command or codex_cli")),
+    unsupportedExecutor.failures.join("\n")
+  );
+
+  const explicitNull = resolveDailyCodexDagNodeRuntimePlan({
+    rootDir,
+    node: executableNode,
+    spec: null,
+    nodeExecutablePath: process.execPath
+  });
+  assert.equal(explicitNull.ok, false);
+  assert.equal(explicitNull.plan, null);
+  assert(
+    explicitNull.failures.some((failure) => failure.includes("spec must be an object")),
+    explicitNull.failures.join("\n")
+  );
+
+  const delegatedCodexFailure = resolveDailyCodexDagNodeRuntimePlan({
+    rootDir,
+    node: executableNode,
+    spec: {
+      ...commandSpec,
+      executor: "codex_cli",
+      invocation: {
+        kind: "codex_cli",
+        prompt_template: "prompts/ai-daily/modules/base.md",
+        args: ["--node", score.id]
+      }
+    }
+  });
+  assert.equal(delegatedCodexFailure.ok, false);
+  assert.equal(delegatedCodexFailure.plan, null);
+  assert(
+    delegatedCodexFailure.failures.some((failure) => failure.includes("codexExecutablePath must be an absolute path")),
+    delegatedCodexFailure.failures.join("\n")
+  );
 });
 
 test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {
