@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -894,6 +895,130 @@ test("daily codex DAG command node executor rejects preflight failures before ex
     result.failures.some((failure) => failure.includes("execution_contract.readiness must be node_executable")),
     result.failures.join("\n")
   );
+});
+
+test("daily codex DAG command node executor resolves real output artifact metadata from disk", async () => {
+  const manifest = await loadManifest();
+  const proofNode = structuredCloneJson(node(manifest, "fetch-source-health"));
+  const artifactPath = [
+    ".tmp",
+    "daily-codex-pipeline",
+    "command-artifact-proof",
+    `summary-${process.pid}-${Date.now()}.json`
+  ].join("/");
+  const absoluteArtifactPath = path.join(rootDir, artifactPath);
+  await fs.rm(absoluteArtifactPath, { force: true });
+
+  proofNode.inputs = [];
+  proofNode.outputs = [{ path: artifactPath, required: true }];
+  const commandSpec = buildFutureNodeExecutionSpec(proofNode, {
+    cwd: ".",
+    invocation: {
+      kind: "command",
+      argv: [
+        "node",
+        "scripts/run-daily-codex-dag.mjs",
+        "--dry-run",
+        "--date",
+        "2026-07-03",
+        "--json",
+        "--summary-path",
+        artifactPath
+      ]
+    }
+  });
+  proofNode.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic executable command node that writes a real .tmp artifact.",
+    node_execution_spec: commandSpec
+  };
+
+  const result = await executeDailyCodexDagCommandNode({
+    rootDir,
+    node: proofNode,
+    reportDate: "2026-07-03",
+    runId: "daily-codex-dag:2026-07-03:artifact-proof",
+    nodeExecutablePath: process.execPath,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:03.000Z"
+  });
+
+  const artifactBytes = await fs.readFile(absoluteArtifactPath);
+  const artifactJson = JSON.parse(artifactBytes.toString("utf8"));
+  assert.equal(artifactJson.mode, "daily_codex_dag_dry_run");
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.result.status, "success");
+  assert.deepEqual(result.result.resolved_inputs, []);
+  assert.deepEqual(result.result.resolved_outputs, [{
+    path: artifactPath,
+    required: true,
+    exists: true,
+    schema_valid: true,
+    bytes: artifactBytes.length,
+    sha256: createHash("sha256").update(artifactBytes).digest("hex")
+  }]);
+
+  const validation = validateDailyCodexDagNodeResult(result.result);
+  assert.equal(validation.ok, true, validation.failures.join("\n"));
+  await fs.rm(absoluteArtifactPath, { force: true });
+});
+
+test("daily codex DAG command node executor fails structurally when a required output is missing", async () => {
+  const manifest = await loadManifest();
+  const proofNode = structuredCloneJson(node(manifest, "fetch-source-health"));
+  const missingArtifactPath = [
+    ".tmp",
+    "daily-codex-pipeline",
+    "command-artifact-proof",
+    `missing-${process.pid}-${Date.now()}.json`
+  ].join("/");
+  const absoluteMissingArtifactPath = path.join(rootDir, missingArtifactPath);
+  await fs.rm(absoluteMissingArtifactPath, { force: true });
+
+  proofNode.inputs = [];
+  proofNode.outputs = [{ path: missingArtifactPath, required: true }];
+  const commandSpec = buildFutureNodeExecutionSpec(proofNode, {
+    cwd: ".",
+    invocation: {
+      kind: "command",
+      argv: ["node", "scripts/validate-daily-codex-dag.mjs"]
+    }
+  });
+  proofNode.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic executable command node with a missing required output.",
+    node_execution_spec: commandSpec
+  };
+
+  const result = await executeDailyCodexDagCommandNode({
+    rootDir,
+    node: proofNode,
+    reportDate: "2026-07-03",
+    runId: "daily-codex-dag:2026-07-03:artifact-missing",
+    nodeExecutablePath: process.execPath,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z"
+  });
+
+  assert.equal(result.ok, false);
+  assert(
+    result.failures.some((failure) => failure.includes(`required output artifact ${missingArtifactPath} was not resolved`)),
+    result.failures.join("\n")
+  );
+  assert.equal(result.result.status, "failure");
+  assert.equal(result.result.downstream_disposition, "block");
+  assert.equal(result.result.failures[0].code, "required_output_artifact_missing");
+  assert.deepEqual(result.result.resolved_outputs, [{
+    path: missingArtifactPath,
+    required: true,
+    exists: false,
+    schema_valid: false,
+    bytes: null,
+    sha256: null
+  }]);
+
+  const validation = validateDailyCodexDagNodeResult(result.result);
+  assert.equal(validation.ok, true, validation.failures.join("\n"));
 });
 
 test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {

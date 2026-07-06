@@ -1,4 +1,5 @@
 import { execFile as execFileCallback } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import Ajv from "ajv/dist/2020.js";
@@ -385,10 +386,21 @@ export async function executeDailyCodexDagCommandNode(options = {}) {
     executionOutcome = normalizeCommandExecutionError(error);
   }
   const finishedAt = toIsoTimestamp(options.finishedAt ?? options.finished_at ?? new Date());
+  const resolvedInputs = hasOwnOption(options, "resolvedInputs")
+    ? options.resolvedInputs
+    : hasOwnOption(options, "resolved_inputs")
+      ? options.resolved_inputs
+      : await resolveDeclaredExecutionArtifacts({ rootDir, reportDate, artifacts: node.inputs || [] });
+  const resolvedOutputs = hasOwnOption(options, "resolvedOutputs")
+    ? options.resolvedOutputs
+    : hasOwnOption(options, "resolved_outputs")
+      ? options.resolved_outputs
+      : await resolveDeclaredExecutionArtifacts({ rootDir, reportDate, artifacts: node.outputs || [] });
   const executionSucceeded = executionOutcome.exit_code === 0 && !executionOutcome.error_message;
-  const executionIssues = executionSucceeded
-    ? []
+  const resultIssues = executionSucceeded
+    ? commandArtifactIssues({ nodeId, declaredInputs: node.inputs || [], declaredOutputs: node.outputs || [], resolvedInputs, resolvedOutputs })
     : [commandExecutionIssue({ nodeId, executionOutcome })];
+  const nodeSucceeded = executionSucceeded && resultIssues.length === 0;
   const result = createDailyCodexDagNodeResult({
     reportDate,
     runId,
@@ -398,19 +410,19 @@ export async function executeDailyCodexDagCommandNode(options = {}) {
     nodeKind: node.kind || "command",
     runnerStageRef: node.runner_stage_ref || "",
     resultScope: "node",
-    status: executionSucceeded ? "success" : "failure",
-    downstreamDisposition: executionSucceeded ? "continue" : "block",
+    status: nodeSucceeded ? "success" : "failure",
+    downstreamDisposition: nodeSucceeded ? "continue" : "block",
     startedAt,
     finishedAt,
     attemptsStarted: 1,
     maxAttempts: 1,
-    attemptsExhausted: !executionSucceeded,
+    attemptsExhausted: !nodeSucceeded,
     dependencyResults: options.dependencyResults || options.dependency_results || [],
     declaredInputs: node.inputs || [],
     declaredOutputs: node.outputs || [],
-    resolvedInputs: options.resolvedInputs || options.resolved_inputs || [],
-    resolvedOutputs: options.resolvedOutputs || options.resolved_outputs || [],
-    failures: executionIssues,
+    resolvedInputs,
+    resolvedOutputs,
+    failures: resultIssues,
     warnings: [],
     audit: {
       parallel_group: node.parallel_group || "",
@@ -422,12 +434,12 @@ export async function executeDailyCodexDagCommandNode(options = {}) {
   });
   const validation = validateDailyCodexDagNodeResult(result);
   const failures = [
-    ...executionIssues.map((issue) => issue.message),
+    ...resultIssues.map((issue) => issue.message),
     ...validation.failures
   ];
 
   return {
-    ok: executionSucceeded && validation.ok,
+    ok: nodeSucceeded && validation.ok,
     failures,
     result,
     runtime_plan: runtimePlan
@@ -1045,6 +1057,107 @@ function commandExecutionIssue({ nodeId, executionOutcome }) {
     source: "command-executor",
     retryable: false
   });
+}
+
+function commandArtifactIssues({ nodeId, declaredInputs, declaredOutputs, resolvedInputs, resolvedOutputs }) {
+  return [
+    ...requiredArtifactIssues({ nodeId, kind: "input", declared: declaredInputs, resolved: resolvedInputs }),
+    ...requiredArtifactIssues({ nodeId, kind: "output", declared: declaredOutputs, resolved: resolvedOutputs })
+  ];
+}
+
+function requiredArtifactIssues({ nodeId, kind, declared, resolved }) {
+  if (!Array.isArray(declared) || !Array.isArray(resolved)) return [];
+  const issues = [];
+  for (const artifact of declared) {
+    if (!isPlainObject(artifact) || artifact.required !== true || !nonEmptyString(artifact.path)) continue;
+    const resolvedArtifact = resolved.find((item) => isPlainObject(item) && item.path === artifact.path);
+    if (!resolvedArtifact || resolvedArtifact.exists !== true) {
+      issues.push(nodeResultIssue({
+        code: `required_${kind}_artifact_missing`,
+        message: `Command node ${nodeId} required ${kind} artifact ${artifact.path} was not resolved.`,
+        source: "artifact-verifier",
+        retryable: false
+      }));
+      continue;
+    }
+    if (resolvedArtifact.schema_valid !== true) {
+      issues.push(nodeResultIssue({
+        code: `required_${kind}_artifact_invalid`,
+        message: `Command node ${nodeId} required ${kind} artifact ${artifact.path} did not pass artifact validation.`,
+        source: "artifact-verifier",
+        retryable: false
+      }));
+    }
+  }
+  return issues;
+}
+
+async function resolveDeclaredExecutionArtifacts({ rootDir, reportDate, artifacts }) {
+  if (!Array.isArray(artifacts)) return artifacts;
+  return Promise.all(artifacts.map((artifact) => resolveDeclaredExecutionArtifact({
+    rootDir,
+    reportDate,
+    artifact
+  })));
+}
+
+async function resolveDeclaredExecutionArtifact({ rootDir, reportDate, artifact }) {
+  if (!isPlainObject(artifact)) return artifact;
+  const declaredPath = artifact.path;
+  const required = artifact.required === true;
+  const missing = {
+    path: declaredPath,
+    required,
+    exists: false,
+    schema_valid: false,
+    bytes: null,
+    sha256: null
+  };
+  if (!nonEmptyString(declaredPath)) return missing;
+
+  const materializedPath = materializeArtifactPath({ templatePath: declaredPath, reportDate });
+  if (!isSafeRelativeTemplatePath(materializedPath)) return missing;
+  const absolutePath = path.resolve(rootDir, materializedPath);
+  if (!isPathWithinOrEqual({ parent: rootDir, child: absolutePath })) return missing;
+
+  try {
+    const stat = await fs.stat(absolutePath);
+    if (!stat.isFile()) return missing;
+    const bytes = await fs.readFile(absolutePath);
+    return {
+      path: declaredPath,
+      required,
+      exists: true,
+      schema_valid: artifactJsonSchemaValid({ artifactPath: materializedPath, bytes }),
+      bytes: bytes.length,
+      sha256: createHash("sha256").update(bytes).digest("hex")
+    };
+  } catch {
+    return missing;
+  }
+}
+
+function materializeArtifactPath({ templatePath, reportDate }) {
+  const [yyyy, mm] = String(reportDate || "").split("-");
+  return String(templatePath || "")
+    .replaceAll("{report_date}", reportDate)
+    .replaceAll("{yyyy}", yyyy || "")
+    .replaceAll("{mm}", mm || "");
+}
+
+function artifactJsonSchemaValid({ artifactPath, bytes }) {
+  if (!String(artifactPath || "").toLowerCase().endsWith(".json")) return true;
+  try {
+    JSON.parse(bytes.toString("utf8"));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function hasOwnOption(options, key) {
+  return Object.prototype.hasOwnProperty.call(options, key);
 }
 
 function validateDagRunFailureSummary(summary, failures) {
