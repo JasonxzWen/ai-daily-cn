@@ -147,7 +147,7 @@ export async function createDailyCodexDagPlan(options = {}) {
 export function resolveDailyCodexDagCommandRuntimePlan(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const node = options.node || {};
-  const spec = options.spec || options.nodeExecutionSpec || node.execution_contract?.node_execution_spec;
+  const spec = selectExplicitNodeExecutionSpec({ options, node });
   const nodeId = nonEmptyString(node.id) ? node.id : "<unknown>";
   const failures = [];
   const label = `daily codex DAG command runtime plan node ${nodeId}`;
@@ -219,6 +219,80 @@ export function resolveDailyCodexDagCommandRuntimePlan(options = {}) {
       shell: false,
       script_path: resolvedScriptPath,
       argv_tail: argvTail
+    }
+  };
+}
+
+export function resolveDailyCodexDagCodexRuntimePlan(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const node = options.node || {};
+  const spec = selectExplicitNodeExecutionSpec({ options, node });
+  const nodeId = nonEmptyString(node.id) ? node.id : "<unknown>";
+  const failures = [];
+  const label = `daily codex DAG Codex runtime plan node ${nodeId}`;
+
+  if (!isPlainObject(spec)) {
+    failures.push(`${label} spec must be an object.`);
+    return { ok: false, failures, plan: null };
+  }
+  if (spec.executor !== "codex_cli") {
+    failures.push(`${label} executor must be codex_cli.`);
+  }
+  if (spec.invocation?.kind !== "codex_cli") {
+    failures.push(`${label} invocation.kind must be codex_cli.`);
+    return { ok: false, failures, plan: null };
+  }
+
+  const codexPolicy = validateCodexCliInvocationPolicyShape({
+    invocation: spec.invocation,
+    failures,
+    label: `${label} invocation`
+  });
+
+  if (!isSafeExecutionRelativePath(spec.cwd, { allowDot: true })) {
+    failures.push(`${label} cwd must be "." or a safe repo-relative path.`);
+  }
+
+  const codexExecutablePath = Object.prototype.hasOwnProperty.call(options, "codexExecutablePath")
+    ? options.codexExecutablePath
+    : null;
+  if (!nonEmptyString(codexExecutablePath) || !path.isAbsolute(codexExecutablePath)) {
+    failures.push(`${label} codexExecutablePath must be an absolute path.`);
+  }
+
+  const cwdRelativePath = spec.cwd === "." ? "." : spec.cwd;
+  const resolvedCwd = isSafeExecutionRelativePath(cwdRelativePath, { allowDot: true })
+    ? path.resolve(rootDir, cwdRelativePath)
+    : null;
+  if (resolvedCwd && !isPathWithinOrEqual({ parent: rootDir, child: resolvedCwd })) {
+    failures.push(`${label} cwd must resolve inside the repository root.`);
+  }
+
+  const promptTemplate = codexPolicy.promptTemplate;
+  const promptTemplatePath = promptTemplate && isSafeExecutionRelativePath(promptTemplate)
+    ? path.resolve(rootDir, promptTemplate)
+    : null;
+  if (promptTemplatePath && !isPathWithinOrEqual({ parent: rootDir, child: promptTemplatePath })) {
+    failures.push(`${label} prompt_template must resolve inside the repository root.`);
+  }
+
+  if (failures.length > 0) {
+    return { ok: false, failures, plan: null };
+  }
+
+  const invocationArgs = [...spec.invocation.args];
+  return {
+    ok: true,
+    failures,
+    plan: {
+      runner: "codex_cli",
+      command: codexExecutablePath,
+      codex_args: [...invocationArgs],
+      invocation_args: invocationArgs,
+      cwd: resolvedCwd,
+      shell: false,
+      prompt_template_path: promptTemplatePath,
+      prompt_template: promptTemplate
     }
   };
 }
@@ -1973,23 +2047,20 @@ async function validateNodeExecutionSpecPreflight({ rootDir, node, spec, failure
     });
   }
   if (spec.invocation?.kind === "codex_cli") {
-    const promptTemplate = spec.invocation.prompt_template;
-    if (!isSafeExecutionRelativePath(promptTemplate)) {
-      failures.push(`config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation.prompt_template must be a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments.`);
-    } else {
+    const codexPolicy = validateCodexCliInvocationPolicyShape({
+      invocation: spec.invocation,
+      failures,
+      label: `config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation`
+    });
+    if (codexPolicy.shouldCheckExistingFile) {
       await validateExistingRelativeFile({
         rootDir,
-        relativePath: promptTemplate,
+        relativePath: codexPolicy.promptTemplate,
         label: `node ${node.id} node_execution_spec.invocation.prompt_template`,
         failures,
         checkedFiles
       });
     }
-    validateExecutionStringArray({
-      values: spec.invocation.args,
-      label: `config/daily-codex-dag.json: node ${node.id} node_execution_spec.invocation.args`,
-      failures
-    });
   }
   validateNodeExecutionRuntimePolicy({ node, spec, failures });
 }
@@ -2007,6 +2078,12 @@ function validateExecutionStringArray({ values, label, failures, requireNonEmpty
       failures.push(`${label} entries must be non-empty strings.`);
     }
   }
+}
+
+function selectExplicitNodeExecutionSpec({ options, node }) {
+  if (Object.prototype.hasOwnProperty.call(options, "spec")) return options.spec;
+  if (Object.prototype.hasOwnProperty.call(options, "nodeExecutionSpec")) return options.nodeExecutionSpec;
+  return node.execution_contract?.node_execution_spec;
 }
 
 async function validateCommandInvocationPolicy({ rootDir, node, argv, failures, checkedFiles }) {
@@ -2069,6 +2146,41 @@ function validateCommandInvocationPolicyShape({ argv, failures, label }) {
   if (!scriptPath.endsWith(".mjs") && !scriptPath.endsWith(".js")) {
     failures.push(`${label}[1] must end with .mjs or .js.`);
     result.ok = false;
+  }
+  return result;
+}
+
+function validateCodexCliInvocationPolicyShape({ invocation, failures, label }) {
+  const result = {
+    ok: true,
+    promptTemplate: null,
+    args: [],
+    shouldCheckExistingFile: false
+  };
+  if (!isPlainObject(invocation)) {
+    failures.push(`${label} must be an object.`);
+    result.ok = false;
+    return result;
+  }
+  const promptTemplate = invocation.prompt_template;
+  result.promptTemplate = promptTemplate;
+  if (!isSafeExecutionRelativePath(promptTemplate)) {
+    failures.push(`${label}.prompt_template must be a repo-relative path without absolute paths, drive letters, URLs, parent traversal, empty segments, backslashes, or colon-containing path segments.`);
+    result.ok = false;
+  } else {
+    result.shouldCheckExistingFile = true;
+  }
+
+  const failureCount = failures.length;
+  validateExecutionStringArray({
+    values: invocation.args,
+    label: `${label}.args`,
+    failures
+  });
+  if (failures.length !== failureCount) {
+    result.ok = false;
+  } else {
+    result.args = [...invocation.args];
   }
   return result;
 }

@@ -10,6 +10,7 @@ import {
   createDailyCodexDagNodeResult,
   createDailyCodexDagDryRun,
   createDailyCodexDagPlan,
+  resolveDailyCodexDagCodexRuntimePlan,
   resolveDailyCodexDagCommandRuntimePlan,
   validateDailyCodexDag,
   validateDailyCodexDagNodeResult,
@@ -391,6 +392,25 @@ test("daily codex DAG command runtime plan rejects unsafe or unsupported command
     );
   }
 
+  const nodeWithFallbackSpec = structuredCloneJson(score);
+  nodeWithFallbackSpec.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic fallback spec that direct helper must not use when spec is explicit.",
+    node_execution_spec: baseSpec
+  };
+  const explicitNull = resolveDailyCodexDagCommandRuntimePlan({
+    rootDir,
+    node: nodeWithFallbackSpec,
+    spec: null,
+    nodeExecutablePath: process.execPath
+  });
+  assert.equal(explicitNull.ok, false);
+  assert.equal(explicitNull.plan, null);
+  assert(
+    explicitNull.failures.some((failure) => failure.includes("spec must be an object")),
+    explicitNull.failures.join("\n")
+  );
+
   for (const nodeExecutablePath of ["node", ""]) {
     const invalidRuntime = resolveDailyCodexDagCommandRuntimePlan({
       rootDir,
@@ -403,6 +423,180 @@ test("daily codex DAG command runtime plan rejects unsafe or unsupported command
     assert(
       invalidRuntime.failures.some((failure) => failure.includes("nodeExecutablePath must be an absolute path")),
       invalidRuntime.failures.join("\n")
+    );
+  }
+});
+
+test("daily codex DAG Codex runtime plan resolves explicit runtime without execution", async () => {
+  const manifest = await loadManifest();
+  const codexNode = node(manifest, "classify-tag-entity");
+  const codexExecutablePath = path.resolve(rootDir, ".tmp", "codex-bin", "codex");
+  const promptTemplate = "prompts/future-missing-codex-node.md";
+  const spec = buildFutureNodeExecutionSpec(codexNode, {
+    executor: "codex_cli",
+    cwd: "scripts",
+    invocation: {
+      kind: "codex_cli",
+      prompt_template: promptTemplate,
+      args: ["--node", codexNode.id, "--mode", "plan-only"]
+    }
+  });
+
+  const result = resolveDailyCodexDagCodexRuntimePlan({
+    rootDir,
+    node: codexNode,
+    spec,
+    codexExecutablePath
+  });
+
+  const expectedPromptPath = path.resolve(rootDir, "prompts", "future-missing-codex-node.md");
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.deepEqual(result.plan, {
+    runner: "codex_cli",
+    command: codexExecutablePath,
+    codex_args: ["--node", codexNode.id, "--mode", "plan-only"],
+    invocation_args: ["--node", codexNode.id, "--mode", "plan-only"],
+    cwd: path.resolve(rootDir, "scripts"),
+    shell: false,
+    prompt_template_path: expectedPromptPath,
+    prompt_template: promptTemplate
+  });
+  assert.equal(Object.hasOwn(result.plan, "args"), false);
+  assert.notEqual(result.plan.prompt_template_path, path.resolve(rootDir, "scripts", "prompts", "future-missing-codex-node.md"));
+});
+
+test("daily codex DAG Codex runtime plan rejects unsafe or unsupported Codex inputs", async () => {
+  const manifest = await loadManifest();
+  const codexNode = node(manifest, "classify-tag-entity");
+  const codexExecutablePath = path.resolve(rootDir, ".tmp", "codex-bin", "codex");
+  const cases = [
+    {
+      name: "mismatched executor",
+      overrides: {
+        executor: "command",
+        invocation: {
+          kind: "codex_cli",
+          prompt_template: "prompts/ai-daily/modules/base.md",
+          args: ["--node", codexNode.id]
+        }
+      },
+      expected: "executor must be codex_cli"
+    },
+    {
+      name: "mismatched invocation kind",
+      overrides: {
+        executor: "codex_cli",
+        invocation: {
+          kind: "command",
+          argv: ["node", "scripts/validate-daily-codex-dag.mjs"]
+        }
+      },
+      expected: "invocation.kind must be codex_cli"
+    },
+    {
+      name: "unsafe prompt template",
+      overrides: {
+        executor: "codex_cli",
+        invocation: {
+          kind: "codex_cli",
+          prompt_template: "../prompts/future-dag-node.md",
+          args: ["--node", codexNode.id]
+        }
+      },
+      expected: "invocation.prompt_template must be a repo-relative path"
+    },
+    {
+      name: "blank arg",
+      overrides: {
+        executor: "codex_cli",
+        invocation: {
+          kind: "codex_cli",
+          prompt_template: "prompts/ai-daily/modules/base.md",
+          args: ["--node", ""]
+        }
+      },
+      expected: "invocation.args entries must be non-empty strings"
+    },
+    {
+      name: "unsafe cwd",
+      overrides: {
+        executor: "codex_cli",
+        cwd: "../outside",
+        invocation: {
+          kind: "codex_cli",
+          prompt_template: "prompts/ai-daily/modules/base.md",
+          args: ["--node", codexNode.id]
+        }
+      },
+      expected: 'cwd must be "." or a safe repo-relative path'
+    }
+  ];
+
+  for (const item of cases) {
+    const spec = buildFutureNodeExecutionSpec(codexNode, item.overrides);
+    const result = resolveDailyCodexDagCodexRuntimePlan({
+      rootDir,
+      node: codexNode,
+      spec,
+      codexExecutablePath
+    });
+
+    assert.equal(result.ok, false, item.name);
+    assert.equal(result.plan, null, item.name);
+    assert(
+      result.failures.some((failure) => failure.includes(item.expected)),
+      `${item.name}\n${result.failures.join("\n")}`
+    );
+  }
+
+  const fallbackSpec = buildFutureNodeExecutionSpec(codexNode, {
+    executor: "codex_cli",
+    invocation: {
+      kind: "codex_cli",
+      prompt_template: "prompts/ai-daily/modules/base.md",
+      args: ["--node", codexNode.id]
+    }
+  });
+  const nodeWithFallbackSpec = structuredCloneJson(codexNode);
+  nodeWithFallbackSpec.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic fallback spec that direct helper must not use when spec is explicit.",
+    node_execution_spec: fallbackSpec
+  };
+  const explicitNull = resolveDailyCodexDagCodexRuntimePlan({
+    rootDir,
+    node: nodeWithFallbackSpec,
+    spec: null,
+    codexExecutablePath
+  });
+  assert.equal(explicitNull.ok, false);
+  assert.equal(explicitNull.plan, null);
+  assert(
+    explicitNull.failures.some((failure) => failure.includes("spec must be an object")),
+    explicitNull.failures.join("\n")
+  );
+
+  for (const codexExecutablePathOverride of [undefined, "codex", ""]) {
+    const spec = buildFutureNodeExecutionSpec(codexNode, {
+      executor: "codex_cli",
+      invocation: {
+        kind: "codex_cli",
+        prompt_template: "prompts/ai-daily/modules/base.md",
+        args: ["--node", codexNode.id]
+      }
+    });
+    const result = resolveDailyCodexDagCodexRuntimePlan({
+      rootDir,
+      node: codexNode,
+      spec,
+      codexExecutablePath: codexExecutablePathOverride
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.plan, null);
+    assert(
+      result.failures.some((failure) => failure.includes("codexExecutablePath must be an absolute path")),
+      result.failures.join("\n")
     );
   }
 });
@@ -426,6 +620,8 @@ test("daily codex DAG dry-run helper is deterministic and level ordered", async 
   assert.deepEqual(first, second);
   assert.equal(first.mode, "daily_codex_dag_dry_run");
   assert.equal(Object.hasOwn(first, "node_runtime_plans"), false);
+  assert.equal(Object.hasOwn(first, "codex_runtime_plans"), false);
+  assert.equal(Object.hasOwn(first, "codex_invocations"), false);
   assert.equal(first.report_date, "2026-07-03");
   assert.equal(first.generated_at, fixedNow);
   assert.equal(first.run.final_status, "dry_run_only");
@@ -672,6 +868,7 @@ test("daily codex DAG contract-run helper emits validated skipped node results",
   assert.deepEqual(result.run.blocked_nodes, []);
   assert(!Object.prototype.hasOwnProperty.call(result.run, "completed_nodes"));
   assert.equal(Object.hasOwn(result, "node_runtime_plans"), false);
+  assert.equal(Object.hasOwn(result, "codex_runtime_plans"), false);
   assert.deepEqual(result.executed_commands, []);
   assert.deepEqual(result.codex_invocations, []);
   await assertValidDagRunSummary(result);
