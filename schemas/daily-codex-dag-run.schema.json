@@ -11,6 +11,8 @@
     { "$ref": "#/$defs/real_node_adapter_mvp_failure" },
     { "$ref": "#/$defs/source_watch_collect_mvp_success" },
     { "$ref": "#/$defs/source_watch_collect_mvp_failure" },
+    { "$ref": "#/$defs/source_watch_downstream_mvp_success" },
+    { "$ref": "#/$defs/source_watch_downstream_mvp_failure" },
     { "$ref": "#/$defs/two_node_fixture_mvp_success" },
     { "$ref": "#/$defs/two_node_fixture_mvp_failure" },
     { "$ref": "#/$defs/failure" }
@@ -487,6 +489,144 @@
           "items": { "type": "object" }
         },
         "next_action": { "$ref": "#/$defs/source_watch_collect_next_action" }
+      }
+    },
+    "source_watch_downstream_mvp_success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "failures",
+        "warnings",
+        "validation",
+        "mode",
+        "report_date",
+        "generated_at",
+        "run_id",
+        "plan",
+        "run",
+        "source_watch",
+        "downstream",
+        "node_results",
+        "node_result_validation",
+        "executed_commands",
+        "codex_invocations",
+        "next_action"
+      ],
+      "properties": {
+        "ok": { "const": true },
+        "failures": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "string" }
+        },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "validation": { "$ref": "#/$defs/success_validation" },
+        "mode": { "const": "daily_codex_dag_source_watch_downstream_mvp" },
+        "report_date": { "type": "string", "format": "date" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "plan": { "$ref": "#/$defs/plan" },
+        "run": { "$ref": "#/$defs/source_watch_downstream_mvp_success_run" },
+        "source_watch": { "$ref": "#/$defs/source_watch_collect_summary" },
+        "downstream": { "$ref": "#/$defs/source_watch_downstream_summary" },
+        "node_results": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "prefixItems": [
+            { "$ref": "#/$defs/source_watch_collect_node_result" },
+            { "$ref": "#/$defs/source_watch_downstream_node_result" }
+          ]
+        },
+        "node_result_validation": { "$ref": "#/$defs/node_result_validation" },
+        "executed_commands": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "prefixItems": [
+            { "$ref": "#/$defs/source_watch_collect_executed_command" },
+            { "$ref": "#/$defs/source_watch_downstream_executed_command" }
+          ]
+        },
+        "codex_invocations": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "object" }
+        },
+        "next_action": { "$ref": "#/$defs/source_watch_downstream_next_action" }
+      }
+    },
+    "source_watch_downstream_mvp_failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "failures",
+        "warnings",
+        "validation",
+        "mode",
+        "report_date",
+        "generated_at",
+        "run_id",
+        "plan",
+        "run",
+        "source_watch",
+        "downstream",
+        "node_results",
+        "node_result_validation",
+        "executed_commands",
+        "codex_invocations",
+        "next_action"
+      ],
+      "properties": {
+        "ok": { "const": false },
+        "failures": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "validation": { "$ref": "#/$defs/success_validation" },
+        "mode": { "const": "daily_codex_dag_source_watch_downstream_mvp" },
+        "report_date": { "type": "string", "format": "date" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "plan": { "$ref": "#/$defs/plan" },
+        "run": { "$ref": "#/$defs/source_watch_downstream_mvp_failure_run" },
+        "source_watch": { "$ref": "#/$defs/source_watch_collect_summary" },
+        "downstream": { "$ref": "#/$defs/source_watch_downstream_summary" },
+        "node_results": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "prefixItems": [
+            { "$ref": "#/$defs/source_watch_collect_node_result" },
+            { "$ref": "#/$defs/source_watch_downstream_node_result" }
+          ]
+        },
+        "node_result_validation": { "$ref": "#/$defs/node_result_validation" },
+        "executed_commands": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "prefixItems": [
+            { "$ref": "#/$defs/source_watch_collect_executed_command" },
+            { "$ref": "#/$defs/source_watch_downstream_executed_command" }
+          ]
+        },
+        "codex_invocations": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "object" }
+        },
+        "next_action": { "$ref": "#/$defs/source_watch_downstream_next_action" }
       }
     },
     "two_node_fixture_mvp_success": {
@@ -977,6 +1117,77 @@
         }
       }
     },
+    "source_watch_downstream_mvp_success_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["final_status", "levels", "planned_nodes", "completed_nodes", "blocked_nodes"],
+      "properties": {
+        "final_status": { "const": "executed_source_watch_downstream" },
+        "levels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/level" }
+        },
+        "planned_nodes": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "fetch-source-health" },
+            { "const": "parse-extract" }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "completed_nodes": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "fetch-source-health" },
+            { "const": "parse-extract" }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "blocked_nodes": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "$ref": "#/$defs/node_id" }
+        }
+      }
+    },
+    "source_watch_downstream_mvp_failure_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["final_status", "levels", "planned_nodes", "completed_nodes", "blocked_nodes"],
+      "properties": {
+        "final_status": { "const": "blocked" },
+        "levels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/level" }
+        },
+        "planned_nodes": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "fetch-source-health" },
+            { "const": "parse-extract" }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "completed_nodes": {
+          "type": "array",
+          "items": {
+            "enum": ["fetch-source-health", "parse-extract"]
+          },
+          "uniqueItems": true
+        },
+        "blocked_nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["fetch-source-health", "parse-extract"]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
     "two_node_fixture_mvp_success_run": {
       "type": "object",
       "additionalProperties": false,
@@ -1131,6 +1342,36 @@
         }
       }
     },
+    "source_watch_downstream_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_path",
+        "artifact_kind",
+        "input_kind",
+        "total_candidates",
+        "github_watch_candidates",
+        "site_watch_candidates",
+        "other_candidates",
+        "empty",
+        "signals"
+      ],
+      "properties": {
+        "artifact_path": { "const": ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json" },
+        "artifact_kind": { "const": "source_watch_extracted_candidates" },
+        "input_kind": { "const": "source_watch_candidates" },
+        "total_candidates": { "type": "integer", "minimum": 0 },
+        "github_watch_candidates": { "type": "integer", "minimum": 0 },
+        "site_watch_candidates": { "type": "integer", "minimum": 0 },
+        "other_candidates": { "type": "integer", "minimum": 0 },
+        "empty": { "type": "boolean" },
+        "signals": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
     "source_watch_rate_limit": {
       "type": "object",
       "additionalProperties": false,
@@ -1241,6 +1482,15 @@
       "required": ["kind", "message"],
       "properties": {
         "kind": { "const": "wire_parse_extract_source_watch_candidates" },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "source_watch_downstream_next_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "message"],
+      "properties": {
+        "kind": { "const": "wire_normalize_canonicalize_source_watch_candidates" },
         "message": { "type": "string", "minLength": 1 }
       }
     },
@@ -1983,6 +2233,237 @@
         }
       ]
     },
+    "source_watch_downstream_node_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "mode",
+        "report_date",
+        "run_id",
+        "manifest_name",
+        "manifest_schema_version",
+        "node_id",
+        "node_kind",
+        "runner_stage_ref",
+        "result_scope",
+        "execution_id",
+        "status",
+        "downstream_disposition",
+        "started_at",
+        "finished_at",
+        "duration_ms",
+        "attempts_started",
+        "max_attempts",
+        "attempts_exhausted",
+        "dependency_results",
+        "declared_inputs",
+        "declared_outputs",
+        "resolved_inputs",
+        "resolved_outputs",
+        "fanout",
+        "barrier",
+        "failures",
+        "warnings",
+        "audit"
+      ],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "mode": { "const": "daily_codex_dag_node_result" },
+        "report_date": { "type": "string", "format": "date" },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "manifest_name": { "const": "daily-codex-dag-contract" },
+        "manifest_schema_version": { "const": 1 },
+        "node_id": { "const": "parse-extract" },
+        "node_kind": { "const": "command" },
+        "runner_stage_ref": { "const": "collect" },
+        "result_scope": { "const": "node" },
+        "execution_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "status": { "enum": ["success", "failure", "blocked"] },
+        "downstream_disposition": { "enum": ["continue", "block"] },
+        "started_at": {
+          "anyOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        },
+        "finished_at": {
+          "anyOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "attempts_started": { "type": "integer", "minimum": 0, "maximum": 1 },
+        "max_attempts": { "const": 1 },
+        "attempts_exhausted": { "type": "boolean" },
+        "dependency_results": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/source_watch_downstream_dependency_result" }
+        },
+        "declared_inputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "required"],
+            "properties": {
+              "path": { "const": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json" },
+              "required": { "const": true }
+            }
+          }
+        },
+        "declared_outputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "required"],
+            "properties": {
+              "path": { "const": ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json" },
+              "required": { "const": true }
+            }
+          }
+        },
+        "resolved_inputs": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/resolved_artifact" },
+              {
+                "type": "object",
+                "properties": {
+                  "path": { "const": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json" },
+                  "required": { "const": true }
+                }
+              }
+            ]
+          }
+        },
+        "resolved_outputs": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/resolved_artifact" },
+              {
+                "type": "object",
+                "properties": {
+                  "path": { "const": ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json" },
+                  "required": { "const": true }
+                }
+              }
+            ]
+          }
+        },
+        "fanout": { "type": "null" },
+        "barrier": { "type": "null" },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_result_issue" }
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_result_issue" }
+        },
+        "audit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["parallel_group", "resilience_policy_ref", "owner_path_scope", "public_artifact", "validator_version"],
+          "properties": {
+            "parallel_group": { "const": "source-lanes" },
+            "resilience_policy_ref": { "const": "discover_content_sources" },
+            "owner_path_scope": { "const": "internal_workdir" },
+            "public_artifact": { "const": false },
+            "validator_version": { "const": "daily-codex-dag-node-result-v1" }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "success" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "downstream_disposition": { "const": "continue" },
+              "started_at": { "type": "string", "format": "date-time" },
+              "finished_at": { "type": "string", "format": "date-time" },
+              "attempts_started": { "const": 1 },
+              "attempts_exhausted": { "const": false },
+              "resolved_inputs": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "resolved_outputs": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "failures": { "type": "array", "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "failure" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "downstream_disposition": { "const": "block" },
+              "started_at": { "type": "string", "format": "date-time" },
+              "finished_at": { "type": "string", "format": "date-time" },
+              "attempts_started": { "const": 1 },
+              "attempts_exhausted": { "const": true },
+              "failures": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/$defs/node_result_issue" }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "blocked" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "downstream_disposition": { "const": "block" },
+              "started_at": { "type": "null" },
+              "finished_at": { "type": "null" },
+              "duration_ms": { "const": 0 },
+              "attempts_started": { "const": 0 },
+              "attempts_exhausted": { "const": false },
+              "resolved_inputs": { "type": "array", "maxItems": 0 },
+              "resolved_outputs": { "type": "array", "maxItems": 0 },
+              "failures": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/$defs/node_result_issue" }
+              }
+            }
+          }
+        }
+      ]
+    },
     "executed_command": {
       "type": "object",
       "additionalProperties": false,
@@ -2011,6 +2492,16 @@
         "node_id": { "const": "fetch-source-health" },
         "runner": { "const": "node" },
         "script": { "const": "scripts/run-source-watch-collect-fixture.mjs" }
+      }
+    },
+    "source_watch_downstream_executed_command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "runner", "script"],
+      "properties": {
+        "node_id": { "const": "parse-extract" },
+        "runner": { "const": "node" },
+        "script": { "const": "scripts/run-source-watch-downstream-fixture.mjs" }
       }
     },
     "two_node_fixture_executed_command": {
@@ -2073,6 +2564,21 @@
         "status": { "const": "success" },
         "required": { "const": true },
         "downstream_disposition": { "const": "continue" }
+      }
+    },
+    "source_watch_downstream_dependency_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "execution_id", "status", "required", "downstream_disposition"],
+      "properties": {
+        "node_id": { "const": "fetch-source-health" },
+        "execution_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "status": { "enum": ["success", "failure", "blocked"] },
+        "required": { "const": true },
+        "downstream_disposition": { "enum": ["continue", "block"] }
       }
     },
     "two_node_fixture_dependency_result": {
