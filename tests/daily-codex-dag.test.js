@@ -12,6 +12,7 @@ import {
   createDailyCodexDagDryRun,
   createDailyCodexDagExecutableNodeMvp,
   createDailyCodexDagRealNodeAdapterMvp,
+  createDailyCodexDagTwoNodeFixtureMvp,
   createDailyCodexDagPlan,
   executeDailyCodexDagCommandNode,
   resolveDailyCodexDagCodexRuntimePlan,
@@ -1381,6 +1382,248 @@ test("daily codex DAG real-node adapter MVP summary validation pins the score pr
   await removeRealNodeAdapterFixtureArtifacts();
 });
 
+test("daily codex DAG two-node fixture MVP runs classify then score with artifact handoff", async () => {
+  await removeTwoNodeFixtureArtifacts();
+  const result = await createDailyCodexDagTwoNodeFixtureMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath
+  });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.mode, "daily_codex_dag_two_node_fixture_mvp");
+  assert.equal(result.run.final_status, "executed_two_node_fixture");
+  assert.deepEqual(result.run.planned_nodes, ["classify-tag-entity", "score"]);
+  assert.deepEqual(result.run.completed_nodes, ["classify-tag-entity", "score"]);
+  assert.deepEqual(result.run.blocked_nodes, []);
+  assert.equal(result.plan.node_count, 2);
+  assert.deepEqual(result.plan.levels, [
+    { level: 0, node_ids: ["classify-tag-entity"] },
+    { level: 1, node_ids: ["score"] }
+  ]);
+  assert.deepEqual(result.plan.nodes.map((node) => node.id), ["classify-tag-entity", "score"]);
+  assert.deepEqual(result.plan.nodes[0].dependencies, []);
+  assert.deepEqual(result.plan.nodes[1].dependencies, ["classify-tag-entity"]);
+  assert.equal(result.node_results.length, 2);
+  assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
+
+  const [classifyResult, scoreResult] = result.node_results;
+  assert.equal(classifyResult.node_id, "classify-tag-entity");
+  assert.equal(classifyResult.node_kind, "codex_exec");
+  assert.equal(classifyResult.status, "success");
+  assert.deepEqual(classifyResult.dependency_results, []);
+  assert.equal(classifyResult.declared_inputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json");
+  assert.equal(classifyResult.declared_outputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json");
+  assert.equal(scoreResult.node_id, "score");
+  assert.equal(scoreResult.node_kind, "command");
+  assert.equal(scoreResult.status, "success");
+  assert.equal(scoreResult.dependency_results[0].node_id, "classify-tag-entity");
+  assert.equal(scoreResult.dependency_results[0].execution_id, classifyResult.execution_id);
+  assert.equal(scoreResult.dependency_results[0].status, "success");
+  assert.equal(scoreResult.declared_inputs[0].path, classifyResult.declared_outputs[0].path);
+  assert.equal(scoreResult.resolved_inputs[0].path, classifyResult.resolved_outputs[0].path);
+  for (const artifact of [
+    classifyResult.resolved_inputs[0],
+    classifyResult.resolved_outputs[0],
+    scoreResult.resolved_inputs[0],
+    scoreResult.resolved_outputs[0]
+  ]) {
+    assertResolvedArtifactMetadata(artifact);
+  }
+  assert.deepEqual(result.executed_commands, [{
+    node_id: "classify-tag-entity",
+    runner: "node",
+    script: "scripts/replay-daily-codex-dag-node-fixture.mjs"
+  }, {
+    node_id: "score",
+    runner: "node",
+    script: "scripts/replay-daily-codex-dag-node-fixture.mjs"
+  }]);
+  assert.equal(result.codex_invocations.length, 0);
+  assert.equal(JSON.stringify(result).includes("SECRET"), false);
+
+  const scoredPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", "2026-07-03", "artifacts", "scored-candidates.json");
+  const scored = JSON.parse(await fs.readFile(scoredPath, "utf8"));
+  assert.equal(scored.node_id, "score");
+  assert.equal(scored.candidates[0].taxonomy.domain, "models");
+  assert.equal(scored.candidates[0].score.rank, 1);
+
+  await assertValidDagNodeResult(classifyResult);
+  await assertValidDagNodeResult(scoreResult);
+  await assertValidDagRunSummary(result);
+  await removeTwoNodeFixtureArtifacts();
+});
+
+test("daily codex DAG two-node fixture MVP rejects misleading order and blocked evidence", async () => {
+  await removeTwoNodeFixtureArtifacts();
+  const result = await createDailyCodexDagTwoNodeFixtureMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath
+  });
+  assert.equal(result.ok, true, result.failures.join("\n"));
+
+  const swappedResults = structuredCloneJson(result);
+  swappedResults.node_results.reverse();
+  await assertInvalidDagRunSummary(swappedResults);
+
+  const swappedCommands = structuredCloneJson(result);
+  swappedCommands.executed_commands.reverse();
+  await assertInvalidDagRunSummary(swappedCommands);
+
+  const blockedAfterSuccess = structuredCloneJson(result);
+  blockedAfterSuccess.ok = false;
+  blockedAfterSuccess.failures = ["score blocked after classify success"];
+  blockedAfterSuccess.run.final_status = "blocked";
+  blockedAfterSuccess.run.completed_nodes = ["classify-tag-entity"];
+  blockedAfterSuccess.run.blocked_nodes = ["score"];
+  blockedAfterSuccess.executed_commands = [blockedAfterSuccess.executed_commands[0]];
+  const scoreResult = blockedAfterSuccess.node_results[1];
+  scoreResult.status = "blocked";
+  scoreResult.downstream_disposition = "block";
+  scoreResult.started_at = null;
+  scoreResult.finished_at = null;
+  scoreResult.duration_ms = 0;
+  scoreResult.attempts_started = 0;
+  scoreResult.attempts_exhausted = false;
+  scoreResult.resolved_inputs = [];
+  scoreResult.resolved_outputs = [];
+  scoreResult.failures = [{
+    code: "dependency_blocked",
+    message: "score cannot be blocked after classify succeeds",
+    source: "daily-codex-dag",
+    retryable: false
+  }];
+  await assertValidDagRunSummarySchemaOnly(blockedAfterSuccess);
+  assertInvalidSemanticDagRunSummary(
+    blockedAfterSuccess,
+    "score must not be blocked when classify succeeds",
+    "score blocked after classify success"
+  );
+
+  await removeTwoNodeFixtureArtifacts();
+});
+
+test("daily codex DAG two-node fixture MVP blocks score when classify command fails", async () => {
+  await removeTwoNodeFixtureArtifacts();
+  const calls = [];
+  const result = await createDailyCodexDagTwoNodeFixtureMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath,
+    executeCommand: async ({ node }) => {
+      calls.push(node.id);
+      return {
+        exitCode: 1,
+        signal: null,
+        stdout: "SECRET stdout payload",
+        stderr: "SECRET stderr payload",
+        errorMessage: "classify fixture failed"
+      };
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.run.final_status, "blocked");
+  assert.deepEqual(result.run.completed_nodes, []);
+  assert.deepEqual(result.run.blocked_nodes, ["classify-tag-entity", "score"]);
+  assert.deepEqual(calls, ["classify-tag-entity"]);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["classify-tag-entity"]);
+  assert.equal(result.node_results.length, 2);
+  assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
+  const [classifyResult, scoreResult] = result.node_results;
+  assert.equal(classifyResult.status, "failure");
+  assert.equal(classifyResult.failures[0].code, "command_execution_failed");
+  assert.equal(scoreResult.node_id, "score");
+  assert.equal(scoreResult.status, "blocked");
+  assert.equal(scoreResult.attempts_started, 0);
+  assert.equal(scoreResult.dependency_results[0].execution_id, classifyResult.execution_id);
+  assert.equal(scoreResult.dependency_results[0].status, "failure");
+  assert.equal(scoreResult.failures[0].code, "dependency_blocked");
+  assert.equal(Object.hasOwn(classifyResult, "stdout"), false);
+  assert.equal(Object.hasOwn(classifyResult, "stderr"), false);
+  assert.equal(Object.hasOwn(scoreResult, "stdout"), false);
+  assert.equal(Object.hasOwn(scoreResult, "stderr"), false);
+  assert.equal(JSON.stringify(result).includes("SECRET"), false);
+
+  await assertValidDagNodeResult(classifyResult);
+  await assertValidDagNodeResult(scoreResult);
+  await assertValidDagRunSummary(result);
+  await removeTwoNodeFixtureArtifacts();
+});
+
+test("daily codex DAG two-node fixture MVP records structured score artifact failure", async () => {
+  await removeTwoNodeFixtureArtifacts();
+  const result = await createDailyCodexDagTwoNodeFixtureMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath,
+    executeCommand: async ({ node, runtime_plan }) => {
+      const outputPathIndex = runtime_plan.argv_tail.indexOf("--output");
+      const outputPath = runtime_plan.argv_tail[outputPathIndex + 1];
+      const absoluteOutputPath = path.resolve(rootDir, outputPath);
+      await fs.mkdir(path.dirname(absoluteOutputPath), { recursive: true });
+      if (node.id === "classify-tag-entity") {
+        await fs.writeFile(absoluteOutputPath, `${JSON.stringify({
+          schema_version: 1,
+          mode: "daily_codex_dag_two_node_fixture_classified_output",
+          report_date: "2026-07-03",
+          node_id: "classify-tag-entity",
+          candidates: [{
+            candidate_id: "fixture-candidate-001",
+            title: "Fixture classified candidate",
+            url: "https://example.com/daily-codex-dag-fixture",
+            taxonomy: { domain: "models", flavor: "release", channel: "official" },
+            tags: ["model-release"],
+            entities: ["Fixture Labs"]
+          }]
+        }, null, 2)}\n`, "utf8");
+      } else {
+        await fs.writeFile(absoluteOutputPath, "{", "utf8");
+      }
+      return {
+        exitCode: 0,
+        signal: null,
+        stdout: "SECRET stdout payload",
+        stderr: "SECRET stderr payload",
+        errorMessage: ""
+      };
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.run.final_status, "blocked");
+  assert.deepEqual(result.run.completed_nodes, ["classify-tag-entity"]);
+  assert.deepEqual(result.run.blocked_nodes, ["score"]);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["classify-tag-entity", "score"]);
+  const [classifyResult, scoreResult] = result.node_results;
+  assert.equal(classifyResult.status, "success");
+  assert.equal(scoreResult.status, "failure");
+  assert.equal(scoreResult.failures[0].code, "required_output_artifact_invalid");
+  assert.equal(scoreResult.dependency_results[0].execution_id, classifyResult.execution_id);
+  assert.equal(scoreResult.resolved_outputs[0].exists, true);
+  assert.equal(scoreResult.resolved_outputs[0].schema_valid, false);
+  assert.match(scoreResult.resolved_outputs[0].sha256, /^[a-f0-9]{64}$/);
+  assert.equal(JSON.stringify(result).includes("SECRET"), false);
+
+  await assertValidDagNodeResult(classifyResult);
+  await assertValidDagNodeResult(scoreResult);
+  await assertValidDagRunSummary(result);
+  await removeTwoNodeFixtureArtifacts();
+});
+
 test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {
   const manifest = await loadManifest();
   const first = await createDailyCodexDagDryRun({
@@ -2273,7 +2516,7 @@ test("daily codex DAG dry-run CLI rejects invalid invocations with structured JS
   const missingDryRunJson = JSON.parse(missingDryRun.stdout);
   assert.equal(
     missingDryRunJson.failures[0],
-    "daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, or --execute-real-node-fixture"
+    "daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, or --execute-two-node-fixture"
   );
   assert.equal(missingDryRunJson.validation, null);
   await assertValidDagRunSummary(missingDryRunJson);
@@ -2365,6 +2608,38 @@ test("daily codex DAG real-node adapter MVP CLI writes JSON to stdout only", asy
   assert.deepEqual(forbiddenAfter.docsReports, forbiddenBefore.docsReports, "stdout-only real-node adapter MVP must not mutate docs reports");
   assert.deepEqual(forbiddenAfter.reportsData, forbiddenBefore.reportsData, "stdout-only real-node adapter MVP must not mutate reports data");
   await removeRealNodeAdapterFixtureArtifacts();
+});
+
+test("daily codex DAG two-node fixture MVP CLI writes JSON to stdout only", async () => {
+  await removeTwoNodeFixtureArtifacts();
+  const forbiddenBefore = await forbiddenPathSnapshot();
+  const result = await runDagCli(["--execute-two-node-fixture", "--date", "2026-07-03", "--json"]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, true, parsed.failures?.join("\n"));
+  assert.equal(parsed.mode, "daily_codex_dag_two_node_fixture_mvp");
+  assert.equal(parsed.report_date, "2026-07-03");
+  assert.equal(parsed.run.final_status, "executed_two_node_fixture");
+  assert.deepEqual(parsed.run.completed_nodes, ["classify-tag-entity", "score"]);
+  assert.equal(parsed.node_results.length, 2);
+  assert.equal(parsed.node_results[0].node_id, "classify-tag-entity");
+  assert.equal(parsed.node_results[0].status, "success");
+  assert.equal(parsed.node_results[1].node_id, "score");
+  assert.equal(parsed.node_results[1].status, "success");
+  assert.equal(parsed.node_results[1].dependency_results[0].execution_id, parsed.node_results[0].execution_id);
+  assertResolvedArtifactMetadata(parsed.node_results[0].resolved_outputs[0]);
+  assertResolvedArtifactMetadata(parsed.node_results[1].resolved_inputs[0]);
+  assertResolvedArtifactMetadata(parsed.node_results[1].resolved_outputs[0]);
+  assert.equal(Object.hasOwn(parsed.node_results[0], "stdout"), false);
+  assert.equal(Object.hasOwn(parsed.node_results[1], "stderr"), false);
+  assert.equal(JSON.stringify(parsed).includes("SECRET"), false);
+  await assertValidDagRunSummary(parsed);
+  const forbiddenAfter = await forbiddenPathSnapshot();
+  assert.deepEqual(forbiddenAfter.docsReports, forbiddenBefore.docsReports, "stdout-only two-node fixture MVP must not mutate docs reports");
+  assert.deepEqual(forbiddenAfter.reportsData, forbiddenBefore.reportsData, "stdout-only two-node fixture MVP must not mutate reports data");
+  await removeTwoNodeFixtureArtifacts();
 });
 
 test("daily codex DAG executable-node MVP CLI writes opt-in summaries under .tmp only", async () => {
@@ -3549,6 +3824,13 @@ async function removeRealNodeAdapterFixtureArtifacts(reportDate = "2026-07-03") 
   await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "scored-candidates.json"), {
     force: true
   });
+}
+
+async function removeTwoNodeFixtureArtifacts(reportDate = "2026-07-03") {
+  await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "canonical-candidates.json"), {
+    force: true
+  });
+  await removeRealNodeAdapterFixtureArtifacts(reportDate);
 }
 
 function assertResolvedArtifactMetadata(artifact) {

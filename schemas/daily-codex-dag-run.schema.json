@@ -9,6 +9,8 @@
     { "$ref": "#/$defs/executable_node_mvp_failure" },
     { "$ref": "#/$defs/real_node_adapter_mvp_success" },
     { "$ref": "#/$defs/real_node_adapter_mvp_failure" },
+    { "$ref": "#/$defs/two_node_fixture_mvp_success" },
+    { "$ref": "#/$defs/two_node_fixture_mvp_failure" },
     { "$ref": "#/$defs/failure" }
   ],
   "$defs": {
@@ -363,6 +365,136 @@
         "next_action": { "$ref": "#/$defs/real_node_adapter_next_action" }
       }
     },
+    "two_node_fixture_mvp_success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "failures",
+        "warnings",
+        "validation",
+        "mode",
+        "report_date",
+        "generated_at",
+        "run_id",
+        "plan",
+        "run",
+        "node_results",
+        "node_result_validation",
+        "executed_commands",
+        "codex_invocations",
+        "next_action"
+      ],
+      "properties": {
+        "ok": { "const": true },
+        "failures": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "string" }
+        },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "validation": { "$ref": "#/$defs/success_validation" },
+        "mode": { "const": "daily_codex_dag_two_node_fixture_mvp" },
+        "report_date": { "type": "string", "format": "date" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "plan": { "$ref": "#/$defs/plan" },
+        "run": { "$ref": "#/$defs/two_node_fixture_mvp_success_run" },
+        "node_results": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "prefixItems": [
+            { "$ref": "#/$defs/two_node_fixture_classify_node_result" },
+            { "$ref": "#/$defs/two_node_fixture_score_node_result" }
+          ]
+        },
+        "node_result_validation": { "$ref": "#/$defs/node_result_validation" },
+        "executed_commands": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "prefixItems": [
+            { "$ref": "#/$defs/two_node_fixture_classify_executed_command" },
+            { "$ref": "#/$defs/two_node_fixture_score_executed_command" }
+          ]
+        },
+        "codex_invocations": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "object" }
+        },
+        "next_action": { "$ref": "#/$defs/two_node_fixture_next_action" }
+      }
+    },
+    "two_node_fixture_mvp_failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "failures",
+        "warnings",
+        "validation",
+        "mode",
+        "report_date",
+        "generated_at",
+        "run_id",
+        "plan",
+        "run",
+        "node_results",
+        "node_result_validation",
+        "executed_commands",
+        "codex_invocations",
+        "next_action"
+      ],
+      "properties": {
+        "ok": { "const": false },
+        "failures": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "validation": { "$ref": "#/$defs/success_validation" },
+        "mode": { "const": "daily_codex_dag_two_node_fixture_mvp" },
+        "report_date": { "type": "string", "format": "date" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "plan": { "$ref": "#/$defs/plan" },
+        "run": { "$ref": "#/$defs/two_node_fixture_mvp_failure_run" },
+        "node_results": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "prefixItems": [
+            { "$ref": "#/$defs/two_node_fixture_classify_node_result" },
+            { "$ref": "#/$defs/two_node_fixture_score_node_result" }
+          ]
+        },
+        "node_result_validation": { "$ref": "#/$defs/node_result_validation" },
+        "executed_commands": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "prefixItems": [
+            { "$ref": "#/$defs/two_node_fixture_classify_executed_command" },
+            { "$ref": "#/$defs/two_node_fixture_score_executed_command" }
+          ]
+        },
+        "codex_invocations": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "object" }
+        },
+        "next_action": { "$ref": "#/$defs/two_node_fixture_next_action" }
+      }
+    },
     "validation": {
       "type": "object",
       "additionalProperties": false,
@@ -655,6 +787,77 @@
         }
       }
     },
+    "two_node_fixture_mvp_success_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["final_status", "levels", "planned_nodes", "completed_nodes", "blocked_nodes"],
+      "properties": {
+        "final_status": { "const": "executed_two_node_fixture" },
+        "levels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/level" }
+        },
+        "planned_nodes": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "classify-tag-entity" },
+            { "const": "score" }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "completed_nodes": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "classify-tag-entity" },
+            { "const": "score" }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "blocked_nodes": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "$ref": "#/$defs/node_id" }
+        }
+      }
+    },
+    "two_node_fixture_mvp_failure_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["final_status", "levels", "planned_nodes", "completed_nodes", "blocked_nodes"],
+      "properties": {
+        "final_status": { "const": "blocked" },
+        "levels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/level" }
+        },
+        "planned_nodes": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "classify-tag-entity" },
+            { "const": "score" }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "completed_nodes": {
+          "type": "array",
+          "items": {
+            "enum": ["classify-tag-entity", "score"]
+          },
+          "uniqueItems": true
+        },
+        "blocked_nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["classify-tag-entity", "score"]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
     "level": {
       "type": "object",
       "additionalProperties": false,
@@ -789,6 +992,15 @@
       "required": ["kind", "message"],
       "properties": {
         "kind": { "const": "wire_multi_node_dag_executor" },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "two_node_fixture_next_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "message"],
+      "properties": {
+        "kind": { "const": "add_artifact_business_schema_validation" },
         "message": { "type": "string", "minLength": 1 }
       }
     },
@@ -1154,6 +1366,211 @@
         }
       ]
     },
+    "two_node_fixture_node_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "mode",
+        "report_date",
+        "run_id",
+        "manifest_name",
+        "manifest_schema_version",
+        "node_id",
+        "node_kind",
+        "runner_stage_ref",
+        "result_scope",
+        "execution_id",
+        "status",
+        "downstream_disposition",
+        "started_at",
+        "finished_at",
+        "duration_ms",
+        "attempts_started",
+        "max_attempts",
+        "attempts_exhausted",
+        "dependency_results",
+        "declared_inputs",
+        "declared_outputs",
+        "resolved_inputs",
+        "resolved_outputs",
+        "fanout",
+        "barrier",
+        "failures",
+        "warnings",
+        "audit"
+      ],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "mode": { "const": "daily_codex_dag_node_result" },
+        "report_date": { "type": "string", "format": "date" },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "manifest_name": { "const": "daily-codex-dag-contract" },
+        "manifest_schema_version": { "const": 1 },
+        "node_id": { "enum": ["classify-tag-entity", "score"] },
+        "node_kind": { "enum": ["codex_exec", "command"] },
+        "runner_stage_ref": { "const": "admit" },
+        "result_scope": { "const": "node" },
+        "execution_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "status": { "enum": ["success", "failure", "blocked"] },
+        "downstream_disposition": { "enum": ["continue", "block"] },
+        "started_at": {
+          "anyOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        },
+        "finished_at": {
+          "anyOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "attempts_started": { "type": "integer", "minimum": 0, "maximum": 1 },
+        "max_attempts": { "const": 1 },
+        "attempts_exhausted": { "type": "boolean" },
+        "dependency_results": {
+          "type": "array",
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/two_node_fixture_dependency_result" }
+        },
+        "declared_inputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "declared_outputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "resolved_inputs": {
+          "type": "array",
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/resolved_artifact" }
+        },
+        "resolved_outputs": {
+          "type": "array",
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/resolved_artifact" }
+        },
+        "fanout": { "type": "null" },
+        "barrier": { "type": "null" },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_result_issue" }
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_result_issue" }
+        },
+        "audit": { "$ref": "#/$defs/real_node_adapter_node_result_audit" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "success" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "downstream_disposition": { "const": "continue" },
+              "started_at": { "type": "string", "format": "date-time" },
+              "finished_at": { "type": "string", "format": "date-time" },
+              "attempts_started": { "const": 1 },
+              "attempts_exhausted": { "const": false },
+              "failures": { "type": "array", "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "failure" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "downstream_disposition": { "const": "block" },
+              "started_at": { "type": "string", "format": "date-time" },
+              "finished_at": { "type": "string", "format": "date-time" },
+              "attempts_started": { "const": 1 },
+              "attempts_exhausted": { "const": true },
+              "failures": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/$defs/node_result_issue" }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "blocked" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "downstream_disposition": { "const": "block" },
+              "started_at": { "type": "null" },
+              "finished_at": { "type": "null" },
+              "duration_ms": { "const": 0 },
+              "attempts_started": { "const": 0 },
+              "attempts_exhausted": { "const": false },
+              "resolved_inputs": { "type": "array", "maxItems": 0 },
+              "resolved_outputs": { "type": "array", "maxItems": 0 },
+              "failures": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/$defs/node_result_issue" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "two_node_fixture_classify_node_result": {
+      "allOf": [
+        { "$ref": "#/$defs/two_node_fixture_node_result" },
+        {
+          "type": "object",
+          "properties": {
+            "node_id": { "const": "classify-tag-entity" },
+            "node_kind": { "const": "codex_exec" },
+            "dependency_results": {
+              "type": "array",
+              "maxItems": 0
+            }
+          }
+        }
+      ]
+    },
+    "two_node_fixture_score_node_result": {
+      "allOf": [
+        { "$ref": "#/$defs/two_node_fixture_node_result" },
+        {
+          "type": "object",
+          "properties": {
+            "node_id": { "const": "score" },
+            "node_kind": { "const": "command" },
+            "dependency_results": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "items": { "$ref": "#/$defs/two_node_fixture_dependency_result" }
+            }
+          }
+        }
+      ]
+    },
     "executed_command": {
       "type": "object",
       "additionalProperties": false,
@@ -1173,6 +1590,38 @@
         "runner": { "const": "node" },
         "script": { "const": "scripts/replay-daily-codex-dag-node-fixture.mjs" }
       }
+    },
+    "two_node_fixture_executed_command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "runner", "script"],
+      "properties": {
+        "node_id": { "enum": ["classify-tag-entity", "score"] },
+        "runner": { "const": "node" },
+        "script": { "const": "scripts/replay-daily-codex-dag-node-fixture.mjs" }
+      }
+    },
+    "two_node_fixture_classify_executed_command": {
+      "allOf": [
+        { "$ref": "#/$defs/two_node_fixture_executed_command" },
+        {
+          "type": "object",
+          "properties": {
+            "node_id": { "const": "classify-tag-entity" }
+          }
+        }
+      ]
+    },
+    "two_node_fixture_score_executed_command": {
+      "allOf": [
+        { "$ref": "#/$defs/two_node_fixture_executed_command" },
+        {
+          "type": "object",
+          "properties": {
+            "node_id": { "const": "score" }
+          }
+        }
+      ]
     },
     "contract_dependency_result": {
       "type": "object",
@@ -1202,6 +1651,21 @@
         "status": { "const": "success" },
         "required": { "const": true },
         "downstream_disposition": { "const": "continue" }
+      }
+    },
+    "two_node_fixture_dependency_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "execution_id", "status", "required", "downstream_disposition"],
+      "properties": {
+        "node_id": { "const": "classify-tag-entity" },
+        "execution_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "status": { "enum": ["success", "failure", "blocked"] },
+        "required": { "const": true },
+        "downstream_disposition": { "enum": ["continue", "block"] }
       }
     },
     "node_result_issue": {

@@ -14,6 +14,7 @@ const NODE_KINDS = ["command", "codex_exec", "fanout", "barrier"];
 const EXECUTION_READINESS_VALUES = ["planned_only", "legacy_mapped", "node_executable"];
 const EXECUTABLE_NODE_MVP_MODE = "daily_codex_dag_executable_node_mvp";
 const REAL_NODE_ADAPTER_MVP_MODE = "daily_codex_dag_real_node_adapter_mvp";
+const TWO_NODE_FIXTURE_MVP_MODE = "daily_codex_dag_two_node_fixture_mvp";
 const SYNTHETIC_EXECUTABLE_NODE_ID = "synthetic-command-node";
 const SYNTHETIC_EXECUTABLE_SCRIPT = "scripts/run-daily-codex-dag.mjs";
 const SYNTHETIC_EXECUTABLE_INPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/input.json";
@@ -21,6 +22,10 @@ const SYNTHETIC_EXECUTABLE_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executab
 const REAL_NODE_ADAPTER_TARGET_NODE_ID = "score";
 const REAL_NODE_ADAPTER_DEPENDENCY_NODE_ID = "classify-tag-entity";
 const REAL_NODE_ADAPTER_SCRIPT = "scripts/replay-daily-codex-dag-node-fixture.mjs";
+const TWO_NODE_FIXTURE_CLASSIFY_NODE_ID = "classify-tag-entity";
+const TWO_NODE_FIXTURE_SCORE_NODE_ID = "score";
+const TWO_NODE_FIXTURE_NODE_IDS = [TWO_NODE_FIXTURE_CLASSIFY_NODE_ID, TWO_NODE_FIXTURE_SCORE_NODE_ID];
+const TWO_NODE_FIXTURE_CANONICAL_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json";
 const REAL_NODE_ADAPTER_INPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json";
 const REAL_NODE_ADAPTER_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/scored-candidates.json";
 const REAL_NODE_ADAPTER_RUNNER_STAGE_REF = "admit";
@@ -773,6 +778,181 @@ export async function createDailyCodexDagRealNodeAdapterMvp(options = {}) {
   };
 }
 
+export async function createDailyCodexDagTwoNodeFixtureMvp(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const reportDate = requiredReportDate(options.reportDate || options.date);
+  const generatedAt = toIsoTimestamp(options.now || new Date());
+  const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}:two-node-fixture`;
+
+  let manifest = null;
+  try {
+    const loaded = await loadDailyCodexDag({ rootDir, dagPath: options.dagPath });
+    manifest = loaded.manifest;
+  } catch (error) {
+    return {
+      ok: false,
+      failures: [`${DEFAULT_DAG_PATH}: ${error.message}`],
+      warnings: [],
+      validation: null,
+      plan: null,
+      run: null
+    };
+  }
+
+  const validation = await validateDailyCodexDag({ rootDir, dagPath: options.dagPath, manifest });
+  if (!validation.ok) {
+    return {
+      ok: false,
+      failures: validation.failures,
+      warnings: validation.warnings,
+      validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const sourceNodes = TWO_NODE_FIXTURE_NODE_IDS.map((nodeId) => manifest.nodes.find((node) => node.id === nodeId));
+  const missingNodeId = TWO_NODE_FIXTURE_NODE_IDS.find((nodeId, index) => !sourceNodes[index]);
+  if (missingNodeId) {
+    return {
+      ok: false,
+      failures: [`daily codex DAG two-node fixture MVP missing node ${missingNodeId}.`],
+      warnings: validation.warnings,
+      validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const [classifySourceNode, scoreSourceNode] = sourceNodes;
+  const executableNodes = [
+    createRealNodeAdapterCommandNode({ sourceNode: classifySourceNode, reportDate, dependencies: [] }),
+    createRealNodeAdapterCommandNode({ sourceNode: scoreSourceNode, reportDate, dependencies: [TWO_NODE_FIXTURE_CLASSIFY_NODE_ID] })
+  ];
+  const fixtureManifest = {
+    schema_version: manifest.schema_version,
+    name: manifest.name,
+    description: "Fixture-only executable adapter for the classify-to-score DAG sequence.",
+    nodes: executableNodes
+  };
+  const plan = projectDailyCodexDagPlan(fixtureManifest);
+
+  await prepareTwoNodeFixtureArtifacts({ rootDir, reportDate, classifySourceNode, scoreSourceNode });
+
+  const nodeResults = [];
+  const executionFailures = [];
+  const executedCommands = [];
+  const nodeExecutablePath = options.nodeExecutablePath || options.node_executable_path || process.execPath;
+  const classifyExecution = await executeDailyCodexDagCommandNode({
+    rootDir,
+    reportDate,
+    runId,
+    manifestName: manifest.name,
+    manifestSchemaVersion: manifest.schema_version,
+    node: executableNodes[0],
+    nodeExecutablePath,
+    executeCommand: options.executeCommand,
+    startedAt: options.startedAt ?? options.started_at,
+    finishedAt: options.finishedAt ?? options.finished_at,
+    timeoutSeconds: options.timeoutSeconds ?? options.timeout_seconds,
+    dependencyResults: [],
+    resiliencePolicyRef: classifySourceNode.resilience_policy_ref || ""
+  });
+  executionFailures.push(...classifyExecution.failures);
+  if (classifyExecution.result) nodeResults.push(classifyExecution.result);
+  executedCommands.push({
+    node_id: TWO_NODE_FIXTURE_CLASSIFY_NODE_ID,
+    runner: "node",
+    script: REAL_NODE_ADAPTER_SCRIPT
+  });
+
+  if (classifyExecution.ok && classifyExecution.result?.status === "success") {
+    const scoreExecution = await executeDailyCodexDagCommandNode({
+      rootDir,
+      reportDate,
+      runId,
+      manifestName: manifest.name,
+      manifestSchemaVersion: manifest.schema_version,
+      node: executableNodes[1],
+      nodeExecutablePath,
+      executeCommand: options.executeCommand,
+      startedAt: options.startedAt ?? options.started_at,
+      finishedAt: options.finishedAt ?? options.finished_at,
+      timeoutSeconds: options.timeoutSeconds ?? options.timeout_seconds,
+      dependencyResults: [dependencyResultFromNodeResult(classifyExecution.result)],
+      resiliencePolicyRef: scoreSourceNode.resilience_policy_ref || ""
+    });
+    executionFailures.push(...scoreExecution.failures);
+    if (scoreExecution.result) nodeResults.push(scoreExecution.result);
+    executedCommands.push({
+      node_id: TWO_NODE_FIXTURE_SCORE_NODE_ID,
+      runner: "node",
+      script: REAL_NODE_ADAPTER_SCRIPT
+    });
+  } else {
+    nodeResults.push(createBlockedTwoNodeFixtureNodeResult({
+      reportDate,
+      runId,
+      manifestName: manifest.name,
+      manifestSchemaVersion: manifest.schema_version,
+      node: executableNodes[1],
+      dependencyResult: classifyExecution.result
+        ? dependencyResultFromNodeResult(classifyExecution.result)
+        : {
+            node_id: TWO_NODE_FIXTURE_CLASSIFY_NODE_ID,
+            execution_id: `${runId}:${TWO_NODE_FIXTURE_CLASSIFY_NODE_ID}:missing-result`,
+            status: "failure",
+            required: true,
+            downstream_disposition: "block"
+          }
+    }));
+  }
+
+  const nodeResultValidation = validateTwoNodeFixtureMvpNodeResults({
+    plan,
+    reportDate,
+    runId,
+    nodeResults
+  });
+  const completedNodes = nodeResults
+    .filter((result) => result.status === "success")
+    .map((result) => result.node_id);
+  const blockedNodes = nodeResults
+    .filter((result) => result.status === "failure" || result.status === "blocked")
+    .map((result) => result.node_id);
+  const ok = nodeResults.length === 2
+    && nodeResults.every((result) => result.status === "success")
+    && nodeResultValidation.ok;
+  const nodeFailureMessages = nodeResults.flatMap((result) => (result.failures || []).map((issue) => issue.message));
+
+  return {
+    ok,
+    failures: ok ? [] : uniqueSorted([...executionFailures, ...nodeFailureMessages, ...nodeResultValidation.failures]),
+    warnings: uniqueSorted([...validation.warnings, ...nodeResultValidation.warnings]),
+    validation,
+    mode: TWO_NODE_FIXTURE_MVP_MODE,
+    report_date: reportDate,
+    generated_at: generatedAt,
+    run_id: runId,
+    plan,
+    run: {
+      final_status: ok ? "executed_two_node_fixture" : "blocked",
+      levels: plan.levels.map(copyLevel),
+      planned_nodes: plan.nodes.map((node) => node.id),
+      completed_nodes: completedNodes,
+      blocked_nodes: blockedNodes
+    },
+    node_results: nodeResults,
+    node_result_validation: nodeResultValidation,
+    executed_commands: executedCommands,
+    codex_invocations: [],
+    next_action: {
+      kind: "add_artifact_business_schema_validation",
+      message: "Two-node fixture DAG sequence proved dependency-ordered artifact handoff; next add business-schema artifact validation or a third real node."
+    }
+  };
+}
+
 export function validateDailyCodexDagRunSummary(summary) {
   const failures = [];
   const warnings = [];
@@ -788,6 +968,10 @@ export function validateDailyCodexDagRunSummary(summary) {
   }
   if (summary.mode === REAL_NODE_ADAPTER_MVP_MODE) {
     validateRealNodeAdapterMvpSummary(summary, failures);
+    return { ok: failures.length === 0, failures, warnings };
+  }
+  if (summary.mode === TWO_NODE_FIXTURE_MVP_MODE) {
+    validateTwoNodeFixtureMvpSummary(summary, failures);
     return { ok: failures.length === 0, failures, warnings };
   }
   if (summary.ok === false) {
@@ -1216,7 +1400,7 @@ async function prepareSyntheticExecutableArtifacts({ rootDir, reportDate }) {
   await fs.rm(outputPath, { force: true });
 }
 
-function createRealNodeAdapterCommandNode({ sourceNode, reportDate }) {
+function createRealNodeAdapterCommandNode({ sourceNode, reportDate, dependencies }) {
   const inputArtifacts = (sourceNode.inputs || []).map(copyArtifact);
   const outputArtifacts = (sourceNode.outputs || []).map(copyArtifact);
   const inputArtifactPath = materializeArtifactPath({
@@ -1260,7 +1444,7 @@ function createRealNodeAdapterCommandNode({ sourceNode, reportDate }) {
         outputs: outputArtifacts
       }
     },
-    dependencies: [...(sourceNode.dependencies || [])],
+    dependencies: Array.isArray(dependencies) ? [...dependencies] : [...(sourceNode.dependencies || [])],
     inputs: inputArtifacts,
     outputs: outputArtifacts,
     runner_stage_ref: sourceNode.runner_stage_ref,
@@ -1268,6 +1452,48 @@ function createRealNodeAdapterCommandNode({ sourceNode, reportDate }) {
     public_artifact: sourceNode.public_artifact,
     owner_path_scope: sourceNode.owner_path_scope
   };
+}
+
+async function prepareTwoNodeFixtureArtifacts({ rootDir, reportDate, classifySourceNode, scoreSourceNode }) {
+  const classifyInputArtifact = classifySourceNode.inputs?.[0] || {};
+  const classifyOutputArtifact = classifySourceNode.outputs?.[0] || {};
+  const scoreOutputArtifact = scoreSourceNode.outputs?.[0] || {};
+  const classifyInputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: classifyInputArtifact.path || "",
+    reportDate
+  }));
+  const classifyOutputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: classifyOutputArtifact.path || "",
+    reportDate
+  }));
+  const scoreOutputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: scoreOutputArtifact.path || "",
+    reportDate
+  }));
+
+  await fs.mkdir(path.dirname(classifyInputPath), { recursive: true });
+  await fs.writeFile(classifyInputPath, `${JSON.stringify({
+    schema_version: 1,
+    mode: "daily_codex_dag_two_node_fixture_input",
+    report_date: reportDate,
+    node_id: classifySourceNode.id,
+    candidates: [{
+      candidate_id: "fixture-candidate-001",
+      title: "Fixture canonical candidate",
+      url: "https://example.com/daily-codex-dag-fixture",
+      language: "en",
+      source: {
+        name: "Fixture Source",
+        authority: "official"
+      },
+      canonical: {
+        title: "Fixture canonical candidate",
+        url: "https://example.com/daily-codex-dag-fixture"
+      }
+    }]
+  }, null, 2)}\n`, "utf8");
+  await fs.rm(classifyOutputPath, { force: true });
+  await fs.rm(scoreOutputPath, { force: true });
 }
 
 async function prepareRealNodeAdapterFixtureArtifacts({ rootDir, reportDate, sourceNode }) {
@@ -1314,6 +1540,61 @@ function createRealNodeAdapterDependencyResults({ sourceNode, reportDate, runId 
   }));
 }
 
+function dependencyResultFromNodeResult(result) {
+  return {
+    node_id: result.node_id,
+    execution_id: result.execution_id,
+    status: result.status,
+    required: true,
+    downstream_disposition: result.downstream_disposition
+  };
+}
+
+function createBlockedTwoNodeFixtureNodeResult({
+  reportDate,
+  runId,
+  manifestName,
+  manifestSchemaVersion,
+  node,
+  dependencyResult
+}) {
+  return createDailyCodexDagNodeResult({
+    reportDate,
+    runId,
+    manifestName,
+    manifestSchemaVersion,
+    nodeId: node.id,
+    nodeKind: node.kind,
+    runnerStageRef: node.runner_stage_ref,
+    status: "blocked",
+    downstreamDisposition: "block",
+    startedAt: null,
+    finishedAt: null,
+    attemptsStarted: 0,
+    maxAttempts: 1,
+    attemptsExhausted: false,
+    dependencyResults: [dependencyResult],
+    declaredInputs: node.inputs || [],
+    declaredOutputs: node.outputs || [],
+    resolvedInputs: [],
+    resolvedOutputs: [],
+    failures: [nodeResultIssue({
+      code: "dependency_blocked",
+      message: `daily codex DAG two-node fixture blocked ${node.id} because ${dependencyResult.node_id} did not continue.`,
+      source: "daily-codex-dag-two-node-fixture",
+      retryable: false
+    })],
+    warnings: [],
+    audit: {
+      parallel_group: node.parallel_group || "",
+      resilience_policy_ref: "",
+      owner_path_scope: node.owner_path_scope || "internal_workdir",
+      public_artifact: node.public_artifact === true,
+      validator_version: NODE_RESULT_VALIDATOR_VERSION
+    }
+  });
+}
+
 function expectedRealNodeAdapterSourceNode() {
   return {
     id: REAL_NODE_ADAPTER_TARGET_NODE_ID,
@@ -1326,6 +1607,30 @@ function expectedRealNodeAdapterSourceNode() {
     public_artifact: REAL_NODE_ADAPTER_PUBLIC_ARTIFACT,
     owner_path_scope: REAL_NODE_ADAPTER_OWNER_PATH_SCOPE
   };
+}
+
+function expectedTwoNodeFixtureSourceNodes() {
+  return [{
+    id: TWO_NODE_FIXTURE_CLASSIFY_NODE_ID,
+    kind: "codex_exec",
+    dependencies: [],
+    inputs: [{ path: TWO_NODE_FIXTURE_CANONICAL_ARTIFACT, required: true }],
+    outputs: [{ path: REAL_NODE_ADAPTER_INPUT_ARTIFACT, required: true }],
+    runner_stage_ref: REAL_NODE_ADAPTER_RUNNER_STAGE_REF,
+    parallel_group: REAL_NODE_ADAPTER_PARALLEL_GROUP,
+    public_artifact: REAL_NODE_ADAPTER_PUBLIC_ARTIFACT,
+    owner_path_scope: REAL_NODE_ADAPTER_OWNER_PATH_SCOPE
+  }, {
+    id: TWO_NODE_FIXTURE_SCORE_NODE_ID,
+    kind: "command",
+    dependencies: [TWO_NODE_FIXTURE_CLASSIFY_NODE_ID],
+    inputs: [{ path: REAL_NODE_ADAPTER_INPUT_ARTIFACT, required: true }],
+    outputs: [{ path: REAL_NODE_ADAPTER_OUTPUT_ARTIFACT, required: true }],
+    runner_stage_ref: REAL_NODE_ADAPTER_RUNNER_STAGE_REF,
+    parallel_group: REAL_NODE_ADAPTER_PARALLEL_GROUP,
+    public_artifact: REAL_NODE_ADAPTER_PUBLIC_ARTIFACT,
+    owner_path_scope: REAL_NODE_ADAPTER_OWNER_PATH_SCOPE
+  }];
 }
 
 function validateExecutableNodeMvpNodeResults({ plan, reportDate, runId, nodeResults }) {
@@ -1476,6 +1781,138 @@ function validateRealNodeAdapterMvpPlanNodeAgainstExpected({ planNode, expectedS
   }
   if (!sameArtifactArray(planNode.outputs, expectedSourceNode.outputs)) {
     failures.push(`${label}.outputs must match the score production contract.`);
+  }
+}
+
+function validateTwoNodeFixtureMvpNodeResults({ plan, reportDate, runId, nodeResults }) {
+  const failures = [];
+  const warnings = [];
+  if (!Array.isArray(nodeResults)) {
+    failures.push("daily codex DAG two-node fixture MVP node_results must be an array.");
+    return nodeResultValidationSummary({ failures, warnings, checkedResults: 0 });
+  }
+  if (nodeResults.length !== 2) {
+    failures.push("daily codex DAG two-node fixture MVP node_results length must be 2.");
+  }
+
+  const expectedNodes = expectedTwoNodeFixtureSourceNodes();
+  const resultByNodeId = new Map(nodeResults.filter(isPlainObject).map((result) => [result.node_id, result]));
+  for (let index = 0; index < nodeResults.length; index += 1) {
+    const result = nodeResults[index];
+    const resultValidation = validateDailyCodexDagNodeResult(result);
+    failures.push(...resultValidation.failures);
+    warnings.push(...resultValidation.warnings);
+    validateTwoNodeFixtureMvpNodeResultAgainstExpected({
+      result,
+      expectedNode: expectedNodes[index],
+      reportDate,
+      runId,
+      resultByNodeId,
+      failures
+    });
+  }
+
+  return nodeResultValidationSummary({ failures, warnings, checkedResults: nodeResults.length });
+}
+
+function validateTwoNodeFixtureMvpNodeResultAgainstExpected({
+  result,
+  expectedNode,
+  reportDate,
+  runId,
+  resultByNodeId,
+  failures
+}) {
+  const label = "daily codex DAG two-node fixture MVP node result";
+  if (!isPlainObject(result)) return;
+  if (!expectedNode) {
+    failures.push(`${label} has an unexpected result position.`);
+    return;
+  }
+  if (result.report_date !== reportDate) failures.push(`${label}.report_date must match run report_date.`);
+  if (result.run_id !== runId) failures.push(`${label}.run_id must match run_id.`);
+  if (result.manifest_name !== "daily-codex-dag-contract") failures.push(`${label}.manifest_name must match manifest.`);
+  if (result.manifest_schema_version !== 1) failures.push(`${label}.manifest_schema_version must be 1.`);
+  if (result.node_id !== expectedNode.id) failures.push(`${label}.node_id must be ${expectedNode.id}.`);
+  if (result.node_kind !== expectedNode.kind) failures.push(`${label}.node_kind must be ${expectedNode.kind}.`);
+  if (result.runner_stage_ref !== expectedNode.runner_stage_ref) failures.push(`${label}.runner_stage_ref must match expected node.`);
+  if (result.result_scope !== "node") failures.push(`${label}.result_scope must be node.`);
+  if (!sameArtifactArray(result.declared_inputs, expectedNode.inputs)) failures.push(`${label}.declared_inputs must match expected node inputs.`);
+  if (!sameArtifactArray(result.declared_outputs, expectedNode.outputs)) failures.push(`${label}.declared_outputs must match expected node outputs.`);
+  if (result.audit?.parallel_group !== expectedNode.parallel_group) failures.push(`${label}.audit.parallel_group must match expected node.`);
+  if (result.audit?.owner_path_scope !== expectedNode.owner_path_scope) failures.push(`${label}.audit.owner_path_scope must match expected node.`);
+  if (result.audit?.public_artifact !== expectedNode.public_artifact) failures.push(`${label}.audit.public_artifact must match expected node.`);
+  if (result.fanout !== null) failures.push(`${label}.fanout must be null.`);
+  if (result.barrier !== null) failures.push(`${label}.barrier must be null.`);
+
+  if (expectedNode.id === TWO_NODE_FIXTURE_CLASSIFY_NODE_ID) {
+    if (!["success", "failure"].includes(result.status)) {
+      failures.push(`${label}.classify status must be success or failure.`);
+    }
+    if (Array.isArray(result.dependency_results) && result.dependency_results.length !== 0) {
+      failures.push(`${label}.classify dependency_results must be empty.`);
+    }
+    return;
+  }
+
+  if (!["success", "failure", "blocked"].includes(result.status)) {
+    failures.push(`${label}.score status must be success, failure, or blocked.`);
+  }
+  const classifyResult = resultByNodeId.get(TWO_NODE_FIXTURE_CLASSIFY_NODE_ID);
+  if (!classifyResult) {
+    failures.push(`${label}.score requires classify node result evidence.`);
+  }
+  if (!Array.isArray(result.dependency_results) || result.dependency_results.length !== 1) {
+    failures.push(`${label}.score dependency_results must contain classify evidence.`);
+    return;
+  }
+  const dependency = result.dependency_results[0];
+  if (dependency.node_id !== TWO_NODE_FIXTURE_CLASSIFY_NODE_ID) {
+    failures.push(`${label}.score dependency_results[0].node_id must be ${TWO_NODE_FIXTURE_CLASSIFY_NODE_ID}.`);
+  }
+  if (classifyResult && dependency.execution_id !== classifyResult.execution_id) {
+    failures.push(`${label}.score dependency_results[0].execution_id must match classify result.`);
+  }
+  if (classifyResult && dependency.status !== classifyResult.status) {
+    failures.push(`${label}.score dependency_results[0].status must match classify result.`);
+  }
+  if (classifyResult && dependency.downstream_disposition !== classifyResult.downstream_disposition) {
+    failures.push(`${label}.score dependency_results[0].downstream_disposition must match classify result.`);
+  }
+  if (dependency.required !== true) failures.push(`${label}.score dependency_results[0].required must be true.`);
+  if (classifyResult?.status !== "success" && result.status !== "blocked") {
+    failures.push(`${label}.score must be blocked when classify does not succeed.`);
+  }
+  if (classifyResult?.status === "success" && result.status === "blocked") {
+    failures.push(`${label}.score must not be blocked when classify succeeds.`);
+  }
+}
+
+function validateTwoNodeFixtureMvpPlanNodeAgainstExpected({ planNode, expectedNode, failures }) {
+  const label = "daily codex DAG two-node fixture MVP plan node";
+  if (!isPlainObject(planNode)) return;
+  if (planNode.id !== expectedNode.id) failures.push(`${label}.id must be ${expectedNode.id}.`);
+  if (planNode.kind !== expectedNode.kind) failures.push(`${label}.kind must be ${expectedNode.kind}.`);
+  if (planNode.runner_stage_ref !== expectedNode.runner_stage_ref) {
+    failures.push(`${label}.runner_stage_ref must be ${expectedNode.runner_stage_ref}.`);
+  }
+  if (planNode.parallel_group !== expectedNode.parallel_group) {
+    failures.push(`${label}.parallel_group must be ${expectedNode.parallel_group}.`);
+  }
+  if (planNode.owner_path_scope !== expectedNode.owner_path_scope) {
+    failures.push(`${label}.owner_path_scope must be ${expectedNode.owner_path_scope}.`);
+  }
+  if (planNode.public_artifact !== expectedNode.public_artifact) {
+    failures.push(`${label}.public_artifact must be ${expectedNode.public_artifact}.`);
+  }
+  if (!sameOrderedStringArray(planNode.dependencies, expectedNode.dependencies)) {
+    failures.push(`${label}.dependencies must match the two-node fixture contract.`);
+  }
+  if (!sameArtifactArray(planNode.inputs, expectedNode.inputs)) {
+    failures.push(`${label}.inputs must match the two-node fixture contract.`);
+  }
+  if (!sameArtifactArray(planNode.outputs, expectedNode.outputs)) {
+    failures.push(`${label}.outputs must match the two-node fixture contract.`);
   }
 }
 
@@ -2219,6 +2656,128 @@ function validateRealNodeAdapterMvpSummary(summary, failures) {
   }
 }
 
+function validateTwoNodeFixtureMvpSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "ok",
+      "failures",
+      "warnings",
+      "validation",
+      "mode",
+      "report_date",
+      "generated_at",
+      "run_id",
+      "plan",
+      "run",
+      "node_results",
+      "node_result_validation",
+      "executed_commands",
+      "codex_invocations",
+      "next_action"
+    ],
+    label: "daily codex DAG two-node fixture MVP summary",
+    failures
+  });
+  if (typeof summary.ok !== "boolean") {
+    failures.push("daily codex DAG two-node fixture MVP summary ok must be a boolean.");
+  }
+  if (!Array.isArray(summary.failures)) {
+    failures.push("daily codex DAG two-node fixture MVP summary failures must be an array.");
+  } else {
+    validateMessageArray(summary.failures, "daily codex DAG two-node fixture MVP summary failures", failures);
+    if (summary.ok === true && summary.failures.length !== 0) {
+      failures.push("daily codex DAG two-node fixture MVP summary failures must be empty when ok is true.");
+    }
+    if (summary.ok === false && summary.failures.length === 0) {
+      failures.push("daily codex DAG two-node fixture MVP summary failures must be non-empty when ok is false.");
+    }
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG two-node fixture MVP summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG two-node fixture MVP summary warnings", failures);
+  }
+  if (summary.mode !== TWO_NODE_FIXTURE_MVP_MODE) {
+    failures.push(`daily codex DAG two-node fixture MVP summary mode must be ${TWO_NODE_FIXTURE_MVP_MODE}.`);
+  }
+  if (!isStrictIsoDate(summary.report_date)) {
+    failures.push("daily codex DAG two-node fixture MVP summary report_date must be a real YYYY-MM-DD date.");
+  }
+  if (!isCanonicalIsoTimestamp(summary.generated_at)) {
+    failures.push("daily codex DAG two-node fixture MVP summary generated_at must be a canonical UTC Date#toISOString() string.");
+  }
+  if (!isStableIdentifier(summary.run_id)) {
+    failures.push("daily codex DAG two-node fixture MVP summary run_id must be a stable identifier.");
+  }
+  if (!isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG two-node fixture MVP summary validation must be an object.");
+  } else {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: true,
+      label: "daily codex DAG two-node fixture MVP summary validation",
+      failures
+    });
+  }
+  validateNextActionShape(summary.next_action, failures, "daily codex DAG two-node fixture MVP summary next_action", {
+    allowedKinds: ["add_artifact_business_schema_validation"]
+  });
+  validateTwoNodeFixtureMvpExecutedCommands({ summary, failures });
+  if (!Array.isArray(summary.codex_invocations) || summary.codex_invocations.length !== 0) {
+    failures.push("daily codex DAG two-node fixture MVP summary codex_invocations must be empty.");
+  }
+
+  const plan = isPlainObject(summary.plan) ? summary.plan : null;
+  const run = isPlainObject(summary.run) ? summary.run : null;
+  if (!plan) failures.push("daily codex DAG two-node fixture MVP summary plan must be an object.");
+  if (!run) failures.push("daily codex DAG two-node fixture MVP summary run must be an object.");
+  if (!Array.isArray(summary.node_results)) failures.push("daily codex DAG two-node fixture MVP summary node_results must be an array.");
+  if (!plan || !run || !Array.isArray(summary.node_results)) return;
+
+  validatePlanShape(plan, failures, { allowNodeExecutable: true });
+  validateRunShape(run, failures);
+  validateContractRunNodeResultValidation(summary.node_result_validation, failures);
+
+  const planNodes = Array.isArray(plan.nodes) ? plan.nodes : null;
+  const planLevels = Array.isArray(plan.levels) ? plan.levels : null;
+  if (!planNodes) failures.push("daily codex DAG two-node fixture MVP summary plan.nodes must be an array.");
+  if (!planLevels) failures.push("daily codex DAG two-node fixture MVP summary plan.levels must be an array.");
+  if (!planNodes || !planLevels) return;
+  if (plan.node_count !== 2 || planNodes.length !== 2) {
+    failures.push("daily codex DAG two-node fixture MVP summary plan must contain exactly two nodes.");
+  }
+
+  const expectedNodes = expectedTwoNodeFixtureSourceNodes();
+  for (let index = 0; index < expectedNodes.length; index += 1) {
+    validateTwoNodeFixtureMvpPlanNodeAgainstExpected({
+      planNode: planNodes[index],
+      expectedNode: expectedNodes[index],
+      failures
+    });
+  }
+  const planNodeIds = planNodes.map((node) => isPlainObject(node) ? node.id : undefined);
+  const levelPartition = validatePlanLevelPartition({ planNodes, planLevels, failures });
+  validatePlanDependencyLevels({ planNodes, levelByNodeId: levelPartition.levelByNodeId, failures });
+  validateTwoNodeFixtureMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures });
+
+  const nodeResultValidation = validateTwoNodeFixtureMvpNodeResults({
+    plan,
+    reportDate: summary.report_date,
+    runId: summary.run_id,
+    nodeResults: summary.node_results
+  });
+  failures.push(...nodeResultValidation.failures);
+  if (isPlainObject(summary.node_result_validation)) {
+    if (summary.node_result_validation.ok !== true) {
+      failures.push("daily codex DAG two-node fixture MVP summary node_result_validation.ok must be true.");
+    }
+    if (summary.node_result_validation.checked_results !== summary.node_results.length) {
+      failures.push("daily codex DAG two-node fixture MVP summary node_result_validation.checked_results must equal node_results length.");
+    }
+  }
+}
+
 function validateExecutableNodeMvpExecutedCommands(values, failures) {
   const label = "daily codex DAG executable-node MVP summary executed_commands";
   if (!Array.isArray(values)) {
@@ -2261,6 +2820,36 @@ function validateRealNodeAdapterMvpExecutedCommands(values, failures) {
   if (command.script !== REAL_NODE_ADAPTER_SCRIPT) failures.push(`${label} entry.script must be ${REAL_NODE_ADAPTER_SCRIPT}.`);
 }
 
+function validateTwoNodeFixtureMvpExecutedCommands({ summary, failures }) {
+  const label = "daily codex DAG two-node fixture MVP summary executed_commands";
+  const values = summary.executed_commands;
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  const scoreResult = Array.isArray(summary.node_results)
+    ? summary.node_results.find((result) => result?.node_id === TWO_NODE_FIXTURE_SCORE_NODE_ID)
+    : null;
+  const expectedNodeIds = scoreResult?.status === "blocked"
+    ? [TWO_NODE_FIXTURE_CLASSIFY_NODE_ID]
+    : TWO_NODE_FIXTURE_NODE_IDS;
+  if (values.length !== expectedNodeIds.length) {
+    failures.push(`${label} length must match attempted fixture commands.`);
+    return;
+  }
+  for (let index = 0; index < expectedNodeIds.length; index += 1) {
+    const command = values[index];
+    if (!isPlainObject(command)) {
+      failures.push(`${label} entry must be an object.`);
+      return;
+    }
+    validateExactKeys({ value: command, allowed: ["node_id", "runner", "script"], label: `${label} entry`, failures });
+    if (command.node_id !== expectedNodeIds[index]) failures.push(`${label} entry.node_id must be ${expectedNodeIds[index]}.`);
+    if (command.runner !== "node") failures.push(`${label} entry.runner must be node.`);
+    if (command.script !== REAL_NODE_ADAPTER_SCRIPT) failures.push(`${label} entry.script must be ${REAL_NODE_ADAPTER_SCRIPT}.`);
+  }
+}
+
 function validateExecutableNodeMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures }) {
   if (!sameOrderedStringArray(run.planned_nodes, planNodeIds)) {
     failures.push("daily codex DAG executable-node MVP summary run.planned_nodes must equal plan.nodes ids.");
@@ -2286,6 +2875,38 @@ function validateExecutableNodeMvpRunSemantics({ summary, run, planLevels, planN
     if (nodeResult.status !== expectedNodeStatus) {
       failures.push(`daily codex DAG executable-node MVP summary node result status must be ${expectedNodeStatus}.`);
     }
+  }
+}
+
+function validateTwoNodeFixtureMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures }) {
+  if (!sameOrderedStringArray(run.planned_nodes, planNodeIds)) {
+    failures.push("daily codex DAG two-node fixture MVP summary run.planned_nodes must equal plan.nodes ids.");
+  }
+  if (!levelsMatch(run.levels, planLevels)) {
+    failures.push("daily codex DAG two-node fixture MVP summary run.levels must equal plan.levels.");
+  }
+  const nodeResults = Array.isArray(summary.node_results) ? summary.node_results : [];
+  const expectedCompleted = nodeResults
+    .filter((result) => result?.status === "success")
+    .map((result) => result.node_id);
+  const expectedBlocked = nodeResults
+    .filter((result) => result?.status === "failure" || result?.status === "blocked")
+    .map((result) => result.node_id);
+  const expectedStatus = summary.ok === true ? "executed_two_node_fixture" : "blocked";
+  if (run.final_status !== expectedStatus) {
+    failures.push(`daily codex DAG two-node fixture MVP summary run.final_status must be ${expectedStatus}.`);
+  }
+  if (!sameOrderedStringArray(run.completed_nodes, expectedCompleted)) {
+    failures.push("daily codex DAG two-node fixture MVP summary run.completed_nodes must match node execution status.");
+  }
+  if (!sameOrderedStringArray(run.blocked_nodes, expectedBlocked)) {
+    failures.push("daily codex DAG two-node fixture MVP summary run.blocked_nodes must match node execution status.");
+  }
+  if (summary.ok === true && !sameOrderedStringArray(expectedCompleted, TWO_NODE_FIXTURE_NODE_IDS)) {
+    failures.push("daily codex DAG two-node fixture MVP summary success requires both nodes to complete.");
+  }
+  if (summary.ok === false && expectedBlocked.length === 0) {
+    failures.push("daily codex DAG two-node fixture MVP summary failure requires at least one blocked node.");
   }
 }
 

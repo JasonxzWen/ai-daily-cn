@@ -2,7 +2,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const SUPPORTED_NODE_ID = "score";
+const CLASSIFY_NODE_ID = "classify-tag-entity";
+const SCORE_NODE_ID = "score";
+const SUPPORTED_NODE_IDS = [CLASSIFY_NODE_ID, SCORE_NODE_ID];
 
 function parseArgs(argv) {
   const args = {
@@ -30,8 +32,8 @@ function parseArgs(argv) {
     }
   }
 
-  if (args.node !== SUPPORTED_NODE_ID) {
-    throw new Error(`daily codex DAG node fixture replay only supports ${SUPPORTED_NODE_ID}`);
+  if (!SUPPORTED_NODE_IDS.includes(args.node)) {
+    throw new Error(`daily codex DAG node fixture replay only supports ${SUPPORTED_NODE_IDS.join(", ")}`);
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(args.date)) {
     throw new Error("daily codex DAG node fixture replay requires --date YYYY-MM-DD");
@@ -78,7 +80,7 @@ function buildScoredCandidates({ input, reportDate }) {
     schema_version: 1,
     mode: "daily_codex_dag_real_node_adapter_fixture_output",
     report_date: reportDate,
-    node_id: SUPPORTED_NODE_ID,
+    node_id: SCORE_NODE_ID,
     candidates: input.candidates.map((candidate, index) => ({
       ...candidate,
       score: {
@@ -90,6 +92,28 @@ function buildScoredCandidates({ input, reportDate }) {
   };
 }
 
+function buildClassifiedCandidates({ input, reportDate }) {
+  if (!input || typeof input !== "object" || !Array.isArray(input.candidates)) {
+    throw new Error("daily codex DAG node fixture replay input.candidates must be an array");
+  }
+  return {
+    schema_version: 1,
+    mode: "daily_codex_dag_two_node_fixture_classified_output",
+    report_date: reportDate,
+    node_id: CLASSIFY_NODE_ID,
+    candidates: input.candidates.map((candidate) => ({
+      ...candidate,
+      taxonomy: {
+        domain: "models",
+        flavor: "release",
+        channel: "official"
+      },
+      tags: ["model-release", "fixture"],
+      entities: ["Fixture Labs"]
+    }))
+  };
+}
+
 async function main() {
   try {
     const args = parseArgs(process.argv.slice(2));
@@ -97,13 +121,15 @@ async function main() {
     const inputPath = resolveArtifactPath(rootDir, args.input, "input");
     const outputPath = resolveArtifactPath(rootDir, args.output, "output");
     const input = JSON.parse(await fs.readFile(inputPath, "utf8"));
-    const output = buildScoredCandidates({ input, reportDate: args.date });
+    const output = args.node === CLASSIFY_NODE_ID
+      ? buildClassifiedCandidates({ input, reportDate: args.date })
+      : buildScoredCandidates({ input, reportDate: args.date });
 
     await fs.mkdir(path.dirname(outputPath), { recursive: true });
     await fs.writeFile(outputPath, `${JSON.stringify(output, null, 2)}\n`, "utf8");
     process.stdout.write(`${JSON.stringify({
       ok: true,
-      node_id: SUPPORTED_NODE_ID,
+      node_id: args.node,
       report_date: args.date,
       candidate_count: output.candidates.length
     }, null, 2)}\n`);
