@@ -11,6 +11,8 @@ export const MERGEABLE_SOURCE_AUDIT_GROUPS = [
   "content_sources",
   "search_sources",
   "sources_health",
+  "github_watch",
+  "site_watch",
   ...PLATFORM_AUDIT_GROUPS
 ];
 

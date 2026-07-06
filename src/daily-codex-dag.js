@@ -15,10 +15,16 @@ const EXECUTION_READINESS_VALUES = ["planned_only", "legacy_mapped", "node_execu
 const EXECUTABLE_NODE_MVP_MODE = "daily_codex_dag_executable_node_mvp";
 const REAL_NODE_ADAPTER_MVP_MODE = "daily_codex_dag_real_node_adapter_mvp";
 const TWO_NODE_FIXTURE_MVP_MODE = "daily_codex_dag_two_node_fixture_mvp";
+const SOURCE_WATCH_COLLECT_MVP_MODE = "daily_codex_dag_source_watch_collect_mvp";
 const SYNTHETIC_EXECUTABLE_NODE_ID = "synthetic-command-node";
 const SYNTHETIC_EXECUTABLE_SCRIPT = "scripts/run-daily-codex-dag.mjs";
 const SYNTHETIC_EXECUTABLE_INPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/input.json";
 const SYNTHETIC_EXECUTABLE_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/dry-run-summary.json";
+const SOURCE_WATCH_COLLECT_NODE_ID = "fetch-source-health";
+const SOURCE_WATCH_COLLECT_SCRIPT = "scripts/run-source-watch-collect-fixture.mjs";
+const SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json";
+const SOURCE_WATCH_FIXTURE_CONFIG = "tests/fixtures/source-watch/source-watchlist.json";
+const SOURCE_WATCH_FIXTURE_DIR = "tests/fixtures/source-watch";
 const REAL_NODE_ADAPTER_TARGET_NODE_ID = "score";
 const REAL_NODE_ADAPTER_DEPENDENCY_NODE_ID = "classify-tag-entity";
 const REAL_NODE_ADAPTER_SCRIPT = "scripts/replay-daily-codex-dag-node-fixture.mjs";
@@ -778,6 +784,140 @@ export async function createDailyCodexDagRealNodeAdapterMvp(options = {}) {
   };
 }
 
+export async function createDailyCodexDagSourceWatchCollectMvp(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const reportDate = requiredReportDate(options.reportDate || options.date);
+  const generatedAt = toIsoTimestamp(options.now || new Date());
+  const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}:source-watch-collect`;
+
+  let manifest = null;
+  try {
+    const loaded = await loadDailyCodexDag({ rootDir, dagPath: options.dagPath });
+    manifest = loaded.manifest;
+  } catch (error) {
+    return {
+      ok: false,
+      failures: [`${DEFAULT_DAG_PATH}: ${error.message}`],
+      warnings: [],
+      validation: null,
+      plan: null,
+      run: null
+    };
+  }
+
+  const validation = await validateDailyCodexDag({ rootDir, dagPath: options.dagPath, manifest });
+  if (!validation.ok) {
+    return {
+      ok: false,
+      failures: validation.failures,
+      warnings: validation.warnings,
+      validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const sourceNode = manifest.nodes.find((node) => node.id === SOURCE_WATCH_COLLECT_NODE_ID);
+  if (!sourceNode) {
+    return {
+      ok: false,
+      failures: [`daily codex DAG source-watch collect MVP missing node ${SOURCE_WATCH_COLLECT_NODE_ID}.`],
+      warnings: validation.warnings,
+      validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const executableNode = createSourceWatchCollectCommandNode({
+    sourceNode,
+    reportDate,
+    generatedAt,
+    watchlistPath: options.watchlistPath || options.watchlist_path || SOURCE_WATCH_FIXTURE_CONFIG,
+    fixtureDir: options.fixtureDir || options.fixture_dir || SOURCE_WATCH_FIXTURE_DIR,
+    endpointLimit: options.endpointLimit || options.endpoint_limit || null
+  });
+  const fixtureManifest = {
+    schema_version: manifest.schema_version,
+    name: manifest.name,
+    description: "Fixture-only executable adapter for the Source Watch collect/context DAG lane.",
+    nodes: [executableNode]
+  };
+  const plan = projectDailyCodexDagPlan(fixtureManifest);
+
+  await prepareSourceWatchCollectFixtureArtifacts({ rootDir, reportDate, sourceNode });
+
+  const execution = await executeDailyCodexDagCommandNode({
+    rootDir,
+    reportDate,
+    runId,
+    manifestName: manifest.name,
+    manifestSchemaVersion: manifest.schema_version,
+    node: executableNode,
+    nodeExecutablePath: options.nodeExecutablePath || options.node_executable_path || process.execPath,
+    executeCommand: options.executeCommand,
+    startedAt: options.startedAt ?? options.started_at,
+    finishedAt: options.finishedAt ?? options.finished_at,
+    timeoutSeconds: options.timeoutSeconds ?? options.timeout_seconds,
+    resiliencePolicyRef: sourceNode.resilience_policy_ref || ""
+  });
+  const nodeResults = execution.result ? [execution.result] : [];
+  const sourceWatch = await summarizeSourceWatchCollectArtifact({ rootDir, reportDate, sourceNode });
+  const nodeResultValidation = validateSourceWatchCollectMvpNodeResults({
+    plan,
+    sourceNode,
+    reportDate,
+    runId,
+    nodeResults
+  });
+  const nodeSucceeded = execution.ok && execution.result?.status === "success";
+  const baseOk = nodeSucceeded && nodeResultValidation.ok && sourceWatch.ok;
+  const completedNodes = nodeSucceeded ? [SOURCE_WATCH_COLLECT_NODE_ID] : [];
+  const blockedNodes = nodeSucceeded ? [] : [SOURCE_WATCH_COLLECT_NODE_ID];
+
+  const summary = {
+    ok: baseOk,
+    failures: baseOk ? [] : uniqueSorted([...execution.failures, ...nodeResultValidation.failures, ...sourceWatch.failures]),
+    warnings: uniqueSorted([...validation.warnings, ...nodeResultValidation.warnings, ...sourceWatch.warnings]),
+    validation,
+    mode: SOURCE_WATCH_COLLECT_MVP_MODE,
+    report_date: reportDate,
+    generated_at: generatedAt,
+    run_id: runId,
+    plan,
+    run: {
+      final_status: nodeSucceeded ? "executed_source_watch_collect" : "blocked",
+      levels: plan.levels.map(copyLevel),
+      planned_nodes: plan.nodes.map((node) => node.id),
+      completed_nodes: completedNodes,
+      blocked_nodes: blockedNodes
+    },
+    source_watch: sourceWatch.summary,
+    node_results: nodeResults,
+    node_result_validation: nodeResultValidation,
+    executed_commands: [{
+      node_id: SOURCE_WATCH_COLLECT_NODE_ID,
+      runner: "node",
+      script: SOURCE_WATCH_COLLECT_SCRIPT
+    }],
+    codex_invocations: [],
+    next_action: {
+      kind: "wire_parse_extract_source_watch_candidates",
+      message: "Source Watch collect/context fixture executed fetch-source-health and wrote source-health.json; next wire parse/extract to consume these candidates."
+    }
+  };
+  const summaryValidation = validateDailyCodexDagRunSummary(summary);
+  if (!summaryValidation.ok) {
+    return {
+      ...summary,
+      ok: false,
+      failures: uniqueSorted([...summary.failures, ...summaryValidation.failures]),
+      warnings: uniqueSorted([...summary.warnings, ...summaryValidation.warnings])
+    };
+  }
+  return summary;
+}
+
 export async function createDailyCodexDagTwoNodeFixtureMvp(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const reportDate = requiredReportDate(options.reportDate || options.date);
@@ -968,6 +1108,10 @@ export function validateDailyCodexDagRunSummary(summary) {
   }
   if (summary.mode === REAL_NODE_ADAPTER_MVP_MODE) {
     validateRealNodeAdapterMvpSummary(summary, failures);
+    return { ok: failures.length === 0, failures, warnings };
+  }
+  if (summary.mode === SOURCE_WATCH_COLLECT_MVP_MODE) {
+    validateSourceWatchCollectMvpSummary(summary, failures);
     return { ok: failures.length === 0, failures, warnings };
   }
   if (summary.mode === TWO_NODE_FIXTURE_MVP_MODE) {
@@ -1454,6 +1598,160 @@ function createRealNodeAdapterCommandNode({ sourceNode, reportDate, dependencies
   };
 }
 
+function createSourceWatchCollectCommandNode({
+  sourceNode,
+  reportDate,
+  generatedAt,
+  watchlistPath,
+  fixtureDir,
+  endpointLimit
+}) {
+  const outputArtifacts = (sourceNode.outputs || []).map(copyArtifact);
+  const outputArtifactPath = materializeArtifactPath({
+    templatePath: outputArtifacts[0]?.path || SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT,
+    reportDate
+  });
+  const argv = [
+    "node",
+    SOURCE_WATCH_COLLECT_SCRIPT,
+    "--date",
+    reportDate,
+    "--generated-at",
+    generatedAt,
+    "--config",
+    watchlistPath,
+    "--fixture-dir",
+    fixtureDir,
+    "--output",
+    outputArtifactPath,
+    "--json"
+  ];
+  if (Number.isInteger(endpointLimit) && endpointLimit > 0) {
+    argv.push("--endpoint-limit", String(endpointLimit));
+  }
+
+  return {
+    id: sourceNode.id,
+    title: sourceNode.title,
+    kind: sourceNode.kind,
+    execution_status: sourceNode.execution_status,
+    execution_contract: {
+      readiness: "node_executable",
+      summary: "Fixture-only executable adapter for the Source Watch collect/context lane.",
+      node_execution_spec: {
+        executor: "command",
+        cwd: ".",
+        timeout_seconds: 60,
+        invocation: {
+          kind: "command",
+          argv
+        },
+        inputs: [],
+        outputs: outputArtifacts
+      }
+    },
+    dependencies: [],
+    inputs: [],
+    outputs: outputArtifacts,
+    runner_stage_ref: sourceNode.runner_stage_ref,
+    parallel_group: sourceNode.parallel_group,
+    public_artifact: sourceNode.public_artifact,
+    owner_path_scope: sourceNode.owner_path_scope
+  };
+}
+
+async function prepareSourceWatchCollectFixtureArtifacts({ rootDir, reportDate, sourceNode }) {
+  const outputArtifact = sourceNode.outputs?.[0] || {};
+  const outputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: outputArtifact.path || SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT,
+    reportDate
+  }));
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  await fs.rm(outputPath, { force: true });
+}
+
+async function summarizeSourceWatchCollectArtifact({ rootDir, reportDate, sourceNode }) {
+  const outputArtifact = sourceNode.outputs?.[0] || {};
+  const declaredArtifactPath = outputArtifact.path || SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT;
+  const materializedArtifactPath = materializeArtifactPath({
+    templatePath: declaredArtifactPath,
+    reportDate
+  });
+  const summary = emptySourceWatchCollectSummary();
+  summary.artifact_path = declaredArtifactPath;
+  try {
+    const payload = JSON.parse(await fs.readFile(path.resolve(rootDir, materializedArtifactPath), "utf8"));
+    const githubAudit = isPlainObject(payload.source_audit?.github_watch) ? payload.source_audit.github_watch : {};
+    const siteAudit = isPlainObject(payload.source_audit?.site_watch) ? payload.source_audit.site_watch : {};
+    const githubSources = Array.isArray(githubAudit.sources) ? githubAudit.sources : [];
+    const siteSources = Array.isArray(siteAudit.sources) ? siteAudit.sources : [];
+    const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
+    const githubCandidates = candidates.filter((candidate) => candidate?.signal === "github_watch").length;
+    const siteCandidates = candidates.filter((candidate) => candidate?.signal === "site_watch").length;
+    const failureCount = [...githubSources, ...siteSources].filter((source) => source?.status === "blocked" || source?.status === "failed").length;
+
+    return {
+      ok: true,
+      failures: [],
+      warnings: [],
+      summary: {
+        ...summary,
+        artifact_kind: nonBlankString(payload.kind) ? payload.kind : "",
+        watched_repos: nonNegativeIntegerOrZero(githubAudit.watched_repos),
+        fetched_repos: nonNegativeIntegerOrZero(githubAudit.fetched_repos),
+        changed_repos: nonNegativeIntegerOrZero(githubAudit.changed_repos),
+        watched_sites: nonNegativeIntegerOrZero(siteAudit.watched_sites),
+        fetched_sites: nonNegativeIntegerOrZero(siteAudit.fetched_sites),
+        github_candidates_found: nonNegativeIntegerOrZero(githubAudit.candidates_found ?? githubCandidates),
+        site_candidates_found: nonNegativeIntegerOrZero(siteAudit.candidates_found ?? siteCandidates),
+        total_candidates_found: candidates.length,
+        failure_count: failureCount,
+        empty: candidates.length === 0,
+        rate_limits: githubSources
+          .map(sourceWatchRateLimitSnapshot)
+          .filter((snapshot) => snapshot !== null)
+      }
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      failures: [`source-watch collect artifact ${materializedArtifactPath} could not be summarized: ${error.message}`],
+      warnings: [],
+      summary
+    };
+  }
+}
+
+function emptySourceWatchCollectSummary() {
+  return {
+    artifact_path: "",
+    artifact_kind: "source_watch_candidates",
+    watched_repos: 0,
+    fetched_repos: 0,
+    changed_repos: 0,
+    watched_sites: 0,
+    fetched_sites: 0,
+    github_candidates_found: 0,
+    site_candidates_found: 0,
+    total_candidates_found: 0,
+    failure_count: 0,
+    empty: true,
+    rate_limits: []
+  };
+}
+
+function sourceWatchRateLimitSnapshot(source) {
+  if (!isPlainObject(source?.rate_limit)) return null;
+  return {
+    repo: nonBlankString(source.repo) ? source.repo : "",
+    limit: nonBlankString(source.rate_limit.limit) ? source.rate_limit.limit : "",
+    remaining: nonBlankString(source.rate_limit.remaining) ? source.rate_limit.remaining : "",
+    used: nonBlankString(source.rate_limit.used) ? source.rate_limit.used : "",
+    reset: nonBlankString(source.rate_limit.reset) ? source.rate_limit.reset : "",
+    resource: nonBlankString(source.rate_limit.resource) ? source.rate_limit.resource : ""
+  };
+}
+
 async function prepareTwoNodeFixtureArtifacts({ rootDir, reportDate, classifySourceNode, scoreSourceNode }) {
   const classifyInputArtifact = classifySourceNode.inputs?.[0] || {};
   const classifyOutputArtifact = classifySourceNode.outputs?.[0] || {};
@@ -1609,6 +1907,20 @@ function expectedRealNodeAdapterSourceNode() {
   };
 }
 
+function expectedSourceWatchCollectSourceNode() {
+  return {
+    id: SOURCE_WATCH_COLLECT_NODE_ID,
+    kind: "command",
+    dependencies: [],
+    inputs: [],
+    outputs: [{ path: SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT, required: true }],
+    runner_stage_ref: "collect",
+    parallel_group: "source-lanes",
+    public_artifact: false,
+    owner_path_scope: "internal_workdir"
+  };
+}
+
 function expectedTwoNodeFixtureSourceNodes() {
   return [{
     id: TWO_NODE_FIXTURE_CLASSIFY_NODE_ID,
@@ -1753,6 +2065,86 @@ function validateRealNodeAdapterDependencyResults({ result, sourceNode, failures
     if (dependencyResult.downstream_disposition !== "continue") {
       failures.push(`${label}.dependency_results ${dependencyId} downstream_disposition must be continue.`);
     }
+  }
+}
+
+function validateSourceWatchCollectMvpNodeResults({ plan, sourceNode, reportDate, runId, nodeResults }) {
+  const failures = [];
+  const warnings = [];
+  if (!Array.isArray(nodeResults)) {
+    failures.push("daily codex DAG source-watch collect MVP node_results must be an array.");
+    return nodeResultValidationSummary({ failures, warnings, checkedResults: 0 });
+  }
+  if (nodeResults.length !== 1) {
+    failures.push("daily codex DAG source-watch collect MVP node_results length must be 1.");
+  }
+
+  const planNode = Array.isArray(plan?.nodes)
+    ? plan.nodes.find((node) => node.id === SOURCE_WATCH_COLLECT_NODE_ID)
+    : null;
+  for (const result of nodeResults) {
+    const resultValidation = validateDailyCodexDagNodeResult(result);
+    failures.push(...resultValidation.failures);
+    warnings.push(...resultValidation.warnings);
+    validateSourceWatchCollectMvpNodeResultAgainstPlan({ result, planNode, sourceNode, reportDate, runId, failures });
+  }
+
+  return nodeResultValidationSummary({ failures, warnings, checkedResults: nodeResults.length });
+}
+
+function validateSourceWatchCollectMvpNodeResultAgainstPlan({ result, planNode, sourceNode, reportDate, runId, failures }) {
+  const label = "daily codex DAG source-watch collect MVP node result";
+  if (!isPlainObject(result)) return;
+  if (!planNode) {
+    failures.push(`${label} must match the source-watch collect plan node.`);
+    return;
+  }
+  if (result.report_date !== reportDate) failures.push(`${label}.report_date must match run report_date.`);
+  if (result.run_id !== runId) failures.push(`${label}.run_id must match run_id.`);
+  if (result.manifest_name !== "daily-codex-dag-contract") failures.push(`${label}.manifest_name must match manifest.`);
+  if (result.manifest_schema_version !== 1) failures.push(`${label}.manifest_schema_version must be 1.`);
+  if (result.node_id !== SOURCE_WATCH_COLLECT_NODE_ID) failures.push(`${label}.node_id must be ${SOURCE_WATCH_COLLECT_NODE_ID}.`);
+  if (result.node_kind !== "command") failures.push(`${label}.node_kind must be command.`);
+  if (result.runner_stage_ref !== sourceNode.runner_stage_ref) failures.push(`${label}.runner_stage_ref must match source node.`);
+  if (result.result_scope !== "node") failures.push(`${label}.result_scope must be node.`);
+  if (!["success", "failure"].includes(result.status)) failures.push(`${label}.status must be success or failure.`);
+  if (!sameArtifactArray(result.declared_inputs, [])) failures.push(`${label}.declared_inputs must be empty.`);
+  if (!sameArtifactArray(result.declared_outputs, sourceNode.outputs || [])) failures.push(`${label}.declared_outputs must match source node outputs.`);
+  if (Array.isArray(result.dependency_results) && result.dependency_results.length !== 0) {
+    failures.push(`${label}.dependency_results must be empty.`);
+  }
+  if (result.fanout !== null) failures.push(`${label}.fanout must be null.`);
+  if (result.barrier !== null) failures.push(`${label}.barrier must be null.`);
+  if (result.audit?.parallel_group !== sourceNode.parallel_group) failures.push(`${label}.audit.parallel_group must match source node.`);
+  if (result.audit?.owner_path_scope !== sourceNode.owner_path_scope) failures.push(`${label}.audit.owner_path_scope must match source node.`);
+  if (result.audit?.public_artifact !== sourceNode.public_artifact) failures.push(`${label}.audit.public_artifact must match source node.`);
+}
+
+function validateSourceWatchCollectMvpPlanNodeAgainstExpected({ planNode, expectedSourceNode, failures }) {
+  const label = "daily codex DAG source-watch collect MVP plan node";
+  if (!isPlainObject(planNode)) return;
+  if (planNode.id !== expectedSourceNode.id) failures.push(`${label}.id must be ${expectedSourceNode.id}.`);
+  if (planNode.kind !== expectedSourceNode.kind) failures.push(`${label}.kind must be ${expectedSourceNode.kind}.`);
+  if (planNode.runner_stage_ref !== expectedSourceNode.runner_stage_ref) {
+    failures.push(`${label}.runner_stage_ref must be ${expectedSourceNode.runner_stage_ref}.`);
+  }
+  if (planNode.parallel_group !== expectedSourceNode.parallel_group) {
+    failures.push(`${label}.parallel_group must be ${expectedSourceNode.parallel_group}.`);
+  }
+  if (planNode.owner_path_scope !== expectedSourceNode.owner_path_scope) {
+    failures.push(`${label}.owner_path_scope must be ${expectedSourceNode.owner_path_scope}.`);
+  }
+  if (planNode.public_artifact !== expectedSourceNode.public_artifact) {
+    failures.push(`${label}.public_artifact must be ${expectedSourceNode.public_artifact}.`);
+  }
+  if (!sameOrderedStringArray(planNode.dependencies, expectedSourceNode.dependencies)) {
+    failures.push(`${label}.dependencies must match the fetch-source-health production contract.`);
+  }
+  if (!sameArtifactArray(planNode.inputs, expectedSourceNode.inputs)) {
+    failures.push(`${label}.inputs must match the fetch-source-health production contract.`);
+  }
+  if (!sameArtifactArray(planNode.outputs, expectedSourceNode.outputs)) {
+    failures.push(`${label}.outputs must match the fetch-source-health production contract.`);
   }
 }
 
@@ -2656,6 +3048,128 @@ function validateRealNodeAdapterMvpSummary(summary, failures) {
   }
 }
 
+function validateSourceWatchCollectMvpSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "ok",
+      "failures",
+      "warnings",
+      "validation",
+      "mode",
+      "report_date",
+      "generated_at",
+      "run_id",
+      "plan",
+      "run",
+      "source_watch",
+      "node_results",
+      "node_result_validation",
+      "executed_commands",
+      "codex_invocations",
+      "next_action"
+    ],
+    label: "daily codex DAG source-watch collect MVP summary",
+    failures
+  });
+  if (typeof summary.ok !== "boolean") {
+    failures.push("daily codex DAG source-watch collect MVP summary ok must be a boolean.");
+  }
+  if (!Array.isArray(summary.failures)) {
+    failures.push("daily codex DAG source-watch collect MVP summary failures must be an array.");
+  } else {
+    validateMessageArray(summary.failures, "daily codex DAG source-watch collect MVP summary failures", failures);
+    if (summary.ok === true && summary.failures.length !== 0) {
+      failures.push("daily codex DAG source-watch collect MVP summary failures must be empty when ok is true.");
+    }
+    if (summary.ok === false && summary.failures.length === 0) {
+      failures.push("daily codex DAG source-watch collect MVP summary failures must be non-empty when ok is false.");
+    }
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG source-watch collect MVP summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG source-watch collect MVP summary warnings", failures);
+  }
+  if (summary.mode !== SOURCE_WATCH_COLLECT_MVP_MODE) {
+    failures.push(`daily codex DAG source-watch collect MVP summary mode must be ${SOURCE_WATCH_COLLECT_MVP_MODE}.`);
+  }
+  if (!isStrictIsoDate(summary.report_date)) {
+    failures.push("daily codex DAG source-watch collect MVP summary report_date must be a real YYYY-MM-DD date.");
+  }
+  if (!isCanonicalIsoTimestamp(summary.generated_at)) {
+    failures.push("daily codex DAG source-watch collect MVP summary generated_at must be a canonical UTC Date#toISOString() string.");
+  }
+  if (!isStableIdentifier(summary.run_id)) {
+    failures.push("daily codex DAG source-watch collect MVP summary run_id must be a stable identifier.");
+  }
+  if (!isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG source-watch collect MVP summary validation must be an object.");
+  } else {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: true,
+      label: "daily codex DAG source-watch collect MVP summary validation",
+      failures
+    });
+  }
+  validateNextActionShape(summary.next_action, failures, "daily codex DAG source-watch collect MVP summary next_action", {
+    allowedKinds: ["wire_parse_extract_source_watch_candidates"]
+  });
+  validateSourceWatchCollectMvpExecutedCommands(summary.executed_commands, failures);
+  validateSourceWatchCollectSummaryShape(summary.source_watch, failures);
+  if (!Array.isArray(summary.codex_invocations) || summary.codex_invocations.length !== 0) {
+    failures.push("daily codex DAG source-watch collect MVP summary codex_invocations must be empty.");
+  }
+
+  const plan = isPlainObject(summary.plan) ? summary.plan : null;
+  const run = isPlainObject(summary.run) ? summary.run : null;
+  if (!plan) failures.push("daily codex DAG source-watch collect MVP summary plan must be an object.");
+  if (!run) failures.push("daily codex DAG source-watch collect MVP summary run must be an object.");
+  if (!Array.isArray(summary.node_results)) failures.push("daily codex DAG source-watch collect MVP summary node_results must be an array.");
+  if (!plan || !run || !Array.isArray(summary.node_results)) return;
+
+  validatePlanShape(plan, failures, { allowNodeExecutable: true });
+  validateRunShape(run, failures);
+  validateContractRunNodeResultValidation(summary.node_result_validation, failures);
+
+  const planNodes = Array.isArray(plan.nodes) ? plan.nodes : null;
+  const planLevels = Array.isArray(plan.levels) ? plan.levels : null;
+  if (!planNodes) failures.push("daily codex DAG source-watch collect MVP summary plan.nodes must be an array.");
+  if (!planLevels) failures.push("daily codex DAG source-watch collect MVP summary plan.levels must be an array.");
+  if (!planNodes || !planLevels) return;
+  if (plan.node_count !== 1 || planNodes.length !== 1 || planNodes[0]?.id !== SOURCE_WATCH_COLLECT_NODE_ID) {
+    failures.push("daily codex DAG source-watch collect MVP summary plan must contain only the fetch-source-health node.");
+  }
+
+  const expectedSourceNode = expectedSourceWatchCollectSourceNode();
+  validateSourceWatchCollectMvpPlanNodeAgainstExpected({
+    planNode: planNodes[0],
+    expectedSourceNode,
+    failures
+  });
+  const planNodeIds = planNodes.map((node) => isPlainObject(node) ? node.id : undefined);
+  validatePlanLevelPartition({ planNodes, planLevels, failures });
+  validateSourceWatchCollectMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures });
+
+  const nodeResultValidation = validateSourceWatchCollectMvpNodeResults({
+    plan,
+    sourceNode: expectedSourceNode,
+    reportDate: summary.report_date,
+    runId: summary.run_id,
+    nodeResults: summary.node_results
+  });
+  failures.push(...nodeResultValidation.failures);
+  if (isPlainObject(summary.node_result_validation)) {
+    if (summary.node_result_validation.ok !== true) {
+      failures.push("daily codex DAG source-watch collect MVP summary node_result_validation.ok must be true.");
+    }
+    if (summary.node_result_validation.checked_results !== summary.node_results.length) {
+      failures.push("daily codex DAG source-watch collect MVP summary node_result_validation.checked_results must equal node_results length.");
+    }
+  }
+}
+
 function validateTwoNodeFixtureMvpSummary(summary, failures) {
   validateExactKeys({
     value: summary,
@@ -2820,6 +3334,129 @@ function validateRealNodeAdapterMvpExecutedCommands(values, failures) {
   if (command.script !== REAL_NODE_ADAPTER_SCRIPT) failures.push(`${label} entry.script must be ${REAL_NODE_ADAPTER_SCRIPT}.`);
 }
 
+function validateSourceWatchCollectMvpExecutedCommands(values, failures) {
+  const label = "daily codex DAG source-watch collect MVP summary executed_commands";
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  if (values.length !== 1) {
+    failures.push(`${label} length must be 1.`);
+    return;
+  }
+  const command = values[0];
+  if (!isPlainObject(command)) {
+    failures.push(`${label} entry must be an object.`);
+    return;
+  }
+  validateExactKeys({ value: command, allowed: ["node_id", "runner", "script"], label: `${label} entry`, failures });
+  if (command.node_id !== SOURCE_WATCH_COLLECT_NODE_ID) failures.push(`${label} entry.node_id must be ${SOURCE_WATCH_COLLECT_NODE_ID}.`);
+  if (command.runner !== "node") failures.push(`${label} entry.runner must be node.`);
+  if (command.script !== SOURCE_WATCH_COLLECT_SCRIPT) failures.push(`${label} entry.script must be ${SOURCE_WATCH_COLLECT_SCRIPT}.`);
+}
+
+function validateSourceWatchCollectSummaryShape(summary, failures) {
+  const label = "daily codex DAG source-watch collect MVP summary source_watch";
+  if (!isPlainObject(summary)) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "artifact_path",
+      "artifact_kind",
+      "watched_repos",
+      "fetched_repos",
+      "changed_repos",
+      "watched_sites",
+      "fetched_sites",
+      "github_candidates_found",
+      "site_candidates_found",
+      "total_candidates_found",
+      "failure_count",
+      "empty",
+      "rate_limits"
+    ],
+    label,
+    failures
+  });
+  if (summary.artifact_path !== SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT) failures.push(`${label}.artifact_path must be ${SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT}.`);
+  if (summary.artifact_kind !== "source_watch_candidates") failures.push(`${label}.artifact_kind must be source_watch_candidates.`);
+  for (const key of [
+    "watched_repos",
+    "fetched_repos",
+    "changed_repos",
+    "watched_sites",
+    "fetched_sites",
+    "github_candidates_found",
+    "site_candidates_found",
+    "total_candidates_found",
+    "failure_count"
+  ]) {
+    if (!Number.isInteger(summary[key]) || summary[key] < 0) {
+      failures.push(`${label}.${key} must be a non-negative integer.`);
+    }
+  }
+  if (typeof summary.empty !== "boolean") failures.push(`${label}.empty must be a boolean.`);
+  if (
+    Number.isInteger(summary.github_candidates_found)
+    && Number.isInteger(summary.site_candidates_found)
+    && Number.isInteger(summary.total_candidates_found)
+    && summary.total_candidates_found !== summary.github_candidates_found + summary.site_candidates_found
+  ) {
+    failures.push(`${label}.total_candidates_found must equal github_candidates_found plus site_candidates_found.`);
+  }
+  if (typeof summary.empty === "boolean" && Number.isInteger(summary.total_candidates_found)) {
+    const expectedEmpty = summary.total_candidates_found === 0;
+    if (summary.empty !== expectedEmpty) failures.push(`${label}.empty must reflect whether total_candidates_found is zero.`);
+  }
+  if (
+    Number.isInteger(summary.watched_repos)
+    && Number.isInteger(summary.fetched_repos)
+    && summary.fetched_repos > summary.watched_repos
+  ) {
+    failures.push(`${label}.fetched_repos must not exceed watched_repos.`);
+  }
+  if (
+    Number.isInteger(summary.fetched_repos)
+    && Number.isInteger(summary.changed_repos)
+    && summary.changed_repos > summary.fetched_repos
+  ) {
+    failures.push(`${label}.changed_repos must not exceed fetched_repos.`);
+  }
+  if (
+    Number.isInteger(summary.watched_sites)
+    && Number.isInteger(summary.fetched_sites)
+    && summary.fetched_sites > summary.watched_sites
+  ) {
+    failures.push(`${label}.fetched_sites must not exceed watched_sites.`);
+  }
+  if (
+    Number.isInteger(summary.failure_count)
+    && Number.isInteger(summary.watched_repos)
+    && Number.isInteger(summary.watched_sites)
+    && summary.failure_count > summary.watched_repos + summary.watched_sites
+  ) {
+    failures.push(`${label}.failure_count must not exceed watched_repos plus watched_sites.`);
+  }
+  if (!Array.isArray(summary.rate_limits)) {
+    failures.push(`${label}.rate_limits must be an array.`);
+  } else {
+    for (const [index, snapshot] of summary.rate_limits.entries()) {
+      const itemLabel = `${label}.rate_limits[${index}]`;
+      if (!isPlainObject(snapshot)) {
+        failures.push(`${itemLabel} must be an object.`);
+        continue;
+      }
+      validateExactKeys({ value: snapshot, allowed: ["repo", "limit", "remaining", "used", "reset", "resource"], label: itemLabel, failures });
+      for (const key of ["repo", "limit", "remaining", "used", "reset", "resource"]) {
+        if (typeof snapshot[key] !== "string") failures.push(`${itemLabel}.${key} must be a string.`);
+      }
+    }
+  }
+}
+
 function validateTwoNodeFixtureMvpExecutedCommands({ summary, failures }) {
   const label = "daily codex DAG two-node fixture MVP summary executed_commands";
   const values = summary.executed_commands;
@@ -2934,6 +3571,34 @@ function validateRealNodeAdapterMvpRunSemantics({ summary, run, planLevels, plan
     const expectedNodeStatus = summary.ok === true ? "success" : "failure";
     if (nodeResult.status !== expectedNodeStatus) {
       failures.push(`daily codex DAG real-node adapter MVP summary node result status must be ${expectedNodeStatus}.`);
+    }
+  }
+}
+
+function validateSourceWatchCollectMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures }) {
+  if (!sameOrderedStringArray(run.planned_nodes, planNodeIds)) {
+    failures.push("daily codex DAG source-watch collect MVP summary run.planned_nodes must equal plan.nodes ids.");
+  }
+  if (!levelsMatch(run.levels, planLevels)) {
+    failures.push("daily codex DAG source-watch collect MVP summary run.levels must equal plan.levels.");
+  }
+  const expectedCompleted = summary.ok === true ? [SOURCE_WATCH_COLLECT_NODE_ID] : [];
+  const expectedBlocked = summary.ok === true ? [] : [SOURCE_WATCH_COLLECT_NODE_ID];
+  const expectedStatus = summary.ok === true ? "executed_source_watch_collect" : "blocked";
+  if (run.final_status !== expectedStatus) {
+    failures.push(`daily codex DAG source-watch collect MVP summary run.final_status must be ${expectedStatus}.`);
+  }
+  if (!sameOrderedStringArray(run.completed_nodes, expectedCompleted)) {
+    failures.push("daily codex DAG source-watch collect MVP summary run.completed_nodes must match node execution status.");
+  }
+  if (!sameOrderedStringArray(run.blocked_nodes, expectedBlocked)) {
+    failures.push("daily codex DAG source-watch collect MVP summary run.blocked_nodes must match node execution status.");
+  }
+  const nodeResult = Array.isArray(summary.node_results) ? summary.node_results[0] : null;
+  if (isPlainObject(nodeResult)) {
+    const expectedNodeStatus = summary.ok === true ? "success" : "failure";
+    if (nodeResult.status !== expectedNodeStatus) {
+      failures.push(`daily codex DAG source-watch collect MVP summary node result status must be ${expectedNodeStatus}.`);
     }
   }
 }
@@ -4561,6 +5226,10 @@ function nonEmptyString(value) {
 
 function nonBlankString(value) {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function nonNegativeIntegerOrZero(value) {
+  return Number.isInteger(value) && value >= 0 ? value : 0;
 }
 
 function isNodeId(value) {
