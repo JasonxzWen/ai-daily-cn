@@ -52,6 +52,10 @@ test("daily codex pipeline plans independent codex contexts per stage", async ()
     assert(stage.command.includes("--output-last-message"));
     assert.equal(stage.command.at(-1), "-");
     assert.equal(stage.cwd, rootDir);
+    assert.match(stage.prompt, /Execution boundary:/);
+    assert.match(stage.prompt, /Do not run harness-hub check\/init\/activate/);
+    assert.match(stage.prompt, /\.harness-hub\/state\/\*/);
+    assert.match(stage.prompt, /tasks\/current-task\.md/);
   }
 
   for (const stage of summaryStages) {
@@ -320,6 +324,112 @@ process.stdout.write(JSON.stringify({ ok: true }) + "\\n");
   const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
   assert.equal(summary.final_status, "blocked");
   assert.equal(summary.next_action.stage_id, "collect");
+});
+
+test("daily codex pipeline blocks codex stage writes to harness state", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-state-write-"));
+  const binDir = path.join(rootDir, "bin");
+  await fs.mkdir(binDir, { recursive: true });
+  const fakeCodex = await writeNodeCommandShim(binDir, "fake-codex-state-write", `
+import fs from "node:fs";
+import path from "node:path";
+
+const prompt = await new Promise((resolve) => {
+  let value = "";
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => { value += chunk; });
+  process.stdin.on("end", () => resolve(value));
+});
+
+const outputMatch = prompt.match(/Write only the required JSON output file:\\s*([^\\n]+)/);
+const outputPath = outputMatch ? outputMatch[1].trim() : "";
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.writeFileSync(outputPath, JSON.stringify({
+  report_date: "2026-07-02",
+  stage: "collect",
+  raw_candidates: [],
+  source_audit: {},
+  warnings: []
+}, null, 2) + "\\n", "utf8");
+
+const forbiddenPath = path.join(process.cwd(), ".harness-hub", "state", "current-task.md");
+fs.mkdirSync(path.dirname(forbiddenPath), { recursive: true });
+fs.writeFileSync(forbiddenPath, "# Current Task\\n\\n- Out of bounds.\\n", "utf8");
+process.stdout.write(JSON.stringify({ type: "done" }) + "\\n");
+`);
+  const fakeNpm = await writeNodeCommandShim(binDir, "fake-npm", `
+process.stdout.write(JSON.stringify({ ok: true }) + "\\n");
+`);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate: "2026-07-02",
+    workDir: path.join(rootDir, ".tmp", "pipeline"),
+    codexBin: fakeCodex,
+    npmBin: fakeNpm
+  });
+
+  await assert.rejects(runDailyCodexPipeline(plan), (error) => {
+    assert.match(error.message, /forbidden paths: created:/);
+    assert(error.message.includes(".harness-hub/state/current-task.md"));
+    return true;
+  });
+  const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.failed_stage_id, "collect");
+  assert.equal(summary.error.code, "codex_stage_forbidden_write");
+});
+
+test("daily codex pipeline blocks codex stage writes to public evidence assets", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-pipeline-evidence-write-"));
+  const binDir = path.join(rootDir, "bin");
+  await fs.mkdir(binDir, { recursive: true });
+  const fakeCodex = await writeNodeCommandShim(binDir, "fake-codex-evidence-write", `
+import fs from "node:fs";
+import path from "node:path";
+
+const prompt = await new Promise((resolve) => {
+  let value = "";
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => { value += chunk; });
+  process.stdin.on("end", () => resolve(value));
+});
+
+const outputMatch = prompt.match(/Write only the required JSON output file:\\s*([^\\n]+)/);
+const outputPath = outputMatch ? outputMatch[1].trim() : "";
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.writeFileSync(outputPath, JSON.stringify({
+  report_date: "2026-07-02",
+  stage: "collect",
+  raw_candidates: [],
+  source_audit: {},
+  warnings: []
+}, null, 2) + "\\n", "utf8");
+
+const evidencePath = path.join(process.cwd(), "docs", "assets", "evidence", "out-of-bounds.png");
+fs.mkdirSync(path.dirname(evidencePath), { recursive: true });
+fs.writeFileSync(evidencePath, "not really a png", "utf8");
+process.stdout.write(JSON.stringify({ type: "done" }) + "\\n");
+`);
+  const fakeNpm = await writeNodeCommandShim(binDir, "fake-npm", `
+process.stdout.write(JSON.stringify({ ok: true }) + "\\n");
+`);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate: "2026-07-02",
+    workDir: path.join(rootDir, ".tmp", "pipeline"),
+    codexBin: fakeCodex,
+    npmBin: fakeNpm
+  });
+
+  await assert.rejects(runDailyCodexPipeline(plan), (error) => {
+    assert.match(error.message, /forbidden paths: created:/);
+    assert(error.message.includes("docs/assets/evidence/out-of-bounds.png"));
+    return true;
+  });
+  const summary = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "run-summary-2026-07-02.json"), "utf8"));
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.failed_stage_id, "collect");
+  assert.equal(summary.error.code, "codex_stage_forbidden_write");
 });
 
 async function writeNodeCommandShim(binDir, name, moduleSource) {

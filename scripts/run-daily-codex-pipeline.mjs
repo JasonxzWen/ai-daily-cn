@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -8,6 +9,24 @@ import { fileURLToPath } from "node:url";
 
 const DEFAULT_SANDBOX = "workspace-write";
 const DEFAULT_WORK_DIR = path.join(".tmp", "daily-codex-pipeline");
+const CODEX_STAGE_FORBIDDEN_EXACT_PATHS = [
+  ".harness-hub/state/current-task.md",
+  ".harness-hub/state/progress.md",
+  ".harness-hub/state/session-handoff.md",
+  ".harness-hub/state/decisions.md",
+  ".harness-hub/state/loop-runs.jsonl",
+  ".harness-hub/state/interrupt-decisions.jsonl",
+  ".harness-hub/state/capability-events.jsonl",
+  "tasks/current-task.md",
+  "progress.md",
+  "session-handoff.md"
+];
+const CODEX_STAGE_FORBIDDEN_DIRS = [
+  ".harness-hub/state",
+  "docs/assets/evidence",
+  "docs/reports",
+  "reports-data"
+];
 
 export async function prepareDailyCodexPipeline(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
@@ -439,12 +458,25 @@ async function runStage(stage) {
       await fs.mkdir(path.dirname(stage.events_path), { recursive: true });
       await fs.mkdir(path.dirname(stage.output_path), { recursive: true });
       const prompt = await fs.readFile(stage.prompt_path, "utf8");
-      await spawnWithPrompt(stage.command[0], stage.command.slice(1), {
-        cwd: stage.cwd,
-        prompt,
-        stdoutPath: stage.events_path,
-        stderrPath: stage.stderr_path
-      });
+      const forbiddenSnapshot = await snapshotCodexStageForbiddenPaths(stage.cwd);
+      let stageError = null;
+      try {
+        await spawnWithPrompt(stage.command[0], stage.command.slice(1), {
+          cwd: stage.cwd,
+          prompt,
+          stdoutPath: stage.events_path,
+          stderrPath: stage.stderr_path
+        });
+      } catch (error) {
+        stageError = error;
+      }
+      const forbiddenChanges = await diffCodexStageForbiddenPaths(stage.cwd, forbiddenSnapshot);
+      if (forbiddenChanges.length) {
+        throw codexStageBoundaryError(stage, forbiddenChanges, stageError);
+      }
+      if (stageError) {
+        throw stageError;
+      }
       await validateCodexStageOutput(stage);
       return { fallback_used: false, ok: true };
     }
@@ -478,6 +510,86 @@ async function runStage(stage) {
     error.stage_id = error.stage_id || stage.id;
     throw error;
   }
+}
+
+async function snapshotCodexStageForbiddenPaths(rootDir) {
+  const snapshot = new Map();
+  const includePath = async (relativePath) => {
+    const key = normalizeRelativePath(relativePath);
+    if (!key || snapshot.has(key)) return;
+    snapshot.set(key, await fileFingerprint(path.join(rootDir, key)));
+  };
+  for (const relativePath of CODEX_STAGE_FORBIDDEN_EXACT_PATHS) {
+    await includePath(relativePath);
+  }
+  for (const relativeDir of CODEX_STAGE_FORBIDDEN_DIRS) {
+    const dirPath = path.join(rootDir, relativeDir);
+    for (const relativePath of await walkFiles(dirPath, relativeDir)) {
+      await includePath(relativePath);
+    }
+  }
+  return snapshot;
+}
+
+async function diffCodexStageForbiddenPaths(rootDir, beforeSnapshot) {
+  const afterSnapshot = await snapshotCodexStageForbiddenPaths(rootDir);
+  const keys = new Set([...beforeSnapshot.keys(), ...afterSnapshot.keys()]);
+  const changes = [];
+  for (const key of [...keys].sort()) {
+    const before = beforeSnapshot.get(key) || null;
+    const after = afterSnapshot.get(key) || null;
+    if (before === after) continue;
+    changes.push({
+      path: key,
+      change: before === null ? "created" : (after === null ? "deleted" : "modified")
+    });
+  }
+  return changes;
+}
+
+async function fileFingerprint(filePath) {
+  try {
+    const content = await fs.readFile(filePath);
+    return createHash("sha256").update(content).digest("hex");
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+async function walkFiles(dirPath, relativeDir) {
+  let entries;
+  try {
+    entries = await fs.readdir(dirPath, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  }
+  const files = [];
+  for (const entry of entries) {
+    const relativePath = path.join(relativeDir, entry.name);
+    const absolutePath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await walkFiles(absolutePath, relativePath));
+    } else if (entry.isFile()) {
+      files.push(normalizeRelativePath(relativePath));
+    }
+  }
+  return files;
+}
+
+function normalizeRelativePath(relativePath) {
+  return String(relativePath || "").replace(/\\/g, "/").replace(/^\/+/, "");
+}
+
+function codexStageBoundaryError(stage, changes, cause = null) {
+  const preview = changes.slice(0, 8).map((item) => `${item.change}:${item.path}`).join(", ");
+  const suffix = changes.length > 8 ? `, ... ${changes.length - 8} more` : "";
+  const error = new Error(`Codex stage modified forbidden paths: ${preview}${suffix}`);
+  error.code = "codex_stage_forbidden_write";
+  error.stage_id = stage.id;
+  if (cause) error.cause = cause;
+  return error;
 }
 
 async function spawnWithPrompt(command, args, options) {
@@ -566,6 +678,7 @@ function codexStage({ id, title, dependsOn = [], promptPath, outputPath, lastMes
     command.push("--model", model);
   }
   command.push("-");
+  const guardedPrompt = `${buildCodexStageBoundaryPrompt({ outputPath })}\n${prompt}`;
   return {
     id,
     title,
@@ -578,10 +691,20 @@ function codexStage({ id, title, dependsOn = [], promptPath, outputPath, lastMes
     last_message_path: lastMessagePath,
     events_path: eventsPath,
     stderr_path: stderrPath,
-    prompt,
+    prompt: guardedPrompt,
     ...(item ? { item } : {}),
     ...(itemPath ? { item_path: itemPath } : {})
   };
+}
+
+function buildCodexStageBoundaryPrompt({ outputPath }) {
+  return `Execution boundary:
+- Write only the required JSON output file: ${outputPath}
+- Do not edit repository files, public docs, reports-data, tasks, progress logs, handoff notes, or harness state.
+- Do not run harness-hub check/init/activate, npm run harness:init, npm run harness:validate, or node scripts/harness-validate.mjs.
+- Never read or write .harness-hub/state/*, .harness-hub/state/current-task.md, .harness-hub/state/progress.md, .harness-hub/state/session-handoff.md, progress.md, session-handoff.md, or tasks/current-task.md.
+- Put any unavoidable scratch files under the pipeline work directory only.
+`;
 }
 
 function commandStage({ id, title, dependsOn = [], command, fallbackCommand = null, fallbackTitle = "", cwd, workDir, outputPath = "", allowFailure = false }) {
