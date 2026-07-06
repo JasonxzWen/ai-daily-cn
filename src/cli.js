@@ -22,6 +22,8 @@ import {
   collectContentSources,
   collectGitHubTrending,
   collectHuggingFaceTrending,
+  collectSourceWatch,
+  createSourceWatchFixtureFetch,
   collectStatuspageIncidents
 } from "./discovery.js";
 import { collectSearchNews } from "./search-news.js";
@@ -713,6 +715,31 @@ try {
       ok: true,
       ...result
     });
+  } else if (command === "discover:github-watch") {
+    const args = parseArgs(argv);
+    const reportDate = args.date || firstPositionalDate(argv);
+    const generatedAt = args["generated-at"] || firstPositionalDateTime(argv);
+    const watchlistPath = args.config || args.watchlist || firstSourceWatchConfigPath(argv);
+    const fixtureDir = args["fixture-dir"] || firstSourceWatchFixtureDir(argv);
+    const outputPath = args.output || args.out || path.join(".tmp", `source-candidates-${reportDate}.github-watch.json`);
+    const fetchImpl = fixtureDir ? await createSourceWatchFixtureFetch(fixtureDir) : undefined;
+    const result = await collectSourceWatch({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate,
+      generatedAt,
+      watchlistPath,
+      fixtureDir,
+      fetchImpl,
+      fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
+      retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10),
+      endpointLimit: Number.parseInt(args["endpoint-limit"] || "5", 10),
+      env: process.env
+    });
+    printJson({
+      ok: true,
+      output_path: path.resolve(outputPath),
+      ...result
+    }, outputPath);
   } else if (command === "discover:huggingface-trending") {
     const args = parseArgs(argv);
     const result = await collectHuggingFaceTrending({
@@ -1072,6 +1099,22 @@ function firstSourcePath(args) {
 
 function firstHistoryPath(args) {
   return positionalArgs(args).find((token) => /(^|[\\/])reports-data([\\/]|$)|^reports-data$/i.test(token));
+}
+
+function firstSourceWatchConfigPath(args) {
+  return positionalArgs(args).find((token) =>
+    /\.json$/i.test(token) &&
+    !/source-candidates-\d{4}-\d{2}-\d{2}\.github-watch\.json$/i.test(path.basename(token))
+  );
+}
+
+function firstSourceWatchFixtureDir(args) {
+  return positionalArgs(args).find((token) => {
+    if (/^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(token) || /\.json$/i.test(token)) {
+      return false;
+    }
+    return fs.existsSync(path.join(token, "fixtures.json"));
+  });
 }
 
 function inferProviderList(args) {

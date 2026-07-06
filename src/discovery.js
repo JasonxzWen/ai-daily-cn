@@ -47,6 +47,9 @@ const DEFAULT_X_BUILDER_SEARCH_TERMS = [
   "Codex agent",
   "AI agents"
 ];
+const DEFAULT_SOURCE_WATCHLIST_PATH = path.join("config", "source-watchlist.json");
+const SOURCE_WATCH_USER_AGENT = "ai-daily-cn-static-publisher";
+const DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT = 5;
 
 export const DEFAULT_GITHUB_TRENDING_SOURCES = [
   source("GitHub Trending daily", "https://github.com/trending?since=daily", "all", "daily"),
@@ -682,6 +685,704 @@ export async function collectGitHubTrending(options = {}) {
     },
     candidates
   };
+}
+
+export async function collectSourceWatch(options = {}) {
+  const reportDate = requireReportDate(options.reportDate);
+  const generatedAt = options.generatedAt || new Date().toISOString();
+  const rootDir = options.rootDir || process.cwd();
+  const fetchImpl = createDiscoveryFetch(options.fetchImpl || globalThis.fetch, options);
+  if (typeof fetchImpl !== "function") {
+    throw new Error("fetch is not available in this runtime");
+  }
+
+  const watchlist = await loadSourceWatchlist(options, rootDir);
+  const targets = [];
+  const sources = [];
+  const candidates = [];
+  const githubAuditSources = [];
+  const siteAuditSources = [];
+
+  for (const target of watchlist.targets) {
+    if (target.type === "github_repo") {
+      const result = await collectSourceWatchGithubRepo(target, {
+        fetchImpl,
+        generatedAt,
+        reportDate,
+        candidates,
+        options
+      });
+      targets.push(result.target);
+      sources.push(result.source);
+      if (result.candidate) {
+        candidates.push(result.candidate);
+      }
+      githubAuditSources.push(result.auditSource);
+      continue;
+    }
+
+    const result = await collectSourceWatchSite(target, {
+      fetchImpl,
+      generatedAt,
+      reportDate,
+      candidates
+    });
+    targets.push(result.target);
+    sources.push(result.source);
+    if (result.candidate) {
+      candidates.push(result.candidate);
+    }
+    siteAuditSources.push(result.auditSource);
+  }
+
+  const fetchedRepos = githubAuditSources.filter((sourceResult) => sourceResult.status === "checked").length;
+  const fetchedSites = siteAuditSources.filter((sourceResult) => sourceResult.status === "checked").length;
+  return {
+    schema_version: 1,
+    kind: "source_watch_candidates",
+    report_date: reportDate,
+    generated_at: generatedAt,
+    watchlist_schema_version: watchlist.schema_version,
+    targets,
+    sources,
+    candidates,
+    source_audit: {
+      github_watch: {
+        checked: true,
+        sources: githubAuditSources,
+        candidates_found: candidates.filter((candidate) => candidate.signal === "github_watch").length,
+        included: 0,
+        watched_repos: watchlist.targets.filter((target) => target.type === "github_repo").length,
+        fetched_repos: fetchedRepos,
+        changed_repos: 0,
+        notes: "Repo delta and cross-day freshness are deferred to the GitHub watch quality loop."
+      },
+      site_watch: {
+        checked: true,
+        sources: siteAuditSources,
+        candidates_found: candidates.filter((candidate) => candidate.signal === "site_watch").length,
+        included: 0,
+        watched_sites: watchlist.targets.filter((target) => target.type === "site").length,
+        fetched_sites: fetchedSites,
+        notes: "Site watch records page metadata, feed discovery, and discovered GitHub links without auto-promoting repos."
+      }
+    }
+  };
+}
+
+export async function createSourceWatchFixtureFetch(fixtureDir) {
+  const manifestPath = path.resolve(fixtureDir || "", "fixtures.json");
+  const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
+  const responses = new Map();
+  for (const entry of Array.isArray(manifest.responses) ? manifest.responses : []) {
+    if (!entry.url) {
+      continue;
+    }
+    responses.set(String(entry.url), {
+      status: Number.isInteger(entry.status) ? entry.status : 200,
+      headers: entry.headers || {},
+      body: entry.body
+    });
+  }
+
+  return async (url) => {
+    const key = String(url);
+    const entry = responses.get(key);
+    if (!entry) {
+      throw new Error(`fixture response missing for ${key}`);
+    }
+    const text = typeof entry.body === "string" ? entry.body : JSON.stringify(entry.body ?? null);
+    return {
+      ok: entry.status >= 200 && entry.status < 300,
+      status: entry.status,
+      url: key,
+      headers: {
+        get(name) {
+          const normalized = String(name || "").toLowerCase();
+          const foundKey = Object.keys(entry.headers).find((headerName) => headerName.toLowerCase() === normalized);
+          return foundKey ? String(entry.headers[foundKey]) : null;
+        }
+      },
+      async text() {
+        return text;
+      },
+      async json() {
+        return typeof entry.body === "string" ? JSON.parse(entry.body) : entry.body;
+      }
+    };
+  };
+}
+
+async function loadSourceWatchlist(options = {}, rootDir = process.cwd()) {
+  const payload = options.watchlist || (Array.isArray(options.targets) ? { targets: options.targets } : null);
+  const watchlist = payload || JSON.parse(await fs.readFile(
+    path.resolve(rootDir, options.watchlistPath || options.configPath || DEFAULT_SOURCE_WATCHLIST_PATH),
+    "utf8"
+  ));
+  const rawTargets = Array.isArray(watchlist) ? watchlist : watchlist.targets;
+  if (!Array.isArray(rawTargets) || rawTargets.length === 0) {
+    throw new Error("source watchlist requires a non-empty targets array");
+  }
+  return {
+    schema_version: Number.isInteger(watchlist.schema_version) ? watchlist.schema_version : 1,
+    targets: rawTargets.map((target, index) => normalizeSourceWatchTarget(target, index))
+  };
+}
+
+function normalizeSourceWatchTarget(rawTarget = {}, index = 0) {
+  const type = String(rawTarget.type || "").trim().toLowerCase();
+  if (["github_repo", "github", "repo", "repository"].includes(type)) {
+    const repo = normalizeSourceWatchRepo(rawTarget.repo || githubRepoFromUrl(rawTarget.url || ""));
+    if (!repo) {
+      throw new Error(`source watch target ${index + 1} requires repo owner/name`);
+    }
+    const url = rawTarget.url && isHttpUrl(rawTarget.url) ? rawTarget.url : `${GITHUB_BASE_URL}/${repo}`;
+    return {
+      ...rawTarget,
+      type: "github_repo",
+      id: rawTarget.id || `github-watch-${slugId(repo)}`,
+      name: rawTarget.name || repo,
+      repo,
+      url
+    };
+  }
+
+  if (type === "site" || (!type && isHttpUrl(rawTarget.url))) {
+    if (!isHttpUrl(rawTarget.url)) {
+      throw new Error(`source watch site target ${index + 1} requires an absolute url`);
+    }
+    return {
+      ...rawTarget,
+      type: "site",
+      id: rawTarget.id || `site-watch-${slugId(rawTarget.url)}`,
+      name: rawTarget.name || rawTarget.url,
+      url: rawTarget.url
+    };
+  }
+
+  throw new Error(`source watch target ${index + 1} has unsupported type ${rawTarget.type || "(missing)"}`);
+}
+
+function normalizeSourceWatchRepo(value) {
+  const normalized = normalizeRepo(String(value || ""));
+  return normalized.split("/").length === 2 ? normalized : "";
+}
+
+function githubRepoFromUrl(value) {
+  if (!isHttpUrl(value)) {
+    return "";
+  }
+  try {
+    const url = new URL(value);
+    if (url.hostname.toLowerCase() !== "github.com") {
+      return "";
+    }
+    return normalizeSourceWatchRepo(url.pathname);
+  } catch {
+    return "";
+  }
+}
+
+async function collectSourceWatchGithubRepo(target, context) {
+  const endpointLimit = sourceWatchEndpointLimit(context.options);
+  const endpointUrls = {
+    repo: `https://api.github.com/repos/${target.repo}`,
+    releases: `https://api.github.com/repos/${target.repo}/releases?per_page=${endpointLimit}`,
+    tags: `https://api.github.com/repos/${target.repo}/tags?per_page=${endpointLimit}`,
+    commits: `https://api.github.com/repos/${target.repo}/commits?per_page=${endpointLimit}`,
+    readme: `https://api.github.com/repos/${target.repo}/readme`
+  };
+  const endpointStatus = {};
+  const rateLimit = {};
+  const repoResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.repo, {
+    headers: sourceWatchGithubHeaders(context.options)
+  });
+  endpointStatus.repo = sourceWatchEndpointStatus(repoResult);
+  sourceWatchMergeRateLimit(rateLimit, repoResult.rate_limit);
+
+  let releases = [];
+  let tags = [];
+  let commits = [];
+  let readme = { status: "not_fetched", excerpt: "" };
+  if (repoResult.ok) {
+    const releaseResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.releases, {
+      headers: sourceWatchGithubHeaders(context.options)
+    });
+    endpointStatus.releases = sourceWatchEndpointStatus(releaseResult);
+    sourceWatchMergeRateLimit(rateLimit, releaseResult.rate_limit);
+    releases = sourceWatchReleases(releaseResult.payload, endpointLimit);
+
+    const tagResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.tags, {
+      headers: sourceWatchGithubHeaders(context.options)
+    });
+    endpointStatus.tags = sourceWatchEndpointStatus(tagResult);
+    sourceWatchMergeRateLimit(rateLimit, tagResult.rate_limit);
+    tags = sourceWatchTags(tagResult.payload, endpointLimit);
+
+    const commitResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.commits, {
+      headers: sourceWatchGithubHeaders(context.options)
+    });
+    endpointStatus.commits = sourceWatchEndpointStatus(commitResult);
+    sourceWatchMergeRateLimit(rateLimit, commitResult.rate_limit);
+    commits = sourceWatchCommits(commitResult.payload, endpointLimit);
+
+    const readmeResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.readme, {
+      headers: sourceWatchGithubHeaders(context.options)
+    });
+    endpointStatus.readme = sourceWatchEndpointStatus(readmeResult);
+    sourceWatchMergeRateLimit(rateLimit, readmeResult.rate_limit);
+    readme = sourceWatchReadme(readmeResult);
+  }
+
+  const metadata = repoResult.ok ? sourceWatchRepoMetadata(repoResult.payload, target) : {};
+  const status = repoResult.ok ? "checked" : "blocked";
+  const notes = repoResult.ok
+    ? `repo metadata fetched; releases=${releases.length}; tags=${tags.length}; commits=${commits.length}; readme=${readme.status}`
+    : `repo metadata failed: ${repoResult.error || `HTTP ${repoResult.status}`}`;
+  const targetResult = {
+    id: target.id,
+    type: target.type,
+    name: target.name,
+    repo: target.repo,
+    url: target.url,
+    status,
+    fetched_at: context.generatedAt,
+    endpoint_status: endpointStatus,
+    ...(Object.keys(rateLimit).length ? { rate_limit: rateLimit } : {}),
+    repo_metadata: metadata,
+    releases,
+    tags,
+    recent_commits: commits,
+    readme
+  };
+  const sourceItem = {
+    id: target.id,
+    name: target.name,
+    url: target.url,
+    category: "repository",
+    status,
+    checked_at: context.generatedAt,
+    notes,
+    repo: target.repo,
+    source_level: "github",
+    verification_status: repoResult.ok ? "primary_confirmed" : "unverified"
+  };
+  const candidate = repoResult.ok ? sourceWatchGithubCandidate(target, metadata, {
+    reportDate: context.reportDate,
+    candidates: context.candidates,
+    releases,
+    tags,
+    commits,
+    readme
+  }) : null;
+  return {
+    target: targetResult,
+    source: sourceItem,
+    candidate,
+    auditSource: auditSource(target.name, target.url, status, notes, {
+      target_id: target.id,
+      repo: target.repo,
+      endpoint_status: endpointStatus,
+      ...(Object.keys(rateLimit).length ? { rate_limit: rateLimit } : {}),
+      stars: metadata.stars || 0,
+      forks: metadata.forks || 0,
+      pushed_at: metadata.pushed_at || "",
+      releases_count: releases.length,
+      tags_count: tags.length,
+      recent_commits_count: commits.length,
+      readme_fetch_status: readme.status
+    })
+  };
+}
+
+async function collectSourceWatchSite(target, context) {
+  const result = await sourceWatchFetchText(context.fetchImpl, target.url, {
+    headers: {
+      accept: "application/json, application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
+      "user-agent": SOURCE_WATCH_USER_AGENT
+    }
+  });
+  const status = result.ok ? "checked" : "blocked";
+  const site = result.ok ? parseSourceWatchSiteHtml(result.text, target.url) : {};
+  const notes = result.ok
+    ? `site metadata fetched; feeds=${site.feeds.length}; github_links=${site.github_repositories.length}`
+    : `site fetch failed: ${result.error || `HTTP ${result.status}`}`;
+  const targetResult = {
+    id: target.id,
+    type: target.type,
+    name: target.name,
+    url: target.url,
+    status,
+    fetched_at: context.generatedAt,
+    http_status: result.status,
+    site_metadata: {
+      title: site.title || "",
+      description: site.description || "",
+      canonical_url: site.canonical_url || ""
+    },
+    feeds: site.feeds || [],
+    discovered_github_repositories: site.github_repositories || []
+  };
+  const sourceItem = {
+    id: target.id,
+    name: target.name,
+    url: target.url,
+    category: "community",
+    status,
+    checked_at: context.generatedAt,
+    notes,
+    source_level: "ai_news_aggregator",
+    verification_status: result.ok ? "intermediary_only" : "unverified"
+  };
+  const candidate = result.ok ? sourceWatchSiteCandidate(target, site, {
+    reportDate: context.reportDate,
+    candidates: context.candidates
+  }) : null;
+  return {
+    target: targetResult,
+    source: sourceItem,
+    candidate,
+    auditSource: auditSource(target.name, target.url, status, notes, {
+      target_id: target.id,
+      http_status: result.status,
+      title: site.title || "",
+      canonical_url: site.canonical_url || "",
+      feeds_count: site.feeds?.length || 0,
+      discovered_github_repositories: site.github_repositories || []
+    })
+  };
+}
+
+function sourceWatchGithubCandidate(target, metadata, details) {
+  const latestRelease = details.releases[0]?.tag_name || "";
+  const latestTag = details.tags[0]?.name || "";
+  const latestCommit = details.commits[0]?.sha || "";
+  return {
+    id: uniqueCandidateId(details.candidates, `github-watch-${target.repo}`),
+    source_id: target.id,
+    category: "project",
+    title: metadata.full_name || target.repo,
+    name: metadata.full_name || target.repo,
+    repo: target.repo,
+    url: metadata.html_url || target.url,
+    source: target.name,
+    event_date: dateOnly(metadata.pushed_at) || details.reportDate,
+    status: "excluded",
+    signal: "github_watch",
+    description: metadata.description || "",
+    evidence: `${target.repo} is explicitly watched; stars=${metadata.stars || 0}; forks=${metadata.forks || 0}; pushed_at=${metadata.pushed_at || "unknown"}.`,
+    notes: [
+      `stars=${metadata.stars || 0}`,
+      `forks=${metadata.forks || 0}`,
+      `pushed_at=${metadata.pushed_at || ""}`,
+      latestRelease ? `latest_release=${latestRelease}` : "",
+      latestTag ? `latest_tag=${latestTag}` : "",
+      latestCommit ? `latest_commit=${latestCommit.slice(0, 12)}` : "",
+      `readme=${details.readme.status}`
+    ].filter(Boolean).join("; "),
+    tags: metadata.topics || [],
+    verification_status: "primary_confirmed",
+    source_level: "github",
+    primary_url: metadata.html_url || target.url,
+    verification_sources: [metadata.html_url || target.url],
+    editorial_category: "open_source",
+    trend: "same"
+  };
+}
+
+function sourceWatchSiteCandidate(target, site, details) {
+  const url = site.canonical_url || target.url;
+  return {
+    id: uniqueCandidateId(details.candidates, `site-watch-${target.id}`),
+    source_id: target.id,
+    category: "community_lead",
+    title: site.title || target.name,
+    url,
+    source: target.name,
+    event_date: details.reportDate,
+    status: "excluded",
+    signal: "site_watch",
+    evidence: `${target.name} is explicitly watched; feeds=${site.feeds.length}; github_links=${site.github_repositories.length}.`,
+    notes: [
+      site.description ? `description=${trimText(site.description, 160)}` : "",
+      `feeds=${site.feeds.length}`,
+      `github_links=${site.github_repositories.length}`
+    ].filter(Boolean).join("; "),
+    verification_status: "intermediary_only",
+    source_level: "ai_news_aggregator",
+    intermediary_url: target.url,
+    verification_sources: [target.url],
+    editorial_category: "community_signal",
+    tags: site.github_repositories.map((repo) => repo.repo).slice(0, 5)
+  };
+}
+
+async function sourceWatchFetchJson(fetchImpl, url, init) {
+  try {
+    const response = await fetchImpl(url, init);
+    const rateLimit = sourceWatchRateLimit(response);
+    if (!response.ok) {
+      return { ok: false, status: response.status || 0, rate_limit: rateLimit, error: withRetryNote(`HTTP ${response.status || 0}`, response) };
+    }
+    return {
+      ok: true,
+      status: response.status || 200,
+      rate_limit: rateLimit,
+      payload: await readJsonResponse(response)
+    };
+  } catch (error) {
+    return { ok: false, status: 0, error: withRetryNote(formatDiscoveryErrorNote(error), error) };
+  }
+}
+
+async function sourceWatchFetchText(fetchImpl, url, init) {
+  try {
+    const response = await fetchImpl(url, init);
+    if (!response.ok) {
+      return { ok: false, status: response.status || 0, text: "", error: withRetryNote(`HTTP ${response.status || 0}`, response) };
+    }
+    return { ok: true, status: response.status || 200, text: await response.text() };
+  } catch (error) {
+    return { ok: false, status: 0, text: "", error: withRetryNote(formatDiscoveryErrorNote(error), error) };
+  }
+}
+
+function sourceWatchGithubHeaders(options = {}) {
+  const headers = {
+    accept: "application/vnd.github+json",
+    "user-agent": SOURCE_WATCH_USER_AGENT,
+    "x-github-api-version": "2022-11-28"
+  };
+  const token = options.githubToken || options.env?.GITHUB_TOKEN || options.env?.GH_TOKEN || "";
+  if (token) {
+    headers.authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+function sourceWatchEndpointLimit(options = {}) {
+  const value = Number.parseInt(options.endpointLimit || options["endpoint-limit"] || DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT, 10);
+  return Number.isInteger(value) && value > 0 ? Math.min(value, 20) : DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT;
+}
+
+function sourceWatchEndpointStatus(result = {}) {
+  return {
+    status: result.ok ? "checked" : "blocked",
+    http_status: result.status || 0,
+    ...(result.error ? { error: result.error } : {})
+  };
+}
+
+function sourceWatchRateLimit(response) {
+  const headers = response?.headers;
+  if (!headers || typeof headers.get !== "function") {
+    return {};
+  }
+  const values = {};
+  for (const [key, header] of [
+    ["limit", "x-ratelimit-limit"],
+    ["remaining", "x-ratelimit-remaining"],
+    ["used", "x-ratelimit-used"],
+    ["reset", "x-ratelimit-reset"],
+    ["resource", "x-ratelimit-resource"]
+  ]) {
+    const value = headers.get(header);
+    if (value !== null && value !== undefined && value !== "") {
+      values[key] = value;
+    }
+  }
+  return values;
+}
+
+function sourceWatchMergeRateLimit(target, source) {
+  if (!source || Object.keys(source).length === 0) {
+    return;
+  }
+  Object.assign(target, source);
+}
+
+function sourceWatchRepoMetadata(payload = {}, target = {}) {
+  const license = payload.license && typeof payload.license === "object"
+    ? payload.license.spdx_id || payload.license.key || payload.license.name || ""
+    : "";
+  return {
+    full_name: payload.full_name || target.repo,
+    html_url: payload.html_url || target.url,
+    description: payload.description || "",
+    stars: Number.isInteger(payload.stargazers_count) ? payload.stargazers_count : 0,
+    forks: Number.isInteger(payload.forks_count) ? payload.forks_count : 0,
+    open_issues: Number.isInteger(payload.open_issues_count) ? payload.open_issues_count : 0,
+    pushed_at: payload.pushed_at || "",
+    updated_at: payload.updated_at || "",
+    default_branch: payload.default_branch || "",
+    language: payload.language || "",
+    topics: Array.isArray(payload.topics) ? payload.topics.filter(Boolean).slice(0, 20) : [],
+    license
+  };
+}
+
+function sourceWatchReleases(payload, limit = DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT) {
+  return Array.isArray(payload) ? payload.slice(0, limit).map((release) => ({
+    tag_name: release.tag_name || "",
+    name: release.name || release.tag_name || "",
+    html_url: release.html_url || "",
+    published_at: release.published_at || "",
+    prerelease: Boolean(release.prerelease)
+  })) : [];
+}
+
+function sourceWatchTags(payload, limit = DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT) {
+  return Array.isArray(payload) ? payload.slice(0, limit).map((tag) => ({
+    name: tag.name || "",
+    commit_sha: tag.commit?.sha || ""
+  })) : [];
+}
+
+function sourceWatchCommits(payload, limit = DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT) {
+  return Array.isArray(payload) ? payload.slice(0, limit).map((commit) => ({
+    sha: commit.sha || "",
+    html_url: commit.html_url || "",
+    message: firstLine(commit.commit?.message || ""),
+    author_date: commit.commit?.author?.date || "",
+    author_name: commit.commit?.author?.name || ""
+  })) : [];
+}
+
+function sourceWatchReadme(result = {}) {
+  if (!result.ok) {
+    return { status: result.status === 404 ? "missing" : "blocked", excerpt: "", error: result.error || "" };
+  }
+  const payload = result.payload || {};
+  const encoded = String(payload.content || "").replace(/\s+/g, "");
+  let text = "";
+  try {
+    text = encoded ? Buffer.from(encoded, payload.encoding || "base64").toString("utf8") : "";
+  } catch {
+    text = "";
+  }
+  return {
+    status: text ? "checked" : "empty",
+    excerpt: trimText(text, 800),
+    path: payload.path || ""
+  };
+}
+
+function parseSourceWatchSiteHtml(html, baseUrl) {
+  const title = cleanText(html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "");
+  const description = sourceWatchMetaContent(html, "description") || sourceWatchMetaPropertyContent(html, "og:description");
+  const canonical = sourceWatchLinkHref(html, "canonical", baseUrl);
+  return {
+    title,
+    description,
+    canonical_url: canonical || baseUrl,
+    feeds: sourceWatchFeeds(html, baseUrl),
+    github_repositories: sourceWatchGithubLinks(html)
+  };
+}
+
+function sourceWatchMetaContent(html, name) {
+  for (const tag of html.match(/<meta\b[^>]*>/gi) || []) {
+    if (sourceWatchAttr(tag, "name").toLowerCase() === name.toLowerCase()) {
+      return cleanText(sourceWatchAttr(tag, "content"));
+    }
+  }
+  return "";
+}
+
+function sourceWatchMetaPropertyContent(html, property) {
+  for (const tag of html.match(/<meta\b[^>]*>/gi) || []) {
+    if (sourceWatchAttr(tag, "property").toLowerCase() === property.toLowerCase()) {
+      return cleanText(sourceWatchAttr(tag, "content"));
+    }
+  }
+  return "";
+}
+
+function sourceWatchLinkHref(html, relName, baseUrl) {
+  for (const tag of html.match(/<link\b[^>]*>/gi) || []) {
+    const rel = sourceWatchAttr(tag, "rel").toLowerCase().split(/\s+/);
+    if (rel.includes(relName.toLowerCase())) {
+      return absoluteUrl(sourceWatchAttr(tag, "href"), baseUrl);
+    }
+  }
+  return "";
+}
+
+function sourceWatchFeeds(html, baseUrl) {
+  const feeds = [];
+  const seen = new Set();
+  for (const tag of html.match(/<link\b[^>]*>/gi) || []) {
+    const rel = sourceWatchAttr(tag, "rel").toLowerCase().split(/\s+/);
+    const type = sourceWatchAttr(tag, "type").toLowerCase();
+    const href = absoluteUrl(sourceWatchAttr(tag, "href"), baseUrl);
+    if (!href || !rel.includes("alternate") || !/(rss|atom|feed|json)/i.test(type)) {
+      continue;
+    }
+    if (seen.has(href)) {
+      continue;
+    }
+    seen.add(href);
+    feeds.push({
+      title: sourceWatchAttr(tag, "title") || "",
+      type,
+      url: href
+    });
+  }
+  return feeds;
+}
+
+function sourceWatchGithubLinks(html) {
+  const repos = [];
+  const seen = new Set();
+  const pattern = /https?:\/\/github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)/g;
+  for (const match of html.matchAll(pattern)) {
+    const repo = normalizeSourceWatchRepo(`${match[1]}/${match[2]}`);
+    if (!repo || isGithubNonRepoPath(repo) || seen.has(repo.toLowerCase())) {
+      continue;
+    }
+    seen.add(repo.toLowerCase());
+    repos.push({
+      repo,
+      url: `${GITHUB_BASE_URL}/${repo}`
+    });
+  }
+  return repos;
+}
+
+function isGithubNonRepoPath(repo) {
+  const [owner, name] = String(repo || "").toLowerCase().split("/");
+  return !owner || !name || new Set([
+    "about",
+    "apps",
+    "collections",
+    "customer-stories",
+    "events",
+    "explore",
+    "features",
+    "github",
+    "issues",
+    "login",
+    "marketplace",
+    "new",
+    "notifications",
+    "orgs",
+    "pricing",
+    "pulls",
+    "search",
+    "settings",
+    "sponsors",
+    "topics",
+    "trending"
+  ]).has(owner);
+}
+
+function sourceWatchAttr(tag, name) {
+  const pattern = new RegExp(`\\b${name}\\s*=\\s*(["'])([\\s\\S]*?)\\1`, "i");
+  return decodeXml(tag.match(pattern)?.[2] || "");
+}
+
+function firstLine(value) {
+  return String(value || "").split(/\r?\n/)[0].trim();
 }
 
 async function enrichGithubTrendingReadmes(candidates, options = {}) {
