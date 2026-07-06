@@ -2531,6 +2531,12 @@
         "sources_health": {
           "$ref": "#/$defs/source_audit_group"
         },
+        "github_watch": {
+          "$ref": "#/$defs/source_audit_group"
+        },
+        "site_watch": {
+          "$ref": "#/$defs/source_audit_group"
+        },
         "wechat_sources": {
           "$ref": "#/$defs/source_audit_group"
         },
@@ -2566,6 +2572,26 @@
           "minimum": 0
         },
         "sources_checked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "watched_repos": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fetched_repos": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changed_repos": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "watched_sites": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fetched_sites": {
           "type": "integer",
           "minimum": 0
         },
@@ -2698,6 +2724,93 @@
         "parsed_count": {
           "type": "integer",
           "minimum": 0
+        },
+        "target_id": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "endpoint_status": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "status": {
+                "type": "string"
+              },
+              "http_status": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "rate_limit": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "stars": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "forks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pushed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "releases_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tags_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "recent_commits_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readme_fetch_status": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "canonical_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "feeds_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "discovered_github_repositories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["repo", "url"],
+            "properties": {
+              "repo": {
+                "type": "string"
+              },
+              "url": {
+                "$ref": "#/$defs/absolute_url"
+              }
+            }
+          }
         },
         "snapshot": {
           "$ref": "#/$defs/daily_tracking_snapshot"

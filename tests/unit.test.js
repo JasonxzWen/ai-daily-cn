@@ -11768,6 +11768,7 @@ test("sources audit merge writes discovery audit groups into the final report JS
   const reportPath = path.join(historyDir, "2026-05-15.json");
   const searchPath = path.join(tmp, "search-news.json");
   const healthPath = path.join(tmp, "sources-health.json");
+  const sourceWatchPath = path.join(tmp, "source-watch.json");
   await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
   await fs.writeFile(
     searchPath,
@@ -11794,19 +11795,86 @@ test("sources audit merge writes discovery audit groups into the final report JS
     }, null, 2)}\n`,
     "utf8"
   );
+  await fs.writeFile(
+    sourceWatchPath,
+    `${JSON.stringify({
+      report_date: "2026-05-15",
+      source_audit: {
+        github_watch: {
+          checked: true,
+          sources: [{
+            name: "ML news of the week",
+            url: "https://github.com/SalvatoreRa/ML-news-of-the-week",
+            status: "checked",
+            notes: "repo metadata fetched",
+            target_id: "repo-ml-news-of-the-week",
+            repo: "SalvatoreRa/ML-news-of-the-week",
+            endpoint_status: {
+              repo: { status: "checked", http_status: 200 },
+              commits: { status: "checked", http_status: 200 }
+            },
+            rate_limit: {
+              limit: "60",
+              remaining: "58",
+              used: "2"
+            },
+            stars: 182,
+            forks: 11,
+            pushed_at: "2025-07-27T09:00:14Z",
+            releases_count: 0,
+            tags_count: 0,
+            recent_commits_count: 1,
+            readme_fetch_status: "empty"
+          }],
+          candidates_found: 1,
+          included: 0,
+          watched_repos: 2,
+          fetched_repos: 2,
+          changed_repos: 0,
+          notes: "Repo delta deferred."
+        },
+        site_watch: {
+          checked: true,
+          sources: [{
+            name: "AI News Radar",
+            url: "https://ryanliangwh.github.io/ai-news-radar/",
+            status: "checked",
+            notes: "site metadata fetched",
+            target_id: "site-ai-news-radar",
+            http_status: 200,
+            title: "AI News Radar",
+            canonical_url: "https://ryanliangwh.github.io/ai-news-radar/",
+            feeds_count: 0,
+            discovered_github_repositories: []
+          }],
+          candidates_found: 1,
+          included: 0,
+          watched_sites: 2,
+          fetched_sites: 2,
+          notes: "Site watch metadata only."
+        }
+      }
+    }, null, 2)}\n`,
+    "utf8"
+  );
 
   const result = await mergeSourceAuditIntoReport({
     rootDir: tmp,
     reportDate: "2026-05-15",
     historyDir: "reports-data",
-    inputPaths: [searchPath, healthPath]
+    inputPaths: [searchPath, healthPath, sourceWatchPath]
   });
   const merged = JSON.parse(await fs.readFile(reportPath, "utf8"));
 
-  assert.deepEqual(result.merged_groups, ["search_sources", "sources_health"]);
+  assert.deepEqual(result.merged_groups, ["search_sources", "sources_health", "github_watch", "site_watch"]);
   assert.equal(merged.source_audit.search_sources.shadow, true);
   assert.equal(merged.source_audit.search_sources.provider_runtime_ms.gdelt, 123);
   assert.equal(merged.source_audit.sources_health.sources[0].name, "Health");
+  assert.equal(merged.source_audit.github_watch.watched_repos, 2);
+  assert.equal(merged.source_audit.github_watch.sources[0].repo, "SalvatoreRa/ML-news-of-the-week");
+  assert.equal(merged.source_audit.github_watch.sources[0].rate_limit.remaining, "58");
+  assert.equal(merged.source_audit.site_watch.watched_sites, 2);
+  assert.equal(merged.source_audit.site_watch.sources[0].canonical_url, "https://ryanliangwh.github.io/ai-news-radar/");
 });
 
 test("phase 5 audit reports missing continuous source audit groups", async () => {
