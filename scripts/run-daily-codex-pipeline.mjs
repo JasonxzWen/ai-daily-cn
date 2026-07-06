@@ -699,10 +699,11 @@ function codexStage({ id, title, dependsOn = [], promptPath, outputPath, lastMes
 
 function buildCodexStageBoundaryPrompt({ outputPath }) {
   return `Execution boundary:
+- OUTPUT_PATH=${outputPath}
 - Write only the required JSON output file: ${outputPath}
 - Do not edit repository files, public docs, reports-data, tasks, progress logs, handoff notes, or harness state.
 - Do not run harness-hub check/init/activate, npm run harness:init, npm run harness:validate, or node scripts/harness-validate.mjs.
-- Never read or write .harness-hub/state/*, .harness-hub/state/current-task.md, .harness-hub/state/progress.md, .harness-hub/state/session-handoff.md, progress.md, session-handoff.md, or tasks/current-task.md.
+- Never read or write .harness-hub/state/**, .harness-hub/state/*, .harness-hub/state/current-task.md, .harness-hub/state/progress.md, .harness-hub/state/session-handoff.md, progress.md, session-handoff.md, or tasks/current-task.md.
 - Put any unavoidable scratch files under the pipeline work directory only.
 `;
 }

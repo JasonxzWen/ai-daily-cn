@@ -53,8 +53,9 @@ test("daily codex pipeline plans independent codex contexts per stage", async ()
     assert.equal(stage.command.at(-1), "-");
     assert.equal(stage.cwd, rootDir);
     assert.match(stage.prompt, /Execution boundary:/);
+    assert.match(stage.prompt, /OUTPUT_PATH=/);
     assert.match(stage.prompt, /Do not run harness-hub check\/init\/activate/);
-    assert.match(stage.prompt, /\.harness-hub\/state\/\*/);
+    assert.match(stage.prompt, /\.harness-hub\/state\/\*\*/);
     assert.match(stage.prompt, /tasks\/current-task\.md/);
   }
 
@@ -341,7 +342,7 @@ const prompt = await new Promise((resolve) => {
   process.stdin.on("end", () => resolve(value));
 });
 
-const outputMatch = prompt.match(/Write only the required JSON output file:\\s*([^\\n]+)/);
+const outputMatch = prompt.match(/\\bOUTPUT_PATH=([^\\n]+)/);
 const outputPath = outputMatch ? outputMatch[1].trim() : "";
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, JSON.stringify({
@@ -356,6 +357,7 @@ const forbiddenPath = path.join(process.cwd(), ".harness-hub", "state", "current
 fs.mkdirSync(path.dirname(forbiddenPath), { recursive: true });
 fs.writeFileSync(forbiddenPath, "# Current Task\\n\\n- Out of bounds.\\n", "utf8");
 process.stdout.write(JSON.stringify({ type: "done" }) + "\\n");
+process.exitCode = 3;
 `);
   const fakeNpm = await writeNodeCommandShim(binDir, "fake-npm", `
 process.stdout.write(JSON.stringify({ ok: true }) + "\\n");
