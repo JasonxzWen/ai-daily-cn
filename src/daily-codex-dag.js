@@ -1,3 +1,4 @@
+import { execFile as execFileCallback } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import Ajv from "ajv/dist/2020.js";
@@ -336,6 +337,100 @@ export function resolveDailyCodexDagNodeRuntimePlan(options = {}) {
       executor: spec.executor,
       runtime_plan: runtimeResult.plan
     }
+  };
+}
+
+export async function executeDailyCodexDagCommandNode(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const node = options.node || {};
+  const reportDate = requiredReportDate(options.reportDate || options.report_date || options.date);
+  const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}:command-node`;
+  const nodeId = nonEmptyString(node.id) ? node.id : "<unknown>";
+  const planResult = resolveDailyCodexDagNodeRuntimePlan({ ...options, rootDir, node });
+
+  if (!planResult.ok) {
+    return {
+      ok: false,
+      failures: planResult.failures,
+      result: null,
+      runtime_plan: null
+    };
+  }
+  if (planResult.plan.executor !== "command") {
+    return {
+      ok: false,
+      failures: [`daily codex DAG command node executor node ${nodeId} executor must be command.`],
+      result: null,
+      runtime_plan: planResult.plan.runtime_plan
+    };
+  }
+
+  const runtimePlan = planResult.plan.runtime_plan;
+  const startedAt = toIsoTimestamp(options.startedAt ?? options.started_at ?? new Date());
+  const executeCommand = typeof options.executeCommand === "function"
+    ? options.executeCommand
+    : executeCommandRuntimePlan;
+  let executionOutcome;
+  try {
+    executionOutcome = normalizeCommandExecutionOutcome(await executeCommand({
+      command: runtimePlan.command,
+      args: [...runtimePlan.args],
+      cwd: runtimePlan.cwd,
+      shell: runtimePlan.shell,
+      timeoutMs: commandNodeTimeoutMs(options),
+      runtime_plan: { ...runtimePlan, args: [...runtimePlan.args], argv_tail: [...runtimePlan.argv_tail] },
+      node
+    }));
+  } catch (error) {
+    executionOutcome = normalizeCommandExecutionError(error);
+  }
+  const finishedAt = toIsoTimestamp(options.finishedAt ?? options.finished_at ?? new Date());
+  const executionSucceeded = executionOutcome.exit_code === 0 && !executionOutcome.error_message;
+  const executionIssues = executionSucceeded
+    ? []
+    : [commandExecutionIssue({ nodeId, executionOutcome })];
+  const result = createDailyCodexDagNodeResult({
+    reportDate,
+    runId,
+    manifestName: options.manifestName || options.manifest_name || "daily-codex-dag-contract",
+    manifestSchemaVersion: options.manifestSchemaVersion || options.manifest_schema_version || 1,
+    nodeId,
+    nodeKind: node.kind || "command",
+    runnerStageRef: node.runner_stage_ref || "",
+    resultScope: "node",
+    status: executionSucceeded ? "success" : "failure",
+    downstreamDisposition: executionSucceeded ? "continue" : "block",
+    startedAt,
+    finishedAt,
+    attemptsStarted: 1,
+    maxAttempts: 1,
+    attemptsExhausted: !executionSucceeded,
+    dependencyResults: options.dependencyResults || options.dependency_results || [],
+    declaredInputs: node.inputs || [],
+    declaredOutputs: node.outputs || [],
+    resolvedInputs: options.resolvedInputs || options.resolved_inputs || [],
+    resolvedOutputs: options.resolvedOutputs || options.resolved_outputs || [],
+    failures: executionIssues,
+    warnings: [],
+    audit: {
+      parallel_group: node.parallel_group || "",
+      resilience_policy_ref: options.resiliencePolicyRef || options.resilience_policy_ref || "",
+      owner_path_scope: node.owner_path_scope || "internal_workdir",
+      public_artifact: node.public_artifact === true,
+      validator_version: NODE_RESULT_VALIDATOR_VERSION
+    }
+  });
+  const validation = validateDailyCodexDagNodeResult(result);
+  const failures = [
+    ...executionIssues.map((issue) => issue.message),
+    ...validation.failures
+  ];
+
+  return {
+    ok: executionSucceeded && validation.ok,
+    failures,
+    result,
+    runtime_plan: runtimePlan
   };
 }
 
@@ -870,6 +965,86 @@ function nodeResultValidationSummary({ failures, warnings, checkedResults }) {
 
 function nodeResultIssue({ code, message, source, retryable }) {
   return { code, message, source, retryable };
+}
+
+function executeCommandRuntimePlan({ command, args, cwd, shell, timeoutMs }) {
+  return new Promise((resolve) => {
+    execFileCallback(command, args, {
+      cwd,
+      shell,
+      timeout: timeoutMs,
+      windowsHide: true,
+      maxBuffer: 1024 * 1024
+    }, (error, stdout, stderr) => {
+      if (error) {
+        resolve({
+          exitCode: Number.isInteger(error.code) ? error.code : 1,
+          signal: error.signal || null,
+          stdout,
+          stderr,
+          errorMessage: error.message
+        });
+        return;
+      }
+      resolve({
+        exitCode: 0,
+        signal: null,
+        stdout,
+        stderr,
+        errorMessage: ""
+      });
+    });
+  });
+}
+
+function commandNodeTimeoutMs(options = {}) {
+  const spec = selectExplicitNodeExecutionSpec({ options, node: options.node || {} });
+  const timeoutSeconds = Number(options.timeoutSeconds ?? options.timeout_seconds ?? spec?.timeout_seconds);
+  if (!Number.isFinite(timeoutSeconds) || timeoutSeconds <= 0) return 0;
+  return Math.floor(timeoutSeconds * 1000);
+}
+
+function normalizeCommandExecutionOutcome(value) {
+  const outcome = isPlainObject(value) ? value : {};
+  const exitCode = normalizeExitCode(outcome.exitCode ?? outcome.exit_code ?? outcome.code, 0);
+  return {
+    exit_code: exitCode,
+    signal: nonBlankString(outcome.signal) ? outcome.signal : null,
+    stdout: typeof outcome.stdout === "string" ? outcome.stdout : "",
+    stderr: typeof outcome.stderr === "string" ? outcome.stderr : "",
+    error_message: typeof outcome.errorMessage === "string"
+      ? outcome.errorMessage
+      : typeof outcome.error_message === "string"
+        ? outcome.error_message
+        : ""
+  };
+}
+
+function normalizeCommandExecutionError(error) {
+  const exitCode = normalizeExitCode(error?.code, 1);
+  return {
+    exit_code: exitCode,
+    signal: nonBlankString(error?.signal) ? error.signal : null,
+    stdout: typeof error?.stdout === "string" ? error.stdout : "",
+    stderr: typeof error?.stderr === "string" ? error.stderr : "",
+    error_message: error instanceof Error ? error.message : String(error || "command execution failed")
+  };
+}
+
+function normalizeExitCode(value, fallback) {
+  if (Number.isInteger(value)) return value;
+  const numeric = Number(value);
+  return Number.isInteger(numeric) ? numeric : fallback;
+}
+
+function commandExecutionIssue({ nodeId, executionOutcome }) {
+  const signalSuffix = nonBlankString(executionOutcome.signal) ? ` and signal ${executionOutcome.signal}` : "";
+  return nodeResultIssue({
+    code: "command_execution_failed",
+    message: `Command node ${nodeId} failed with exit code ${executionOutcome.exit_code}${signalSuffix}.`,
+    source: "command-executor",
+    retryable: false
+  });
 }
 
 function validateDagRunFailureSummary(summary, failures) {
