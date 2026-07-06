@@ -12,6 +12,9 @@ const NODE_RESULT_SCOPES = ["node", "fanout_item", "barrier"];
 const NODE_RESULT_DOWNSTREAM_DISPOSITIONS = ["continue", "block"];
 const NODE_KINDS = ["command", "codex_exec", "fanout", "barrier"];
 const EXECUTION_READINESS_VALUES = ["planned_only", "legacy_mapped", "node_executable"];
+const EXECUTABLE_NODE_MVP_MODE = "daily_codex_dag_executable_node_mvp";
+const SYNTHETIC_EXECUTABLE_NODE_ID = "synthetic-command-node";
+const SYNTHETIC_EXECUTABLE_SCRIPT = "scripts/validate-daily-codex-dag.mjs";
 
 const REQUIRED_NODE_IDS = [
   "fetch-source-health",
@@ -555,6 +558,79 @@ export async function createDailyCodexDagContractRun(options = {}) {
   };
 }
 
+export async function createDailyCodexDagExecutableNodeMvp(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const reportDate = requiredReportDate(options.reportDate || options.date);
+  const generatedAt = toIsoTimestamp(options.now || new Date());
+  const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}:executable-node-mvp`;
+  const manifest = createSyntheticExecutableNodeManifest();
+  const executableNode = manifest.nodes[0];
+  const plan = projectDailyCodexDagPlan(manifest);
+  const validation = {
+    ok: true,
+    failures: [],
+    warnings: [],
+    node_ids: [SYNTHETIC_EXECUTABLE_NODE_ID],
+    checked_files: []
+  };
+
+  const execution = await executeDailyCodexDagCommandNode({
+    rootDir,
+    reportDate,
+    runId,
+    manifestName: manifest.name,
+    manifestSchemaVersion: manifest.schema_version,
+    node: executableNode,
+    nodeExecutablePath: options.nodeExecutablePath || options.node_executable_path || process.execPath,
+    executeCommand: options.executeCommand,
+    startedAt: options.startedAt ?? options.started_at,
+    finishedAt: options.finishedAt ?? options.finished_at,
+    timeoutSeconds: options.timeoutSeconds ?? options.timeout_seconds
+  });
+  const nodeResults = execution.result ? [execution.result] : [];
+  const nodeResultValidation = validateExecutableNodeMvpNodeResults({
+    plan,
+    reportDate,
+    runId,
+    nodeResults
+  });
+  const nodeSucceeded = execution.ok && execution.result?.status === "success";
+  const ok = nodeSucceeded && nodeResultValidation.ok;
+  const completedNodes = nodeSucceeded ? [SYNTHETIC_EXECUTABLE_NODE_ID] : [];
+  const blockedNodes = nodeSucceeded ? [] : [SYNTHETIC_EXECUTABLE_NODE_ID];
+
+  return {
+    ok,
+    failures: ok ? [] : uniqueSorted([...execution.failures, ...nodeResultValidation.failures]),
+    warnings: uniqueSorted([...validation.warnings, ...nodeResultValidation.warnings]),
+    validation,
+    mode: EXECUTABLE_NODE_MVP_MODE,
+    report_date: reportDate,
+    generated_at: generatedAt,
+    run_id: runId,
+    plan,
+    run: {
+      final_status: nodeSucceeded ? "executed_one_node" : "blocked",
+      levels: plan.levels.map(copyLevel),
+      planned_nodes: plan.nodes.map((node) => node.id),
+      completed_nodes: completedNodes,
+      blocked_nodes: blockedNodes
+    },
+    node_results: nodeResults,
+    node_result_validation: nodeResultValidation,
+    executed_commands: [{
+      node_id: SYNTHETIC_EXECUTABLE_NODE_ID,
+      runner: "node",
+      script: SYNTHETIC_EXECUTABLE_SCRIPT
+    }],
+    codex_invocations: [],
+    next_action: {
+      kind: "implement_artifact_io_contract",
+      message: "Executable-node MVP ran one synthetic command node; next add explicit artifact input/output contracts."
+    }
+  };
+}
+
 export function validateDailyCodexDagRunSummary(summary) {
   const failures = [];
   const warnings = [];
@@ -564,6 +640,10 @@ export function validateDailyCodexDagRunSummary(summary) {
     return { ok: false, failures, warnings };
   }
 
+  if (summary.mode === EXECUTABLE_NODE_MVP_MODE) {
+    validateExecutableNodeMvpSummary(summary, failures);
+    return { ok: failures.length === 0, failures, warnings };
+  }
   if (summary.ok === false) {
     validateDagRunFailureSummary(summary, failures);
     return { ok: failures.length === 0, failures, warnings };
@@ -913,6 +993,98 @@ function validateContractRunNodeResults({ plan, reportDate, runId, nodeResults }
   }
 
   return nodeResultValidationSummary({ failures, warnings, checkedResults: nodeResults.length });
+}
+
+function createSyntheticExecutableNodeManifest() {
+  return {
+    schema_version: 1,
+    name: "daily-codex-dag-contract",
+    description: "Synthetic executable-node MVP fixture.",
+    nodes: [createSyntheticExecutableCommandNode()]
+  };
+}
+
+function createSyntheticExecutableCommandNode() {
+  return {
+    id: SYNTHETIC_EXECUTABLE_NODE_ID,
+    title: "Synthetic command node",
+    kind: "command",
+    execution_status: "planned",
+    execution_contract: {
+      readiness: "node_executable",
+      summary: "Synthetic command fixture for executable-node MVP.",
+      node_execution_spec: {
+        executor: "command",
+        cwd: ".",
+        timeout_seconds: 30,
+        invocation: {
+          kind: "command",
+          argv: ["node", SYNTHETIC_EXECUTABLE_SCRIPT]
+        },
+        inputs: [],
+        outputs: []
+      }
+    },
+    dependencies: [],
+    inputs: [],
+    outputs: [],
+    runner_stage_ref: "synthetic:validate-dag",
+    parallel_group: "mvp-fixture",
+    public_artifact: false,
+    owner_path_scope: "internal_workdir"
+  };
+}
+
+function validateExecutableNodeMvpNodeResults({ plan, reportDate, runId, nodeResults }) {
+  const failures = [];
+  const warnings = [];
+  if (!Array.isArray(nodeResults)) {
+    failures.push("daily codex DAG executable-node MVP node_results must be an array.");
+    return nodeResultValidationSummary({ failures, warnings, checkedResults: 0 });
+  }
+  if (nodeResults.length !== 1) {
+    failures.push("daily codex DAG executable-node MVP node_results length must be 1.");
+  }
+
+  const planNode = Array.isArray(plan?.nodes)
+    ? plan.nodes.find((node) => node.id === SYNTHETIC_EXECUTABLE_NODE_ID)
+    : null;
+  for (const result of nodeResults) {
+    const resultValidation = validateDailyCodexDagNodeResult(result);
+    failures.push(...resultValidation.failures);
+    warnings.push(...resultValidation.warnings);
+    validateExecutableNodeMvpNodeResultAgainstPlan({ result, planNode, reportDate, runId, failures });
+  }
+
+  return nodeResultValidationSummary({ failures, warnings, checkedResults: nodeResults.length });
+}
+
+function validateExecutableNodeMvpNodeResultAgainstPlan({ result, planNode, reportDate, runId, failures }) {
+  const label = "daily codex DAG executable-node MVP node result";
+  if (!isPlainObject(result)) return;
+  if (!planNode) {
+    failures.push(`${label} must match the synthetic plan node.`);
+    return;
+  }
+  if (result.report_date !== reportDate) failures.push(`${label}.report_date must match run report_date.`);
+  if (result.run_id !== runId) failures.push(`${label}.run_id must match run_id.`);
+  if (result.manifest_name !== "daily-codex-dag-contract") failures.push(`${label}.manifest_name must match synthetic manifest.`);
+  if (result.manifest_schema_version !== 1) failures.push(`${label}.manifest_schema_version must be 1.`);
+  if (result.node_id !== SYNTHETIC_EXECUTABLE_NODE_ID) failures.push(`${label}.node_id must be ${SYNTHETIC_EXECUTABLE_NODE_ID}.`);
+  if (result.node_kind !== "command") failures.push(`${label}.node_kind must be command.`);
+  if (result.runner_stage_ref !== planNode.runner_stage_ref) failures.push(`${label}.runner_stage_ref must match plan node.`);
+  if (result.result_scope !== "node") failures.push(`${label}.result_scope must be node.`);
+  if (!["success", "failure"].includes(result.status)) failures.push(`${label}.status must be success or failure.`);
+  if (!sameArtifactArray(result.declared_inputs, planNode.inputs)) failures.push(`${label}.declared_inputs must match plan inputs.`);
+  if (!sameArtifactArray(result.declared_outputs, planNode.outputs)) failures.push(`${label}.declared_outputs must match plan outputs.`);
+  if (Array.isArray(result.dependency_results) && result.dependency_results.length !== 0) {
+    failures.push(`${label}.dependency_results must be empty.`);
+  }
+  if (result.fanout !== null) failures.push(`${label}.fanout must be null.`);
+  if (result.barrier !== null) failures.push(`${label}.barrier must be null.`);
+  if (result.audit?.parallel_group !== planNode.parallel_group) failures.push(`${label}.audit.parallel_group must match plan node.`);
+  if (result.audit?.owner_path_scope !== planNode.owner_path_scope) failures.push(`${label}.audit.owner_path_scope must match plan node.`);
+  if (result.audit?.public_artifact !== planNode.public_artifact) failures.push(`${label}.audit.public_artifact must match plan node.`);
 }
 
 function validateContractRunNodeResultAgainstPlan({ result, resultByNodeId, planNode, reportDate, runId, failures }) {
@@ -1421,6 +1593,169 @@ function validateContractRunSuccessSummary(summary, failures) {
   }
 }
 
+function validateExecutableNodeMvpSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "ok",
+      "failures",
+      "warnings",
+      "validation",
+      "mode",
+      "report_date",
+      "generated_at",
+      "run_id",
+      "plan",
+      "run",
+      "node_results",
+      "node_result_validation",
+      "executed_commands",
+      "codex_invocations",
+      "next_action"
+    ],
+    label: "daily codex DAG executable-node MVP summary",
+    failures
+  });
+  if (typeof summary.ok !== "boolean") {
+    failures.push("daily codex DAG executable-node MVP summary ok must be a boolean.");
+  }
+  if (!Array.isArray(summary.failures)) {
+    failures.push("daily codex DAG executable-node MVP summary failures must be an array.");
+  } else {
+    validateMessageArray(summary.failures, "daily codex DAG executable-node MVP summary failures", failures);
+    if (summary.ok === true && summary.failures.length !== 0) {
+      failures.push("daily codex DAG executable-node MVP summary failures must be empty when ok is true.");
+    }
+    if (summary.ok === false && summary.failures.length === 0) {
+      failures.push("daily codex DAG executable-node MVP summary failures must be non-empty when ok is false.");
+    }
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG executable-node MVP summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG executable-node MVP summary warnings", failures);
+  }
+  if (summary.mode !== EXECUTABLE_NODE_MVP_MODE) {
+    failures.push(`daily codex DAG executable-node MVP summary mode must be ${EXECUTABLE_NODE_MVP_MODE}.`);
+  }
+  if (!isStrictIsoDate(summary.report_date)) {
+    failures.push("daily codex DAG executable-node MVP summary report_date must be a real YYYY-MM-DD date.");
+  }
+  if (!isCanonicalIsoTimestamp(summary.generated_at)) {
+    failures.push("daily codex DAG executable-node MVP summary generated_at must be a canonical UTC Date#toISOString() string.");
+  }
+  if (!isStableIdentifier(summary.run_id)) {
+    failures.push("daily codex DAG executable-node MVP summary run_id must be a stable identifier.");
+  }
+  if (!isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG executable-node MVP summary validation must be an object.");
+  } else {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: true,
+      label: "daily codex DAG executable-node MVP summary validation",
+      failures
+    });
+  }
+  validateNextActionShape(summary.next_action, failures, "daily codex DAG executable-node MVP summary next_action", {
+    allowedKinds: ["implement_artifact_io_contract"]
+  });
+  validateExecutableNodeMvpExecutedCommands(summary.executed_commands, failures);
+  if (!Array.isArray(summary.codex_invocations) || summary.codex_invocations.length !== 0) {
+    failures.push("daily codex DAG executable-node MVP summary codex_invocations must be empty.");
+  }
+
+  const plan = isPlainObject(summary.plan) ? summary.plan : null;
+  const run = isPlainObject(summary.run) ? summary.run : null;
+  if (!plan) failures.push("daily codex DAG executable-node MVP summary plan must be an object.");
+  if (!run) failures.push("daily codex DAG executable-node MVP summary run must be an object.");
+  if (!Array.isArray(summary.node_results)) failures.push("daily codex DAG executable-node MVP summary node_results must be an array.");
+  if (!plan || !run || !Array.isArray(summary.node_results)) return;
+
+  validatePlanShape(plan, failures, { allowNodeExecutable: true });
+  validateRunShape(run, failures);
+  validateContractRunNodeResultValidation(summary.node_result_validation, failures);
+
+  const planNodes = Array.isArray(plan.nodes) ? plan.nodes : null;
+  const planLevels = Array.isArray(plan.levels) ? plan.levels : null;
+  if (!planNodes) failures.push("daily codex DAG executable-node MVP summary plan.nodes must be an array.");
+  if (!planLevels) failures.push("daily codex DAG executable-node MVP summary plan.levels must be an array.");
+  if (!planNodes || !planLevels) return;
+  if (plan.node_count !== 1 || planNodes.length !== 1 || planNodes[0]?.id !== SYNTHETIC_EXECUTABLE_NODE_ID) {
+    failures.push("daily codex DAG executable-node MVP summary plan must contain only the synthetic command node.");
+  }
+
+  const planNodeIds = planNodes.map((node) => isPlainObject(node) ? node.id : undefined);
+  const levelPartition = validatePlanLevelPartition({ planNodes, planLevels, failures });
+  validateExecutableNodeMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures });
+  validatePlanDependencyLevels({ planNodes, levelByNodeId: levelPartition.levelByNodeId, failures });
+
+  const nodeResultValidation = validateExecutableNodeMvpNodeResults({
+    plan,
+    reportDate: summary.report_date,
+    runId: summary.run_id,
+    nodeResults: summary.node_results
+  });
+  failures.push(...nodeResultValidation.failures);
+  if (isPlainObject(summary.node_result_validation)) {
+    if (summary.node_result_validation.ok !== true) {
+      failures.push("daily codex DAG executable-node MVP summary node_result_validation.ok must be true.");
+    }
+    if (summary.node_result_validation.checked_results !== summary.node_results.length) {
+      failures.push("daily codex DAG executable-node MVP summary node_result_validation.checked_results must equal node_results length.");
+    }
+  }
+}
+
+function validateExecutableNodeMvpExecutedCommands(values, failures) {
+  const label = "daily codex DAG executable-node MVP summary executed_commands";
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  if (values.length !== 1) {
+    failures.push(`${label} length must be 1.`);
+    return;
+  }
+  const command = values[0];
+  if (!isPlainObject(command)) {
+    failures.push(`${label} entry must be an object.`);
+    return;
+  }
+  validateExactKeys({ value: command, allowed: ["node_id", "runner", "script"], label: `${label} entry`, failures });
+  if (command.node_id !== SYNTHETIC_EXECUTABLE_NODE_ID) failures.push(`${label} entry.node_id must be ${SYNTHETIC_EXECUTABLE_NODE_ID}.`);
+  if (command.runner !== "node") failures.push(`${label} entry.runner must be node.`);
+  if (command.script !== SYNTHETIC_EXECUTABLE_SCRIPT) failures.push(`${label} entry.script must be ${SYNTHETIC_EXECUTABLE_SCRIPT}.`);
+}
+
+function validateExecutableNodeMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures }) {
+  if (!sameOrderedStringArray(run.planned_nodes, planNodeIds)) {
+    failures.push("daily codex DAG executable-node MVP summary run.planned_nodes must equal plan.nodes ids.");
+  }
+  if (!levelsMatch(run.levels, planLevels)) {
+    failures.push("daily codex DAG executable-node MVP summary run.levels must equal plan.levels.");
+  }
+  const expectedCompleted = summary.ok === true ? [SYNTHETIC_EXECUTABLE_NODE_ID] : [];
+  const expectedBlocked = summary.ok === true ? [] : [SYNTHETIC_EXECUTABLE_NODE_ID];
+  const expectedStatus = summary.ok === true ? "executed_one_node" : "blocked";
+  if (run.final_status !== expectedStatus) {
+    failures.push(`daily codex DAG executable-node MVP summary run.final_status must be ${expectedStatus}.`);
+  }
+  if (!sameOrderedStringArray(run.completed_nodes, expectedCompleted)) {
+    failures.push("daily codex DAG executable-node MVP summary run.completed_nodes must match node execution status.");
+  }
+  if (!sameOrderedStringArray(run.blocked_nodes, expectedBlocked)) {
+    failures.push("daily codex DAG executable-node MVP summary run.blocked_nodes must match node execution status.");
+  }
+  const nodeResult = Array.isArray(summary.node_results) ? summary.node_results[0] : null;
+  if (isPlainObject(nodeResult)) {
+    const expectedNodeStatus = summary.ok === true ? "success" : "failure";
+    if (nodeResult.status !== expectedNodeStatus) {
+      failures.push(`daily codex DAG executable-node MVP summary node result status must be ${expectedNodeStatus}.`);
+    }
+  }
+}
+
 function validateNodeResultShape(result, failures) {
   const label = "daily codex DAG node result";
   validateExactKeys({
@@ -1838,7 +2173,7 @@ function validateValidationShape({ validation, expectedOk, label, failures }) {
   validateStringArray(validation.checked_files, `${label}.checked_files`, failures);
 }
 
-function validatePlanShape(plan, failures) {
+function validatePlanShape(plan, failures, options = {}) {
   validateExactKeys({
     value: plan,
     allowed: ["schema_version", "manifest_name", "description", "node_count", "levels", "nodes"],
@@ -1864,12 +2199,12 @@ function validatePlanShape(plan, failures) {
   }
   if (Array.isArray(plan.nodes)) {
     for (const node of plan.nodes) {
-      validatePlanNodeShape(node, failures);
+      validatePlanNodeShape(node, failures, options);
     }
   }
 }
 
-function validatePlanNodeShape(node, failures) {
+function validatePlanNodeShape(node, failures, options = {}) {
   const label = "daily codex DAG dry-run success summary plan.nodes entry";
   if (!isPlainObject(node)) {
     failures.push(`${label} must be an object.`);
@@ -1906,7 +2241,8 @@ function validatePlanNodeShape(node, failures) {
     executionStatus: node.execution_status,
     readiness: node.execution_contract?.readiness,
     label,
-    failures
+    failures,
+    allowNodeExecutable: options.allowNodeExecutable === true
   });
   if (!["planned", "mapped"].includes(node.plan_status)) failures.push(`${label}.plan_status is invalid.`);
   if (!Number.isInteger(node.level) || node.level < 0) failures.push(`${label}.level must be a non-negative integer.`);
@@ -1938,7 +2274,7 @@ function validateExecutionContractShape(contract, label, failures) {
   }
 }
 
-function validateExecutionReadiness({ nodeId, executionStatus, readiness, label, failures }) {
+function validateExecutionReadiness({ nodeId, executionStatus, readiness, label, failures, allowNodeExecutable = false }) {
   const reservedNodeExecutable = readiness === "node_executable";
   if (executionStatus === "planned" && readiness !== "planned_only" && !reservedNodeExecutable) {
     failures.push(`${label} ${formatSummaryValue(nodeId)} with execution_status planned must use execution_contract.readiness planned_only.`);
@@ -1946,7 +2282,7 @@ function validateExecutionReadiness({ nodeId, executionStatus, readiness, label,
   if (executionStatus === "mapped" && readiness !== "legacy_mapped" && !reservedNodeExecutable) {
     failures.push(`${label} ${formatSummaryValue(nodeId)} with execution_status mapped must use execution_contract.readiness legacy_mapped; legacy mapped is not node-level execution.`);
   }
-  if (reservedNodeExecutable) {
+  if (reservedNodeExecutable && !allowNodeExecutable) {
     failures.push(`${label} ${formatSummaryValue(nodeId)} execution_contract.readiness node_executable is reserved until executor migration enables standalone node execution.`);
   }
 }
@@ -2039,7 +2375,7 @@ function validateContractRunExpansionArray(values, failures) {
   }
 }
 
-function validateNextActionShape(nextAction, failures, label = "daily codex DAG dry-run success summary next_action") {
+function validateNextActionShape(nextAction, failures, label = "daily codex DAG dry-run success summary next_action", options = {}) {
   if (!isPlainObject(nextAction)) {
     failures.push(`${label} must be an object.`);
     return;
@@ -2050,8 +2386,11 @@ function validateNextActionShape(nextAction, failures, label = "daily codex DAG 
     label,
     failures
   });
-  if (nextAction.kind !== "implement_executable_node_runner") {
-    failures.push(`${label}.kind must be implement_executable_node_runner.`);
+  const allowedKinds = Array.isArray(options.allowedKinds) && options.allowedKinds.length > 0
+    ? options.allowedKinds
+    : ["implement_executable_node_runner"];
+  if (!allowedKinds.includes(nextAction.kind)) {
+    failures.push(`${label}.kind must be ${allowedKinds.join(" or ")}.`);
   }
   if (!nonEmptyString(nextAction.message)) {
     failures.push(`${label}.message must be a non-empty string.`);

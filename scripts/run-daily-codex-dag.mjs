@@ -1,12 +1,17 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createDailyCodexDagContractRun, createDailyCodexDagDryRun } from "../src/daily-codex-dag.js";
+import {
+  createDailyCodexDagContractRun,
+  createDailyCodexDagDryRun,
+  createDailyCodexDagExecutableNodeMvp
+} from "../src/daily-codex-dag.js";
 
 function parseArgs(argv) {
   const args = {
     dryRun: false,
     contractRun: false,
+    executeNodeFixture: false,
     execute: false,
     publish: false,
     json: false,
@@ -20,6 +25,8 @@ function parseArgs(argv) {
       args.dryRun = true;
     } else if (arg === "--contract-run") {
       args.contractRun = true;
+    } else if (arg === "--execute-node-fixture") {
+      args.executeNodeFixture = true;
     } else if (arg === "--execute") {
       args.execute = true;
     } else if (arg === "--publish") {
@@ -40,17 +47,24 @@ function parseArgs(argv) {
     }
   }
 
-  if (!args.dryRun && !args.contractRun) {
-    throw new Error("daily codex DAG CLI requires --dry-run");
+  const modeCount = [args.dryRun, args.contractRun, args.executeNodeFixture].filter(Boolean).length;
+  if (modeCount === 0) {
+    throw new Error("daily codex DAG CLI requires one of --dry-run, --contract-run, or --execute-node-fixture");
   }
-  if (args.dryRun && args.contractRun) {
+  if (args.dryRun && args.contractRun && !args.executeNodeFixture) {
     throw new Error("daily codex DAG CLI cannot combine --dry-run and --contract-run");
   }
-  if (!args.contractRun && (args.execute || args.publish)) {
+  if (modeCount > 1) {
+    throw new Error("daily codex DAG CLI cannot combine --dry-run, --contract-run, and --execute-node-fixture");
+  }
+  if (args.dryRun && (args.execute || args.publish)) {
     throw new Error(`Unsupported argument: ${args.execute ? "--execute" : "--publish"}`);
   }
   if (args.contractRun && (args.execute || args.publish)) {
     throw new Error("daily codex DAG CLI contract-run does not support --execute or --publish");
+  }
+  if (args.executeNodeFixture && (args.execute || args.publish)) {
+    throw new Error("daily codex DAG CLI execute-node fixture does not support --execute or --publish");
   }
   if (!args.json) {
     throw new Error("daily codex DAG CLI requires --json");
@@ -88,7 +102,9 @@ async function main() {
     const summaryPath = resolveSummaryPath(process.cwd(), args.summaryPath);
     const result = args.contractRun
       ? await createDailyCodexDagContractRun({ reportDate: args.date })
-      : await createDailyCodexDagDryRun({ reportDate: args.date });
+      : args.executeNodeFixture
+        ? await createDailyCodexDagExecutableNodeMvp({ reportDate: args.date })
+        : await createDailyCodexDagDryRun({ reportDate: args.date });
     if (result.ok) {
       await writeSummaryFile(summaryPath, result);
     }

@@ -5,6 +5,8 @@
   "oneOf": [
     { "$ref": "#/$defs/success" },
     { "$ref": "#/$defs/contract_run_success" },
+    { "$ref": "#/$defs/executable_node_mvp_success" },
+    { "$ref": "#/$defs/executable_node_mvp_failure" },
     { "$ref": "#/$defs/failure" }
   ],
   "$defs": {
@@ -121,6 +123,124 @@
           "items": { "type": "object" }
         },
         "next_action": { "$ref": "#/$defs/next_action" }
+      }
+    },
+    "executable_node_mvp_success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "failures",
+        "warnings",
+        "validation",
+        "mode",
+        "report_date",
+        "generated_at",
+        "run_id",
+        "plan",
+        "run",
+        "node_results",
+        "node_result_validation",
+        "executed_commands",
+        "codex_invocations",
+        "next_action"
+      ],
+      "properties": {
+        "ok": { "const": true },
+        "failures": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "string" }
+        },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "validation": { "$ref": "#/$defs/success_validation" },
+        "mode": { "const": "daily_codex_dag_executable_node_mvp" },
+        "report_date": { "type": "string", "format": "date" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "plan": { "$ref": "#/$defs/plan" },
+        "run": { "$ref": "#/$defs/executable_node_mvp_success_run" },
+        "node_results": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/executable_node_result" }
+        },
+        "node_result_validation": { "$ref": "#/$defs/node_result_validation" },
+        "executed_commands": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/executed_command" }
+        },
+        "codex_invocations": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "object" }
+        },
+        "next_action": { "$ref": "#/$defs/executable_node_mvp_next_action" }
+      }
+    },
+    "executable_node_mvp_failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "failures",
+        "warnings",
+        "validation",
+        "mode",
+        "report_date",
+        "generated_at",
+        "run_id",
+        "plan",
+        "run",
+        "node_results",
+        "node_result_validation",
+        "executed_commands",
+        "codex_invocations",
+        "next_action"
+      ],
+      "properties": {
+        "ok": { "const": false },
+        "failures": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "warnings": { "$ref": "#/$defs/messages" },
+        "validation": { "$ref": "#/$defs/success_validation" },
+        "mode": { "const": "daily_codex_dag_executable_node_mvp" },
+        "report_date": { "type": "string", "format": "date" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "plan": { "$ref": "#/$defs/plan" },
+        "run": { "$ref": "#/$defs/executable_node_mvp_failure_run" },
+        "node_results": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/executable_node_result" }
+        },
+        "node_result_validation": { "$ref": "#/$defs/node_result_validation" },
+        "executed_commands": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/executed_command" }
+        },
+        "codex_invocations": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "type": "object" }
+        },
+        "next_action": { "$ref": "#/$defs/executable_node_mvp_next_action" }
       }
     },
     "validation": {
@@ -307,6 +427,60 @@
         }
       }
     },
+    "executable_node_mvp_success_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["final_status", "levels", "planned_nodes", "completed_nodes", "blocked_nodes"],
+      "properties": {
+        "final_status": { "const": "executed_one_node" },
+        "levels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/level" }
+        },
+        "planned_nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        },
+        "completed_nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        },
+        "blocked_nodes": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "$ref": "#/$defs/node_id" }
+        }
+      }
+    },
+    "executable_node_mvp_failure_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["final_status", "levels", "planned_nodes", "completed_nodes", "blocked_nodes"],
+      "properties": {
+        "final_status": { "const": "blocked" },
+        "levels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/level" }
+        },
+        "planned_nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        },
+        "completed_nodes": {
+          "type": "array",
+          "maxItems": 0,
+          "items": { "$ref": "#/$defs/node_id" }
+        },
+        "blocked_nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_id" },
+          "uniqueItems": true
+        }
+      }
+    },
     "level": {
       "type": "object",
       "additionalProperties": false,
@@ -336,6 +510,15 @@
       "required": ["kind", "message"],
       "properties": {
         "kind": { "const": "implement_executable_node_runner" },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "executable_node_mvp_next_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "message"],
+      "properties": {
+        "kind": { "const": "implement_artifact_io_contract" },
         "message": { "type": "string", "minLength": 1 }
       }
     },
@@ -431,6 +614,141 @@
           "items": { "$ref": "#/$defs/node_result_issue" }
         },
         "audit": { "$ref": "#/$defs/node_result_audit" }
+      }
+    },
+    "executable_node_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "mode",
+        "report_date",
+        "run_id",
+        "manifest_name",
+        "manifest_schema_version",
+        "node_id",
+        "node_kind",
+        "runner_stage_ref",
+        "result_scope",
+        "execution_id",
+        "status",
+        "downstream_disposition",
+        "started_at",
+        "finished_at",
+        "duration_ms",
+        "attempts_started",
+        "max_attempts",
+        "attempts_exhausted",
+        "dependency_results",
+        "declared_inputs",
+        "declared_outputs",
+        "resolved_inputs",
+        "resolved_outputs",
+        "fanout",
+        "barrier",
+        "failures",
+        "warnings",
+        "audit"
+      ],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "mode": { "const": "daily_codex_dag_node_result" },
+        "report_date": { "type": "string", "format": "date" },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "manifest_name": { "const": "daily-codex-dag-contract" },
+        "manifest_schema_version": { "const": 1 },
+        "node_id": { "const": "synthetic-command-node" },
+        "node_kind": { "const": "command" },
+        "runner_stage_ref": { "type": "string" },
+        "result_scope": { "const": "node" },
+        "execution_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "status": { "enum": ["success", "failure"] },
+        "downstream_disposition": { "enum": ["continue", "block"] },
+        "started_at": { "type": "string", "format": "date-time" },
+        "finished_at": { "type": "string", "format": "date-time" },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "attempts_started": { "const": 1 },
+        "max_attempts": { "const": 1 },
+        "attempts_exhausted": { "type": "boolean" },
+        "dependency_results": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "declared_inputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "declared_outputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "resolved_inputs": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "resolved_outputs": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "fanout": { "type": "null" },
+        "barrier": { "type": "null" },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_result_issue" }
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node_result_issue" }
+        },
+        "audit": { "$ref": "#/$defs/node_result_audit" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "success" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "downstream_disposition": { "const": "continue" },
+              "attempts_exhausted": { "const": false },
+              "failures": { "type": "array", "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "failure" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "downstream_disposition": { "const": "block" },
+              "attempts_exhausted": { "const": true },
+              "failures": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/$defs/node_result_issue" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "executed_command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "runner", "script"],
+      "properties": {
+        "node_id": { "const": "synthetic-command-node" },
+        "runner": { "const": "node" },
+        "script": { "const": "scripts/validate-daily-codex-dag.mjs" }
       }
     },
     "contract_dependency_result": {

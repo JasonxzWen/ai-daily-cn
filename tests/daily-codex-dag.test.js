@@ -10,6 +10,7 @@ import {
   createDailyCodexDagContractRun,
   createDailyCodexDagNodeResult,
   createDailyCodexDagDryRun,
+  createDailyCodexDagExecutableNodeMvp,
   createDailyCodexDagPlan,
   executeDailyCodexDagCommandNode,
   resolveDailyCodexDagCodexRuntimePlan,
@@ -1021,6 +1022,87 @@ test("daily codex DAG command node executor fails structurally when a required o
   assert.equal(validation.ok, true, validation.failures.join("\n"));
 });
 
+test("daily codex DAG executable-node MVP runs one synthetic command node and emits a valid run summary", async () => {
+  const result = await createDailyCodexDagExecutableNodeMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath
+  });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.mode, "daily_codex_dag_executable_node_mvp");
+  assert.equal(result.run.final_status, "executed_one_node");
+  assert.deepEqual(result.run.planned_nodes, ["synthetic-command-node"]);
+  assert.deepEqual(result.run.completed_nodes, ["synthetic-command-node"]);
+  assert.deepEqual(result.run.blocked_nodes, []);
+  assert.equal(result.plan.node_count, 1);
+  assert.equal(result.plan.nodes[0].execution_contract.readiness, "node_executable");
+  assert.equal(Object.hasOwn(result.plan.nodes[0].execution_contract, "node_execution_spec"), false);
+  assert.equal(result.node_results.length, 1);
+  assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
+  assert.equal(result.node_result_validation.checked_results, 1);
+  assert.equal(result.node_results[0].status, "success");
+  assert.equal(result.node_results[0].downstream_disposition, "continue");
+  assert.equal(result.node_results[0].node_id, "synthetic-command-node");
+  assert.equal(result.node_results[0].duration_ms, 1000);
+  assert.equal(Object.hasOwn(result.node_results[0], "stdout"), false);
+  assert.equal(Object.hasOwn(result.node_results[0], "stderr"), false);
+  assert.equal(result.executed_commands.length, 1);
+  assert.deepEqual(Object.keys(result.executed_commands[0]).sort(), ["node_id", "runner", "script"]);
+  assert.equal(result.codex_invocations.length, 0);
+
+  const nodeResultValidation = validateDailyCodexDagNodeResult(result.node_results[0]);
+  assert.equal(nodeResultValidation.ok, true, nodeResultValidation.failures.join("\n"));
+  await assertValidDagRunSummary(result);
+
+  const manifest = await loadManifest();
+  assert.equal(
+    manifest.nodes.some((item) => Object.hasOwn(item.execution_contract || {}, "node_execution_spec")),
+    false,
+    "production manifest must remain untouched by executable-node MVP"
+  );
+});
+
+test("daily codex DAG executable-node MVP records structured command failure without leaking streams", async () => {
+  const result = await createDailyCodexDagExecutableNodeMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath,
+    executeCommand: async () => ({
+      exitCode: 7,
+      signal: null,
+      stdout: "SECRET stdout payload",
+      stderr: "SECRET stderr payload",
+      errorMessage: "synthetic failure"
+    })
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.mode, "daily_codex_dag_executable_node_mvp");
+  assert.equal(result.run.final_status, "blocked");
+  assert.deepEqual(result.run.completed_nodes, []);
+  assert.deepEqual(result.run.blocked_nodes, ["synthetic-command-node"]);
+  assert.equal(result.node_results.length, 1);
+  assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
+  assert.equal(result.node_results[0].status, "failure");
+  assert.equal(result.node_results[0].downstream_disposition, "block");
+  assert.equal(result.node_results[0].attempts_exhausted, true);
+  assert.equal(result.node_results[0].failures.length, 1);
+  assert.equal(Object.hasOwn(result.node_results[0], "stdout"), false);
+  assert.equal(Object.hasOwn(result.node_results[0], "stderr"), false);
+  assert.equal(JSON.stringify(result).includes("SECRET"), false);
+
+  const nodeResultValidation = validateDailyCodexDagNodeResult(result.node_results[0]);
+  assert.equal(nodeResultValidation.ok, true, nodeResultValidation.failures.join("\n"));
+  await assertValidDagRunSummary(result);
+});
+
 test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {
   const manifest = await loadManifest();
   const first = await createDailyCodexDagDryRun({
@@ -1911,7 +1993,7 @@ test("daily codex DAG dry-run CLI rejects invalid invocations with structured JS
   assert.equal(missingDryRun.code, 1);
   assert.equal(missingDryRun.stderr, "");
   const missingDryRunJson = JSON.parse(missingDryRun.stdout);
-  assert.equal(missingDryRunJson.failures[0], "daily codex DAG CLI requires --dry-run");
+  assert.equal(missingDryRunJson.failures[0], "daily codex DAG CLI requires one of --dry-run, --contract-run, or --execute-node-fixture");
   assert.equal(missingDryRunJson.validation, null);
   await assertValidDagRunSummary(missingDryRunJson);
 
@@ -1940,6 +2022,56 @@ test("daily codex DAG dry-run CLI rejects invalid invocations with structured JS
   assert.equal(dryRunPublish.code, 1);
   assert.equal(dryRunPublish.stderr, "");
   assert.equal(JSON.parse(dryRunPublish.stdout).failures[0], "Unsupported argument: --publish");
+});
+
+test("daily codex DAG executable-node MVP CLI writes JSON to stdout only", async () => {
+  const forbiddenBefore = await forbiddenPathSnapshot();
+  const result = await runDagCli(["--execute-node-fixture", "--date", "2026-07-03", "--json"]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, true, parsed.failures?.join("\n"));
+  assert.equal(parsed.mode, "daily_codex_dag_executable_node_mvp");
+  assert.equal(parsed.report_date, "2026-07-03");
+  assert.equal(parsed.run.final_status, "executed_one_node");
+  assert.deepEqual(parsed.run.completed_nodes, ["synthetic-command-node"]);
+  assert.equal(parsed.node_results.length, 1);
+  assert.equal(parsed.node_results[0].mode, "daily_codex_dag_node_result");
+  assert.equal(parsed.node_results[0].status, "success");
+  assert.equal(Object.hasOwn(parsed.node_results[0], "stdout"), false);
+  assert.equal(Object.hasOwn(parsed.node_results[0], "stderr"), false);
+  assert.equal(JSON.stringify(parsed).includes("SECRET"), false);
+  await assertValidDagRunSummary(parsed);
+  assert.deepEqual(await forbiddenPathSnapshot(), forbiddenBefore, "stdout-only executable-node MVP must not mutate production or scratch paths");
+});
+
+test("daily codex DAG executable-node MVP CLI writes opt-in summaries under .tmp only", async () => {
+  const tempName = `execute-node-summary-${process.pid}-${Date.now()}.json`;
+  const summaryPath = path.join(".tmp", "daily-codex-pipeline", "dag-execute-node-test", tempName);
+  const absoluteSummaryPath = path.join(rootDir, summaryPath);
+  await fs.rm(absoluteSummaryPath, { force: true });
+
+  const result = await runDagCli([
+    "--execute-node-fixture",
+    "--date",
+    "2026-07-03",
+    "--json",
+    "--summary-path",
+    summaryPath
+  ]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const stdoutJson = JSON.parse(result.stdout);
+  const fileJson = JSON.parse(await fs.readFile(absoluteSummaryPath, "utf8"));
+  assert.deepEqual(fileJson, stdoutJson);
+  assert.equal(fileJson.ok, true);
+  assert.equal(fileJson.mode, "daily_codex_dag_executable_node_mvp");
+  assert.equal(fileJson.node_result_validation.ok, true);
+  await assertValidDagRunSummary(fileJson);
+
+  await fs.rm(absoluteSummaryPath, { force: true });
 });
 
 test("daily codex DAG dry-run CLI writes opt-in summaries under .tmp only", async () => {
