@@ -10,6 +10,7 @@ import {
   createDailyCodexDagNodeResult,
   createDailyCodexDagDryRun,
   createDailyCodexDagPlan,
+  executeDailyCodexDagCommandNode,
   resolveDailyCodexDagCodexRuntimePlan,
   resolveDailyCodexDagCommandRuntimePlan,
   resolveDailyCodexDagNodeRuntimePlan,
@@ -752,6 +753,146 @@ test("daily codex DAG node runtime plan rejects non-executable, unsupported, and
   assert(
     delegatedCodexFailure.failures.some((failure) => failure.includes("codexExecutablePath must be an absolute path")),
     delegatedCodexFailure.failures.join("\n")
+  );
+});
+
+test("daily codex DAG command node executor runs a deterministic repo command and emits a valid success node result", async () => {
+  const manifest = await loadManifest();
+  const score = structuredCloneJson(node(manifest, "score"));
+  const commandSpec = buildFutureNodeExecutionSpec(score, {
+    cwd: ".",
+    invocation: {
+      kind: "command",
+      argv: ["node", "scripts/validate-daily-codex-dag.mjs"]
+    }
+  });
+  score.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic executable command node for command executor testing.",
+    node_execution_spec: commandSpec
+  };
+
+  const result = await executeDailyCodexDagCommandNode({
+    rootDir,
+    node: score,
+    reportDate: "2026-07-03",
+    runId: "daily-codex-dag:2026-07-03:command-test",
+    nodeExecutablePath: process.execPath,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    resolvedInputs: (score.inputs || []).map((artifact) => resolvedArtifact(artifact.path)),
+    resolvedOutputs: (score.outputs || []).map((artifact) => resolvedArtifact(artifact.path))
+  });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.deepEqual(result.runtime_plan, {
+    runner: "node",
+    command: process.execPath,
+    args: [path.resolve(rootDir, "scripts", "validate-daily-codex-dag.mjs")],
+    cwd: rootDir,
+    shell: false,
+    script_path: path.resolve(rootDir, "scripts", "validate-daily-codex-dag.mjs"),
+    argv_tail: []
+  });
+  assert.equal(result.result.status, "success");
+  assert.equal(result.result.downstream_disposition, "continue");
+  assert.equal(result.result.duration_ms, 1000);
+  assert.equal(result.result.attempts_started, 1);
+  assert.equal(result.result.attempts_exhausted, false);
+  assert.deepEqual(result.result.failures, []);
+  assert.deepEqual(result.result.warnings, []);
+  assert.equal(result.result.node_id, score.id);
+  assert.equal(result.result.runner_stage_ref, score.runner_stage_ref);
+  assert.equal(result.result.audit.parallel_group, score.parallel_group);
+  assert.equal(Object.hasOwn(result.result, "stdout"), false);
+  assert.equal(Object.hasOwn(result.result, "stderr"), false);
+
+  const validation = validateDailyCodexDagNodeResult(result.result);
+  assert.equal(validation.ok, true, validation.failures.join("\n"));
+});
+
+test("daily codex DAG command node executor emits a valid failure node result when execution fails", async () => {
+  const manifest = await loadManifest();
+  const score = structuredCloneJson(node(manifest, "score"));
+  const commandSpec = buildFutureNodeExecutionSpec(score);
+  score.execution_contract = {
+    readiness: "node_executable",
+    summary: "Synthetic executable command node for command failure testing.",
+    node_execution_spec: commandSpec
+  };
+  const calls = [];
+
+  const result = await executeDailyCodexDagCommandNode({
+    rootDir,
+    node: score,
+    reportDate: "2026-07-03",
+    runId: "daily-codex-dag:2026-07-03:command-failure-test",
+    nodeExecutablePath: process.execPath,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:02.000Z",
+    executeCommand: async (invocation) => {
+      calls.push(invocation);
+      const error = new Error("SECRET_ERROR_SENTINEL");
+      error.code = 7;
+      error.stderr = "SECRET_STDERR_SENTINEL";
+      throw error;
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(calls.length, 1);
+  assert(
+    result.failures.some((failure) => failure.includes("exit code 7")),
+    result.failures.join("\n")
+  );
+  assert.equal(result.failures.some((failure) => failure.includes("SECRET_ERROR_SENTINEL")), false);
+  assert.equal(result.failures.some((failure) => failure.includes("SECRET_STDERR_SENTINEL")), false);
+  assert.equal(result.result.status, "failure");
+  assert.equal(result.result.downstream_disposition, "block");
+  assert.equal(result.result.duration_ms, 2000);
+  assert.equal(result.result.attempts_started, 1);
+  assert.equal(result.result.attempts_exhausted, true);
+  assert.equal(result.result.failures.length, 1);
+  assert.equal(result.result.failures[0].code, "command_execution_failed");
+  assert(
+    result.result.failures[0].message.includes("exit code 7"),
+    result.result.failures[0].message
+  );
+  assert.equal(result.result.failures[0].message.includes("SECRET_ERROR_SENTINEL"), false);
+  assert.equal(result.result.failures[0].message.includes("SECRET_STDERR_SENTINEL"), false);
+  assert.equal(Object.hasOwn(result.result, "stdout"), false);
+  assert.equal(Object.hasOwn(result.result, "stderr"), false);
+
+  const validation = validateDailyCodexDagNodeResult(result.result);
+  assert.equal(validation.ok, true, validation.failures.join("\n"));
+});
+
+test("daily codex DAG command node executor rejects preflight failures before execution", async () => {
+  const manifest = await loadManifest();
+  const score = structuredCloneJson(node(manifest, "score"));
+  const commandSpec = buildFutureNodeExecutionSpec(score);
+  let calls = 0;
+
+  const result = await executeDailyCodexDagCommandNode({
+    rootDir,
+    node: score,
+    spec: commandSpec,
+    reportDate: "2026-07-03",
+    runId: "daily-codex-dag:2026-07-03:command-preflight-test",
+    nodeExecutablePath: process.execPath,
+    executeCommand: async () => {
+      calls += 1;
+      return { exitCode: 0 };
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.result, null);
+  assert.equal(result.runtime_plan, null);
+  assert.equal(calls, 0);
+  assert(
+    result.failures.some((failure) => failure.includes("execution_contract.readiness must be node_executable")),
+    result.failures.join("\n")
   );
 });
 
