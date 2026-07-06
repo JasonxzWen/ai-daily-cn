@@ -297,6 +297,48 @@ export function resolveDailyCodexDagCodexRuntimePlan(options = {}) {
   };
 }
 
+export function resolveDailyCodexDagNodeRuntimePlan(options = {}) {
+  const node = options.node || {};
+  const spec = selectExplicitNodeExecutionSpec({ options, node });
+  const nodeId = nonEmptyString(node.id) ? node.id : "<unknown>";
+  const label = `daily codex DAG node runtime plan node ${nodeId}`;
+  const failures = [];
+
+  if (node.execution_contract?.readiness !== "node_executable") {
+    failures.push(`${label} execution_contract.readiness must be node_executable.`);
+  }
+  if (!isPlainObject(spec)) {
+    failures.push(`${label} spec must be an object.`);
+    return { ok: false, failures, plan: null };
+  }
+
+  let runtimeResult = null;
+  if (spec.executor === "command") {
+    runtimeResult = resolveDailyCodexDagCommandRuntimePlan({ ...options, node, spec });
+  } else if (spec.executor === "codex_cli") {
+    runtimeResult = resolveDailyCodexDagCodexRuntimePlan({ ...options, node, spec });
+  } else {
+    failures.push(`${label} executor must be command or codex_cli.`);
+  }
+
+  if (runtimeResult && !runtimeResult.ok) {
+    failures.push(...runtimeResult.failures);
+  }
+  if (failures.length > 0) {
+    return { ok: false, failures, plan: null };
+  }
+
+  return {
+    ok: true,
+    failures,
+    plan: {
+      node_id: nodeId,
+      executor: spec.executor,
+      runtime_plan: runtimeResult.plan
+    }
+  };
+}
+
 export async function createDailyCodexDagDryRun(options = {}) {
   const reportDate = requiredReportDate(options.reportDate || options.date);
   const generatedAt = toIsoTimestamp(options.now || new Date());
