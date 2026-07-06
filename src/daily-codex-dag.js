@@ -13,10 +13,20 @@ const NODE_RESULT_DOWNSTREAM_DISPOSITIONS = ["continue", "block"];
 const NODE_KINDS = ["command", "codex_exec", "fanout", "barrier"];
 const EXECUTION_READINESS_VALUES = ["planned_only", "legacy_mapped", "node_executable"];
 const EXECUTABLE_NODE_MVP_MODE = "daily_codex_dag_executable_node_mvp";
+const REAL_NODE_ADAPTER_MVP_MODE = "daily_codex_dag_real_node_adapter_mvp";
 const SYNTHETIC_EXECUTABLE_NODE_ID = "synthetic-command-node";
 const SYNTHETIC_EXECUTABLE_SCRIPT = "scripts/run-daily-codex-dag.mjs";
 const SYNTHETIC_EXECUTABLE_INPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/input.json";
 const SYNTHETIC_EXECUTABLE_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/dry-run-summary.json";
+const REAL_NODE_ADAPTER_TARGET_NODE_ID = "score";
+const REAL_NODE_ADAPTER_DEPENDENCY_NODE_ID = "classify-tag-entity";
+const REAL_NODE_ADAPTER_SCRIPT = "scripts/replay-daily-codex-dag-node-fixture.mjs";
+const REAL_NODE_ADAPTER_INPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json";
+const REAL_NODE_ADAPTER_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/scored-candidates.json";
+const REAL_NODE_ADAPTER_RUNNER_STAGE_REF = "admit";
+const REAL_NODE_ADAPTER_PARALLEL_GROUP = "item-lanes";
+const REAL_NODE_ADAPTER_OWNER_PATH_SCOPE = "internal_workdir";
+const REAL_NODE_ADAPTER_PUBLIC_ARTIFACT = false;
 
 const REQUIRED_NODE_IDS = [
   "fetch-source-health",
@@ -635,6 +645,134 @@ export async function createDailyCodexDagExecutableNodeMvp(options = {}) {
   };
 }
 
+export async function createDailyCodexDagRealNodeAdapterMvp(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const reportDate = requiredReportDate(options.reportDate || options.date);
+  const generatedAt = toIsoTimestamp(options.now || new Date());
+  const nodeId = options.nodeId || options.node_id || REAL_NODE_ADAPTER_TARGET_NODE_ID;
+  const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}:real-node-adapter:${nodeId}`;
+
+  if (nodeId !== REAL_NODE_ADAPTER_TARGET_NODE_ID) {
+    return {
+      ok: false,
+      failures: [`daily codex DAG real-node adapter MVP only supports ${REAL_NODE_ADAPTER_TARGET_NODE_ID}.`],
+      warnings: [],
+      validation: null,
+      plan: null,
+      run: null
+    };
+  }
+
+  let manifest = null;
+  try {
+    const loaded = await loadDailyCodexDag({ rootDir, dagPath: options.dagPath });
+    manifest = loaded.manifest;
+  } catch (error) {
+    return {
+      ok: false,
+      failures: [`${DEFAULT_DAG_PATH}: ${error.message}`],
+      warnings: [],
+      validation: null,
+      plan: null,
+      run: null
+    };
+  }
+
+  const validation = await validateDailyCodexDag({ rootDir, dagPath: options.dagPath, manifest });
+  if (!validation.ok) {
+    return {
+      ok: false,
+      failures: validation.failures,
+      warnings: validation.warnings,
+      validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const sourceNode = manifest.nodes.find((node) => node.id === nodeId);
+  if (!sourceNode) {
+    return {
+      ok: false,
+      failures: [`daily codex DAG real-node adapter MVP missing node ${nodeId}.`],
+      warnings: validation.warnings,
+      validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const executableNode = createRealNodeAdapterCommandNode({ sourceNode, reportDate });
+  const fixtureManifest = {
+    schema_version: manifest.schema_version,
+    name: manifest.name,
+    description: `Fixture-only executable adapter for real DAG node ${nodeId}.`,
+    nodes: [executableNode]
+  };
+  const plan = projectDailyCodexDagPlan(fixtureManifest);
+
+  await prepareRealNodeAdapterFixtureArtifacts({ rootDir, reportDate, sourceNode });
+
+  const execution = await executeDailyCodexDagCommandNode({
+    rootDir,
+    reportDate,
+    runId,
+    manifestName: manifest.name,
+    manifestSchemaVersion: manifest.schema_version,
+    node: executableNode,
+    nodeExecutablePath: options.nodeExecutablePath || options.node_executable_path || process.execPath,
+    executeCommand: options.executeCommand,
+    startedAt: options.startedAt ?? options.started_at,
+    finishedAt: options.finishedAt ?? options.finished_at,
+    timeoutSeconds: options.timeoutSeconds ?? options.timeout_seconds,
+    dependencyResults: createRealNodeAdapterDependencyResults({ sourceNode, reportDate, runId }),
+    resiliencePolicyRef: sourceNode.resilience_policy_ref || ""
+  });
+  const nodeResults = execution.result ? [execution.result] : [];
+  const nodeResultValidation = validateRealNodeAdapterMvpNodeResults({
+    plan,
+    sourceNode,
+    reportDate,
+    runId,
+    nodeResults
+  });
+  const nodeSucceeded = execution.ok && execution.result?.status === "success";
+  const ok = nodeSucceeded && nodeResultValidation.ok;
+  const completedNodes = nodeSucceeded ? [nodeId] : [];
+  const blockedNodes = nodeSucceeded ? [] : [nodeId];
+
+  return {
+    ok,
+    failures: ok ? [] : uniqueSorted([...execution.failures, ...nodeResultValidation.failures]),
+    warnings: uniqueSorted([...validation.warnings, ...nodeResultValidation.warnings]),
+    validation,
+    mode: REAL_NODE_ADAPTER_MVP_MODE,
+    report_date: reportDate,
+    generated_at: generatedAt,
+    run_id: runId,
+    plan,
+    run: {
+      final_status: nodeSucceeded ? "executed_one_real_node" : "blocked",
+      levels: plan.levels.map(copyLevel),
+      planned_nodes: plan.nodes.map((node) => node.id),
+      completed_nodes: completedNodes,
+      blocked_nodes: blockedNodes
+    },
+    node_results: nodeResults,
+    node_result_validation: nodeResultValidation,
+    executed_commands: [{
+      node_id: nodeId,
+      runner: "node",
+      script: REAL_NODE_ADAPTER_SCRIPT
+    }],
+    codex_invocations: [],
+    next_action: {
+      kind: "wire_multi_node_dag_executor",
+      message: "Real-node adapter MVP ran the score node against fixture artifacts; next wire a small multi-node DAG executor sequence."
+    }
+  };
+}
+
 export function validateDailyCodexDagRunSummary(summary) {
   const failures = [];
   const warnings = [];
@@ -646,6 +784,10 @@ export function validateDailyCodexDagRunSummary(summary) {
 
   if (summary.mode === EXECUTABLE_NODE_MVP_MODE) {
     validateExecutableNodeMvpSummary(summary, failures);
+    return { ok: failures.length === 0, failures, warnings };
+  }
+  if (summary.mode === REAL_NODE_ADAPTER_MVP_MODE) {
+    validateRealNodeAdapterMvpSummary(summary, failures);
     return { ok: failures.length === 0, failures, warnings };
   }
   if (summary.ok === false) {
@@ -1074,6 +1216,118 @@ async function prepareSyntheticExecutableArtifacts({ rootDir, reportDate }) {
   await fs.rm(outputPath, { force: true });
 }
 
+function createRealNodeAdapterCommandNode({ sourceNode, reportDate }) {
+  const inputArtifacts = (sourceNode.inputs || []).map(copyArtifact);
+  const outputArtifacts = (sourceNode.outputs || []).map(copyArtifact);
+  const inputArtifactPath = materializeArtifactPath({
+    templatePath: inputArtifacts[0]?.path || "",
+    reportDate
+  });
+  const outputArtifactPath = materializeArtifactPath({
+    templatePath: outputArtifacts[0]?.path || "",
+    reportDate
+  });
+
+  return {
+    id: sourceNode.id,
+    title: sourceNode.title,
+    kind: sourceNode.kind,
+    execution_status: sourceNode.execution_status,
+    execution_contract: {
+      readiness: "node_executable",
+      summary: `Fixture-only executable adapter for real DAG node ${sourceNode.id}.`,
+      node_execution_spec: {
+        executor: "command",
+        cwd: ".",
+        timeout_seconds: 30,
+        invocation: {
+          kind: "command",
+          argv: [
+            "node",
+            REAL_NODE_ADAPTER_SCRIPT,
+            "--node",
+            sourceNode.id,
+            "--date",
+            reportDate,
+            "--input",
+            inputArtifactPath,
+            "--output",
+            outputArtifactPath,
+            "--json"
+          ]
+        },
+        inputs: inputArtifacts,
+        outputs: outputArtifacts
+      }
+    },
+    dependencies: [...(sourceNode.dependencies || [])],
+    inputs: inputArtifacts,
+    outputs: outputArtifacts,
+    runner_stage_ref: sourceNode.runner_stage_ref,
+    parallel_group: sourceNode.parallel_group,
+    public_artifact: sourceNode.public_artifact,
+    owner_path_scope: sourceNode.owner_path_scope
+  };
+}
+
+async function prepareRealNodeAdapterFixtureArtifacts({ rootDir, reportDate, sourceNode }) {
+  const inputArtifact = sourceNode.inputs?.[0] || {};
+  const outputArtifact = sourceNode.outputs?.[0] || {};
+  const inputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: inputArtifact.path || "",
+    reportDate
+  }));
+  const outputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: outputArtifact.path || "",
+    reportDate
+  }));
+  await fs.mkdir(path.dirname(inputPath), { recursive: true });
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    schema_version: 1,
+    mode: "daily_codex_dag_real_node_adapter_fixture_input",
+    report_date: reportDate,
+    node_id: sourceNode.id,
+    candidates: [{
+      candidate_id: "fixture-candidate-001",
+      title: "Fixture classified candidate",
+      url: "https://example.com/daily-codex-dag-fixture",
+      language: "en",
+      taxonomy: {
+        domain: "models",
+        flavor: "release",
+        channel: "official"
+      },
+      tags: ["model-release"],
+      entities: ["Fixture Labs"]
+    }]
+  }, null, 2)}\n`, "utf8");
+  await fs.rm(outputPath, { force: true });
+}
+
+function createRealNodeAdapterDependencyResults({ sourceNode, reportDate, runId }) {
+  return (sourceNode.dependencies || []).map((dependencyId) => ({
+    node_id: dependencyId,
+    execution_id: `${runId}:${dependencyId}:fixture`,
+    status: "success",
+    required: true,
+    downstream_disposition: "continue"
+  }));
+}
+
+function expectedRealNodeAdapterSourceNode() {
+  return {
+    id: REAL_NODE_ADAPTER_TARGET_NODE_ID,
+    kind: "command",
+    dependencies: [REAL_NODE_ADAPTER_DEPENDENCY_NODE_ID],
+    inputs: [{ path: REAL_NODE_ADAPTER_INPUT_ARTIFACT, required: true }],
+    outputs: [{ path: REAL_NODE_ADAPTER_OUTPUT_ARTIFACT, required: true }],
+    runner_stage_ref: REAL_NODE_ADAPTER_RUNNER_STAGE_REF,
+    parallel_group: REAL_NODE_ADAPTER_PARALLEL_GROUP,
+    public_artifact: REAL_NODE_ADAPTER_PUBLIC_ARTIFACT,
+    owner_path_scope: REAL_NODE_ADAPTER_OWNER_PATH_SCOPE
+  };
+}
+
 function validateExecutableNodeMvpNodeResults({ plan, reportDate, runId, nodeResults }) {
   const failures = [];
   const warnings = [];
@@ -1124,6 +1378,105 @@ function validateExecutableNodeMvpNodeResultAgainstPlan({ result, planNode, repo
   if (result.audit?.parallel_group !== planNode.parallel_group) failures.push(`${label}.audit.parallel_group must match plan node.`);
   if (result.audit?.owner_path_scope !== planNode.owner_path_scope) failures.push(`${label}.audit.owner_path_scope must match plan node.`);
   if (result.audit?.public_artifact !== planNode.public_artifact) failures.push(`${label}.audit.public_artifact must match plan node.`);
+}
+
+function validateRealNodeAdapterMvpNodeResults({ plan, sourceNode, reportDate, runId, nodeResults }) {
+  const failures = [];
+  const warnings = [];
+  if (!Array.isArray(nodeResults)) {
+    failures.push("daily codex DAG real-node adapter MVP node_results must be an array.");
+    return nodeResultValidationSummary({ failures, warnings, checkedResults: 0 });
+  }
+  if (nodeResults.length !== 1) {
+    failures.push("daily codex DAG real-node adapter MVP node_results length must be 1.");
+  }
+
+  const planNode = Array.isArray(plan?.nodes)
+    ? plan.nodes.find((node) => node.id === REAL_NODE_ADAPTER_TARGET_NODE_ID)
+    : null;
+  for (const result of nodeResults) {
+    const resultValidation = validateDailyCodexDagNodeResult(result);
+    failures.push(...resultValidation.failures);
+    warnings.push(...resultValidation.warnings);
+    validateRealNodeAdapterMvpNodeResultAgainstPlan({ result, planNode, sourceNode, reportDate, runId, failures });
+  }
+
+  return nodeResultValidationSummary({ failures, warnings, checkedResults: nodeResults.length });
+}
+
+function validateRealNodeAdapterMvpNodeResultAgainstPlan({ result, planNode, sourceNode, reportDate, runId, failures }) {
+  const label = "daily codex DAG real-node adapter MVP node result";
+  if (!isPlainObject(result)) return;
+  if (!planNode) {
+    failures.push(`${label} must match the real adapter plan node.`);
+    return;
+  }
+  if (result.report_date !== reportDate) failures.push(`${label}.report_date must match run report_date.`);
+  if (result.run_id !== runId) failures.push(`${label}.run_id must match run_id.`);
+  if (result.manifest_name !== "daily-codex-dag-contract") failures.push(`${label}.manifest_name must match manifest.`);
+  if (result.manifest_schema_version !== 1) failures.push(`${label}.manifest_schema_version must be 1.`);
+  if (result.node_id !== REAL_NODE_ADAPTER_TARGET_NODE_ID) failures.push(`${label}.node_id must be ${REAL_NODE_ADAPTER_TARGET_NODE_ID}.`);
+  if (result.node_kind !== "command") failures.push(`${label}.node_kind must be command.`);
+  if (result.runner_stage_ref !== sourceNode.runner_stage_ref) failures.push(`${label}.runner_stage_ref must match source node.`);
+  if (result.result_scope !== "node") failures.push(`${label}.result_scope must be node.`);
+  if (!["success", "failure"].includes(result.status)) failures.push(`${label}.status must be success or failure.`);
+  if (!sameArtifactArray(result.declared_inputs, sourceNode.inputs || [])) failures.push(`${label}.declared_inputs must match source node inputs.`);
+  if (!sameArtifactArray(result.declared_outputs, sourceNode.outputs || [])) failures.push(`${label}.declared_outputs must match source node outputs.`);
+  validateRealNodeAdapterDependencyResults({ result, sourceNode, failures, label });
+  if (result.fanout !== null) failures.push(`${label}.fanout must be null.`);
+  if (result.barrier !== null) failures.push(`${label}.barrier must be null.`);
+  if (result.audit?.parallel_group !== sourceNode.parallel_group) failures.push(`${label}.audit.parallel_group must match source node.`);
+  if (result.audit?.owner_path_scope !== sourceNode.owner_path_scope) failures.push(`${label}.audit.owner_path_scope must match source node.`);
+  if (result.audit?.public_artifact !== sourceNode.public_artifact) failures.push(`${label}.audit.public_artifact must match source node.`);
+}
+
+function validateRealNodeAdapterDependencyResults({ result, sourceNode, failures, label }) {
+  if (!Array.isArray(result.dependency_results)) return;
+  const expectedDependencies = sourceNode.dependencies || [];
+  if (result.dependency_results.length !== expectedDependencies.length) {
+    failures.push(`${label}.dependency_results must match source node dependencies.`);
+    return;
+  }
+  for (const dependencyId of expectedDependencies) {
+    const dependencyResult = result.dependency_results.find((item) => item.node_id === dependencyId);
+    if (!dependencyResult) {
+      failures.push(`${label}.dependency_results must include ${dependencyId}.`);
+      continue;
+    }
+    if (dependencyResult.status !== "success") failures.push(`${label}.dependency_results ${dependencyId} status must be success.`);
+    if (dependencyResult.required !== true) failures.push(`${label}.dependency_results ${dependencyId} required must be true.`);
+    if (dependencyResult.downstream_disposition !== "continue") {
+      failures.push(`${label}.dependency_results ${dependencyId} downstream_disposition must be continue.`);
+    }
+  }
+}
+
+function validateRealNodeAdapterMvpPlanNodeAgainstExpected({ planNode, expectedSourceNode, failures }) {
+  const label = "daily codex DAG real-node adapter MVP plan node";
+  if (!isPlainObject(planNode)) return;
+  if (planNode.id !== expectedSourceNode.id) failures.push(`${label}.id must be ${expectedSourceNode.id}.`);
+  if (planNode.kind !== expectedSourceNode.kind) failures.push(`${label}.kind must be ${expectedSourceNode.kind}.`);
+  if (planNode.runner_stage_ref !== expectedSourceNode.runner_stage_ref) {
+    failures.push(`${label}.runner_stage_ref must be ${expectedSourceNode.runner_stage_ref}.`);
+  }
+  if (planNode.parallel_group !== expectedSourceNode.parallel_group) {
+    failures.push(`${label}.parallel_group must be ${expectedSourceNode.parallel_group}.`);
+  }
+  if (planNode.owner_path_scope !== expectedSourceNode.owner_path_scope) {
+    failures.push(`${label}.owner_path_scope must be ${expectedSourceNode.owner_path_scope}.`);
+  }
+  if (planNode.public_artifact !== expectedSourceNode.public_artifact) {
+    failures.push(`${label}.public_artifact must be ${expectedSourceNode.public_artifact}.`);
+  }
+  if (!sameOrderedStringArray(planNode.dependencies, expectedSourceNode.dependencies)) {
+    failures.push(`${label}.dependencies must match the score production contract.`);
+  }
+  if (!sameArtifactArray(planNode.inputs, expectedSourceNode.inputs)) {
+    failures.push(`${label}.inputs must match the score production contract.`);
+  }
+  if (!sameArtifactArray(planNode.outputs, expectedSourceNode.outputs)) {
+    failures.push(`${label}.outputs must match the score production contract.`);
+  }
 }
 
 function validateContractRunNodeResultAgainstPlan({ result, resultByNodeId, planNode, reportDate, runId, failures }) {
@@ -1746,6 +2099,126 @@ function validateExecutableNodeMvpSummary(summary, failures) {
   }
 }
 
+function validateRealNodeAdapterMvpSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "ok",
+      "failures",
+      "warnings",
+      "validation",
+      "mode",
+      "report_date",
+      "generated_at",
+      "run_id",
+      "plan",
+      "run",
+      "node_results",
+      "node_result_validation",
+      "executed_commands",
+      "codex_invocations",
+      "next_action"
+    ],
+    label: "daily codex DAG real-node adapter MVP summary",
+    failures
+  });
+  if (typeof summary.ok !== "boolean") {
+    failures.push("daily codex DAG real-node adapter MVP summary ok must be a boolean.");
+  }
+  if (!Array.isArray(summary.failures)) {
+    failures.push("daily codex DAG real-node adapter MVP summary failures must be an array.");
+  } else {
+    validateMessageArray(summary.failures, "daily codex DAG real-node adapter MVP summary failures", failures);
+    if (summary.ok === true && summary.failures.length !== 0) {
+      failures.push("daily codex DAG real-node adapter MVP summary failures must be empty when ok is true.");
+    }
+    if (summary.ok === false && summary.failures.length === 0) {
+      failures.push("daily codex DAG real-node adapter MVP summary failures must be non-empty when ok is false.");
+    }
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG real-node adapter MVP summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG real-node adapter MVP summary warnings", failures);
+  }
+  if (summary.mode !== REAL_NODE_ADAPTER_MVP_MODE) {
+    failures.push(`daily codex DAG real-node adapter MVP summary mode must be ${REAL_NODE_ADAPTER_MVP_MODE}.`);
+  }
+  if (!isStrictIsoDate(summary.report_date)) {
+    failures.push("daily codex DAG real-node adapter MVP summary report_date must be a real YYYY-MM-DD date.");
+  }
+  if (!isCanonicalIsoTimestamp(summary.generated_at)) {
+    failures.push("daily codex DAG real-node adapter MVP summary generated_at must be a canonical UTC Date#toISOString() string.");
+  }
+  if (!isStableIdentifier(summary.run_id)) {
+    failures.push("daily codex DAG real-node adapter MVP summary run_id must be a stable identifier.");
+  }
+  if (!isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG real-node adapter MVP summary validation must be an object.");
+  } else {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: true,
+      label: "daily codex DAG real-node adapter MVP summary validation",
+      failures
+    });
+  }
+  validateNextActionShape(summary.next_action, failures, "daily codex DAG real-node adapter MVP summary next_action", {
+    allowedKinds: ["wire_multi_node_dag_executor"]
+  });
+  validateRealNodeAdapterMvpExecutedCommands(summary.executed_commands, failures);
+  if (!Array.isArray(summary.codex_invocations) || summary.codex_invocations.length !== 0) {
+    failures.push("daily codex DAG real-node adapter MVP summary codex_invocations must be empty.");
+  }
+
+  const plan = isPlainObject(summary.plan) ? summary.plan : null;
+  const run = isPlainObject(summary.run) ? summary.run : null;
+  if (!plan) failures.push("daily codex DAG real-node adapter MVP summary plan must be an object.");
+  if (!run) failures.push("daily codex DAG real-node adapter MVP summary run must be an object.");
+  if (!Array.isArray(summary.node_results)) failures.push("daily codex DAG real-node adapter MVP summary node_results must be an array.");
+  if (!plan || !run || !Array.isArray(summary.node_results)) return;
+
+  validatePlanShape(plan, failures, { allowNodeExecutable: true });
+  validateRunShape(run, failures);
+  validateContractRunNodeResultValidation(summary.node_result_validation, failures);
+
+  const planNodes = Array.isArray(plan.nodes) ? plan.nodes : null;
+  const planLevels = Array.isArray(plan.levels) ? plan.levels : null;
+  if (!planNodes) failures.push("daily codex DAG real-node adapter MVP summary plan.nodes must be an array.");
+  if (!planLevels) failures.push("daily codex DAG real-node adapter MVP summary plan.levels must be an array.");
+  if (!planNodes || !planLevels) return;
+  if (plan.node_count !== 1 || planNodes.length !== 1 || planNodes[0]?.id !== REAL_NODE_ADAPTER_TARGET_NODE_ID) {
+    failures.push("daily codex DAG real-node adapter MVP summary plan must contain only the score node.");
+  }
+
+  const expectedSourceNode = expectedRealNodeAdapterSourceNode();
+  validateRealNodeAdapterMvpPlanNodeAgainstExpected({
+    planNode: planNodes[0],
+    expectedSourceNode,
+    failures
+  });
+  const planNodeIds = planNodes.map((node) => isPlainObject(node) ? node.id : undefined);
+  validatePlanLevelPartition({ planNodes, planLevels, failures });
+  validateRealNodeAdapterMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures });
+
+  const nodeResultValidation = validateRealNodeAdapterMvpNodeResults({
+    plan,
+    sourceNode: expectedSourceNode,
+    reportDate: summary.report_date,
+    runId: summary.run_id,
+    nodeResults: summary.node_results
+  });
+  failures.push(...nodeResultValidation.failures);
+  if (isPlainObject(summary.node_result_validation)) {
+    if (summary.node_result_validation.ok !== true) {
+      failures.push("daily codex DAG real-node adapter MVP summary node_result_validation.ok must be true.");
+    }
+    if (summary.node_result_validation.checked_results !== summary.node_results.length) {
+      failures.push("daily codex DAG real-node adapter MVP summary node_result_validation.checked_results must equal node_results length.");
+    }
+  }
+}
+
 function validateExecutableNodeMvpExecutedCommands(values, failures) {
   const label = "daily codex DAG executable-node MVP summary executed_commands";
   if (!Array.isArray(values)) {
@@ -1765,6 +2238,27 @@ function validateExecutableNodeMvpExecutedCommands(values, failures) {
   if (command.node_id !== SYNTHETIC_EXECUTABLE_NODE_ID) failures.push(`${label} entry.node_id must be ${SYNTHETIC_EXECUTABLE_NODE_ID}.`);
   if (command.runner !== "node") failures.push(`${label} entry.runner must be node.`);
   if (command.script !== SYNTHETIC_EXECUTABLE_SCRIPT) failures.push(`${label} entry.script must be ${SYNTHETIC_EXECUTABLE_SCRIPT}.`);
+}
+
+function validateRealNodeAdapterMvpExecutedCommands(values, failures) {
+  const label = "daily codex DAG real-node adapter MVP summary executed_commands";
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  if (values.length !== 1) {
+    failures.push(`${label} length must be 1.`);
+    return;
+  }
+  const command = values[0];
+  if (!isPlainObject(command)) {
+    failures.push(`${label} entry must be an object.`);
+    return;
+  }
+  validateExactKeys({ value: command, allowed: ["node_id", "runner", "script"], label: `${label} entry`, failures });
+  if (command.node_id !== REAL_NODE_ADAPTER_TARGET_NODE_ID) failures.push(`${label} entry.node_id must be ${REAL_NODE_ADAPTER_TARGET_NODE_ID}.`);
+  if (command.runner !== "node") failures.push(`${label} entry.runner must be node.`);
+  if (command.script !== REAL_NODE_ADAPTER_SCRIPT) failures.push(`${label} entry.script must be ${REAL_NODE_ADAPTER_SCRIPT}.`);
 }
 
 function validateExecutableNodeMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures }) {
@@ -1791,6 +2285,34 @@ function validateExecutableNodeMvpRunSemantics({ summary, run, planLevels, planN
     const expectedNodeStatus = summary.ok === true ? "success" : "failure";
     if (nodeResult.status !== expectedNodeStatus) {
       failures.push(`daily codex DAG executable-node MVP summary node result status must be ${expectedNodeStatus}.`);
+    }
+  }
+}
+
+function validateRealNodeAdapterMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures }) {
+  if (!sameOrderedStringArray(run.planned_nodes, planNodeIds)) {
+    failures.push("daily codex DAG real-node adapter MVP summary run.planned_nodes must equal plan.nodes ids.");
+  }
+  if (!levelsMatch(run.levels, planLevels)) {
+    failures.push("daily codex DAG real-node adapter MVP summary run.levels must equal plan.levels.");
+  }
+  const expectedCompleted = summary.ok === true ? [REAL_NODE_ADAPTER_TARGET_NODE_ID] : [];
+  const expectedBlocked = summary.ok === true ? [] : [REAL_NODE_ADAPTER_TARGET_NODE_ID];
+  const expectedStatus = summary.ok === true ? "executed_one_real_node" : "blocked";
+  if (run.final_status !== expectedStatus) {
+    failures.push(`daily codex DAG real-node adapter MVP summary run.final_status must be ${expectedStatus}.`);
+  }
+  if (!sameOrderedStringArray(run.completed_nodes, expectedCompleted)) {
+    failures.push("daily codex DAG real-node adapter MVP summary run.completed_nodes must match node execution status.");
+  }
+  if (!sameOrderedStringArray(run.blocked_nodes, expectedBlocked)) {
+    failures.push("daily codex DAG real-node adapter MVP summary run.blocked_nodes must match node execution status.");
+  }
+  const nodeResult = Array.isArray(summary.node_results) ? summary.node_results[0] : null;
+  if (isPlainObject(nodeResult)) {
+    const expectedNodeStatus = summary.ok === true ? "success" : "failure";
+    if (nodeResult.status !== expectedNodeStatus) {
+      failures.push(`daily codex DAG real-node adapter MVP summary node result status must be ${expectedNodeStatus}.`);
     }
   }
 }

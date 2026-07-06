@@ -4,7 +4,8 @@ import path from "node:path";
 import {
   createDailyCodexDagContractRun,
   createDailyCodexDagDryRun,
-  createDailyCodexDagExecutableNodeMvp
+  createDailyCodexDagExecutableNodeMvp,
+  createDailyCodexDagRealNodeAdapterMvp
 } from "../src/daily-codex-dag.js";
 
 function parseArgs(argv) {
@@ -12,10 +13,12 @@ function parseArgs(argv) {
     dryRun: false,
     contractRun: false,
     executeNodeFixture: false,
+    executeRealNodeFixture: false,
     execute: false,
     publish: false,
     json: false,
     date: "",
+    node: "",
     summaryPath: ""
   };
 
@@ -27,6 +30,8 @@ function parseArgs(argv) {
       args.contractRun = true;
     } else if (arg === "--execute-node-fixture") {
       args.executeNodeFixture = true;
+    } else if (arg === "--execute-real-node-fixture") {
+      args.executeRealNodeFixture = true;
     } else if (arg === "--execute") {
       args.execute = true;
     } else if (arg === "--publish") {
@@ -36,6 +41,12 @@ function parseArgs(argv) {
     } else if (arg === "--date") {
       index += 1;
       args.date = argv[index] || "";
+    } else if (arg === "--node") {
+      index += 1;
+      args.node = argv[index] || "";
+      if (!args.node || args.node.startsWith("--")) {
+        throw new Error("daily codex DAG CLI requires --node value");
+      }
     } else if (arg === "--summary-path") {
       index += 1;
       args.summaryPath = argv[index] || "";
@@ -47,15 +58,15 @@ function parseArgs(argv) {
     }
   }
 
-  const modeCount = [args.dryRun, args.contractRun, args.executeNodeFixture].filter(Boolean).length;
+  const modeCount = [args.dryRun, args.contractRun, args.executeNodeFixture, args.executeRealNodeFixture].filter(Boolean).length;
   if (modeCount === 0) {
-    throw new Error("daily codex DAG CLI requires one of --dry-run, --contract-run, or --execute-node-fixture");
+    throw new Error("daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, or --execute-real-node-fixture");
   }
-  if (args.dryRun && args.contractRun && !args.executeNodeFixture) {
+  if (args.dryRun && args.contractRun && !args.executeNodeFixture && !args.executeRealNodeFixture) {
     throw new Error("daily codex DAG CLI cannot combine --dry-run and --contract-run");
   }
   if (modeCount > 1) {
-    throw new Error("daily codex DAG CLI cannot combine --dry-run, --contract-run, and --execute-node-fixture");
+    throw new Error("daily codex DAG CLI cannot combine --dry-run, --contract-run, --execute-node-fixture, and --execute-real-node-fixture");
   }
   if (args.dryRun && (args.execute || args.publish)) {
     throw new Error(`Unsupported argument: ${args.execute ? "--execute" : "--publish"}`);
@@ -65,6 +76,12 @@ function parseArgs(argv) {
   }
   if (args.executeNodeFixture && (args.execute || args.publish)) {
     throw new Error("daily codex DAG CLI execute-node fixture does not support --execute or --publish");
+  }
+  if (args.executeRealNodeFixture && (args.execute || args.publish)) {
+    throw new Error("daily codex DAG CLI execute-real-node fixture does not support --execute or --publish");
+  }
+  if (!args.executeRealNodeFixture && args.node) {
+    throw new Error("daily codex DAG CLI --node is only supported with --execute-real-node-fixture");
   }
   if (!args.json) {
     throw new Error("daily codex DAG CLI requires --json");
@@ -104,7 +121,9 @@ async function main() {
       ? await createDailyCodexDagContractRun({ reportDate: args.date })
       : args.executeNodeFixture
         ? await createDailyCodexDagExecutableNodeMvp({ reportDate: args.date })
-        : await createDailyCodexDagDryRun({ reportDate: args.date });
+        : args.executeRealNodeFixture
+          ? await createDailyCodexDagRealNodeAdapterMvp({ reportDate: args.date, nodeId: args.node || "score" })
+          : await createDailyCodexDagDryRun({ reportDate: args.date });
     if (result.ok) {
       await writeSummaryFile(summaryPath, result);
     }

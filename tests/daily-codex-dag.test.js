@@ -11,6 +11,7 @@ import {
   createDailyCodexDagNodeResult,
   createDailyCodexDagDryRun,
   createDailyCodexDagExecutableNodeMvp,
+  createDailyCodexDagRealNodeAdapterMvp,
   createDailyCodexDagPlan,
   executeDailyCodexDagCommandNode,
   resolveDailyCodexDagCodexRuntimePlan,
@@ -1206,6 +1207,180 @@ test("daily codex DAG executable-node MVP records structured artifact failure wh
   await removeExecutableNodeFixtureArtifacts();
 });
 
+test("daily codex DAG real-node adapter MVP runs score fixture and emits a valid run summary", async () => {
+  await removeRealNodeAdapterFixtureArtifacts();
+  const result = await createDailyCodexDagRealNodeAdapterMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath
+  });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.mode, "daily_codex_dag_real_node_adapter_mvp");
+  assert.equal(result.run.final_status, "executed_one_real_node");
+  assert.deepEqual(result.run.planned_nodes, ["score"]);
+  assert.deepEqual(result.run.completed_nodes, ["score"]);
+  assert.deepEqual(result.run.blocked_nodes, []);
+  assert.equal(result.plan.node_count, 1);
+  assert.equal(result.plan.nodes[0].id, "score");
+  assert.deepEqual(result.plan.nodes[0].dependencies, ["classify-tag-entity"]);
+  assert.equal(result.plan.nodes[0].execution_contract.readiness, "node_executable");
+  assert.equal(Object.hasOwn(result.plan.nodes[0].execution_contract, "node_execution_spec"), false);
+  assert.equal(result.node_results.length, 1);
+  assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
+  const nodeResult = result.node_results[0];
+  assert.equal(nodeResult.status, "success");
+  assert.equal(nodeResult.node_id, "score");
+  assert.equal(nodeResult.node_kind, "command");
+  assert.equal(nodeResult.runner_stage_ref, "admit");
+  assert.deepEqual(nodeResult.dependency_results.map((item) => item.node_id), ["classify-tag-entity"]);
+  assert.equal(nodeResult.dependency_results[0].status, "success");
+  assert.equal(nodeResult.audit.parallel_group, "item-lanes");
+  assert.equal(nodeResult.declared_inputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/classified-candidates.json");
+  assert.equal(nodeResult.declared_outputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/scored-candidates.json");
+  assert.equal(nodeResult.resolved_inputs.length, 1);
+  assert.equal(nodeResult.resolved_outputs.length, 1);
+  assert.equal(nodeResult.resolved_inputs[0].path, nodeResult.declared_inputs[0].path);
+  assert.equal(nodeResult.resolved_outputs[0].path, nodeResult.declared_outputs[0].path);
+  assertResolvedArtifactMetadata(nodeResult.resolved_inputs[0]);
+  assertResolvedArtifactMetadata(nodeResult.resolved_outputs[0]);
+  assert.equal(Object.hasOwn(nodeResult, "stdout"), false);
+  assert.equal(Object.hasOwn(nodeResult, "stderr"), false);
+  assert.deepEqual(result.executed_commands, [{
+    node_id: "score",
+    runner: "node",
+    script: "scripts/replay-daily-codex-dag-node-fixture.mjs"
+  }]);
+  assert.equal(result.codex_invocations.length, 0);
+
+  await assertValidDagNodeResult(nodeResult);
+  await assertValidDagRunSummary(result);
+
+  const manifest = await loadManifest();
+  assert.equal(
+    manifest.nodes.some((item) => Object.hasOwn(item.execution_contract || {}, "node_execution_spec")),
+    false,
+    "production manifest must remain untouched by real-node adapter MVP"
+  );
+  await removeRealNodeAdapterFixtureArtifacts();
+});
+
+test("daily codex DAG real-node adapter MVP records structured artifact failure when output is missing", async () => {
+  await removeRealNodeAdapterFixtureArtifacts();
+  const result = await createDailyCodexDagRealNodeAdapterMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath,
+    executeCommand: async () => ({
+      exitCode: 0,
+      signal: null,
+      stdout: "SECRET stdout payload",
+      stderr: "SECRET stderr payload",
+      errorMessage: ""
+    })
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.mode, "daily_codex_dag_real_node_adapter_mvp");
+  assert.equal(result.run.final_status, "blocked");
+  assert.deepEqual(result.run.completed_nodes, []);
+  assert.deepEqual(result.run.blocked_nodes, ["score"]);
+  assert.equal(result.node_results.length, 1);
+  assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
+  const nodeResult = result.node_results[0];
+  assert.equal(nodeResult.node_id, "score");
+  assert.equal(nodeResult.status, "failure");
+  assert.equal(nodeResult.downstream_disposition, "block");
+  assert.equal(nodeResult.failures[0].code, "required_output_artifact_missing");
+  assert.equal(nodeResult.resolved_inputs[0].exists, true);
+  assert.equal(nodeResult.resolved_inputs[0].schema_valid, true);
+  assert.equal(nodeResult.resolved_outputs[0].exists, false);
+  assert.equal(nodeResult.resolved_outputs[0].schema_valid, false);
+  assert.equal(Object.hasOwn(nodeResult, "stdout"), false);
+  assert.equal(Object.hasOwn(nodeResult, "stderr"), false);
+  assert.equal(JSON.stringify(result).includes("SECRET"), false);
+
+  await assertValidDagNodeResult(nodeResult);
+  await assertValidDagRunSummary(result);
+  await removeRealNodeAdapterFixtureArtifacts();
+});
+
+test("daily codex DAG real-node adapter MVP records structured artifact failure when output JSON is malformed", async () => {
+  await removeRealNodeAdapterFixtureArtifacts();
+  const result = await createDailyCodexDagRealNodeAdapterMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath,
+    executeCommand: async ({ runtime_plan }) => {
+      const outputPathIndex = runtime_plan.argv_tail.indexOf("--output");
+      const outputPath = runtime_plan.argv_tail[outputPathIndex + 1];
+      const absoluteOutputPath = path.resolve(rootDir, outputPath);
+      await fs.mkdir(path.dirname(absoluteOutputPath), { recursive: true });
+      await fs.writeFile(absoluteOutputPath, "{", "utf8");
+      return {
+        exitCode: 0,
+        signal: null,
+        stdout: "SECRET stdout payload",
+        stderr: "SECRET stderr payload",
+        errorMessage: ""
+      };
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.run.final_status, "blocked");
+  const nodeResult = result.node_results[0];
+  assert.equal(nodeResult.status, "failure");
+  assert.equal(nodeResult.failures[0].code, "required_output_artifact_invalid");
+  assert.equal(nodeResult.resolved_outputs[0].exists, true);
+  assert.equal(nodeResult.resolved_outputs[0].schema_valid, false);
+  assert(Number.isInteger(nodeResult.resolved_outputs[0].bytes) && nodeResult.resolved_outputs[0].bytes > 0);
+  assert.match(nodeResult.resolved_outputs[0].sha256, /^[a-f0-9]{64}$/);
+  assert.equal(Object.hasOwn(nodeResult, "stdout"), false);
+  assert.equal(Object.hasOwn(nodeResult, "stderr"), false);
+  assert.equal(JSON.stringify(result).includes("SECRET"), false);
+
+  await assertValidDagNodeResult(nodeResult);
+  await assertValidDagRunSummary(result);
+  await removeRealNodeAdapterFixtureArtifacts();
+});
+
+test("daily codex DAG real-node adapter MVP summary validation pins the score production contract", async () => {
+  await removeRealNodeAdapterFixtureArtifacts();
+  const result = await createDailyCodexDagRealNodeAdapterMvp({
+    rootDir,
+    reportDate: "2026-07-03",
+    now: fixedNow,
+    startedAt: "2026-07-03T08:00:00.000Z",
+    finishedAt: "2026-07-03T08:00:01.000Z",
+    nodeExecutablePath: process.execPath
+  });
+  assert.equal(result.ok, true, result.failures.join("\n"));
+
+  const tampered = structuredCloneJson(result);
+  const replacementInput = ".tmp/daily-codex-pipeline/{report_date}/artifacts/other-candidates.json";
+  tampered.plan.nodes[0].inputs[0].path = replacementInput;
+  tampered.node_results[0].declared_inputs[0].path = replacementInput;
+  tampered.node_results[0].resolved_inputs[0].path = replacementInput;
+
+  await assertInvalidDagRunSummary(tampered);
+  assertInvalidSemanticDagRunSummary(
+    tampered,
+    "real-node adapter MVP plan node.inputs must match the score production contract",
+    "tampered score adapter summary"
+  );
+  await removeRealNodeAdapterFixtureArtifacts();
+});
+
 test("daily codex DAG dry-run helper is deterministic and level ordered", async () => {
   const manifest = await loadManifest();
   const first = await createDailyCodexDagDryRun({
@@ -2096,7 +2271,10 @@ test("daily codex DAG dry-run CLI rejects invalid invocations with structured JS
   assert.equal(missingDryRun.code, 1);
   assert.equal(missingDryRun.stderr, "");
   const missingDryRunJson = JSON.parse(missingDryRun.stdout);
-  assert.equal(missingDryRunJson.failures[0], "daily codex DAG CLI requires one of --dry-run, --contract-run, or --execute-node-fixture");
+  assert.equal(
+    missingDryRunJson.failures[0],
+    "daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, or --execute-real-node-fixture"
+  );
   assert.equal(missingDryRunJson.validation, null);
   await assertValidDagRunSummary(missingDryRunJson);
 
@@ -2155,6 +2333,38 @@ test("daily codex DAG executable-node MVP CLI writes JSON to stdout only", async
   assert.deepEqual(forbiddenAfter.docsReports, forbiddenBefore.docsReports, "stdout-only executable-node MVP must not mutate docs reports");
   assert.deepEqual(forbiddenAfter.reportsData, forbiddenBefore.reportsData, "stdout-only executable-node MVP must not mutate reports data");
   await removeExecutableNodeFixtureArtifacts();
+});
+
+test("daily codex DAG real-node adapter MVP CLI writes JSON to stdout only", async () => {
+  await removeRealNodeAdapterFixtureArtifacts();
+  const forbiddenBefore = await forbiddenPathSnapshot();
+  const result = await runDagCli(["--execute-real-node-fixture", "--node", "score", "--date", "2026-07-03", "--json"]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, true, parsed.failures?.join("\n"));
+  assert.equal(parsed.mode, "daily_codex_dag_real_node_adapter_mvp");
+  assert.equal(parsed.report_date, "2026-07-03");
+  assert.equal(parsed.run.final_status, "executed_one_real_node");
+  assert.deepEqual(parsed.run.completed_nodes, ["score"]);
+  assert.equal(parsed.node_results.length, 1);
+  assert.equal(parsed.node_results[0].mode, "daily_codex_dag_node_result");
+  assert.equal(parsed.node_results[0].node_id, "score");
+  assert.equal(parsed.node_results[0].status, "success");
+  assert.equal(parsed.node_results[0].dependency_results[0].node_id, "classify-tag-entity");
+  assert.equal(parsed.node_results[0].resolved_inputs.length, 1);
+  assert.equal(parsed.node_results[0].resolved_outputs.length, 1);
+  assertResolvedArtifactMetadata(parsed.node_results[0].resolved_inputs[0]);
+  assertResolvedArtifactMetadata(parsed.node_results[0].resolved_outputs[0]);
+  assert.equal(Object.hasOwn(parsed.node_results[0], "stdout"), false);
+  assert.equal(Object.hasOwn(parsed.node_results[0], "stderr"), false);
+  assert.equal(JSON.stringify(parsed).includes("SECRET"), false);
+  await assertValidDagRunSummary(parsed);
+  const forbiddenAfter = await forbiddenPathSnapshot();
+  assert.deepEqual(forbiddenAfter.docsReports, forbiddenBefore.docsReports, "stdout-only real-node adapter MVP must not mutate docs reports");
+  assert.deepEqual(forbiddenAfter.reportsData, forbiddenBefore.reportsData, "stdout-only real-node adapter MVP must not mutate reports data");
+  await removeRealNodeAdapterFixtureArtifacts();
 });
 
 test("daily codex DAG executable-node MVP CLI writes opt-in summaries under .tmp only", async () => {
@@ -3328,6 +3538,15 @@ async function pathExists(filePath) {
 async function removeExecutableNodeFixtureArtifacts() {
   await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", "executable-node-mvp"), {
     recursive: true,
+    force: true
+  });
+}
+
+async function removeRealNodeAdapterFixtureArtifacts(reportDate = "2026-07-03") {
+  await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "classified-candidates.json"), {
+    force: true
+  });
+  await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "scored-candidates.json"), {
     force: true
   });
 }
