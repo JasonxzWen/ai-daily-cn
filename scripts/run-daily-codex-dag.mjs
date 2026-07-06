@@ -8,6 +8,7 @@ import {
   createDailyCodexDagRealNodeAdapterMvp,
   createDailyCodexDagSourceWatchCollectMvp,
   createDailyCodexDagSourceWatchDownstreamMvp,
+  createDailyCodexDagSourceWatchNormalizeMvp,
   createDailyCodexDagTwoNodeFixtureMvp
 } from "../src/daily-codex-dag.js";
 
@@ -19,6 +20,7 @@ function parseArgs(argv) {
     executeRealNodeFixture: false,
     executeSourceWatchFixture: false,
     executeSourceWatchDownstreamFixture: false,
+    executeSourceWatchNormalizeFixture: false,
     executeTwoNodeFixture: false,
     execute: false,
     publish: false,
@@ -42,6 +44,8 @@ function parseArgs(argv) {
       args.executeSourceWatchFixture = true;
     } else if (arg === "--execute-source-watch-downstream-fixture") {
       args.executeSourceWatchDownstreamFixture = true;
+    } else if (arg === "--execute-source-watch-normalize-fixture") {
+      args.executeSourceWatchNormalizeFixture = true;
     } else if (arg === "--execute-two-node-fixture") {
       args.executeTwoNodeFixture = true;
     } else if (arg === "--execute") {
@@ -77,16 +81,17 @@ function parseArgs(argv) {
     args.executeRealNodeFixture,
     args.executeSourceWatchFixture,
     args.executeSourceWatchDownstreamFixture,
+    args.executeSourceWatchNormalizeFixture,
     args.executeTwoNodeFixture
   ].filter(Boolean).length;
   if (modeCount === 0) {
-    throw new Error("daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, or --execute-two-node-fixture");
+    throw new Error("daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, or --execute-two-node-fixture");
   }
-  if (args.dryRun && args.contractRun && !args.executeNodeFixture && !args.executeRealNodeFixture && !args.executeSourceWatchFixture && !args.executeSourceWatchDownstreamFixture && !args.executeTwoNodeFixture) {
+  if (args.dryRun && args.contractRun && !args.executeNodeFixture && !args.executeRealNodeFixture && !args.executeSourceWatchFixture && !args.executeSourceWatchDownstreamFixture && !args.executeSourceWatchNormalizeFixture && !args.executeTwoNodeFixture) {
     throw new Error("daily codex DAG CLI cannot combine --dry-run and --contract-run");
   }
   if (modeCount > 1) {
-    throw new Error("daily codex DAG CLI cannot combine --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, and --execute-two-node-fixture");
+    throw new Error("daily codex DAG CLI cannot combine --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, and --execute-two-node-fixture");
   }
   if (args.dryRun && (args.execute || args.publish)) {
     throw new Error(`Unsupported argument: ${args.execute ? "--execute" : "--publish"}`);
@@ -105,6 +110,9 @@ function parseArgs(argv) {
   }
   if (args.executeSourceWatchDownstreamFixture && (args.execute || args.publish)) {
     throw new Error("daily codex DAG CLI execute-source-watch-downstream fixture does not support --execute or --publish");
+  }
+  if (args.executeSourceWatchNormalizeFixture && (args.execute || args.publish)) {
+    throw new Error("daily codex DAG CLI execute-source-watch-normalize fixture does not support --execute or --publish");
   }
   if (args.executeTwoNodeFixture && (args.execute || args.publish)) {
     throw new Error("daily codex DAG CLI execute-two-node fixture does not support --execute or --publish");
@@ -156,9 +164,11 @@ async function main() {
             ? await createDailyCodexDagSourceWatchCollectMvp({ reportDate: args.date })
             : args.executeSourceWatchDownstreamFixture
               ? await createDailyCodexDagSourceWatchDownstreamMvp({ reportDate: args.date })
-              : args.executeTwoNodeFixture
-                ? await createDailyCodexDagTwoNodeFixtureMvp({ reportDate: args.date })
-                : await createDailyCodexDagDryRun({ reportDate: args.date });
+              : args.executeSourceWatchNormalizeFixture
+                ? await createDailyCodexDagSourceWatchNormalizeMvp({ reportDate: args.date })
+                : args.executeTwoNodeFixture
+                  ? await createDailyCodexDagTwoNodeFixtureMvp({ reportDate: args.date })
+                  : await createDailyCodexDagDryRun({ reportDate: args.date });
     if (result.ok) {
       await writeSummaryFile(summaryPath, result);
     }
