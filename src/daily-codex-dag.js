@@ -14,7 +14,9 @@ const NODE_KINDS = ["command", "codex_exec", "fanout", "barrier"];
 const EXECUTION_READINESS_VALUES = ["planned_only", "legacy_mapped", "node_executable"];
 const EXECUTABLE_NODE_MVP_MODE = "daily_codex_dag_executable_node_mvp";
 const SYNTHETIC_EXECUTABLE_NODE_ID = "synthetic-command-node";
-const SYNTHETIC_EXECUTABLE_SCRIPT = "scripts/validate-daily-codex-dag.mjs";
+const SYNTHETIC_EXECUTABLE_SCRIPT = "scripts/run-daily-codex-dag.mjs";
+const SYNTHETIC_EXECUTABLE_INPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/input.json";
+const SYNTHETIC_EXECUTABLE_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/dry-run-summary.json";
 
 const REQUIRED_NODE_IDS = [
   "fetch-source-health",
@@ -563,7 +565,7 @@ export async function createDailyCodexDagExecutableNodeMvp(options = {}) {
   const reportDate = requiredReportDate(options.reportDate || options.date);
   const generatedAt = toIsoTimestamp(options.now || new Date());
   const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}:executable-node-mvp`;
-  const manifest = createSyntheticExecutableNodeManifest();
+  const manifest = createSyntheticExecutableNodeManifest({ reportDate });
   const executableNode = manifest.nodes[0];
   const plan = projectDailyCodexDagPlan(manifest);
   const validation = {
@@ -573,6 +575,8 @@ export async function createDailyCodexDagExecutableNodeMvp(options = {}) {
     node_ids: [SYNTHETIC_EXECUTABLE_NODE_ID],
     checked_files: []
   };
+
+  await prepareSyntheticExecutableArtifacts({ rootDir, reportDate });
 
   const execution = await executeDailyCodexDagCommandNode({
     rootDir,
@@ -625,8 +629,8 @@ export async function createDailyCodexDagExecutableNodeMvp(options = {}) {
     }],
     codex_invocations: [],
     next_action: {
-      kind: "implement_artifact_io_contract",
-      message: "Executable-node MVP ran one synthetic command node; next add explicit artifact input/output contracts."
+      kind: "implement_real_dag_node_adapter",
+      message: "Executable-node MVP ran one synthetic command node with explicit artifact input/output contracts; next adapt one real low-risk DAG node."
     }
   };
 }
@@ -995,16 +999,23 @@ function validateContractRunNodeResults({ plan, reportDate, runId, nodeResults }
   return nodeResultValidationSummary({ failures, warnings, checkedResults: nodeResults.length });
 }
 
-function createSyntheticExecutableNodeManifest() {
+function createSyntheticExecutableNodeManifest({ reportDate } = {}) {
   return {
     schema_version: 1,
     name: "daily-codex-dag-contract",
-    description: "Synthetic executable-node MVP fixture.",
-    nodes: [createSyntheticExecutableCommandNode()]
+    description: "Synthetic executable-node MVP artifact I/O fixture.",
+    nodes: [createSyntheticExecutableCommandNode({ reportDate })]
   };
 }
 
-function createSyntheticExecutableCommandNode() {
+function createSyntheticExecutableCommandNode({ reportDate } = {}) {
+  const inputArtifacts = [{ path: SYNTHETIC_EXECUTABLE_INPUT_ARTIFACT, required: true }];
+  const outputArtifacts = [{ path: SYNTHETIC_EXECUTABLE_OUTPUT_ARTIFACT, required: true }];
+  const outputArtifactPath = materializeArtifactPath({
+    templatePath: SYNTHETIC_EXECUTABLE_OUTPUT_ARTIFACT,
+    reportDate
+  });
+
   return {
     id: SYNTHETIC_EXECUTABLE_NODE_ID,
     title: "Synthetic command node",
@@ -1012,27 +1023,55 @@ function createSyntheticExecutableCommandNode() {
     execution_status: "planned",
     execution_contract: {
       readiness: "node_executable",
-      summary: "Synthetic command fixture for executable-node MVP.",
+      summary: "Synthetic command fixture for executable-node MVP artifact I/O.",
       node_execution_spec: {
         executor: "command",
         cwd: ".",
         timeout_seconds: 30,
         invocation: {
           kind: "command",
-          argv: ["node", SYNTHETIC_EXECUTABLE_SCRIPT]
+          argv: [
+            "node",
+            SYNTHETIC_EXECUTABLE_SCRIPT,
+            "--dry-run",
+            "--date",
+            reportDate,
+            "--json",
+            "--summary-path",
+            outputArtifactPath
+          ]
         },
-        inputs: [],
-        outputs: []
+        inputs: inputArtifacts,
+        outputs: outputArtifacts
       }
     },
     dependencies: [],
-    inputs: [],
-    outputs: [],
-    runner_stage_ref: "synthetic:validate-dag",
+    inputs: inputArtifacts,
+    outputs: outputArtifacts,
+    runner_stage_ref: "synthetic:artifact-io",
     parallel_group: "mvp-fixture",
     public_artifact: false,
     owner_path_scope: "internal_workdir"
   };
+}
+
+async function prepareSyntheticExecutableArtifacts({ rootDir, reportDate }) {
+  const inputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: SYNTHETIC_EXECUTABLE_INPUT_ARTIFACT,
+    reportDate
+  }));
+  const outputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: SYNTHETIC_EXECUTABLE_OUTPUT_ARTIFACT,
+    reportDate
+  }));
+  await fs.mkdir(path.dirname(inputPath), { recursive: true });
+  await fs.writeFile(inputPath, `${JSON.stringify({
+    schema_version: 1,
+    mode: "daily_codex_dag_executable_node_mvp_input",
+    report_date: reportDate,
+    node_id: SYNTHETIC_EXECUTABLE_NODE_ID
+  }, null, 2)}\n`, "utf8");
+  await fs.rm(outputPath, { force: true });
 }
 
 function validateExecutableNodeMvpNodeResults({ plan, reportDate, runId, nodeResults }) {
@@ -1658,7 +1697,7 @@ function validateExecutableNodeMvpSummary(summary, failures) {
     });
   }
   validateNextActionShape(summary.next_action, failures, "daily codex DAG executable-node MVP summary next_action", {
-    allowedKinds: ["implement_artifact_io_contract"]
+    allowedKinds: ["implement_real_dag_node_adapter"]
   });
   validateExecutableNodeMvpExecutedCommands(summary.executed_commands, failures);
   if (!Array.isArray(summary.codex_invocations) || summary.codex_invocations.length !== 0) {

@@ -504,6 +504,29 @@
         "required": { "type": "boolean" }
       }
     },
+    "resolved_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "required", "exists", "schema_valid", "bytes", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" },
+        "exists": { "type": "boolean" },
+        "schema_valid": { "type": "boolean" },
+        "bytes": {
+          "anyOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "sha256": {
+          "anyOf": [
+            { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
     "next_action": {
       "type": "object",
       "additionalProperties": false,
@@ -518,7 +541,7 @@
       "additionalProperties": false,
       "required": ["kind", "message"],
       "properties": {
-        "kind": { "const": "implement_artifact_io_contract" },
+        "kind": { "const": "implement_real_dag_node_adapter" },
         "message": { "type": "string", "minLength": 1 }
       }
     },
@@ -682,19 +705,27 @@
         },
         "declared_inputs": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": { "$ref": "#/$defs/artifact" }
         },
         "declared_outputs": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
           "items": { "$ref": "#/$defs/artifact" }
         },
         "resolved_inputs": {
           "type": "array",
-          "maxItems": 0
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/resolved_artifact" }
         },
         "resolved_outputs": {
           "type": "array",
-          "maxItems": 0
+          "minItems": 1,
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/resolved_artifact" }
         },
         "fanout": { "type": "null" },
         "barrier": { "type": "null" },
@@ -748,7 +779,7 @@
       "properties": {
         "node_id": { "const": "synthetic-command-node" },
         "runner": { "const": "node" },
-        "script": { "const": "scripts/validate-daily-codex-dag.mjs" }
+        "script": { "const": "scripts/run-daily-codex-dag.mjs" }
       }
     },
     "contract_dependency_result": {
