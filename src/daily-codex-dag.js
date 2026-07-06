@@ -16,6 +16,7 @@ const EXECUTABLE_NODE_MVP_MODE = "daily_codex_dag_executable_node_mvp";
 const REAL_NODE_ADAPTER_MVP_MODE = "daily_codex_dag_real_node_adapter_mvp";
 const TWO_NODE_FIXTURE_MVP_MODE = "daily_codex_dag_two_node_fixture_mvp";
 const SOURCE_WATCH_COLLECT_MVP_MODE = "daily_codex_dag_source_watch_collect_mvp";
+const SOURCE_WATCH_DOWNSTREAM_MVP_MODE = "daily_codex_dag_source_watch_downstream_mvp";
 const SYNTHETIC_EXECUTABLE_NODE_ID = "synthetic-command-node";
 const SYNTHETIC_EXECUTABLE_SCRIPT = "scripts/run-daily-codex-dag.mjs";
 const SYNTHETIC_EXECUTABLE_INPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/input.json";
@@ -23,6 +24,9 @@ const SYNTHETIC_EXECUTABLE_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executab
 const SOURCE_WATCH_COLLECT_NODE_ID = "fetch-source-health";
 const SOURCE_WATCH_COLLECT_SCRIPT = "scripts/run-source-watch-collect-fixture.mjs";
 const SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json";
+const SOURCE_WATCH_DOWNSTREAM_NODE_ID = "parse-extract";
+const SOURCE_WATCH_DOWNSTREAM_SCRIPT = "scripts/run-source-watch-downstream-fixture.mjs";
+const SOURCE_WATCH_DOWNSTREAM_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json";
 const SOURCE_WATCH_FIXTURE_CONFIG = "tests/fixtures/source-watch/source-watchlist.json";
 const SOURCE_WATCH_FIXTURE_DIR = "tests/fixtures/source-watch";
 const REAL_NODE_ADAPTER_TARGET_NODE_ID = "score";
@@ -918,6 +922,244 @@ export async function createDailyCodexDagSourceWatchCollectMvp(options = {}) {
   return summary;
 }
 
+export async function createDailyCodexDagSourceWatchDownstreamMvp(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const reportDate = requiredReportDate(options.reportDate || options.date);
+  const generatedAt = toIsoTimestamp(options.now || new Date());
+  const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}:source-watch-downstream`;
+
+  let manifest = null;
+  try {
+    const loaded = await loadDailyCodexDag({ rootDir, dagPath: options.dagPath });
+    manifest = loaded.manifest;
+  } catch (error) {
+    return {
+      ok: false,
+      failures: [`${DEFAULT_DAG_PATH}: ${error.message}`],
+      warnings: [],
+      validation: null,
+      plan: null,
+      run: null
+    };
+  }
+
+  const validation = await validateDailyCodexDag({ rootDir, dagPath: options.dagPath, manifest });
+  if (!validation.ok) {
+    return {
+      ok: false,
+      failures: validation.failures,
+      warnings: validation.warnings,
+      validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const collectSourceNode = manifest.nodes.find((node) => node.id === SOURCE_WATCH_COLLECT_NODE_ID);
+  const downstreamSourceNode = manifest.nodes.find((node) => node.id === SOURCE_WATCH_DOWNSTREAM_NODE_ID);
+  const missingNodeId = !collectSourceNode
+    ? SOURCE_WATCH_COLLECT_NODE_ID
+    : !downstreamSourceNode
+      ? SOURCE_WATCH_DOWNSTREAM_NODE_ID
+      : "";
+  if (missingNodeId) {
+    return {
+      ok: false,
+      failures: [`daily codex DAG source-watch downstream MVP missing node ${missingNodeId}.`],
+      warnings: validation.warnings,
+      validation,
+      plan: null,
+      run: null
+    };
+  }
+
+  const executableNodes = [
+    createSourceWatchCollectCommandNode({
+      sourceNode: collectSourceNode,
+      reportDate,
+      generatedAt,
+      watchlistPath: options.watchlistPath || options.watchlist_path || SOURCE_WATCH_FIXTURE_CONFIG,
+      fixtureDir: options.fixtureDir || options.fixture_dir || SOURCE_WATCH_FIXTURE_DIR,
+      endpointLimit: options.endpointLimit || options.endpoint_limit || null
+    }),
+    createSourceWatchDownstreamCommandNode({
+      sourceNode: downstreamSourceNode,
+      reportDate,
+      dependencies: [SOURCE_WATCH_COLLECT_NODE_ID]
+    })
+  ];
+  const fixtureManifest = {
+    schema_version: manifest.schema_version,
+    name: manifest.name,
+    description: "Fixture-only executable adapter for the Source Watch collect-to-parse DAG sequence.",
+    nodes: executableNodes
+  };
+  const plan = projectDailyCodexDagPlan(fixtureManifest);
+
+  await prepareSourceWatchDownstreamFixtureArtifacts({ rootDir, reportDate, collectSourceNode, downstreamSourceNode });
+
+  const nodeResults = [];
+  const executionFailures = [];
+  const executedCommands = [];
+  const nodeExecutablePath = options.nodeExecutablePath || options.node_executable_path || process.execPath;
+  const collectExecution = await executeDailyCodexDagCommandNode({
+    rootDir,
+    reportDate,
+    runId,
+    manifestName: manifest.name,
+    manifestSchemaVersion: manifest.schema_version,
+    node: executableNodes[0],
+    nodeExecutablePath,
+    executeCommand: options.executeCommand,
+    startedAt: options.startedAt ?? options.started_at,
+    finishedAt: options.finishedAt ?? options.finished_at,
+    timeoutSeconds: options.timeoutSeconds ?? options.timeout_seconds,
+    dependencyResults: [],
+    resiliencePolicyRef: collectSourceNode.resilience_policy_ref || ""
+  });
+  executionFailures.push(...collectExecution.failures);
+  if (collectExecution.result) nodeResults.push(collectExecution.result);
+  executedCommands.push({
+    node_id: SOURCE_WATCH_COLLECT_NODE_ID,
+    runner: "node",
+    script: SOURCE_WATCH_COLLECT_SCRIPT
+  });
+
+  const collectSucceeded = collectExecution.ok && collectExecution.result?.status === "success";
+  if (collectSucceeded) {
+    const downstreamExecution = await executeDailyCodexDagCommandNode({
+      rootDir,
+      reportDate,
+      runId,
+      manifestName: manifest.name,
+      manifestSchemaVersion: manifest.schema_version,
+      node: executableNodes[1],
+      nodeExecutablePath,
+      executeCommand: options.executeCommand,
+      startedAt: options.startedAt ?? options.started_at,
+      finishedAt: options.finishedAt ?? options.finished_at,
+      timeoutSeconds: options.timeoutSeconds ?? options.timeout_seconds,
+      dependencyResults: [dependencyResultFromNodeResult(collectExecution.result)],
+      resiliencePolicyRef: downstreamSourceNode.resilience_policy_ref || ""
+    });
+    executionFailures.push(...downstreamExecution.failures);
+    if (downstreamExecution.result) nodeResults.push(downstreamExecution.result);
+    executedCommands.push({
+      node_id: SOURCE_WATCH_DOWNSTREAM_NODE_ID,
+      runner: "node",
+      script: SOURCE_WATCH_DOWNSTREAM_SCRIPT
+    });
+  } else {
+    nodeResults.push(createBlockedSourceWatchDownstreamNodeResult({
+      reportDate,
+      runId,
+      manifestName: manifest.name,
+      manifestSchemaVersion: manifest.schema_version,
+      node: executableNodes[1],
+      dependencyResult: collectExecution.result
+        ? dependencyResultFromNodeResult(collectExecution.result)
+        : {
+            node_id: SOURCE_WATCH_COLLECT_NODE_ID,
+            execution_id: `${runId}:${SOURCE_WATCH_COLLECT_NODE_ID}:missing-result`,
+            status: "failure",
+            required: true,
+            downstream_disposition: "block"
+          }
+    }));
+  }
+
+  const sourceWatch = collectSucceeded
+    ? await summarizeSourceWatchCollectArtifact({ rootDir, reportDate, sourceNode: collectSourceNode })
+    : {
+        ok: true,
+        failures: [],
+        warnings: [],
+        summary: {
+          ...emptySourceWatchCollectSummary(),
+          artifact_path: SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT
+        }
+      };
+  const downstream = collectSucceeded
+    ? await summarizeSourceWatchDownstreamArtifact({ rootDir, reportDate, sourceNode: downstreamSourceNode })
+    : {
+        ok: true,
+        failures: [],
+        warnings: [],
+        summary: {
+          ...emptySourceWatchDownstreamSummary(),
+          artifact_path: SOURCE_WATCH_DOWNSTREAM_OUTPUT_ARTIFACT
+        }
+      };
+  const nodeResultValidation = validateSourceWatchDownstreamMvpNodeResults({
+    plan,
+    reportDate,
+    runId,
+    nodeResults
+  });
+  const completedNodes = nodeResults
+    .filter((result) => result.status === "success")
+    .map((result) => result.node_id);
+  const blockedNodes = nodeResults
+    .filter((result) => result.status === "failure" || result.status === "blocked")
+    .map((result) => result.node_id);
+  const ok = nodeResults.length === 2
+    && nodeResults.every((result) => result.status === "success")
+    && nodeResultValidation.ok
+    && sourceWatch.ok
+    && downstream.ok;
+  const nodeFailureMessages = nodeResults.flatMap((result) => (result.failures || []).map((issue) => issue.message));
+
+  const summary = {
+    ok,
+    failures: ok ? [] : uniqueSorted([
+      ...executionFailures,
+      ...nodeFailureMessages,
+      ...nodeResultValidation.failures,
+      ...sourceWatch.failures,
+      ...downstream.failures
+    ]),
+    warnings: uniqueSorted([
+      ...validation.warnings,
+      ...nodeResultValidation.warnings,
+      ...sourceWatch.warnings,
+      ...downstream.warnings
+    ]),
+    validation,
+    mode: SOURCE_WATCH_DOWNSTREAM_MVP_MODE,
+    report_date: reportDate,
+    generated_at: generatedAt,
+    run_id: runId,
+    plan,
+    run: {
+      final_status: ok ? "executed_source_watch_downstream" : "blocked",
+      levels: plan.levels.map(copyLevel),
+      planned_nodes: plan.nodes.map((node) => node.id),
+      completed_nodes: completedNodes,
+      blocked_nodes: blockedNodes
+    },
+    source_watch: sourceWatch.summary,
+    downstream: downstream.summary,
+    node_results: nodeResults,
+    node_result_validation: nodeResultValidation,
+    executed_commands: executedCommands,
+    codex_invocations: [],
+    next_action: {
+      kind: "wire_normalize_canonicalize_source_watch_candidates",
+      message: "Source Watch downstream fixture consumed source-health.json and emitted extracted-candidates.json; next wire normalize/canonicalize to consume these candidates."
+    }
+  };
+  const summaryValidation = validateDailyCodexDagRunSummary(summary);
+  if (!summaryValidation.ok) {
+    return {
+      ...summary,
+      ok: false,
+      failures: uniqueSorted([...summary.failures, ...summaryValidation.failures]),
+      warnings: uniqueSorted([...summary.warnings, ...summaryValidation.warnings])
+    };
+  }
+  return summary;
+}
+
 export async function createDailyCodexDagTwoNodeFixtureMvp(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const reportDate = requiredReportDate(options.reportDate || options.date);
@@ -1112,6 +1354,10 @@ export function validateDailyCodexDagRunSummary(summary) {
   }
   if (summary.mode === SOURCE_WATCH_COLLECT_MVP_MODE) {
     validateSourceWatchCollectMvpSummary(summary, failures);
+    return { ok: failures.length === 0, failures, warnings };
+  }
+  if (summary.mode === SOURCE_WATCH_DOWNSTREAM_MVP_MODE) {
+    validateSourceWatchDownstreamMvpSummary(summary, failures);
     return { ok: failures.length === 0, failures, warnings };
   }
   if (summary.mode === TWO_NODE_FIXTURE_MVP_MODE) {
@@ -1660,10 +1906,74 @@ function createSourceWatchCollectCommandNode({
   };
 }
 
+function createSourceWatchDownstreamCommandNode({ sourceNode, reportDate, dependencies }) {
+  const inputArtifacts = (sourceNode.inputs || []).map(copyArtifact);
+  const outputArtifacts = (sourceNode.outputs || []).map(copyArtifact);
+  const inputArtifactPath = materializeArtifactPath({
+    templatePath: inputArtifacts[0]?.path || SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT,
+    reportDate
+  });
+  const outputArtifactPath = materializeArtifactPath({
+    templatePath: outputArtifacts[0]?.path || SOURCE_WATCH_DOWNSTREAM_OUTPUT_ARTIFACT,
+    reportDate
+  });
+
+  return {
+    id: sourceNode.id,
+    title: sourceNode.title,
+    kind: sourceNode.kind,
+    execution_status: sourceNode.execution_status,
+    execution_contract: {
+      readiness: "node_executable",
+      summary: "Fixture-only executable adapter for Source Watch parse/extract consumption.",
+      node_execution_spec: {
+        executor: "command",
+        cwd: ".",
+        timeout_seconds: 30,
+        invocation: {
+          kind: "command",
+          argv: [
+            "node",
+            SOURCE_WATCH_DOWNSTREAM_SCRIPT,
+            "--date",
+            reportDate,
+            "--input",
+            inputArtifactPath,
+            "--output",
+            outputArtifactPath,
+            "--json"
+          ]
+        },
+        inputs: inputArtifacts,
+        outputs: outputArtifacts
+      }
+    },
+    dependencies: Array.isArray(dependencies) ? [...dependencies] : [...(sourceNode.dependencies || [])],
+    inputs: inputArtifacts,
+    outputs: outputArtifacts,
+    runner_stage_ref: sourceNode.runner_stage_ref,
+    parallel_group: sourceNode.parallel_group,
+    resilience_policy_ref: sourceNode.resilience_policy_ref || "",
+    public_artifact: sourceNode.public_artifact,
+    owner_path_scope: sourceNode.owner_path_scope
+  };
+}
+
 async function prepareSourceWatchCollectFixtureArtifacts({ rootDir, reportDate, sourceNode }) {
   const outputArtifact = sourceNode.outputs?.[0] || {};
   const outputPath = path.resolve(rootDir, materializeArtifactPath({
     templatePath: outputArtifact.path || SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT,
+    reportDate
+  }));
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  await fs.rm(outputPath, { force: true });
+}
+
+async function prepareSourceWatchDownstreamFixtureArtifacts({ rootDir, reportDate, collectSourceNode, downstreamSourceNode }) {
+  await prepareSourceWatchCollectFixtureArtifacts({ rootDir, reportDate, sourceNode: collectSourceNode });
+  const outputArtifact = downstreamSourceNode.outputs?.[0] || {};
+  const outputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: outputArtifact.path || SOURCE_WATCH_DOWNSTREAM_OUTPUT_ARTIFACT,
     reportDate
   }));
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
@@ -1722,6 +2032,48 @@ async function summarizeSourceWatchCollectArtifact({ rootDir, reportDate, source
   }
 }
 
+async function summarizeSourceWatchDownstreamArtifact({ rootDir, reportDate, sourceNode }) {
+  const outputArtifact = sourceNode.outputs?.[0] || {};
+  const declaredArtifactPath = outputArtifact.path || SOURCE_WATCH_DOWNSTREAM_OUTPUT_ARTIFACT;
+  const materializedArtifactPath = materializeArtifactPath({
+    templatePath: declaredArtifactPath,
+    reportDate
+  });
+  const summary = emptySourceWatchDownstreamSummary();
+  summary.artifact_path = declaredArtifactPath;
+  try {
+    const payload = JSON.parse(await fs.readFile(path.resolve(rootDir, materializedArtifactPath), "utf8"));
+    const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
+    const signalCounts = isPlainObject(payload.signal_counts) ? payload.signal_counts : {};
+    const githubCount = nonNegativeIntegerOrZero(signalCounts.github_watch);
+    const siteCount = nonNegativeIntegerOrZero(signalCounts.site_watch);
+
+    return {
+      ok: true,
+      failures: [],
+      warnings: [],
+      summary: {
+        ...summary,
+        artifact_kind: nonBlankString(payload.kind) ? payload.kind : "",
+        input_kind: nonBlankString(payload.input_kind) ? payload.input_kind : "",
+        total_candidates: candidates.length,
+        github_watch_candidates: githubCount,
+        site_watch_candidates: siteCount,
+        other_candidates: Math.max(0, candidates.length - githubCount - siteCount),
+        empty: candidates.length === 0,
+        signals: uniqueSorted(candidates.map((candidate) => candidate?.signal).filter((signal) => typeof signal === "string" && signal))
+      }
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      failures: [`source-watch downstream artifact ${materializedArtifactPath} could not be summarized: ${error.message}`],
+      warnings: [],
+      summary
+    };
+  }
+}
+
 function emptySourceWatchCollectSummary() {
   return {
     artifact_path: "",
@@ -1737,6 +2089,20 @@ function emptySourceWatchCollectSummary() {
     failure_count: 0,
     empty: true,
     rate_limits: []
+  };
+}
+
+function emptySourceWatchDownstreamSummary() {
+  return {
+    artifact_path: "",
+    artifact_kind: "source_watch_extracted_candidates",
+    input_kind: "source_watch_candidates",
+    total_candidates: 0,
+    github_watch_candidates: 0,
+    site_watch_candidates: 0,
+    other_candidates: 0,
+    empty: true,
+    signals: []
   };
 }
 
@@ -1885,7 +2251,52 @@ function createBlockedTwoNodeFixtureNodeResult({
     warnings: [],
     audit: {
       parallel_group: node.parallel_group || "",
-      resilience_policy_ref: "",
+      resilience_policy_ref: node.resilience_policy_ref || "",
+      owner_path_scope: node.owner_path_scope || "internal_workdir",
+      public_artifact: node.public_artifact === true,
+      validator_version: NODE_RESULT_VALIDATOR_VERSION
+    }
+  });
+}
+
+function createBlockedSourceWatchDownstreamNodeResult({
+  reportDate,
+  runId,
+  manifestName,
+  manifestSchemaVersion,
+  node,
+  dependencyResult
+}) {
+  return createDailyCodexDagNodeResult({
+    reportDate,
+    runId,
+    manifestName,
+    manifestSchemaVersion,
+    nodeId: node.id,
+    nodeKind: node.kind,
+    runnerStageRef: node.runner_stage_ref,
+    status: "blocked",
+    downstreamDisposition: "block",
+    startedAt: null,
+    finishedAt: null,
+    attemptsStarted: 0,
+    maxAttempts: 1,
+    attemptsExhausted: false,
+    dependencyResults: [dependencyResult],
+    declaredInputs: node.inputs || [],
+    declaredOutputs: node.outputs || [],
+    resolvedInputs: [],
+    resolvedOutputs: [],
+    failures: [nodeResultIssue({
+      code: "dependency_blocked",
+      message: `daily codex DAG source-watch downstream fixture blocked ${node.id} because ${dependencyResult.node_id} did not continue.`,
+      source: "daily-codex-dag-source-watch-downstream-fixture",
+      retryable: false
+    })],
+    warnings: [],
+    audit: {
+      parallel_group: node.parallel_group || "",
+      resilience_policy_ref: node.resilience_policy_ref || "",
       owner_path_scope: node.owner_path_scope || "internal_workdir",
       public_artifact: node.public_artifact === true,
       validator_version: NODE_RESULT_VALIDATOR_VERSION
@@ -1919,6 +2330,23 @@ function expectedSourceWatchCollectSourceNode() {
     public_artifact: false,
     owner_path_scope: "internal_workdir"
   };
+}
+
+function expectedSourceWatchDownstreamSourceNodes() {
+  return [
+    expectedSourceWatchCollectSourceNode(),
+    {
+      id: SOURCE_WATCH_DOWNSTREAM_NODE_ID,
+      kind: "command",
+      dependencies: [SOURCE_WATCH_COLLECT_NODE_ID],
+      inputs: [{ path: SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT, required: true }],
+      outputs: [{ path: SOURCE_WATCH_DOWNSTREAM_OUTPUT_ARTIFACT, required: true }],
+      runner_stage_ref: "collect",
+      parallel_group: "source-lanes",
+      public_artifact: false,
+      owner_path_scope: "internal_workdir"
+    }
+  ];
 }
 
 function expectedTwoNodeFixtureSourceNodes() {
@@ -2120,6 +2548,110 @@ function validateSourceWatchCollectMvpNodeResultAgainstPlan({ result, planNode, 
   if (result.audit?.public_artifact !== sourceNode.public_artifact) failures.push(`${label}.audit.public_artifact must match source node.`);
 }
 
+function validateSourceWatchDownstreamMvpNodeResults({ plan, reportDate, runId, nodeResults }) {
+  const failures = [];
+  const warnings = [];
+  if (!Array.isArray(nodeResults)) {
+    failures.push("daily codex DAG source-watch downstream MVP node_results must be an array.");
+    return nodeResultValidationSummary({ failures, warnings, checkedResults: 0 });
+  }
+  if (nodeResults.length !== 2) {
+    failures.push("daily codex DAG source-watch downstream MVP node_results length must be 2.");
+  }
+
+  const expectedNodes = expectedSourceWatchDownstreamSourceNodes();
+  const resultByNodeId = new Map(nodeResults.filter(isPlainObject).map((result) => [result.node_id, result]));
+  for (let index = 0; index < nodeResults.length; index += 1) {
+    const result = nodeResults[index];
+    const resultValidation = validateDailyCodexDagNodeResult(result);
+    failures.push(...resultValidation.failures);
+    warnings.push(...resultValidation.warnings);
+    validateSourceWatchDownstreamMvpNodeResultAgainstExpected({
+      result,
+      expectedNode: expectedNodes[index],
+      reportDate,
+      runId,
+      resultByNodeId,
+      failures
+    });
+  }
+
+  return nodeResultValidationSummary({ failures, warnings, checkedResults: nodeResults.length });
+}
+
+function validateSourceWatchDownstreamMvpNodeResultAgainstExpected({
+  result,
+  expectedNode,
+  reportDate,
+  runId,
+  resultByNodeId,
+  failures
+}) {
+  const label = "daily codex DAG source-watch downstream MVP node result";
+  if (!isPlainObject(result)) return;
+  if (!expectedNode) {
+    failures.push(`${label} has an unexpected result position.`);
+    return;
+  }
+  if (result.report_date !== reportDate) failures.push(`${label}.report_date must match run report_date.`);
+  if (result.run_id !== runId) failures.push(`${label}.run_id must match run_id.`);
+  if (result.manifest_name !== "daily-codex-dag-contract") failures.push(`${label}.manifest_name must match manifest.`);
+  if (result.manifest_schema_version !== 1) failures.push(`${label}.manifest_schema_version must be 1.`);
+  if (result.node_id !== expectedNode.id) failures.push(`${label}.node_id must be ${expectedNode.id}.`);
+  if (result.node_kind !== expectedNode.kind) failures.push(`${label}.node_kind must be ${expectedNode.kind}.`);
+  if (result.runner_stage_ref !== expectedNode.runner_stage_ref) failures.push(`${label}.runner_stage_ref must match expected node.`);
+  if (result.result_scope !== "node") failures.push(`${label}.result_scope must be node.`);
+  if (!sameArtifactArray(result.declared_inputs, expectedNode.inputs)) failures.push(`${label}.declared_inputs must match expected node inputs.`);
+  if (!sameArtifactArray(result.declared_outputs, expectedNode.outputs)) failures.push(`${label}.declared_outputs must match expected node outputs.`);
+  if (result.audit?.parallel_group !== expectedNode.parallel_group) failures.push(`${label}.audit.parallel_group must match expected node.`);
+  if (result.audit?.owner_path_scope !== expectedNode.owner_path_scope) failures.push(`${label}.audit.owner_path_scope must match expected node.`);
+  if (result.audit?.public_artifact !== expectedNode.public_artifact) failures.push(`${label}.audit.public_artifact must match expected node.`);
+  if (result.fanout !== null) failures.push(`${label}.fanout must be null.`);
+  if (result.barrier !== null) failures.push(`${label}.barrier must be null.`);
+
+  if (expectedNode.id === SOURCE_WATCH_COLLECT_NODE_ID) {
+    if (!["success", "failure"].includes(result.status)) {
+      failures.push(`${label}.fetch-source-health status must be success or failure.`);
+    }
+    if (Array.isArray(result.dependency_results) && result.dependency_results.length !== 0) {
+      failures.push(`${label}.fetch-source-health dependency_results must be empty.`);
+    }
+    return;
+  }
+
+  if (!["success", "failure", "blocked"].includes(result.status)) {
+    failures.push(`${label}.parse-extract status must be success, failure, or blocked.`);
+  }
+  const collectResult = resultByNodeId.get(SOURCE_WATCH_COLLECT_NODE_ID);
+  if (!collectResult) {
+    failures.push(`${label}.parse-extract requires fetch-source-health node result evidence.`);
+  }
+  if (!Array.isArray(result.dependency_results) || result.dependency_results.length !== 1) {
+    failures.push(`${label}.parse-extract dependency_results must contain fetch-source-health evidence.`);
+    return;
+  }
+  const dependency = result.dependency_results[0];
+  if (dependency.node_id !== SOURCE_WATCH_COLLECT_NODE_ID) {
+    failures.push(`${label}.parse-extract dependency_results[0].node_id must be ${SOURCE_WATCH_COLLECT_NODE_ID}.`);
+  }
+  if (collectResult && dependency.execution_id !== collectResult.execution_id) {
+    failures.push(`${label}.parse-extract dependency_results[0].execution_id must match fetch-source-health result.`);
+  }
+  if (collectResult && dependency.status !== collectResult.status) {
+    failures.push(`${label}.parse-extract dependency_results[0].status must match fetch-source-health result.`);
+  }
+  if (collectResult && dependency.downstream_disposition !== collectResult.downstream_disposition) {
+    failures.push(`${label}.parse-extract dependency_results[0].downstream_disposition must match fetch-source-health result.`);
+  }
+  if (dependency.required !== true) failures.push(`${label}.parse-extract dependency_results[0].required must be true.`);
+  if (collectResult?.status !== "success" && result.status !== "blocked") {
+    failures.push(`${label}.parse-extract must be blocked when fetch-source-health does not succeed.`);
+  }
+  if (collectResult?.status === "success" && result.status === "blocked") {
+    failures.push(`${label}.parse-extract must not be blocked when fetch-source-health succeeds.`);
+  }
+}
+
 function validateSourceWatchCollectMvpPlanNodeAgainstExpected({ planNode, expectedSourceNode, failures }) {
   const label = "daily codex DAG source-watch collect MVP plan node";
   if (!isPlainObject(planNode)) return;
@@ -2145,6 +2677,38 @@ function validateSourceWatchCollectMvpPlanNodeAgainstExpected({ planNode, expect
   }
   if (!sameArtifactArray(planNode.outputs, expectedSourceNode.outputs)) {
     failures.push(`${label}.outputs must match the fetch-source-health production contract.`);
+  }
+}
+
+function validateSourceWatchDownstreamMvpPlanNodeAgainstExpected({ planNode, expectedNode, failures }) {
+  const label = "daily codex DAG source-watch downstream MVP plan node";
+  if (!isPlainObject(planNode)) return;
+  if (!expectedNode) {
+    failures.push(`${label} has an unexpected plan position.`);
+    return;
+  }
+  if (planNode.id !== expectedNode.id) failures.push(`${label}.id must be ${expectedNode.id}.`);
+  if (planNode.kind !== expectedNode.kind) failures.push(`${label}.kind must be ${expectedNode.kind}.`);
+  if (planNode.runner_stage_ref !== expectedNode.runner_stage_ref) {
+    failures.push(`${label}.runner_stage_ref must be ${expectedNode.runner_stage_ref}.`);
+  }
+  if (planNode.parallel_group !== expectedNode.parallel_group) {
+    failures.push(`${label}.parallel_group must be ${expectedNode.parallel_group}.`);
+  }
+  if (planNode.owner_path_scope !== expectedNode.owner_path_scope) {
+    failures.push(`${label}.owner_path_scope must be ${expectedNode.owner_path_scope}.`);
+  }
+  if (planNode.public_artifact !== expectedNode.public_artifact) {
+    failures.push(`${label}.public_artifact must be ${expectedNode.public_artifact}.`);
+  }
+  if (!sameOrderedStringArray(planNode.dependencies, expectedNode.dependencies)) {
+    failures.push(`${label}.dependencies must match the production collect-to-parse contract.`);
+  }
+  if (!sameArtifactArray(planNode.inputs, expectedNode.inputs)) {
+    failures.push(`${label}.inputs must match the production collect-to-parse contract.`);
+  }
+  if (!sameArtifactArray(planNode.outputs, expectedNode.outputs)) {
+    failures.push(`${label}.outputs must match the production collect-to-parse contract.`);
   }
 }
 
@@ -3170,6 +3734,133 @@ function validateSourceWatchCollectMvpSummary(summary, failures) {
   }
 }
 
+function validateSourceWatchDownstreamMvpSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "ok",
+      "failures",
+      "warnings",
+      "validation",
+      "mode",
+      "report_date",
+      "generated_at",
+      "run_id",
+      "plan",
+      "run",
+      "source_watch",
+      "downstream",
+      "node_results",
+      "node_result_validation",
+      "executed_commands",
+      "codex_invocations",
+      "next_action"
+    ],
+    label: "daily codex DAG source-watch downstream MVP summary",
+    failures
+  });
+  if (typeof summary.ok !== "boolean") {
+    failures.push("daily codex DAG source-watch downstream MVP summary ok must be a boolean.");
+  }
+  if (!Array.isArray(summary.failures)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary failures must be an array.");
+  } else {
+    validateMessageArray(summary.failures, "daily codex DAG source-watch downstream MVP summary failures", failures);
+    if (summary.ok === true && summary.failures.length !== 0) {
+      failures.push("daily codex DAG source-watch downstream MVP summary failures must be empty when ok is true.");
+    }
+    if (summary.ok === false && summary.failures.length === 0) {
+      failures.push("daily codex DAG source-watch downstream MVP summary failures must be non-empty when ok is false.");
+    }
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG source-watch downstream MVP summary warnings", failures);
+  }
+  if (summary.mode !== SOURCE_WATCH_DOWNSTREAM_MVP_MODE) {
+    failures.push(`daily codex DAG source-watch downstream MVP summary mode must be ${SOURCE_WATCH_DOWNSTREAM_MVP_MODE}.`);
+  }
+  if (!isStrictIsoDate(summary.report_date)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary report_date must be a real YYYY-MM-DD date.");
+  }
+  if (!isCanonicalIsoTimestamp(summary.generated_at)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary generated_at must be a canonical UTC Date#toISOString() string.");
+  }
+  if (!isStableIdentifier(summary.run_id)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary run_id must be a stable identifier.");
+  }
+  if (!isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary validation must be an object.");
+  } else {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: true,
+      label: "daily codex DAG source-watch downstream MVP summary validation",
+      failures
+    });
+  }
+  validateNextActionShape(summary.next_action, failures, "daily codex DAG source-watch downstream MVP summary next_action", {
+    allowedKinds: ["wire_normalize_canonicalize_source_watch_candidates"]
+  });
+  validateSourceWatchDownstreamMvpExecutedCommands({ summary, failures });
+  validateSourceWatchCollectSummaryShape(summary.source_watch, failures);
+  validateSourceWatchDownstreamSummaryShape(summary.downstream, failures);
+  validateSourceWatchDownstreamSummaryConsistency(summary, failures);
+  if (!Array.isArray(summary.codex_invocations) || summary.codex_invocations.length !== 0) {
+    failures.push("daily codex DAG source-watch downstream MVP summary codex_invocations must be empty.");
+  }
+
+  const plan = isPlainObject(summary.plan) ? summary.plan : null;
+  const run = isPlainObject(summary.run) ? summary.run : null;
+  if (!plan) failures.push("daily codex DAG source-watch downstream MVP summary plan must be an object.");
+  if (!run) failures.push("daily codex DAG source-watch downstream MVP summary run must be an object.");
+  if (!Array.isArray(summary.node_results)) failures.push("daily codex DAG source-watch downstream MVP summary node_results must be an array.");
+  if (!plan || !run || !Array.isArray(summary.node_results)) return;
+
+  validatePlanShape(plan, failures, { allowNodeExecutable: true });
+  validateRunShape(run, failures);
+  validateContractRunNodeResultValidation(summary.node_result_validation, failures);
+
+  const planNodes = Array.isArray(plan.nodes) ? plan.nodes : null;
+  const planLevels = Array.isArray(plan.levels) ? plan.levels : null;
+  if (!planNodes) failures.push("daily codex DAG source-watch downstream MVP summary plan.nodes must be an array.");
+  if (!planLevels) failures.push("daily codex DAG source-watch downstream MVP summary plan.levels must be an array.");
+  if (!planNodes || !planLevels) return;
+  if (plan.node_count !== 2 || planNodes.length !== 2) {
+    failures.push("daily codex DAG source-watch downstream MVP summary plan must contain exactly fetch-source-health and parse-extract.");
+  }
+
+  const expectedNodes = expectedSourceWatchDownstreamSourceNodes();
+  for (let index = 0; index < expectedNodes.length; index += 1) {
+    validateSourceWatchDownstreamMvpPlanNodeAgainstExpected({
+      planNode: planNodes[index],
+      expectedNode: expectedNodes[index],
+      failures
+    });
+  }
+  const planNodeIds = planNodes.map((node) => isPlainObject(node) ? node.id : undefined);
+  const levelPartition = validatePlanLevelPartition({ planNodes, planLevels, failures });
+  validatePlanDependencyLevels({ planNodes, levelByNodeId: levelPartition.levelByNodeId, failures });
+  validateSourceWatchDownstreamMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures });
+
+  const nodeResultValidation = validateSourceWatchDownstreamMvpNodeResults({
+    plan,
+    reportDate: summary.report_date,
+    runId: summary.run_id,
+    nodeResults: summary.node_results
+  });
+  failures.push(...nodeResultValidation.failures);
+  if (isPlainObject(summary.node_result_validation)) {
+    if (summary.node_result_validation.ok !== true) {
+      failures.push("daily codex DAG source-watch downstream MVP summary node_result_validation.ok must be true.");
+    }
+    if (summary.node_result_validation.checked_results !== summary.node_results.length) {
+      failures.push("daily codex DAG source-watch downstream MVP summary node_result_validation.checked_results must equal node_results length.");
+    }
+  }
+}
+
 function validateTwoNodeFixtureMvpSummary(summary, failures) {
   validateExactKeys({
     value: summary,
@@ -3355,6 +4046,46 @@ function validateSourceWatchCollectMvpExecutedCommands(values, failures) {
   if (command.script !== SOURCE_WATCH_COLLECT_SCRIPT) failures.push(`${label} entry.script must be ${SOURCE_WATCH_COLLECT_SCRIPT}.`);
 }
 
+function validateSourceWatchDownstreamMvpExecutedCommands({ summary, failures }) {
+  const label = "daily codex DAG source-watch downstream MVP summary executed_commands";
+  const values = summary.executed_commands;
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  const downstreamResult = Array.isArray(summary.node_results)
+    ? summary.node_results.find((result) => result?.node_id === SOURCE_WATCH_DOWNSTREAM_NODE_ID)
+    : null;
+  const expectedCommands = downstreamResult?.status === "blocked"
+    ? [{
+        node_id: SOURCE_WATCH_COLLECT_NODE_ID,
+        script: SOURCE_WATCH_COLLECT_SCRIPT
+      }]
+    : [{
+        node_id: SOURCE_WATCH_COLLECT_NODE_ID,
+        script: SOURCE_WATCH_COLLECT_SCRIPT
+      }, {
+        node_id: SOURCE_WATCH_DOWNSTREAM_NODE_ID,
+        script: SOURCE_WATCH_DOWNSTREAM_SCRIPT
+      }];
+  if (values.length !== expectedCommands.length) {
+    failures.push(`${label} length must match attempted source-watch commands.`);
+    return;
+  }
+  for (let index = 0; index < expectedCommands.length; index += 1) {
+    const command = values[index];
+    const expected = expectedCommands[index];
+    if (!isPlainObject(command)) {
+      failures.push(`${label} entry must be an object.`);
+      return;
+    }
+    validateExactKeys({ value: command, allowed: ["node_id", "runner", "script"], label: `${label} entry`, failures });
+    if (command.node_id !== expected.node_id) failures.push(`${label} entry.node_id must be ${expected.node_id}.`);
+    if (command.runner !== "node") failures.push(`${label} entry.runner must be node.`);
+    if (command.script !== expected.script) failures.push(`${label} entry.script must be ${expected.script}.`);
+  }
+}
+
 function validateSourceWatchCollectSummaryShape(summary, failures) {
   const label = "daily codex DAG source-watch collect MVP summary source_watch";
   if (!isPlainObject(summary)) {
@@ -3454,6 +4185,87 @@ function validateSourceWatchCollectSummaryShape(summary, failures) {
         if (typeof snapshot[key] !== "string") failures.push(`${itemLabel}.${key} must be a string.`);
       }
     }
+  }
+}
+
+function validateSourceWatchDownstreamSummaryShape(summary, failures) {
+  const label = "daily codex DAG source-watch downstream MVP summary downstream";
+  if (!isPlainObject(summary)) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "artifact_path",
+      "artifact_kind",
+      "input_kind",
+      "total_candidates",
+      "github_watch_candidates",
+      "site_watch_candidates",
+      "other_candidates",
+      "empty",
+      "signals"
+    ],
+    label,
+    failures
+  });
+  if (summary.artifact_path !== SOURCE_WATCH_DOWNSTREAM_OUTPUT_ARTIFACT) failures.push(`${label}.artifact_path must be ${SOURCE_WATCH_DOWNSTREAM_OUTPUT_ARTIFACT}.`);
+  if (summary.artifact_kind !== "source_watch_extracted_candidates") failures.push(`${label}.artifact_kind must be source_watch_extracted_candidates.`);
+  if (summary.input_kind !== "source_watch_candidates") failures.push(`${label}.input_kind must be source_watch_candidates.`);
+  for (const key of ["total_candidates", "github_watch_candidates", "site_watch_candidates", "other_candidates"]) {
+    if (!Number.isInteger(summary[key]) || summary[key] < 0) {
+      failures.push(`${label}.${key} must be a non-negative integer.`);
+    }
+  }
+  if (typeof summary.empty !== "boolean") failures.push(`${label}.empty must be a boolean.`);
+  if (
+    Number.isInteger(summary.github_watch_candidates)
+    && Number.isInteger(summary.site_watch_candidates)
+    && Number.isInteger(summary.other_candidates)
+    && Number.isInteger(summary.total_candidates)
+    && summary.total_candidates !== summary.github_watch_candidates + summary.site_watch_candidates + summary.other_candidates
+  ) {
+    failures.push(`${label}.total_candidates must equal github_watch_candidates plus site_watch_candidates plus other_candidates.`);
+  }
+  if (typeof summary.empty === "boolean" && Number.isInteger(summary.total_candidates)) {
+    const expectedEmpty = summary.total_candidates === 0;
+    if (summary.empty !== expectedEmpty) failures.push(`${label}.empty must reflect whether total_candidates is zero.`);
+  }
+  if (!Array.isArray(summary.signals)) {
+    failures.push(`${label}.signals must be an array.`);
+  } else {
+    if (!sameOrderedStringArray(summary.signals, uniqueSorted(summary.signals))) {
+      failures.push(`${label}.signals must be unique and sorted.`);
+    }
+    for (const [index, signal] of summary.signals.entries()) {
+      if (!nonBlankString(signal)) failures.push(`${label}.signals[${index}] must be a non-empty string.`);
+    }
+  }
+}
+
+function validateSourceWatchDownstreamSummaryConsistency(summary, failures) {
+  if (!isPlainObject(summary.source_watch) || !isPlainObject(summary.downstream)) return;
+  if (
+    Number.isInteger(summary.source_watch.total_candidates_found)
+    && Number.isInteger(summary.downstream.total_candidates)
+    && summary.downstream.total_candidates !== summary.source_watch.total_candidates_found
+  ) {
+    failures.push("daily codex DAG source-watch downstream MVP summary downstream.total_candidates must equal source_watch.total_candidates_found.");
+  }
+  if (
+    Number.isInteger(summary.source_watch.github_candidates_found)
+    && Number.isInteger(summary.downstream.github_watch_candidates)
+    && summary.downstream.github_watch_candidates !== summary.source_watch.github_candidates_found
+  ) {
+    failures.push("daily codex DAG source-watch downstream MVP summary downstream.github_watch_candidates must equal source_watch.github_candidates_found.");
+  }
+  if (
+    Number.isInteger(summary.source_watch.site_candidates_found)
+    && Number.isInteger(summary.downstream.site_watch_candidates)
+    && summary.downstream.site_watch_candidates !== summary.source_watch.site_candidates_found
+  ) {
+    failures.push("daily codex DAG source-watch downstream MVP summary downstream.site_watch_candidates must equal source_watch.site_candidates_found.");
   }
 }
 
@@ -3600,6 +4412,38 @@ function validateSourceWatchCollectMvpRunSemantics({ summary, run, planLevels, p
     if (nodeResult.status !== expectedNodeStatus) {
       failures.push(`daily codex DAG source-watch collect MVP summary node result status must be ${expectedNodeStatus}.`);
     }
+  }
+}
+
+function validateSourceWatchDownstreamMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures }) {
+  if (!sameOrderedStringArray(run.planned_nodes, planNodeIds)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary run.planned_nodes must equal plan.nodes ids.");
+  }
+  if (!levelsMatch(run.levels, planLevels)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary run.levels must equal plan.levels.");
+  }
+  const nodeResults = Array.isArray(summary.node_results) ? summary.node_results : [];
+  const expectedCompleted = nodeResults
+    .filter((result) => result?.status === "success")
+    .map((result) => result.node_id);
+  const expectedBlocked = nodeResults
+    .filter((result) => result?.status === "failure" || result?.status === "blocked")
+    .map((result) => result.node_id);
+  const expectedStatus = summary.ok === true ? "executed_source_watch_downstream" : "blocked";
+  if (run.final_status !== expectedStatus) {
+    failures.push(`daily codex DAG source-watch downstream MVP summary run.final_status must be ${expectedStatus}.`);
+  }
+  if (!sameOrderedStringArray(run.completed_nodes, expectedCompleted)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary run.completed_nodes must match node execution status.");
+  }
+  if (!sameOrderedStringArray(run.blocked_nodes, expectedBlocked)) {
+    failures.push("daily codex DAG source-watch downstream MVP summary run.blocked_nodes must match node execution status.");
+  }
+  if (summary.ok === true && !sameOrderedStringArray(expectedCompleted, [SOURCE_WATCH_COLLECT_NODE_ID, SOURCE_WATCH_DOWNSTREAM_NODE_ID])) {
+    failures.push("daily codex DAG source-watch downstream MVP summary success requires fetch-source-health and parse-extract to complete.");
+  }
+  if (summary.ok === false && expectedBlocked.length === 0) {
+    failures.push("daily codex DAG source-watch downstream MVP summary failure requires at least one blocked node.");
   }
 }
 
