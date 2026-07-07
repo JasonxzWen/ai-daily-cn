@@ -103,7 +103,8 @@ const ARTICLE_SECTION_BASE_SCORE = {
   builder_observations: 68,
   community_leads: 60,
   official_org_updates: 82,
-  chinese_media_dynamics: 72
+  chinese_media_dynamics: 72,
+  source_watch: 78
 };
 const ARTICLE_DOMAIN_ORDER = [
   "AI 产品与应用工具",
@@ -706,6 +707,18 @@ export function buildArticleIndex(reports = [], options = {}) {
     }
   }
 
+  for (const record of sourceWatchAdmittedCandidateRecords(options)) {
+    const article = articleFromSourceWatchCandidate(record.candidate, record.reportDate);
+    if (!article) {
+      continue;
+    }
+    const key = articleUrlKey(article.url);
+    if (!key) {
+      continue;
+    }
+    byUrl.set(key, byUrl.has(key) ? mergeArticleRecords(byUrl.get(key), article) : article);
+  }
+
   return [...byUrl.values()].sort((a, b) =>
     String(b.date).localeCompare(String(a.date)) ||
     Number(b.quality_score || 0) - Number(a.quality_score || 0) ||
@@ -769,6 +782,250 @@ function articleFromReportItem(report, section, item, options = {}) {
     companies: entities.companies,
     products: entities.products
   };
+}
+
+function sourceWatchAdmittedCandidateRecords(options = {}) {
+  const records = [];
+  for (const artifact of sourceWatchAdmittedArtifactList(options.sourceWatchAdmittedArtifacts)) {
+    if (!artifact || typeof artifact !== "object" || artifact.kind !== "source_watch_admitted_candidates") {
+      continue;
+    }
+    const reportDate = normalizeSourceWatchReportDate(artifact.report_date || options.sourceWatchReportDate || options.reportDate);
+    if (!reportDate || !Array.isArray(artifact.candidates)) {
+      continue;
+    }
+    for (const candidate of artifact.candidates) {
+      records.push({ candidate, reportDate });
+    }
+  }
+
+  const directReportDate = normalizeSourceWatchReportDate(options.sourceWatchReportDate || options.reportDate);
+  if (Array.isArray(options.sourceWatchAdmittedCandidates)) {
+    for (const candidate of options.sourceWatchAdmittedCandidates) {
+      const reportDate = normalizeSourceWatchReportDate(candidate?.report_date) || directReportDate;
+      if (!reportDate) {
+        continue;
+      }
+      records.push({
+        candidate,
+        reportDate
+      });
+    }
+  }
+
+  return records;
+}
+
+function sourceWatchAdmittedArtifactList(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (value && typeof value === "object") {
+    return [value];
+  }
+  return [];
+}
+
+function articleFromSourceWatchCandidate(candidate, reportDate) {
+  if (!candidate || typeof candidate !== "object" || candidate.decision !== "admitted") {
+    return null;
+  }
+  const url = firstHttpUrl(candidate.url, candidate.canonical_url);
+  if (!isHttpUrl(url)) {
+    return null;
+  }
+  const title = cleanArticleText(candidate.title || candidate.repo || url);
+  const source = sourceWatchArticleSource(candidate, title);
+  const summary = sourceWatchArticleSummary(candidate, title);
+  if (!title || !source || !summary) {
+    return null;
+  }
+
+  const date = normalizeArticleDate(candidate.event_date || reportDate, reportDate);
+  if (!date) {
+    return null;
+  }
+  const paths = reportRelativePaths(reportDate);
+  const importance = sourceWatchArticleImportance(candidate);
+  const rawText = [
+    "source_watch",
+    title,
+    summary,
+    source,
+    candidate.editorial_category,
+    candidate.category,
+    candidate.signal,
+    candidate.repo,
+    ...(Array.isArray(candidate.tags) ? candidate.tags : [])
+  ].filter(Boolean).join(" ");
+  const taxonomy = classifyArticleTaxonomy("source_watch", rawText);
+  const entities = extractArticleEntities(candidate, rawText);
+
+  return {
+    id: articleId(url),
+    title,
+    url,
+    summary,
+    date,
+    month: date.slice(0, 7),
+    source,
+    section: "source_watch",
+    report_date: reportDate,
+    report_url: paths.htmlPath,
+    data_url: paths.dataPath,
+    quality_score: sourceWatchArticleQualityScore(candidate),
+    importance,
+    domain: taxonomy.domain,
+    flavors: taxonomy.flavors,
+    channels_l1: taxonomy.channels_l1,
+    channels_l2: taxonomy.channels_l2,
+    companies: entities.companies,
+    products: entities.products
+  };
+}
+
+function sourceWatchArticleSource(candidate, title) {
+  if (candidate.source_tier === "first_class" && title) {
+    return title;
+  }
+  const source = cleanArticleText(candidate.source);
+  if (source) {
+    return source;
+  }
+  const repo = cleanArticleText(candidate.repo);
+  if (repo) {
+    return `GitHub repo watch: ${repo}`;
+  }
+  return title || "Source Watch";
+}
+
+function sourceWatchArticleSummary(candidate, title) {
+  const template = candidate.summary_template && typeof candidate.summary_template === "object" && !Array.isArray(candidate.summary_template)
+    ? candidate.summary_template
+    : null;
+  const summaryFromTemplate = cleanArticleText([
+    publicSourceWatchTemplatePurpose(template?.purpose),
+    publicSourceWatchTemplateChange(template?.change),
+    publicSourceWatchTemplateEvidence(template?.evidence)
+  ].filter(Boolean).join(" "));
+  if (summaryFromTemplate) {
+    return summaryFromTemplate;
+  }
+  if (candidate.source_tier === "first_class" || candidate.source_lane === "aify") {
+    return cleanArticleText(`${title} is tracked as a first-class AI news source for the public article library.`);
+  }
+  const repo = cleanArticleText(candidate.repo || title);
+  if (candidate.signal === "github_watch" && repo) {
+    return `${repo} is tracked as a Source Watch repository signal with public project, release, and update evidence.`;
+  }
+  return `${title} is tracked as a Source Watch signal for the public article library.`;
+}
+
+function publicSourceWatchTemplatePurpose(value) {
+  return stripSourceWatchInternalTokens(value);
+}
+
+function publicSourceWatchTemplateChange(value) {
+  const text = cleanArticleText(value);
+  if (!text) {
+    return "";
+  }
+  if (/historical snapshot changed/i.test(text)) {
+    const changed = [];
+    if (/(?:commit|pushed_at)/i.test(text)) changed.push("recent repository activity");
+    if (/(?:release|tag)/i.test(text)) changed.push("release or tag metadata");
+    if (/(?:stars_delta|forks_delta|stars|forks)/i.test(text)) changed.push("community metrics");
+    return changed.length > 0
+      ? `Public repository signals changed across ${changed.join(", ")}.`
+      : "Public repository signals changed since the previous local snapshot.";
+  }
+  if (/new source watch repository/i.test(text)) {
+    return "Newly tracked source repository without prior local history.";
+  }
+  if (/unchanged|suppress/i.test(text)) {
+    return "";
+  }
+  return stripSourceWatchInternalTokens(text);
+}
+
+function publicSourceWatchTemplateEvidence(value) {
+  const fields = sourceWatchEvidenceFields(value);
+  const parts = [];
+  const stars = fields.get("stars");
+  const forks = fields.get("forks");
+  if (stars && forks) {
+    parts.push(`GitHub metadata shows ${stars} stars and ${forks} forks.`);
+  } else if (stars) {
+    parts.push(`GitHub metadata shows ${stars} stars.`);
+  } else if (forks) {
+    parts.push(`GitHub metadata shows ${forks} forks.`);
+  }
+  if (fields.get("latest_release")) {
+    parts.push(`Latest release metadata is ${cleanArticleText(fields.get("latest_release"))}.`);
+  }
+  if (fields.get("latest_tag")) {
+    parts.push(`Latest tag metadata is ${cleanArticleText(fields.get("latest_tag"))}.`);
+  }
+  if (fields.get("latest_commit")) {
+    parts.push("Recent commit activity is present.");
+  }
+  if (fields.get("pushed_at")) {
+    parts.push(`Repository push activity is dated ${cleanArticleText(String(fields.get("pushed_at")).slice(0, 10))}.`);
+  }
+  if (parts.length > 0) {
+    return parts.join(" ");
+  }
+  return stripSourceWatchInternalTokens(value);
+}
+
+function sourceWatchEvidenceFields(value) {
+  const fields = new Map();
+  for (const part of String(value || "").split(";")) {
+    const [rawKey, ...rawValue] = part.trim().split("=");
+    const key = String(rawKey || "").trim().toLowerCase();
+    const fieldValue = cleanArticleText(rawValue.join("="));
+    if (key && fieldValue) {
+      fields.set(key, fieldValue);
+    }
+  }
+  return fields;
+}
+
+function stripSourceWatchInternalTokens(value) {
+  return cleanArticleText(String(value || "")
+    .replace(/\b(?:latest_commit|latest_release|latest_tag|pushed_at|stars_delta|forks_delta|repo_delta|freshness|source_lane|source_tier|verification_policy|verification_status)\s*=\s*[^;,\s]+/gi, "")
+    .replace(/\b(?:latest_commit|latest_release|latest_tag|pushed_at|stars_delta|forks_delta|repo_delta|freshness|source_lane|source_tier|verification_policy|verification_status)\b/gi, "")
+    .replace(/\bHistorical snapshot changed\s*:\s*/gi, "Public repository signals changed: ")
+    .replace(/\s*;\s*/g, "; ")
+    .replace(/\s+([.;,])/g, "$1")
+    .replace(/(?:;\s*){2,}/g, "; "));
+}
+
+function sourceWatchArticleImportance(candidate) {
+  if (candidate.importance) {
+    return normalizeArticleImportance(candidate.importance);
+  }
+  const score = sourceWatchArticleQualityScore(candidate);
+  if (score >= 90) return "major";
+  if (score >= 75) return "notable";
+  return "general";
+}
+
+function sourceWatchArticleQualityScore(candidate) {
+  const score = Number(candidate.quality_score);
+  if (Number.isFinite(score)) {
+    return Math.max(0, Math.min(100, Math.round(score)));
+  }
+  return ARTICLE_SECTION_BASE_SCORE.source_watch;
+}
+
+function normalizeSourceWatchReportDate(value) {
+  const date = String(value || "").slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "";
+}
+
+function firstHttpUrl(...values) {
+  return values.find((value) => isHttpUrl(value)) || "";
 }
 
 function articleItemUrl(section, item) {

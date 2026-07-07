@@ -105,6 +105,87 @@ function sampleReport() {
   };
 }
 
+function sampleSourceWatchAdmittedArtifact() {
+  return {
+    schema_version: 1,
+    kind: "source_watch_admitted_candidates",
+    mode: "source_watch_admit_fixture_output",
+    report_date: "2026-07-03",
+    public_surface: false,
+    candidates: [
+      {
+        id: "candidate-ml-news",
+        canonical_id: "source-watch:ml-news",
+        source_id: "repo-ml-news-of-the-week",
+        signal: "github_watch",
+        title: "SalvatoreRa/ML-news-of-the-week",
+        url: "https://github.com/SalvatoreRa/ML-news-of-the-week",
+        canonical_url: "https://github.com/SalvatoreRa/ML-news-of-the-week",
+        source: "GitHub repo watch: SalvatoreRa/ML-news-of-the-week",
+        event_date: "2026-07-03",
+        category: "project",
+        decision: "admitted",
+        quality_score: 88,
+        verification_status: "primary_confirmed",
+        source_level: "github",
+        editorial_category: "open_source",
+        repo: "SalvatoreRa/ML-news-of-the-week",
+        evidence: "GitHub repo SalvatoreRa/ML-news-of-the-week stars=3210 forks=210 pushed_at=2026-07-05T12:00:00Z",
+        notes: "stars=3210; forks=210; pushed_at=2026-07-05T12:00:00Z; latest_commit=bbbbbbbbbbbb",
+        repo_delta: { status: "changed", latest_commit_changed: true },
+        freshness: { status: "fresh" },
+        summary_template: {
+          purpose: "SalvatoreRa/ML-news-of-the-week tracks open-source signals related to ml-news, weekly.",
+          change: "Historical snapshot changed: latest_commit.",
+          evidence: "stars=3210; forks=210; latest_commit=bbbbbbbbbbbb",
+          fit: "Internal Source Watch candidate only; public promotion still needs downstream gates."
+        },
+        tags: ["ml-news", "weekly"]
+      },
+      {
+        id: "candidate-aify",
+        canonical_id: "source-watch:aify-news",
+        source_id: "site-aify-news",
+        signal: "site_watch",
+        title: "Aify News",
+        url: "https://aify-news.pages.dev/",
+        canonical_url: "https://aify-news.pages.dev/",
+        source: "Site watch: Aify News",
+        event_date: "2026-07-03",
+        category: "community_lead",
+        decision: "admitted",
+        quality_score: 91,
+        verification_status: "first_class_source_confirmed",
+        source_level: "ai_news_aggregator",
+        source_lane: "aify",
+        source_tier: "first_class",
+        verification_policy: "no_secondary_review_required",
+        editorial_category: "community",
+        evidence: "Site metadata title=Aify News",
+        notes: "feeds=1; discovered_github_repositories=1",
+        summary_template: null,
+        tags: ["ai-news"]
+      },
+      {
+        id: "candidate-suppressed",
+        signal: "github_watch",
+        title: "taielab/awesome-ai-news",
+        url: "https://github.com/taielab/awesome-ai-news",
+        canonical_url: "https://github.com/taielab/awesome-ai-news",
+        source: "GitHub repo watch: taielab/awesome-ai-news",
+        event_date: "2026-07-03",
+        decision: "suppressed",
+        quality_score: 42,
+        repo: "taielab/awesome-ai-news",
+        summary_template: {
+          purpose: "Suppressed repo should never become public."
+        },
+        tags: ["ai-news"]
+      }
+    ]
+  };
+}
+
 test("buildArticleIndex emits public Aify-style article records", () => {
   const articles = buildArticleIndex([sampleReport()], {
     siteTitle: "AI 日报",
@@ -143,6 +224,98 @@ test("buildArticleIndex emits public Aify-style article records", () => {
   assert.equal(validation.valid, true, JSON.stringify(validation.errors, null, 2));
 });
 
+test("buildArticleIndex consumes admitted Source Watch candidates as public articles", () => {
+  const articles = buildArticleIndex([], {
+    updatedAt: "2026-07-03T08:00:00.000Z",
+    sourceWatchAdmittedArtifacts: [sampleSourceWatchAdmittedArtifact()]
+  });
+
+  assert.equal(articles.length, 2, "only admitted Source Watch candidates should become public articles");
+  assert.equal(articles.some((article) => article.url.includes("awesome-ai-news")), false);
+
+  const github = articles.find((article) => article.url.includes("ML-news-of-the-week"));
+  assert.equal(github.section, "source_watch");
+  assert.equal(github.date, "2026-07-03");
+  assert.equal(github.source, "GitHub repo watch: SalvatoreRa/ML-news-of-the-week");
+  assert.equal(github.quality_score, 88);
+  assert.match(github.summary, /tracks open-source signals/);
+  assert.match(github.summary, /3210 stars/);
+  assert.match(github.summary, /Recent commit activity/);
+  assert.doesNotMatch(github.summary, /latest_commit=|pushed_at=|stars=|forks=|Historical snapshot changed/);
+
+  const aify = articles.find((article) => article.url === "https://aify-news.pages.dev/");
+  assert.equal(aify.section, "source_watch");
+  assert.equal(aify.source, "Aify News");
+  assert.equal(aify.quality_score, 91);
+  assert.match(aify.summary, /first-class AI news source/);
+
+  const serialized = JSON.stringify(articles);
+  for (const forbidden of [
+    "candidate_id",
+    "canonical_id",
+    "source_id",
+    "source_lane",
+    "source_tier",
+    "verification_policy",
+    "verification_status",
+    "repo_delta",
+    "freshness",
+    "summary_template",
+    "admission",
+    "rationale",
+    "notes",
+    "raw"
+  ]) {
+    assert.equal(serialized.includes(forbidden), false, `public Source Watch article leaked ${forbidden}`);
+  }
+
+  const validation = validateArticles(articles);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors, null, 2));
+});
+
+test("buildArticleIndex accepts direct Source Watch candidate arrays with per-candidate dates", () => {
+  const artifact = sampleSourceWatchAdmittedArtifact();
+  const articles = buildArticleIndex([], {
+    sourceWatchAdmittedCandidates: artifact.candidates.map((candidate) => ({
+      ...candidate,
+      report_date: artifact.report_date
+    }))
+  });
+
+  assert.equal(articles.length, 2);
+  assert(articles.every((article) => article.report_date === "2026-07-03"));
+  const validation = validateArticles(articles);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors, null, 2));
+});
+
+test("Source Watch article records dedupe with report-derived records by canonical URL", () => {
+  const artifact = sampleSourceWatchAdmittedArtifact();
+  artifact.candidates = [{
+    ...artifact.candidates[0],
+    id: "candidate-codex-duplicate",
+    title: "openai/codex",
+    url: "https://github.com/openai/codex?utm_source=source-watch",
+    canonical_url: "https://github.com/openai/codex?utm_source=source-watch",
+    source: "Source Watch duplicate",
+    quality_score: 97,
+    summary_template: {
+      purpose: "Duplicate URL should merge with the report article.",
+      change: "Source Watch saw the same public URL.",
+      evidence: "verified duplicate"
+    }
+  }];
+
+  const articles = buildArticleIndex([sampleReport()], {
+    updatedAt: "2026-07-03T08:00:00.000Z",
+    sourceWatchAdmittedArtifacts: [artifact]
+  });
+
+  const duplicates = articles.filter((article) => article.url.includes("github.com/openai/codex"));
+  assert.equal(duplicates.length, 1);
+  assert.equal(duplicates[0].quality_score, 97);
+  assert.notEqual(duplicates[0].section, "source_watch", "existing report-derived public article should remain the primary record");
+});
+
 test("article index does not leak internal generation fields", () => {
   const articles = buildArticleIndex([sampleReport()], {
     updatedAt: "2026-07-03T08:00:00.000Z"
@@ -154,6 +327,15 @@ test("article index does not leak internal generation fields", () => {
     "self_check",
     "candidate_pool",
     "reader_relevance",
+    "canonical_id",
+    "source_id",
+    "source_lane",
+    "source_tier",
+    "verification_policy",
+    "verification_status",
+    "repo_delta",
+    "freshness",
+    "summary_template",
     "admission",
     "rationale"
   ]) {
