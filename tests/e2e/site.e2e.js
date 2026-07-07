@@ -432,6 +432,7 @@ await buildSite({
   dataInputDir,
   outDir,
   generatedAt: fixedGeneratedAt,
+  includeDailyHtml: true,
   trendConfigPath
 });
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-benchmark.png"));

@@ -194,7 +194,7 @@ function fixtureArticle(overrides) {
     source: overrides.id.includes("a") ? "AIFY Fixture" : "ADC Fixture",
     section: "source_watch",
     report_date: "2026-07-07",
-    report_url: "reports/2026/07/2026-07-07.html",
+    report_url: "index.html",
     data_url: "data/2026/07/2026-07-07.json",
     quality_score: overrides.quality_score,
     importance: overrides.importance,

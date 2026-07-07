@@ -5,7 +5,7 @@ import { promisify } from "node:util";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
-import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
+import { canonicalHomeUrl, canonicalTodayDataUrl, reportRelativePaths } from "./paths.js";
 import { classifyPublishQuality, requirePublishableQuality } from "./quality-status.js";
 import { planGeneratedFiles, reportManagedAssetPaths } from "./site.js";
 import { buildAutomationRevision } from "./automation-revision.js";
@@ -386,7 +386,7 @@ export async function createPublishPlan(options = {}) {
     will_stage_files: stageFiles,
     current_dirty_files: statusEntries.map((entry) => entry.path).sort(),
     commit_message: commitMessage,
-    expected_pages_url: reports.length === 1 ? reports[0].canonical_url : DEFAULT_SITE.siteUrl,
+    expected_pages_url: canonicalHomeUrl(options.siteUrl || DEFAULT_SITE.siteUrl),
     reports: reports.map((report) => ({
       report_date: report.report_date,
       title: report.title,
@@ -472,7 +472,7 @@ export async function publishGeneratedArtifacts(options = {}) {
     options.commitMessage || `chore: publish AI daily report${options.reportDate ? ` ${options.reportDate}` : ""}`;
   await git.add(publishFiles);
   const commitOutput = await git.commit(commitMessage);
-  const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  const pagesUrl = options.reportDate ? canonicalTodayDataUrl(DEFAULT_SITE.siteUrl) : "";
   let pushOutput = "";
   try {
     pushOutput = await git.push(branch);
@@ -641,7 +641,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
     force: false
   });
 
-  const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  const pagesUrl = options.reportDate ? canonicalTodayDataUrl(DEFAULT_SITE.siteUrl) : "";
   const verification =
     pagesUrl && options.verifyPages
       ? await verifyPublishedUrl(pagesUrl, {
@@ -717,7 +717,7 @@ export async function resumePublishPush(options = {}) {
   }
 
   await checkPushTransport(repoRoot, git, branch);
-  const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  const pagesUrl = options.reportDate ? canonicalTodayDataUrl(DEFAULT_SITE.siteUrl) : "";
   const pushOutput = await git.push(branch);
   const verification =
     pagesUrl && options.verifyPages

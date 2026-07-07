@@ -318,10 +318,18 @@ test("buildSite publishes an explicit Source Watch admitted artifact into docs/a
   const aify = articles.find((article) => article.url === "https://aify-news.pages.dev/");
   assert.equal(aify.source, "Aify News");
   assert.equal(aify.section, "source_watch");
+  assert.equal(aify.report_url, "index.html");
   assert.equal(validateArticles(articles).valid, true);
+  const feed = JSON.parse(await fs.readFile(path.join(outDir, "feed.json"), "utf8"));
+  assert.equal(feed.reports[0].url, "index.html");
   const serialized = JSON.stringify(articles);
   assert.equal(serialized.includes("source_lane"), false);
   assert.equal(serialized.includes("latest_commit="), false);
+  assert.equal(result.writtenFiles.some((filePath) => /^reports\/\d{4}\/\d{2}\/\d{4}-\d{2}-\d{2}\.html$/.test(filePath)), false);
+  await assert.rejects(
+    fs.readFile(path.join(outDir, "reports", "2026", "07", "2026-07-03.html"), "utf8"),
+    /ENOENT/
+  );
 });
 
 test("buildSite writes React frontend data artifacts with external AIFY articles", async () => {

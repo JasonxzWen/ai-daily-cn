@@ -47,8 +47,10 @@ test("publish dry-run 在干净工作树输出发布计划", async () => {
   assert.equal(plan.mode, "dry-run");
   assert.equal(plan.branch, "main");
   assert.equal(plan.commit_message, "chore: publish AI daily report 2026-05-13");
-  assert.equal(plan.expected_pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
-  assert(plan.will_write_files.includes("docs/reports/2026/05/2026-05-13.html"));
+  assert.equal(plan.expected_pages_url, "https://jasonxzwen.github.io/ai-daily-cn/");
+  assert(plan.will_write_files.includes("docs/index.html"));
+  assert(plan.will_write_files.includes("docs/data/2026/05/2026-05-13.json"));
+  assert(!plan.will_write_files.includes("docs/reports/2026/05/2026-05-13.html"));
   assert(plan.will_stage_files.includes("docs/feed.json"));
   assert(plan.will_stage_files.includes("docs/articles.json"));
   assert(plan.will_stage_files.includes("docs/trends.json"));
@@ -82,7 +84,7 @@ test("daily dry-run requires an explicit report date and stays date-scoped", asy
   assert.equal(plan.mode, "daily-dry-run");
   assert.equal(plan.reports.length, 1);
   assert.equal(plan.reports[0].report_date, "2026-05-13");
-  assert.equal(plan.expected_pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
+  assert.equal(plan.expected_pages_url, "https://jasonxzwen.github.io/ai-daily-cn/");
   assert(plan.will_write_files.includes("docs/articles.json"));
   assert(plan.will_stage_files.includes("docs/articles.json"));
   assert(plan.will_stage_files.includes("docs/data/official-blogs.json"));
@@ -949,9 +951,10 @@ test("github api publish can use planned generated files when the worktree is cl
   });
 
   assert.equal(result.committed, true);
-  assert(result.published_files.includes("docs/reports/2026/05/2026-05-13.html"));
+  assert(result.published_files.includes("docs/index.html"));
   assert(result.published_files.includes("docs/data/2026/05/2026-05-13.json"));
   assert(result.published_files.includes("reports-data/2026/05/2026-05-13.json"));
+  assert(!result.published_files.includes("docs/reports/2026/05/2026-05-13.html"));
 });
 
 test("github api publish 遇到非发布器管理改动时停止", async () => {
@@ -1104,7 +1107,7 @@ test("publish 可在 push 后验证 Pages URL", async () => {
 
   assert.equal(result.pages_verified, true);
   assert.equal(result.verification_error, "");
-  assert.equal(result.pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
+  assert.equal(result.pages_url, "https://jasonxzwen.github.io/ai-daily-cn/data/today.json");
 });
 
 test("publish resume pushes existing local commits and verifies Pages", async () => {

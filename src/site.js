@@ -478,7 +478,9 @@ export async function buildSite(options = {}) {
   }
 
   const existingFeed = await readExistingFeed(outDir, siteTitle, siteUrl, generatedAt);
-  const feed = mergeFeed(existingFeed, reports, { siteTitle, siteUrl, updatedAt: generatedAt });
+  const defaultReportUrl = options.includeDailyHtml ? "" : "index.html";
+  const reportUrl = options.reportUrl ?? options.articleReportUrl ?? defaultReportUrl;
+  const feed = mergeFeed(existingFeed, reports, { siteTitle, siteUrl, updatedAt: generatedAt, reportUrl });
   const feedValidation = validateFeed(feed);
   if (!feedValidation.valid) {
     throw new PublisherError("feed_schema_validation_failed", "生成的 feed.json 未通过 schema 校验。", {
@@ -524,6 +526,7 @@ export async function buildSite(options = {}) {
     siteUrl,
     updatedAt: feedValidation.value.updated_at,
     sourceWatchAdmittedArtifacts,
+    articleReportUrl: reportUrl,
     externalArticles: externalArticleSources.flatMap((source) => source.articles || [])
   });
   const articleValidation = validateArticles(articles);
@@ -556,6 +559,7 @@ export async function buildSite(options = {}) {
       trackingHistoryById: trackingHistoryByDate.get(record.report.report_date),
       fetchImpl: options.fetchImpl,
       siteUrl,
+      includeDailyHtml: Boolean(options.includeDailyHtml),
       includeInternalData: Boolean(options.includeInternalData)
     });
   }
@@ -570,7 +574,8 @@ export async function buildSite(options = {}) {
   await writeJsonTracked(outDir, "data/runtime.json", frontendValidation.value.runtime, writtenFiles);
   await writeJsonTracked(outDir, "data/official-blogs.json", officialBlogKnowledge, writtenFiles);
   await writeFileTracked(outDir, "official-blogs/index.html", renderOfficialBlogsHtml(officialBlogKnowledge, {
-    styleHref: `../assets/style.css?v=${encodeURIComponent(indexStyleVersion)}`
+    styleHref: `../assets/style.css?v=${encodeURIComponent(indexStyleVersion)}`,
+    reportHrefForDate: options.includeDailyHtml ? undefined : () => "../index.html"
   }), writtenFiles);
   await writeFileTracked(outDir, "ops.html", renderOpsIndexHtml(feedValidation.value, trendValidation.value, dateIndex, {
     styleVersion: indexStyleVersion,
@@ -686,7 +691,10 @@ export async function planGeneratedFiles(options = {}) {
     const markdown = await fs.readFile(file, "utf8");
     const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt });
     const paths = reportRelativePaths(report.report_date);
-    files.push(paths.markdownPath, paths.dataPath, paths.htmlPath);
+    files.push(paths.markdownPath, paths.dataPath);
+    if (options.includeDailyHtml) {
+      files.push(paths.htmlPath);
+    }
     files.push(...reportManagedAssetPaths(report));
     reports.push(report);
   }
@@ -694,7 +702,10 @@ export async function planGeneratedFiles(options = {}) {
   for (const file of reportJsonFiles) {
     const report = await readReportJson(file);
     const paths = reportRelativePaths(report.report_date);
-    files.push(paths.dataPath, paths.htmlPath);
+    files.push(paths.dataPath);
+    if (options.includeDailyHtml) {
+      files.push(paths.htmlPath);
+    }
     files.push(...reportManagedAssetPaths(report));
     if (options.includeInternalData && (report.candidate_pool_path || (await exists(candidatePoolPathForReportFile(file, report.report_date))))) {
       files.push(paths.candidateDataPath);
@@ -727,7 +738,7 @@ export function mergeFeed(existingFeed, reports, options = {}) {
       report_date: report.report_date,
       title: report.title,
       summary: report.summary,
-      url: paths.htmlPath,
+      url: articleReportUrl(options, paths),
       data_url: paths.dataPath,
       main_items: report.main_items.length,
       builder_observations: report.builder_observations.length,
@@ -778,7 +789,7 @@ export function buildArticleIndex(reports = [], options = {}) {
   }
 
   for (const record of sourceWatchAdmittedCandidateRecords(options)) {
-    const article = articleFromSourceWatchCandidate(record.candidate, record.reportDate);
+    const article = articleFromSourceWatchCandidate(record.candidate, record.reportDate, options);
     if (!article) {
       continue;
     }
@@ -1026,7 +1037,7 @@ function externalArticleFromRecord(record, target, options = {}) {
     source: cleanArticleText(record.source || target.name || "AIFY"),
     section: "source_watch",
     report_date: reportDate,
-    report_url: paths.htmlPath,
+    report_url: articleReportUrl(options, paths),
     data_url: paths.dataPath,
     quality_score: score,
     importance: score >= 88 ? "major" : score >= 72 ? "notable" : "general",
@@ -1389,7 +1400,7 @@ function articleFromReportItem(report, section, item, options = {}) {
     source,
     section,
     report_date: report.report_date,
-    report_url: paths.htmlPath,
+    report_url: articleReportUrl(options, paths),
     data_url: paths.dataPath,
     quality_score: scoreArticle(section, item, importance, summary),
     importance,
@@ -1444,7 +1455,7 @@ function sourceWatchAdmittedArtifactList(value) {
   return [];
 }
 
-function articleFromSourceWatchCandidate(candidate, reportDate) {
+function articleFromSourceWatchCandidate(candidate, reportDate, options = {}) {
   if (!candidate || typeof candidate !== "object" || candidate.decision !== "admitted") {
     return null;
   }
@@ -1489,7 +1500,7 @@ function articleFromSourceWatchCandidate(candidate, reportDate) {
     source,
     section: "source_watch",
     report_date: reportDate,
-    report_url: paths.htmlPath,
+    report_url: articleReportUrl(options, paths),
     data_url: paths.dataPath,
     quality_score: sourceWatchArticleQualityScore(candidate),
     importance,
@@ -1500,6 +1511,14 @@ function articleFromSourceWatchCandidate(candidate, reportDate) {
     companies: entities.companies,
     products: entities.products
   };
+}
+
+function articleReportUrl(options = {}, paths = {}) {
+  const value = String(options.articleReportUrl ?? options.reportUrl ?? "").trim().replaceAll("\\", "/");
+  if (value && !value.startsWith("/") && !/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)) {
+    return value;
+  }
+  return paths.htmlPath || "index.html";
 }
 
 function sourceWatchArticleSource(candidate, title) {
@@ -2544,16 +2563,18 @@ async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markd
   await localizeBuilderAvatars(rootDir, outDir, report, writtenFiles, {
     fetchImpl: options.fetchImpl
   });
-  const reportHtml = applyDailyReportHtmlOverrides(await renderReportWithEffectiveInteract(report, {
-    rootDir,
-    assetRootDir: outDir,
-    trendAnnotations: options.trendAnnotations,
-    reportNavigation: options.reportNavigation,
-    dateIndexItem: options.dateIndexItem,
-    trackingHistoryById: options.trackingHistoryById
-  }), report.report_date);
   await writeJsonTracked(outDir, paths.dataPath, publicReportData(report), writtenFiles);
-  await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);
+  if (options.includeDailyHtml) {
+    const reportHtml = applyDailyReportHtmlOverrides(await renderReportWithEffectiveInteract(report, {
+      rootDir,
+      assetRootDir: outDir,
+      trendAnnotations: options.trendAnnotations,
+      reportNavigation: options.reportNavigation,
+      dateIndexItem: options.dateIndexItem,
+      trackingHistoryById: options.trackingHistoryById
+    }), report.report_date);
+    await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);
+  }
   if (options.includeInternalData && reportJsonPath) {
     await copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writtenFiles);
   }

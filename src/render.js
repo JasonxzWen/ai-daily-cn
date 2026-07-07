@@ -625,7 +625,7 @@ export function renderOfficialBlogsHtml(knowledge = {}, options = {}) {
       </div>
     </section>
     <section class="official-blog-excerpt-grid" aria-label="官方博客节选列表">
-      ${records.map((record) => renderOfficialBlogExcerptCard(record, recordById)).join("\n")}
+      ${records.map((record) => renderOfficialBlogExcerptCard(record, recordById, options)).join("\n")}
     </section>
   </main>
 </body>
@@ -962,7 +962,7 @@ function renderOfficialBlogCard(record) {
     </article>`;
 }
 
-function renderOfficialBlogExcerptCard(record, recordById) {
+function renderOfficialBlogExcerptCard(record, recordById, options = {}) {
   const title = record.title_zh || record.title_original || record.id;
   const ideas = Array.isArray(record.key_ideas) ? record.key_ideas : [];
   const practices = Array.isArray(record.practice_checklist) ? record.practice_checklist : [];
@@ -982,7 +982,7 @@ function renderOfficialBlogExcerptCard(record, recordById) {
         ${topics.map((topic) => `<span class="tag">${escapeHtml(topic)}</span>`).join("")}
       </div>
       ${renderRelatedBlogLinks(record, recordById)}
-      ${renderRelatedReportLinks(record)}
+      ${renderRelatedReportLinks(record, options)}
       <div class="item-meta">
         <span>${escapeHtml(record.published_at || "")}</span>
         <a href="${escapeAttribute(record.canonical_url || "#")}" target="_blank" rel="noopener noreferrer">阅读原文</a>
@@ -1018,11 +1018,12 @@ function renderRelatedBlogLinks(record, recordById) {
     </div>`;
 }
 
-function renderRelatedReportLinks(record) {
+function renderRelatedReportLinks(record, options = {}) {
   const dates = Array.isArray(record.related_report_dates) ? record.related_report_dates : [];
   const links = dates.map((date) => {
+    const configuredHref = typeof options.reportHrefForDate === "function" ? options.reportHrefForDate(date) : "";
     const paths = reportRelativePaths(date);
-    const href = relativeAssetHref("official-blogs/index.html", paths.htmlPath);
+    const href = configuredHref || relativeAssetHref("official-blogs/index.html", paths.htmlPath);
     return `<a class="tag" href="${escapeAttribute(href)}" data-related-report-link="${escapeAttribute(date)}">${escapeHtml(date)}</a>`;
   });
   return `<div class="official-blog-related" data-related-report-links="${escapeAttribute(record.id || "")}">

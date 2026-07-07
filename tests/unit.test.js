@@ -3440,6 +3440,7 @@ test("public data rewrites generic Hugging Face Trending machine descriptions", 
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath,
     fetchImpl: async () => new Response("", { status: 404 })
   });
@@ -12029,6 +12030,7 @@ test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12063,6 +12065,7 @@ test("buildSite skips unchanged files and avoids legacy shared scratch path", as
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   };
   const first = await buildSite(options);
@@ -12124,6 +12127,7 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12209,6 +12213,7 @@ test("buildSite preserves explicit report quality status in docs data and homepa
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12247,6 +12252,7 @@ test("buildSite ignores source status history metadata in reports-data", async (
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12404,6 +12410,7 @@ test("buildSite writes reader-safe public data without internal fields or candid
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12564,6 +12571,7 @@ test("public artifacts omit removed community sources", async () => {
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12600,6 +12608,7 @@ test("daily tracking renders multi-entity seven day trend lines", async () => {
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12700,6 +12709,7 @@ test("public report projection preserves sanitized public quality events", async
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12774,6 +12784,7 @@ test("public report projection removes retired platform data and degraded events
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12813,6 +12824,7 @@ test("production daily does not enable PromptLayer-inspired theme or ticket grid
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12882,6 +12894,7 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -12957,6 +12970,7 @@ test("buildSite writes trend index and injects scoped trend tags without mutatin
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -13396,6 +13410,7 @@ test("official blog related report dates generated file public projection is gen
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -13440,6 +13455,8 @@ test("official blog related report dates generated file public projection is gen
   assert(generated.files.includes("ops.html"));
   assert(generated.files.includes("data/official-blogs.json"));
   assert(generated.files.includes("official-blogs/index.html"));
+  assert(generated.files.includes("data/2026/05/2026-05-14.json"));
+  assert(!generated.files.includes("reports/2026/05/2026-05-14.html"));
 });
 
 test("effective interact index style uses report primitives", async () => {
@@ -13571,6 +13588,7 @@ test("buildSite writes date index homepage without exposing private report field
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -13610,6 +13628,7 @@ test("旧结构化 JSON 缺少模型发布和热门博客字段时仍可 build",
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath
   });
 
@@ -18959,6 +18978,7 @@ test("public daily followups open external report links in new tabs", async () =
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath,
     fetchImpl: async () => new Response("", { status: 404 })
   });
@@ -19036,6 +19056,7 @@ test("public daily followups reject generic GitHub Trending README summaries", a
     outDir,
     siteUrl,
     generatedAt: fixedGeneratedAt,
+    includeDailyHtml: true,
     trendConfigPath,
     fetchImpl: async () => new Response("", { status: 404 })
   });
@@ -25007,7 +25028,7 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("plain_language_failed"));
   assert(prompt.includes("候选池"));
   assert(prompt.includes("candidate_id"));
-  assert(prompt.includes("真实发布后必须验证当日 GitHub Pages URL 返回 HTTP 200"));
+  assert(prompt.includes("真实发布后必须验证 GitHub Pages 首页返回 HTTP 200"));
   assert(prompt.includes("反思与自动化迭代建议"));
   assert(prompt.includes("GitHub Trending"));
   assert(prompt.includes("github_trending"));
