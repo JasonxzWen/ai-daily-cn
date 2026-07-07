@@ -831,6 +831,7 @@ async function loadSourceWatchlist(options = {}, rootDir = process.cwd()) {
 
 function normalizeSourceWatchTarget(rawTarget = {}, index = 0) {
   const type = String(rawTarget.type || "").trim().toLowerCase();
+  const contractFields = normalizeSourceWatchContractFields(rawTarget);
   if (["github_repo", "github", "repo", "repository"].includes(type)) {
     const repo = normalizeSourceWatchRepo(rawTarget.repo || githubRepoFromUrl(rawTarget.url || ""));
     if (!repo) {
@@ -843,7 +844,8 @@ function normalizeSourceWatchTarget(rawTarget = {}, index = 0) {
       id: rawTarget.id || `github-watch-${slugId(repo)}`,
       name: rawTarget.name || repo,
       repo,
-      url
+      url,
+      ...contractFields
     };
   }
 
@@ -856,11 +858,41 @@ function normalizeSourceWatchTarget(rawTarget = {}, index = 0) {
       type: "site",
       id: rawTarget.id || `site-watch-${slugId(rawTarget.url)}`,
       name: rawTarget.name || rawTarget.url,
-      url: rawTarget.url
+      url: rawTarget.url,
+      ...contractFields
     };
   }
 
   throw new Error(`source watch target ${index + 1} has unsupported type ${rawTarget.type || "(missing)"}`);
+}
+
+function normalizeSourceWatchContractFields(rawTarget = {}) {
+  const sourceLane = sourceWatchToken(rawTarget.source_lane || rawTarget.lane);
+  const sourceTier = sourceWatchToken(rawTarget.source_tier || rawTarget.tier);
+  const verificationPolicy = sourceWatchToken(rawTarget.verification_policy);
+  return {
+    ...(sourceLane ? { source_lane: sourceLane } : {}),
+    ...(sourceTier ? { source_tier: sourceTier } : {}),
+    ...(verificationPolicy ? { verification_policy: verificationPolicy } : {})
+  };
+}
+
+function sourceWatchContractFields(target = {}) {
+  return normalizeSourceWatchContractFields(target);
+}
+
+function sourceWatchToken(value) {
+  return String(value || "").trim().toLowerCase().replace(/[^a-z0-9_:-]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function sourceWatchVerificationStatus(target = {}, fallback = "") {
+  if (
+    target.source_tier === "first_class"
+    && target.verification_policy === "no_secondary_review_required"
+  ) {
+    return "first_class_source_confirmed";
+  }
+  return fallback;
 }
 
 function normalizeSourceWatchRepo(value) {
@@ -945,6 +977,7 @@ async function collectSourceWatchGithubRepo(target, context) {
     name: target.name,
     repo: target.repo,
     url: target.url,
+    ...sourceWatchContractFields(target),
     status,
     fetched_at: context.generatedAt,
     endpoint_status: endpointStatus,
@@ -965,6 +998,7 @@ async function collectSourceWatchGithubRepo(target, context) {
     notes,
     repo: target.repo,
     source_level: "github",
+    ...sourceWatchContractFields(target),
     verification_status: repoResult.ok ? "primary_confirmed" : "unverified"
   };
   const candidate = repoResult.ok ? sourceWatchGithubCandidate(target, metadata, {
@@ -982,6 +1016,7 @@ async function collectSourceWatchGithubRepo(target, context) {
     auditSource: auditSource(target.name, target.url, status, notes, {
       target_id: target.id,
       repo: target.repo,
+      ...sourceWatchContractFields(target),
       endpoint_status: endpointStatus,
       ...(Object.keys(rateLimit).length ? { rate_limit: rateLimit } : {}),
       stars: metadata.stars || 0,
@@ -1012,6 +1047,7 @@ async function collectSourceWatchSite(target, context) {
     type: target.type,
     name: target.name,
     url: target.url,
+    ...sourceWatchContractFields(target),
     status,
     fetched_at: context.generatedAt,
     http_status: result.status,
@@ -1032,7 +1068,8 @@ async function collectSourceWatchSite(target, context) {
     checked_at: context.generatedAt,
     notes,
     source_level: "ai_news_aggregator",
-    verification_status: result.ok ? "intermediary_only" : "unverified"
+    ...sourceWatchContractFields(target),
+    verification_status: result.ok ? sourceWatchVerificationStatus(target, "intermediary_only") : "unverified"
   };
   const candidate = result.ok ? sourceWatchSiteCandidate(target, site, {
     reportDate: context.reportDate,
@@ -1044,6 +1081,7 @@ async function collectSourceWatchSite(target, context) {
     candidate,
     auditSource: auditSource(target.name, target.url, status, notes, {
       target_id: target.id,
+      ...sourceWatchContractFields(target),
       http_status: result.status,
       title: site.title || "",
       canonical_url: site.canonical_url || "",
@@ -1069,6 +1107,7 @@ function sourceWatchGithubCandidate(target, metadata, details) {
     event_date: dateOnly(metadata.pushed_at) || details.reportDate,
     status: "excluded",
     signal: "github_watch",
+    ...sourceWatchContractFields(target),
     description: metadata.description || "",
     evidence: `${target.repo} is explicitly watched; stars=${metadata.stars || 0}; forks=${metadata.forks || 0}; pushed_at=${metadata.pushed_at || "unknown"}.`,
     notes: [
@@ -1081,7 +1120,7 @@ function sourceWatchGithubCandidate(target, metadata, details) {
       `readme=${details.readme.status}`
     ].filter(Boolean).join("; "),
     tags: metadata.topics || [],
-    verification_status: "primary_confirmed",
+    verification_status: sourceWatchVerificationStatus(target, "primary_confirmed"),
     source_level: "github",
     primary_url: metadata.html_url || target.url,
     verification_sources: [metadata.html_url || target.url],
@@ -1102,13 +1141,14 @@ function sourceWatchSiteCandidate(target, site, details) {
     event_date: details.reportDate,
     status: "excluded",
     signal: "site_watch",
+    ...sourceWatchContractFields(target),
     evidence: `${target.name} is explicitly watched; feeds=${site.feeds.length}; github_links=${site.github_repositories.length}.`,
     notes: [
       site.description ? `description=${trimText(site.description, 160)}` : "",
       `feeds=${site.feeds.length}`,
       `github_links=${site.github_repositories.length}`
     ].filter(Boolean).join("; "),
-    verification_status: "intermediary_only",
+    verification_status: sourceWatchVerificationStatus(target, "intermediary_only"),
     source_level: "ai_news_aggregator",
     intermediary_url: target.url,
     verification_sources: [target.url],

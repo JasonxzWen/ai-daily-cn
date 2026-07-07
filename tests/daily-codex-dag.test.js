@@ -1612,6 +1612,7 @@ test("daily codex DAG source-watch downstream MVP consumes source-health artifac
   assert.deepEqual(artifact.signal_counts, { github_watch: 2, site_watch: 2 });
   assert(artifact.candidates.some((candidate) => candidate.signal === "github_watch"));
   assert(artifact.candidates.some((candidate) => candidate.signal === "site_watch"));
+  assertAifyLaneCandidate(artifact.candidates.find((candidate) => candidate.source_id === "site-aify-news"));
   assert.equal(JSON.stringify(artifact).includes("ML news of the week tracks machine learning updates"), false);
 
   const wrongTotal = structuredCloneJson(result);
@@ -1758,6 +1759,7 @@ test("daily codex DAG source-watch normalize MVP consumes extracted candidates i
   assert.deepEqual(artifact.signal_counts, { github_watch: 2, site_watch: 2 });
   assert(artifact.candidates.every((candidate) => typeof candidate.canonical_id === "string" && candidate.canonical_id.startsWith("source-watch:")));
   assert(artifact.candidates.every((candidate) => typeof candidate.canonical_url === "string"));
+  assertAifyLaneCandidate(artifact.candidates.find((candidate) => candidate.source_id === "site-aify-news"));
   assert.equal(JSON.stringify(artifact).includes("ML news of the week tracks machine learning updates"), false);
 
   const wrongTotal = structuredCloneJson(result);
@@ -3500,6 +3502,7 @@ test("daily codex DAG source-watch quality MVP CLI writes internal quality artif
   assert.equal(artifact.candidate_count, 4);
   assert.equal(artifact.suppressed_count, 1);
   assert.equal(artifact.quality_audit.public_surface, false);
+  assertAifyLaneCandidate(artifact.candidates.find((candidate) => candidate.source_id === "site-aify-news"));
 
   await assertValidDagRunSummary(parsed);
   const forbiddenAfter = await forbiddenPathSnapshot();
@@ -4764,6 +4767,14 @@ function assertResolvedArtifactMetadata(artifact) {
   assert.equal(artifact.schema_valid, true);
   assert(Number.isInteger(artifact.bytes) && artifact.bytes > 0, "artifact bytes must be a positive integer");
   assert.match(artifact.sha256, /^[a-f0-9]{64}$/);
+}
+
+function assertAifyLaneCandidate(candidate) {
+  assert(candidate, "expected site-aify-news candidate");
+  assert.equal(candidate.source_lane, "aify");
+  assert.equal(candidate.source_tier, "first_class");
+  assert.equal(candidate.verification_policy, "no_secondary_review_required");
+  assert.equal(candidate.verification_status, "first_class_source_confirmed");
 }
 
 async function forbiddenPathSnapshot() {

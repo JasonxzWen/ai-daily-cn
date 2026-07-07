@@ -65,14 +65,32 @@ test("collectSourceWatch replays configured sites and GitHub repos from fixtures
 
   const siteTarget = collected.targets.find((target) => target.id === "site-aify-news");
   assert.equal(siteTarget.status, "checked");
+  assert.equal(siteTarget.source_lane, "aify");
+  assert.equal(siteTarget.source_tier, "first_class");
+  assert.equal(siteTarget.verification_policy, "no_secondary_review_required");
   assert.equal(siteTarget.site_metadata.title, "Aify News");
   assert.equal(siteTarget.feeds[0].url, "https://aify-news.pages.dev/feed.xml");
   assert.equal(siteTarget.discovered_github_repositories[0].repo, "example/aify-news");
 
+  const siteSource = collected.sources.find((source) => source.id === "site-aify-news");
+  assert.equal(siteSource.source_lane, "aify");
+  assert.equal(siteSource.source_tier, "first_class");
+  assert.equal(siteSource.verification_policy, "no_secondary_review_required");
+  assert.equal(siteSource.verification_status, "first_class_source_confirmed");
+
+  const siteAudit = collected.source_audit.site_watch.sources.find((source) => source.target_id === "site-aify-news");
+  assert.equal(siteAudit.source_lane, "aify");
+  assert.equal(siteAudit.source_tier, "first_class");
+  assert.equal(siteAudit.verification_policy, "no_secondary_review_required");
+
   const siteCandidate = collected.candidates.find((candidate) => candidate.source_id === "site-aify-news");
   assert.equal(siteCandidate.category, "community_lead");
   assert.equal(siteCandidate.signal, "site_watch");
+  assert.equal(siteCandidate.source_lane, "aify");
+  assert.equal(siteCandidate.source_tier, "first_class");
+  assert.equal(siteCandidate.verification_policy, "no_secondary_review_required");
   assert.equal(siteCandidate.source_level, "ai_news_aggregator");
+  assert.equal(siteCandidate.verification_status, "first_class_source_confirmed");
   assert.match(siteCandidate.notes, /feeds=1/);
 });
 
@@ -192,6 +210,11 @@ test("discover:github-watch CLI writes the source watch artifact", async () => {
   assert.equal(filePayload.candidates.length, 4);
   assert.equal(filePayload.source_audit.github_watch.fetched_repos, 2);
   assert.equal(filePayload.source_audit.site_watch.fetched_sites, 2);
+  const aifyCandidate = filePayload.candidates.find((candidate) => candidate.source_id === "site-aify-news");
+  assert.equal(aifyCandidate.source_lane, "aify");
+  assert.equal(aifyCandidate.source_tier, "first_class");
+  assert.equal(aifyCandidate.verification_policy, "no_secondary_review_required");
+  assert.equal(aifyCandidate.verification_status, "first_class_source_confirmed");
 });
 
 test("source watch quality fixture dedupes stale unchanged repos and keeps internal summaries", async () => {
@@ -278,6 +301,9 @@ test("source watch quality fixture dedupes stale unchanged repos and keeps inter
       status: "pending",
       verification_status: "secondary_confirmed",
       source_level: "ai_news_aggregator",
+      source_lane: "aify",
+      source_tier: "first_class",
+      verification_policy: "no_secondary_review_required",
       editorial_category: "community",
       repo: "",
       evidence: "Site metadata title=Aify News",
@@ -328,6 +354,9 @@ test("source watch quality fixture dedupes stale unchanged repos and keeps inter
   assert.deepEqual(duplicateRepo.suppression_reasons, ["duplicate_current", "repo_unchanged", "seen_recently"]);
   assert.equal(siteCandidate.decision, "admitted");
   assert.equal(siteCandidate.summary_template, null);
+  assert.equal(siteCandidate.source_lane, "aify");
+  assert.equal(siteCandidate.source_tier, "first_class");
+  assert.equal(siteCandidate.verification_policy, "no_secondary_review_required");
   assert.equal(JSON.stringify(output).includes("machine learning updates"), false);
 
   await fs.rm(inputPath, { force: true });
