@@ -16,6 +16,7 @@ import {
   createDailyCodexDagSourceWatchDownstreamMvp,
   createDailyCodexDagSourceWatchNormalizeMvp,
   createDailyCodexDagSourceWatchQualityMvp,
+  createDailyCodexDagSourceWatchAdmitMvp,
   createDailyCodexDagTwoNodeFixtureMvp,
   createDailyCodexDagPlan,
   executeDailyCodexDagCommandNode,
@@ -2109,6 +2110,225 @@ test("daily codex DAG source-watch quality MVP records structured quality failur
   await removeSourceWatchQualityFixtureArtifacts(reportDate);
 });
 
+test("daily codex DAG source-watch admit MVP consumes quality candidates into admitted candidates", async () => {
+  const reportDate = "2026-07-06";
+  await removeSourceWatchAdmitFixtureArtifacts(reportDate);
+  const result = await createDailyCodexDagSourceWatchAdmitMvp({
+    rootDir,
+    reportDate,
+    now: "2026-07-06T08:00:00.000Z",
+    startedAt: "2026-07-06T08:00:00.000Z",
+    finishedAt: "2026-07-06T08:00:01.000Z",
+    nodeExecutablePath: process.execPath
+  });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.mode, "daily_codex_dag_source_watch_admit_mvp");
+  assert.equal(result.run.final_status, "executed_source_watch_admit");
+  assert.deepEqual(result.run.planned_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
+  assert.deepEqual(result.run.blocked_nodes, []);
+  assert.equal(result.plan.node_count, 5);
+  assert.deepEqual(result.plan.levels, [
+    { level: 0, node_ids: ["fetch-source-health"] },
+    { level: 1, node_ids: ["parse-extract"] },
+    { level: 2, node_ids: ["normalize-canonicalize"] },
+    { level: 3, node_ids: ["freshness-history-check"] },
+    { level: 4, node_ids: ["admit-reject"] }
+  ]);
+  assert.equal(result.quality.admitted_candidates, 3);
+  assert.deepEqual(result.admitted, {
+    artifact_path: ".tmp/daily-codex-pipeline/{report_date}/artifacts/admitted-candidates.json",
+    artifact_kind: "source_watch_admitted_candidates",
+    input_kind: "source_watch_quality_candidates",
+    total_candidates: 3,
+    github_watch_candidates: 1,
+    site_watch_candidates: 2,
+    other_candidates: 0,
+    empty: false,
+    signals: ["github_watch", "site_watch"],
+    public_surface: false
+  });
+  assert.equal(result.node_results.length, 5);
+  assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
+
+  const [collectResult, downstreamResult, normalizeResult, qualityResult, admitResult] = result.node_results;
+  assert.equal(admitResult.node_id, "admit-reject");
+  assert.equal(admitResult.node_kind, "command");
+  assert.equal(admitResult.runner_stage_ref, "admit");
+  assert.equal(admitResult.status, "success");
+  assert.equal(admitResult.dependency_results[0].node_id, "freshness-history-check");
+  assert.equal(admitResult.dependency_results[0].execution_id, qualityResult.execution_id);
+  assert.equal(admitResult.declared_inputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/quality-candidates.json");
+  assert.equal(admitResult.declared_outputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/admitted-candidates.json");
+  assert.equal(admitResult.resolved_inputs[0].path, qualityResult.resolved_outputs[0].path);
+  for (const artifact of [
+    collectResult.resolved_outputs[0],
+    downstreamResult.resolved_outputs[0],
+    normalizeResult.resolved_outputs[0],
+    qualityResult.resolved_outputs[0],
+    admitResult.resolved_inputs[0],
+    admitResult.resolved_outputs[0]
+  ]) {
+    assertResolvedArtifactMetadata(artifact);
+  }
+  assert.equal(Object.hasOwn(admitResult, "stdout"), false);
+  assert.equal(Object.hasOwn(admitResult, "stderr"), false);
+  assert.deepEqual(result.executed_commands, [{
+    node_id: "fetch-source-health",
+    runner: "node",
+    script: "scripts/run-source-watch-collect-fixture.mjs"
+  }, {
+    node_id: "parse-extract",
+    runner: "node",
+    script: "scripts/run-source-watch-downstream-fixture.mjs"
+  }, {
+    node_id: "normalize-canonicalize",
+    runner: "node",
+    script: "scripts/run-source-watch-normalize-fixture.mjs"
+  }, {
+    node_id: "freshness-history-check",
+    runner: "node",
+    script: "scripts/run-source-watch-quality-fixture.mjs"
+  }, {
+    node_id: "admit-reject",
+    runner: "node",
+    script: "scripts/run-source-watch-admit-fixture.mjs"
+  }]);
+  assert.equal(result.codex_invocations.length, 0);
+  assert.equal(JSON.stringify(result).includes("ML news of the week tracks machine learning updates"), false);
+
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "admitted-candidates.json");
+  const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
+  assert.equal(artifact.kind, "source_watch_admitted_candidates");
+  assert.equal(artifact.input_kind, "source_watch_quality_candidates");
+  assert.equal(artifact.candidate_count, 3);
+  assert.equal(artifact.public_surface, false);
+  assert(artifact.candidates.every((candidate) => candidate.decision === "admitted"));
+  assert.equal(artifact.candidates.some((candidate) => candidate.repo === "taielab/awesome-ai-news"), false);
+  assertAifyLaneCandidate(artifact.candidates.find((candidate) => candidate.source_id === "site-aify-news"));
+
+  const wrongTotal = structuredCloneJson(result);
+  wrongTotal.admitted.total_candidates = 2;
+  assertInvalidSemanticDagRunSummary(
+    wrongTotal,
+    "admitted.total_candidates must equal quality.admitted_candidates",
+    "tampered admitted total"
+  );
+
+  await assertValidDagNodeResult(collectResult);
+  await assertValidDagNodeResult(downstreamResult);
+  await assertValidDagNodeResult(normalizeResult);
+  await assertValidDagNodeResult(qualityResult);
+  await assertValidDagNodeResult(admitResult);
+  await assertValidDagRunSummary(result);
+  await removeSourceWatchAdmitFixtureArtifacts(reportDate);
+});
+
+test("daily codex DAG source-watch admit MVP blocks admit when quality fails", async () => {
+  const reportDate = "2026-07-06";
+  await removeSourceWatchAdmitFixtureArtifacts(reportDate);
+  const result = await createDailyCodexDagSourceWatchAdmitMvp({
+    rootDir,
+    reportDate,
+    now: "2026-07-06T08:00:00.000Z",
+    startedAt: "2026-07-06T08:00:00.000Z",
+    finishedAt: "2026-07-06T08:00:01.000Z",
+    nodeExecutablePath: process.execPath,
+    async executeCommand(invocation) {
+      if (
+        argsIncludeScript(invocation.args, "scripts/run-source-watch-collect-fixture.mjs")
+        || argsIncludeScript(invocation.args, "scripts/run-source-watch-downstream-fixture.mjs")
+        || argsIncludeScript(invocation.args, "scripts/run-source-watch-normalize-fixture.mjs")
+      ) {
+        return runCommandForTest(invocation);
+      }
+      if (argsIncludeScript(invocation.args, "scripts/run-source-watch-quality-fixture.mjs")) {
+        return { exitCode: 1, stdout: "{\"ok\":false,\"failures\":[\"SECRET quality failed\"]}", stderr: "SECRET quality stderr" };
+      }
+      assert.fail(`unexpected command: ${invocation.args.join(" ")}`);
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.mode, "daily_codex_dag_source_watch_admit_mvp");
+  assert.equal(result.run.final_status, "blocked");
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(result.run.blocked_nodes, ["freshness-history-check", "admit-reject"]);
+  assert.equal(result.admitted.total_candidates, 0);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  const [collectResult, downstreamResult, normalizeResult, qualityResult, admitResult] = result.node_results;
+  assert.equal(qualityResult.status, "failure");
+  assert.equal(admitResult.status, "blocked");
+  assert.equal(admitResult.dependency_results[0].node_id, "freshness-history-check");
+  assert.equal(admitResult.dependency_results[0].execution_id, qualityResult.execution_id);
+  assert.equal(Object.hasOwn(qualityResult, "stdout"), false);
+  assert.equal(Object.hasOwn(admitResult, "stderr"), false);
+  assert.equal(JSON.stringify(result).includes("SECRET quality"), false);
+  assert.equal(JSON.stringify(result.failures).includes("admitted.total_candidates must equal quality.admitted_candidates"), false);
+
+  await assertValidDagNodeResult(collectResult);
+  await assertValidDagNodeResult(downstreamResult);
+  await assertValidDagNodeResult(normalizeResult);
+  await assertValidDagNodeResult(qualityResult);
+  await assertValidDagNodeResult(admitResult);
+  await assertValidDagRunSummary(result);
+  await removeSourceWatchAdmitFixtureArtifacts(reportDate);
+});
+
+test("daily codex DAG source-watch admit MVP records structured admit failure after quality succeeds", async () => {
+  const reportDate = "2026-07-06";
+  await removeSourceWatchAdmitFixtureArtifacts(reportDate);
+  const result = await createDailyCodexDagSourceWatchAdmitMvp({
+    rootDir,
+    reportDate,
+    now: "2026-07-06T08:00:00.000Z",
+    startedAt: "2026-07-06T08:00:00.000Z",
+    finishedAt: "2026-07-06T08:00:01.000Z",
+    nodeExecutablePath: process.execPath,
+    async executeCommand(invocation) {
+      if (
+        argsIncludeScript(invocation.args, "scripts/run-source-watch-collect-fixture.mjs")
+        || argsIncludeScript(invocation.args, "scripts/run-source-watch-downstream-fixture.mjs")
+        || argsIncludeScript(invocation.args, "scripts/run-source-watch-normalize-fixture.mjs")
+        || argsIncludeScript(invocation.args, "scripts/run-source-watch-quality-fixture.mjs")
+      ) {
+        return runCommandForTest(invocation);
+      }
+      if (argsIncludeScript(invocation.args, "scripts/run-source-watch-admit-fixture.mjs")) {
+        return { exitCode: 1, stdout: "{\"ok\":false,\"failures\":[\"SECRET admit failed\"]}", stderr: "SECRET admit stderr" };
+      }
+      assert.fail(`unexpected command: ${invocation.args.join(" ")}`);
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.mode, "daily_codex_dag_source_watch_admit_mvp");
+  assert.equal(result.run.final_status, "blocked");
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.deepEqual(result.run.blocked_nodes, ["admit-reject"]);
+  assert.equal(result.admitted.total_candidates, 0);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
+  const [collectResult, downstreamResult, normalizeResult, qualityResult, admitResult] = result.node_results;
+  assert.equal(qualityResult.status, "success");
+  assert.equal(admitResult.status, "failure");
+  assert.equal(admitResult.dependency_results[0].node_id, "freshness-history-check");
+  assert.equal(admitResult.dependency_results[0].execution_id, qualityResult.execution_id);
+  assert.equal(Object.hasOwn(admitResult, "stdout"), false);
+  assert.equal(Object.hasOwn(admitResult, "stderr"), false);
+  assert(result.failures.some((failure) => failure.includes("exit code 1")), result.failures.join("\n"));
+  assert.equal(JSON.stringify(result).includes("SECRET admit"), false);
+  assert.equal(JSON.stringify(result.failures).includes("admitted.total_candidates must equal quality.admitted_candidates"), false);
+
+  await assertValidDagNodeResult(collectResult);
+  await assertValidDagNodeResult(downstreamResult);
+  await assertValidDagNodeResult(normalizeResult);
+  await assertValidDagNodeResult(qualityResult);
+  await assertValidDagNodeResult(admitResult);
+  await assertValidDagRunSummary(result);
+  await removeSourceWatchAdmitFixtureArtifacts(reportDate);
+});
+
 test("daily codex DAG two-node fixture MVP runs classify then score with artifact handoff", async () => {
   await removeTwoNodeFixtureArtifacts();
   const result = await createDailyCodexDagTwoNodeFixtureMvp({
@@ -3243,7 +3463,7 @@ test("daily codex DAG dry-run CLI rejects invalid invocations with structured JS
   const missingDryRunJson = JSON.parse(missingDryRun.stdout);
   assert.equal(
     missingDryRunJson.failures[0],
-    "daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, --execute-source-watch-quality-fixture, or --execute-two-node-fixture"
+    "daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, --execute-source-watch-quality-fixture, --execute-source-watch-admit-fixture, or --execute-two-node-fixture"
   );
   assert.equal(missingDryRunJson.validation, null);
   await assertValidDagRunSummary(missingDryRunJson);
@@ -3509,6 +3729,50 @@ test("daily codex DAG source-watch quality MVP CLI writes internal quality artif
   assert.deepEqual(forbiddenAfter.docsReports, forbiddenBefore.docsReports, "source-watch quality MVP must not mutate docs reports");
   assert.deepEqual(forbiddenAfter.reportsData, forbiddenBefore.reportsData, "source-watch quality MVP must not mutate reports data");
   await removeSourceWatchQualityFixtureArtifacts(reportDate);
+});
+
+test("daily codex DAG source-watch admit MVP CLI writes internal admitted artifact under .tmp only", async () => {
+  const reportDate = "2026-07-06";
+  await removeSourceWatchAdmitFixtureArtifacts(reportDate);
+  const forbiddenBefore = await forbiddenPathSnapshot();
+  const result = await runDagCli(["--execute-source-watch-admit-fixture", "--date", reportDate, "--json"]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, true, parsed.failures?.join("\n"));
+  assert.equal(parsed.mode, "daily_codex_dag_source_watch_admit_mvp");
+  assert.equal(parsed.report_date, reportDate);
+  assert.equal(parsed.run.final_status, "executed_source_watch_admit");
+  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
+  assert.equal(parsed.quality.admitted_candidates, 3);
+  assert.equal(parsed.admitted.total_candidates, 3);
+  assert.equal(parsed.admitted.public_surface, false);
+  assert.equal(parsed.node_results.length, 5);
+  assert.equal(parsed.node_results[4].node_id, "admit-reject");
+  assert.equal(parsed.node_results[4].status, "success");
+  assert.equal(parsed.node_results[4].dependency_results[0].execution_id, parsed.node_results[3].execution_id);
+  assertResolvedArtifactMetadata(parsed.node_results[3].resolved_outputs[0]);
+  assertResolvedArtifactMetadata(parsed.node_results[4].resolved_inputs[0]);
+  assertResolvedArtifactMetadata(parsed.node_results[4].resolved_outputs[0]);
+  assert.equal(Object.hasOwn(parsed.node_results[0], "stdout"), false);
+  assert.equal(Object.hasOwn(parsed.node_results[4], "stderr"), false);
+  assert.equal(JSON.stringify(parsed).includes("ML news of the week tracks machine learning updates"), false);
+
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "admitted-candidates.json");
+  const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
+  assert.equal(artifact.kind, "source_watch_admitted_candidates");
+  assert.equal(artifact.candidate_count, 3);
+  assert.equal(artifact.public_surface, false);
+  assert(artifact.candidates.every((candidate) => candidate.decision === "admitted"));
+  assert.equal(artifact.candidates.some((candidate) => candidate.repo === "taielab/awesome-ai-news"), false);
+  assertAifyLaneCandidate(artifact.candidates.find((candidate) => candidate.source_id === "site-aify-news"));
+
+  await assertValidDagRunSummary(parsed);
+  const forbiddenAfter = await forbiddenPathSnapshot();
+  assert.deepEqual(forbiddenAfter.docsReports, forbiddenBefore.docsReports, "source-watch admit MVP must not mutate docs reports");
+  assert.deepEqual(forbiddenAfter.reportsData, forbiddenBefore.reportsData, "source-watch admit MVP must not mutate reports data");
+  await removeSourceWatchAdmitFixtureArtifacts(reportDate);
 });
 
 test("daily codex DAG two-node fixture MVP CLI writes JSON to stdout only", async () => {
@@ -4750,6 +5014,13 @@ async function removeSourceWatchNormalizeFixtureArtifacts(reportDate = "2026-07-
 async function removeSourceWatchQualityFixtureArtifacts(reportDate = "2026-07-06") {
   await removeSourceWatchNormalizeFixtureArtifacts(reportDate);
   await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "quality-candidates.json"), {
+    force: true
+  });
+}
+
+async function removeSourceWatchAdmitFixtureArtifacts(reportDate = "2026-07-06") {
+  await removeSourceWatchQualityFixtureArtifacts(reportDate);
+  await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "admitted-candidates.json"), {
     force: true
   });
 }
