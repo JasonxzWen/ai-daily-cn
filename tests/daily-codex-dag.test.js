@@ -15,6 +15,7 @@ import {
   createDailyCodexDagSourceWatchCollectMvp,
   createDailyCodexDagSourceWatchDownstreamMvp,
   createDailyCodexDagSourceWatchNormalizeMvp,
+  createDailyCodexDagSourceWatchQualityMvp,
   createDailyCodexDagTwoNodeFixtureMvp,
   createDailyCodexDagPlan,
   executeDailyCodexDagCommandNode,
@@ -1930,6 +1931,182 @@ test("daily codex DAG source-watch normalize MVP records structured normalize fa
   await removeSourceWatchNormalizeFixtureArtifacts(reportDate);
 });
 
+test("daily codex DAG source-watch quality MVP consumes canonical candidates into quality candidates", async () => {
+  const reportDate = "2026-07-06";
+  await removeSourceWatchQualityFixtureArtifacts(reportDate);
+  const result = await createDailyCodexDagSourceWatchQualityMvp({
+    rootDir,
+    reportDate,
+    now: "2026-07-06T08:00:00.000Z",
+    startedAt: "2026-07-06T08:00:00.000Z",
+    finishedAt: "2026-07-06T08:00:01.000Z",
+    nodeExecutablePath: process.execPath
+  });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.mode, "daily_codex_dag_source_watch_quality_mvp");
+  assert.equal(result.run.final_status, "executed_source_watch_quality");
+  assert.deepEqual(result.run.planned_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.deepEqual(result.run.blocked_nodes, []);
+  assert.equal(result.plan.node_count, 4);
+  assert.deepEqual(result.plan.levels, [
+    { level: 0, node_ids: ["fetch-source-health"] },
+    { level: 1, node_ids: ["parse-extract"] },
+    { level: 2, node_ids: ["normalize-canonicalize"] },
+    { level: 3, node_ids: ["freshness-history-check"] }
+  ]);
+  assert.equal(result.source_watch.total_candidates_found, 4);
+  assert.equal(result.downstream.total_candidates, 4);
+  assert.equal(result.normalized.total_candidates, 4);
+  assert.deepEqual(result.quality, {
+    artifact_path: ".tmp/daily-codex-pipeline/{report_date}/artifacts/quality-candidates.json",
+    artifact_kind: "source_watch_quality_candidates",
+    input_kind: "source_watch_canonical_candidates",
+    total_candidates: 4,
+    admitted_candidates: 3,
+    suppressed_candidates: 1,
+    duplicate_candidates: 0,
+    stale_candidates: 1,
+    unchanged_repo_candidates: 1,
+    github_watch_candidates: 2,
+    site_watch_candidates: 2,
+    other_candidates: 0,
+    empty: false,
+    signals: ["github_watch", "site_watch"],
+    suppressed_reasons: ["repo_unchanged", "seen_recently"],
+    public_surface: false
+  });
+  assert.equal(result.node_results.length, 4);
+  assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
+
+  const [collectResult, downstreamResult, normalizeResult, qualityResult] = result.node_results;
+  assert.equal(qualityResult.node_id, "freshness-history-check");
+  assert.equal(qualityResult.node_kind, "command");
+  assert.equal(qualityResult.runner_stage_ref, "admit");
+  assert.equal(qualityResult.status, "success");
+  assert.equal(qualityResult.dependency_results[0].node_id, "normalize-canonicalize");
+  assert.equal(qualityResult.dependency_results[0].execution_id, normalizeResult.execution_id);
+  assert.equal(qualityResult.declared_inputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json");
+  assert.equal(qualityResult.declared_outputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/quality-candidates.json");
+  assert.equal(qualityResult.resolved_inputs[0].path, normalizeResult.resolved_outputs[0].path);
+  for (const artifact of [
+    collectResult.resolved_outputs[0],
+    downstreamResult.resolved_outputs[0],
+    normalizeResult.resolved_outputs[0],
+    qualityResult.resolved_inputs[0],
+    qualityResult.resolved_outputs[0]
+  ]) {
+    assertResolvedArtifactMetadata(artifact);
+  }
+  assert.equal(Object.hasOwn(qualityResult, "stdout"), false);
+  assert.equal(Object.hasOwn(qualityResult, "stderr"), false);
+  assert.deepEqual(result.executed_commands, [{
+    node_id: "fetch-source-health",
+    runner: "node",
+    script: "scripts/run-source-watch-collect-fixture.mjs"
+  }, {
+    node_id: "parse-extract",
+    runner: "node",
+    script: "scripts/run-source-watch-downstream-fixture.mjs"
+  }, {
+    node_id: "normalize-canonicalize",
+    runner: "node",
+    script: "scripts/run-source-watch-normalize-fixture.mjs"
+  }, {
+    node_id: "freshness-history-check",
+    runner: "node",
+    script: "scripts/run-source-watch-quality-fixture.mjs"
+  }]);
+  assert.equal(result.codex_invocations.length, 0);
+  assert.equal(JSON.stringify(result).includes("ML news of the week tracks machine learning updates"), false);
+
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "quality-candidates.json");
+  const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
+  assert.equal(artifact.kind, "source_watch_quality_candidates");
+  assert.equal(artifact.input_kind, "source_watch_canonical_candidates");
+  assert.equal(artifact.candidates.length, 4);
+  assert.deepEqual(artifact.signal_counts, { github_watch: 2, site_watch: 2 });
+  assert.equal(artifact.quality_audit.public_surface, false);
+  const changedRepo = artifact.candidates.find((candidate) => candidate.repo === "SalvatoreRa/ML-news-of-the-week");
+  const unchangedRepo = artifact.candidates.find((candidate) => candidate.repo === "taielab/awesome-ai-news");
+  assert.equal(changedRepo.decision, "admitted");
+  assert.equal(changedRepo.repo_delta.status, "changed");
+  assert.equal(changedRepo.summary_template.purpose.includes("SalvatoreRa/ML-news-of-the-week"), true);
+  assert.match(changedRepo.summary_template.evidence, /latest_commit=bbbbbbbbbbbb/);
+  assert.equal(unchangedRepo.decision, "suppressed");
+  assert.deepEqual(unchangedRepo.suppression_reasons, ["repo_unchanged", "seen_recently"]);
+  assert.equal(JSON.stringify(artifact).includes("ML news of the week tracks machine learning updates"), false);
+
+  const wrongTotal = structuredCloneJson(result);
+  wrongTotal.quality.total_candidates = 3;
+  assertInvalidSemanticDagRunSummary(
+    wrongTotal,
+    "quality.total_candidates must equal normalized.total_candidates",
+    "tampered quality total"
+  );
+
+  await assertValidDagNodeResult(collectResult);
+  await assertValidDagNodeResult(downstreamResult);
+  await assertValidDagNodeResult(normalizeResult);
+  await assertValidDagNodeResult(qualityResult);
+  await assertValidDagRunSummary(result);
+  await removeSourceWatchQualityFixtureArtifacts(reportDate);
+});
+
+test("daily codex DAG source-watch quality MVP records structured quality failure after normalize succeeds", async () => {
+  const reportDate = "2026-07-06";
+  await removeSourceWatchQualityFixtureArtifacts(reportDate);
+  const result = await createDailyCodexDagSourceWatchQualityMvp({
+    rootDir,
+    reportDate,
+    now: "2026-07-06T08:00:00.000Z",
+    startedAt: "2026-07-06T08:00:00.000Z",
+    finishedAt: "2026-07-06T08:00:01.000Z",
+    nodeExecutablePath: process.execPath,
+    async executeCommand(invocation) {
+      if (
+        argsIncludeScript(invocation.args, "scripts/run-source-watch-collect-fixture.mjs")
+        || argsIncludeScript(invocation.args, "scripts/run-source-watch-downstream-fixture.mjs")
+        || argsIncludeScript(invocation.args, "scripts/run-source-watch-normalize-fixture.mjs")
+      ) {
+        return runCommandForTest(invocation);
+      }
+      if (argsIncludeScript(invocation.args, "scripts/run-source-watch-quality-fixture.mjs")) {
+        return { exitCode: 1, stdout: "{\"ok\":false,\"failures\":[\"SECRET quality failed\"]}", stderr: "SECRET quality stderr" };
+      }
+      assert.fail(`unexpected command: ${invocation.args.join(" ")}`);
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.mode, "daily_codex_dag_source_watch_quality_mvp");
+  assert.equal(result.run.final_status, "blocked");
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(result.run.blocked_nodes, ["freshness-history-check"]);
+  assert.equal(result.quality.total_candidates, 0);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  const [collectResult, downstreamResult, normalizeResult, qualityResult] = result.node_results;
+  assert.equal(collectResult.status, "success");
+  assert.equal(downstreamResult.status, "success");
+  assert.equal(normalizeResult.status, "success");
+  assert.equal(qualityResult.status, "failure");
+  assert.equal(qualityResult.dependency_results[0].node_id, "normalize-canonicalize");
+  assert.equal(qualityResult.dependency_results[0].execution_id, normalizeResult.execution_id);
+  assert.equal(Object.hasOwn(qualityResult, "stdout"), false);
+  assert.equal(Object.hasOwn(qualityResult, "stderr"), false);
+  assert(result.failures.some((failure) => failure.includes("exit code 1")), result.failures.join("\n"));
+  assert.equal(JSON.stringify(result).includes("SECRET quality"), false);
+  assert.equal(JSON.stringify(result.failures).includes("quality.total_candidates must equal normalized.total_candidates"), false);
+
+  await assertValidDagNodeResult(collectResult);
+  await assertValidDagNodeResult(downstreamResult);
+  await assertValidDagNodeResult(normalizeResult);
+  await assertValidDagNodeResult(qualityResult);
+  await assertValidDagRunSummary(result);
+  await removeSourceWatchQualityFixtureArtifacts(reportDate);
+});
+
 test("daily codex DAG two-node fixture MVP runs classify then score with artifact handoff", async () => {
   await removeTwoNodeFixtureArtifacts();
   const result = await createDailyCodexDagTwoNodeFixtureMvp({
@@ -3064,7 +3241,7 @@ test("daily codex DAG dry-run CLI rejects invalid invocations with structured JS
   const missingDryRunJson = JSON.parse(missingDryRun.stdout);
   assert.equal(
     missingDryRunJson.failures[0],
-    "daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, or --execute-two-node-fixture"
+    "daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, --execute-source-watch-quality-fixture, or --execute-two-node-fixture"
   );
   assert.equal(missingDryRunJson.validation, null);
   await assertValidDagRunSummary(missingDryRunJson);
@@ -3286,6 +3463,49 @@ test("daily codex DAG source-watch normalize MVP CLI writes collect parse and ca
   assert.deepEqual(forbiddenAfter.docsReports, forbiddenBefore.docsReports, "source-watch normalize MVP must not mutate docs reports");
   assert.deepEqual(forbiddenAfter.reportsData, forbiddenBefore.reportsData, "source-watch normalize MVP must not mutate reports data");
   await removeSourceWatchNormalizeFixtureArtifacts(reportDate);
+});
+
+test("daily codex DAG source-watch quality MVP CLI writes internal quality artifact under .tmp only", async () => {
+  const reportDate = "2026-07-06";
+  await removeSourceWatchQualityFixtureArtifacts(reportDate);
+  const forbiddenBefore = await forbiddenPathSnapshot();
+  const result = await runDagCli(["--execute-source-watch-quality-fixture", "--date", reportDate, "--json"]);
+
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.ok, true, parsed.failures?.join("\n"));
+  assert.equal(parsed.mode, "daily_codex_dag_source_watch_quality_mvp");
+  assert.equal(parsed.report_date, reportDate);
+  assert.equal(parsed.run.final_status, "executed_source_watch_quality");
+  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.equal(parsed.quality.total_candidates, 4);
+  assert.equal(parsed.quality.admitted_candidates, 3);
+  assert.equal(parsed.quality.suppressed_candidates, 1);
+  assert.equal(parsed.quality.public_surface, false);
+  assert.equal(parsed.node_results.length, 4);
+  assert.equal(parsed.node_results[3].node_id, "freshness-history-check");
+  assert.equal(parsed.node_results[3].status, "success");
+  assert.equal(parsed.node_results[3].dependency_results[0].execution_id, parsed.node_results[2].execution_id);
+  assertResolvedArtifactMetadata(parsed.node_results[2].resolved_outputs[0]);
+  assertResolvedArtifactMetadata(parsed.node_results[3].resolved_inputs[0]);
+  assertResolvedArtifactMetadata(parsed.node_results[3].resolved_outputs[0]);
+  assert.equal(Object.hasOwn(parsed.node_results[0], "stdout"), false);
+  assert.equal(Object.hasOwn(parsed.node_results[3], "stderr"), false);
+  assert.equal(JSON.stringify(parsed).includes("ML news of the week tracks machine learning updates"), false);
+
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "quality-candidates.json");
+  const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
+  assert.equal(artifact.kind, "source_watch_quality_candidates");
+  assert.equal(artifact.candidate_count, 4);
+  assert.equal(artifact.suppressed_count, 1);
+  assert.equal(artifact.quality_audit.public_surface, false);
+
+  await assertValidDagRunSummary(parsed);
+  const forbiddenAfter = await forbiddenPathSnapshot();
+  assert.deepEqual(forbiddenAfter.docsReports, forbiddenBefore.docsReports, "source-watch quality MVP must not mutate docs reports");
+  assert.deepEqual(forbiddenAfter.reportsData, forbiddenBefore.reportsData, "source-watch quality MVP must not mutate reports data");
+  await removeSourceWatchQualityFixtureArtifacts(reportDate);
 });
 
 test("daily codex DAG two-node fixture MVP CLI writes JSON to stdout only", async () => {
@@ -4520,6 +4740,13 @@ async function removeSourceWatchDownstreamFixtureArtifacts(reportDate = "2026-07
 async function removeSourceWatchNormalizeFixtureArtifacts(reportDate = "2026-07-06") {
   await removeSourceWatchDownstreamFixtureArtifacts(reportDate);
   await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "canonical-candidates.json"), {
+    force: true
+  });
+}
+
+async function removeSourceWatchQualityFixtureArtifacts(reportDate = "2026-07-06") {
+  await removeSourceWatchNormalizeFixtureArtifacts(reportDate);
+  await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "quality-candidates.json"), {
     force: true
   });
 }
