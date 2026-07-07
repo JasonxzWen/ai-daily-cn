@@ -11,6 +11,7 @@ import {
   createDailyCodexDagSourceWatchNormalizeMvp,
   createDailyCodexDagSourceWatchQualityMvp,
   createDailyCodexDagSourceWatchAdmitMvp,
+  createDailyCodexDagSourceWatchArticleIndexMvp,
   createDailyCodexDagTwoNodeFixtureMvp
 } from "../src/daily-codex-dag.js";
 
@@ -25,6 +26,7 @@ function parseArgs(argv) {
     executeSourceWatchNormalizeFixture: false,
     executeSourceWatchQualityFixture: false,
     executeSourceWatchAdmitFixture: false,
+    executeSourceWatchArticleIndexFixture: false,
     executeTwoNodeFixture: false,
     execute: false,
     publish: false,
@@ -54,6 +56,8 @@ function parseArgs(argv) {
       args.executeSourceWatchQualityFixture = true;
     } else if (arg === "--execute-source-watch-admit-fixture") {
       args.executeSourceWatchAdmitFixture = true;
+    } else if (arg === "--execute-source-watch-article-index-fixture") {
+      args.executeSourceWatchArticleIndexFixture = true;
     } else if (arg === "--execute-two-node-fixture") {
       args.executeTwoNodeFixture = true;
     } else if (arg === "--execute") {
@@ -92,16 +96,17 @@ function parseArgs(argv) {
     args.executeSourceWatchNormalizeFixture,
     args.executeSourceWatchQualityFixture,
     args.executeSourceWatchAdmitFixture,
+    args.executeSourceWatchArticleIndexFixture,
     args.executeTwoNodeFixture
   ].filter(Boolean).length;
   if (modeCount === 0) {
-    throw new Error("daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, --execute-source-watch-quality-fixture, --execute-source-watch-admit-fixture, or --execute-two-node-fixture");
+    throw new Error("daily codex DAG CLI requires one of --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, --execute-source-watch-quality-fixture, --execute-source-watch-admit-fixture, --execute-source-watch-article-index-fixture, or --execute-two-node-fixture");
   }
-  if (args.dryRun && args.contractRun && !args.executeNodeFixture && !args.executeRealNodeFixture && !args.executeSourceWatchFixture && !args.executeSourceWatchDownstreamFixture && !args.executeSourceWatchNormalizeFixture && !args.executeSourceWatchQualityFixture && !args.executeSourceWatchAdmitFixture && !args.executeTwoNodeFixture) {
+  if (args.dryRun && args.contractRun && !args.executeNodeFixture && !args.executeRealNodeFixture && !args.executeSourceWatchFixture && !args.executeSourceWatchDownstreamFixture && !args.executeSourceWatchNormalizeFixture && !args.executeSourceWatchQualityFixture && !args.executeSourceWatchAdmitFixture && !args.executeSourceWatchArticleIndexFixture && !args.executeTwoNodeFixture) {
     throw new Error("daily codex DAG CLI cannot combine --dry-run and --contract-run");
   }
   if (modeCount > 1) {
-    throw new Error("daily codex DAG CLI cannot combine --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, --execute-source-watch-quality-fixture, --execute-source-watch-admit-fixture, and --execute-two-node-fixture");
+    throw new Error("daily codex DAG CLI cannot combine --dry-run, --contract-run, --execute-node-fixture, --execute-real-node-fixture, --execute-source-watch-fixture, --execute-source-watch-downstream-fixture, --execute-source-watch-normalize-fixture, --execute-source-watch-quality-fixture, --execute-source-watch-admit-fixture, --execute-source-watch-article-index-fixture, and --execute-two-node-fixture");
   }
   if (args.dryRun && (args.execute || args.publish)) {
     throw new Error(`Unsupported argument: ${args.execute ? "--execute" : "--publish"}`);
@@ -129,6 +134,9 @@ function parseArgs(argv) {
   }
   if (args.executeSourceWatchAdmitFixture && (args.execute || args.publish)) {
     throw new Error("daily codex DAG CLI execute-source-watch-admit fixture does not support --execute or --publish");
+  }
+  if (args.executeSourceWatchArticleIndexFixture && (args.execute || args.publish)) {
+    throw new Error("daily codex DAG CLI execute-source-watch-article-index fixture does not support --execute or --publish");
   }
   if (args.executeTwoNodeFixture && (args.execute || args.publish)) {
     throw new Error("daily codex DAG CLI execute-two-node fixture does not support --execute or --publish");
@@ -186,9 +194,11 @@ async function main() {
                   ? await createDailyCodexDagSourceWatchQualityMvp({ reportDate: args.date })
                   : args.executeSourceWatchAdmitFixture
                     ? await createDailyCodexDagSourceWatchAdmitMvp({ reportDate: args.date })
-                    : args.executeTwoNodeFixture
-                      ? await createDailyCodexDagTwoNodeFixtureMvp({ reportDate: args.date })
-                      : await createDailyCodexDagDryRun({ reportDate: args.date });
+                    : args.executeSourceWatchArticleIndexFixture
+                      ? await createDailyCodexDagSourceWatchArticleIndexMvp({ reportDate: args.date })
+                      : args.executeTwoNodeFixture
+                        ? await createDailyCodexDagTwoNodeFixtureMvp({ reportDate: args.date })
+                        : await createDailyCodexDagDryRun({ reportDate: args.date });
     if (result.ok) {
       await writeSummaryFile(summaryPath, result);
     }
