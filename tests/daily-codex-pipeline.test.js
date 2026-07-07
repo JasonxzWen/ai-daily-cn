@@ -262,14 +262,233 @@ test("daily Codex DAG-lite CLI accepts production execute publish flags with cod
   const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
   assert.equal(summary.execute_requested, true);
   assert.equal(summary.publish_requested, true);
-  assert.equal(summary.completed_stages.length, 6);
+  assert.equal(summary.completed_stages.length, 7);
+  assert.equal(summary.completed_stages.find((stage) => stage.id === "publish").status, "skipped");
+  assert.equal(summary.completed_stages.find((stage) => stage.id === "publish").skipped_reason, "source_watch_admitted_artifact_not_provided");
   assert.equal(summary.failures.length, 0);
+  assert.equal(summary.publication.ok, false);
+  assert.equal(summary.publication.skipped_reason, "source_watch_admitted_artifact_not_provided");
 
   const plan = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "daily-codex-mvp", "2026-07-06", "pipeline-plan.json"), "utf8"));
   assert.equal(plan.codex.bin, codexCmd);
   assert.equal(plan.codex.fixture_mode, "");
   assert.equal(plan.execute_requested, true);
   assert.equal(plan.publish_requested, true);
+});
+
+test("daily Codex DAG-lite CLI publishes explicit Source Watch admitted artifact into public articles", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-source-watch-publish-"));
+  const reportDate = "2026-07-03";
+  await writeMinimalRepoFiles(rootDir);
+  await writeReportSourceFixture(rootDir);
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "admitted-candidates.json");
+  await writeAdmittedSourceWatchFixture(artifactPath, reportDate);
+
+  const { stdout } = await execFileAsync(process.execPath, [
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+    "--repo-root",
+    rootDir,
+    "--date",
+    reportDate,
+    "--fixture",
+    "success",
+    "--publish",
+    "--source-watch-admitted-artifact",
+    artifactPath,
+    "--input",
+    "reports-source",
+    "--data-input",
+    "reports-data",
+    "--out",
+    "docs",
+    "--trend-config",
+    path.join(repoRoot, "config", "trends.json"),
+    "--generated-at",
+    `${reportDate}T08:00:00.000Z`
+  ], { maxBuffer: 20 * 1024 * 1024 });
+
+  const result = JSON.parse(stdout);
+  assert.equal(result.ok, true);
+  assert.equal(result.final_status, "published");
+  assert.equal(result.publish_requested, true);
+  assert.equal(result.source_watch_admitted_artifact_path, artifactPath);
+
+  const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
+  assert.equal(summary.final_status, "published");
+  assert.equal(summary.publication.ok, true);
+  assert.equal(summary.publication.source_watch_articles, 2);
+  assert.equal(summary.publication.source_watch_admitted_artifact_path, artifactPath);
+  assert.equal(summary.completed_stages.find((stage) => stage.id === "publish").status, "success");
+
+  const articles = JSON.parse(await fs.readFile(path.join(rootDir, "docs", "articles.json"), "utf8"));
+  assert.equal(articles.filter((article) => article.section === "source_watch").length, 2);
+  assert(articles.some((article) => article.url === "https://aify-news.pages.dev/"));
+  const serialized = JSON.stringify(articles);
+  assert.equal(serialized.includes("source_lane"), false);
+  assert.equal(serialized.includes("latest_commit="), false);
+});
+
+test("daily Codex DAG-lite publish stage records structured failure for unsafe Source Watch artifact paths", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-source-watch-bad-path-"));
+  const reportDate = "2026-07-03";
+  await writeMinimalRepoFiles(rootDir);
+  await writeReportSourceFixture(rootDir);
+  const artifactPath = path.join(rootDir, "admitted-candidates.json");
+  await writeAdmittedSourceWatchFixture(artifactPath, reportDate);
+
+  await assert.rejects(execFileAsync(process.execPath, [
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+    "--repo-root",
+    rootDir,
+    "--date",
+    reportDate,
+    "--fixture",
+    "success",
+    "--publish",
+    "--source-watch-admitted-artifact",
+    artifactPath,
+    "--input",
+    "reports-source",
+    "--data-input",
+    "reports-data",
+    "--out",
+    "docs",
+    "--trend-config",
+    path.join(repoRoot, "config", "trends.json")
+  ], { maxBuffer: 20 * 1024 * 1024 }), (error) => {
+    const result = JSON.parse(error.stdout);
+    assert.equal(result.ok, false);
+    assert.equal(result.final_status, "blocked");
+    assert.equal(result.stage_id, "publish");
+    assert.equal(result.publish_requested, true);
+    assert.match(result.failures.join("\n"), /must stay under \.tmp[\\/]daily-codex-pipeline/);
+    return true;
+  });
+  await assert.rejects(fs.stat(path.join(rootDir, "docs")), /ENOENT/);
+});
+
+test("daily Codex DAG-lite publish stage records structured failure for invalid Source Watch artifacts", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-source-watch-bad-kind-"));
+  const reportDate = "2026-07-03";
+  await writeMinimalRepoFiles(rootDir);
+  await writeReportSourceFixture(rootDir);
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "admitted-candidates.json");
+  await fs.mkdir(path.dirname(artifactPath), { recursive: true });
+  await fs.writeFile(artifactPath, `${JSON.stringify({
+    kind: "source_watch_quality_candidates",
+    report_date: reportDate,
+    candidates: []
+  }, null, 2)}\n`, "utf8");
+
+  await assert.rejects(execFileAsync(process.execPath, [
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+    "--repo-root",
+    rootDir,
+    "--date",
+    reportDate,
+    "--fixture",
+    "success",
+    "--publish",
+    "--source-watch-admitted-artifact",
+    artifactPath,
+    "--input",
+    "reports-source",
+    "--data-input",
+    "reports-data",
+    "--out",
+    "docs",
+    "--trend-config",
+    path.join(repoRoot, "config", "trends.json")
+  ], { maxBuffer: 20 * 1024 * 1024 }), (error) => {
+    const result = JSON.parse(error.stdout);
+    assert.equal(result.ok, false);
+    assert.equal(result.final_status, "blocked");
+    assert.equal(result.stage_id, "publish");
+    assert.match(result.failures.join("\n"), /kind source_watch_admitted_candidates/);
+    assert.equal(result.publication.ok, false);
+    assert.equal(result.publication.source_watch_admitted_artifact_path, artifactPath);
+    return true;
+  });
+  await assert.rejects(fs.stat(path.join(rootDir, "docs")), /ENOENT/);
+});
+
+test("daily Codex DAG-lite publish stage rejects stale Source Watch admitted artifacts", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-source-watch-stale-"));
+  const reportDate = "2026-07-03";
+  await writeMinimalRepoFiles(rootDir);
+  await writeReportSourceFixture(rootDir);
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "admitted-candidates.json");
+  await writeAdmittedSourceWatchFixture(artifactPath, "2026-07-02");
+
+  await assert.rejects(execFileAsync(process.execPath, [
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+    "--repo-root",
+    rootDir,
+    "--date",
+    reportDate,
+    "--fixture",
+    "success",
+    "--publish",
+    "--source-watch-admitted-artifact",
+    artifactPath,
+    "--input",
+    "reports-source",
+    "--data-input",
+    "reports-data",
+    "--out",
+    "docs",
+    "--trend-config",
+    path.join(repoRoot, "config", "trends.json")
+  ], { maxBuffer: 20 * 1024 * 1024 }), (error) => {
+    const result = JSON.parse(error.stdout);
+    assert.equal(result.ok, false);
+    assert.equal(result.final_status, "blocked");
+    assert.equal(result.stage_id, "publish");
+    assert.match(result.failures.join("\n"), /report_date must match 2026-07-03/);
+    assert.equal(result.publication.ok, false);
+    return true;
+  });
+  await assert.rejects(fs.stat(path.join(rootDir, "docs")), /ENOENT/);
+});
+
+test("daily Codex DAG-lite publish stage rejects out dirs outside the repository", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-source-watch-bad-out-"));
+  const reportDate = "2026-07-03";
+  await writeMinimalRepoFiles(rootDir);
+  await writeReportSourceFixture(rootDir);
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "admitted-candidates.json");
+  const outsideDir = path.join(path.dirname(rootDir), `${path.basename(rootDir)}-published-outside`);
+  await writeAdmittedSourceWatchFixture(artifactPath, reportDate);
+
+  await assert.rejects(execFileAsync(process.execPath, [
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+    "--repo-root",
+    rootDir,
+    "--date",
+    reportDate,
+    "--fixture",
+    "success",
+    "--publish",
+    "--source-watch-admitted-artifact",
+    artifactPath,
+    "--input",
+    "reports-source",
+    "--data-input",
+    "reports-data",
+    "--out",
+    outsideDir,
+    "--trend-config",
+    path.join(repoRoot, "config", "trends.json")
+  ], { maxBuffer: 20 * 1024 * 1024 }), (error) => {
+    const result = JSON.parse(error.stdout);
+    assert.equal(result.ok, false);
+    assert.equal(result.final_status, "blocked");
+    assert.equal(result.stage_id, "publish");
+    assert.match(result.failures.join("\n"), /publish out dir must stay inside the repository/);
+    assert.equal(result.publication.ok, false);
+    return true;
+  });
+  await assert.rejects(fs.stat(path.join(outsideDir, "articles.json")), /ENOENT/);
 });
 
 test("daily Codex DAG-lite CLI writes root summary for unsupported args", async () => {
@@ -306,6 +525,7 @@ test("daily Codex DAG-lite CLI writes root summary for unsupported args", async 
 test("daily Codex DAG-lite CLI writes root summary for missing value flags", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-missing-value-"));
   await writeMinimalRepoFiles(rootDir);
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", "2026-07-06", "artifacts", "admitted-candidates.json");
 
   try {
     await execFileAsync(process.execPath, [
@@ -314,6 +534,8 @@ test("daily Codex DAG-lite CLI writes root summary for missing value flags", asy
       rootDir,
       "--date",
       "2026-07-06",
+      "--source-watch-admitted-artifact",
+      artifactPath,
       "--codex-bin",
       "--execute",
       "--publish"
@@ -326,6 +548,8 @@ test("daily Codex DAG-lite CLI writes root summary for missing value flags", asy
     assert.equal(result.stage_id, "parse-args");
     assert.equal(result.execute_requested, true);
     assert.equal(result.publish_requested, true);
+    assert.equal(result.source_watch_admitted_artifact_path, artifactPath);
+    assert.equal(result.publication, null);
     assert.match(result.failures.join("\n"), /flag --codex-bin requires a value/);
     assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
 
@@ -333,6 +557,8 @@ test("daily Codex DAG-lite CLI writes root summary for missing value flags", asy
     assert.equal(summary.stage_id, "parse-args");
     assert.equal(summary.execute_requested, true);
     assert.equal(summary.publish_requested, true);
+    assert.equal(summary.source_watch_admitted_artifact_path, artifactPath);
+    assert.equal(summary.publication, null);
   }
 });
 
@@ -395,6 +621,85 @@ async function writeMinimalRepoFiles(rootDir) {
       { id: "codex-generate" }
     ]
   }, null, 2), "utf8");
+}
+
+async function writeReportSourceFixture(rootDir) {
+  const inputDir = path.join(rootDir, "reports-source");
+  await fs.mkdir(inputDir, { recursive: true });
+  await fs.copyFile(
+    path.join(repoRoot, "tests", "fixtures", "reports", "good", "official-release.md"),
+    path.join(inputDir, "official-release.md")
+  );
+}
+
+async function writeAdmittedSourceWatchFixture(filePath, reportDate) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, `${JSON.stringify({
+    schema_version: 1,
+    kind: "source_watch_admitted_candidates",
+    mode: "source_watch_admit_fixture_output",
+    report_date: reportDate,
+    public_surface: false,
+    admission_audit: {
+      public_surface: false,
+      admitted_only: true
+    },
+    candidates: [
+      {
+        id: "candidate-ml-news",
+        canonical_id: "source-watch:ml-news",
+        source_id: "repo-ml-news-of-the-week",
+        signal: "github_watch",
+        title: "SalvatoreRa/ML-news-of-the-week",
+        url: "https://github.com/SalvatoreRa/ML-news-of-the-week",
+        canonical_url: "https://github.com/SalvatoreRa/ML-news-of-the-week",
+        source: "GitHub repo watch: SalvatoreRa/ML-news-of-the-week",
+        event_date: reportDate,
+        category: "project",
+        decision: "admitted",
+        quality_score: 88,
+        verification_status: "primary_confirmed",
+        source_level: "github",
+        editorial_category: "open_source",
+        repo: "SalvatoreRa/ML-news-of-the-week",
+        evidence: "GitHub repo SalvatoreRa/ML-news-of-the-week stars=3210 forks=210 pushed_at=2026-07-05T12:00:00Z",
+        notes: "stars=3210; forks=210; pushed_at=2026-07-05T12:00:00Z; latest_commit=bbbbbbbbbbbb",
+        repo_delta: { status: "changed", latest_commit_changed: true },
+        freshness: { status: "fresh" },
+        summary_template: {
+          purpose: "SalvatoreRa/ML-news-of-the-week tracks open-source ML news.",
+          change: "Historical snapshot changed: latest_commit.",
+          evidence: "stars=3210; forks=210; latest_commit=bbbbbbbbbbbb",
+          fit: "Internal Source Watch candidate only; public promotion still needs downstream gates."
+        },
+        tags: ["ml-news", "weekly"]
+      },
+      {
+        id: "candidate-aify",
+        canonical_id: "source-watch:aify-news",
+        source_id: "site-aify-news",
+        signal: "site_watch",
+        title: "Aify News",
+        url: "https://aify-news.pages.dev/",
+        canonical_url: "https://aify-news.pages.dev/",
+        source: "Site watch: Aify News",
+        event_date: reportDate,
+        category: "community_lead",
+        decision: "admitted",
+        quality_score: 91,
+        verification_status: "first_class_source_confirmed",
+        source_level: "ai_news_aggregator",
+        source_lane: "aify",
+        source_tier: "first_class",
+        verification_policy: "no_secondary_review_required",
+        editorial_category: "community",
+        evidence: "Site metadata title=Aify News",
+        notes: "feeds=1; discovered_github_repositories=1",
+        summary_template: null,
+        tags: ["ai-news"]
+      }
+    ]
+  }, null, 2)}\n`, "utf8");
 }
 
 async function writeFakeCodexCommand(rootDir) {

@@ -6,10 +6,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { finished } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
+import { buildSite } from "../src/site.js";
 
 const DEFAULT_WORK_DIR = path.join(".tmp", "daily-codex-mvp");
 const DEFAULT_SANDBOX = "workspace-write";
 const STAGE_IDS = ["prepare", "collect-context", "codex-generate", "validate", "repair-once", "summarize"];
+const PUBLISH_STAGE_ID = "publish";
 const REPOSITORY_GUARD_EXCLUDED_DIRS = new Set([".git", ".codegraph", "node_modules"]);
 
 export async function prepareDailyCodexPipeline(options = {}) {
@@ -32,6 +34,8 @@ export function buildDailyCodexPipelinePlan(options = {}) {
   const executeRequested = Boolean(options.executeRequested ?? options.execute ?? false);
   const publishRequested = Boolean(options.publishRequested ?? options.publish ?? false);
   const outputs = buildOutputs({ rootDir, workDir, reportDate });
+  const publish = buildPublishConfig(options);
+  const stageIds = publishRequested ? [...STAGE_IDS, PUBLISH_STAGE_ID] : STAGE_IDS;
   return {
     version: 2,
     mode: "daily_codex_dag_lite",
@@ -46,8 +50,9 @@ export function buildDailyCodexPipelinePlan(options = {}) {
       sandbox,
       fixture_mode: fixtureMode
     },
+    publish,
     outputs,
-    stages: STAGE_IDS.map((id) => buildStage({ id, rootDir, workDir, outputs }))
+    stages: stageIds.map((id) => buildStage({ id, rootDir, workDir, outputs }))
   };
 }
 
@@ -62,7 +67,8 @@ export async function runDailyCodexPipeline(plan, options = {}) {
     repairValidation: null,
     repairAttempted: false,
     finalArtifactPath: "",
-    finalValidation: null
+    finalValidation: null,
+    publication: null
   };
   await writeRunSummary(state, { finalStatus: "running" });
 
@@ -72,8 +78,11 @@ export async function runDailyCodexPipeline(plan, options = {}) {
   await recordStage(state, "validate", () => runValidateStage(state));
   await recordStage(state, "repair-once", () => runRepairStage(state, options));
   await recordStage(state, "summarize", () => runSummarizeStage(state));
+  if (state.plan.publish_requested) {
+    await recordStage(state, PUBLISH_STAGE_ID, () => runPublishStage(state));
+  }
 
-  const finalStatus = state.finalValidation?.ok ? "generated_only" : "blocked";
+  const finalStatus = finalStatusFor(state);
   const summary = await writeRunSummary(state, { finalStatus });
   return { plan, summary };
 }
@@ -268,6 +277,119 @@ async function runSummarizeStage(state) {
   };
 }
 
+async function runPublishStage(state) {
+  const publishConfig = state.plan.publish || {};
+  const sourceWatchAdmittedArtifactPath = String(publishConfig.source_watch_admitted_artifact_path || "").trim();
+  if (!sourceWatchAdmittedArtifactPath) {
+    state.publication = {
+      ok: false,
+      skipped_reason: "source_watch_admitted_artifact_not_provided",
+      source_watch_admitted_artifact_path: "",
+      article_count: 0,
+      source_watch_articles: 0,
+      articles_path: ""
+    };
+    await writeJson(state.plan.outputs.publish_summary, state.publication);
+    return {
+      status: "skipped",
+      skipped_reason: "source_watch_admitted_artifact_not_provided",
+      artifacts: await artifactRecords([state.plan.outputs.publish_summary])
+    };
+  }
+
+  try {
+    await preflightSourceWatchAdmittedArtifactForPublish(
+      state.plan.root_dir,
+      sourceWatchAdmittedArtifactPath,
+      state.plan.report_date
+    );
+    assertPublishOutDirInsideRepo(state.plan.root_dir, publishConfig.out_dir);
+    const result = await buildSite({
+      rootDir: state.plan.root_dir,
+      inputDir: publishConfig.input_dir,
+      dataInputDir: publishConfig.data_input_dir,
+      outDir: publishConfig.out_dir,
+      siteUrl: publishConfig.site_url || undefined,
+      generatedAt: publishConfig.generated_at || undefined,
+      trendConfigPath: publishConfig.trend_config_path || undefined,
+      sourceWatchAdmittedArtifactPath
+    });
+    const articlesPath = path.resolve(state.plan.root_dir, publishConfig.out_dir || "docs", "articles.json");
+    state.publication = {
+      ok: true,
+      report_date: state.plan.report_date,
+      out_dir: result.outDir,
+      articles_path: articlesPath,
+      source_watch_admitted_artifact_path: sourceWatchAdmittedArtifactPath,
+      article_count: result.articles.length,
+      source_watch_articles: result.articles.filter((article) => article.section === "source_watch").length,
+      written_files: result.writtenFiles
+    };
+    await writeJson(state.plan.outputs.publish_summary, state.publication);
+    return {
+      status: "success",
+      artifacts: await artifactRecords([state.plan.outputs.publish_summary, articlesPath])
+    };
+  } catch (error) {
+    state.publication = {
+      ok: false,
+      report_date: state.plan.report_date,
+      source_watch_admitted_artifact_path: sourceWatchAdmittedArtifactPath,
+      failures: [error instanceof Error ? error.message : String(error)]
+    };
+    await writeJson(state.plan.outputs.publish_summary, state.publication);
+    throw error;
+  }
+}
+
+async function preflightSourceWatchAdmittedArtifactForPublish(rootDir, artifactPath, expectedReportDate) {
+  if (!String(artifactPath).toLowerCase().endsWith(".json")) {
+    const error = new Error("Source Watch admitted artifact path must end with .json.");
+    error.code = "source_watch_admitted_artifact_path_invalid";
+    throw error;
+  }
+  const allowedRoot = path.resolve(rootDir, ".tmp", "daily-codex-pipeline");
+  const resolved = path.resolve(rootDir, artifactPath);
+  const relative = path.relative(allowedRoot, resolved);
+  if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
+    const error = new Error(`Source Watch admitted artifact path must stay under ${path.join(".tmp", "daily-codex-pipeline")}.`);
+    error.code = "source_watch_admitted_artifact_path_out_of_scope";
+    throw error;
+  }
+  let payload;
+  try {
+    payload = JSON.parse(await fs.readFile(resolved, "utf8"));
+  } catch (readError) {
+    const error = new Error(`Source Watch admitted artifact could not be read: ${readError.message}`);
+    error.code = "source_watch_admitted_artifact_read_failed";
+    throw error;
+  }
+  if (!isPlainObject(payload) || payload.kind !== "source_watch_admitted_candidates") {
+    const error = new Error("Source Watch admitted artifact must have kind source_watch_admitted_candidates.");
+    error.code = "source_watch_admitted_artifact_invalid";
+    throw error;
+  }
+  if (payload.report_date !== expectedReportDate) {
+    const error = new Error(`Source Watch admitted artifact report_date must match ${expectedReportDate}.`);
+    error.code = "source_watch_admitted_artifact_report_date_mismatch";
+    throw error;
+  }
+  if (payload.public_surface === true || payload.admission_audit?.public_surface === true) {
+    const error = new Error("Source Watch admitted artifact must remain an internal input before article publication.");
+    error.code = "source_watch_admitted_artifact_public_surface_invalid";
+    throw error;
+  }
+}
+
+function assertPublishOutDirInsideRepo(rootDir, outDir) {
+  const resolved = path.resolve(rootDir, outDir || "docs");
+  if (!isPathInside(rootDir, resolved)) {
+    const error = new Error("daily Codex publish out dir must stay inside the repository.");
+    error.code = "daily_codex_publish_out_dir_out_of_scope";
+    throw error;
+  }
+}
+
 async function writeRunSummary(state, { finalStatus }) {
   const failedStage = [...state.completedStages].reverse().find((stage) => stage.status === "failure") || null;
   const latestStage = state.completedStages[state.completedStages.length - 1] || null;
@@ -277,7 +399,7 @@ async function writeRunSummary(state, { finalStatus }) {
       : []
   ));
   const summary = {
-    ok: finalStatus === "generated_only",
+    ok: finalStatus === "generated_only" || finalStatus === "published",
     mode: "daily_codex_dag_lite",
     report_date: state.plan.report_date,
     final_status: finalStatus,
@@ -291,6 +413,8 @@ async function writeRunSummary(state, { finalStatus }) {
     summary_path: state.plan.outputs.run_summary,
     publish_requested: Boolean(state.plan.publish_requested),
     execute_requested: Boolean(state.plan.execute_requested),
+    source_watch_admitted_artifact_path: state.plan.publish?.source_watch_admitted_artifact_path || "",
+    publication: state.publication,
     validation: state.finalValidation || state.validation || null,
     repair_attempted: state.repairAttempted,
     updated_at: new Date().toISOString()
@@ -299,9 +423,27 @@ async function writeRunSummary(state, { finalStatus }) {
   return summary;
 }
 
+function finalStatusFor(state) {
+  if (!state.finalValidation?.ok) return "blocked";
+  if (state.publication?.ok) return "published";
+  return "generated_only";
+}
+
 function nextActionFor({ finalStatus, state }) {
   if (finalStatus === "running") return { kind: "none" };
+  if (finalStatus === "published") {
+    return {
+      kind: "published_articles",
+      articles_path: state.publication?.articles_path || ""
+    };
+  }
   if (finalStatus === "generated_only") {
+    if (state.plan.publish_requested && !state.plan.publish?.source_watch_admitted_artifact_path) {
+      return {
+        kind: "provide_source_watch_admitted_artifact",
+        expected_flag: "--source-watch-admitted-artifact"
+      };
+    }
     return { kind: "promote_mvp_artifact", artifact_path: state.plan.outputs.final };
   }
   return {
@@ -588,6 +730,7 @@ function buildStage({ id, rootDir, workDir, outputs }) {
   if (id === "validate") stage.output_path = outputs.validation;
   if (id === "repair-once") stage.output_path = outputs.repaired;
   if (id === "summarize") stage.output_path = outputs.stage_summary;
+  if (id === PUBLISH_STAGE_ID) stage.output_path = outputs.publish_summary;
   return stage;
 }
 
@@ -601,6 +744,7 @@ function buildOutputs({ rootDir, workDir, reportDate }) {
     validation: path.join(workDir, "validation.json"),
     repair_validation: path.join(workDir, "repair-validation.json"),
     stage_summary: path.join(workDir, "stage-summary.json"),
+    publish_summary: path.join(workDir, "publish-summary.json"),
     run_summary: path.join(rootDir, ".tmp", `run-summary-${reportDate}.json`),
     generate_prompt: path.join(workDir, "prompts", "generate.md"),
     repair_prompt: path.join(workDir, "prompts", "repair.md"),
@@ -608,6 +752,18 @@ function buildOutputs({ rootDir, workDir, reportDate }) {
     generate_stderr: path.join(workDir, "logs", "codex-generate.stderr.log"),
     repair_stdout: path.join(workDir, "logs", "repair-once.stdout.jsonl"),
     repair_stderr: path.join(workDir, "logs", "repair-once.stderr.log")
+  };
+}
+
+function buildPublishConfig(options = {}) {
+  return {
+    source_watch_admitted_artifact_path: String(options.sourceWatchAdmittedArtifactPath || options["source-watch-admitted-artifact"] || "").trim(),
+    input_dir: options.inputDir || options.input || "reports-source",
+    data_input_dir: options.dataInputDir || options["data-input"] || "reports-data",
+    out_dir: options.outDir || options.out || "docs",
+    site_url: options.siteUrl || options["site-url"] || "",
+    generated_at: options.generatedAt || options["generated-at"] || "",
+    trend_config_path: options.trendConfigPath || options["trend-config"] || ""
   };
 }
 
@@ -716,7 +872,22 @@ function nonEmptyString(value) {
 }
 
 function parseArgs(argv) {
-  const valueFlags = new Set(["repo-root", "date", "work-dir", "codex-bin", "model", "sandbox", "fixture"]);
+  const valueFlags = new Set([
+    "repo-root",
+    "date",
+    "work-dir",
+    "codex-bin",
+    "model",
+    "sandbox",
+    "fixture",
+    "source-watch-admitted-artifact",
+    "input",
+    "data-input",
+    "out",
+    "site-url",
+    "generated-at",
+    "trend-config"
+  ]);
   const booleanFlags = new Set(["execute", "publish"]);
   const parsed = {
     positionals: [],
@@ -828,7 +999,29 @@ function fallbackRequestedFlag(argv, flagName, parsedValue) {
   return argv.some((token) => token === flag || token === `${flag}=true` || token === `${flag}=1`);
 }
 
-async function writeEntryFailureRunSummary({ rootDir, reportDate, error, stageId, executeRequested, publishRequested }) {
+function fallbackValueFlag(argv, flagName) {
+  const flag = `--${flagName}`;
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = argv[index];
+    if (token === "--") break;
+    if (token.startsWith(`${flag}=`)) return token.slice(flag.length + 1);
+    if (token === flag) {
+      const next = argv[index + 1];
+      return next && !next.startsWith("--") ? next : "";
+    }
+  }
+  return "";
+}
+
+async function writeEntryFailureRunSummary({
+  rootDir,
+  reportDate,
+  error,
+  stageId,
+  executeRequested,
+  publishRequested,
+  sourceWatchAdmittedArtifactPath
+}) {
   if (!validReportDate(reportDate)) return "";
   const summaryPath = path.resolve(rootDir, ".tmp", `run-summary-${reportDate}.json`);
   await writeJson(summaryPath, {
@@ -842,6 +1035,8 @@ async function writeEntryFailureRunSummary({ rootDir, reportDate, error, stageId
     summary_path: summaryPath,
     publish_requested: Boolean(publishRequested),
     execute_requested: Boolean(executeRequested),
+    source_watch_admitted_artifact_path: sourceWatchAdmittedArtifactPath || "",
+    publication: null,
     updated_at: new Date().toISOString()
   });
   return summaryPath;
@@ -866,7 +1061,14 @@ if (isMainModule(import.meta.url)) {
       sandbox: args.sandbox || process.env.npm_config_sandbox || DEFAULT_SANDBOX,
       fixtureMode: fixtureFromArgs(args),
       executeRequested: Boolean(args.execute),
-      publishRequested: Boolean(args.publish)
+      publishRequested: Boolean(args.publish),
+      sourceWatchAdmittedArtifactPath: args["source-watch-admitted-artifact"] || process.env.npm_config_source_watch_admitted_artifact || "",
+      inputDir: args.input || process.env.npm_config_input || "reports-source",
+      dataInputDir: args["data-input"] || process.env.npm_config_data_input || "reports-data",
+      outDir: args.out || process.env.npm_config_out || "docs",
+      siteUrl: args["site-url"] || process.env.npm_config_site_url || "",
+      generatedAt: args["generated-at"] || process.env.npm_config_generated_at || "",
+      trendConfigPath: args["trend-config"] || process.env.npm_config_trend_config || ""
     });
     const { summary } = await runDailyCodexPipeline(plan);
     process.stdout.write(`${JSON.stringify({
@@ -880,6 +1082,8 @@ if (isMainModule(import.meta.url)) {
       summary_path: plan.outputs.run_summary,
       publish_requested: summary.publish_requested,
       execute_requested: summary.execute_requested,
+      source_watch_admitted_artifact_path: summary.source_watch_admitted_artifact_path,
+      publication: summary.publication,
       final_artifact: summary.final_artifact,
       work_dir: plan.work_dir
     }, null, 2)}\n`);
@@ -890,13 +1094,19 @@ if (isMainModule(import.meta.url)) {
     const reportDate = plan?.report_date || (args ? dateFromArgs(args) : fallbackDateFromArgv(rawArgv));
     const rootDir = path.resolve(plan?.root_dir || args?.["repo-root"] || fallbackRootDirFromArgv(rawArgv));
     const existingSummary = plan?.outputs?.run_summary ? await readJsonOrNull(plan.outputs.run_summary) : null;
+    const sourceWatchAdmittedArtifactPath = existingSummary?.source_watch_admitted_artifact_path
+      || args?.["source-watch-admitted-artifact"]
+      || fallbackValueFlag(rawArgv, "source-watch-admitted-artifact")
+      || process.env.npm_config_source_watch_admitted_artifact
+      || "";
     const summaryPath = plan?.outputs?.run_summary || await writeEntryFailureRunSummary({
       rootDir,
       reportDate,
       error,
       stageId: error.stage_id || (args ? "initialize" : "parse-args"),
       executeRequested: fallbackRequestedFlag(rawArgv, "execute", args?.execute),
-      publishRequested: fallbackRequestedFlag(rawArgv, "publish", args?.publish)
+      publishRequested: fallbackRequestedFlag(rawArgv, "publish", args?.publish),
+      sourceWatchAdmittedArtifactPath
     });
     process.stdout.write(`${JSON.stringify({
       ok: false,
@@ -914,7 +1124,9 @@ if (isMainModule(import.meta.url)) {
         : [error.message],
       summary_path: summaryPath,
       publish_requested: existingSummary?.publish_requested ?? fallbackRequestedFlag(rawArgv, "publish", args?.publish),
-      execute_requested: existingSummary?.execute_requested ?? fallbackRequestedFlag(rawArgv, "execute", args?.execute)
+      execute_requested: existingSummary?.execute_requested ?? fallbackRequestedFlag(rawArgv, "execute", args?.execute),
+      source_watch_admitted_artifact_path: sourceWatchAdmittedArtifactPath,
+      publication: existingSummary?.publication || null
     }, null, 2)}\n`);
     process.exitCode = 1;
   }
