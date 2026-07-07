@@ -12,6 +12,8 @@ npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
 npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
 ```
 
+Source Watch admitted candidates are a conditional explicit handoff: when .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json exists, append --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json and expect source_watch_admitted_artifact_path in .tmp/run-summary-YYYY-MM-DD.json; do not scan .tmp for a newest artifact.
+
 旧 `daily:run` 只保留为人工恢复和短期兼容入口；scheduled automation 不得优先使用旧 runner，也不得在 prompt 中内联旧手工 discovery/repair/build/publish 链路。脚本缺失时才允许临时 `legacy_daily_run_compatibility`，合并新管线后应自动回到分阶段入口。
 
 - 该脚本把 collect、admit、每条 summarize 和 assemble 拆成独立 `codex exec --ephemeral` 上下文；定时任务迁移到该入口后，只传日期和执行意图，不在 automation prompt 中内联信息收集、准入、逐条概括或发布流水线。

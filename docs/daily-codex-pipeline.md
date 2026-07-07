@@ -3,7 +3,7 @@
 `daily:codex-pipeline` is now the MVP production-facing entrypoint for the Codex-driven daily generation flow. It intentionally replaces the older compatibility-first multi-stage runner with one coarse DAG-lite flow:
 
 ```text
-prepare -> collect/context -> codex-generate -> validate -> repair-once -> summarize
+prepare -> collect/context -> codex-generate -> validate -> repair-once -> summarize -> publish
 ```
 
 The MVP goal is to prove a runnable end-to-end generation loop first, then split the coarse stages into the full DAG once the loop is useful.
@@ -30,7 +30,21 @@ Run the deterministic fixture path for local validation:
 npm run daily:codex-pipeline -- --date YYYY-MM-DD --fixture success
 ```
 
-The DAG-lite CLI rejects legacy publish-mode flags such as `--execute` and `--publish`. Publishing, Pages verification, and final report assembly are not part of MVP-1.
+Production-shaped execution and publish flags are supported:
+
+```powershell
+npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --codex-bin codex.cmd
+```
+
+`--execute` records the production intent and configures the Codex command. `codex.cmd` and arguments after `--` are command configuration, not fixture modes.
+
+`--publish` adds a gated `publish` stage. If no Source Watch admitted artifact is provided, the publish stage is recorded as skipped and the run remains `final_status:"generated_only"`. When `.tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json` exists, callers may pass it explicitly:
+
+```powershell
+npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json
+```
+
+The runner does not scan `.tmp` for the newest artifact. The summary records `source_watch_admitted_artifact_path` so scheduled automation can report which admitted artifact was used.
 
 Fixture modes:
 
@@ -50,9 +64,10 @@ The runner writes all MVP artifacts under `.tmp/daily-codex-mvp/YYYY-MM-DD/`.
 - `repair-validation.json`: validation result for the repair output.
 - `final.json`: final artifact selected by the runner.
 - `stage-summary.json`: compact final-stage summary.
+- `publish-summary.json`: publish-stage metadata when `--publish` is requested.
 - `run-summary.json`: authoritative machine-readable run summary.
 
-`run-summary.json` reports `mode:"daily_codex_dag_lite"`, `final_status`, `next_action`, `completed_stages`, validation state, repair state, and the final artifact path.
+`run-summary.json` reports `mode:"daily_codex_dag_lite"`, `final_status`, `next_action`, `completed_stages`, validation state, repair state, the final artifact path, `publish_requested`, `execute_requested`, `source_watch_admitted_artifact_path`, and `publication`.
 
 ## Validation Contract
 
@@ -73,4 +88,4 @@ If validation fails, the runner invokes exactly one repair pass. If the repair o
 
 ## Replacement Boundary
 
-The old compatibility runner stages are not part of this MVP path. Publishing, Pages verification, full report-data normalization, multi-agent fanout, and the final 16-node DAG migration are later slices. They should build on this DAG-lite run summary instead of reintroducing a parallel legacy runner.
+The old compatibility runner stages are not part of this MVP path. Full report-data normalization, multi-agent fanout, Pages verification, and the final 16-node DAG migration are later slices. They should build on this DAG-lite run summary instead of reintroducing a parallel legacy runner.
