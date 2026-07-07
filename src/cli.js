@@ -70,7 +70,8 @@ try {
       dataInputDir: args["data-input"] || "reports-data",
       outDir: args.out || "docs",
       siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
-      generatedAt: args["generated-at"]
+      generatedAt: args["generated-at"],
+      sourceWatchAdmittedArtifactPath: args["source-watch-admitted-artifact"]
     });
     printJson({
       ok: true,

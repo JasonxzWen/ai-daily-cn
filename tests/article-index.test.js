@@ -7,10 +7,14 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { PublisherError } from "../src/errors.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
-import { buildArticleIndex } from "../src/site.js";
+import { buildArticleIndex, buildSite } from "../src/site.js";
 import { renderIndexHtml } from "../src/render.js";
 import { validateArticles } from "../src/schema.js";
+
+const rootDir = process.cwd();
+const trendConfigPath = path.join(rootDir, "config", "trends.json");
 
 const AIFY_DOMAINS = new Set([
   "AI 产品与应用工具",
@@ -273,6 +277,72 @@ test("buildArticleIndex consumes admitted Source Watch candidates as public arti
   assert.equal(validation.valid, true, JSON.stringify(validation.errors, null, 2));
 });
 
+test("buildSite publishes an explicit Source Watch admitted artifact into docs/articles.json", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "article-public-build-"));
+  const inputDir = path.join(tmp, "reports-source");
+  const outDir = path.join(tmp, "docs");
+  const artifactPath = path.join(
+    tmp,
+    ".tmp",
+    "daily-codex-pipeline",
+    "2026-07-03",
+    "artifacts",
+    "admitted-candidates.json"
+  );
+  await fs.mkdir(inputDir, { recursive: true });
+  await fs.mkdir(path.dirname(artifactPath), { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "tests", "fixtures", "reports", "good", "official-release.md"),
+    path.join(inputDir, "official-release.md")
+  );
+  await fs.writeFile(artifactPath, `${JSON.stringify(sampleSourceWatchAdmittedArtifact(), null, 2)}\n`, "utf8");
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir,
+    outDir,
+    generatedAt: "2026-07-03T08:00:00.000Z",
+    trendConfigPath,
+    sourceWatchAdmittedArtifactPath: artifactPath
+  });
+
+  assert(result.writtenFiles.includes("articles.json"));
+  assert(result.articles.some((article) => article.section === "source_watch"));
+  const articles = JSON.parse(await fs.readFile(path.join(outDir, "articles.json"), "utf8"));
+  const aify = articles.find((article) => article.url === "https://aify-news.pages.dev/");
+  assert.equal(aify.source, "Aify News");
+  assert.equal(aify.section, "source_watch");
+  assert.equal(validateArticles(articles).valid, true);
+  const serialized = JSON.stringify(articles);
+  assert.equal(serialized.includes("source_lane"), false);
+  assert.equal(serialized.includes("latest_commit="), false);
+});
+
+test("buildSite rejects Source Watch admitted artifact paths outside the pipeline temp root", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "article-public-build-scope-"));
+  const inputDir = path.join(tmp, "reports-source");
+  const outDir = path.join(tmp, "docs");
+  const artifactPath = path.join(tmp, "admitted-candidates.json");
+  await fs.mkdir(inputDir, { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "tests", "fixtures", "reports", "good", "official-release.md"),
+    path.join(inputDir, "official-release.md")
+  );
+  await fs.writeFile(artifactPath, `${JSON.stringify(sampleSourceWatchAdmittedArtifact(), null, 2)}\n`, "utf8");
+
+  await assert.rejects(
+    () => buildSite({
+      rootDir: tmp,
+      inputDir,
+      outDir,
+      generatedAt: "2026-07-03T08:00:00.000Z",
+      trendConfigPath,
+      sourceWatchAdmittedArtifactPath: artifactPath
+    }),
+    (error) => error instanceof PublisherError && error.code === "source_watch_admitted_artifact_path_out_of_scope"
+  );
+});
+
 test("buildArticleIndex accepts direct Source Watch candidate arrays with per-candidate dates", () => {
   const artifact = sampleSourceWatchAdmittedArtifact();
   const articles = buildArticleIndex([], {
@@ -399,6 +469,17 @@ test("homepage renders the article library as the primary surface", () => {
   const articles = buildArticleIndex([sampleReport()], {
     updatedAt: "2026-07-03T08:00:00.000Z"
   });
+  articles.push({
+    ...articles[0],
+    id: "article-old-history-only",
+    title: "Very Old History Only Article",
+    url: "https://example.com/old-history-only",
+    date: "2026-01-01",
+    month: "2026-01",
+    report_date: "2026-01-01",
+    report_url: "reports/2026/01/2026-01-01.html",
+    data_url: "data/2026/01/2026-01-01.json"
+  });
   const html = renderIndexHtml({
     schema_version: 1,
     site_title: "AI 日报",
@@ -424,9 +505,18 @@ test("homepage renders the article library as the primary surface", () => {
   assert.match(html, /data-article-index="aify-style"/);
   assert.match(html, /AI 资讯库/);
   assert.match(html, /今日精选/);
+  assert.match(html, /昨日回看/);
   assert.match(html, /全部资讯/);
   assert.match(html, /商业洞察|技术拆解|实战方法/);
   assert.match(html, /articles\.json/);
+  assert.match(html, /id="articleSource"/);
+  assert.match(html, /id="articleScore"/);
+  assert.match(html, /window\.__ARTICLE_INDEX_INLINE__/);
+  assert.match(html, /requestIdleCallback|setTimeout/);
+  assert.match(html, /window\.__ARTICLE_INDEX_URL__="articles\.json"/);
+  assert.match(html, /fetch\(url/);
+  assert.doesNotMatch(html, /window\.__ARTICLE_INDEX__=/);
+  assert.doesNotMatch(html, /Very Old History Only Article/);
   assert.doesNotMatch(html, /近 30 天共/);
   assert.doesNotMatch(html, /source-lane-board/);
 });

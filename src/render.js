@@ -165,21 +165,23 @@ export function renderIndexHtml(feed, trends = null, dateIndex = null, options =
 function renderArticleIndexHtml(feed, articles, options = {}) {
   const sortedArticles = sortArticlesForIndex(articles);
   const latestDate = sortedArticles[0]?.date || feed.reports?.[0]?.report_date || "";
-  const todayArticles = todayArticleSelection(sortedArticles);
+  const dateBuckets = articleDateBuckets(sortedArticles);
+  const yesterdayDate = dateBuckets.find((date) => date !== latestDate) || "";
+  const todayArticles = articlesForDate(sortedArticles, latestDate);
+  const yesterdayArticles = articlesForDate(sortedArticles, yesterdayDate);
+  const inlineArticles = uniqueArticlesById([...todayArticles, ...yesterdayArticles]);
   const domains = uniqueRenderValues(sortedArticles.map((article) => article.domain));
   const channels = uniqueRenderValues(sortedArticles.flatMap((article) => article.channels_l1 || []));
-  const entities = uniqueRenderValues(sortedArticles.flatMap((article) => [
-    ...(article.companies || []),
-    ...(article.products || [])
-  ])).slice(0, 80);
-  const months = uniqueRenderValues(sortedArticles.map((article) => article.month));
+  const sources = uniqueRenderValues(sortedArticles.map((article) => article.source));
   const stats = {
     articles: sortedArticles.length,
     sources: uniqueRenderValues(sortedArticles.map((article) => article.source)).length,
     domains: domains.length,
-    latestDate
+    latestDate,
+    today: todayArticles.length,
+    yesterday: yesterdayArticles.length
   };
-  const articleJson = JSON.stringify(sortedArticles).replace(/</g, "\\u003c");
+  const inlineArticleJson = JSON.stringify(inlineArticles).replace(/</g, "\\u003c");
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -200,21 +202,27 @@ function renderArticleIndexHtml(feed, articles, options = {}) {
   <main class="report-shell article-index-page" data-article-index="aify-style">
     <section class="article-hero" id="article-home" aria-labelledby="article-home-title">
       <div class="article-hero-copy">
-        <p class="eyebrow">AI Feed</p>
+        <p class="eyebrow">Aify-style Article Library</p>
         <h1 class="report-title" id="article-home-title">AI 资讯库</h1>
-        <p class="article-hero-summary">把每日 AI 日报拆成可检索、可筛选、可回链的文章级资讯流，优先展示高质量、低噪声、可直接阅读的信号。</p>
+        <p class="article-hero-summary">把每日 AI 日报拆成可检索、可筛选、可回链的文章级资讯流。首屏只内联今日与昨日，空闲时加载完整 articles.json，让 GitHub Pages 上的历史检索保持轻量。</p>
+        <div class="article-hero-actions" aria-label="资讯库入口">
+          <a href="articles.json">打开 articles.json</a>
+          <a href="${escapeAttribute(feed.reports?.[0]?.url || "#")}">最新日报</a>
+          <a href="ops.html">运行看板</a>
+        </div>
       </div>
       <div class="article-stat-grid" aria-label="资讯库统计">
-        ${renderArticleStat("资讯", stats.articles)}
+        ${renderArticleStat("今日", stats.today)}
+        ${renderArticleStat("昨日", stats.yesterday || "-")}
+        ${renderArticleStat("全量", stats.articles)}
         ${renderArticleStat("信源", stats.sources)}
-        ${renderArticleStat("分类", stats.domains)}
-        ${renderArticleStat("最新", stats.latestDate || "-")}
       </div>
     </section>
 
     <section class="article-control-panel" aria-label="资讯筛选">
       <div class="article-tab-row" role="tablist" aria-label="资讯口味">
         ${renderArticleFilterButton("today", "今日精选", true)}
+        ${renderArticleFilterButton("yesterday", "昨日回看")}
         ${renderArticleFilterButton("all", "全部资讯")}
         ${["快讯", "商业洞察", "实战方法", "技术拆解", "观点专访", "论文", "报告"].map((flavor) => renderArticleFilterButton(flavor, flavor)).join("")}
       </div>
@@ -225,15 +233,15 @@ function renderArticleIndexHtml(feed, articles, options = {}) {
         </label>
         ${renderArticleSelect("articleDomain", "领域", domains)}
         ${renderArticleSelect("articleChannel", "频道", channels)}
-        ${renderArticleSelect("articleEntity", "公司/产品", entities)}
-        ${renderArticleSelect("articleMonth", "月份", months)}
+        ${renderArticleSelect("articleSource", "信源", sources)}
+        ${renderArticleScoreSelect()}
       </div>
     </section>
 
     <section class="article-results" aria-labelledby="article-results-title">
       <div class="section-heading split-row">
         <div>
-          <p class="eyebrow">Today Selection</p>
+          <p class="eyebrow">Inline Today / Yesterday</p>
           <h2 id="article-results-title">今日精选</h2>
         </div>
         <span class="chip status-info" id="articleResultMeta">${escapeHtml(todayArticles.length)} 条</span>
@@ -243,7 +251,7 @@ function renderArticleIndexHtml(feed, articles, options = {}) {
       </div>
     </section>
   </main>
-  <script>window.__ARTICLE_INDEX__=${articleJson};</script>
+  <script>window.__ARTICLE_INDEX_INLINE__=${inlineArticleJson};window.__ARTICLE_INDEX_URL__="articles.json";</script>
   <script>${articleIndexScript()}</script>
 </body>
 </html>
@@ -310,6 +318,18 @@ function renderArticleSelect(id, label, options) {
     </label>`;
 }
 
+function renderArticleScoreSelect() {
+  return `<label class="article-select">
+      <span>最低分</span>
+      <select id="articleScore">
+        <option value="0">全部</option>
+        <option value="70">70+</option>
+        <option value="80">80+</option>
+        <option value="90">90+</option>
+      </select>
+    </label>`;
+}
+
 function renderArticleGroups(articles, options = {}) {
   const groups = groupArticlesByDomain(articles);
   const perDomainCap = Number(options.perDomainCap || 0);
@@ -337,7 +357,7 @@ function renderArticleCard(article) {
     ...(article.companies || []).slice(0, 2),
     ...(article.products || []).slice(0, 2)
   ].slice(0, 6);
-  return `<article class="article-card" data-article-card>
+  return `<article class="article-card" data-article-card data-article-date="${escapeAttribute(article.date)}" data-article-score="${escapeAttribute(article.quality_score)}">
       <div class="article-card-meta">
         <span>${escapeHtml(article.source)}</span>
         <strong>${escapeHtml(article.quality_score)}</strong>
@@ -354,12 +374,28 @@ function renderArticleCard(article) {
     </article>`;
 }
 
-function todayArticleSelection(articles) {
-  const sorted = sortArticlesForIndex(articles);
-  const latestDate = sorted[0]?.date || "";
-  const today = sorted.filter((article) => article.date === latestDate);
-  const selected = today.length >= 24 ? today : [...today, ...sorted.filter((article) => article.date !== latestDate).slice(0, 80 - today.length)];
-  return selected.slice(0, 80);
+function articleDateBuckets(articles) {
+  return uniqueRenderValues((Array.isArray(articles) ? articles : []).map((article) => article.date))
+    .sort((a, b) => String(b).localeCompare(String(a)));
+}
+
+function articlesForDate(articles, date) {
+  if (!date) {
+    return [];
+  }
+  return sortArticlesForIndex(articles).filter((article) => article.date === date).slice(0, 80);
+}
+
+function uniqueArticlesById(articles) {
+  const byId = new Map();
+  for (const article of Array.isArray(articles) ? articles : []) {
+    const key = article.id || article.url;
+    if (!key || byId.has(key)) {
+      continue;
+    }
+    byId.set(key, article);
+  }
+  return sortArticlesForIndex([...byId.values()]);
 }
 
 function sortArticlesForIndex(articles) {
@@ -401,7 +437,9 @@ function uniqueRenderValues(values) {
 
 function articleIndexScript() {
   return `(() => {
-  const articles = Array.isArray(window.__ARTICLE_INDEX__) ? window.__ARTICLE_INDEX__ : [];
+  let articles = Array.isArray(window.__ARTICLE_INDEX_INLINE__) ? window.__ARTICLE_INDEX_INLINE__ : [];
+  let fullArticlesLoaded = false;
+  let fullArticlesPromise = null;
   const groups = document.getElementById("articleGroups");
   const title = document.getElementById("article-results-title");
   const meta = document.getElementById("articleResultMeta");
@@ -409,25 +447,51 @@ function articleIndexScript() {
     search: document.getElementById("articleSearch"),
     domain: document.getElementById("articleDomain"),
     channel: document.getElementById("articleChannel"),
-    entity: document.getElementById("articleEntity"),
-    month: document.getElementById("articleMonth")
+    source: document.getElementById("articleSource"),
+    score: document.getElementById("articleScore")
   };
-  const state = { mode: "today", search: "", domain: "", channel: "", entity: "", month: "" };
+  const state = { mode: "today", search: "", domain: "", channel: "", source: "", score: 0 };
   const domainOrder = ["AI 产品与应用工具", "AI 用法与实践方法", "企业落地与业务应用", "行业动态与政策地缘", "基础模型与算力技术栈", "多模态与具身等前沿"];
   const escapeHtml = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
   const sortArticles = (items) => [...items].sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")) || Number(b.quality_score || 0) - Number(a.quality_score || 0) || String(a.title || "").localeCompare(String(b.title || ""), "zh-Hans-CN"));
-  const todaySelection = (items) => {
-    const sorted = sortArticles(items);
-    const latest = sorted[0]?.date || "";
-    const today = sorted.filter((article) => article.date === latest);
-    return (today.length >= 24 ? today : [...today, ...sorted.filter((article) => article.date !== latest).slice(0, 80 - today.length)]).slice(0, 80);
+  const dates = () => [...new Set(sortArticles(articles).map((article) => article.date).filter(Boolean))].sort((a, b) => String(b).localeCompare(String(a)));
+  const articlesForDate = (date) => date ? sortArticles(articles).filter((article) => article.date === date).slice(0, 120) : [];
+  const baseArticles = () => {
+    const buckets = dates();
+    if (state.mode === "today") return articlesForDate(buckets[0]);
+    if (state.mode === "yesterday") return articlesForDate(buckets.find((date) => date !== buckets[0]) || "");
+    return articles;
+  };
+  const loadFullArticles = () => {
+    if (fullArticlesLoaded) return Promise.resolve(articles);
+    if (fullArticlesPromise) return fullArticlesPromise;
+    const url = String(window.__ARTICLE_INDEX_URL__ || "articles.json");
+    fullArticlesPromise = fetch(url, { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error("articles.json fetch failed");
+        return response.json();
+      })
+      .then((payload) => {
+        if (Array.isArray(payload) && payload.length >= articles.length) {
+          articles = payload;
+          fullArticlesLoaded = true;
+          document.documentElement.dataset.articleIndexLoaded = "full";
+          update();
+        }
+        return articles;
+      })
+      .catch(() => {
+        document.documentElement.dataset.articleIndexLoaded = "inline";
+        return articles;
+      });
+    return fullArticlesPromise;
   };
   const matches = (article) => {
     if (state.domain && article.domain !== state.domain) return false;
-    if (state.month && article.month !== state.month) return false;
     if (state.channel && !(article.channels_l1 || []).includes(state.channel)) return false;
-    if (state.entity && ![...(article.companies || []), ...(article.products || [])].includes(state.entity)) return false;
-    if (state.mode !== "today" && state.mode !== "all" && !(article.flavors || []).includes(state.mode)) return false;
+    if (state.source && article.source !== state.source) return false;
+    if (state.score && Number(article.quality_score || 0) < state.score) return false;
+    if (!["today", "yesterday", "all"].includes(state.mode) && !(article.flavors || []).includes(state.mode)) return false;
     if (state.search) {
       const haystack = [article.title, article.summary, article.source, article.domain, ...(article.flavors || []), ...(article.channels_l1 || []), ...(article.channels_l2 || []), ...(article.companies || []), ...(article.products || [])].join(" ").toLowerCase();
       if (!haystack.includes(state.search.toLowerCase())) return false;
@@ -449,7 +513,7 @@ function articleIndexScript() {
   };
   const renderCard = (article) => {
     const tags = [...(article.flavors || []), ...(article.channels_l1 || []).slice(0, 2), ...(article.companies || []).slice(0, 2), ...(article.products || []).slice(0, 2)].slice(0, 6);
-    return '<article class="article-card" data-article-card>' +
+    return '<article class="article-card" data-article-card data-article-date="' + escapeHtml(article.date) + '" data-article-score="' + escapeHtml(article.quality_score) + '">' +
       '<div class="article-card-meta"><span>' + escapeHtml(article.source) + '</span><strong>' + escapeHtml(article.quality_score) + '</strong></div>' +
       '<h4><a href="' + escapeHtml(article.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(article.title) + '</a></h4>' +
       '<p>' + escapeHtml(article.summary) + '</p>' +
@@ -466,7 +530,7 @@ function articleIndexScript() {
     }
     const cap = state.mode === "today" ? 4 : 0;
     groups.innerHTML = grouped.map(([domain, domainItems]) => {
-      const visible = cap ? domainItems.slice(0, cap) : domainItems.slice(0, 120);
+      const visible = cap ? domainItems.slice(0, cap) : domainItems;
       return '<section class="article-domain-group" data-domain="' + escapeHtml(domain) + '">' +
         '<div class="article-domain-heading"><h3>' + escapeHtml(domain) + '</h3><span>' + escapeHtml(domainItems.length) + ' 条</span></div>' +
         '<div class="article-card-grid">' + visible.map(renderCard).join("") + '</div>' +
@@ -474,15 +538,16 @@ function articleIndexScript() {
     }).join("");
   };
   const update = () => {
-    const base = state.mode === "today" ? todaySelection(articles) : articles;
+    const base = baseArticles();
     const filtered = sortArticles(base.filter(matches));
-    if (title) title.textContent = state.mode === "today" ? "今日精选" : (state.mode === "all" ? "全部资讯" : state.mode);
+    if (title) title.textContent = state.mode === "today" ? "今日精选" : (state.mode === "yesterday" ? "昨日回看" : (state.mode === "all" ? "全部资讯" : state.mode));
     if (meta) meta.textContent = filtered.length + " 条";
     renderGroups(filtered);
   };
   document.querySelectorAll("[data-article-filter]").forEach((button) => {
     button.addEventListener("click", () => {
       state.mode = button.getAttribute("data-article-filter") || "today";
+      if (state.mode === "all") loadFullArticles();
       document.querySelectorAll("[data-article-filter]").forEach((item) => {
         const active = item === button;
         item.classList.toggle("is-active", active);
@@ -494,8 +559,10 @@ function articleIndexScript() {
   controls.search?.addEventListener("input", (event) => { state.search = event.target.value.trim(); update(); });
   controls.domain?.addEventListener("change", (event) => { state.domain = event.target.value; update(); });
   controls.channel?.addEventListener("change", (event) => { state.channel = event.target.value; update(); });
-  controls.entity?.addEventListener("change", (event) => { state.entity = event.target.value; update(); });
-  controls.month?.addEventListener("change", (event) => { state.month = event.target.value; update(); });
+  controls.source?.addEventListener("change", (event) => { state.source = event.target.value; update(); });
+  controls.score?.addEventListener("change", (event) => { state.score = Number(event.target.value || 0); update(); });
+  const idle = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 800));
+  idle(() => { loadFullArticles(); });
 })();`;
 }
 
@@ -1643,6 +1710,33 @@ h3 {
   color: var(--muted);
   font-size: 1.02rem;
   line-height: 1.65;
+}
+
+.article-hero-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.article-hero-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 780;
+  text-decoration: none;
+}
+
+.article-hero-actions a:hover {
+  border-color: color-mix(in srgb, var(--accent) 54%, var(--line));
+  color: var(--accent);
 }
 
 .article-stat-grid {

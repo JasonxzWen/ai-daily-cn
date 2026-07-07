@@ -497,10 +497,15 @@ export async function buildSite(options = {}) {
     reports
   });
   const dateIndex = buildDateIndex(feedValidation.value, reports, trendValidation.value);
+  const sourceWatchAdmittedArtifacts = await loadSourceWatchAdmittedArtifacts(rootDir, {
+    artifactPath: options.sourceWatchAdmittedArtifactPath,
+    artifactPaths: options.sourceWatchAdmittedArtifactPaths
+  });
   const articles = buildArticleIndex(reports, {
     siteTitle,
     siteUrl,
-    updatedAt: feedValidation.value.updated_at
+    updatedAt: feedValidation.value.updated_at,
+    sourceWatchAdmittedArtifacts
   });
   const articleValidation = validateArticles(articles);
   if (!articleValidation.valid) {
@@ -724,6 +729,65 @@ export function buildArticleIndex(reports = [], options = {}) {
     Number(b.quality_score || 0) - Number(a.quality_score || 0) ||
     String(a.title).localeCompare(String(b.title), "zh-Hans-CN")
   );
+}
+
+async function loadSourceWatchAdmittedArtifacts(rootDir, options = {}) {
+  const artifactPaths = sourceWatchAdmittedArtifactPaths(options.artifactPaths || options.artifactPath);
+  if (artifactPaths.length === 0) {
+    return [];
+  }
+  const artifacts = [];
+  for (const artifactPath of artifactPaths) {
+    const resolved = resolveSourceWatchAdmittedArtifactPath(rootDir, artifactPath);
+    let payload;
+    try {
+      payload = JSON.parse(await fs.readFile(resolved, "utf8"));
+    } catch (error) {
+      throw new PublisherError("source_watch_admitted_artifact_read_failed", "Source Watch admitted artifact could not be read.", {
+        path: artifactPath,
+        error: error.message
+      });
+    }
+    if (!payload || typeof payload !== "object" || payload.kind !== "source_watch_admitted_candidates") {
+      throw new PublisherError("source_watch_admitted_artifact_invalid", "Source Watch admitted artifact must have kind source_watch_admitted_candidates.", {
+        path: artifactPath
+      });
+    }
+    if (payload.public_surface === true || payload.admission_audit?.public_surface === true) {
+      throw new PublisherError("source_watch_admitted_artifact_public_surface_invalid", "Source Watch admitted artifact must remain an internal input before article publication.", {
+        path: artifactPath
+      });
+    }
+    artifacts.push(payload);
+  }
+  return artifacts;
+}
+
+function sourceWatchAdmittedArtifactPaths(value) {
+  if (!value) {
+    return [];
+  }
+  return (Array.isArray(value) ? value : [value])
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+}
+
+function resolveSourceWatchAdmittedArtifactPath(rootDir, value) {
+  if (!String(value).toLowerCase().endsWith(".json")) {
+    throw new PublisherError("source_watch_admitted_artifact_path_invalid", "Source Watch admitted artifact path must end with .json.", {
+      path: value
+    });
+  }
+  const allowedRoot = path.resolve(rootDir, ".tmp", "daily-codex-pipeline");
+  const resolved = path.resolve(rootDir, value);
+  const relative = path.relative(allowedRoot, resolved);
+  if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new PublisherError("source_watch_admitted_artifact_path_out_of_scope", "Source Watch admitted artifact path must stay under .tmp/daily-codex-pipeline.", {
+      path: value,
+      allowed_root: path.join(".tmp", "daily-codex-pipeline")
+    });
+  }
+  return resolved;
 }
 
 function articleFromReportItem(report, section, item, options = {}) {
