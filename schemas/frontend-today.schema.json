@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/frontend-today.schema.json",
+  "title": "ADC React Today Data",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "report_date",
+    "title",
+    "summary",
+    "stats",
+    "top_article_ids",
+    "articles",
+    "top_topics"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "report_date": { "type": "string", "format": "date" },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["article_count", "source_count", "topic_count", "aify_count"],
+      "properties": {
+        "article_count": { "type": "integer", "minimum": 0 },
+        "source_count": { "type": "integer", "minimum": 0 },
+        "topic_count": { "type": "integer", "minimum": 0 },
+        "aify_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "top_article_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/article_id" }
+    },
+    "articles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/article_preview" }
+    },
+    "top_topics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/topic_summary" }
+    }
+  },
+  "$defs": {
+    "article_id": {
+      "type": "string",
+      "pattern": "^article-[a-f0-9]{16}$"
+    },
+    "article_preview": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "title", "url", "summary", "date", "source", "quality_score", "importance"],
+      "properties": {
+        "id": { "$ref": "#/$defs/article_id" },
+        "title": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" },
+        "summary": { "type": "string", "minLength": 1 },
+        "date": { "type": "string", "format": "date" },
+        "source": { "type": "string", "minLength": 1 },
+        "quality_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "importance": { "enum": ["major", "notable", "general"] }
+      }
+    },
+    "topic_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "count", "article_ids", "sources", "latest_date", "accent"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^topic-[a-f0-9]{12}$" },
+        "label": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 0 },
+        "article_ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/article_id" }
+        },
+        "sources": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "latest_date": { "type": "string", "format": "date" },
+        "accent": { "enum": ["cyan", "green", "pink", "orange", "purple"] }
+      }
+    }
+  }
+}

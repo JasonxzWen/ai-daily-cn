@@ -11,7 +11,13 @@ import { PublisherError } from "../src/errors.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildArticleIndex, buildFrontendData, buildSite } from "../src/site.js";
 import { renderIndexHtml } from "../src/render.js";
-import { validateArticles } from "../src/schema.js";
+import {
+  validateArticles,
+  validateFrontendRuntime,
+  validateFrontendSources,
+  validateFrontendToday,
+  validateFrontendTopics
+} from "../src/schema.js";
 
 const rootDir = process.cwd();
 const trendConfigPath = path.join(rootDir, "config", "trends.json");
@@ -374,6 +380,107 @@ test("buildSite writes React frontend data artifacts with external AIFY articles
   assert.equal(today.stats.aify_count, 1);
   const sources = JSON.parse(await fs.readFile(path.join(outDir, "data", "sources.json"), "utf8"));
   assert(sources.sources.some((source) => source.id === "site-aify-news" && source.article_count === 1));
+  const topics = JSON.parse(await fs.readFile(path.join(outDir, "data", "topics.json"), "utf8"));
+  const runtime = JSON.parse(await fs.readFile(path.join(outDir, "data", "runtime.json"), "utf8"));
+  assert.equal(validateArticles(articles).valid, true);
+  assert.equal(validateFrontendToday(today).valid, true);
+  assert.equal(validateFrontendTopics(topics).valid, true);
+  assert.equal(validateFrontendSources(sources).valid, true);
+  assert.equal(validateFrontendRuntime(runtime).valid, true);
+});
+
+test("React frontend source schema rejects internal Source Watch strategy fields", () => {
+  const frontendData = buildFrontendData({
+    generatedAt: "2026-07-07T08:00:00.000Z",
+    feed: { reports: [] },
+    articles: buildArticleIndex([], {
+      externalArticles: [{
+        title: "AIFY schema source signal",
+        url: "https://example.com/aify-schema-source-signal",
+        summary: "AIFY schema source signal keeps public source records reader-safe.",
+        date: "2026-07-07",
+        source: "AIFY Source",
+        quality_score: 86
+      }]
+    }),
+    externalArticleSources: [{
+      id: "site-aify-news",
+      name: "Aify News",
+      url: "https://aify-news.pages.dev/",
+      articles: []
+    }]
+  });
+
+  const valid = validateFrontendSources(frontendData.sources);
+  assert.equal(valid.valid, true, JSON.stringify(valid.errors, null, 2));
+
+  const leaked = validateFrontendSources({
+    ...frontendData.sources,
+    sources: [{
+      ...frontendData.sources.sources[0],
+      source_lane: "aify",
+      verification_policy: "no_secondary_review_required"
+    }]
+  });
+  assert.equal(leaked.valid, false);
+  assert(leaked.errors.some((error) => error.keyword === "additionalProperties"));
+});
+
+test("buildSite degrades React runtime when AIFY article fetch fails", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "article-public-aify-failure-"));
+  const inputDir = path.join(tmp, "reports-source");
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(inputDir, { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "tests", "fixtures", "reports", "good", "official-release.md"),
+    path.join(inputDir, "official-release.md")
+  );
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir,
+    outDir,
+    generatedAt: "2026-07-07T08:00:00.000Z",
+    trendConfigPath,
+    externalArticleTargets: [{
+      id: "site-aify-news",
+      name: "Aify News",
+      url: "https://aify-news.pages.dev/",
+      articles_url: "https://aify-news.pages.dev/articles.json",
+      content_kind: "aify_articles_json",
+      source_tier: "first_class",
+      source_lane: "aify",
+      verification_policy: "no_secondary_review_required"
+    }],
+    fetchImpl: async () => {
+      throw new Error("synthetic AIFY outage");
+    }
+  });
+
+  assert.equal(result.externalArticleSources.length, 1);
+  assert.equal(result.externalArticleSources[0].status, "blocked");
+  assert.equal(result.externalArticleSources[0].articles.length, 0);
+
+  const runtime = JSON.parse(await fs.readFile(path.join(outDir, "data", "runtime.json"), "utf8"));
+  assert.equal(runtime.final_status, "degraded");
+  assert.deepEqual(runtime.source_inputs, [{
+    id: "site-aify-news",
+    name: "Aify News",
+    url: "https://aify-news.pages.dev/articles.json",
+    status: "blocked",
+    article_count: 0
+  }]);
+  assert.equal(validateFrontendRuntime(runtime).valid, true);
+
+  const sources = JSON.parse(await fs.readFile(path.join(outDir, "data", "sources.json"), "utf8"));
+  const aify = sources.sources.find((source) => source.id === "site-aify-news");
+  assert.equal(aify.status, "blocked");
+  assert.equal(aify.article_count, 0);
+  assert.equal(validateFrontendSources(sources).valid, true);
+
+  const today = JSON.parse(await fs.readFile(path.join(outDir, "data", "today.json"), "utf8"));
+  assert.equal(today.stats.aify_count, 0);
+  assert.equal(validateFrontendToday(today).valid, true);
 });
 
 test("buildSite rejects Source Watch admitted artifact paths outside the pipeline temp root", async () => {

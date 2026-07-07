@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/frontend-topics.schema.json",
+  "title": "ADC React Topics Data",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "topics"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "topics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/topic_summary" }
+    }
+  },
+  "$defs": {
+    "article_id": {
+      "type": "string",
+      "pattern": "^article-[a-f0-9]{16}$"
+    },
+    "topic_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "count", "article_ids", "sources", "latest_date", "accent"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^topic-[a-f0-9]{12}$" },
+        "label": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 0 },
+        "article_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/article_id" }
+        },
+        "sources": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "latest_date": { "type": "string", "format": "date" },
+        "accent": { "enum": ["cyan", "green", "pink", "orange", "purple"] }
+      }
+    }
+  }
+}

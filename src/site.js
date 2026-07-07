@@ -8,7 +8,16 @@ import { defaultStyleCss, renderIndexHtml, renderOfficialBlogsHtml, renderOpsInd
 import { renderReportWithEffectiveInteract } from "./interaction-report.js";
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import { defaultGeneratedAt } from "./time.js";
-import { validateArticles, validateFeed, validateReport, validateTrends } from "./schema.js";
+import {
+  validateArticles,
+  validateFeed,
+  validateFrontendRuntime,
+  validateFrontendSources,
+  validateFrontendToday,
+  validateFrontendTopics,
+  validateReport,
+  validateTrends
+} from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
 import { deriveQualityStatus, normalizeQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
@@ -532,6 +541,12 @@ export async function buildSite(options = {}) {
     generatedAt: feedValidation.value.updated_at,
     externalArticleSources
   });
+  const frontendValidation = validateFrontendData(frontendData);
+  if (!frontendValidation.valid) {
+    throw new PublisherError("frontend_data_schema_validation_failed", "生成的 React 首页数据未通过 schema 校验。", {
+      errors: frontendValidation.errors
+    });
+  }
 
   for (const record of reportRecords) {
     await writeReportArtifacts(rootDir, outDir, record.report, writtenFiles, record.markdown, record.reportJsonPath, {
@@ -549,10 +564,10 @@ export async function buildSite(options = {}) {
   await writeJsonTracked(outDir, "articles.json", articleValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "data/articles.json", articleValidation.value, writtenFiles);
-  await writeJsonTracked(outDir, "data/today.json", frontendData.today, writtenFiles);
-  await writeJsonTracked(outDir, "data/topics.json", frontendData.topics, writtenFiles);
-  await writeJsonTracked(outDir, "data/sources.json", frontendData.sources, writtenFiles);
-  await writeJsonTracked(outDir, "data/runtime.json", frontendData.runtime, writtenFiles);
+  await writeJsonTracked(outDir, "data/today.json", frontendValidation.value.today, writtenFiles);
+  await writeJsonTracked(outDir, "data/topics.json", frontendValidation.value.topics, writtenFiles);
+  await writeJsonTracked(outDir, "data/sources.json", frontendValidation.value.sources, writtenFiles);
+  await writeJsonTracked(outDir, "data/runtime.json", frontendValidation.value.runtime, writtenFiles);
   await writeJsonTracked(outDir, "data/official-blogs.json", officialBlogKnowledge, writtenFiles);
   await writeFileTracked(outDir, "official-blogs/index.html", renderOfficialBlogsHtml(officialBlogKnowledge, {
     styleHref: `../assets/style.css?v=${encodeURIComponent(indexStyleVersion)}`
@@ -578,6 +593,32 @@ export async function buildSite(options = {}) {
     officialBlogKnowledge,
     dateIndex,
     writtenFiles: uniqueSorted(writtenFiles)
+  };
+}
+
+function validateFrontendData(frontendData) {
+  const validators = {
+    today: validateFrontendToday,
+    topics: validateFrontendTopics,
+    sources: validateFrontendSources,
+    runtime: validateFrontendRuntime
+  };
+  const value = {};
+  const errors = [];
+  for (const [key, validate] of Object.entries(validators)) {
+    const result = validate(frontendData[key]);
+    if (!result.valid) {
+      errors.push(...result.errors.map((error) => ({
+        ...error,
+        file: `data/${key}.json`
+      })));
+    }
+    value[key] = result.value;
+  }
+  return {
+    valid: errors.length === 0,
+    value,
+    errors
   };
 }
 

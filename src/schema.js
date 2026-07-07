@@ -46,6 +46,10 @@ export const schemas = {
   report: loadSchema("report.schema.json"),
   feed: loadSchema("feed.schema.json"),
   articles: loadSchema("articles.schema.json"),
+  frontendToday: loadSchema("frontend-today.schema.json"),
+  frontendTopics: loadSchema("frontend-topics.schema.json"),
+  frontendSources: loadSchema("frontend-sources.schema.json"),
+  frontendRuntime: loadSchema("frontend-runtime.schema.json"),
   candidatePool: loadSchema("candidates.schema.json"),
   sourceRegistry: loadSchema("sources.schema.json"),
   trends: loadSchema("trends.schema.json")
@@ -55,6 +59,10 @@ const ajv = createAjv();
 const validateReportSchema = ajv.compile(schemas.report);
 const validateFeedSchema = ajv.compile(schemas.feed);
 const validateArticlesSchema = ajv.compile(schemas.articles);
+const validateFrontendTodaySchema = ajv.compile(schemas.frontendToday);
+const validateFrontendTopicsSchema = ajv.compile(schemas.frontendTopics);
+const validateFrontendSourcesSchema = ajv.compile(schemas.frontendSources);
+const validateFrontendRuntimeSchema = ajv.compile(schemas.frontendRuntime);
 const validateCandidatePoolSchema = ajv.compile(schemas.candidatePool);
 const validateSourceRegistrySchema = ajv.compile(schemas.sourceRegistry);
 const validateTrendsSchema = ajv.compile(schemas.trends);
@@ -86,6 +94,46 @@ export function validateArticles(articles) {
     valid,
     value: candidate,
     errors: valid ? [] : normalizeAjvErrors(validateArticlesSchema.errors)
+  };
+}
+
+export function validateFrontendToday(today) {
+  const candidate = structuredClone(today);
+  const valid = validateFrontendTodaySchema(candidate);
+  return {
+    valid,
+    value: candidate,
+    errors: valid ? [] : normalizeAjvErrors(validateFrontendTodaySchema.errors)
+  };
+}
+
+export function validateFrontendTopics(topics) {
+  const candidate = structuredClone(topics);
+  const valid = validateFrontendTopicsSchema(candidate);
+  return {
+    valid,
+    value: candidate,
+    errors: valid ? [] : normalizeAjvErrors(validateFrontendTopicsSchema.errors)
+  };
+}
+
+export function validateFrontendSources(sources) {
+  const candidate = structuredClone(sources);
+  const valid = validateFrontendSourcesSchema(candidate);
+  return {
+    valid,
+    value: candidate,
+    errors: valid ? [] : normalizeAjvErrors(validateFrontendSourcesSchema.errors)
+  };
+}
+
+export function validateFrontendRuntime(runtime) {
+  const candidate = structuredClone(runtime);
+  const valid = validateFrontendRuntimeSchema(candidate);
+  return {
+    valid,
+    value: candidate,
+    errors: valid ? [] : normalizeAjvErrors(validateFrontendRuntimeSchema.errors)
   };
 }
 

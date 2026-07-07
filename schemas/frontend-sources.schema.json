@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/frontend-sources.schema.json",
+  "title": "ADC React Sources Data",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "source_registry_version", "sources"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "source_registry_version": { "const": 1 },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source_summary" }
+    }
+  },
+  "$defs": {
+    "article_id": {
+      "type": "string",
+      "pattern": "^article-[a-f0-9]{16}$"
+    },
+    "source_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "url",
+        "source_kind",
+        "authority",
+        "tier",
+        "article_count",
+        "latest_article_date",
+        "latest_article_ids",
+        "status"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" },
+        "source_kind": { "type": "string", "minLength": 1 },
+        "authority": { "type": "string", "minLength": 1 },
+        "tier": { "type": "string", "minLength": 1 },
+        "article_count": { "type": "integer", "minimum": 0 },
+        "latest_article_date": {
+          "type": "string",
+          "anyOf": [
+            { "format": "date" },
+            { "const": "" }
+          ]
+        },
+        "latest_article_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/article_id" }
+        },
+        "status": {
+          "enum": ["checked", "blocked", "no_signal", "not_configured_or_skipped"]
+        }
+      }
+    }
+  }
+}
