@@ -276,6 +276,33 @@ h3 {
   line-height: 1.65;
 }
 
+.article-hero-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.article-hero-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 780;
+  text-decoration: none;
+}
+
+.article-hero-actions a:hover {
+  border-color: color-mix(in srgb, var(--accent) 54%, var(--line));
+  color: var(--accent);
+}
+
 .article-stat-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

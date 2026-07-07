@@ -9,6 +9,7 @@ import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 import { buildSite } from "../../src/site.js";
+import { renderIndexHtml } from "../../src/render.js";
 import { evaluateDailyPageChecklist, evaluateIndexPageChecklist } from "../../src/page-checklist.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -438,6 +439,38 @@ await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-workflow.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-blog-architecture.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-builder-post.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-community-token-routing.png"));
+const syntheticArticles = Array.from({ length: 130 }, (_unused, index) => ({
+  id: `synthetic-full-history-${index + 1}`,
+  title: `Synthetic full history article ${index + 1}`,
+  url: `https://example.com/synthetic-full-history-${index + 1}`,
+  summary: `Synthetic article ${index + 1} verifies that full history rendering is not capped per domain.`,
+  date: "2026-05-17",
+  month: "2026-05",
+  source: `Synthetic Source ${String(index + 1).padStart(3, "0")}`,
+  section: "stories",
+  report_date: "2026-05-17",
+  report_url: "reports/2026/05/2026-05-17.html",
+  data_url: "data/2026/05/2026-05-17.json",
+  quality_score: 91,
+  importance: "notable",
+  domain: "基础模型与算力技术栈",
+  flavors: ["快讯"],
+  channels_l1: ["基础模型"],
+  channels_l2: ["模型能力"],
+  companies: [],
+  products: []
+}));
+const syntheticDir = path.join(outDir, "synthetic");
+await fs.mkdir(syntheticDir, { recursive: true });
+await fs.writeFile(path.join(syntheticDir, "index.html"), renderIndexHtml({
+  schema_version: 1,
+  site_title: "AI 日报",
+  reports: [{ url: "reports/2026/05/2026-05-17.html", report_date: "2026-05-17" }]
+}, null, null, {
+  articles: syntheticArticles,
+  styleVersion: "synthetic"
+}), "utf8");
+await fs.writeFile(path.join(syntheticDir, "articles.json"), `${JSON.stringify(syntheticArticles, null, 2)}\n`, "utf8");
 
 const positionalPageCheckOutput = path.join(tmp, "page-check-positional-viewports.json");
 await execFileAsync(process.execPath, [
@@ -465,17 +498,37 @@ try {
   assert.match(await page.locator("h1").textContent(), /AI 资讯库/);
   assert.equal(await hasRemoteScripts(page), false);
   assert.equal(await page.locator('[data-article-index="aify-style"]').count(), 1);
-  assert.equal(await page.locator('a[href="ops.html"]').count(), 1);
-  assert.equal(await page.locator('a[href="articles.json"]').count(), 1);
+  assert.equal(await page.locator('a[href="ops.html"]').count() >= 1, true);
+  assert.equal(await page.locator('a[href="articles.json"]').count() >= 1, true);
   assert.equal(await page.locator('[data-article-filter="today"]').count(), 1);
+  assert.equal(await page.locator('[data-article-filter="yesterday"]').count(), 1);
   assert.equal(await page.locator('[data-article-filter="all"]').count(), 1);
   assert.equal(await page.locator("#articleSearch").count(), 1);
+  assert.equal(await page.locator("#articleSource").count(), 1);
+  assert.equal(await page.locator("#articleScore").count(), 1);
   assert.equal(await page.locator("[data-article-card]").count() >= 2, true);
   await page.locator("#articleSearch").fill("harness");
   assert.equal(await page.locator("[data-article-card]").count() >= 1, true);
   await page.locator("#articleSearch").fill("");
+  await page.locator('[data-article-filter="yesterday"]').click();
+  assert.equal(await page.locator("#article-results-title").textContent(), "昨日回看");
   await page.locator('[data-article-filter="all"]').click();
+  await page.waitForFunction(() => document.documentElement.dataset.articleIndexLoaded === "full");
   assert.equal(await page.locator("#article-results-title").textContent(), "全部资讯");
+  await page.locator("#articleScore").selectOption("90");
+  assert.equal(await page.locator("[data-article-card]").count() >= 1, true);
+  assert.equal(await page.locator("[data-article-card][data-article-score]").evaluateAll((cards) =>
+    cards.every((card) => Number(card.getAttribute("data-article-score") || "0") >= 90)
+  ), true);
+  await page.locator("#articleScore").selectOption("0");
+  await page.goto(`${server.url}/synthetic/index.html`);
+  assert.equal(await page.locator("#articleSource option").count(), syntheticArticles.length + 1);
+  await page.locator('[data-article-filter="all"]').click();
+  await page.waitForFunction(() => document.documentElement.dataset.articleIndexLoaded === "full");
+  assert.equal(await page.locator("#article-results-title").textContent(), "全部资讯");
+  const fullHistoryMeta = await page.locator("#articleResultMeta").textContent();
+  assert.equal(Number(fullHistoryMeta.replace(/\D/g, "")), syntheticArticles.length);
+  assert.equal(await page.locator("[data-article-card]").count(), syntheticArticles.length);
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await hasHorizontalOverflow(page), false);
   await page.setViewportSize({ width: 1280, height: 900 });
