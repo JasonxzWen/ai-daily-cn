@@ -31,6 +31,11 @@ const SOURCE_WATCH_NORMALIZE_MVP_MODE = "daily_codex_dag_source_watch_normalize_
 const SOURCE_WATCH_NORMALIZE_NODE_ID = "normalize-canonicalize";
 const SOURCE_WATCH_NORMALIZE_SCRIPT = "scripts/run-source-watch-normalize-fixture.mjs";
 const SOURCE_WATCH_NORMALIZE_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json";
+const SOURCE_WATCH_QUALITY_MVP_MODE = "daily_codex_dag_source_watch_quality_mvp";
+const SOURCE_WATCH_QUALITY_NODE_ID = "freshness-history-check";
+const SOURCE_WATCH_QUALITY_SCRIPT = "scripts/run-source-watch-quality-fixture.mjs";
+const SOURCE_WATCH_QUALITY_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/quality-candidates.json";
+const SOURCE_WATCH_QUALITY_HISTORY = "tests/fixtures/source-watch/quality-history.json";
 const SOURCE_WATCH_FIXTURE_CONFIG = "tests/fixtures/source-watch/source-watchlist.json";
 const SOURCE_WATCH_FIXTURE_DIR = "tests/fixtures/source-watch";
 const REAL_NODE_ADAPTER_TARGET_NODE_ID = "score";
@@ -1477,6 +1482,205 @@ export async function createDailyCodexDagSourceWatchNormalizeMvp(options = {}) {
   return summary;
 }
 
+export async function createDailyCodexDagSourceWatchQualityMvp(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const reportDate = requiredReportDate(options.reportDate || options.date);
+  const generatedAt = toIsoTimestamp(options.now || new Date());
+  const runId = options.runId || options.run_id || `daily-codex-dag:${reportDate}:source-watch-quality`;
+  const normalizeSummary = await createDailyCodexDagSourceWatchNormalizeMvp({
+    ...options,
+    rootDir,
+    reportDate,
+    now: generatedAt,
+    runId
+  });
+
+  if (!isPlainObject(normalizeSummary.plan) || !Array.isArray(normalizeSummary.node_results)) {
+    return {
+      ...normalizeSummary,
+      mode: SOURCE_WATCH_QUALITY_MVP_MODE,
+      failures: uniqueSorted([...(normalizeSummary.failures || []), "daily codex DAG source-watch quality MVP could not build the upstream normalize sequence."])
+    };
+  }
+
+  let manifest = null;
+  try {
+    const loaded = await loadDailyCodexDag({ rootDir, dagPath: options.dagPath });
+    manifest = loaded.manifest;
+  } catch (error) {
+    return {
+      ok: false,
+      failures: [`${DEFAULT_DAG_PATH}: ${error.message}`],
+      warnings: [],
+      validation: null,
+      plan: null,
+      run: null
+    };
+  }
+
+  const qualitySourceNode = manifest.nodes.find((node) => node.id === SOURCE_WATCH_QUALITY_NODE_ID);
+  if (!qualitySourceNode) {
+    return {
+      ok: false,
+      failures: [`daily codex DAG source-watch quality MVP missing node ${SOURCE_WATCH_QUALITY_NODE_ID}.`],
+      warnings: normalizeSummary.validation?.warnings || [],
+      validation: normalizeSummary.validation || null,
+      plan: null,
+      run: null
+    };
+  }
+
+  const qualityNode = createSourceWatchQualityCommandNode({
+    sourceNode: qualitySourceNode,
+    reportDate,
+    dependencies: [SOURCE_WATCH_NORMALIZE_NODE_ID],
+    historyPath: options.historyPath || options.history_path || SOURCE_WATCH_QUALITY_HISTORY
+  });
+  const fixtureManifest = {
+    schema_version: manifest.schema_version,
+    name: manifest.name,
+    description: "Fixture-only executable adapter for the Source Watch collect-to-quality DAG sequence.",
+    nodes: [...normalizeSummary.plan.nodes, qualityNode]
+  };
+  const plan = projectDailyCodexDagPlan(fixtureManifest);
+  await prepareSourceWatchQualityFixtureArtifacts({ rootDir, reportDate });
+
+  const nodeResults = [...normalizeSummary.node_results];
+  const executionFailures = [];
+  const executedCommands = [...normalizeSummary.executed_commands];
+  const nodeExecutablePath = options.nodeExecutablePath || options.node_executable_path || process.execPath;
+  const normalizeResult = nodeResults.find((result) => result.node_id === SOURCE_WATCH_NORMALIZE_NODE_ID);
+  const normalizeSucceeded = normalizeResult?.status === "success";
+  if (normalizeSucceeded) {
+    const qualityExecution = await executeDailyCodexDagCommandNode({
+      rootDir,
+      reportDate,
+      runId,
+      manifestName: manifest.name,
+      manifestSchemaVersion: manifest.schema_version,
+      node: qualityNode,
+      nodeExecutablePath,
+      executeCommand: options.executeCommand,
+      startedAt: options.startedAt ?? options.started_at,
+      finishedAt: options.finishedAt ?? options.finished_at,
+      timeoutSeconds: options.timeoutSeconds ?? options.timeout_seconds,
+      dependencyResults: [dependencyResultFromNodeResult(normalizeResult)],
+      resiliencePolicyRef: qualitySourceNode.resilience_policy_ref || ""
+    });
+    executionFailures.push(...qualityExecution.failures);
+    if (qualityExecution.result) nodeResults.push(qualityExecution.result);
+    executedCommands.push({
+      node_id: SOURCE_WATCH_QUALITY_NODE_ID,
+      runner: "node",
+      script: SOURCE_WATCH_QUALITY_SCRIPT
+    });
+  } else {
+    nodeResults.push(createBlockedSourceWatchDownstreamNodeResult({
+      reportDate,
+      runId,
+      manifestName: manifest.name,
+      manifestSchemaVersion: manifest.schema_version,
+      node: qualityNode,
+      fixtureLabel: "source-watch quality fixture",
+      issueSource: "daily-codex-dag-source-watch-quality-fixture",
+      dependencyResult: normalizeResult
+        ? dependencyResultFromNodeResult(normalizeResult)
+        : {
+            node_id: SOURCE_WATCH_NORMALIZE_NODE_ID,
+            execution_id: `${runId}:${SOURCE_WATCH_NORMALIZE_NODE_ID}:missing-result`,
+            status: "failure",
+            required: true,
+            downstream_disposition: "block"
+          }
+    }));
+  }
+
+  const qualityResult = nodeResults.find((result) => result.node_id === SOURCE_WATCH_QUALITY_NODE_ID);
+  const qualitySucceeded = qualityResult?.status === "success";
+  const quality = qualitySucceeded
+    ? await summarizeSourceWatchQualityArtifact({ rootDir, reportDate })
+    : {
+        ok: true,
+        failures: [],
+        warnings: [],
+        summary: {
+          ...emptySourceWatchQualitySummary(),
+          artifact_path: SOURCE_WATCH_QUALITY_OUTPUT_ARTIFACT
+        }
+      };
+  const nodeResultValidation = validateSourceWatchQualityMvpNodeResults({
+    plan,
+    reportDate,
+    runId,
+    nodeResults
+  });
+  const completedNodes = nodeResults
+    .filter((result) => result.status === "success")
+    .map((result) => result.node_id);
+  const blockedNodes = nodeResults
+    .filter((result) => result.status === "failure" || result.status === "blocked")
+    .map((result) => result.node_id);
+  const ok = nodeResults.length === 4
+    && nodeResults.every((result) => result.status === "success")
+    && nodeResultValidation.ok
+    && normalizeSummary.source_watch
+    && normalizeSummary.downstream
+    && normalizeSummary.normalized
+    && quality.ok;
+  const nodeFailureMessages = nodeResults.flatMap((result) => (result.failures || []).map((issue) => issue.message));
+
+  const summary = {
+    ok,
+    failures: ok ? [] : uniqueSorted([
+      ...(normalizeSummary.ok ? [] : normalizeSummary.failures || []),
+      ...executionFailures,
+      ...nodeFailureMessages,
+      ...nodeResultValidation.failures,
+      ...quality.failures
+    ]),
+    warnings: uniqueSorted([
+      ...(normalizeSummary.warnings || []),
+      ...nodeResultValidation.warnings,
+      ...quality.warnings
+    ]),
+    validation: normalizeSummary.validation,
+    mode: SOURCE_WATCH_QUALITY_MVP_MODE,
+    report_date: reportDate,
+    generated_at: generatedAt,
+    run_id: runId,
+    plan,
+    run: {
+      final_status: ok ? "executed_source_watch_quality" : "blocked",
+      levels: plan.levels.map(copyLevel),
+      planned_nodes: plan.nodes.map((node) => node.id),
+      completed_nodes: completedNodes,
+      blocked_nodes: blockedNodes
+    },
+    source_watch: normalizeSummary.source_watch,
+    downstream: normalizeSummary.downstream,
+    normalized: normalizeSummary.normalized,
+    quality: quality.summary,
+    node_results: nodeResults,
+    node_result_validation: nodeResultValidation,
+    executed_commands: executedCommands,
+    codex_invocations: [],
+    next_action: {
+      kind: "promote_source_watch_quality_candidates_after_review",
+      message: "Source Watch quality fixture consumed canonical-candidates.json and emitted internal quality-candidates.json; next promote admitted candidates only after downstream review gates."
+    }
+  };
+  const summaryValidation = validateDailyCodexDagRunSummary(summary);
+  if (!summaryValidation.ok) {
+    return {
+      ...summary,
+      ok: false,
+      failures: uniqueSorted([...summary.failures, ...summaryValidation.failures]),
+      warnings: uniqueSorted([...summary.warnings, ...summaryValidation.warnings])
+    };
+  }
+  return summary;
+}
+
 export async function createDailyCodexDagTwoNodeFixtureMvp(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const reportDate = requiredReportDate(options.reportDate || options.date);
@@ -1679,6 +1883,10 @@ export function validateDailyCodexDagRunSummary(summary) {
   }
   if (summary.mode === SOURCE_WATCH_NORMALIZE_MVP_MODE) {
     validateSourceWatchNormalizeMvpSummary(summary, failures);
+    return { ok: failures.length === 0, failures, warnings };
+  }
+  if (summary.mode === SOURCE_WATCH_QUALITY_MVP_MODE) {
+    validateSourceWatchQualityMvpSummary(summary, failures);
     return { ok: failures.length === 0, failures, warnings };
   }
   if (summary.mode === TWO_NODE_FIXTURE_MVP_MODE) {
@@ -2333,6 +2541,61 @@ function createSourceWatchNormalizeCommandNode({ sourceNode, reportDate, depende
   };
 }
 
+function createSourceWatchQualityCommandNode({ sourceNode, reportDate, dependencies, historyPath }) {
+  const inputArtifacts = [{ path: SOURCE_WATCH_NORMALIZE_OUTPUT_ARTIFACT, required: true }];
+  const outputArtifacts = [{ path: SOURCE_WATCH_QUALITY_OUTPUT_ARTIFACT, required: true }];
+  const inputArtifactPath = materializeArtifactPath({
+    templatePath: SOURCE_WATCH_NORMALIZE_OUTPUT_ARTIFACT,
+    reportDate
+  });
+  const outputArtifactPath = materializeArtifactPath({
+    templatePath: SOURCE_WATCH_QUALITY_OUTPUT_ARTIFACT,
+    reportDate
+  });
+
+  return {
+    id: sourceNode.id,
+    title: sourceNode.title,
+    kind: "command",
+    execution_status: sourceNode.execution_status,
+    execution_contract: {
+      readiness: "node_executable",
+      summary: "Fixture-only executable adapter for Source Watch quality suppression and freshness checks.",
+      node_execution_spec: {
+        executor: "command",
+        cwd: ".",
+        timeout_seconds: 30,
+        invocation: {
+          kind: "command",
+          argv: [
+            "node",
+            SOURCE_WATCH_QUALITY_SCRIPT,
+            "--date",
+            reportDate,
+            "--input",
+            inputArtifactPath,
+            "--output",
+            outputArtifactPath,
+            "--history",
+            historyPath,
+            "--json"
+          ]
+        },
+        inputs: inputArtifacts,
+        outputs: outputArtifacts
+      }
+    },
+    dependencies: Array.isArray(dependencies) ? [...dependencies] : [SOURCE_WATCH_NORMALIZE_NODE_ID],
+    inputs: inputArtifacts,
+    outputs: outputArtifacts,
+    runner_stage_ref: sourceNode.runner_stage_ref,
+    parallel_group: sourceNode.parallel_group,
+    resilience_policy_ref: sourceNode.resilience_policy_ref || "",
+    public_artifact: sourceNode.public_artifact,
+    owner_path_scope: sourceNode.owner_path_scope
+  };
+}
+
 async function prepareSourceWatchCollectFixtureArtifacts({ rootDir, reportDate, sourceNode }) {
   const outputArtifact = sourceNode.outputs?.[0] || {};
   const outputPath = path.resolve(rootDir, materializeArtifactPath({
@@ -2359,6 +2622,15 @@ async function prepareSourceWatchNormalizeFixtureArtifacts({ rootDir, reportDate
   const outputArtifact = normalizeSourceNode.outputs?.[0] || {};
   const outputPath = path.resolve(rootDir, materializeArtifactPath({
     templatePath: outputArtifact.path || SOURCE_WATCH_NORMALIZE_OUTPUT_ARTIFACT,
+    reportDate
+  }));
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  await fs.rm(outputPath, { force: true });
+}
+
+async function prepareSourceWatchQualityFixtureArtifacts({ rootDir, reportDate }) {
+  const outputPath = path.resolve(rootDir, materializeArtifactPath({
+    templatePath: SOURCE_WATCH_QUALITY_OUTPUT_ARTIFACT,
     reportDate
   }));
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
@@ -2501,6 +2773,57 @@ async function summarizeSourceWatchNormalizeArtifact({ rootDir, reportDate, sour
   }
 }
 
+async function summarizeSourceWatchQualityArtifact({ rootDir, reportDate }) {
+  const declaredArtifactPath = SOURCE_WATCH_QUALITY_OUTPUT_ARTIFACT;
+  const materializedArtifactPath = materializeArtifactPath({
+    templatePath: declaredArtifactPath,
+    reportDate
+  });
+  const summary = emptySourceWatchQualitySummary();
+  summary.artifact_path = declaredArtifactPath;
+  try {
+    const payload = JSON.parse(await fs.readFile(path.resolve(rootDir, materializedArtifactPath), "utf8"));
+    const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
+    const signalCounts = isPlainObject(payload.signal_counts) ? payload.signal_counts : {};
+    const qualityAudit = isPlainObject(payload.quality_audit) ? payload.quality_audit : {};
+    const githubCount = nonNegativeIntegerOrZero(signalCounts.github_watch);
+    const siteCount = nonNegativeIntegerOrZero(signalCounts.site_watch);
+
+    return {
+      ok: true,
+      failures: [],
+      warnings: [],
+      summary: {
+        ...summary,
+        artifact_kind: nonBlankString(payload.kind) ? payload.kind : "",
+        input_kind: nonBlankString(payload.input_kind) ? payload.input_kind : "",
+        total_candidates: candidates.length,
+        admitted_candidates: nonNegativeIntegerOrZero(payload.admitted_count),
+        suppressed_candidates: nonNegativeIntegerOrZero(payload.suppressed_count),
+        duplicate_candidates: nonNegativeIntegerOrZero(payload.duplicate_count),
+        stale_candidates: nonNegativeIntegerOrZero(payload.stale_count),
+        unchanged_repo_candidates: nonNegativeIntegerOrZero(payload.unchanged_repo_count),
+        github_watch_candidates: githubCount,
+        site_watch_candidates: siteCount,
+        other_candidates: Math.max(0, candidates.length - githubCount - siteCount),
+        empty: candidates.length === 0,
+        signals: uniqueSorted(candidates.map((candidate) => candidate?.signal).filter((signal) => typeof signal === "string" && signal)),
+        suppressed_reasons: Array.isArray(qualityAudit.suppressed_reasons)
+          ? uniqueSorted(qualityAudit.suppressed_reasons)
+          : [],
+        public_surface: qualityAudit.public_surface === true
+      }
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      failures: [`source-watch quality artifact ${materializedArtifactPath} could not be summarized: ${error.message}`],
+      warnings: [],
+      summary
+    };
+  }
+}
+
 function emptySourceWatchCollectSummary() {
   return {
     artifact_path: "",
@@ -2544,6 +2867,27 @@ function emptySourceWatchNormalizeSummary() {
     other_candidates: 0,
     empty: true,
     signals: []
+  };
+}
+
+function emptySourceWatchQualitySummary() {
+  return {
+    artifact_path: "",
+    artifact_kind: "source_watch_quality_candidates",
+    input_kind: "source_watch_canonical_candidates",
+    total_candidates: 0,
+    admitted_candidates: 0,
+    suppressed_candidates: 0,
+    duplicate_candidates: 0,
+    stale_candidates: 0,
+    unchanged_repo_candidates: 0,
+    github_watch_candidates: 0,
+    site_watch_candidates: 0,
+    other_candidates: 0,
+    empty: true,
+    signals: [],
+    suppressed_reasons: [],
+    public_surface: false
   };
 }
 
@@ -2803,6 +3147,23 @@ function expectedSourceWatchNormalizeSourceNodes() {
       outputs: [{ path: SOURCE_WATCH_NORMALIZE_OUTPUT_ARTIFACT, required: true }],
       runner_stage_ref: "collect",
       parallel_group: "source-lanes",
+      public_artifact: false,
+      owner_path_scope: "internal_workdir"
+    }
+  ];
+}
+
+function expectedSourceWatchQualitySourceNodes() {
+  return [
+    ...expectedSourceWatchNormalizeSourceNodes(),
+    {
+      id: SOURCE_WATCH_QUALITY_NODE_ID,
+      kind: "command",
+      dependencies: [SOURCE_WATCH_NORMALIZE_NODE_ID],
+      inputs: [{ path: SOURCE_WATCH_NORMALIZE_OUTPUT_ARTIFACT, required: true }],
+      outputs: [{ path: SOURCE_WATCH_QUALITY_OUTPUT_ARTIFACT, required: true }],
+      runner_stage_ref: "admit",
+      parallel_group: "item-lanes",
       public_artifact: false,
       owner_path_scope: "internal_workdir"
     }
@@ -3124,6 +3485,37 @@ function validateSourceWatchNormalizeMvpNodeResults({ plan, reportDate, runId, n
   }
 
   const expectedNodes = expectedSourceWatchNormalizeSourceNodes();
+  const resultByNodeId = new Map(nodeResults.filter(isPlainObject).map((result) => [result.node_id, result]));
+  for (let index = 0; index < nodeResults.length; index += 1) {
+    const result = nodeResults[index];
+    const resultValidation = validateDailyCodexDagNodeResult(result);
+    failures.push(...resultValidation.failures);
+    warnings.push(...resultValidation.warnings);
+    validateSourceWatchNormalizeMvpNodeResultAgainstExpected({
+      result,
+      expectedNode: expectedNodes[index],
+      reportDate,
+      runId,
+      resultByNodeId,
+      failures
+    });
+  }
+
+  return nodeResultValidationSummary({ failures, warnings, checkedResults: nodeResults.length });
+}
+
+function validateSourceWatchQualityMvpNodeResults({ plan, reportDate, runId, nodeResults }) {
+  const failures = [];
+  const warnings = [];
+  if (!Array.isArray(nodeResults)) {
+    failures.push("daily codex DAG source-watch quality MVP node_results must be an array.");
+    return nodeResultValidationSummary({ failures, warnings, checkedResults: 0 });
+  }
+  if (nodeResults.length !== 4) {
+    failures.push("daily codex DAG source-watch quality MVP node_results length must be 4.");
+  }
+
+  const expectedNodes = expectedSourceWatchQualitySourceNodes();
   const resultByNodeId = new Map(nodeResults.filter(isPlainObject).map((result) => [result.node_id, result]));
   for (let index = 0; index < nodeResults.length; index += 1) {
     const result = nodeResults[index];
@@ -4555,6 +4947,137 @@ function validateSourceWatchNormalizeMvpSummary(summary, failures) {
   }
 }
 
+function validateSourceWatchQualityMvpSummary(summary, failures) {
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "ok",
+      "failures",
+      "warnings",
+      "validation",
+      "mode",
+      "report_date",
+      "generated_at",
+      "run_id",
+      "plan",
+      "run",
+      "source_watch",
+      "downstream",
+      "normalized",
+      "quality",
+      "node_results",
+      "node_result_validation",
+      "executed_commands",
+      "codex_invocations",
+      "next_action"
+    ],
+    label: "daily codex DAG source-watch quality MVP summary",
+    failures
+  });
+  if (typeof summary.ok !== "boolean") {
+    failures.push("daily codex DAG source-watch quality MVP summary ok must be a boolean.");
+  }
+  if (!Array.isArray(summary.failures)) {
+    failures.push("daily codex DAG source-watch quality MVP summary failures must be an array.");
+  } else {
+    validateMessageArray(summary.failures, "daily codex DAG source-watch quality MVP summary failures", failures);
+    if (summary.ok === true && summary.failures.length !== 0) {
+      failures.push("daily codex DAG source-watch quality MVP summary failures must be empty when ok is true.");
+    }
+    if (summary.ok === false && summary.failures.length === 0) {
+      failures.push("daily codex DAG source-watch quality MVP summary failures must be non-empty when ok is false.");
+    }
+  }
+  if (!Array.isArray(summary.warnings)) {
+    failures.push("daily codex DAG source-watch quality MVP summary warnings must be an array.");
+  } else {
+    validateMessageArray(summary.warnings, "daily codex DAG source-watch quality MVP summary warnings", failures);
+  }
+  if (summary.mode !== SOURCE_WATCH_QUALITY_MVP_MODE) {
+    failures.push(`daily codex DAG source-watch quality MVP summary mode must be ${SOURCE_WATCH_QUALITY_MVP_MODE}.`);
+  }
+  if (!isStrictIsoDate(summary.report_date)) {
+    failures.push("daily codex DAG source-watch quality MVP summary report_date must be a real YYYY-MM-DD date.");
+  }
+  if (!isCanonicalIsoTimestamp(summary.generated_at)) {
+    failures.push("daily codex DAG source-watch quality MVP summary generated_at must be a canonical UTC Date#toISOString() string.");
+  }
+  if (!isStableIdentifier(summary.run_id)) {
+    failures.push("daily codex DAG source-watch quality MVP summary run_id must be a stable identifier.");
+  }
+  if (!isPlainObject(summary.validation)) {
+    failures.push("daily codex DAG source-watch quality MVP summary validation must be an object.");
+  } else {
+    validateValidationShape({
+      validation: summary.validation,
+      expectedOk: true,
+      label: "daily codex DAG source-watch quality MVP summary validation",
+      failures
+    });
+  }
+  validateNextActionShape(summary.next_action, failures, "daily codex DAG source-watch quality MVP summary next_action", {
+    allowedKinds: ["promote_source_watch_quality_candidates_after_review"]
+  });
+  validateSourceWatchQualityMvpExecutedCommands({ summary, failures });
+  validateSourceWatchCollectSummaryShape(summary.source_watch, failures);
+  validateSourceWatchDownstreamSummaryShape(summary.downstream, failures);
+  validateSourceWatchNormalizeSummaryShape(summary.normalized, failures);
+  validateSourceWatchQualitySummaryShape(summary.quality, failures);
+  validateSourceWatchQualitySummaryConsistency(summary, failures);
+  if (!Array.isArray(summary.codex_invocations) || summary.codex_invocations.length !== 0) {
+    failures.push("daily codex DAG source-watch quality MVP summary codex_invocations must be empty.");
+  }
+
+  const plan = isPlainObject(summary.plan) ? summary.plan : null;
+  const run = isPlainObject(summary.run) ? summary.run : null;
+  if (!plan) failures.push("daily codex DAG source-watch quality MVP summary plan must be an object.");
+  if (!run) failures.push("daily codex DAG source-watch quality MVP summary run must be an object.");
+  if (!Array.isArray(summary.node_results)) failures.push("daily codex DAG source-watch quality MVP summary node_results must be an array.");
+  if (!plan || !run || !Array.isArray(summary.node_results)) return;
+
+  validatePlanShape(plan, failures, { allowNodeExecutable: true });
+  validateRunShape(run, failures);
+  validateContractRunNodeResultValidation(summary.node_result_validation, failures);
+
+  const planNodes = Array.isArray(plan.nodes) ? plan.nodes : null;
+  const planLevels = Array.isArray(plan.levels) ? plan.levels : null;
+  if (!planNodes) failures.push("daily codex DAG source-watch quality MVP summary plan.nodes must be an array.");
+  if (!planLevels) failures.push("daily codex DAG source-watch quality MVP summary plan.levels must be an array.");
+  if (!planNodes || !planLevels) return;
+  if (plan.node_count !== 4 || planNodes.length !== 4) {
+    failures.push("daily codex DAG source-watch quality MVP summary plan must contain exactly fetch-source-health, parse-extract, normalize-canonicalize, and freshness-history-check.");
+  }
+
+  const expectedNodes = expectedSourceWatchQualitySourceNodes();
+  for (let index = 0; index < expectedNodes.length; index += 1) {
+    validateSourceWatchDownstreamMvpPlanNodeAgainstExpected({
+      planNode: planNodes[index],
+      expectedNode: expectedNodes[index],
+      failures
+    });
+  }
+  const planNodeIds = planNodes.map((node) => isPlainObject(node) ? node.id : undefined);
+  const levelPartition = validatePlanLevelPartition({ planNodes, planLevels, failures });
+  validatePlanDependencyLevels({ planNodes, levelByNodeId: levelPartition.levelByNodeId, failures });
+  validateSourceWatchQualityMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures });
+
+  const nodeResultValidation = validateSourceWatchQualityMvpNodeResults({
+    plan,
+    reportDate: summary.report_date,
+    runId: summary.run_id,
+    nodeResults: summary.node_results
+  });
+  failures.push(...nodeResultValidation.failures);
+  if (isPlainObject(summary.node_result_validation)) {
+    if (summary.node_result_validation.ok !== true) {
+      failures.push("daily codex DAG source-watch quality MVP summary node_result_validation.ok must be true.");
+    }
+    if (summary.node_result_validation.checked_results !== summary.node_results.length) {
+      failures.push("daily codex DAG source-watch quality MVP summary node_result_validation.checked_results must equal node_results length.");
+    }
+  }
+}
+
 function validateTwoNodeFixtureMvpSummary(summary, failures) {
   validateExactKeys({
     value: summary,
@@ -4827,6 +5350,57 @@ function validateSourceWatchNormalizeMvpExecutedCommands({ summary, failures }) 
   }
 }
 
+function validateSourceWatchQualityMvpExecutedCommands({ summary, failures }) {
+  const label = "daily codex DAG source-watch quality MVP summary executed_commands";
+  const values = summary.executed_commands;
+  if (!Array.isArray(values)) {
+    failures.push(`${label} must be an array.`);
+    return;
+  }
+  const nodeResults = Array.isArray(summary.node_results) ? summary.node_results : [];
+  const downstreamResult = nodeResults.find((result) => result?.node_id === SOURCE_WATCH_DOWNSTREAM_NODE_ID);
+  const normalizeResult = nodeResults.find((result) => result?.node_id === SOURCE_WATCH_NORMALIZE_NODE_ID);
+  const qualityResult = nodeResults.find((result) => result?.node_id === SOURCE_WATCH_QUALITY_NODE_ID);
+  const expectedCommands = [{
+    node_id: SOURCE_WATCH_COLLECT_NODE_ID,
+    script: SOURCE_WATCH_COLLECT_SCRIPT
+  }];
+  if (downstreamResult?.status !== "blocked") {
+    expectedCommands.push({
+      node_id: SOURCE_WATCH_DOWNSTREAM_NODE_ID,
+      script: SOURCE_WATCH_DOWNSTREAM_SCRIPT
+    });
+  }
+  if (normalizeResult?.status !== "blocked") {
+    expectedCommands.push({
+      node_id: SOURCE_WATCH_NORMALIZE_NODE_ID,
+      script: SOURCE_WATCH_NORMALIZE_SCRIPT
+    });
+  }
+  if (qualityResult?.status !== "blocked") {
+    expectedCommands.push({
+      node_id: SOURCE_WATCH_QUALITY_NODE_ID,
+      script: SOURCE_WATCH_QUALITY_SCRIPT
+    });
+  }
+  if (values.length !== expectedCommands.length) {
+    failures.push(`${label} length must match attempted source-watch commands.`);
+    return;
+  }
+  for (let index = 0; index < expectedCommands.length; index += 1) {
+    const command = values[index];
+    const expected = expectedCommands[index];
+    if (!isPlainObject(command)) {
+      failures.push(`${label} entry must be an object.`);
+      return;
+    }
+    validateExactKeys({ value: command, allowed: ["node_id", "runner", "script"], label: `${label} entry`, failures });
+    if (command.node_id !== expected.node_id) failures.push(`${label} entry.node_id must be ${expected.node_id}.`);
+    if (command.runner !== "node") failures.push(`${label} entry.runner must be node.`);
+    if (command.script !== expected.script) failures.push(`${label} entry.script must be ${expected.script}.`);
+  }
+}
+
 function validateSourceWatchCollectSummaryShape(summary, failures) {
   const label = "daily codex DAG source-watch collect MVP summary source_watch";
   if (!isPlainObject(summary)) {
@@ -5041,6 +5615,90 @@ function validateSourceWatchNormalizeSummaryShape(summary, failures) {
   }
 }
 
+function validateSourceWatchQualitySummaryShape(summary, failures) {
+  const label = "daily codex DAG source-watch quality MVP summary quality";
+  if (!isPlainObject(summary)) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  validateExactKeys({
+    value: summary,
+    allowed: [
+      "artifact_path",
+      "artifact_kind",
+      "input_kind",
+      "total_candidates",
+      "admitted_candidates",
+      "suppressed_candidates",
+      "duplicate_candidates",
+      "stale_candidates",
+      "unchanged_repo_candidates",
+      "github_watch_candidates",
+      "site_watch_candidates",
+      "other_candidates",
+      "empty",
+      "signals",
+      "suppressed_reasons",
+      "public_surface"
+    ],
+    label,
+    failures
+  });
+  if (summary.artifact_path !== SOURCE_WATCH_QUALITY_OUTPUT_ARTIFACT) failures.push(`${label}.artifact_path must be ${SOURCE_WATCH_QUALITY_OUTPUT_ARTIFACT}.`);
+  if (summary.artifact_kind !== "source_watch_quality_candidates") failures.push(`${label}.artifact_kind must be source_watch_quality_candidates.`);
+  if (summary.input_kind !== "source_watch_canonical_candidates") failures.push(`${label}.input_kind must be source_watch_canonical_candidates.`);
+  for (const key of [
+    "total_candidates",
+    "admitted_candidates",
+    "suppressed_candidates",
+    "duplicate_candidates",
+    "stale_candidates",
+    "unchanged_repo_candidates",
+    "github_watch_candidates",
+    "site_watch_candidates",
+    "other_candidates"
+  ]) {
+    if (!Number.isInteger(summary[key]) || summary[key] < 0) {
+      failures.push(`${label}.${key} must be a non-negative integer.`);
+    }
+  }
+  if (typeof summary.empty !== "boolean") failures.push(`${label}.empty must be a boolean.`);
+  if (typeof summary.public_surface !== "boolean") failures.push(`${label}.public_surface must be a boolean.`);
+  if (
+    Number.isInteger(summary.admitted_candidates)
+    && Number.isInteger(summary.suppressed_candidates)
+    && Number.isInteger(summary.total_candidates)
+    && summary.total_candidates !== summary.admitted_candidates + summary.suppressed_candidates
+  ) {
+    failures.push(`${label}.total_candidates must equal admitted_candidates plus suppressed_candidates.`);
+  }
+  if (
+    Number.isInteger(summary.github_watch_candidates)
+    && Number.isInteger(summary.site_watch_candidates)
+    && Number.isInteger(summary.other_candidates)
+    && Number.isInteger(summary.total_candidates)
+    && summary.total_candidates !== summary.github_watch_candidates + summary.site_watch_candidates + summary.other_candidates
+  ) {
+    failures.push(`${label}.total_candidates must equal github_watch_candidates plus site_watch_candidates plus other_candidates.`);
+  }
+  if (typeof summary.empty === "boolean" && Number.isInteger(summary.total_candidates)) {
+    const expectedEmpty = summary.total_candidates === 0;
+    if (summary.empty !== expectedEmpty) failures.push(`${label}.empty must reflect whether total_candidates is zero.`);
+  }
+  for (const key of ["signals", "suppressed_reasons"]) {
+    if (!Array.isArray(summary[key])) {
+      failures.push(`${label}.${key} must be an array.`);
+    } else {
+      if (!sameOrderedStringArray(summary[key], uniqueSorted(summary[key]))) {
+        failures.push(`${label}.${key} must be unique and sorted.`);
+      }
+      for (const [index, value] of summary[key].entries()) {
+        if (!nonBlankString(value)) failures.push(`${label}.${key}[${index}] must be a non-empty string.`);
+      }
+    }
+  }
+}
+
 function validateSourceWatchDownstreamSummaryConsistency(summary, failures) {
   if (sourceWatchSummaryNodeStatus(summary, SOURCE_WATCH_DOWNSTREAM_NODE_ID) !== "success") return;
   if (!isPlainObject(summary.source_watch) || !isPlainObject(summary.downstream)) return;
@@ -5091,6 +5749,36 @@ function validateSourceWatchNormalizeSummaryConsistency(summary, failures) {
     && summary.normalized.site_watch_candidates !== summary.downstream.site_watch_candidates
   ) {
     failures.push("daily codex DAG source-watch normalize MVP summary normalized.site_watch_candidates must equal downstream.site_watch_candidates.");
+  }
+}
+
+function validateSourceWatchQualitySummaryConsistency(summary, failures) {
+  validateSourceWatchNormalizeSummaryConsistency(summary, failures);
+  if (sourceWatchSummaryNodeStatus(summary, SOURCE_WATCH_QUALITY_NODE_ID) !== "success") return;
+  if (!isPlainObject(summary.normalized) || !isPlainObject(summary.quality)) return;
+  if (
+    Number.isInteger(summary.normalized.total_candidates)
+    && Number.isInteger(summary.quality.total_candidates)
+    && summary.quality.total_candidates !== summary.normalized.total_candidates
+  ) {
+    failures.push("daily codex DAG source-watch quality MVP summary quality.total_candidates must equal normalized.total_candidates.");
+  }
+  if (
+    Number.isInteger(summary.normalized.github_watch_candidates)
+    && Number.isInteger(summary.quality.github_watch_candidates)
+    && summary.quality.github_watch_candidates !== summary.normalized.github_watch_candidates
+  ) {
+    failures.push("daily codex DAG source-watch quality MVP summary quality.github_watch_candidates must equal normalized.github_watch_candidates.");
+  }
+  if (
+    Number.isInteger(summary.normalized.site_watch_candidates)
+    && Number.isInteger(summary.quality.site_watch_candidates)
+    && summary.quality.site_watch_candidates !== summary.normalized.site_watch_candidates
+  ) {
+    failures.push("daily codex DAG source-watch quality MVP summary quality.site_watch_candidates must equal normalized.site_watch_candidates.");
+  }
+  if (summary.quality.public_surface !== false) {
+    failures.push("daily codex DAG source-watch quality MVP summary quality.public_surface must stay false.");
   }
 }
 
@@ -5307,6 +5995,43 @@ function validateSourceWatchNormalizeMvpRunSemantics({ summary, run, planLevels,
   }
   if (summary.ok === false && expectedBlocked.length === 0) {
     failures.push("daily codex DAG source-watch normalize MVP summary failure requires at least one blocked node.");
+  }
+}
+
+function validateSourceWatchQualityMvpRunSemantics({ summary, run, planLevels, planNodeIds, failures }) {
+  if (!sameOrderedStringArray(run.planned_nodes, planNodeIds)) {
+    failures.push("daily codex DAG source-watch quality MVP summary run.planned_nodes must equal plan.nodes ids.");
+  }
+  if (!levelsMatch(run.levels, planLevels)) {
+    failures.push("daily codex DAG source-watch quality MVP summary run.levels must equal plan.levels.");
+  }
+  const nodeResults = Array.isArray(summary.node_results) ? summary.node_results : [];
+  const expectedCompleted = nodeResults
+    .filter((result) => result?.status === "success")
+    .map((result) => result.node_id);
+  const expectedBlocked = nodeResults
+    .filter((result) => result?.status === "failure" || result?.status === "blocked")
+    .map((result) => result.node_id);
+  const expectedStatus = summary.ok === true ? "executed_source_watch_quality" : "blocked";
+  if (run.final_status !== expectedStatus) {
+    failures.push(`daily codex DAG source-watch quality MVP summary run.final_status must be ${expectedStatus}.`);
+  }
+  if (!sameOrderedStringArray(run.completed_nodes, expectedCompleted)) {
+    failures.push("daily codex DAG source-watch quality MVP summary run.completed_nodes must match node execution status.");
+  }
+  if (!sameOrderedStringArray(run.blocked_nodes, expectedBlocked)) {
+    failures.push("daily codex DAG source-watch quality MVP summary run.blocked_nodes must match node execution status.");
+  }
+  if (summary.ok === true && !sameOrderedStringArray(expectedCompleted, [
+    SOURCE_WATCH_COLLECT_NODE_ID,
+    SOURCE_WATCH_DOWNSTREAM_NODE_ID,
+    SOURCE_WATCH_NORMALIZE_NODE_ID,
+    SOURCE_WATCH_QUALITY_NODE_ID
+  ])) {
+    failures.push("daily codex DAG source-watch quality MVP summary success requires all four source-watch quality fixture nodes to complete.");
+  }
+  if (summary.ok === false && expectedBlocked.length === 0) {
+    failures.push("daily codex DAG source-watch quality MVP summary failure requires at least one blocked node.");
   }
 }
 
