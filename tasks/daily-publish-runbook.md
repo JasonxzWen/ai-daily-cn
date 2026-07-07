@@ -7,13 +7,14 @@ Use this runbook for daily AI report generation and GitHub Pages publishing.
 
 ## Codex-Native Runner Contract
 
-- Scheduled and long-running publish tasks start from the launcher worktree and invoke `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
+- Scheduled and long-running publish tasks start from the launcher worktree and invoke only `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
 - Dry-run-only mode is the default. It runs generation and quality gates, writes `.tmp/run-summary-YYYY-MM-DD.json`, and reports `final_status:"generated_only"`.
-- Real publish requires `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`. Publish mode runs `publish:dry-run:daily` before real publish and Pages verification.
+- Real publish requires `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`. The single script internally runs publish dry-run checks, real publish, and Pages verification.
 - Source Watch public promotion is explicit. If `.tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json` exists, scheduled publish must append `--source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json`; otherwise it must omit the flag and leave `source_watch_admitted_artifact_path` empty in the run summary.
-- The pipeline owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Information collection, admission, per-item summarization, assembly, quality review, source Phase 5 audit, content contract, page check, publish dry-run, real publish, and Pages verification are separate stages and should be read from `completed_stages`.
+- The pipeline owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Information collection, admission, per-item summarization, assembly, quality review, source Phase 5 audit, content contract, page check, publish dry-run, real publish, and Pages verification are separate internal stages and should be read from `completed_stages`.
+- The run summary and CLI output must expose `automation_pipeline_mode:"single_script_dag_orchestrator"` and `orchestration_node_count`; scheduled prompts must not inline lower-level Codex CLI or publish commands.
 - To intentionally discard same-date pipeline state, delete or replace `.tmp/daily-codex-pipeline/YYYY-MM-DD` before rerunning the same command.
-- Scheduled automation must use `publish:dry-run:daily` as the only dry-run command. The older `publish:dry-run -- --date YYYY-MM-DD` remains for manual diagnostics only.
+- Scheduled automation must not call dry-run, Codex CLI, discovery, or publish subcommands directly. The older `publish:dry-run -- --date YYYY-MM-DD` remains for manual diagnostics only.
 - A separate 21:30 status self-check runs `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json`.
 - `status:self-check` checks current artifacts, Pages HTTP, `quality_status`, `sources:health`, `publish:dry-run:daily`, and active Codex automations; `multiple_active_daily_publish_automations` is a blocking issue.
 

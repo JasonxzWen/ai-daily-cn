@@ -2,6 +2,8 @@
 
 Source Watch admitted candidates are published only through an explicit scheduler handoff. When .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json exists, the daily publish automation appends --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json and records source_watch_admitted_artifact_path in .tmp/run-summary-YYYY-MM-DD.json; it must not scan .tmp for a newest artifact.
 
+Single-script scheduler boundary: the daily publish automation calls only `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute` or, when real publish is explicitly allowed, `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`. The automation prompt reads `.tmp/run-summary-YYYY-MM-DD.json` for `final_status`, `completed_stages`, `next_action`, `automation_pipeline_mode:"single_script_dag_orchestrator"`, and `orchestration_node_count`; it must not inline lower-level Codex CLI, discovery, dry-run, or publish commands.
+
 ## 21:30 状态自检自动化
 
 每天 21:30 另设一个 `status:self-check` 定时任务，输出 `.tmp/status-self-check-YYYY-MM-DD.json`。它只做状态自检，不生成新日报、不真实 publish；检查 `sources:phase5-audit`、`publish:dry-run:daily`、Pages HTTP、信源健康和自动化清单。若发现 `multiple_active_daily_publish_automations`，必须作为 blocking issue 报告。
@@ -30,9 +32,9 @@ Source Watch admitted candidates are published only through an explicit schedule
 
 目标：按今天的 Asia/Shanghai 日期生成中文 AI 日报。主产物是由 `.codex/skills/effective-interact` 以 `pre-rendered` 模式生成的自包含静态 HTML 和结构化 JSON；验证通过后只发布 `docs/` 与 `reports-data/`，由 GitHub Actions Pages workflow 部署到 GitHub Pages。
 
-执行准则：先阅读并遵守唯一权威资产 `prompts/ai-daily/modules/editorial-authority.md`，再按 `docs/codex-automation-setup.md` 与 `tasks/daily-publish-runbook.md` 执行。始终从 launcher worktree 调用 `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`；pipeline 负责 clean checkout、独立 Codex 阶段、状态、质量门、`publish:dry-run:daily`、真实 publish 或 GitHub API 兜底。旧 `daily:run` 只保留为人工兼容入口；自动化 prompt 不要展开旧手工流水线，不要使用 `publish:prepare-worktree`，不要提交、stash、切换或清理 launcher worktree。若无法确认远端 `main` 最新基线或存在 `remote_ahead`，真实发布必须停止。
+执行准则：先阅读并遵守唯一权威资产 `prompts/ai-daily/modules/editorial-authority.md`，再按 `docs/codex-automation-setup.md` 与 `tasks/daily-publish-runbook.md` 执行。始终从 launcher worktree 调用 `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`；pipeline 负责 clean checkout、独立 Codex 阶段、状态、质量门、内部发布预检、真实 publish 或 GitHub API 兜底。旧 `daily:run` 只保留为人工兼容入口；自动化 prompt 不要展开旧手工流水线，不要使用 `publish:prepare-worktree`，不要提交、stash、切换或清理 launcher worktree。若无法确认远端 `main` 最新基线或存在 `remote_ahead`，真实发布必须停止。
 
-必须运行并记录：`npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish` 和 `.tmp/run-summary-YYYY-MM-DD.json`。读取 summary 中的 `final_status`、`completed_stages` 和 `next_action`；publish 模式的 `completed_stages` 应覆盖 collect、admit、summarize、assemble、quality-review、content-contract、page-check、publish-dry-run、publish 和 pages-verify。若 `next_action` 要求修复，先按 summary 指向的问题修正文案或报告阻塞，再用同一 pipeline 命令重跑；不得回退到旧 AI repair contract 手工链路。涉及页面元素时必须确认 pipeline 的 page-check/validate 结果；如果浏览器环境阻塞，必须报告阻塞原因。
+必须运行并记录：`npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish` 和 `.tmp/run-summary-YYYY-MM-DD.json`。读取 summary 中的 `final_status`、`completed_stages`、`next_action`、`automation_pipeline_mode` 和 `orchestration_node_count`；publish 模式的 `completed_stages` 应覆盖 collect、admit、summarize、assemble、quality-review、content-contract、page-check、publish-dry-run、publish 和 pages-verify。若 `next_action` 要求修复，先按 summary 指向的问题修正文案或报告阻塞，再用同一 pipeline 命令重跑；不得回退到旧 AI repair contract 手工链路。涉及页面元素时必须确认 pipeline 的 page-check/validate 结果；如果浏览器环境阻塞，必须报告阻塞原因。
 
 日报公开页面必须遵守固定展示合同：顶部日期区显示本期覆盖时间范围；主体信息只用 icon/link 表示来源，不显示来源名称；主体标题不加下划线；正文 `==...==` 关键词渲染为加粗变色文字而不是 tag；tag 只用于重要级别、趋势、star 变化、主题和项目 highlight，并且必须按类型区分颜色且去重；`model_releases` 只保留结构化 JSON 索引，不渲染公开“模型发布”板块，相关新闻合入 `main_items`；`projects` 只作为 GitHub Trending 的 `项目 highlight` 元数据，不渲染公开“今日值得关注的项目”板块、“项目 highlights”子标题或额外项目列表；国内/中文动态并入现有主体分组、热门博客、GitHub Trending 或共享“社区线索”，不渲染独立“国内动态”导航项；热门博客摘要为约 100-160 个中文字符的 2-4 个分点，原文有信息密度高的证据图时通过 `evidence_assets` 贴图；正文证据图和热门博客卡片图片必须可点开放大，来源 icon 不参与放大；GitHub Trending 默认展示 Top 10，star 变化必须做成 tag，项目 highlight 只能作为匹配 Top 10 条目的 tag，并把领域和作用压进行内说明。
 
@@ -44,7 +46,7 @@ Source Watch admitted candidates are published only through an explicit schedule
 
 发布后必须验证当日 Pages URL 返回 HTTP 200 且包含 `YYYY-MM-DD`。如果仓库发布成功但 Pages 仍未刷新，使用 `published_pending_pages_verification` 和 `verify_pages_later` 记录可恢复动作。如果同一会话随后要做项目迭代，必须新建 `codex/...` 分支或独立工作树；发布工作树只用于日报发布，不继续写项目改动。
 
-最终回复必须包含：`.tmp/run-summary-YYYY-MM-DD.json`、HTML 路径、结构化 JSON 路径、`validate` 结果、`publish:dry-run:daily` 结果、真实发布或 API 兜底结果、Pages HTTP 验证、`blocking_issues` / `degraded_sections` 摘要、今日采样与规则差距、最多 3 条提示词或规则迭代建议。
+最终回复必须包含：`.tmp/run-summary-YYYY-MM-DD.json`、HTML 路径、结构化 JSON 路径、`validate` 结果、pipeline 内部发布预检结果、真实发布或 API 兜底结果、Pages HTTP 验证、`blocking_issues` / `degraded_sections` 摘要、今日采样与规则差距、最多 3 条提示词或规则迭代建议。
 ```
 
 ## 当前发布边界
@@ -136,7 +138,7 @@ npm run publish:github-api -- confirm-push YYYY-MM-DD
 结构化草稿必须把 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health` 都合并进最终 `source_audit`，记录 `checked:true`、检查过的来源、候选数、入选数和未入选原因；只保留命令 stdout 不算连续运行证据。GitHub trending 条目进入 `github_trending` 时应填写 `rank`、`previous_rank`、`rank_delta`、`trend`、`event_date`、`source`、`evidence`；进入 `projects` 时还应填写 `domains`、`use_case`、`signal`，并确保它会作为 GitHub Trending highlight 呈现。如果 shell 网络受限但浏览器能保存 GitHub Trending HTML 或采样 JSON，可运行 `npm run discover:github-trending -- --browser-export <path>` 复用同一解析器。Builder 来源受阻时必须在 `source_audit.builder_sources` 填写 `blocked_reason` 与 `last_successful_feed_at`，不要只写进 notes；如果 Builder 候选存在但未入选，也必须写明过滤原因。Builder 条目进入 `builder_observations` 时必须填写 `original_text`、`translation`、`role`、`event_date`、`source`、`evidence`，并让 `content` 等于完整中文 `translation`；有 handle/头像时填写 `handle` 和 `avatar_url`，构建器会 best-effort 缓存为本地头像。合格候选足够时公开入选 5-20 条；没有合格候选时保持空数组，但必须在 `source_audit` 说明已经检查过什么。
 ## Codex-native pipeline prompt
 
-定时任务 prompt 应保持很薄：从 launcher worktree 调用 `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`，真实发布时调用 `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`。pipeline 固定写 `.tmp/run-summary-YYYY-MM-DD.json`，定时任务只读取 `final_status`、`completed_stages` 和 `next_action`；如果需要丢弃同日未完成 pipeline 状态，删除或换用 `.tmp/daily-codex-pipeline/YYYY-MM-DD` 工作目录后重新运行同一命令。调度 dry-run 由 pipeline 内部执行 `publish:dry-run:daily`，旧 `publish:dry-run -- --date YYYY-MM-DD` 只保留给人工诊断。
+定时任务 prompt 应保持很薄：从 launcher worktree 调用 `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`，真实发布时调用 `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`。pipeline 固定写 `.tmp/run-summary-YYYY-MM-DD.json`，定时任务只读取 `final_status`、`completed_stages`、`next_action`、`automation_pipeline_mode:"single_script_dag_orchestrator"` 和 `orchestration_node_count`；如果需要丢弃同日未完成 pipeline 状态，删除或换用 `.tmp/daily-codex-pipeline/YYYY-MM-DD` 工作目录后重新运行同一命令。旧 `publish:dry-run -- --date YYYY-MM-DD` 只保留给人工诊断。
 
 ## Daily resilience policy
 

@@ -6,13 +6,14 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 
 ## Runner
 
-- Start from the launcher worktree with `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
+- Start from the launcher worktree with only `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
 - Use `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish` only when real publish is explicitly allowed.
 - When `.tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json` exists, append `--source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json`; otherwise omit the flag and expect an empty `source_watch_admitted_artifact_path`.
-- Read `.tmp/run-summary-YYYY-MM-DD.json` for `final_status`, `completed_stages`, and `next_action`.
+- Read `.tmp/run-summary-YYYY-MM-DD.json` for `final_status`, `completed_stages`, `automation_pipeline_mode`, `orchestration_node_count`, and `next_action`.
+- Expect `automation_pipeline_mode:"single_script_dag_orchestrator"`; scheduled prompts must not inline lower-level Codex CLI, discovery, dry-run, or publish commands.
 - If `next_action` requests repair, fix the reported public text or blocker, then rerun the same `daily:codex-pipeline` command.
 - To intentionally discard same-date pipeline state, delete or replace `.tmp/daily-codex-pipeline/YYYY-MM-DD` before rerunning.
-- Scheduled dry-run uses `publish:dry-run:daily`.
+- Scheduled dry-run is a `daily:codex-pipeline` run without `--publish`; publish dry-run checks are internal runner stages.
 - 21:30 status self-check uses `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json` and treats `multiple_active_daily_publish_automations` as blocking.
 - Daily resilience policy lives in `config/daily-resilience-policy.json`; changed workflows must pass `npm run resilience:validate`. Safe public source/coverage failures can publish as `published_degraded`; exhausted publish infrastructure reports `infrastructure_blocked_after_fallback_exhausted`.
 
@@ -61,7 +62,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 - Runner records `sources:phase5-audit` before dry-run/publish completion.
 - If prompt / rule changes are explicitly approved during the run, update `prompts/ai-daily/modules/editorial-authority.md` together with its `本轮修改清单`、`Good Case`、`Bad Case`、`迭代历史`.
 - `npm run validate` passes.
-- `npm run publish:dry-run:daily -- --date YYYY-MM-DD` reports the date-scoped publish plan and expected Pages URL.
+- `daily:codex-pipeline` reports the date-scoped publish plan and expected Pages URL through `.tmp/run-summary-YYYY-MM-DD.json` when `--publish` is approved.
 - Real publish, when approved, verifies the final Pages URL or reports `published_pending_pages_verification` when the repository publish succeeded but Pages is still catching up.
 
 ## Validation commands
@@ -71,7 +72,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 - `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`
 - `npm run build`
 - `npm run validate`
-- `npm run publish:dry-run:daily -- --date YYYY-MM-DD`
+- `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`
 
 ## Parallel writes
 

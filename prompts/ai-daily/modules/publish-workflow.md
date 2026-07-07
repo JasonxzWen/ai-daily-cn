@@ -7,12 +7,13 @@ Status self-check: the 21:30 automation must call `status:self-check` after the 
 定时任务和长程发布任务必须从 launcher worktree 启动，统一调用可调试的 Codex 分阶段 pipeline：
 
 ```powershell
-npm run daily:codex-pipeline -- --date YYYY-MM-DD --dry-run
 npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
 npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
 ```
 
 Source Watch admitted candidates are a conditional explicit handoff: when .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json exists, append --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json and expect source_watch_admitted_artifact_path in .tmp/run-summary-YYYY-MM-DD.json; do not scan .tmp for a newest artifact.
+
+Scheduled automation must stay thin: it calls only `daily:codex-pipeline`, then reads `.tmp/run-summary-YYYY-MM-DD.json`. The summary must expose `automation_pipeline_mode:"single_script_dag_orchestrator"` and `orchestration_node_count`; do not inline lower-level Codex CLI, discovery, dry-run, or publish commands in the automation prompt.
 
 旧 `daily:run` 只保留为人工恢复和短期兼容入口；scheduled automation 不得优先使用旧 runner，也不得在 prompt 中内联旧手工 discovery/repair/build/publish 链路。脚本缺失时才允许临时 `legacy_daily_run_compatibility`，合并新管线后应自动回到分阶段入口。
 

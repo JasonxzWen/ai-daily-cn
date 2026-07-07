@@ -14,8 +14,39 @@ import {
 
 const execFileAsync = promisify(execFile);
 const repoRoot = path.resolve(".");
+const defaultDagNodeIds = [
+  "fetch-source-health",
+  "parse-extract",
+  "normalize-canonicalize",
+  "classify-tag-entity",
+  "score",
+  "dedupe-cross-language",
+  "freshness-history-check",
+  "verify-source-authority",
+  "admit-reject",
+  "per-item-summary",
+  "quality-audit",
+  "repair-regenerate",
+  "persist-article-db",
+  "assemble-daily-edition",
+  "build-cards-page",
+  "publish-cleanup"
+];
 
-test("daily Codex DAG-lite runner plans the six MVP stages", () => {
+function expectedStageIds({ publish = false } = {}) {
+  return [
+    "prepare",
+    "collect-context",
+    ...defaultDagNodeIds,
+    "codex-generate",
+    "validate",
+    "repair-once",
+    "summarize",
+    ...(publish ? ["publish"] : [])
+  ];
+}
+
+test("daily Codex pipeline plans one script with manifest-backed DAG stages", () => {
   const rootDir = path.join(os.tmpdir(), "daily-codex-mvp-plan");
   const plan = buildDailyCodexPipelinePlan({
     rootDir,
@@ -24,14 +55,11 @@ test("daily Codex DAG-lite runner plans the six MVP stages", () => {
   });
 
   assert.equal(plan.mode, "daily_codex_dag_lite");
-  assert.deepEqual(plan.stages.map((stage) => stage.id), [
-    "prepare",
-    "collect-context",
-    "codex-generate",
-    "validate",
-    "repair-once",
-    "summarize"
-  ]);
+  assert.equal(plan.orchestration.mode, "single_script_dag_orchestrator");
+  assert.equal(plan.orchestration.node_count, defaultDagNodeIds.length);
+  assert.equal(plan.orchestration.codex_cli_stage_count, defaultDagNodeIds.length + 1);
+  assert.deepEqual(plan.stages.map((stage) => stage.id), expectedStageIds());
+  assert.equal(plan.stages.find((stage) => stage.id === "fetch-source-health").kind, "dag_node:codex_exec");
   assert(plan.outputs.run_summary.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
 });
 
@@ -52,15 +80,11 @@ test("daily Codex DAG-lite runner produces a successful fixture summary", async 
   assert.equal(summary.summary_path, plan.outputs.run_summary);
   assert.equal(summary.execute_requested, false);
   assert.equal(summary.publish_requested, false);
-  assert.equal(summary.completed_stages.length, 6);
-  assert.deepEqual(summary.completed_stages.map((stage) => stage.id), [
-    "prepare",
-    "collect-context",
-    "codex-generate",
-    "validate",
-    "repair-once",
-    "summarize"
-  ]);
+  assert.equal(summary.automation_pipeline_mode, "single_script_dag_orchestrator");
+  assert.equal(summary.orchestration.node_count, defaultDagNodeIds.length);
+  assert.equal(summary.node_results.length, defaultDagNodeIds.length);
+  assert.equal(summary.completed_stages.length, expectedStageIds().length);
+  assert.deepEqual(summary.completed_stages.map((stage) => stage.id), expectedStageIds());
   assert.equal(summary.completed_stages.find((stage) => stage.id === "repair-once").status, "skipped");
   assert.equal(summary.repair_attempted, false);
 
@@ -136,14 +160,14 @@ test("daily Codex DAG-lite runner rejects Codex repository writes outside work d
 
   await assert.rejects(runDailyCodexPipeline(plan), /modified repository paths outside work dir/);
   const summary = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
-  const generateStage = summary.completed_stages.find((stage) => stage.id === "codex-generate");
+  const firstDagStage = summary.completed_stages.find((stage) => stage.id === defaultDagNodeIds[0]);
 
   assert.equal(summary.final_status, "blocked");
   assert.equal(summary.ok, false);
-  assert.equal(summary.stage_id, "codex-generate");
+  assert.equal(summary.stage_id, defaultDagNodeIds[0]);
   assert.equal(summary.failures.some((failure) => failure.includes("package.json")), true);
-  assert.equal(generateStage.status, "failure");
-  assert.match(generateStage.failures[0].message, /package\.json/);
+  assert.equal(firstDagStage.status, "failure");
+  assert.match(firstDagStage.failures[0].message, /package\.json/);
 });
 
 test("daily Codex DAG-lite runner fails after one unsuccessful repair", async () => {
@@ -158,7 +182,7 @@ test("daily Codex DAG-lite runner fails after one unsuccessful repair", async ()
   await assert.rejects(runDailyCodexPipeline(plan), /summary|required|items/i);
   const summary = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
   assert.equal(summary.final_status, "blocked");
-  assert.equal(summary.completed_stages.length, 6);
+  assert.equal(summary.completed_stages.length, expectedStageIds().length);
   assert.equal(summary.completed_stages.find((stage) => stage.id === "repair-once").status, "failure");
   assert.equal(summary.completed_stages.find((stage) => stage.id === "summarize").status, "failure");
   assert.equal(summary.next_action.kind, "inspect_mvp_failure");
@@ -184,7 +208,7 @@ test("daily Codex DAG-lite CLI exits zero for fixture success and writes summary
   assert.equal(result.publish_requested, false);
   assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
   const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
-  assert.equal(summary.completed_stages.length, 6);
+  assert.equal(summary.completed_stages.length, expectedStageIds().length);
   assert.equal(summary.summary_path, result.summary_path);
 });
 
@@ -262,7 +286,7 @@ test("daily Codex DAG-lite CLI accepts production execute publish flags with cod
   const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
   assert.equal(summary.execute_requested, true);
   assert.equal(summary.publish_requested, true);
-  assert.equal(summary.completed_stages.length, 7);
+  assert.equal(summary.completed_stages.length, expectedStageIds({ publish: true }).length);
   assert.equal(summary.completed_stages.find((stage) => stage.id === "publish").status, "skipped");
   assert.equal(summary.completed_stages.find((stage) => stage.id === "publish").skipped_reason, "source_watch_admitted_artifact_not_provided");
   assert.equal(summary.failures.length, 0);
@@ -274,6 +298,8 @@ test("daily Codex DAG-lite CLI accepts production execute publish flags with cod
   assert.equal(plan.codex.fixture_mode, "");
   assert.equal(plan.execute_requested, true);
   assert.equal(plan.publish_requested, true);
+  assert.equal(plan.orchestration.mode, "single_script_dag_orchestrator");
+  assert.equal(plan.orchestration.node_count, defaultDagNodeIds.length);
 });
 
 test("daily Codex DAG-lite CLI publishes explicit Source Watch admitted artifact into public articles", async () => {

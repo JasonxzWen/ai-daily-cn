@@ -80,6 +80,76 @@
     ]
   },
   {
+    "id": "article-ebe3f6b0dd4de778",
+    "title": "AI 工程 Harness 架构解读:Eval / Agent / RL / Test 四类系统的原理与 PR 门禁流程",
+    "url": "https://jishuzhan.net/article/2074316453504888833",
+    "summary": "一篇系统解读 AI 工程 Harness 的技术长文,拆解 Eval / Agent / RL / Test 四类 Harness 各自要解决的核心问题、架构差异,并沿一条 PR 从提交到通过门禁的完整链路,讲清 Harness 在 AI 系统里承担的验证与守门角色。 适合正在搭建 AI 工程流水线、判断自家系统需要引入哪几类 Harness 的团队,作为选型和自建的参考。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "jishuzhan.net",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 78,
+    "importance": "notable",
+    "domain": "AI 用法与实践方法",
+    "flavors": [
+      "技术拆解",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 实践方法",
+      "AI 用法与实践方法",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "实践方法",
+      "Agent 产品",
+      "Agent 工程实践",
+      "AI 评测"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-ebc6bc46253f41c7",
+    "title": "Stratechery 为 Meta 财报电话会代拟脚本，建议扎克伯格把叙事收回广告主业",
+    "url": "https://stratechery.com/2026/a-script-for-mark-zuckerberg/",
+    "summary": "Ben Thompson 在专栏里替扎克伯格拟了一段 Meta 下季财报电话会开场词，核心主张是把叙事重心从 Superintelligence 拉回广告主业：AI 正把 Reels 推荐、广告创意生成、广告主自助投放的效率抬起来，这才是当期股东价值来源；对 AGI 和顶级人才军备赛的巨额投入，应被明确定位为长期期权，而非估值支柱。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Stratechery",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 78,
+    "importance": "notable",
+    "domain": "行业动态与政策地缘",
+    "flavors": [
+      "观点专访",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "行业动态与政策地缘",
+      "AI 市场动态",
+      "AI 政策与地缘"
+    ],
+    "channels_l2": [
+      "监管与政策",
+      "市场与商业化",
+      "行业动态",
+      "AI 厂商战略动作"
+    ],
+    "companies": [
+      "Meta"
+    ],
+    "products": []
+  },
+  {
     "id": "article-1803ced8938a326e",
     "title": "SwarmResearch: 用 Shepherd Agent 编排多分支搜索,15 个任务中 13 个超越 SOTA",
     "url": "https://arxiv.org/abs/2607.02807",
@@ -150,6 +220,42 @@
       "Nvidia",
       "NVIDIA"
     ],
+    "products": []
+  },
+  {
+    "id": "article-e816335b91635e37",
+    "title": "AI 销售 Agent 公司 APTSell 获 DCM 独家投资数百万美元种子轮",
+    "url": "https://36kr.com/p/3883591654895873",
+    "summary": "AI 销售 Agent 公司 APTSell 完成数百万美元种子轮融资,由 DCM Ventures 独家投资。产品提供售前、外呼、跟进、复盘 4 类协作 Agent,已在跨境电商与 SaaS 客户中落地,官方披露客户成交转化率相较人工基线提升 10% 至 15%,下一步将拓展北美中型企业客户。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "36氪",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 73,
+    "importance": "notable",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "企业 AI 采纳",
+      "企业落地与业务应用",
+      "企业职能 AI",
+      "AI 市场动态",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "企业落地",
+      "企业治理与落地",
+      "市场与商业化",
+      "通用任务 Agent",
+      "销售 AI"
+    ],
+    "companies": [],
     "products": []
   },
   {
@@ -263,6 +369,143 @@
     "products": []
   },
   {
+    "id": "article-9d6b76990d8898c6",
+    "title": "Langfuse 官方文档:LLM-as-a-Judge 评测方法与在 Observation / Trace / Experiment 三处的落地",
+    "url": "https://langfuse.com/docs/evaluation/evaluation-methods/llm-as-a-judge",
+    "summary": "Langfuse 官方文档系统讲解 LLM-as-a-Judge:让一个 LLM 按预设 rubric 给另一个 LLM 应用的输出打分并输出理由,兼具人类判断的细腻与自动化的可扩展性,评分可以是数值、类别或布尔。文档同时给出在生产观测(Observation)、完整链路(Trace)、离线实验(Experiment)三类数据上的落地路径,并推荐生产监控优先跑在 observation 级以拿到秒级评估延迟、按 LLM 调用/检索/工具调用分开打分。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "langfuse.com",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 72,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "基础模型与算力技术栈",
+      "AI 工程栈",
+      "AI 算力与推理服务"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "AI 评测",
+      "AI 运行观测",
+      "RAG 与检索"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-52bbaf7745dea616",
+    "title": "珞石机器人港股 IPO 定价 38 港元,市值 99.46 亿港元募资 8.75 亿",
+    "url": "https://36kr.com/p/3883708118921480",
+    "summary": "工业与具身智能机器人厂商珞石机器人正式登陆港交所,发行价 38 港元,总市值 99.46 亿港元,本次募资净额 8.75 亿港元。公司 2025 年营收 5.22 亿元同比增长 60.4%,具身智能业务收入两年内翻 16 倍,累计融资 10 轮,主要股东包括深创投、顺为、招银国际。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "36氪",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 71,
+    "importance": "general",
+    "domain": "行业动态与政策地缘",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "具身智能",
+      "行业动态与政策地缘",
+      "AI 市场动态",
+      "AI 政策与地缘"
+    ],
+    "channels_l2": [
+      "监管与政策",
+      "具身与机器人",
+      "具身智能",
+      "市场与商业化",
+      "行业动态"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-1c52e0d8b3836e94",
+    "title": "蚂蚁灵波发布空间感知模型 LingBot-Depth 2.0,1.5 亿数据训练,16 项测评 12 项第一",
+    "url": "https://www.qbitai.com/2026/07/445184.html",
+    "summary": "蚂蚁旗下具身智能公司灵波科技 7 月 7 日发布空间感知模型 LingBot-Depth 2.0,训练数据从 300 万扩至 1.5 亿规模,深度补全 16 项测评拿下 12 项第一,室内大面积深度缺失场景 RMSE 从 0.132 降至 0.062;同步开源视觉基座 LingBot-Vision 的 ViT-G / L / B / S 四个版本,已适配奥比中光 Gemini 330 相机。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "量子位",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 71,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "多模态与具身等前沿",
+      "基础模型",
+      "具身智能"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "具身与机器人",
+      "具身智能",
+      "模型能力",
+      "图像 AI"
+    ],
+    "companies": [],
+    "products": [
+      "Gemini"
+    ]
+  },
+  {
+    "id": "article-35f2ff1e5a56095a",
+    "title": "美光与福特签长期战略供货协议,锁定车规级 DRAM 与存储,应对 AI 驱动的芯片荒",
+    "url": "https://the420.in/micron-ford-semiconductor-supply-agreement-automotive-chips/",
+    "summary": "美光科技与福特汽车签署长期战略客户协议,福特将获得优先供应的定制车规级 DRAM 和存储芯片,由美光位于弗吉尼亚州 Manassas 的工厂扩产支撑;这是美光一周内第二桩车企大单,前一份刚签给通用汽车。背景是 AI 服务器需求吞噬全球存储产能,DRAM 现货价自去年 12 月至今上涨约 70%,车企正批量放弃 JIT 采购、直接与上游芯片大厂锁定多年供货。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "the420.in",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 70,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "基础模型与算力技术栈",
+      "AI 算力与推理服务"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "AI 算力硬件"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
     "id": "article-7fe20d8e3d7226af",
     "title": "法国 AI 人力服务商 Skello 完成 2 亿欧元融资",
     "url": "https://www.hrtechchina.com/76064.html",
@@ -329,6 +572,117 @@
       "具身智能",
       "开发者工具",
       "空间·3D AI"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-6d35f3874cbb54bd",
+    "title": "Copilot Studio Agent 评测方法梳理:AB-620 认证备考如何选评估路径",
+    "url": "https://thedatacommunity.org/2026/07/07/choose-an-evaluation-method-ab-620-exam-prep/",
+    "summary": "围绕微软 AB-620 认证(在 Copilot Studio 中设计与构建集成 AI Agent 解决方案)的评测环节,The Data Community 博客系统梳理了可选的几种 Agent 评估方法及其适用条件,整体是一份偏考试备考视角的 playbook。对企业侧做 Copilot Studio Agent 的团队来说,可当作评测选路时的一份参考清单。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "thedatacommunity.org",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 68,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "基础模型与算力技术栈",
+      "AI 工程栈",
+      "AI 算力与推理服务",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "AI 编程",
+      "AI 评测"
+    ],
+    "companies": [],
+    "products": [
+      "Copilot"
+    ]
+  },
+  {
+    "id": "article-5e23e2099df8b0f8",
+    "title": "欧洲央行要求受监管银行提交前沿 AI 网络安全应对方案",
+    "url": "https://www.bloomberg.com/news/articles/2026-07-07/ecb-asks-banks-for-plans-to-address-ai-cybersecurity-threats",
+    "summary": "欧洲央行监管部门要求受其监管的银行,提交针对前沿 AI 模型(如 Anthropic Claude Mythos)的网络安全应对方案。监管方关切模型能力跃升后,钓鱼、社工、内部代码审计与交易接口自动化滥用会打开新的攻击面,银行须在治理框架、红队测试和事件响应上给出可核查计划。这是欧洲监管首次把前沿模型正式列入银行 IT 风险清单,将 AI 安全从建议项抬到合规项。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Bloomberg",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 66,
+    "importance": "general",
+    "domain": "行业动态与政策地缘",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "企业 AI 采纳",
+      "行业动态与政策地缘",
+      "AI 工程栈",
+      "AI 政策与地缘"
+    ],
+    "channels_l2": [
+      "监管与政策",
+      "模型安全防护",
+      "模型能力",
+      "企业治理与落地",
+      "行业动态"
+    ],
+    "companies": [
+      "Anthropic"
+    ],
+    "products": [
+      "Claude"
+    ]
+  },
+  {
+    "id": "article-c79cbf72c2d286af",
+    "title": "前大疆员工创业消费级纺织机浪爪智能,累计融资数亿元",
+    "url": "https://36kr.com/p/3876837605585160",
+    "summary": "消费级纺织机公司浪爪智能由前大疆员工创立,累计融资数亿元人民币,投资方包括红杉中国、顺为资本、米哈游,Pre-A2 轮由元璟资本领投、Pre-A3 轮由米哈游领投。首款自动簇绒枪上市两年营收接近亿元,下一步将发布桌面级编织机产品。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "36氪",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 66,
+    "importance": "general",
+    "domain": "AI 产品与应用工具",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "工作场景 AI 软件",
+      "AI 产品与应用工具",
+      "AI 市场动态",
+      "C 端 AI 产品"
+    ],
+    "channels_l2": [
+      "市场与商业化",
+      "AI 融资与估值",
+      "AI 应用工具",
+      "AI 硬件"
     ],
     "companies": [],
     "products": []
@@ -471,6 +825,81 @@
     "products": []
   },
   {
+    "id": "article-8f9983ff41260f67",
+    "title": "2026 提示词工程栈全景:20 款工具按六层能力评测,覆盖编写、编排、检索、评测、监控、治理",
+    "url": "https://chatgptaihub.com/the-complete-prompt-engineering-stack-for-2026-20-tools-evaluated/",
+    "summary": "chatgptaihub.com 出品的 2026 年提示词工程栈盘点,按六层结构 —— 提示词编写模板、编排与 tool/function calling、检索与上下文管理(RAG)、评测与回归测试、监控与分析、治理与协作 —— 评测 20 款代表性工具,并给出参考架构、生产级 JSON prompt 模式和运维 runbook。核心判断:多个基准上模型能力已趋同,评测 + 监控 + 检索策略才是当下降本增效的最大杠杆,而不是花时间挑更花哨的编写 UX。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "chatgptaihub.com",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 61,
+    "importance": "general",
+    "domain": "AI 用法与实践方法",
+    "flavors": [
+      "报告",
+      "技术拆解",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 实践方法",
+      "AI 用法与实践方法"
+    ],
+    "channels_l2": [
+      "模型能力",
+      "实践方法",
+      "提示词与上下文",
+      "AI 评测",
+      "RAG 与检索"
+    ],
+    "companies": [],
+    "products": [
+      "ChatGPT",
+      "GPT"
+    ]
+  },
+  {
+    "id": "article-0c6ffa1cd03a0db3",
+    "title": "德意志银行 Jim Reid：AI 对生产率的正面拉动仍需数年才能兑现",
+    "url": "https://www.bloomberg.com/news/articles/2026-07-07/ai-productivity-gains-are-years-away-deutsche-bank-s-reid-says",
+    "summary": "德银策略师 Jim Reid 判断 AI 长期会显著抬升生产率，但落到宏观数据上还需数年。企业在流程改造、技能重配置、数据治理三个环节的调整速度会比模型能力提升本身慢得多，短期 AI 更多以资本开支而非产出增量出现；把当前市场热度线性外推成 GDP 抬升过度乐观，也解释了美股 AI 叙事强而企业盈利改善温和的落差。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Bloomberg",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 61,
+    "importance": "general",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "观点专访",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "企业 AI 采纳",
+      "企业落地与业务应用",
+      "AI 市场动态"
+    ],
+    "channels_l2": [
+      "模型能力",
+      "企业 AI 采纳指标",
+      "企业落地",
+      "企业治理与落地",
+      "市场与商业化"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
     "id": "article-7077e78eee574258",
     "title": "快手与浙大提出 MemGUI-Agent：给长程手机 GUI 任务加上工作记忆",
     "url": "https://mp.weixin.qq.com/s?__biz=MzIzNjc1NzUzMw==&mid=2247902040&idx=3&sn=68b945acd4b331099f80f29c018551b8",
@@ -505,22 +934,22 @@
     "products": []
   },
   {
-    "id": "article-e3d5400e7a8fa039",
-    "title": "美团 LongCat 团队开源 VitaBench 2.0:面向长期动态用户建模的 Agent 评测基准",
-    "url": "https://aitoolly.com/ai-news/article/2026-07-07-longcat-open-sources-vitabench-20-a-new-benchmark-for-long-term-dynamic-ai-agents",
-    "summary": "美团 LongCat 团队开源 VitaBench 2.0,把 Agent 评测的重心从静态一次性任务转到长期动态用户建模,新增对个性化和主动性的考察,补上了现有基准在跨轮会话、上下文演化上的空白。 对做 Agent 产品的团队来说,这类基准的出现意味着「能不能记住用户、能不能主动推进」正在从产品直觉被拉进可量化的评测维度。",
+    "id": "article-a8a12f2eec3afc28",
+    "title": "CSDN 转译长文:AI Agent 从 demo 推向生产,评估体系是绕不开的一步",
+    "url": "https://blog.csdn.net/D1237890/article/details/162640638",
+    "summary": "一篇 CSDN 转译的 AI Agent 评估方法长文,回答一个基础问题:为什么要专门建评估体系。作者指出团队起步阶段靠人工测试、内部试用和直觉就能走出一段距离,但一旦要面向更复杂场景或规模化上线,离不开系统化 eval——只有把评估当成基础设施,才能持续迭代 Agent 而不倒退。适合正在把 Agent 从 demo 推向生产、准备搭评测流水线的团队。",
     "date": "2026-07-07",
     "month": "2026-07",
-    "source": "aitoolly.com",
+    "source": "blog.csdn.net",
     "section": "source_watch",
     "report_date": "2026-07-06",
     "report_url": "reports/2026/07/2026-07-06.html",
     "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 60,
+    "quality_score": 51,
     "importance": "general",
     "domain": "基础模型与算力技术栈",
     "flavors": [
-      "快讯",
+      "技术拆解",
       "实战方法"
     ],
     "channels_l1": [
@@ -535,77 +964,6 @@
       "模型能力",
       "Agent 产品",
       "Agent 工程实践",
-      "AI 评测"
-    ],
-    "companies": [],
-    "products": []
-  },
-  {
-    "id": "article-6d35f3874cbb54bd",
-    "title": "Copilot Studio Agent 评测方法梳理:AB-620 认证备考如何选评估路径",
-    "url": "https://thedatacommunity.org/2026/07/07/choose-an-evaluation-method-ab-620-exam-prep/",
-    "summary": "围绕微软 AB-620 认证(在 Copilot Studio 中设计与构建集成 AI Agent 解决方案)的评测环节,The Data Community 博客系统梳理了可选的几种 Agent 评估方法及其适用条件,整体是一份偏考试备考视角的 playbook。对企业侧做 Copilot Studio Agent 的团队来说,可当作评测选路时的一份参考清单。",
-    "date": "2026-07-07",
-    "month": "2026-07",
-    "source": "thedatacommunity.org",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 56,
-    "importance": "general",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "商业洞察",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "基础模型与算力技术栈",
-      "AI 工程栈",
-      "AI 算力与推理服务",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力",
-      "AI 编程",
-      "AI 评测"
-    ],
-    "companies": [],
-    "products": [
-      "Copilot"
-    ]
-  },
-  {
-    "id": "article-45f88024ae1d2ac9",
-    "title": "DataLearnerAI 更新 2026 年 7 月 AI 模型榜单:覆盖 ARC-AGI-2、HLE、SWE-bench Verified 等基准",
-    "url": "https://www.datalearner.com/en/leaderboards",
-    "summary": "DataLearnerAI 更新了 2026 年 7 月的 AI 模型综合榜单,按 ARC-AGI-2、HLE、SWE-bench Verified、τ²-Bench 等基准汇总各家模型的最新成绩,并拆出编程、数学、Agent 任务的分榜。榜单页本身是聚合视角,适合快速比较各家新版本在不同能力维度上的相对位置。",
-    "date": "2026-07-07",
-    "month": "2026-07",
-    "source": "DataLearnerAI",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 56,
-    "importance": "general",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "报告"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "基础模型与算力技术栈",
-      "AI 工程栈",
-      "AI 算力与推理服务",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力",
-      "AI 编程",
       "AI 评测"
     ],
     "companies": [],
@@ -1056,6 +1414,40 @@
       "企业治理与落地"
     ],
     "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-e426ca77c3a02a12",
+    "title": "微软全球裁员 4800 人,Xbox 部门单日裁 1600、出售 4 个工作室",
+    "url": "https://www.geekwire.com/2026/microsoft-cuts-4800-jobs-about-2-globally-revamps-salesforce-and-launches-massive-xbox-overhaul",
+    "summary": "微软 7 月 6 日宣布全球裁员 4800 人,占总员工 2.1%,其中华盛顿州 600 人。Xbox 部门单日裁员 1600 人,累计裁员比例达 20%,并出售 4 个游戏工作室;公司同步推出自愿退休计划,8750 名目标员工参与率超 30%。管理层维持 1900 亿美元 AI 基础设施投入,并新组建 2500 人规模的 Frontier Company 工程师团队。",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "GeekWire",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 82,
+    "importance": "notable",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "企业 AI 采纳",
+      "企业落地与业务应用"
+    ],
+    "channels_l2": [
+      "企业落地",
+      "企业治理与落地",
+      "AI 与岗位变化",
+      "AI 组织变革"
+    ],
+    "companies": [
+      "Microsoft"
+    ],
     "products": []
   },
   {
@@ -3512,42 +3904,6 @@
     ]
   },
   {
-    "id": "article-8a159d85249634ba",
-    "title": "Karpathy 用 700 次 Loop 实验证明：Agent 76% 的性能差异不来自模型本身",
-    "url": "https://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU2MA==&mid=2247664358&idx=1&sn=59ab02811270d0564a04ebef63249d99",
-    "summary": "Andrej Karpathy 公开一组 700 次 Agent Loop 实验数据，显示同一底座模型在不同上下文管理、工具调用编排和错误恢复策略下性能可以拉开约 76% 差距，模型强弱反而是次要变量。他把常见「换更大模型就好」的做法称为 Agent 落地最大误区，主张先把 loop 打磨清楚再谈模型升级。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "AI 前线",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 71,
-    "importance": "general",
-    "domain": "AI 用法与实践方法",
-    "flavors": [
-      "观点专访",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "AI 工程栈",
-      "AI 实践方法",
-      "AI 用法与实践方法",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力",
-      "实践方法",
-      "Agent 产品",
-      "Agent 工程实践"
-    ],
-    "companies": [],
-    "products": []
-  },
-  {
     "id": "article-6d39cf543de05510",
     "title": "OpenAI Codex PM Rohan Varma:AI 的价值不是让人做得更快,而是让人做以前不敢做的事",
     "url": "https://36kr.com/p/3884773176193287",
@@ -3879,6 +4235,43 @@
       "AI 政策法规"
     ],
     "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-391676c3383da031",
+    "title": "Anthropic 联手 Neuronpedia,把 J-space 可解释性方法搬到开源权重模型上做成交互 Demo",
+    "url": "https://x.com/AnthropicAI/status/2074185390060110138",
+    "summary": "Anthropic 与 Neuronpedia 合作,把 J-space 可解释性方法搬到开源权重模型上做成可点开的交互式 Demo,托管在 neuronpedia.org/jlens。研究者和工程师可以直接看到某个 prompt 下模型内部激活的高权重概念,不用自建可解释性工具链。 把可解释性做成 hosted 工具,是过去一年 mechanistic interpretability 圈的明显方向,此次上线相当于把 alignment 层能力向下游 AI 工程栈开放。",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "X：Anthropic",
+    "section": "source_watch",
+    "report_date": "2026-07-06",
+    "report_url": "reports/2026/07/2026-07-06.html",
+    "data_url": "data/2026/07/2026-07-06.json",
+    "quality_score": 68,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "论文",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "基础模型与算力技术栈",
+      "AI 工程栈",
+      "AI 算力与推理服务"
+    ],
+    "channels_l2": [
+      "基础模型研究",
+      "开发者工具",
+      "模型能力",
+      "AI 运行观测"
+    ],
+    "companies": [
+      "Anthropic"
+    ],
     "products": []
   },
   {
@@ -10356,220 +10749,6 @@
     "products": []
   },
   {
-    "id": "article-c4da007acea1beaf",
-    "title": "AI 学习社区 Build Club 发布 Solaris,转向企业 AI 采纳与员工培训平台",
-    "url": "https://www.producthunt.com/products/build-club",
-    "summary": "AI 学习社区 Build Club 在 Product Hunt 发布 Solaris,把「协作式 AI 学习生态」打包成企业侧的 AI 采纳与员工技能升级平台,主打免费开放学习资源。 定位从个人学习转向企业采买,反映 AI adoption 焦点正在从模型和工具,向组织内规模化培训与工作方式改造迁移。",
-    "date": "2026-07-04",
-    "month": "2026-07",
-    "source": "Product Hunt",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 56,
-    "importance": "general",
-    "domain": "AI 产品与应用工具",
-    "flavors": [
-      "快讯",
-      "商业洞察",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "企业 AI 采纳",
-      "新兴 AI 产品与项目",
-      "AI 产品与应用工具",
-      "AI 实践方法"
-    ],
-    "channels_l2": [
-      "模型能力",
-      "企业治理与落地",
-      "新兴 AI 产品与项目",
-      "AI 场景实战",
-      "AI 应用工具"
-    ],
-    "companies": [],
-    "products": []
-  },
-  {
-    "id": "article-5625448111e8598e",
-    "title": "光象科技完成数亿元天使轮，物理基座模型落地汽车产线",
-    "url": "https://www.pingwest.com/w/315278",
-    "summary": "光象科技累计完成数亿元天使轮融资，投资方包括珠海科技产业集团、兴证资本、松禾资本等。公司专注物理原生基座模型，推出 Phi-RL Matrix 强化学习算法和 Phi-Space 数据资产。其 Phi-Bot X1 工业级具身智能机器人已在汽车产线完成验证。",
-    "date": "2026-07-04",
-    "month": "2026-07",
-    "source": "品玩",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 52,
-    "importance": "general",
-    "domain": "行业动态与政策地缘",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "基础模型",
-      "具身智能",
-      "行业动态与政策地缘",
-      "AI 市场动态"
-    ],
-    "channels_l2": [
-      "监管与政策",
-      "具身与机器人",
-      "具身智能",
-      "模型能力",
-      "市场与商业化"
-    ],
-    "companies": [],
-    "products": []
-  },
-  {
-    "id": "article-ade1653d3f4b0ed7",
-    "title": "京东在 2026 全球数字经济大会披露：内部运行近 4 万个智能体、周 Token 调用量达万亿级",
-    "url": "https://m.sohu.com/a/1045753048_123753",
-    "summary": "2026 全球数字经济大会上，京东披露内部运行近 4 万个智能体，周 Token 调用量已达万亿级，覆盖采购、物流、客服、研发四条线。同场信号：金山云员工日均 Token 从百万级增至 3500 万，360 创始人预测百亿级智能体将融入社会。",
-    "date": "2026-07-04",
-    "month": "2026-07",
-    "source": "中国新闻网",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 52,
-    "importance": "general",
-    "domain": "企业落地与业务应用",
-    "flavors": [
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "企业 AI 采纳",
-      "企业落地与业务应用",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "内部 AI 应用",
-      "企业 AI 采纳指标",
-      "企业落地",
-      "企业治理与落地",
-      "Agent 产品"
-    ],
-    "companies": [],
-    "products": []
-  },
-  {
-    "id": "article-e7f2a76d9707fdd0",
-    "title": "Ethan Mollick：AI 编码正把行业带出手工码字的“旧代码时代”",
-    "url": "https://x.com/emollick/status/2073388609567113698",
-    "summary": "沃顿商学院教授 Ethan Mollick 在 X 上表示,行业正在离开 Paleocodic 手工码字时代,类比过去需要委托本地代码工匠一字一字打出程序的模式即将结束,新代码时代由模型直接生成完成。<br>他借此提醒管理者,过去数十年靠人工打字撑起的软件体量,在 AI 编码工具普及后会被重新定义,需要重新思考工程师岗位与工作流。",
-    "date": "2026-07-04",
-    "month": "2026-07",
-    "source": "X：@emollick",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 52,
-    "importance": "general",
-    "domain": "AI 产品与应用工具",
-    "flavors": [
-      "观点专访",
-      "商业洞察",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "企业 AI 采纳",
-      "AI 产品与应用工具",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "编程 Agent",
-      "模型能力",
-      "企业治理与落地",
-      "AI 编程",
-      "AI 应用工具"
-    ],
-    "companies": [],
-    "products": []
-  },
-  {
-    "id": "article-d523a9d5e7081f81",
-    "title": "Humalike 上线,专门给 AI Agent 补上被忽视的社交智能层",
-    "url": "https://www.producthunt.com/products/humalike-2",
-    "summary": "Humalike 面向对客户、对同事、对合作方场景中使用的 AI Agent,专门补齐社交层能力:拿捏语气、识别人际语境、给 Agent 一套可复用的社交策略。 多数 Agent 产品仍卡在任务完成度,但只要 Agent 开始代替真人和外部对话,「说得像人」就变成必备属性,独立解这一层的公司会越来越多。",
-    "date": "2026-07-04",
-    "month": "2026-07",
-    "source": "Product Hunt",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 52,
-    "importance": "general",
-    "domain": "AI 产品与应用工具",
-    "flavors": [
-      "快讯"
-    ],
-    "channels_l1": [
-      "新兴 AI 产品与项目",
-      "AI 产品与应用工具",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "通用任务 Agent",
-      "新兴 AI 产品与项目",
-      "Agent 产品",
-      "AI 应用工具"
-    ],
-    "companies": [],
-    "products": []
-  },
-  {
-    "id": "article-459d583b312e0a0e",
-    "title": "Vox 在 Product Hunt 上线：把语音输入输出直接接进 GitHub Copilot 编码流程",
-    "url": "https://www.producthunt.com/products/vox-5",
-    "summary": "Vox 在 Product Hunt 发布，主打语音输入、语音输出，把语音交互做成 GitHub Copilot 使用界面的一部分，让开发者靠讲话完成代码生成与修改。是 Copilot 之上语音层的一次新形态尝试。",
-    "date": "2026-07-04",
-    "month": "2026-07",
-    "source": "Product Hunt",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 47,
-    "importance": "general",
-    "domain": "AI 产品与应用工具",
-    "flavors": [
-      "快讯"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "新兴 AI 产品与项目",
-      "AI 产品与应用工具",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "编程 Agent",
-      "多模态生成",
-      "新兴 AI 产品与项目",
-      "AI 编程",
-      "AI 应用工具"
-    ],
-    "companies": [
-      "GitHub",
-      "Microsoft"
-    ],
-    "products": [
-      "Copilot",
-      "GitHub Copilot"
-    ]
-  },
-  {
     "id": "article-dcaa1b238e01075e",
     "title": "Alibaba Cloud发布面向软件团队的 agent 平台",
     "url": "https://www.alibabacloud.com/blog/qoderwake-your-always-on-ai-employee_603327",
@@ -10736,83 +10915,6 @@
     "products": []
   },
   {
-    "id": "article-439b0eeb20dfb0a4",
-    "title": "SGLang 团队把 CUDA 调优、内核集成、性能分析写进 SKILL.md 形态的 Agent 工作流",
-    "url": "https://www.lmsys.org/blog/2026-07-02-agent-assisted-sglang-development",
-    "summary": "SGLang 团队把 LLM 服务、分布式运行时、GPU 内核、扩散管道等日常工作全部编码为可执行的 SKILL.md 文件、脚本、基准合约与审查循环，覆盖 .claude/skills、扩散 skills、BBuf 跨框架 SOTA 循环、KDA 竞赛方案等场景。SOTA Performance Loop 把性能优化拆成公平基准、差距决策、profile、补丁、再验证五步，Codex Goal 与 Humanize/RLCR 承担评审。开发者角色从写代码转向定义问题与判断结果,相关做法由 LMSYS 官方博客披露。",
-    "date": "2026-07-03",
-    "month": "2026-07",
-    "source": "LMSYS",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 84,
-    "importance": "notable",
-    "domain": "AI 用法与实践方法",
-    "flavors": [
-      "技术拆解",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "AI 实践方法",
-      "AI 算力与推理服务",
-      "AI 用法与实践方法",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型服务平台",
-      "模型能力",
-      "实践方法",
-      "Agent 工程实践"
-    ],
-    "companies": [],
-    "products": [
-      "Claude",
-      "Codex",
-      "SGLang"
-    ]
-  },
-  {
-    "id": "article-93d04618369d3d6e",
-    "title": "Mistral AI 开源 Leanstral 1.5 形式化验证模型，miniF2F 达 100%、PutnamBench 587/672",
-    "url": "https://mistral.ai/news/leanstral-1-5",
-    "summary": "Mistral AI 发布 Apache-2.0 许可的开源形式化验证模型 Leanstral 1.5，总参数 119B、激活 6B，miniF2F 达 100% 饱和，PutnamBench 解出 587/672，FATE-H 87%、FATE-X 34% 均刷新 SOTA。训练分 mid-training、SFT 与基于 CISPO 的强化学习三阶段；具备智能体式证明能力，在 57 个开源仓库中发现 5 个未知 bug。模型已通过 HuggingFace 和免费 API 开放。",
-    "date": "2026-07-03",
-    "month": "2026-07",
-    "source": "Mistral AI",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 83,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "快讯",
-      "论文"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "基础模型与算力技术栈",
-      "AI 算力与推理服务",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "基础模型发布",
-      "基础模型研究",
-      "开发者工具",
-      "模型能力",
-      "Agent 产品"
-    ],
-    "companies": [
-      "Mistral"
-    ],
-    "products": []
-  },
-  {
     "id": "article-cfbc8b78581b7bf0",
     "title": "Simon Willison 绘制开源 AI 差距地图",
     "url": "https://simonwillison.net/2026/Jul/3/open-source-ai-gap-map/#atom-everything",
@@ -10840,115 +10942,6 @@
       "模型能力"
     ],
     "companies": [],
-    "products": []
-  },
-  {
-    "id": "article-bda0bbc3a6aca79b",
-    "title": "Yann LeCun 论 AI 权力集中是最大风险,基础模型终将像 Linux 与 Apache 一样商品化",
-    "url": "https://x.com/ylecun/status/2073037974153896312",
-    "summary": "Yann LeCun 在 X 发长文回应 AI 权力集中议题:他把少数私营公司或国家垄断信息、知识与经济工具的访问,视为 AI 最大危险,类比奥斯曼帝国禁印刷术两百年。他引用 1993 年 Gore 与 Clinton 顶住电信巨头把 ARPAnet 开放给商业和公众,以及 1990 到 2000 年代 Sun、HP、IBM 专有栈被 Linux、Apache 挤出的历史,判断基础模型作为基础设施必然商品化,长期利润在应用层。",
-    "date": "2026-07-03",
-    "month": "2026-07",
-    "source": "X：Yann LeCun",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 82,
-    "importance": "notable",
-    "domain": "行业动态与政策地缘",
-    "flavors": [
-      "观点专访",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "企业 AI 采纳",
-      "行业动态与政策地缘",
-      "AI 市场动态",
-      "AI 政策与地缘"
-    ],
-    "channels_l2": [
-      "基础模型发布",
-      "监管与政策",
-      "模型能力",
-      "企业治理与落地",
-      "市场与商业化"
-    ],
-    "companies": [],
-    "products": []
-  },
-  {
-    "id": "article-40f6296cc0e604cc",
-    "title": "Headroom 本地压缩 LLM 输入,最高省 92% token,精度反升 3 分",
-    "url": "https://developer.aliyun.com/article/1745202",
-    "summary": "开源工具 Headroom 在 agent 和 LLM 间插入本地压缩层，按内容类型分诊(JSON 走 SmartCrusher、源码走 AST、日志走自训小模型)，实测最高省 92% token，TruthfulQA 精度反升 3 分，作者 SRE agent 账单从一晚 300 元压到约 60 元。",
-    "date": "2026-07-03",
-    "month": "2026-07",
-    "source": "阿里云开发者社区",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 80,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "技术拆解",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "基础模型与算力技术栈",
-      "AI 工程栈",
-      "AI 实践方法",
-      "AI 算力与推理服务"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力",
-      "上下文与记忆",
-      "Agent 产品",
-      "Agent 工程实践"
-    ],
-    "companies": [],
-    "products": []
-  },
-  {
-    "id": "article-436a3c6b8852ec91",
-    "title": "Wafer.ai 实测:GLM 5.2 在 AMD MI355X 达 2626 tok/s/node,总拥有成本较 Nvidia Blackwell 低 2 倍以上",
-    "url": "https://www.wafer.ai/blog/glm52-amd",
-    "summary": "Wafer.ai 公布 GLM 5.2 在 AMD MI355X 上的推理实测数据:单节点吞吐 2626 tok/s,同等吞吐下总拥有成本较 Nvidia Blackwell 低 2 倍以上。文章附完整对比方法与配置细节,显示 AMD 在开源大模型推理场景开始出现真实的性价比优势。",
-    "date": "2026-07-03",
-    "month": "2026-07",
-    "source": "Wafer AI",
-    "section": "source_watch",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 80,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "技术拆解",
-      "论文",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "基础模型与算力技术栈",
-      "AI 算力与推理服务"
-    ],
-    "channels_l2": [
-      "基础模型研究",
-      "开发者工具",
-      "模型服务平台",
-      "模型能力",
-      "AI 算力硬件"
-    ],
-    "companies": [
-      "NVIDIA"
-    ],
     "products": []
   },
   {

@@ -17,7 +17,8 @@
         "terminal_status": "published"
       }
     },
-    "scheduled_dry_run_script": "publish:dry-run:daily"
+    "scheduled_entrypoint_script": "daily:codex-pipeline",
+    "automation_pipeline_mode": "single_script_dag_orchestrator"
   },
   "status_self_check": {
     "script": "status:self-check",
@@ -48,7 +49,9 @@
         "--execute",
         "--publish",
         "completed_stages",
-        "publish:dry-run:daily",
+        "automation_pipeline_mode",
+        "single_script_dag_orchestrator",
+        "orchestration_node_count",
         ".tmp/run-summary-YYYY-MM-DD.json",
         "--source-watch-admitted-artifact",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json",
@@ -72,7 +75,9 @@
         "completed_stages",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD",
         "legacy_daily_run_compatibility",
-        "publish:dry-run:daily",
+        "automation_pipeline_mode",
+        "single_script_dag_orchestrator",
+        "orchestration_node_count",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
@@ -95,7 +100,9 @@
         "--publish",
         "completed_stages",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD",
-        "publish:dry-run:daily",
+        "automation_pipeline_mode",
+        "single_script_dag_orchestrator",
+        "orchestration_node_count",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
@@ -119,7 +126,9 @@
         "--publish",
         "completed_stages",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD",
-        "publish:dry-run:daily",
+        "automation_pipeline_mode",
+        "single_script_dag_orchestrator",
+        "orchestration_node_count",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
@@ -168,11 +177,15 @@
       "source_watch_admitted_artifact_path",
       "completed_stages",
       "automation_pipeline_mode",
-      "publish:dry-run:daily"
+      "single_script_dag_orchestrator",
+      "orchestration_node_count"
     ],
     "not_contains": [
       "publish:prepare-worktree",
-      "npm run publish:dry-run --"
+      "npm run publish:dry-run --",
+      "publish:dry-run:daily",
+      "node src/cli.js daily:run",
+      "codex exec"
     ]
   },
   "external_automation_inventory": {

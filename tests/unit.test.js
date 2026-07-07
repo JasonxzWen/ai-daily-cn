@@ -8417,7 +8417,7 @@ test("daily workflow contract validates repository workflow markers", async () =
     [
       'id = "ai-daily"',
       'kind = "cron"',
-      `prompt = "npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact ${expectedSourceWatchArtifactPath}; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch_admitted_artifact_path"`,
+      `prompt = "npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact ${expectedSourceWatchArtifactPath}; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode single_script_dag_orchestrator orchestration_node_count source_watch_admitted_artifact_path"`,
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8457,7 +8457,7 @@ test("daily workflow contract rejects active publish automation missing Source W
     [
       'id = "ai-daily"',
       'kind = "cron"',
-      'prompt = "npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily"',
+      'prompt = "npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode single_script_dag_orchestrator orchestration_node_count"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),

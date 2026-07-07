@@ -10,8 +10,29 @@ import { buildSite } from "../src/site.js";
 
 const DEFAULT_WORK_DIR = path.join(".tmp", "daily-codex-mvp");
 const DEFAULT_SANDBOX = "workspace-write";
-const STAGE_IDS = ["prepare", "collect-context", "codex-generate", "validate", "repair-once", "summarize"];
+const DEFAULT_DAG_PATH = path.join("config", "daily-codex-dag.json");
+const CONTROL_STAGE_IDS = ["prepare", "collect-context"];
+const MVP_STAGE_IDS = ["codex-generate", "validate", "repair-once", "summarize"];
 const PUBLISH_STAGE_ID = "publish";
+const RESERVED_STAGE_IDS = new Set([...CONTROL_STAGE_IDS, ...MVP_STAGE_IDS, PUBLISH_STAGE_ID]);
+const FALLBACK_DAG_NODE_IDS = [
+  "fetch-source-health",
+  "parse-extract",
+  "normalize-canonicalize",
+  "classify-tag-entity",
+  "score",
+  "dedupe-cross-language",
+  "freshness-history-check",
+  "verify-source-authority",
+  "admit-reject",
+  "per-item-summary",
+  "quality-audit",
+  "repair-regenerate",
+  "persist-article-db",
+  "assemble-daily-edition",
+  "build-cards-page",
+  "publish-cleanup"
+];
 const REPOSITORY_GUARD_EXCLUDED_DIRS = new Set([".git", ".codegraph", "node_modules"]);
 
 export async function prepareDailyCodexPipeline(options = {}) {
@@ -33,9 +54,15 @@ export function buildDailyCodexPipelinePlan(options = {}) {
   const fixtureMode = normalizeFixtureMode(options.fixtureMode || options.fixture || "");
   const executeRequested = Boolean(options.executeRequested ?? options.execute ?? false);
   const publishRequested = Boolean(options.publishRequested ?? options.publish ?? false);
-  const outputs = buildOutputs({ rootDir, workDir, reportDate });
+  const dagNodes = loadDailyCodexDagNodeStages(rootDir, options);
+  const outputs = buildOutputs({ rootDir, workDir, reportDate, dagNodes });
   const publish = buildPublishConfig(options);
-  const stageIds = publishRequested ? [...STAGE_IDS, PUBLISH_STAGE_ID] : STAGE_IDS;
+  const stageIds = [
+    ...CONTROL_STAGE_IDS,
+    ...dagNodes.map((node) => node.id),
+    ...MVP_STAGE_IDS,
+    ...(publishRequested ? [PUBLISH_STAGE_ID] : [])
+  ];
   return {
     version: 2,
     mode: "daily_codex_dag_lite",
@@ -51,8 +78,21 @@ export function buildDailyCodexPipelinePlan(options = {}) {
       fixture_mode: fixtureMode
     },
     publish,
+    orchestration: {
+      mode: "single_script_dag_orchestrator",
+      manifest_path: path.resolve(rootDir, options.dagPath || options["dag-path"] || DEFAULT_DAG_PATH),
+      node_count: dagNodes.length,
+      codex_cli_stage_count: dagNodes.length + 1,
+      nodes: dagNodes
+    },
     outputs,
-    stages: stageIds.map((id) => buildStage({ id, rootDir, workDir, outputs }))
+    stages: stageIds.map((id) => buildStage({
+      id,
+      rootDir,
+      workDir,
+      outputs,
+      dagNode: dagNodes.find((node) => node.id === id)
+    }))
   };
 }
 
@@ -66,6 +106,7 @@ export async function runDailyCodexPipeline(plan, options = {}) {
     repair: null,
     repairValidation: null,
     repairAttempted: false,
+    nodeResults: [],
     finalArtifactPath: "",
     finalValidation: null,
     publication: null
@@ -74,6 +115,9 @@ export async function runDailyCodexPipeline(plan, options = {}) {
 
   await recordStage(state, "prepare", () => runPrepareStage(state));
   await recordStage(state, "collect-context", () => runCollectContextStage(state, options));
+  for (const node of state.plan.orchestration?.nodes || []) {
+    await recordStage(state, node.id, () => runDagNodeStage(state, node));
+  }
   await recordStage(state, "codex-generate", () => runGenerateStage(state, options));
   await recordStage(state, "validate", () => runValidateStage(state));
   await recordStage(state, "repair-once", () => runRepairStage(state, options));
@@ -167,6 +211,47 @@ async function runCollectContextStage(state, options) {
   state.context = context;
   await writeJson(state.plan.outputs.context, context);
   return { status: "success", artifacts: await artifactRecords([state.plan.outputs.context]) };
+}
+
+async function runDagNodeStage(state, node) {
+  const outputPath = state.plan.outputs.node_outputs[node.id];
+  if (!outputPath) {
+    const error = new Error(`daily Codex DAG node output path is not configured: ${node.id}`);
+    error.code = "daily_codex_node_output_missing";
+    throw error;
+  }
+
+  if (state.plan.codex.fixture_mode) {
+    const result = fixtureDagNodeResult({ node, reportDate: state.plan.report_date, outputPath });
+    await writeJson(outputPath, result);
+    state.nodeResults.push(result);
+    return {
+      status: "success",
+      artifacts: await artifactRecords([outputPath])
+    };
+  }
+
+  const prompt = buildDagNodePrompt(state, node, outputPath);
+  const promptPath = state.plan.outputs.node_prompts[node.id];
+  await writeText(promptPath, prompt);
+  await runCodexStage({
+    plan: state.plan,
+    prompt,
+    stdoutPath: state.plan.outputs.node_stdout[node.id],
+    stderrPath: state.plan.outputs.node_stderr[node.id]
+  });
+  const result = await readJson(outputPath);
+  state.nodeResults.push({
+    node_id: node.id,
+    title: node.title,
+    kind: node.kind,
+    artifact_path: outputPath,
+    produced_keys: isPlainObject(result) ? Object.keys(result).sort() : []
+  });
+  return {
+    status: "success",
+    artifacts: await artifactRecords([outputPath])
+  };
 }
 
 async function runGenerateStage(state) {
@@ -411,6 +496,9 @@ async function writeRunSummary(state, { finalStatus }) {
     completed_stages: state.completedStages,
     failures,
     summary_path: state.plan.outputs.run_summary,
+    automation_pipeline_mode: "single_script_dag_orchestrator",
+    orchestration: state.plan.orchestration,
+    node_results: state.nodeResults,
     publish_requested: Boolean(state.plan.publish_requested),
     execute_requested: Boolean(state.plan.execute_requested),
     source_watch_admitted_artifact_path: state.plan.publish?.source_watch_admitted_artifact_path || "",
@@ -469,8 +557,18 @@ async function buildLocalContext(plan) {
       name.startsWith("report:")
     )).sort(),
     dag_nodes: Array.isArray(dagManifest?.nodes) ? dagManifest.nodes.map((node) => node.id).filter(Boolean) : [],
+    orchestrated_nodes: plan.orchestration?.nodes?.map((node) => ({
+      id: node.id,
+      title: node.title,
+      kind: node.kind,
+      dependencies: node.dependencies
+    })) || [],
     mvp_contract: {
-      stages: STAGE_IDS,
+      stages: [
+        ...CONTROL_STAGE_IDS,
+        ...(plan.orchestration?.nodes || []).map((node) => node.id),
+        ...MVP_STAGE_IDS
+      ],
       output_schema: {
         report_date: "YYYY-MM-DD",
         headline: "string",
@@ -479,6 +577,41 @@ async function buildLocalContext(plan) {
       }
     }
   };
+}
+
+function buildDagNodePrompt(state, node, outputPath) {
+  const inputLines = (node.inputs || [])
+    .map((item) => `- ${item.path}${item.required ? " (required)" : ""}`)
+    .join("\n") || "- none";
+  const outputLines = (node.outputs || [])
+    .map((item) => `- ${item.path}${item.required ? " (required)" : ""}`)
+    .join("\n") || `- ${outputPath}`;
+  return `${boundaryPrompt(outputPath)}
+You are executing one stage in the ADC daily Codex single-script pipeline.
+Stage:
+- node_id: ${node.id}
+- title: ${node.title || node.id}
+- kind: ${node.kind || "codex_exec"}
+- dependencies: ${(node.dependencies || []).join(", ") || "none"}
+- runner_stage_ref: ${node.runner_stage_ref || ""}
+
+Read the local context JSON at ${state.plan.outputs.context}.
+Inputs declared by the DAG:
+${inputLines}
+
+Outputs declared by the DAG:
+${outputLines}
+
+Write a single JSON object to OUTPUT_PATH. Required shape:
+{
+  "report_date": "${state.plan.report_date}",
+  "node_id": "${node.id}",
+  "status": "success",
+  "summary": "concise Chinese stage result",
+  "artifacts": [{ "path": "${normalizeRelativePath(path.relative(state.plan.root_dir, outputPath))}", "kind": "internal" }]
+}
+Keep all writes inside the pipeline work directory. Do not edit repository product files.
+`;
 }
 
 function buildGeneratePrompt(state) {
@@ -718,13 +851,82 @@ function fixtureGeneration({ mode, reportDate, repaired }) {
   };
 }
 
-function buildStage({ id, rootDir, workDir, outputs }) {
+function fixtureDagNodeResult({ node, reportDate, outputPath }) {
+  return {
+    report_date: reportDate,
+    node_id: node.id,
+    title: node.title || node.id,
+    kind: node.kind || "codex_exec",
+    status: "success",
+    execution: "fixture",
+    summary: `${node.title || node.id} fixture completed for ${reportDate}.`,
+    dependencies: node.dependencies || [],
+    artifacts: [{
+      path: normalizeRelativePath(outputPath),
+      kind: "internal"
+    }]
+  };
+}
+
+function loadDailyCodexDagNodeStages(rootDir, options = {}) {
+  const dagPath = path.resolve(rootDir, options.dagPath || options["dag-path"] || DEFAULT_DAG_PATH);
+  try {
+    const manifest = JSON.parse(fsSync.readFileSync(dagPath, "utf8"));
+    const nodes = Array.isArray(manifest.nodes) ? manifest.nodes : [];
+    const normalized = nodes
+      .filter((node) => nonEmptyString(node?.id))
+      .filter((node) => !RESERVED_STAGE_IDS.has(String(node.id)))
+      .map((node) => ({
+        id: String(node.id),
+        title: String(node.title || node.id),
+        kind: String(node.kind || "codex_exec"),
+        dependencies: Array.isArray(node.dependencies) ? node.dependencies.filter(nonEmptyString).map(String) : [],
+        inputs: Array.isArray(node.inputs) ? node.inputs.map(normalizeDagArtifactRef) : [],
+        outputs: Array.isArray(node.outputs) ? node.outputs.map(normalizeDagArtifactRef) : [],
+        runner_stage_ref: String(node.runner_stage_ref || ""),
+        parallel_group: String(node.parallel_group || ""),
+        public_artifact: Boolean(node.public_artifact)
+      }));
+    return normalized.length > 0 ? normalized : fallbackDagNodeStages();
+  } catch {
+    return fallbackDagNodeStages();
+  }
+}
+
+function normalizeDagArtifactRef(value) {
+  return {
+    path: String(value?.path || ""),
+    required: Boolean(value?.required)
+  };
+}
+
+function fallbackDagNodeStages() {
+  return FALLBACK_DAG_NODE_IDS.map((id) => ({
+    id,
+    title: id,
+    kind: "codex_exec",
+    dependencies: [],
+    inputs: [],
+    outputs: [],
+    runner_stage_ref: "",
+    parallel_group: "",
+    public_artifact: false
+  }));
+}
+
+function buildStage({ id, rootDir, workDir, outputs, dagNode = null }) {
   const stage = {
     id,
-    kind: id === "codex-generate" || id === "repair-once" ? "codex_or_fixture" : "internal",
+    kind: dagNode ? `dag_node:${dagNode.kind}` : (id === "codex-generate" || id === "repair-once" ? "codex_or_fixture" : "internal"),
     cwd: rootDir,
     work_dir: workDir
   };
+  if (dagNode) {
+    stage.title = dagNode.title;
+    stage.dependencies = dagNode.dependencies;
+    stage.runner_stage_ref = dagNode.runner_stage_ref;
+    stage.output_path = outputs.node_outputs[id];
+  }
   if (id === "collect-context") stage.output_path = outputs.context;
   if (id === "codex-generate") stage.output_path = outputs.generated;
   if (id === "validate") stage.output_path = outputs.validation;
@@ -734,7 +936,17 @@ function buildStage({ id, rootDir, workDir, outputs }) {
   return stage;
 }
 
-function buildOutputs({ rootDir, workDir, reportDate }) {
+function buildOutputs({ rootDir, workDir, reportDate, dagNodes = [] }) {
+  const node_outputs = {};
+  const node_prompts = {};
+  const node_stdout = {};
+  const node_stderr = {};
+  for (const node of dagNodes) {
+    node_outputs[node.id] = path.join(workDir, "nodes", `${node.id}.json`);
+    node_prompts[node.id] = path.join(workDir, "prompts", "nodes", `${node.id}.md`);
+    node_stdout[node.id] = path.join(workDir, "logs", "nodes", `${node.id}.stdout.jsonl`);
+    node_stderr[node.id] = path.join(workDir, "logs", "nodes", `${node.id}.stderr.log`);
+  }
   return {
     plan: path.join(workDir, "pipeline-plan.json"),
     context: path.join(workDir, "context.json"),
@@ -751,7 +963,11 @@ function buildOutputs({ rootDir, workDir, reportDate }) {
     generate_stdout: path.join(workDir, "logs", "codex-generate.stdout.jsonl"),
     generate_stderr: path.join(workDir, "logs", "codex-generate.stderr.log"),
     repair_stdout: path.join(workDir, "logs", "repair-once.stdout.jsonl"),
-    repair_stderr: path.join(workDir, "logs", "repair-once.stderr.log")
+    repair_stderr: path.join(workDir, "logs", "repair-once.stderr.log"),
+    node_outputs,
+    node_prompts,
+    node_stdout,
+    node_stderr
   };
 }
 
@@ -886,7 +1102,8 @@ function parseArgs(argv) {
     "out",
     "site-url",
     "generated-at",
-    "trend-config"
+    "trend-config",
+    "dag-path"
   ]);
   const booleanFlags = new Set(["execute", "publish"]);
   const parsed = {
@@ -1068,7 +1285,8 @@ if (isMainModule(import.meta.url)) {
       outDir: args.out || process.env.npm_config_out || "docs",
       siteUrl: args["site-url"] || process.env.npm_config_site_url || "",
       generatedAt: args["generated-at"] || process.env.npm_config_generated_at || "",
-      trendConfigPath: args["trend-config"] || process.env.npm_config_trend_config || ""
+      trendConfigPath: args["trend-config"] || process.env.npm_config_trend_config || "",
+      dagPath: args["dag-path"] || process.env.npm_config_dag_path || ""
     });
     const { summary } = await runDailyCodexPipeline(plan);
     process.stdout.write(`${JSON.stringify({
@@ -1080,6 +1298,8 @@ if (isMainModule(import.meta.url)) {
       completed_stages: summary.completed_stages.map((stage) => stage.id),
       failures: summary.failures,
       summary_path: plan.outputs.run_summary,
+      automation_pipeline_mode: summary.automation_pipeline_mode,
+      orchestration_node_count: summary.orchestration?.node_count || 0,
       publish_requested: summary.publish_requested,
       execute_requested: summary.execute_requested,
       source_watch_admitted_artifact_path: summary.source_watch_admitted_artifact_path,
