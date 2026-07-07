@@ -8398,13 +8398,55 @@ test("status:self-check runs publish checks from the prepared clean worktree", a
 
 test("daily workflow contract validates repository workflow markers", async () => {
   const expectedDagContractRunCommand = "node scripts/run-daily-codex-dag.mjs --contract-run --json";
+  const expectedSourceWatchArtifactPath = ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json";
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-workflow-contract.json"), "utf8"));
   const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
   assert.equal(contract.required_package_scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
+  assert.equal(contract.daily_runner.source_watch_admitted_artifact_path_template, expectedSourceWatchArtifactPath);
   assert.equal(manifest.scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
   assert(!contract.daily_runner || contract.daily_runner.script !== "daily:codex-dag:contract-run");
 
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-"));
+  const automationsDir = path.join(tmp, "automations");
+  const promptPath = path.join(automationsDir, "ai-daily", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
+  await fs.mkdir(path.join(automationsDir, "ai-daily-status-self-check"), { recursive: true });
+  await fs.writeFile(
+    promptPath,
+    [
+      'id = "ai-daily"',
+      'kind = "cron"',
+      `prompt = "npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact ${expectedSourceWatchArtifactPath}; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch_admitted_artifact_path"`,
+      'status = "ACTIVE"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(automationsDir, "ai-daily-status-self-check", "automation.toml"),
+    [
+      'id = "ai-daily-status-self-check"',
+      'kind = "cron"',
+      'prompt = "node src/cli.js status:self-check --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json"',
+      'status = "ACTIVE"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await validateDailyWorkflowContract({
+    rootDir,
+    automationsDir,
+    automationPromptPath: promptPath
+  });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert(result.checked_files.some((file) => file.endsWith("tasks/daily-publish-runbook.md")));
+  assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
+});
+
+test("daily workflow contract rejects active publish automation missing Source Watch admitted artifact handoff", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-missing-source-watch-"));
   const automationsDir = path.join(tmp, "automations");
   const promptPath = path.join(automationsDir, "ai-daily", "automation.toml");
   await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
@@ -8438,9 +8480,8 @@ test("daily workflow contract validates repository workflow markers", async () =
     automationPromptPath: promptPath
   });
 
-  assert.equal(result.ok, true, result.failures.join("\n"));
-  assert(result.checked_files.some((file) => file.endsWith("tasks/daily-publish-runbook.md")));
-  assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("--source-watch-admitted-artifact")), result.failures.join("\n"));
 });
 
 test("daily workflow contract rejects DAG contract-run package script drift", async () => {
