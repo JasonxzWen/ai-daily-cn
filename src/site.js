@@ -115,6 +115,7 @@ const ARTICLE_DOMAIN_ORDER = [
   "多模态与具身等前沿"
 ];
 const ARTICLE_FLAVORS = ["快讯", "论文", "技术拆解", "商业洞察", "报告", "实战方法", "观点专访"];
+const EXTERNAL_ARTICLE_LIMIT_PER_SOURCE = 240;
 const KNOWN_AI_COMPANIES = [
   "OpenAI",
   "Anthropic",
@@ -501,11 +502,20 @@ export async function buildSite(options = {}) {
     artifactPath: options.sourceWatchAdmittedArtifactPath,
     artifactPaths: options.sourceWatchAdmittedArtifactPaths
   });
+  const externalArticleSources = await loadConfiguredExternalArticleSources(rootDir, {
+    generatedAt,
+    reportDate: feedValidation.value.reports[0]?.report_date,
+    fetchImpl: options.fetchImpl,
+    sourceWatchlistPath: options.sourceWatchlistPath,
+    externalArticleSources: options.externalArticleSources,
+    externalArticleTargets: options.externalArticleTargets
+  });
   const articles = buildArticleIndex(reports, {
     siteTitle,
     siteUrl,
     updatedAt: feedValidation.value.updated_at,
-    sourceWatchAdmittedArtifacts
+    sourceWatchAdmittedArtifacts,
+    externalArticles: externalArticleSources.flatMap((source) => source.articles || [])
   });
   const articleValidation = validateArticles(articles);
   if (!articleValidation.valid) {
@@ -515,6 +525,13 @@ export async function buildSite(options = {}) {
   }
   const reportNavigationByDate = buildReportNavigation(feedValidation.value.reports, dateIndex.items);
   const trackingHistoryByDate = buildDailyTrackingHistoryByReportDate(reports);
+  const frontendData = buildFrontendData({
+    feed: feedValidation.value,
+    articles: articleValidation.value,
+    trends: trendValidation.value,
+    generatedAt: feedValidation.value.updated_at,
+    externalArticleSources
+  });
 
   for (const record of reportRecords) {
     await writeReportArtifacts(rootDir, outDir, record.report, writtenFiles, record.markdown, record.reportJsonPath, {
@@ -531,6 +548,11 @@ export async function buildSite(options = {}) {
   await writeJsonTracked(outDir, "feed.json", feedValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "articles.json", articleValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
+  await writeJsonTracked(outDir, "data/articles.json", articleValidation.value, writtenFiles);
+  await writeJsonTracked(outDir, "data/today.json", frontendData.today, writtenFiles);
+  await writeJsonTracked(outDir, "data/topics.json", frontendData.topics, writtenFiles);
+  await writeJsonTracked(outDir, "data/sources.json", frontendData.sources, writtenFiles);
+  await writeJsonTracked(outDir, "data/runtime.json", frontendData.runtime, writtenFiles);
   await writeJsonTracked(outDir, "data/official-blogs.json", officialBlogKnowledge, writtenFiles);
   await writeFileTracked(outDir, "official-blogs/index.html", renderOfficialBlogsHtml(officialBlogKnowledge, {
     styleHref: `../assets/style.css?v=${encodeURIComponent(indexStyleVersion)}`
@@ -550,6 +572,8 @@ export async function buildSite(options = {}) {
     reports,
     feed: feedValidation.value,
     articles: articleValidation.value,
+    frontendData,
+    externalArticleSources,
     trends: trendValidation.value,
     officialBlogKnowledge,
     dateIndex,
@@ -724,11 +748,500 @@ export function buildArticleIndex(reports = [], options = {}) {
     byUrl.set(key, byUrl.has(key) ? mergeArticleRecords(byUrl.get(key), article) : article);
   }
 
+  for (const article of externalArticleRecords(options)) {
+    const key = articleUrlKey(article.url);
+    if (!key) {
+      continue;
+    }
+    byUrl.set(key, byUrl.has(key) ? mergeArticleRecords(byUrl.get(key), article) : article);
+  }
+
   return [...byUrl.values()].sort((a, b) =>
     String(b.date).localeCompare(String(a.date)) ||
     Number(b.quality_score || 0) - Number(a.quality_score || 0) ||
     String(a.title).localeCompare(String(b.title), "zh-Hans-CN")
   );
+}
+
+export async function loadConfiguredExternalArticleSources(rootDir, options = {}) {
+  if (Array.isArray(options.externalArticleSources)) {
+    return options.externalArticleSources.map((source) => normalizeExternalArticleSource(source, options));
+  }
+
+  const targets = Array.isArray(options.externalArticleTargets)
+    ? options.externalArticleTargets
+    : await loadExternalArticleTargets(rootDir, options);
+  if (targets.length === 0) {
+    return [];
+  }
+
+  const fetchImpl = typeof options.fetchImpl === "function" ? options.fetchImpl : globalThis.fetch;
+  if (typeof fetchImpl !== "function") {
+    return targets.map((target) => externalArticleSourceResult(target, {
+      status: "blocked",
+      generatedAt: options.generatedAt,
+      reportDate: options.reportDate,
+      articles: []
+    }));
+  }
+
+  const sources = [];
+  for (const target of targets) {
+    const result = await fetchExternalArticleJson(fetchImpl, target.articles_url);
+    const payload = result.ok ? externalArticlePayloadItems(result.payload) : [];
+    const articles = payload
+      .slice(0, EXTERNAL_ARTICLE_LIMIT_PER_SOURCE)
+      .map((item, index) => externalArticleFromRecord(item, target, {
+        index,
+        reportDate: options.reportDate
+      }))
+      .filter(Boolean);
+    sources.push(externalArticleSourceResult(target, {
+      status: result.ok ? "checked" : "blocked",
+      generatedAt: options.generatedAt,
+      reportDate: options.reportDate,
+      articles,
+      httpStatus: result.status || 0
+    }));
+  }
+  return sources;
+}
+
+async function loadExternalArticleTargets(rootDir, options = {}) {
+  const configPath = path.resolve(rootDir, options.sourceWatchlistPath || path.join("config", "source-watchlist.json"));
+  let payload;
+  try {
+    payload = JSON.parse(await fs.readFile(configPath, "utf8"));
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+  const rawTargets = Array.isArray(payload) ? payload : payload.targets;
+  return (Array.isArray(rawTargets) ? rawTargets : [])
+    .filter((target) => isHttpUrl(target?.articles_url))
+    .map((target) => ({
+      id: cleanArticleToken(target.id) || `external-${articleId(target.articles_url).replace(/^article-/, "")}`,
+      name: cleanArticleText(target.name || target.url || target.articles_url),
+      url: isHttpUrl(target.url) ? target.url : target.articles_url,
+      articles_url: target.articles_url,
+      source_kind: cleanArticleToken(target.content_kind) || "articles_json",
+      authority: target.source_tier === "first_class" ? "first_class" : "watched",
+      tier: cleanArticleToken(target.source_tier || target.tier) || "standard",
+      source_lane: cleanArticleToken(target.source_lane || target.lane) || "",
+      verification_policy: cleanArticleToken(target.verification_policy) || ""
+    }));
+}
+
+function normalizeExternalArticleSource(source = {}, options = {}) {
+  const target = {
+    id: cleanArticleToken(source.id) || `external-${articleId(source.url || source.articles_url || source.name).replace(/^article-/, "")}`,
+    name: cleanArticleText(source.name || "External Articles"),
+    url: isHttpUrl(source.url) ? source.url : source.articles_url || "",
+    articles_url: source.articles_url || source.url || "",
+    source_kind: cleanArticleToken(source.source_kind) || "articles_json",
+    authority: cleanArticleToken(source.authority) || "watched",
+    tier: cleanArticleToken(source.tier) || "standard",
+    source_lane: cleanArticleToken(source.source_lane) || "",
+    verification_policy: cleanArticleToken(source.verification_policy) || ""
+  };
+  const articles = (Array.isArray(source.articles) ? source.articles : [])
+    .map((item, index) => externalArticleFromRecord(item, target, {
+      index,
+      reportDate: options.reportDate || source.report_date
+    }))
+    .filter(Boolean);
+  return externalArticleSourceResult(target, {
+    status: source.status === "blocked" ? "blocked" : "checked",
+    generatedAt: options.generatedAt || source.generated_at,
+    reportDate: options.reportDate || source.report_date,
+    articles
+  });
+}
+
+function externalArticleSourceResult(target, details = {}) {
+  return {
+    id: target.id,
+    name: target.name,
+    url: target.url,
+    articles_url: target.articles_url,
+    source_kind: target.source_kind || "articles_json",
+    authority: target.authority || "watched",
+    tier: target.tier || "standard",
+    source_lane: target.source_lane || "",
+    verification_policy: target.verification_policy || "",
+    status: details.status || "not_configured_or_skipped",
+    checked_at: details.generatedAt || defaultGeneratedAt(),
+    report_date: normalizeArticleDate(details.reportDate, defaultGeneratedAt()),
+    http_status: details.httpStatus || 0,
+    articles: details.articles || []
+  };
+}
+
+async function fetchExternalArticleJson(fetchImpl, url) {
+  try {
+    const response = await fetchImpl(url, {
+      headers: {
+        accept: "application/json",
+        "user-agent": "ai-daily-cn-static-publisher"
+      }
+    });
+    if (!response.ok) {
+      return { ok: false, status: response.status || 0, payload: null };
+    }
+    return { ok: true, status: response.status || 200, payload: await response.json() };
+  } catch {
+    return { ok: false, status: 0, payload: null };
+  }
+}
+
+function externalArticlePayloadItems(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (Array.isArray(payload?.articles)) {
+    return payload.articles;
+  }
+  if (Array.isArray(payload?.items)) {
+    return payload.items;
+  }
+  return [];
+}
+
+function externalArticleRecords(options = {}) {
+  return (Array.isArray(options.externalArticles) ? options.externalArticles : [])
+    .map((article, index) => {
+      if (!article || typeof article !== "object") {
+        return null;
+      }
+      return isPublicArticleRecord(article)
+        ? article
+        : externalArticleFromRecord(article, { name: "External Articles", url: "" }, {
+          index,
+          reportDate: options.reportDate
+        });
+    })
+    .filter(Boolean);
+}
+
+function isPublicArticleRecord(value) {
+  return Boolean(
+    value
+    && typeof value === "object"
+    && value.id
+    && value.title
+    && value.url
+    && value.summary
+    && value.date
+    && value.section
+    && value.report_date
+    && value.report_url
+    && value.data_url
+  );
+}
+
+function externalArticleFromRecord(record, target, options = {}) {
+  if (!record || typeof record !== "object") {
+    return null;
+  }
+  const url = firstHttpUrl(record.url, record.canonical_url, record.link);
+  if (!isHttpUrl(url)) {
+    return null;
+  }
+  const title = cleanArticleText(record.title || record.name);
+  const summary = cleanArticleText(record.summary || record.description || record.abstract);
+  if (!title || !summary) {
+    return null;
+  }
+  const date = normalizeArticleDate(record.date || record.event_date || record.published_at, options.reportDate || defaultGeneratedAt());
+  if (!date) {
+    return null;
+  }
+  const rawText = [
+    title,
+    summary,
+    record.domain,
+    ...(Array.isArray(record.flavors) ? record.flavors : []),
+    ...(Array.isArray(record.channels_l1) ? record.channels_l1 : []),
+    ...(Array.isArray(record.channels_l2) ? record.channels_l2 : [])
+  ].filter(Boolean).join(" ");
+  const taxonomy = classifyArticleTaxonomy("source_watch", rawText);
+  const entities = extractArticleEntities(record, rawText);
+  const domain = ARTICLE_DOMAIN_ORDER.includes(record.domain) ? record.domain : taxonomy.domain;
+  const flavors = normalizeExternalFlavors(record.flavors, taxonomy.flavors);
+  const channelsL1 = normalizeExternalChannels(record.channels_l1, taxonomy.channels_l1, domain);
+  const channelsL2 = normalizeExternalChannels(record.channels_l2, taxonomy.channels_l2, defaultArticleChannelL2(domain));
+  const reportDate = normalizeArticleDate(options.reportDate, date) || date;
+  const paths = reportRelativePaths(reportDate);
+  const score = clampInteger(record.quality_score, 0, 100, 80);
+  return {
+    id: articleId(url),
+    title,
+    url,
+    summary,
+    date,
+    month: date.slice(0, 7),
+    source: cleanArticleText(record.source || target.name || "AIFY"),
+    section: "source_watch",
+    report_date: reportDate,
+    report_url: paths.htmlPath,
+    data_url: paths.dataPath,
+    quality_score: score,
+    importance: score >= 88 ? "major" : score >= 72 ? "notable" : "general",
+    domain,
+    flavors,
+    channels_l1: channelsL1,
+    channels_l2: channelsL2,
+    companies: uniqueSorted([...(Array.isArray(record.companies) ? record.companies : []), ...entities.companies]).slice(0, 8),
+    products: uniqueSorted([...(Array.isArray(record.products) ? record.products : []), ...entities.products]).slice(0, 8)
+  };
+}
+
+function normalizeExternalFlavors(values, fallback = []) {
+  const mapped = (Array.isArray(values) ? values : [values])
+    .map((value) => {
+      const text = cleanArticleText(value);
+      if (ARTICLE_FLAVORS.includes(text)) return text;
+      if (/实战|实践|方法|用法/.test(text)) return "实战方法";
+      if (/论文|研究/.test(text)) return "论文";
+      if (/拆解|技术|工程/.test(text)) return "技术拆解";
+      if (/商业|市场|洞察/.test(text)) return "商业洞察";
+      if (/报告/.test(text)) return "报告";
+      if (/观点|专访/.test(text)) return "观点专访";
+      if (/快讯|新闻/.test(text)) return "快讯";
+      return "";
+    })
+    .filter((value) => ARTICLE_FLAVORS.includes(value));
+  const merged = uniqueSorted([...mapped, ...(Array.isArray(fallback) ? fallback : [])])
+    .filter((value) => ARTICLE_FLAVORS.includes(value));
+  return merged.length ? merged.slice(0, 3) : ["快讯"];
+}
+
+function normalizeExternalChannels(primary, fallback = [], domain = "") {
+  const values = [
+    ...(Array.isArray(primary) ? primary : [primary]),
+    ...(Array.isArray(fallback) ? fallback : [fallback]),
+    domain
+  ]
+    .map(cleanArticleText)
+    .filter(Boolean);
+  return uniqueSorted(values).slice(0, 5);
+}
+
+function cleanArticleToken(value) {
+  return String(value || "").trim().toLowerCase().replace(/[^a-z0-9_:-]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function clampInteger(value, min, max, fallback) {
+  const number = Number.parseInt(value, 10);
+  if (!Number.isFinite(number)) {
+    return fallback;
+  }
+  return Math.max(min, Math.min(max, number));
+}
+
+export function buildFrontendData(options = {}) {
+  const articles = Array.isArray(options.articles) ? options.articles : [];
+  const generatedAt = options.generatedAt || defaultGeneratedAt();
+  const latestDate = latestArticleDate(articles) || options.feed?.reports?.[0]?.report_date || generatedAt.slice(0, 10);
+  const aifyIds = new Set(
+    (Array.isArray(options.externalArticleSources) ? options.externalArticleSources : [])
+      .flatMap((source) => source.articles || [])
+      .map((article) => article.id)
+  );
+  const topics = buildFrontendTopics(articles, generatedAt);
+  const sources = buildFrontendSources(articles, options.externalArticleSources || [], generatedAt);
+  const todayArticles = selectTodayArticles(articles, latestDate);
+  const today = {
+    schema_version: 1,
+    generated_at: generatedAt,
+    report_date: latestDate,
+    title: "今日 AI 情报",
+    summary: `基于 ${articles.length} 条公开资讯完成去重、精读和主题归类，默认展示最值得先看的信号。`,
+    stats: {
+      article_count: articles.length,
+      source_count: sources.sources.length,
+      topic_count: topics.topics.length,
+      aify_count: articles.filter((article) => aifyIds.has(article.id)).length
+    },
+    top_article_ids: todayArticles.map((article) => article.id),
+    articles: todayArticles,
+    top_topics: topics.topics.slice(0, 8)
+  };
+  const runtime = buildFrontendRuntime({
+    generatedAt,
+    reportDate: latestDate,
+    articles,
+    today,
+    topics,
+    sources,
+    externalArticleSources: options.externalArticleSources || []
+  });
+  return {
+    today,
+    topics,
+    sources,
+    runtime
+  };
+}
+
+function latestArticleDate(articles) {
+  return articles
+    .map((article) => article.date)
+    .filter(Boolean)
+    .sort((a, b) => String(b).localeCompare(String(a)))[0] || "";
+}
+
+function selectTodayArticles(articles, latestDate) {
+  const sameDay = articles.filter((article) => article.date === latestDate);
+  const pool = sameDay.length >= 12 ? sameDay : articles.slice(0, 24);
+  return pool
+    .slice()
+    .sort((a, b) =>
+      articleImportanceRank(b.importance) - articleImportanceRank(a.importance)
+      || Number(b.quality_score || 0) - Number(a.quality_score || 0)
+      || String(b.date).localeCompare(String(a.date))
+    )
+    .slice(0, 18);
+}
+
+function buildFrontendTopics(articles, generatedAt = defaultGeneratedAt()) {
+  const byLabel = new Map();
+  for (const article of articles) {
+    const labels = uniqueSorted([
+      ...(article.channels_l1 || []),
+      ...(article.channels_l2 || []),
+      article.domain
+    ].filter(Boolean)).slice(0, 4);
+    for (const label of labels) {
+      const id = topicId(label);
+      const topic = byLabel.get(id) || {
+        id,
+        label,
+        count: 0,
+        article_ids: [],
+        sources: [],
+        latest_date: "",
+        accent: topicAccent(byLabel.size)
+      };
+      topic.count += 1;
+      topic.article_ids.push(article.id);
+      topic.sources.push(article.source);
+      topic.latest_date = [topic.latest_date, article.date].filter(Boolean).sort((a, b) => String(b).localeCompare(String(a)))[0] || "";
+      byLabel.set(id, topic);
+    }
+  }
+  return {
+    schema_version: 1,
+    generated_at: generatedAt,
+    topics: [...byLabel.values()]
+      .map((topic) => ({
+        ...topic,
+        article_ids: uniqueSorted(topic.article_ids).slice(0, 60),
+        sources: uniqueSorted(topic.sources).slice(0, 8)
+      }))
+      .sort((a, b) => b.count - a.count || String(b.latest_date).localeCompare(String(a.latest_date)))
+  };
+}
+
+function buildFrontendSources(articles, externalSources, generatedAt) {
+  const bySource = new Map();
+  for (const article of articles) {
+    const id = topicId(article.source);
+    const source = bySource.get(id) || {
+      id,
+      name: article.source,
+      url: article.url,
+      source_kind: "article_source",
+      authority: "observed",
+      tier: "standard",
+      article_count: 0,
+      latest_article_date: "",
+      latest_article_ids: [],
+      status: "checked"
+    };
+    source.article_count += 1;
+    source.latest_article_ids.push(article.id);
+    if (!source.latest_article_date || String(article.date).localeCompare(String(source.latest_article_date)) > 0) {
+      source.latest_article_date = article.date;
+      source.url = article.url;
+    }
+    bySource.set(id, source);
+  }
+
+  for (const externalSource of externalSources) {
+    const id = externalSource.id || topicId(externalSource.name);
+    bySource.set(id, {
+      id,
+      name: externalSource.name,
+      url: externalSource.url,
+      source_kind: externalSource.source_kind || "articles_json",
+      authority: externalSource.authority || "watched",
+      tier: externalSource.tier || "standard",
+      article_count: externalSource.articles?.length || 0,
+      latest_article_date: latestArticleDate(externalSource.articles || []),
+      latest_article_ids: (externalSource.articles || []).slice(0, 8).map((article) => article.id),
+      status: externalSource.status || "not_configured_or_skipped"
+    });
+  }
+
+  return {
+    schema_version: 1,
+    generated_at: generatedAt,
+    source_registry_version: 1,
+    sources: [...bySource.values()]
+      .map((source) => ({
+        ...source,
+        latest_article_ids: uniqueSorted(source.latest_article_ids).slice(0, 8)
+      }))
+      .sort((a, b) => Number(b.article_count || 0) - Number(a.article_count || 0) || String(a.name).localeCompare(String(b.name), "zh-Hans-CN"))
+      .slice(0, 80)
+  };
+}
+
+function buildFrontendRuntime(details) {
+  const sourceInputs = details.externalArticleSources.map((source) => ({
+    id: source.id,
+    name: source.name,
+    url: source.articles_url || source.url,
+    status: source.status === "checked" ? "checked" : source.status === "blocked" ? "blocked" : "not_configured_or_skipped",
+    article_count: source.articles?.length || 0
+  }));
+  const finalStatus = sourceInputs.some((source) => source.status === "blocked") ? "degraded" : "ready";
+  return {
+    schema_version: 1,
+    generated_at: details.generatedAt,
+    build_id: contentHash(`${details.generatedAt}:${details.articles.length}:${details.reportDate}`),
+    mode: "static-react-github-pages",
+    report_date: details.reportDate,
+    final_status: finalStatus,
+    artifacts: [
+      frontendArtifact("data/articles.json", details.articles),
+      frontendArtifact("data/today.json", details.today?.articles || []),
+      frontendArtifact("data/topics.json", details.topics?.topics || []),
+      frontendArtifact("data/sources.json", details.sources?.sources || [])
+    ],
+    source_inputs: sourceInputs
+  };
+}
+
+function frontendArtifact(relativePath, value) {
+  const payload = JSON.stringify(value || []);
+  return {
+    path: relativePath,
+    count: Array.isArray(value) ? value.length : 0,
+    hash: contentHash(payload)
+  };
+}
+
+function topicId(value) {
+  const text = cleanArticleText(value) || "topic";
+  return `topic-${createHash("sha256").update(text).digest("hex").slice(0, 12)}`;
+}
+
+function topicAccent(index) {
+  return ["cyan", "green", "pink", "orange", "purple"][index % 5];
 }
 
 async function loadSourceWatchAdmittedArtifacts(rootDir, options = {}) {

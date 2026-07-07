@@ -18,7 +18,12 @@
     "preflight:worktree": "node src/cli.js preflight:worktree",
     "source-reset:preflight": "node src/cli.js source-reset:preflight",
     "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
-    "build": "node src/cli.js build --data-input reports-data --input reports-source --out docs",
+    "build:content": "node src/cli.js build --data-input reports-data --input reports-source --out docs",
+    "build:web": "vite build",
+    "build": "npm run build:content && npm run build:web",
+    "dev": "npm run build:content && vite --host 127.0.0.1",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --outDir ../docs",
+    "typecheck": "tsc --noEmit",
     "test": "node --test tests/unit.test.js tests/publish.test.js tests/skills.test.js tests/story-authoring.test.js tests/generation-first.test.js tests/content-contract.test.js tests/page-check-tiering.test.js tests/source-coverage.test.js tests/trends.test.js tests/article-index.test.js tests/official-blog-knowledge.test.js tests/daily-codex-pipeline.test.js tests/daily-codex-dag.test.js tests/source-watch.test.js",
     "test:e2e": "node scripts/run-e2e.mjs",
     "harness:init": "node scripts/harness-init.mjs",
@@ -59,9 +64,27 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.53.0",
-    "ajv": "^8.17.1"
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "ajv": "^8.17.1",
+    "tailwindcss": "^4.3.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.3"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
+  },
+  "dependencies": {
+    "@fontsource/geist-mono": "^5.2.8",
+    "@fontsource/geist-sans": "^5.2.5",
+    "@radix-ui/react-slot": "^1.3.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.23.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tailwind-merge": "^3.6.0"
   }
 }

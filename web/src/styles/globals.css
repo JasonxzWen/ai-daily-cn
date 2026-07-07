@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Geist Sans";
+  src: url("../../../node_modules/@fontsource/geist-sans/files/geist-sans-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Sans";
+  src: url("../../../node_modules/@fontsource/geist-sans/files/geist-sans-latin-500-normal.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Sans";
+  src: url("../../../node_modules/@fontsource/geist-sans/files/geist-sans-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Sans";
+  src: url("../../../node_modules/@fontsource/geist-sans/files/geist-sans-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Sans";
+  src: url("../../../node_modules/@fontsource/geist-sans/files/geist-sans-latin-800-normal.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Sans";
+  src: url("../../../node_modules/@fontsource/geist-sans/files/geist-sans-latin-900-normal.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("../../../node_modules/@fontsource/geist-mono/files/geist-mono-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("../../../node_modules/@fontsource/geist-mono/files/geist-mono-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --dracula-background: #282a36;
+  --dracula-current-line: #44475a;
+  --dracula-foreground: #f8f8f2;
+  --dracula-comment: #6272a4;
+  --dracula-cyan: #8be9fd;
+  --dracula-green: #50fa7b;
+  --dracula-orange: #ffb86c;
+  --dracula-pink: #ff79c6;
+  --dracula-purple: #bd93f9;
+  --dracula-red: #ff5555;
+  --dracula-yellow: #f1fa8c;
+
+  --background: var(--dracula-background);
+  --foreground: var(--dracula-foreground);
+  --card: rgba(40, 42, 54, 0.72);
+  --card-foreground: var(--dracula-foreground);
+  --muted: rgba(98, 114, 164, 0.18);
+  --muted-foreground: #b9bfd8;
+  --border: rgba(248, 248, 242, 0.11);
+  --primary: var(--dracula-purple);
+  --primary-foreground: #191a21;
+  --ring: var(--dracula-cyan);
+  --radius: 1.25rem;
+
+  font-family: "Geist Sans", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  color: var(--foreground);
+  background: var(--background);
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 1120px;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 16% 10%, rgba(139, 233, 253, 0.12), transparent 25%),
+    radial-gradient(circle at 82% 6%, rgba(255, 121, 198, 0.12), transparent 25%),
+    radial-gradient(circle at 58% 82%, rgba(80, 250, 123, 0.08), transparent 28%),
+    var(--dracula-background);
+}
+
+body {
+  min-width: 1120px;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 42px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 36px),
+    linear-gradient(180deg, rgba(40, 42, 54, 0.35), rgba(25, 26, 33, 0.92));
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(circle at 30% 20%, rgba(241, 250, 140, 0.06), transparent 18%),
+    radial-gradient(circle at 70% 10%, rgba(189, 147, 249, 0.12), transparent 21%),
+    linear-gradient(180deg, transparent, rgba(25, 26, 33, 0.68));
+  mask-image: linear-gradient(to bottom, black, transparent 86%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.font-mono {
+  font-family: "Geist Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.adc-shell {
+  position: relative;
+  width: min(1440px, calc(100vw - 64px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+
+.adc-grid {
+  background-image: radial-gradient(circle, rgba(248, 248, 242, 0.16) 1px, transparent 1px);
+  background-size: 28px 28px;
+}

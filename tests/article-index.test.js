@@ -9,7 +9,7 @@ import path from "node:path";
 import test from "node:test";
 import { PublisherError } from "../src/errors.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
-import { buildArticleIndex, buildSite } from "../src/site.js";
+import { buildArticleIndex, buildFrontendData, buildSite } from "../src/site.js";
 import { renderIndexHtml } from "../src/render.js";
 import { validateArticles } from "../src/schema.js";
 
@@ -318,6 +318,64 @@ test("buildSite publishes an explicit Source Watch admitted artifact into docs/a
   assert.equal(serialized.includes("latest_commit="), false);
 });
 
+test("buildSite writes React frontend data artifacts with external AIFY articles", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "article-public-frontend-data-"));
+  const inputDir = path.join(tmp, "reports-source");
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(inputDir, { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "tests", "fixtures", "reports", "good", "official-release.md"),
+    path.join(inputDir, "official-release.md")
+  );
+
+  const result = await buildSite({
+    rootDir: tmp,
+    inputDir,
+    outDir,
+    generatedAt: "2026-07-07T08:00:00.000Z",
+    trendConfigPath,
+    externalArticleSources: [{
+      id: "site-aify-news",
+      name: "Aify News",
+      url: "https://aify-news.pages.dev/",
+      articles_url: "https://aify-news.pages.dev/articles.json",
+      source_lane: "aify",
+      tier: "first_class",
+      verification_policy: "no_secondary_review_required",
+      articles: [{
+        title: "AIFY latest engineering signal",
+        url: "https://example.com/aify-latest-engineering-signal",
+        summary: "AIFY latest engineering signal explains how teams are changing AI engineering practice.",
+        date: "2026-07-07",
+        source: "AIFY Fixture",
+        quality_score: 90,
+        domain: "AI 用法与实践方法",
+        channels_l1: ["AI 工程栈"],
+        channels_l2: ["Agent 工程实践"],
+        flavors: ["实战"]
+      }]
+    }]
+  });
+
+  for (const filePath of [
+    "data/articles.json",
+    "data/today.json",
+    "data/topics.json",
+    "data/sources.json",
+    "data/runtime.json"
+  ]) {
+    assert(result.writtenFiles.includes(filePath), `${filePath} should be written`);
+  }
+
+  const articles = JSON.parse(await fs.readFile(path.join(outDir, "data", "articles.json"), "utf8"));
+  assert(articles.some((article) => article.url === "https://example.com/aify-latest-engineering-signal"));
+  const today = JSON.parse(await fs.readFile(path.join(outDir, "data", "today.json"), "utf8"));
+  assert.equal(today.report_date, "2026-07-07");
+  assert.equal(today.stats.aify_count, 1);
+  const sources = JSON.parse(await fs.readFile(path.join(outDir, "data", "sources.json"), "utf8"));
+  assert(sources.sources.some((source) => source.id === "site-aify-news" && source.article_count === 1));
+});
+
 test("buildSite rejects Source Watch admitted artifact paths outside the pipeline temp root", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "article-public-build-scope-"));
   const inputDir = path.join(tmp, "reports-source");
@@ -356,6 +414,68 @@ test("buildArticleIndex accepts direct Source Watch candidate arrays with per-ca
   assert(articles.every((article) => article.report_date === "2026-07-03"));
   const validation = validateArticles(articles);
   assert.equal(validation.valid, true, JSON.stringify(validation.errors, null, 2));
+});
+
+test("buildArticleIndex normalizes AIFY article JSON records into public articles", () => {
+  const articles = buildArticleIndex([], {
+    externalArticles: [{
+      title: "Latent Space 拆解 Claude Fable 5 使用方法论",
+      url: "https://www.latent.space/p/ainews-the-field-guide-to-fable?utm_source=aify",
+      summary: "Latent Space 归纳了与新一代模型协作的方法，包括解除旧约束、主动寻找盲区和提高对模型输出的要求。",
+      date: "2026-07-07",
+      source: "Latent Space",
+      quality_score: 80,
+      flavors: ["实战"],
+      domain: "AI 用法与实践方法",
+      channels_l1: ["AI 实践方法"],
+      channels_l2: ["AI 场景实战", "Agent 工程实践"],
+      companies: ["Anthropic"],
+      products: ["Claude"]
+    }]
+  });
+
+  assert.equal(articles.length, 1);
+  assert.equal(articles[0].section, "source_watch");
+  assert.equal(articles[0].source, "Latent Space");
+  assert.equal(articles[0].flavors.includes("实战方法"), true);
+  assert.equal(articles[0].channels_l1.includes("AI 实践方法"), true);
+  assert.equal(articles[0].quality_score, 80);
+  assert.equal(validateArticles(articles).valid, true);
+});
+
+test("buildFrontendData writes first-screen data around latest articles", () => {
+  const articles = buildArticleIndex([], {
+    externalArticles: [{
+      title: "AIFY latest product signal",
+      url: "https://example.com/aify-latest-product-signal",
+      summary: "AIFY latest product signal gives readers a useful daily AI update.",
+      date: "2026-07-07",
+      source: "AIFY Source",
+      quality_score: 92,
+      domain: "AI 产品与应用工具",
+      channels_l1: ["新兴 AI 产品与项目"],
+      channels_l2: ["AI 应用工具"],
+      flavors: ["快讯"]
+    }]
+  });
+  const frontendData = buildFrontendData({
+    generatedAt: "2026-07-07T08:00:00.000Z",
+    feed: { reports: [] },
+    articles,
+    externalArticleSources: [{
+      id: "site-aify-news",
+      name: "Aify News",
+      url: "https://aify-news.pages.dev/",
+      articles
+    }]
+  });
+
+  assert.equal(frontendData.today.report_date, "2026-07-07");
+  assert.equal(frontendData.today.stats.aify_count, 1);
+  assert.equal(frontendData.today.articles[0].title, "AIFY latest product signal");
+  assert.equal(frontendData.topics.topics.some((topic) => topic.label === "新兴 AI 产品与项目"), true);
+  assert.equal(frontendData.sources.sources.some((source) => source.id === "site-aify-news"), true);
+  assert.equal(frontendData.runtime.final_status, "ready");
 });
 
 test("Source Watch article records dedupe with report-derived records by canonical URL", () => {

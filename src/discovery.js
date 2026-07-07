@@ -732,6 +732,9 @@ export async function collectSourceWatch(options = {}) {
     if (result.candidate) {
       candidates.push(result.candidate);
     }
+    if (Array.isArray(result.candidates)) {
+      candidates.push(...result.candidates);
+    }
     siteAuditSources.push(result.auditSource);
   }
 
@@ -1037,20 +1040,32 @@ async function collectSourceWatchSite(target, context) {
       "user-agent": SOURCE_WATCH_USER_AGENT
     }
   });
+  const articleJsonResult = result.ok && isHttpUrl(target.articles_url)
+    ? await sourceWatchFetchJson(context.fetchImpl, target.articles_url, {
+      headers: {
+        accept: "application/json",
+        "user-agent": SOURCE_WATCH_USER_AGENT
+      }
+    })
+    : null;
+  const articleItems = sourceWatchSiteArticlePayloadItems(articleJsonResult?.payload)
+    .slice(0, DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT);
   const status = result.ok ? "checked" : "blocked";
   const site = result.ok ? parseSourceWatchSiteHtml(result.text, target.url) : {};
   const notes = result.ok
-    ? `site metadata fetched; feeds=${site.feeds.length}; github_links=${site.github_repositories.length}`
+    ? `site metadata fetched; feeds=${site.feeds.length}; github_links=${site.github_repositories.length}; articles=${articleItems.length}`
     : `site fetch failed: ${result.error || `HTTP ${result.status}`}`;
   const targetResult = {
     id: target.id,
     type: target.type,
     name: target.name,
     url: target.url,
+    ...(target.articles_url ? { articles_url: target.articles_url } : {}),
     ...sourceWatchContractFields(target),
     status,
     fetched_at: context.generatedAt,
     http_status: result.status,
+    ...(articleJsonResult ? { articles_http_status: articleJsonResult.status || 0 } : {}),
     site_metadata: {
       title: site.title || "",
       description: site.description || "",
@@ -1075,17 +1090,26 @@ async function collectSourceWatchSite(target, context) {
     reportDate: context.reportDate,
     candidates: context.candidates
   }) : null;
+  const candidates = result.ok
+    ? sourceWatchSiteArticleCandidates(target, articleItems, {
+      reportDate: context.reportDate,
+      candidates: [...context.candidates, candidate].filter(Boolean)
+    })
+    : [];
   return {
     target: targetResult,
     source: sourceItem,
     candidate,
+    candidates,
     auditSource: auditSource(target.name, target.url, status, notes, {
       target_id: target.id,
       ...sourceWatchContractFields(target),
       http_status: result.status,
+      articles_http_status: articleJsonResult?.status || 0,
       title: site.title || "",
       canonical_url: site.canonical_url || "",
       feeds_count: site.feeds?.length || 0,
+      article_candidates_count: articleItems.length,
       discovered_github_repositories: site.github_repositories || []
     })
   };
@@ -1154,6 +1178,70 @@ function sourceWatchSiteCandidate(target, site, details) {
     verification_sources: [target.url],
     editorial_category: "community_signal",
     tags: site.github_repositories.map((repo) => repo.repo).slice(0, 5)
+  };
+}
+
+function sourceWatchSiteArticlePayloadItems(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (Array.isArray(payload?.articles)) {
+    return payload.articles;
+  }
+  if (Array.isArray(payload?.items)) {
+    return payload.items;
+  }
+  return [];
+}
+
+function sourceWatchSiteArticleCandidates(target, items, details) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return [];
+  }
+  return items
+    .map((item, index) => sourceWatchSiteArticleCandidate(target, item, {
+      ...details,
+      index
+    }))
+    .filter(Boolean);
+}
+
+function sourceWatchSiteArticleCandidate(target, item, details) {
+  if (!item || typeof item !== "object" || !isHttpUrl(item.url)) {
+    return null;
+  }
+  const title = cleanText(item.title || "");
+  const summary = cleanText(item.summary || item.description || "");
+  if (!title || !summary) {
+    return null;
+  }
+  const eventDate = dateOnly(item.date || item.event_date || item.published_at) || details.reportDate;
+  const source = cleanText(item.source || target.name);
+  const tags = [
+    item.domain,
+    ...(Array.isArray(item.flavors) ? item.flavors : []),
+    ...(Array.isArray(item.channels_l1) ? item.channels_l1 : []),
+    ...(Array.isArray(item.channels_l2) ? item.channels_l2 : [])
+  ].map(cleanText).filter(Boolean).slice(0, 12);
+  return {
+    id: uniqueCandidateId(details.candidates, `site-watch-${target.id}-article-${details.index + 1}-${item.url}`),
+    source_id: target.id,
+    category: "community_lead",
+    title,
+    url: item.url,
+    source,
+    event_date: eventDate,
+    status: "excluded",
+    signal: "site_watch",
+    ...sourceWatchContractFields(target),
+    description: summary,
+    evidence: `${target.name} articles JSON item; source=${source}; quality_score=${Number(item.quality_score || 0) || "unknown"}.`,
+    verification_status: sourceWatchVerificationStatus(target, "intermediary_only"),
+    source_level: "ai_news_aggregator",
+    intermediary_url: target.url,
+    verification_sources: [target.articles_url, item.url].filter(Boolean),
+    editorial_category: "community_signal",
+    tags
   };
 }
 

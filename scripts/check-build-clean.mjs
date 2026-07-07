@@ -55,16 +55,10 @@ async function gitStatus(cwd) {
 
 async function runBuild(cwd) {
   await new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [
-      "src/cli.js",
-      "build",
-      "--data-input",
-      "reports-data",
-      "--input",
-      "reports-source",
-      "--out",
-      "docs"
-    ], {
+    const npmExecPath = process.env.npm_execpath;
+    const command = npmExecPath ? process.execPath : process.platform === "win32" ? "npm.cmd" : "npm";
+    const args = npmExecPath ? [npmExecPath, "run", "build"] : ["run", "build"];
+    const child = spawn(command, args, {
       cwd,
       stdio: "inherit",
       windowsHide: true
