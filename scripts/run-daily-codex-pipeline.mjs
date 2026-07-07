@@ -29,13 +29,17 @@ export function buildDailyCodexPipelinePlan(options = {}) {
   const sandbox = options.sandbox || DEFAULT_SANDBOX;
   const model = options.model || "";
   const fixtureMode = normalizeFixtureMode(options.fixtureMode || options.fixture || "");
-  const outputs = buildOutputs({ workDir });
+  const executeRequested = Boolean(options.executeRequested ?? options.execute ?? false);
+  const publishRequested = Boolean(options.publishRequested ?? options.publish ?? false);
+  const outputs = buildOutputs({ rootDir, workDir, reportDate });
   return {
     version: 2,
     mode: "daily_codex_dag_lite",
     report_date: reportDate,
     root_dir: rootDir,
     work_dir: workDir,
+    execute_requested: executeRequested,
+    publish_requested: publishRequested,
     codex: {
       bin: codexBin,
       model,
@@ -265,15 +269,28 @@ async function runSummarizeStage(state) {
 }
 
 async function writeRunSummary(state, { finalStatus }) {
+  const failedStage = [...state.completedStages].reverse().find((stage) => stage.status === "failure") || null;
+  const latestStage = state.completedStages[state.completedStages.length - 1] || null;
+  const failures = state.completedStages.flatMap((stage) => (
+    Array.isArray(stage.failures)
+      ? stage.failures.map((failure) => failure.message || failure.code || String(failure)).filter(Boolean)
+      : []
+  ));
   const summary = {
-    report_date: state.plan.report_date,
+    ok: finalStatus === "generated_only",
     mode: "daily_codex_dag_lite",
+    report_date: state.plan.report_date,
     final_status: finalStatus,
+    stage_id: failedStage?.id || latestStage?.id || "initialize",
     next_action: nextActionFor({ finalStatus, state }),
     work_dir: state.plan.work_dir,
     plan_path: state.plan.outputs.plan,
     final_artifact: state.plan.outputs.final,
     completed_stages: state.completedStages,
+    failures,
+    summary_path: state.plan.outputs.run_summary,
+    publish_requested: Boolean(state.plan.publish_requested),
+    execute_requested: Boolean(state.plan.execute_requested),
     validation: state.finalValidation || state.validation || null,
     repair_attempted: state.repairAttempted,
     updated_at: new Date().toISOString()
@@ -574,7 +591,7 @@ function buildStage({ id, rootDir, workDir, outputs }) {
   return stage;
 }
 
-function buildOutputs({ workDir }) {
+function buildOutputs({ rootDir, workDir, reportDate }) {
   return {
     plan: path.join(workDir, "pipeline-plan.json"),
     context: path.join(workDir, "context.json"),
@@ -584,7 +601,7 @@ function buildOutputs({ workDir }) {
     validation: path.join(workDir, "validation.json"),
     repair_validation: path.join(workDir, "repair-validation.json"),
     stage_summary: path.join(workDir, "stage-summary.json"),
-    run_summary: path.join(workDir, "run-summary.json"),
+    run_summary: path.join(rootDir, ".tmp", `run-summary-${reportDate}.json`),
     generate_prompt: path.join(workDir, "prompts", "generate.md"),
     repair_prompt: path.join(workDir, "prompts", "repair.md"),
     generate_stdout: path.join(workDir, "logs", "codex-generate.stdout.jsonl"),
@@ -699,28 +716,46 @@ function nonEmptyString(value) {
 }
 
 function parseArgs(argv) {
-  const allowedFlags = new Set(["repo-root", "date", "work-dir", "codex-bin", "model", "sandbox", "fixture"]);
-  const parsed = {};
+  const valueFlags = new Set(["repo-root", "date", "work-dir", "codex-bin", "model", "sandbox", "fixture"]);
+  const booleanFlags = new Set(["execute", "publish"]);
+  const parsed = {
+    positionals: [],
+    codexArgv: []
+  };
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
-    if (token === "--") continue;
-    if (!token.startsWith("--")) continue;
+    if (token === "--") {
+      parsed.codexArgv = argv.slice(index + 1);
+      break;
+    }
+    if (!token.startsWith("--")) {
+      parsed.positionals.push(token);
+      continue;
+    }
     const equalIndex = token.indexOf("=");
     if (equalIndex > 2) {
       const key = token.slice(2, equalIndex);
-      if (!allowedFlags.has(key)) throw new Error(`unsupported daily Codex DAG-lite flag: --${key}`);
-      parsed[key] = token.slice(equalIndex + 1);
+      if (booleanFlags.has(key)) {
+        parsed[key] = parseBooleanFlag(token.slice(equalIndex + 1));
+      } else if (valueFlags.has(key)) {
+        parsed[key] = token.slice(equalIndex + 1);
+      } else {
+        throw new Error(`unsupported daily Codex DAG-lite flag: --${key}`);
+      }
       continue;
     }
     const key = token.slice(2);
-    if (!allowedFlags.has(key)) throw new Error(`unsupported daily Codex DAG-lite flag: --${key}`);
+    if (booleanFlags.has(key)) {
+      parsed[key] = true;
+      continue;
+    }
+    if (!valueFlags.has(key)) throw new Error(`unsupported daily Codex DAG-lite flag: --${key}`);
     const next = argv[index + 1];
     if (!next || next.startsWith("--")) {
-      parsed[key] = true;
-    } else {
-      parsed[key] = next;
-      index += 1;
+      throw new Error(`daily Codex DAG-lite flag --${key} requires a value`);
     }
+    parsed[key] = next;
+    index += 1;
   }
   return parsed;
 }
@@ -730,7 +765,7 @@ function dateFromArgs(args) {
     ? args.date
     : validReportDate(process.env.npm_config_date)
       ? process.env.npm_config_date
-      : firstDate(process.argv.slice(2));
+      : firstDate(args.positionals || []);
 }
 
 function fixtureFromArgs(args) {
@@ -738,29 +773,21 @@ function fixtureFromArgs(args) {
     ? args.fixture
     : validFixtureMode(process.env.npm_config_fixture)
       ? process.env.npm_config_fixture
-      : firstNonDatePositional(process.argv.slice(2));
-}
-
-function positionalArgs(argv) {
-  const values = [];
-  for (let index = 0; index < argv.length; index += 1) {
-    const token = argv[index];
-    if (token.startsWith("--")) {
-      const next = argv[index + 1];
-      if (next && !next.startsWith("--")) index += 1;
-      continue;
-    }
-    values.push(token);
-  }
-  return values;
+      : firstFixturePositional(args.positionals || []);
 }
 
 function firstDate(argv) {
-  return positionalArgs(argv).find((token) => validReportDate(token)) || "";
+  return argv.find((token) => validReportDate(token)) || "";
 }
 
-function firstNonDatePositional(argv) {
-  return positionalArgs(argv).find((token) => !validReportDate(token)) || "";
+function firstFixturePositional(argv) {
+  return argv.find((token) => validFixtureMode(token)) || "";
+}
+
+function parseBooleanFlag(value) {
+  if (value === "" || value === "true" || value === "1") return true;
+  if (value === "false" || value === "0") return false;
+  throw new Error(`unsupported boolean flag value: ${value}`);
 }
 
 function validReportDate(value) {
@@ -771,14 +798,65 @@ function validFixtureMode(value) {
   return ["success", "repair-success", "failure"].includes(String(value || "").trim());
 }
 
+function fallbackDateFromArgv(argv) {
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = argv[index];
+    if (token === "--") break;
+    if (token === "--date" && validReportDate(argv[index + 1])) return argv[index + 1];
+    if (token.startsWith("--date=")) {
+      const value = token.slice("--date=".length);
+      if (validReportDate(value)) return value;
+    }
+    if (validReportDate(token)) return token;
+  }
+  return validReportDate(process.env.npm_config_date) ? process.env.npm_config_date : "";
+}
+
+function fallbackRootDirFromArgv(argv) {
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = argv[index];
+    if (token === "--") break;
+    if (token === "--repo-root" && argv[index + 1]) return argv[index + 1];
+    if (token.startsWith("--repo-root=")) return token.slice("--repo-root=".length);
+  }
+  return process.cwd();
+}
+
+function fallbackRequestedFlag(argv, flagName, parsedValue) {
+  if (typeof parsedValue === "boolean") return parsedValue;
+  const flag = `--${flagName}`;
+  return argv.some((token) => token === flag || token === `${flag}=true` || token === `${flag}=1`);
+}
+
+async function writeEntryFailureRunSummary({ rootDir, reportDate, error, stageId, executeRequested, publishRequested }) {
+  if (!validReportDate(reportDate)) return "";
+  const summaryPath = path.resolve(rootDir, ".tmp", `run-summary-${reportDate}.json`);
+  await writeJson(summaryPath, {
+    ok: false,
+    mode: "daily_codex_dag_lite",
+    report_date: reportDate,
+    final_status: "initialization_failed",
+    stage_id: stageId,
+    completed_stages: [],
+    failures: [error instanceof Error ? error.message : String(error || "daily codex pipeline failed")],
+    summary_path: summaryPath,
+    publish_requested: Boolean(publishRequested),
+    execute_requested: Boolean(executeRequested),
+    updated_at: new Date().toISOString()
+  });
+  return summaryPath;
+}
+
 function isMainModule(metaUrl) {
   return process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(metaUrl);
 }
 
 if (isMainModule(import.meta.url)) {
   let plan = null;
+  let args = null;
+  const rawArgv = process.argv.slice(2);
   try {
-    const args = parseArgs(process.argv.slice(2));
+    args = parseArgs(rawArgv);
     plan = await prepareDailyCodexPipeline({
       rootDir: args["repo-root"] || process.cwd(),
       reportDate: dateFromArgs(args),
@@ -786,14 +864,22 @@ if (isMainModule(import.meta.url)) {
       codexBin: args["codex-bin"] || process.env.npm_config_codex_bin || "",
       model: args.model || process.env.npm_config_model || "",
       sandbox: args.sandbox || process.env.npm_config_sandbox || DEFAULT_SANDBOX,
-      fixtureMode: fixtureFromArgs(args)
+      fixtureMode: fixtureFromArgs(args),
+      executeRequested: Boolean(args.execute),
+      publishRequested: Boolean(args.publish)
     });
     const { summary } = await runDailyCodexPipeline(plan);
     process.stdout.write(`${JSON.stringify({
-      ok: summary.final_status !== "blocked",
+      ok: summary.ok,
       mode: summary.mode,
+      report_date: summary.report_date,
       final_status: summary.final_status,
+      stage_id: summary.stage_id,
+      completed_stages: summary.completed_stages.map((stage) => stage.id),
+      failures: summary.failures,
       summary_path: plan.outputs.run_summary,
+      publish_requested: summary.publish_requested,
+      execute_requested: summary.execute_requested,
       final_artifact: summary.final_artifact,
       work_dir: plan.work_dir
     }, null, 2)}\n`);
@@ -801,13 +887,34 @@ if (isMainModule(import.meta.url)) {
       process.exitCode = 1;
     }
   } catch (error) {
+    const reportDate = plan?.report_date || (args ? dateFromArgs(args) : fallbackDateFromArgv(rawArgv));
+    const rootDir = path.resolve(plan?.root_dir || args?.["repo-root"] || fallbackRootDirFromArgv(rawArgv));
+    const existingSummary = plan?.outputs?.run_summary ? await readJsonOrNull(plan.outputs.run_summary) : null;
+    const summaryPath = plan?.outputs?.run_summary || await writeEntryFailureRunSummary({
+      rootDir,
+      reportDate,
+      error,
+      stageId: error.stage_id || (args ? "initialize" : "parse-args"),
+      executeRequested: fallbackRequestedFlag(rawArgv, "execute", args?.execute),
+      publishRequested: fallbackRequestedFlag(rawArgv, "publish", args?.publish)
+    });
     process.stdout.write(`${JSON.stringify({
       ok: false,
       mode: "daily_codex_dag_lite",
+      report_date: existingSummary?.report_date || reportDate || "",
+      final_status: existingSummary?.final_status || "initialization_failed",
       error: error.code || "daily_codex_pipeline_failed",
       message: error.message,
-      stage_id: error.stage_id || "",
-      summary_path: plan?.outputs?.run_summary || ""
+      stage_id: existingSummary?.stage_id || error.stage_id || (args ? "initialize" : "parse-args"),
+      completed_stages: Array.isArray(existingSummary?.completed_stages)
+        ? existingSummary.completed_stages.map((stage) => stage.id).filter(Boolean)
+        : [],
+      failures: Array.isArray(existingSummary?.failures) && existingSummary.failures.length
+        ? existingSummary.failures
+        : [error.message],
+      summary_path: summaryPath,
+      publish_requested: existingSummary?.publish_requested ?? fallbackRequestedFlag(rawArgv, "publish", args?.publish),
+      execute_requested: existingSummary?.execute_requested ?? fallbackRequestedFlag(rawArgv, "execute", args?.execute)
     }, null, 2)}\n`);
     process.exitCode = 1;
   }

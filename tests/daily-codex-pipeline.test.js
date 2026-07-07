@@ -32,7 +32,7 @@ test("daily Codex DAG-lite runner plans the six MVP stages", () => {
     "repair-once",
     "summarize"
   ]);
-  assert(plan.outputs.run_summary.endsWith(path.join(".tmp", "daily-codex-mvp", "2026-07-06", "run-summary.json")));
+  assert(plan.outputs.run_summary.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
 });
 
 test("daily Codex DAG-lite runner produces a successful fixture summary", async () => {
@@ -46,7 +46,12 @@ test("daily Codex DAG-lite runner produces a successful fixture summary", async 
 
   const { summary } = await runDailyCodexPipeline(plan);
   assert.equal(summary.final_status, "generated_only");
+  assert.equal(summary.ok, true);
   assert.equal(summary.mode, "daily_codex_dag_lite");
+  assert.equal(summary.report_date, "2026-07-06");
+  assert.equal(summary.summary_path, plan.outputs.run_summary);
+  assert.equal(summary.execute_requested, false);
+  assert.equal(summary.publish_requested, false);
   assert.equal(summary.completed_stages.length, 6);
   assert.deepEqual(summary.completed_stages.map((stage) => stage.id), [
     "prepare",
@@ -134,6 +139,9 @@ test("daily Codex DAG-lite runner rejects Codex repository writes outside work d
   const generateStage = summary.completed_stages.find((stage) => stage.id === "codex-generate");
 
   assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.ok, false);
+  assert.equal(summary.stage_id, "codex-generate");
+  assert.equal(summary.failures.some((failure) => failure.includes("package.json")), true);
   assert.equal(generateStage.status, "failure");
   assert.match(generateStage.failures[0].message, /package\.json/);
 });
@@ -172,8 +180,12 @@ test("daily Codex DAG-lite CLI exits zero for fixture success and writes summary
   const result = JSON.parse(stdout);
   assert.equal(result.ok, true);
   assert.equal(result.final_status, "generated_only");
+  assert.equal(result.execute_requested, false);
+  assert.equal(result.publish_requested, false);
+  assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
   const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
   assert.equal(summary.completed_stages.length, 6);
+  assert.equal(summary.summary_path, result.summary_path);
 });
 
 test("daily Codex DAG-lite CLI accepts npm-style positional date and fixture", async () => {
@@ -214,31 +226,149 @@ test("daily Codex DAG-lite CLI exits non-zero for unrepaired fixture failure", a
     const result = JSON.parse(error.stdout);
     assert.equal(result.ok, false);
     assert.equal(result.mode, "daily_codex_dag_lite");
-    assert(result.summary_path.endsWith(path.join("run-summary.json")));
+    assert.equal(result.final_status, "blocked");
+    assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
     return true;
   });
 });
 
-test("daily Codex DAG-lite CLI rejects legacy publish flags", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-legacy-flags-"));
+test("daily Codex DAG-lite CLI accepts production execute publish flags with codex.cmd", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-production-"));
+  await writeMinimalRepoFiles(rootDir);
+  const codexCmd = await writeSuccessfulCodexCommand(rootDir, "2026-07-06");
+
+  const { stdout } = await execFileAsync(process.execPath, [
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+    "--repo-root",
+    rootDir,
+    "--date",
+    "2026-07-06",
+    "--execute",
+    "--publish",
+    "--codex-bin",
+    codexCmd,
+    "--",
+    "codex.cmd",
+    "--fake-codex-argv"
+  ]);
+
+  const result = JSON.parse(stdout);
+  assert.equal(result.ok, true);
+  assert.equal(result.final_status, "generated_only");
+  assert.equal(result.execute_requested, true);
+  assert.equal(result.publish_requested, true);
+  assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
+
+  const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
+  assert.equal(summary.execute_requested, true);
+  assert.equal(summary.publish_requested, true);
+  assert.equal(summary.completed_stages.length, 6);
+  assert.equal(summary.failures.length, 0);
+
+  const plan = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "daily-codex-mvp", "2026-07-06", "pipeline-plan.json"), "utf8"));
+  assert.equal(plan.codex.bin, codexCmd);
+  assert.equal(plan.codex.fixture_mode, "");
+  assert.equal(plan.execute_requested, true);
+  assert.equal(plan.publish_requested, true);
+});
+
+test("daily Codex DAG-lite CLI writes root summary for unsupported args", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-bad-arg-"));
   await writeMinimalRepoFiles(rootDir);
 
-  for (const legacyFlag of ["--publish", "--execute"]) {
-    await assert.rejects(execFileAsync(process.execPath, [
+  try {
+    await execFileAsync(process.execPath, [
       path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
       "--repo-root",
       rootDir,
       "--date",
       "2026-07-06",
-      "--fixture",
-      "success",
-      legacyFlag
-    ]), (error) => {
-      const result = JSON.parse(error.stdout);
-      assert.equal(result.ok, false);
-      assert.match(result.message, new RegExp(`unsupported daily Codex DAG-lite flag: ${legacyFlag}`));
-      return true;
-    });
+      "--unsupported-flag"
+    ]);
+    assert.fail("unsupported args should fail");
+  } catch (error) {
+    const result = JSON.parse(error.stdout);
+    assert.equal(result.ok, false);
+    assert.equal(result.final_status, "initialization_failed");
+    assert.equal(result.stage_id, "parse-args");
+    assert.equal(result.execute_requested, false);
+    assert.equal(result.publish_requested, false);
+    assert.match(result.failures.join("\n"), /unsupported daily Codex DAG-lite flag: --unsupported-flag/);
+    assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
+
+    const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
+    assert.equal(summary.final_status, "initialization_failed");
+    assert.equal(summary.stage_id, "parse-args");
+    assert.deepEqual(summary.completed_stages, []);
+  }
+});
+
+test("daily Codex DAG-lite CLI writes root summary for missing value flags", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-missing-value-"));
+  await writeMinimalRepoFiles(rootDir);
+
+  try {
+    await execFileAsync(process.execPath, [
+      path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+      "--repo-root",
+      rootDir,
+      "--date",
+      "2026-07-06",
+      "--codex-bin",
+      "--execute",
+      "--publish"
+    ]);
+    assert.fail("missing value flag should fail");
+  } catch (error) {
+    const result = JSON.parse(error.stdout);
+    assert.equal(result.ok, false);
+    assert.equal(result.final_status, "initialization_failed");
+    assert.equal(result.stage_id, "parse-args");
+    assert.equal(result.execute_requested, true);
+    assert.equal(result.publish_requested, true);
+    assert.match(result.failures.join("\n"), /flag --codex-bin requires a value/);
+    assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
+
+    const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
+    assert.equal(summary.stage_id, "parse-args");
+    assert.equal(summary.execute_requested, true);
+    assert.equal(summary.publish_requested, true);
+  }
+});
+
+test("daily Codex DAG-lite CLI writes root summary for initialization failures", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-bad-init-"));
+  await writeMinimalRepoFiles(rootDir);
+
+  try {
+    await execFileAsync(process.execPath, [
+      path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+      "--repo-root",
+      rootDir,
+      "--date",
+      "2026-07-06",
+      "--work-dir",
+      rootDir,
+      "--execute",
+      "--publish",
+      "--codex-bin",
+      "codex.cmd"
+    ]);
+    assert.fail("initialization failure should fail");
+  } catch (error) {
+    const result = JSON.parse(error.stdout);
+    assert.equal(result.ok, false);
+    assert.equal(result.final_status, "initialization_failed");
+    assert.equal(result.stage_id, "initialize");
+    assert.equal(result.execute_requested, true);
+    assert.equal(result.publish_requested, true);
+    assert.match(result.failures.join("\n"), /work dir cannot be the repository root/);
+    assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
+
+    const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
+    assert.equal(summary.execute_requested, true);
+    assert.equal(summary.publish_requested, true);
+    assert.deepEqual(summary.completed_stages, []);
   }
 });
 
@@ -296,5 +426,34 @@ fs.writeFileSync(outputPath, JSON.stringify({
   const commandPath = path.join(rootDir, "fake-codex");
   await fs.writeFile(commandPath, `#!/usr/bin/env sh\nexec "${process.execPath}" "$(dirname "$0")/fake-codex.mjs" "$@"\n`, "utf8");
   await fs.chmod(commandPath, 0o755);
+  return commandPath;
+}
+
+async function writeSuccessfulCodexCommand(rootDir, reportDate) {
+  const fakeScriptPath = path.join(rootDir, "successful-codex.mjs");
+  await fs.writeFile(fakeScriptPath, `
+import fs from "node:fs";
+import path from "node:path";
+
+const prompt = fs.readFileSync(0, "utf8");
+const match = prompt.match(/OUTPUT_PATH=([^\\r\\n]+)/);
+if (!match) process.exit(2);
+const outputPath = match[1].trim();
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.writeFileSync(outputPath, JSON.stringify({
+  report_date: "${reportDate}",
+  headline: "Fake Codex output",
+  summary: "This output proves production execute and publish flags reach the DAG-lite entrypoint.",
+  items: [{ title: "Production entrypoint", url: "https://example.com/production-entrypoint", note: "codex.cmd is command configuration, not a fixture mode." }]
+}, null, 2));
+`, "utf8");
+
+  const commandPath = path.join(rootDir, "codex.cmd");
+  if (process.platform === "win32") {
+    await fs.writeFile(commandPath, `@echo off\r\n"${process.execPath}" "%~dp0successful-codex.mjs" %*\r\n`, "utf8");
+  } else {
+    await fs.writeFile(commandPath, `#!/usr/bin/env sh\nexec "${process.execPath}" "$(dirname "$0")/successful-codex.mjs" "$@"\n`, "utf8");
+    await fs.chmod(commandPath, 0o755);
+  }
   return commandPath;
 }
