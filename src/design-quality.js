@@ -33,7 +33,7 @@ export async function validateDesignQuality(options = {}) {
   await validateQualityDoc({ rootDir, issues });
   await validateAdcSkill({ rootDir, issues });
   await validateTasteSkill({ rootDir, manifest, issues, warnings });
-  await validatePackageScripts({ rootDir, issues });
+  await validatePackageContracts({ rootDir, issues });
 
   return {
     ok: issues.length === 0,
@@ -140,7 +140,13 @@ function validateQualityContract(contract, issues) {
   const evidence = new Set(
     Array.isArray(contract.required_frontend_pr_evidence) ? contract.required_frontend_pr_evidence : []
   );
-  for (const required of ["design_read", "design_dials", "audit_or_skip_reason", "browser_acceptance"]) {
+  for (const required of [
+    "design_read",
+    "design_dials",
+    "source_or_tool_evidence",
+    "audit_or_skip_reason",
+    "browser_acceptance"
+  ]) {
     if (!evidence.has(required)) {
       issues.push({
         code: "design_quality_evidence_missing",
@@ -232,9 +238,17 @@ async function validateTasteSkill({ rootDir, manifest, issues, warnings }) {
   }
 }
 
-async function validatePackageScripts({ rootDir, issues }) {
-  const packageJson = await readJson({ rootDir, relativePath: PACKAGE_JSON, issues });
-  if (!packageJson) return;
+async function validatePackageContracts({ rootDir, issues }) {
+  const packagePaths = await findWorkspacePackageJsonFiles(rootDir);
+  for (const packagePath of packagePaths) {
+    const packageJson = await readJson({ rootDir, relativePath: packagePath, issues });
+    if (!packageJson) continue;
+    if (packagePath === PACKAGE_JSON) validateRootPackageScripts(packageJson, issues);
+    validateExternalToolPackageBoundary(packageJson, packagePath, issues);
+  }
+}
+
+function validateRootPackageScripts(packageJson, issues) {
   const scripts = packageJson.scripts || {};
   if (scripts["design-quality:validate"] !== "node scripts/validate-design-quality.mjs") {
     issues.push({
@@ -258,6 +272,35 @@ async function validatePackageScripts({ rootDir, issues }) {
       path: PACKAGE_JSON,
       message: "package.json test script must run tests/design-quality.test.js."
     });
+  }
+}
+
+function validateExternalToolPackageBoundary(packageJson, packagePath, issues) {
+  const dependencyFields = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"];
+  for (const field of dependencyFields) {
+    const dependencies = packageJson[field];
+    if (!dependencies || typeof dependencies !== "object") continue;
+    for (const packageName of Object.keys(dependencies)) {
+      if (isForbiddenExternalToolName(packageName)) {
+        issues.push({
+          code: "design_quality_external_tool_dependency_forbidden",
+          path: toPosix(packagePath),
+          message: `${field}.${packageName} must not be added while the design quality manifest marks external tools as non-production dependencies.`
+        });
+      }
+    }
+  }
+
+  const scripts = packageJson.scripts || {};
+  for (const [scriptName, command] of Object.entries(scripts)) {
+    const scriptText = `${scriptName} ${typeof command === "string" ? command : ""}`;
+    if (isForbiddenExternalToolScript(scriptText)) {
+      issues.push({
+        code: "design_quality_external_tool_script_forbidden",
+        path: toPosix(packagePath),
+        message: `${scriptName} must not invoke taste-skill or Impeccable from package scripts; record them as optional audit evidence instead.`
+      });
+    }
   }
 }
 
@@ -299,6 +342,37 @@ function requireEqual(actual, expected, field, recordPath, issues) {
       message: `${field} must be ${expected}.`
     });
   }
+}
+
+async function findWorkspacePackageJsonFiles(rootDir) {
+  const packagePaths = [PACKAGE_JSON];
+  for (const workspaceRoot of ["apps", "packages"]) {
+    const absoluteRoot = path.join(rootDir, workspaceRoot);
+    let entries = [];
+    try {
+      entries = await fs.readdir(absoluteRoot, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const relativePath = path.join(workspaceRoot, entry.name, PACKAGE_JSON);
+      if (await pathExists(path.join(rootDir, relativePath))) {
+        packagePaths.push(relativePath);
+      }
+    }
+  }
+  return packagePaths;
+}
+
+function isForbiddenExternalToolName(packageName) {
+  const normalized = packageName.toLowerCase();
+  const tokens = normalized.split(/[^a-z0-9]+/).filter(Boolean);
+  return tokens.includes("impeccable") || normalized.includes("taste-skill");
+}
+
+function isForbiddenExternalToolScript(scriptText) {
+  return /\bnpx\s+impeccable\b/i.test(scriptText) || /\bimpeccable\b/i.test(scriptText) || /taste-skill/i.test(scriptText);
 }
 
 async function readTextIfExists(filePath) {
