@@ -21,6 +21,7 @@ import { sanitizePublicDegradationEvent } from "./degradation-events.js";
 import { loadOfficialBlogKnowledge, toPublicOfficialBlogKnowledge } from "./official-blog-knowledge.js";
 import { normalizeGithubReadmeSummary } from "./github-readme.js";
 import { isPublicSurfaceDietEnabled } from "./public-surface-policy.js";
+import { WEB_APP_GENERATED_FILES } from "./web-app-build.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
@@ -615,6 +616,7 @@ export async function planGeneratedFiles(options = {}) {
     "data/official-blogs.json",
     "official-blogs/index.html"
   ];
+  files.push(...WEB_APP_GENERATED_FILES.filter((file) => file !== "index.html"));
   const reports = [];
 
   for (const file of markdownFiles) {
