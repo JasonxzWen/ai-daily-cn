@@ -1,16 +1,22 @@
-# Daily Codex DAG-Lite Pipeline
+# Daily Codex Pipeline
 
-`daily:codex-pipeline` is now the MVP production-facing entrypoint for the Codex-driven daily generation flow. It intentionally replaces the older compatibility-first multi-stage runner with one coarse DAG-lite flow:
+`daily:codex-pipeline` is the production-facing entrypoint for the Codex-driven daily generation flow. In local fixture mode it can still run the coarse DAG-lite MVP flow:
 
 ```text
 prepare -> collect/context -> codex-generate -> validate -> repair-once -> summarize -> publish
 ```
 
-The MVP goal is to prove a runnable end-to-end generation loop first, then split the coarse stages into the full DAG once the loop is useful.
+In production mode (`--execute --publish` without a fixture), the script runs as a single-script DAG orchestrator. It writes `.tmp/daily-codex-pipeline/YYYY-MM-DD/pipeline-plan.json`, calls the existing daily workflow implementation, and normalizes `.tmp/run-summary-YYYY-MM-DD.json` with:
+
+- `automation_pipeline_mode:"single_script_dag_orchestrator"`
+- `orchestration.node_count`
+- `source_watch_admitted_artifact_path`
+- report JSON, docs data JSON, and HTML paths
+- validation, publish, Pages, blocking, and degraded summaries
 
 ## Command
 
-Run the MVP pipeline:
+Run the local DAG-lite pipeline:
 
 ```powershell
 npm run daily:codex-pipeline -- --date YYYY-MM-DD
@@ -30,21 +36,21 @@ Run the deterministic fixture path for local validation:
 npm run daily:codex-pipeline -- --date YYYY-MM-DD --fixture success
 ```
 
-Production-shaped execution and publish flags are supported:
+Production execution and publishing use the same entrypoint:
 
 ```powershell
 npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --codex-bin codex.cmd
 ```
 
-`--execute` records the production intent and configures the Codex command. `codex.cmd` and arguments after `--` are command configuration, not fixture modes.
+`--execute` records the production intent and configures the Codex command. `codex.cmd` and arguments after `--` are command configuration, not fixture modes. In a full repository checkout this command runs the single-script production orchestrator and may publish.
 
-`--publish` adds a gated `publish` stage. If no Source Watch admitted artifact is provided, the publish stage is recorded as skipped and the run remains `final_status:"generated_only"`. When `.tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json` exists, callers may pass it explicitly:
+When `.tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json` exists, callers may pass it explicitly:
 
 ```powershell
 npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json
 ```
 
-The runner does not scan `.tmp` for the newest artifact. The summary records `source_watch_admitted_artifact_path` so scheduled automation can report which admitted artifact was used.
+The runner does not scan `.tmp` for the newest artifact. The summary records `source_watch_admitted_artifact_path` so scheduled automation can report which admitted artifact was used. If the artifact is not provided, the field remains empty; the normal daily publish flow still runs.
 
 Fixture modes:
 
@@ -54,7 +60,9 @@ Fixture modes:
 
 ## Artifact Contract
 
-The runner writes all MVP artifacts under `.tmp/daily-codex-mvp/YYYY-MM-DD/`.
+The DAG-lite fixture runner writes MVP artifacts under `.tmp/daily-codex-mvp/YYYY-MM-DD/`.
+
+The production orchestrator writes its plan under `.tmp/daily-codex-pipeline/YYYY-MM-DD/` and the authoritative run summary at `.tmp/run-summary-YYYY-MM-DD.json`.
 
 - `pipeline-plan.json`: sanitized plan with the six DAG-lite stages.
 - `context.json`: deterministic repository context used by the generation prompt.
@@ -67,7 +75,9 @@ The runner writes all MVP artifacts under `.tmp/daily-codex-mvp/YYYY-MM-DD/`.
 - `publish-summary.json`: publish-stage metadata when `--publish` is requested.
 - `run-summary.json`: authoritative machine-readable run summary.
 
-`run-summary.json` reports `mode:"daily_codex_dag_lite"`, `final_status`, `next_action`, `completed_stages`, validation state, repair state, the final artifact path, `publish_requested`, `execute_requested`, `source_watch_admitted_artifact_path`, and `publication`.
+Fixture `run-summary.json` reports `mode:"daily_codex_dag_lite"`, `final_status`, `next_action`, `completed_stages`, validation state, repair state, the final artifact path, `publish_requested`, `execute_requested`, `source_watch_admitted_artifact_path`, and `publication`.
+
+Production `run-summary.json` reports `mode:"single_script_dag_orchestrator"`, `automation_pipeline_mode:"single_script_dag_orchestrator"`, `orchestration.node_count`, `completed_stages`, validation and publish summaries, Pages status, `blocking_issues`, `degraded_sections`, `structured_json_path`, `docs_data_json_path`, and `html_path`.
 
 ## Validation Contract
 
@@ -88,4 +98,4 @@ If validation fails, the runner invokes exactly one repair pass. If the repair o
 
 ## Replacement Boundary
 
-The old compatibility runner stages are not part of this MVP path. Full report-data normalization, multi-agent fanout, Pages verification, and the final 16-node DAG migration are later slices. They should build on this DAG-lite run summary instead of reintroducing a parallel legacy runner.
+The production entrypoint must remain `npm run daily:codex-pipeline`. The legacy daily workflow is invoked only behind that single script so scheduled automation does not expand old manual stage commands.

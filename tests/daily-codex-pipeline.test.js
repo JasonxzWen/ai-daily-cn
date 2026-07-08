@@ -276,6 +276,108 @@ test("daily Codex DAG-lite CLI accepts production execute publish flags with cod
   assert.equal(plan.publish_requested, true);
 });
 
+test("daily Codex production orchestrator normalizes legacy daily publish summary", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-orchestrator-"));
+  const reportDate = "2026-07-06";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const reportJsonPath = path.join(cleanRoot, "reports-data", "2026", "07", `${reportDate}.json`);
+  const reportHtmlPath = path.join(cleanRoot, "docs", "reports", "2026", "07", `${reportDate}.html`);
+  const docsDataJsonPath = path.join(cleanRoot, "docs", "data", "2026", "07", `${reportDate}.json`);
+  await fs.mkdir(path.dirname(reportJsonPath), { recursive: true });
+  await fs.mkdir(path.dirname(reportHtmlPath), { recursive: true });
+  await fs.mkdir(path.dirname(docsDataJsonPath), { recursive: true });
+  await fs.writeFile(reportJsonPath, `${JSON.stringify({
+    report_date: reportDate,
+    quality_status: {
+      status: "degraded",
+      degraded_sections: [{ code: "china_ai_no_recent_signal", section: "china_ai" }],
+      blocking_issues: []
+    }
+  }, null, 2)}\n`, "utf8");
+  await fs.writeFile(reportHtmlPath, "<!doctype html><title>Daily</title>\n", "utf8");
+  await fs.writeFile(docsDataJsonPath, "{}\n", "utf8");
+
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  const workflowRunner = async ({ summaryPath }) => {
+    const legacySummary = {
+      report_date: reportDate,
+      final_status: "published_degraded",
+      next_action: { kind: "none" },
+      clean_repo_root: cleanRoot,
+      stages: [
+        { id: "report_write", status: "passed", output: { report_path: "reports-data/2026/07/2026-07-06.json" } },
+        { id: "build", status: "passed" },
+        { id: "quality_page_check", status: "passed" },
+        { id: "validate", status: "passed" },
+        { id: "publish_dry_run_daily", status: "passed" },
+        {
+          id: "publish_real",
+          status: "passed",
+          output: {
+            publish_status: {
+              repo_pushed: true,
+              commit: "abc1234",
+              pages_url: "https://example.com/reports/2026/07/2026-07-06.html"
+            }
+          }
+        },
+        {
+          id: "pages_verify",
+          status: "passed",
+          output: {
+            pages_url: "https://example.com/reports/2026/07/2026-07-06.html",
+            http_status: 200
+          }
+        }
+      ]
+    };
+    await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+    return { summary: legacySummary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+
+  assert.equal(summary.automation_pipeline_mode, "single_script_dag_orchestrator");
+  assert.equal(summary.final_status, "published");
+  assert.equal(summary.legacy_final_status, "published_degraded");
+  assert.equal(summary.orchestration.node_count, 2);
+  assert.equal(summary.orchestration_node_count, 2);
+  assert.equal(
+    summary.pipeline_plan_path,
+    path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "pipeline-plan.json")
+  );
+  assert.equal(summary.structured_json_path, reportJsonPath);
+  assert.equal(summary.html_path, reportHtmlPath);
+  assert.equal(summary.docs_data_json_path, docsDataJsonPath);
+  assert.deepEqual(summary.blocking_issues, []);
+  assert.equal(summary.degraded_sections[0].code, "china_ai_no_recent_signal");
+  assert.equal(summary.publication.repo_pushed, true);
+  assert.equal(summary.publication.commit, "abc1234");
+  assert.equal(summary.pages.verified, true);
+  assert.equal(summary.source_watch_admitted_artifact_path, "");
+  assert.deepEqual(summary.completed_stages.map((stage) => stage.id), [
+    "report_write",
+    "build",
+    "quality_page_check",
+    "validate",
+    "publish_dry_run_daily",
+    "publish_real",
+    "pages_verify"
+  ]);
+
+  const saved = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
+  assert.equal(saved.automation_pipeline_mode, "single_script_dag_orchestrator");
+  assert.equal(saved.final_status, "published");
+});
+
 test("daily Codex DAG-lite CLI publishes explicit Source Watch admitted artifact into public articles", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-source-watch-publish-"));
   const reportDate = "2026-07-03";

@@ -6,10 +6,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { finished } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
+import { runDailyWorkflow } from "../src/daily-runner.js";
 import { buildSite } from "../src/site.js";
 
 const DEFAULT_WORK_DIR = path.join(".tmp", "daily-codex-mvp");
 const DEFAULT_SANDBOX = "workspace-write";
+const SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE = "single_script_dag_orchestrator";
 const STAGE_IDS = ["prepare", "collect-context", "codex-generate", "validate", "repair-once", "summarize"];
 const PUBLISH_STAGE_ID = "publish";
 const REPOSITORY_GUARD_EXCLUDED_DIRS = new Set([".git", ".codegraph", "node_modules"]);
@@ -57,6 +59,10 @@ export function buildDailyCodexPipelinePlan(options = {}) {
 }
 
 export async function runDailyCodexPipeline(plan, options = {}) {
+  if (await shouldRunSingleScriptDagOrchestrator(plan, options)) {
+    return await runSingleScriptDagOrchestrator(plan, options);
+  }
+
   const state = {
     plan,
     completedStages: [],
@@ -85,6 +91,168 @@ export async function runDailyCodexPipeline(plan, options = {}) {
   const finalStatus = finalStatusFor(state);
   const summary = await writeRunSummary(state, { finalStatus });
   return { plan, summary };
+}
+
+async function shouldRunSingleScriptDagOrchestrator(plan, options = {}) {
+  if (!plan.execute_requested || !plan.publish_requested || plan.codex?.fixture_mode) {
+    return false;
+  }
+  if (typeof options.workflowRunner === "function") {
+    return true;
+  }
+  return await productionDailyWorkflowAvailable(plan.root_dir);
+}
+
+async function productionDailyWorkflowAvailable(rootDir) {
+  const packageJson = await readJsonOrNull(path.join(rootDir, "package.json"));
+  return Boolean(
+    packageJson?.scripts?.["daily:run"] &&
+    await fileExists(path.join(rootDir, "src", "daily-runner.js")) &&
+    await fileExists(path.join(rootDir, "src", "cli.js"))
+  );
+}
+
+async function runSingleScriptDagOrchestrator(plan, options = {}) {
+  const dagManifest = await readJsonOrNull(path.join(plan.root_dir, "config", "daily-codex-dag.json"));
+  const pipelinePlanPath = singleScriptPipelinePlanPath(plan);
+  const orchestration = buildSingleScriptOrchestration({ plan, dagManifest, pipelinePlanPath });
+  await writeJson(pipelinePlanPath, {
+    schema_version: 1,
+    mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+    automation_pipeline_mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+    report_date: plan.report_date,
+    root_dir: plan.root_dir,
+    execute_requested: true,
+    publish_requested: true,
+    codex: {
+      bin: plan.codex?.bin || defaultCodexBin(),
+      model: plan.codex?.model || "",
+      sandbox: plan.codex?.sandbox || DEFAULT_SANDBOX
+    },
+    source_watch_admitted_artifact_path: plan.publish?.source_watch_admitted_artifact_path || "",
+    orchestration,
+    legacy_runner: {
+      module: "src/daily-runner.js",
+      export: "runDailyWorkflow",
+      publish: true
+    }
+  });
+  await writeJson(plan.outputs.run_summary, {
+    ok: false,
+    mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+    automation_pipeline_mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+    report_date: plan.report_date,
+    final_status: "running",
+    stage_id: "initialize",
+    next_action: { kind: "none" },
+    summary_path: plan.outputs.run_summary,
+    pipeline_plan_path: pipelinePlanPath,
+    plan_path: pipelinePlanPath,
+    orchestration,
+    orchestration_node_count: orchestration.node_count,
+    completed_stages: [],
+    source_watch_admitted_artifact_path: plan.publish?.source_watch_admitted_artifact_path || "",
+    updated_at: new Date().toISOString()
+  });
+
+  const workflowRunner = options.workflowRunner || runDailyWorkflow;
+  let result;
+  let legacySummary;
+  try {
+    result = await workflowRunner({
+      launcherRoot: plan.root_dir,
+      reportDate: plan.report_date,
+      publish: true,
+      summaryPath: plan.outputs.run_summary,
+      allowedBranch: options.allowedBranch,
+      worktreeDir: options.publishWorktreeDir,
+      maxReviewRepairLoops: options.maxReviewRepairLoops,
+      restart: options.restart
+    });
+    legacySummary = result?.summary || await readJsonOrNull(plan.outputs.run_summary) || {};
+  } catch (error) {
+    legacySummary = await readJsonOrNull(plan.outputs.run_summary) || {
+      report_date: plan.report_date,
+      final_status: "blocked",
+      next_action: blockedNextActionFromError(error),
+      stages: [],
+      failures: [error instanceof Error ? error.message : String(error || "daily workflow failed")]
+    };
+    if (!legacySummary.final_status || legacySummary.final_status === "running") {
+      legacySummary.final_status = "blocked";
+    }
+    legacySummary.next_action ||= blockedNextActionFromError(error);
+    legacySummary.error = legacySummary.error || (error instanceof Error ? error.message : String(error || "daily workflow failed"));
+    legacySummary.error_code = legacySummary.error_code || error?.code || "daily_workflow_failed";
+  }
+
+  const summary = await normalizeSingleScriptRunSummary({
+    plan,
+    legacySummary,
+    pipelinePlanPath,
+    orchestration
+  });
+  return { plan, summary };
+}
+
+async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePlanPath, orchestration }) {
+  const legacyFinalStatus = legacySummary.final_status || "blocked";
+  const finalStatus = normalizeProductionFinalStatus(legacyFinalStatus);
+  const cleanRoot = path.resolve(legacySummary.clean_repo_root || plan.root_dir);
+  const artifactPaths = buildDailyReportArtifactPaths({ cleanRoot, reportDate: plan.report_date });
+  const report = await readJsonOrNull(artifactPaths.structured_json_path);
+  const qualityStatus = report?.quality_status && typeof report.quality_status === "object"
+    ? report.quality_status
+    : {};
+  const completedStages = normalizeCompletedStages(legacySummary.stages || legacySummary.completed_stages || []);
+  const publication = buildPublicationSummary({ legacySummary, completedStages, finalStatus });
+  const pages = buildPagesSummary({ completedStages, finalStatus, publication });
+  const validation = buildValidationSummary(completedStages);
+  const blockingIssues = Array.isArray(qualityStatus.blocking_issues) ? qualityStatus.blocking_issues : [];
+  const degradedSections = Array.isArray(qualityStatus.degraded_sections) ? qualityStatus.degraded_sections : [];
+  const failures = collectLegacyFailures(legacySummary, completedStages);
+  const summary = {
+    ...legacySummary,
+    ok: finalStatus === "published" || finalStatus === "published_pending_pages_verification",
+    mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+    automation_pipeline_mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+    report_date: plan.report_date,
+    final_status: finalStatus,
+    legacy_final_status: legacyFinalStatus,
+    stage_id: failedStageId(completedStages) || latestStageId(completedStages) || legacySummary.stage_id || "initialize",
+    next_action: legacySummary.next_action || { kind: "none" },
+    summary_path: plan.outputs.run_summary,
+    pipeline_plan_path: pipelinePlanPath,
+    plan_path: pipelinePlanPath,
+    orchestration,
+    orchestration_node_count: orchestration.node_count,
+    completed_stages: completedStages,
+    failures,
+    publish_requested: true,
+    execute_requested: true,
+    source_watch_admitted_artifact_path: plan.publish?.source_watch_admitted_artifact_path || "",
+    clean_repo_root: cleanRoot,
+    structured_json_path: artifactPaths.structured_json_path,
+    html_path: artifactPaths.html_path,
+    docs_data_json_path: artifactPaths.docs_data_json_path,
+    artifacts: artifactPaths,
+    validation,
+    publication,
+    publish: publication,
+    pages,
+    blocking_issues: blockingIssues,
+    degraded_sections: degradedSections,
+    updated_at: new Date().toISOString()
+  };
+  if (finalStatus !== "published" && finalStatus !== "published_pending_pages_verification") {
+    summary.failed_stage_id = failedStageId(completedStages) || legacySummary.failed_stage_id || summary.stage_id;
+    summary.error = legacySummary.error || failures[0] || "";
+  } else {
+    summary.failed_stage_id = legacySummary.failed_stage_id || "";
+    summary.error = legacySummary.error || "";
+  }
+  await writeJson(plan.outputs.run_summary, summary);
+  return summary;
 }
 
 export function validateDailyCodexMvpArtifact(value, { reportDate } = {}) {
@@ -451,6 +619,209 @@ function nextActionFor({ finalStatus, state }) {
     summary_path: state.plan.outputs.run_summary,
     validation_path: state.repairValidation ? state.plan.outputs.repair_validation : state.plan.outputs.validation
   };
+}
+
+function singleScriptPipelinePlanPath(plan) {
+  return path.join(plan.root_dir, ".tmp", "daily-codex-pipeline", plan.report_date, "pipeline-plan.json");
+}
+
+function buildSingleScriptOrchestration({ plan, dagManifest, pipelinePlanPath }) {
+  const nodes = Array.isArray(dagManifest?.nodes) ? dagManifest.nodes : [];
+  return {
+    mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+    node_count: nodes.length,
+    plan_path: pipelinePlanPath,
+    manifest_path: path.join(plan.root_dir, "config", "daily-codex-dag.json"),
+    mapped_node_count: nodes.filter((node) => node.execution_status === "mapped").length,
+    planned_node_count: nodes.filter((node) => node.execution_status === "planned").length,
+    node_ids: nodes.map((node) => node.id).filter(Boolean)
+  };
+}
+
+function normalizeProductionFinalStatus(value) {
+  if (value === "published" || value === "published_degraded") return "published";
+  if (value === "published_pending_pages_verification") return "published_pending_pages_verification";
+  return value || "blocked";
+}
+
+function buildDailyReportArtifactPaths({ cleanRoot, reportDate }) {
+  const year = reportDate.slice(0, 4);
+  const month = reportDate.slice(5, 7);
+  return {
+    structured_json_path: path.join(cleanRoot, "reports-data", year, month, `${reportDate}.json`),
+    candidates_json_path: path.join(cleanRoot, "reports-data", year, month, `${reportDate}.candidates.json`),
+    html_path: path.join(cleanRoot, "docs", "reports", year, month, `${reportDate}.html`),
+    docs_data_json_path: path.join(cleanRoot, "docs", "data", year, month, `${reportDate}.json`)
+  };
+}
+
+function normalizeCompletedStages(stages) {
+  return stages.map((stage) => ({
+    id: stage.id || stage.stage || "",
+    status: stage.status || "",
+    ...(stage.command ? { command: stage.command } : {}),
+    ...(stage.output ? { output: stage.output } : {}),
+    ...(stage.error ? { error: stage.error } : {}),
+    ...(stage.error_code ? { error_code: stage.error_code } : {}),
+    ...(stage.updated_at ? { updated_at: stage.updated_at } : {}),
+    ...(Array.isArray(stage.failures) ? { failures: stage.failures } : {})
+  })).filter((stage) => stage.id);
+}
+
+function buildValidationSummary(completedStages) {
+  return {
+    report_write: summarizeStageForContract(completedStages, "report_write"),
+    build: summarizeStageForContract(completedStages, "build"),
+    content_contract: summarizeStageForContract(completedStages, "content_contract"),
+    quality_page_check: summarizeStageForContract(completedStages, "quality_page_check"),
+    npm_validate: summarizeStageForContract(completedStages, "validate"),
+    sources_phase5_audit: summarizeStageForContract(completedStages, "sources_phase5_audit"),
+    publish_dry_run_daily: summarizeStageForContract(completedStages, "publish_dry_run_daily")
+  };
+}
+
+function buildPublicationSummary({ legacySummary, completedStages, finalStatus }) {
+  const dryRunStage = findStage(completedStages, "publish_dry_run_daily");
+  const publishRealStage = findStage(completedStages, "publish_real");
+  const fallbackStage = findStage(completedStages, "publish_github_api_fallback");
+  const publishStage = stagePassed(fallbackStage) ? fallbackStage : publishRealStage;
+  const output = stageOutput(publishStage);
+  const publishStatus = plainObject(output.publish_status) ? output.publish_status : {};
+  const result = plainObject(output.result) ? output.result : {};
+  const repoPushed = firstDefined([
+    publishStatus.repo_pushed,
+    output.repo_pushed,
+    result.repo_pushed,
+    legacySummary.repo_pushed
+  ]);
+  return {
+    ok: finalStatus === "published" || finalStatus === "published_pending_pages_verification",
+    mode: stagePassed(fallbackStage) ? "github_api_fallback" : (stagePassed(publishRealStage) ? "git" : ""),
+    dry_run: summarizeStageForContract(completedStages, "publish_dry_run_daily"),
+    publish_real: summarizeStageForContract(completedStages, "publish_real"),
+    github_api_fallback: summarizeStageForContract(completedStages, "publish_github_api_fallback"),
+    repo_pushed: Boolean(repoPushed),
+    commit: stringFirst([
+      publishStatus.commit,
+      publishStatus.commit_hash,
+      output.commit,
+      output.commit_hash,
+      result.commit,
+      result.commit_hash,
+      legacySummary.commit
+    ]),
+    pages_url: stringFirst([
+      publishStatus.pages_url,
+      output.pages_url,
+      result.pages_url,
+      legacySummary.pages_url
+    ]),
+    skipped_reason: !publishStage ? "publish_stage_not_reached" : ""
+  };
+}
+
+function buildPagesSummary({ completedStages, finalStatus, publication }) {
+  const pagesStage = findStage(completedStages, "pages_verify");
+  const output = stageOutput(pagesStage);
+  const publishStatus = plainObject(output.publish_status) ? output.publish_status : {};
+  const result = plainObject(output.result) ? output.result : {};
+  return {
+    verified: stagePassed(pagesStage) && finalStatus === "published",
+    pending: finalStatus === "published_pending_pages_verification",
+    status: pagesStage?.status || "",
+    pages_url: stringFirst([
+      output.pages_url,
+      publishStatus.pages_url,
+      result.pages_url,
+      publication.pages_url
+    ]),
+    http_status: firstDefined([
+      output.http_status,
+      output.status,
+      result.http_status,
+      result.status
+    ]),
+    message: stringFirst([
+      output.verification_error,
+      output.error,
+      output.message,
+      result.verification_error
+    ])
+  };
+}
+
+function summarizeStageForContract(stages, id) {
+  const stage = findStage(stages, id);
+  if (!stage) return { reached: false, status: "not_reached" };
+  return {
+    reached: true,
+    status: stage.status || "",
+    ok: stagePassed(stage),
+    ...(stage.error ? { error: stage.error } : {}),
+    ...(stage.error_code ? { error_code: stage.error_code } : {})
+  };
+}
+
+function collectLegacyFailures(legacySummary, completedStages) {
+  const stageFailures = completedStages.flatMap((stage) => {
+    const failures = [];
+    if (Array.isArray(stage.failures)) {
+      failures.push(...stage.failures.map((failure) => (
+        typeof failure === "string" ? failure : failure?.message || failure?.code || JSON.stringify(failure)
+      )));
+    }
+    if (stage.error) failures.push(stage.error);
+    return failures;
+  });
+  return uniqueExistingStrings([
+    ...(Array.isArray(legacySummary.failures) ? legacySummary.failures : []),
+    ...stageFailures
+  ]);
+}
+
+function findStage(stages, id) {
+  return stages.find((stage) => stage.id === id) || null;
+}
+
+function stagePassed(stage) {
+  return ["passed", "success"].includes(stage?.status);
+}
+
+function stageOutput(stage) {
+  return plainObject(stage?.output) ? stage.output : {};
+}
+
+function plainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function failedStageId(stages) {
+  return stages.find((stage) => ["failed", "failure", "blocked"].includes(stage.status))?.id || "";
+}
+
+function latestStageId(stages) {
+  return stages.length ? stages[stages.length - 1].id : "";
+}
+
+function blockedNextActionFromError(error) {
+  return {
+    kind: "inspect_blocker",
+    error_code: error?.code || "daily_workflow_failed",
+    message: error instanceof Error ? error.message : String(error || "daily workflow failed")
+  };
+}
+
+function firstDefined(values) {
+  return values.find((value) => value !== undefined && value !== null && value !== "");
+}
+
+function uniqueExistingStrings(values) {
+  return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))];
+}
+
+function stringFirst(values) {
+  const value = firstDefined(values.map((item) => typeof item === "string" ? item.trim() : ""));
+  return value || "";
 }
 
 async function buildLocalContext(plan) {
@@ -1074,20 +1445,31 @@ if (isMainModule(import.meta.url)) {
     process.stdout.write(`${JSON.stringify({
       ok: summary.ok,
       mode: summary.mode,
+      automation_pipeline_mode: summary.automation_pipeline_mode || "",
+      orchestration_node_count: summary.orchestration?.node_count || summary.orchestration_node_count || null,
       report_date: summary.report_date,
       final_status: summary.final_status,
       stage_id: summary.stage_id,
       completed_stages: summary.completed_stages.map((stage) => stage.id),
       failures: summary.failures,
       summary_path: plan.outputs.run_summary,
+      pipeline_plan_path: summary.pipeline_plan_path || summary.plan_path || plan.outputs.plan,
+      structured_json_path: summary.structured_json_path || "",
+      html_path: summary.html_path || "",
+      docs_data_json_path: summary.docs_data_json_path || "",
       publish_requested: summary.publish_requested,
       execute_requested: summary.execute_requested,
       source_watch_admitted_artifact_path: summary.source_watch_admitted_artifact_path,
       publication: summary.publication,
+      validation: summary.validation,
+      publish: summary.publish,
+      pages: summary.pages,
+      blocking_issues: summary.blocking_issues,
+      degraded_sections: summary.degraded_sections,
       final_artifact: summary.final_artifact,
       work_dir: plan.work_dir
     }, null, 2)}\n`);
-    if (summary.final_status === "blocked") {
+    if (!summary.ok && summary.final_status !== "generated_only") {
       process.exitCode = 1;
     }
   } catch (error) {
@@ -1110,7 +1492,9 @@ if (isMainModule(import.meta.url)) {
     });
     process.stdout.write(`${JSON.stringify({
       ok: false,
-      mode: "daily_codex_dag_lite",
+      mode: existingSummary?.mode || "daily_codex_dag_lite",
+      automation_pipeline_mode: existingSummary?.automation_pipeline_mode || "",
+      orchestration_node_count: existingSummary?.orchestration?.node_count || existingSummary?.orchestration_node_count || null,
       report_date: existingSummary?.report_date || reportDate || "",
       final_status: existingSummary?.final_status || "initialization_failed",
       error: error.code || "daily_codex_pipeline_failed",
@@ -1123,10 +1507,18 @@ if (isMainModule(import.meta.url)) {
         ? existingSummary.failures
         : [error.message],
       summary_path: summaryPath,
+      pipeline_plan_path: existingSummary?.pipeline_plan_path || existingSummary?.plan_path || "",
+      structured_json_path: existingSummary?.structured_json_path || "",
+      html_path: existingSummary?.html_path || "",
       publish_requested: existingSummary?.publish_requested ?? fallbackRequestedFlag(rawArgv, "publish", args?.publish),
       execute_requested: existingSummary?.execute_requested ?? fallbackRequestedFlag(rawArgv, "execute", args?.execute),
       source_watch_admitted_artifact_path: sourceWatchAdmittedArtifactPath,
-      publication: existingSummary?.publication || null
+      publication: existingSummary?.publication || null,
+      validation: existingSummary?.validation || null,
+      publish: existingSummary?.publish || null,
+      pages: existingSummary?.pages || null,
+      blocking_issues: existingSummary?.blocking_issues || null,
+      degraded_sections: existingSummary?.degraded_sections || null
     }, null, 2)}\n`);
     process.exitCode = 1;
   }
