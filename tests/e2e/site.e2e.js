@@ -500,6 +500,8 @@ try {
   assert.match(await page.locator("h1").textContent(), /ADC\. AI 资讯流/);
   assert.equal(await hasRemoteScripts(page), false);
   assert.equal(await page.locator('[data-article-index="adc-react-astryx"]').count(), 1);
+  assert.equal(await page.locator('img[src="assets/adc-character.svg"]').count(), 1);
+  assert.equal(await page.locator('img[src="assets/adc-character.svg"]').evaluate((image) => image.complete && image.naturalWidth > 0), true);
   assert.equal(await page.locator('a[href="ops.html"]').count() >= 1, true);
   assert.equal(await page.locator('a[href="articles.json"]').count() >= 1, true);
   assert.equal(await page.locator("#articleSearch").count(), 0);
@@ -860,6 +862,7 @@ function contentType(filePath) {
   if (filePath.endsWith(".js")) return "text/javascript; charset=utf-8";
   if (filePath.endsWith(".json")) return "application/json; charset=utf-8";
   if (filePath.endsWith(".md")) return "text/markdown; charset=utf-8";
+  if (filePath.endsWith(".svg")) return "image/svg+xml; charset=utf-8";
   return "application/octet-stream";
 }
 

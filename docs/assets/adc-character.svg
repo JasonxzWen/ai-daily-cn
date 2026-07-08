@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="520" viewBox="0 0 520 520" role="img" aria-labelledby="title desc">
+  <title id="title">ADC. line-art observer</title>
+  <desc id="desc">Original black and white hand-drawn ADC. character with glasses and a paper badge.</desc>
+  <defs>
+    <filter id="roughInk" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="18" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+  <rect width="520" height="520" rx="58" fill="#f8f5ec"/>
+  <g fill="none" stroke="#111111" stroke-linecap="round" stroke-linejoin="round" filter="url(#roughInk)">
+    <path d="M151 116c37-49 111-66 176-45 73 23 118 83 119 164 1 90-53 166-135 190-79 23-171-4-218-72-45-66-35-160 58-237z" fill="#fffdf7" stroke-width="13"/>
+    <path d="M151 116c-34 21-58 47-72 79-18 41-16 80-8 111" stroke-width="12"/>
+    <path d="M103 341c18 56 58 96 116 115 52 17 112 15 164-9" stroke-width="9"/>
+    <path d="M156 112c-2-24 18-45 56-46 35-1 66 11 95 32" stroke-width="12"/>
+    <path d="M294 100c42-18 93-15 126 8 31 22 48 51 55 88" stroke-width="12"/>
+    <path d="M99 225c35-11 72-13 112-5" stroke-width="10"/>
+    <path d="M326 215c38-8 74-5 108 9" stroke-width="10"/>
+    <path d="M189 254c42-17 88-16 136 4" stroke-width="10"/>
+    <path d="M221 255c-23-23-63-26-88-8-21 16-16 49 9 61 33 17 75 3 94-26" stroke-width="9"/>
+    <path d="M298 260c25-23 66-26 91-6 22 17 14 50-13 62-34 15-74-3-89-33" stroke-width="9"/>
+    <path d="M236 268c16-8 34-8 51 0" stroke-width="8"/>
+    <path d="M267 301c-4 19 5 29 27 30" stroke-width="8"/>
+    <path d="M215 369c39 19 88 19 130 0" stroke-width="10"/>
+    <path d="M171 343l8 4M364 345l-8 5M200 142l-8 26M247 128l-2 20M333 133l15 28M385 168l21 25" stroke-width="7"/>
+    <path d="M129 393c-42 33-68 71-75 115" stroke-width="13"/>
+    <path d="M153 406c-17 49-45 83-82 103" stroke-width="10"/>
+    <path d="M421 388c37 29 57 64 60 106" stroke-width="10"/>
+    <path d="M445 350c18 18 30 40 35 66" stroke-width="8"/>
+  </g>
+  <g filter="url(#roughInk)">
+    <path d="M58 61h120c15 0 27 12 27 27v45c0 15-12 27-27 27H58c-15 0-27-12-27-27V88c0-15 12-27 27-27z" fill="#111"/>
+    <text x="56" y="122" fill="#fffdf7" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="900" letter-spacing="0">ADC.</text>
+  </g>
+  <g fill="#111">
+    <circle cx="171" cy="340" r="4"/>
+    <circle cx="385" cy="340" r="4"/>
+    <circle cx="196" cy="395" r="3"/>
+    <circle cx="360" cy="395" r="3"/>
+    <circle cx="270" cy="151" r="3"/>
+    <circle cx="314" cy="154" r="3"/>
+    <circle cx="239" cy="364" r="3"/>
+    <circle cx="318" cy="363" r="3"/>
+  </g>
+</svg>
