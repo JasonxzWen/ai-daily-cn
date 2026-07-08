@@ -2210,10 +2210,7 @@ function isRemoteAheadOutcome(outcome) {
   if (hasRemoteAheadCode(output, outcome?.error)) {
     return true;
   }
-  const signalText = retrySignalText({
-    normalized: outcome?.normalized,
-    error: outcome?.error
-  });
+  const signalText = remoteAheadMessageText(output, outcome?.error);
   return /\bremote[_ -]?ahead\b|远端.+领先/i.test(signalText);
 }
 
@@ -2231,6 +2228,21 @@ function hasRemoteAheadCode(output, error) {
     publishStatus.error_code,
     error?.code
   ].some((value) => String(value || "").toLowerCase() === "remote_ahead");
+}
+
+function remoteAheadMessageText(output, error) {
+  const publishStatus = output.publish_status && typeof output.publish_status === "object"
+    ? output.publish_status
+    : {};
+  return [
+    error?.message,
+    output.error,
+    output.message,
+    publishStatus.publish_error
+  ]
+    .filter((part) => part !== undefined && part !== null && String(part).trim().length > 0)
+    .map((part) => String(part).toLowerCase())
+    .join(" ");
 }
 
 function stageOutcomeOutput(outcome) {
@@ -2359,7 +2371,8 @@ function parseJsonOutput(stdout) {
 
 function trimOutput(value) {
   const text = String(value || "").trim();
-  return text.length > 4000 ? `${text.slice(0, 4000)}...` : text;
+  if (text.length <= 4000) return text;
+  return `${text.slice(0, 2000)}\n...[truncated ${text.length - 4000} chars]...\n${text.slice(-2000)}`;
 }
 
 function sanitizeStageOutput(output) {
