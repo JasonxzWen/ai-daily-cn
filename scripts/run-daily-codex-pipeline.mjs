@@ -137,23 +137,37 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
       publish: true
     }
   });
-  await writeJson(plan.outputs.run_summary, {
-    ok: false,
-    mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
-    automation_pipeline_mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
-    report_date: plan.report_date,
-    final_status: "running",
-    stage_id: "initialize",
-    next_action: { kind: "none" },
-    summary_path: plan.outputs.run_summary,
-    pipeline_plan_path: pipelinePlanPath,
-    plan_path: pipelinePlanPath,
-    orchestration,
-    orchestration_node_count: orchestration.node_count,
-    completed_stages: [],
-    source_watch_admitted_artifact_path: plan.publish?.source_watch_admitted_artifact_path || "",
-    updated_at: new Date().toISOString()
-  });
+  const existingSummary = await readJsonOrNull(plan.outputs.run_summary);
+  const shouldResumeAiRepair = existingSummary?.final_status === "needs_ai_repair";
+  await writeJson(plan.outputs.run_summary, shouldResumeAiRepair
+    ? {
+        ...existingSummary,
+        automation_pipeline_mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+        summary_path: plan.outputs.run_summary,
+        pipeline_plan_path: pipelinePlanPath,
+        plan_path: pipelinePlanPath,
+        orchestration,
+        orchestration_node_count: orchestration.node_count,
+        source_watch_admitted_artifact_path: plan.publish?.source_watch_admitted_artifact_path || "",
+        updated_at: new Date().toISOString()
+      }
+    : {
+        ok: false,
+        mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+        automation_pipeline_mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+        report_date: plan.report_date,
+        final_status: "running",
+        stage_id: "initialize",
+        next_action: { kind: "none" },
+        summary_path: plan.outputs.run_summary,
+        pipeline_plan_path: pipelinePlanPath,
+        plan_path: pipelinePlanPath,
+        orchestration,
+        orchestration_node_count: orchestration.node_count,
+        completed_stages: [],
+        source_watch_admitted_artifact_path: plan.publish?.source_watch_admitted_artifact_path || "",
+        updated_at: new Date().toISOString()
+      });
 
   const workflowRunner = options.workflowRunner || runDailyWorkflow;
   let result;

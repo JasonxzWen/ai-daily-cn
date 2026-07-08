@@ -395,25 +395,31 @@ test("daily Codex production orchestrator preserves daily runner mode for AI rep
     publishRequested: true,
     codexBin: "codex.cmd"
   });
+  const legacySummary = {
+    report_date: reportDate,
+    mode: "publish",
+    final_status: "needs_ai_repair",
+    clean_repo_root: cleanRoot,
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: contractPath,
+      summary_path: plan.outputs.run_summary
+    },
+    stages: [
+      { id: "report_draft", status: "passed" },
+      { id: "quality_review", status: "failed" }
+    ]
+  };
+  await fs.mkdir(path.dirname(plan.outputs.run_summary), { recursive: true });
+  await fs.writeFile(plan.outputs.run_summary, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+
   const workflowRunner = async ({ summaryPath }) => {
-    const legacySummary = {
-      report_date: reportDate,
-      mode: "publish",
-      final_status: "needs_ai_repair",
-      clean_repo_root: cleanRoot,
-      next_action: {
-        kind: "codex_ai_repair_contract",
-        contract_path: contractPath,
-        summary_path: summaryPath
-      },
-      stages: [
-        { id: "report_draft", status: "passed" },
-        { id: "quality_review", status: "failed" }
-      ]
-    };
-    await fs.mkdir(path.dirname(summaryPath), { recursive: true });
-    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
-    return { summary: legacySummary, summaryPath };
+    const seen = JSON.parse(await fs.readFile(summaryPath, "utf8"));
+    assert.equal(seen.final_status, "needs_ai_repair");
+    assert.equal(seen.mode, "publish");
+    assert.equal(seen.automation_pipeline_mode, "single_script_dag_orchestrator");
+    assert.equal(seen.next_action.contract_path, contractPath);
+    return { summary: seen, summaryPath };
   };
 
   const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
