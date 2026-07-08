@@ -255,6 +255,53 @@
       }
     },
     {
+      "id": "frontend-quality-workflow",
+      "status": "active",
+      "summary": "Projectize taste-skill and Impeccable as ADC frontend design-read, audit, and browser-acceptance quality gates.",
+      "commands": [
+        "corepack pnpm run design-quality:validate",
+        "corepack pnpm run validate:docs"
+      ],
+      "artifacts": [
+        "design/frontend-quality-workflow.md",
+        "design/design-quality-sources.json",
+        ".codex/skills/adc-frontend-quality/SKILL.md",
+        ".codex/skills/design-taste-frontend/SKILL.md",
+        "scripts/validate-design-quality.mjs"
+      ],
+      "acceptance": [
+        "Taste-skill is adopted through the local design-taste-frontend skill with its dashboard and data-table boundary preserved.",
+        "Impeccable is adopted as optional external design audit evidence, not as a production runtime or CI network dependency.",
+        "Material frontend PRs record design read, visual dials, source/tool evidence, audit or skip reason, and browser acceptance."
+      ],
+      "stop_conditions": [
+        "Generated or external UI code is committed directly into production paths.",
+        "A dense ADC data-product surface is replaced by a landing-page template.",
+        "External design tools become unpinned production or CI dependencies without a migration record."
+      ],
+      "behavior": "Projectize taste-skill and Impeccable as ADC frontend design-read, audit, and browser-acceptance quality gates.",
+      "validation": {
+        "commands": [
+          "corepack pnpm run design-quality:validate",
+          "corepack pnpm run validate:docs"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "design/frontend-quality-workflow.md",
+          "design/design-quality-sources.json",
+          ".codex/skills/adc-frontend-quality/SKILL.md",
+          ".codex/skills/design-taste-frontend/SKILL.md",
+          "scripts/validate-design-quality.mjs"
+        ],
+        "stop_conditions": [
+          "Generated or external UI code is committed directly into production paths.",
+          "A dense ADC data-product surface is replaced by a landing-page template.",
+          "External design tools become unpinned production or CI dependencies without a migration record."
+        ]
+      }
+    },
+    {
       "id": "adc-illustration-workflow",
       "status": "active",
       "summary": "Track ADC illustration assets with prompt, decision, rights, source, and generated public asset evidence.",
