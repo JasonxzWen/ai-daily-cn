@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "policy_id": "editorial-rank-policy-v1",
+  "contract_name": "editorial-classification-contract",
+  "description": "Internal-only ranking policy for editorial Top100 evidence artifacts. This policy must not be exposed through public article JSON.",
+  "artifact": {
+    "max_items": 100,
+    "public": false
+  },
+  "selection_limits": {
+    "today_selected": 20,
+    "must_read": 8,
+    "quota_policy": "upper_bound_not_quota"
+  },
+  "score_weights": {
+    "rank_policy": {
+      "breaking_official_technical": 70,
+      "major_company_high_signal": 58,
+      "watch_source_full_internal": 26,
+      "github_contextual_repo": 36,
+      "github_momentum_downgrade": -34,
+      "builder_discussion": 12,
+      "industry_background": 4,
+      "trend_hot_active": 30
+    },
+    "selection_reason": {
+      "official_technical_signal": 28,
+      "major_company_priority": 24,
+      "model_or_platform_increment": 18,
+      "engineering_practice_value": 16,
+      "unconfirmed_high_signal_disclosed": 12,
+      "watch_source_high_value": 12,
+      "github_repo_context_sufficient": 14,
+      "trend_hot_or_active": 10
+    },
+    "demotion_reason": {
+      "github_readme_context_insufficient": -36,
+      "momentum_only": -24,
+      "partnership_only": -28,
+      "customer_case_low_information": -24,
+      "ordinary_rss_repost": -18,
+      "low_evidence_single_source": -30,
+      "high_noise_x": -28,
+      "stale_duplicate": -45,
+      "public_internal_boundary_leak": -80,
+      "unconfirmed_signal_missing_public_disclosure": -60,
+      "unconfirmed_signal_factualized": -60
+    },
+    "event_type": {
+      "official_technical_blog": 20,
+      "model_release": 22,
+      "product_launch": 16,
+      "platform_update": 16,
+      "engineering_practice": 18,
+      "safety_eval_method": 18,
+      "strategy_org": 14,
+      "pricing_business": 13,
+      "layoff_org": 10,
+      "github_repo_with_context": 12,
+      "github_momentum": 2,
+      "watch_source_original": 8,
+      "watch_source_repost": 0,
+      "builder_discussion": 5,
+      "industry_signal": 4,
+      "trend_signal": 10,
+      "partnership_only": -10,
+      "customer_case_low_information": -10,
+      "stale_duplicate": -20
+    },
+    "verification_status": {
+      "confirmed": 10,
+      "multi_source_confirmed": 14,
+      "unconfirmed_high_signal": 4,
+      "single_source_unconfirmed": -8
+    },
+    "priority": {
+      "critical": 22,
+      "high": 16,
+      "medium": 6,
+      "low": 0
+    },
+    "source_type": {
+      "official": 18,
+      "github": 8,
+      "rss": 5,
+      "media": 4,
+      "x": 1
+    }
+  }
+}
