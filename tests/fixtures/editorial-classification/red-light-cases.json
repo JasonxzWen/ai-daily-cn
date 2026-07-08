@@ -1,0 +1,173 @@
+[
+  {
+    "id": "partnership-only",
+    "title": "某公司宣布与大型云厂商建立 AI 合作",
+    "summary": "稿件只说明合作关系，没有模型、平台、工程实践、定价或组织变化。",
+    "source_type": "official",
+    "event_type": "partnership_only",
+    "entities": ["amazon"],
+    "topics": ["ai_market_dynamics"],
+    "verification_status": "confirmed",
+    "evidence_level": "medium",
+    "source_count": 1,
+    "priority": "medium",
+    "expected": {
+      "today_selected": false,
+      "must_read": false,
+      "demotion_reasons": ["partnership_only"]
+    }
+  },
+  {
+    "id": "low-information-customer-case",
+    "title": "客户案例称企业正在使用 AI 工具",
+    "summary": "内容只有客户案例和采用口号，没有部署方式、业务结果或技术细节。",
+    "source_type": "official",
+    "event_type": "customer_case_low_information",
+    "entities": ["microsoft"],
+    "topics": ["enterprise_ai_adoption"],
+    "verification_status": "confirmed",
+    "evidence_level": "medium",
+    "source_count": 1,
+    "priority": "medium",
+    "expected": {
+      "today_selected": false,
+      "must_read": false,
+      "demotion_reasons": ["customer_case_low_information"]
+    }
+  },
+  {
+    "id": "github-readme-insufficient",
+    "title": "某 AI 仓库进入 GitHub Trending",
+    "summary": "只能确认榜单动量，缺少 README 语境，不能写成能力总结。",
+    "source_type": "github",
+    "event_type": "github_momentum",
+    "entities": [],
+    "topics": ["ai_engineering_stack"],
+    "verification_status": "confirmed",
+    "github_context_state": "readme_missing",
+    "evidence_level": "medium",
+    "source_count": 1,
+    "priority": "high",
+    "expected": {
+      "today_selected": false,
+      "must_read": false,
+      "demotion_reasons": ["github_readme_context_insufficient", "momentum_only"],
+      "github_tab_allowed": true,
+      "github_summary_mode": "momentum_only"
+    }
+  },
+  {
+    "id": "ordinary-rss-repost",
+    "title": "关注源转发普通行业文章",
+    "summary": "RSS 只是普通转发，没有原创观点、重大实体或技术增量。",
+    "source_type": "rss",
+    "event_type": "watch_source_repost",
+    "entities": [],
+    "topics": ["ai_market_dynamics"],
+    "verification_status": "confirmed",
+    "watch_source_high_value": false,
+    "evidence_level": "medium",
+    "source_count": 1,
+    "priority": "medium",
+    "expected": {
+      "today_selected": false,
+      "must_read": false,
+      "demotion_reasons": ["ordinary_rss_repost"]
+    }
+  },
+  {
+    "id": "low-evidence-single-source-media",
+    "title": "单一媒体称小公司发布 AI 功能",
+    "summary": "只有单源低证据线索，缺少一手材料和明确技术或商业增量。",
+    "source_type": "media",
+    "event_type": "industry_signal",
+    "entities": [],
+    "topics": ["ai_market_dynamics"],
+    "verification_status": "single_source_unconfirmed",
+    "evidence_level": "low",
+    "source_count": 1,
+    "priority": "medium",
+    "expected": {
+      "today_selected": false,
+      "must_read": false,
+      "demotion_reasons": ["low_evidence_single_source"]
+    }
+  },
+  {
+    "id": "high-noise-x",
+    "title": "Builder 在 X 上讨论某工具体验",
+    "summary": "讨论噪声高，缺少明确来源、复现线索或可验证产品增量。",
+    "source_type": "x",
+    "event_type": "builder_discussion",
+    "entities": [],
+    "topics": ["ai_assistants_agents"],
+    "verification_status": "single_source_unconfirmed",
+    "evidence_level": "low",
+    "source_count": 1,
+    "priority": "medium",
+    "expected": {
+      "today_selected": false,
+      "must_read": false,
+      "demotion_reasons": ["high_noise_x"]
+    }
+  },
+  {
+    "id": "stale-duplicate",
+    "title": "上周已收录的模型发布再次出现",
+    "summary": "同一 URL 和事实已在过去 7 天进入主体信息。",
+    "source_type": "official",
+    "event_type": "stale_duplicate",
+    "entities": ["openai"],
+    "topics": ["foundation_models"],
+    "verification_status": "confirmed",
+    "evidence_level": "high",
+    "source_count": 1,
+    "priority": "high",
+    "is_stale_duplicate": true,
+    "expected": {
+      "today_selected": false,
+      "must_read": false,
+      "demotion_reasons": ["stale_duplicate"]
+    }
+  },
+  {
+    "id": "public-internal-boundary-leak",
+    "title": "公开文章泄露内部排序字段",
+    "summary": "public article 不应包含 editorial_rank、rank_policy 或 selection reasons。",
+    "source_type": "official",
+    "event_type": "model_release",
+    "entities": ["openai"],
+    "topics": ["foundation_models"],
+    "verification_status": "confirmed",
+    "evidence_level": "high",
+    "source_count": 1,
+    "priority": "high",
+    "public_fields": ["id", "title", "editorial_rank"],
+    "expected": {
+      "today_selected": false,
+      "must_read": false,
+      "demotion_reasons": ["public_internal_boundary_leak"]
+    }
+  },
+  {
+    "id": "unconfirmed-high-signal-factualized",
+    "title": "OpenAI 将收购一家新兴 AI 公司",
+    "summary": "OpenAI 将收购一家新兴 AI 公司，交易已经进入执行阶段。",
+    "source_type": "media",
+    "event_type": "strategy_org",
+    "entities": ["openai"],
+    "topics": ["ai_market_dynamics"],
+    "verification_status": "unconfirmed_high_signal",
+    "evidence_level": "medium",
+    "source_count": 1,
+    "priority": "high",
+    "expected": {
+      "today_selected": false,
+      "must_read": false,
+      "demotion_reasons": [
+        "unconfirmed_signal_missing_public_disclosure",
+        "unconfirmed_signal_factualized"
+      ]
+    }
+  }
+]

@@ -16,7 +16,7 @@ This wiki holds stable knowledge only. Raw sources remain authoritative when the
 
 ## Stable Knowledge Map
 
-No project-specific stable pages have been confirmed yet.
+- [Engineering Delivery Signals](concepts/engineering-delivery-signals.md): reusable PR delivery, validation, GitHub security, and generated artifact repair signals from confirmed project work.
 
 Add pages only after checking raw sources and receiving human confirmation.
 

@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/editorial-classification-contract.schema.json",
+  "title": "Editorial Classification Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "name",
+    "description",
+    "homepage_tabs",
+    "daily_lanes",
+    "topics",
+    "entities",
+    "event_types",
+    "verification_statuses",
+    "rank_policies",
+    "reason_codes",
+    "admission_targets",
+    "github_policy",
+    "watch_source_policy",
+    "trend_policy",
+    "public_private_boundary"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "name": { "const": "editorial-classification-contract" },
+    "description": { "type": "string", "minLength": 1 },
+    "homepage_tabs": {
+      "type": "array",
+      "minItems": 6,
+      "items": { "$ref": "#/$defs/homepageTab" }
+    },
+    "daily_lanes": {
+      "type": "array",
+      "minItems": 7,
+      "items": { "$ref": "#/$defs/dailyLane" }
+    },
+    "topics": {
+      "type": "array",
+      "minItems": 14,
+      "items": { "$ref": "#/$defs/labeledId" }
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 12,
+      "items": { "$ref": "#/$defs/entity" }
+    },
+    "event_types": { "$ref": "#/$defs/stringIdArray" },
+    "verification_statuses": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/verificationStatus" }
+    },
+    "rank_policies": { "$ref": "#/$defs/stringIdArray" },
+    "reason_codes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selection", "demotion"],
+      "properties": {
+        "selection": { "$ref": "#/$defs/stringIdArray" },
+        "demotion": { "$ref": "#/$defs/stringIdArray" }
+      }
+    },
+    "admission_targets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["today_selected", "must_read"],
+      "properties": {
+        "today_selected": { "$ref": "#/$defs/admissionTarget" },
+        "must_read": { "$ref": "#/$defs/admissionTarget" }
+      }
+    },
+    "github_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context_states", "readme_insufficient"],
+      "properties": {
+        "context_states": { "$ref": "#/$defs/stringIdArray" },
+        "readme_insufficient": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "github_tab_allowed",
+            "today_selected_allowed",
+            "must_read_allowed",
+            "public_summary_mode",
+            "capability_summary_allowed"
+          ],
+          "properties": {
+            "github_tab_allowed": { "type": "boolean" },
+            "today_selected_allowed": { "type": "boolean" },
+            "must_read_allowed": { "type": "boolean" },
+            "public_summary_mode": { "type": "string", "minLength": 1 },
+            "capability_summary_allowed": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "watch_source_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["internal_retention", "public_surface", "missing_public_display_means_lost"],
+      "properties": {
+        "internal_retention": { "type": "string", "minLength": 1 },
+        "public_surface": { "type": "string", "minLength": 1 },
+        "missing_public_display_means_lost": { "type": "boolean" }
+      }
+    },
+    "trend_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public_states", "internal_states"],
+      "properties": {
+        "public_states": { "$ref": "#/$defs/stringIdArray" },
+        "internal_states": { "$ref": "#/$defs/stringIdArray" }
+      }
+    },
+    "public_private_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public_articles_forbidden_fields", "internal_artifact_required_fields"],
+      "properties": {
+        "public_articles_forbidden_fields": { "$ref": "#/$defs/stringIdArray" },
+        "internal_artifact_required_fields": { "$ref": "#/$defs/stringIdArray" }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "stringIdArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "labeledId": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "watch_priority"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "watch_priority": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "homepageTab": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "public_visibility"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "max_items": { "type": "integer", "minimum": 1 },
+        "quota_policy": { "enum": ["upper_bound_not_quota"] },
+        "public_trend_states": { "$ref": "#/$defs/stringIdArray" },
+        "internal_trend_states": { "$ref": "#/$defs/stringIdArray" },
+        "public_visibility": {
+          "enum": ["public", "public_filtered", "public_digest"]
+        }
+      }
+    },
+    "dailyLane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "max_items": { "type": "integer", "minimum": 1 },
+        "quota_policy": { "enum": ["upper_bound_not_quota"] },
+        "threshold": { "type": "string", "minLength": 1 }
+      }
+    },
+    "verificationStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "public_label", "title_factuality"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "public_label": {
+          "type": ["string", "null"]
+        },
+        "title_factuality": {
+          "enum": ["can_state_as_fact", "must_not_state_as_fact"]
+        },
+        "required_title_cues": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "admissionTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_items", "quota_policy", "forbidden_demotion_codes"],
+      "properties": {
+        "max_items": { "type": "integer", "minimum": 1 },
+        "quota_policy": { "enum": ["upper_bound_not_quota"] },
+        "threshold": { "type": "string", "minLength": 1 },
+        "forbidden_demotion_codes": { "$ref": "#/$defs/stringIdArray" }
+      }
+    }
+  }
+}
