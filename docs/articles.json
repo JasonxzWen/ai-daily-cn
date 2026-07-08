@@ -1,5 +1,1790 @@
 [
   {
+    "id": "article-0427039daf6e1318",
+    "title": "GitHub Changelog说明 Copilot 与企业可用范围变化",
+    "url": "https://github.blog/changelog/2026-07-07-kimi-k2-7-now-available-for-copilot-business-and-enterprise",
+    "summary": "GitHub说明模型能力和评估方法更新，重点包括能力边界、评估设置、数据来源、使用场景和限制说明，使用前提是结论仍要依赖可复现评测、真实任务和公开限制。 可观察的是代码、权重、示例、许可证和生态复用条件",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Changelog",
+    "section": "stories",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 92,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": [
+      "Copilot"
+    ]
+  },
+  {
+    "id": "article-810460beb79df931",
+    "title": "SWE-bench Pro",
+    "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
+    "summary": "Scale Labs 公开榜单显示，SWE-bench Pro Public Dataset 当前第一是 SWE-Agent + claude-4-5-Sonnet（anthropic，Resolve Rate 43.72%）。 前三名为 SWE-Agent + claude-4-5-Sonnet 43.72%、SWE-Agent + claude-4-Sonnet 42.70%、SWE-Agent + claude-4-5-haiku 39.45%，Top 10 供应商分布为 anthropic 3、openai 2、moonshot 1、unknown 1。 这个榜单适合观察 coding agent 在长周期真实工程任务上的相对表现，但生产选型仍要结合 scaffold、成本上限、置信区间和团队自有仓库复测。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Scale Labs SWE-Bench Pro",
+    "section": "daily_tracking",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 90,
+    "importance": "major",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "企业 AI 采纳",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "成本与用量治理",
+      "模型能力",
+      "AI 编程"
+    ],
+    "companies": [
+      "Anthropic",
+      "Moonshot",
+      "OpenAI"
+    ],
+    "products": [
+      "Claude"
+    ]
+  },
+  {
+    "id": "article-07e9d51e749eb918",
+    "title": "Artificial Analysis",
+    "url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
+    "summary": "Artificial Analysis 公开榜单显示，当前 Intelligence Index 第一是 Claude Fable 5 (with fallback)（anthropic，60 分）。 前三名为 Claude Fable 5 (with fallback) 60 分、Claude Opus 4.8 (max) 56 分、GPT-5.5 (xhigh) 55 分，Top 10 供应商分布为 anthropic 4、google 2、alibaba 1、minimax 1、openai 1、zhipu 1。 这个榜单适合做模型 shortlist 和能力变化监测，但生产选型仍要结合延迟、价格、上下文长度和自有任务复测。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Artificial Analysis Intelligence Index",
+    "section": "daily_tracking",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 86,
+    "importance": "notable",
+    "domain": "行业动态与政策地缘",
+    "flavors": [
+      "技术拆解",
+      "快讯"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "Alibaba",
+      "Anthropic",
+      "Google",
+      "Moonshot",
+      "OpenAI",
+      "Zhipu"
+    ],
+    "products": [
+      "Claude",
+      "GPT"
+    ]
+  },
+  {
+    "id": "article-e3bfb0c3548ab358",
+    "title": "OpenRouter",
+    "url": "https://openrouter.ai/rankings",
+    "summary": "OpenRouter 公开榜单显示，本周调用热度第一是 DeepSeek V4 Flash（deepseek，5.44T tokens，周变化 14%）。 Top 10 供应商分布为 anthropic 3、deepseek 2、minimax 1、stepfun 1、tencent 1、xiaomi 1、z-ai 1，可用来观察开发者在 OpenRouter 平台内的真实调用偏好。 该快照只说明 OpenRouter 平台内使用热度，不能替代能力榜单或全市场份额判断。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "OpenRouter Rankings",
+    "section": "daily_tracking",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 86,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 市场动态"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "市场与商业化"
+    ],
+    "companies": [
+      "Anthropic",
+      "DeepSeek",
+      "Tencent"
+    ],
+    "products": [
+      "DeepSeek"
+    ]
+  },
+  {
+    "id": "article-32e2db27eca9a8cc",
+    "title": "相关团队说明模型能力和评估方法更新",
+    "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+    "summary": "文章说明轻量句向量模型在语义任务中的持续使用，围绕语义搜索、聚类、去重和轻量检索增强展开。应用团队可关注模型尺寸、延迟、语言覆盖、向量质量、索引成本、评估数据和部署风险，决定是否替换或保留现有检索链路。这些指标能支撑召回评测、成本核算和线上监控。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "hot_blogs",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 82,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "观点专访",
+      "技术拆解",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "RAG 与检索"
+    ],
+    "companies": [
+      "Hugging Face"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-0446821518e71993",
+    "title": "diegosouzapw/OmniRoute",
+    "url": "https://github.com/diegosouzapw/OmniRoute",
+    "summary": "omniroute 是面向AI 工程实践的开源项目，核心能力是工具调用和工作流编排；项目提供README 说明和使用入口，主要用于理解项目能力边界、代码入口和可复用组件。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 78,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": [
+      "Claude",
+      "Codex",
+      "MCP"
+    ]
+  },
+  {
+    "id": "article-afba96f60b5ba9cc",
+    "title": "hasaneyldrm/exercises-dataset",
+    "url": "https://github.com/hasaneyldrm/exercises-dataset",
+    "summary": "exercises-dataset 是面向模型评测、回归验证和工程质量控制的开源项目，核心能力是评测与回归、API/SDK 适配；项目提供测试或评估资产，主要用于搭建模型评测、回归验证和工程质量检查流程。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 78,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-3c44be280a6c9e15",
+    "title": "stabilityai/stable-diffusion-xl-base-1.0",
+    "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
+    "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为图像生成方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 78,
+    "importance": "notable",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力"
+    ],
+    "companies": [
+      "Hugging Face"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-c7c9684abfb72529",
+    "title": "usestrix/strix",
+    "url": "https://github.com/usestrix/strix",
+    "summary": "strix 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、评测与回归、工具调用和工作流编排；项目提供测试或评估资产、部署说明，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 78,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "报告",
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "Agent 产品",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-2e124a6790ad32c3",
+    "title": "Zackriya-Solutions/meetily",
+    "url": "https://github.com/Zackriya-Solutions/meetily",
+    "summary": "meetily 是面向agent 工作流和自动化工程的开源项目，核心能力是评测与回归、工具调用和工作流编排；项目提供示例、测试或评估资产，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 78,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "Agent 产品",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-9f386735a1b4e84a",
+    "title": "60000小时炼出新开源VLA！20多种机器人都能用",
+    "url": "https://www.qbitai.com/2026/07/445678.html",
+    "summary": "60000小时炼出新开源VLA！20多种机器人都能用：蚂蚁灵波Lingbot-VLA 2.0。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "QbitAI",
+    "section": "chinese_media_dynamics",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯"
+    ],
+    "channels_l1": [
+      "多模态 AI"
+    ],
+    "channels_l2": [
+      "具身智能"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-42798b7f60194e72",
+    "title": "三个理想火枪手创业，打破具身最快百台交付纪录",
+    "url": "https://www.qbitai.com/2026/07/445531.html",
+    "summary": "三个理想火枪手创业，打破具身最快百台交付纪录：机器人开始自己造自己了。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "QbitAI",
+    "section": "chinese_media_dynamics",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯"
+    ],
+    "channels_l1": [
+      "多模态 AI"
+    ],
+    "channels_l2": [
+      "具身智能"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-cc16eef02675e8d0",
+    "title": "支持17家机器人厂商20多种构型，蚂蚁灵波LingBot-VLA 2.0正式开源",
+    "url": "https://www.qbitai.com/2026/07/445668.html",
+    "summary": "支持17家机器人厂商20多种构型，蚂蚁灵波LingBot-VLA 2.0正式开源：",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "QbitAI",
+    "section": "chinese_media_dynamics",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯"
+    ],
+    "channels_l1": [
+      "多模态 AI"
+    ],
+    "channels_l2": [
+      "具身智能"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-d1946b21c02e5fa5",
+    "title": "alibaba/page-agent",
+    "url": "https://github.com/alibaba/page-agent",
+    "summary": "page-agent 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、工具调用和工作流编排；项目提供可复用包、示例，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "技术拆解",
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "Agent 产品",
+      "AI 编程"
+    ],
+    "companies": [
+      "Alibaba",
+      "GitHub"
+    ],
+    "products": [
+      "MCP"
+    ]
+  },
+  {
+    "id": "article-f72ce97d15ad1c7b",
+    "title": "altic-dev/FluidVoice",
+    "url": "https://github.com/altic-dev/FluidVoice",
+    "summary": "fluidvoice 是面向模型评测、回归验证和工程质量控制的开源项目，核心能力是评测与回归；项目提供测试或评估资产，主要用于搭建模型评测、回归验证和工程质量检查流程。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-4d5e92d1978119e8",
+    "title": "black-forest-labs/FLUX.1-dev",
+    "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
+    "summary": "FLUX.1-dev 是图像生成模型，榜单热度显示它仍被大量用于文生图和视觉创作实验。选型时需要结合模型卡、许可证、推理成本和生成质量，尤其关注商用限制、硬件需求和团队已有工作流。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力"
+    ],
+    "companies": [
+      "Hugging Face"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-3ce63bb1cf5241de",
+    "title": "deepseek-ai/DeepSeek-R1",
+    "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
+    "summary": "DeepSeek-R1 是文本生成与推理模型，下载量和收藏量显示社区仍在持续试用。开发者评估时应结合模型卡、许可证、上下文长度、推理成本和真实任务表现，避免只用热度衡量可用性。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 算力与推理服务"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "RAG 与检索"
+    ],
+    "companies": [
+      "DeepSeek",
+      "Hugging Face"
+    ],
+    "products": [
+      "DeepSeek",
+      "Qwen"
+    ]
+  },
+  {
+    "id": "article-2b4f6c034c8e44fa",
+    "title": "logto-io/logto",
+    "url": "https://github.com/logto-io/logto",
+    "summary": "logto 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、API/SDK 适配；项目提供部署说明，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending TypeScript weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-7af184c03e7ab7a7",
+    "title": "MadsLorentzen/ai-job-search",
+    "url": "https://github.com/MadsLorentzen/ai-job-search",
+    "summary": "ai-job-search 是面向agent 工作流和自动化工程的开源项目，核心能力是评测与回归、工具调用和工作流编排；项目提供README 说明和使用入口，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-c87b77df69f1bb71",
+    "title": "ogulcancelik/herdr",
+    "url": "https://github.com/ogulcancelik/herdr",
+    "summary": "herdr 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建；项目提供README 说明和使用入口，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "AI 编程",
+      "RAG 与检索"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-0c13739dbedc7f32",
+    "title": "openai/codex-plugin-cc",
+    "url": "https://github.com/openai/codex-plugin-cc",
+    "summary": "codex-plugin-cc 是面向agent 工作流和自动化工程的开源项目，核心能力是工具调用和工作流编排、API/SDK 适配；项目提供README 说明和使用入口，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub",
+      "OpenAI"
+    ],
+    "products": [
+      "Codex"
+    ]
+  },
+  {
+    "id": "article-022c4327710cbfe7",
+    "title": "TencentCloud/CubeSandbox",
+    "url": "https://github.com/TencentCloud/CubeSandbox",
+    "summary": "cubesandbox 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、记忆或知识检索、API/SDK 适配；项目提供可复用包、部署说明，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 76,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "AI 编程",
+      "RAG 与检索"
+    ],
+    "companies": [
+      "GitHub",
+      "Tencent"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-c734f6fc572cbb07",
+    "title": "actions/checkout",
+    "url": "https://github.com/actions/checkout",
+    "summary": "checkout 是面向agent 工作流和自动化工程的开源项目，核心能力是评测与回归、工具调用和工作流编排、API/SDK 适配；项目提供可复用包、测试或评估资产，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending TypeScript weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-3cb7ff1cdcf97c6b",
+    "title": "alirezarezvani/claude-skills",
+    "url": "https://github.com/alirezarezvani/claude-skills",
+    "summary": "claude-skills 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建、评测与回归、工具调用和工作流编排、API/SDK 适配；项目提供可复用包、测试或评估资产、部署说明，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending Python weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": [
+      "Claude"
+    ]
+  },
+  {
+    "id": "article-a7aae41bfe46e3ba",
+    "title": "apache/maven",
+    "url": "https://github.com/apache/maven",
+    "summary": "maven 是面向模型应用、推理服务和提示词工程的开源项目，核心能力是工具调用和工作流编排；项目提供README 说明和使用入口，主要用于串联模型调用、推理服务和提示词工程。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending Java weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 算力与推理服务"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-cc2152070c02e2ab",
+    "title": "bradautomates/claude-video",
+    "url": "https://github.com/bradautomates/claude-video",
+    "summary": "claude-video 是面向agent 工作流和自动化工程的开源项目，核心能力是Agent 构建；项目提供README 说明和使用入口，主要用于构建、调试和编排 agent 工作流。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending Python weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力",
+      "AI 编程"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": [
+      "Claude"
+    ]
+  },
+  {
+    "id": "article-f3aa7dbdb63c9465",
+    "title": "CompVis/stable-diffusion-v1-4",
+    "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
+    "summary": "stable-diffusion-v1-4 是经典图像生成模型，仍在榜单中保持可见度，说明它在示例、复现和轻量实验中还有需求。团队采用时应比较新模型的质量、速度、许可证和部署成本。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力"
+    ],
+    "companies": [
+      "Hugging Face"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-068fdb7f37d07979",
+    "title": "elastic/elasticsearch",
+    "url": "https://github.com/elastic/elasticsearch",
+    "summary": "elastic/elasticsearch appeared on GitHub Trending Java weekly with 391 stars this week. 近 7 天本地记录曾在 2026-07-04、2026-07-05、2026-07-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending Java weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯"
+    ],
+    "channels_l1": [
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-b303b1e4141446e6",
+    "title": "ruvnet/RuView",
+    "url": "https://github.com/ruvnet/RuView",
+    "summary": "ruview 是面向AI 工程实践的开源项目，核心能力是项目框架、示例代码和可复用工具链；项目提供README 说明和使用入口，主要用于理解项目能力边界、代码入口和可复用组件。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending Rust weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-bb0858634f4b2e64",
+    "title": "yorukot/superfile",
+    "url": "https://github.com/yorukot/superfile",
+    "summary": "superfile 是面向模型评测、回归验证和工程质量控制的开源项目，核心能力是评测与回归；项目提供示例、测试或评估资产，主要用于搭建模型评测、回归验证和工程质量检查流程。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending Go weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-4143cf1471f6ab87",
+    "title": "black-forest-labs/FLUX.1-schnell",
+    "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
+    "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为图像生成方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 72,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力"
+    ],
+    "companies": [
+      "Hugging Face"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-a0d5aaf3b3e59dfb",
+    "title": "deepseek-ai/DeepSeek-V4-Pro",
+    "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+    "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为文本生成方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 72,
+    "importance": "general",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "企业 AI 采纳",
+      "AI 算力与推理服务"
+    ],
+    "channels_l2": [
+      "成本与用量治理",
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "DeepSeek",
+      "Hugging Face"
+    ],
+    "products": [
+      "DeepSeek"
+    ]
+  },
+  {
+    "id": "article-18be6e3adcab0771",
+    "title": "gin-gonic/gin",
+    "url": "https://github.com/gin-gonic/gin",
+    "summary": "gin 是面向模型评测、回归验证和工程质量控制的开源项目，核心能力是评测与回归；项目提供测试或评估资产，主要用于搭建模型评测、回归验证和工程质量检查流程。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending Go weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 72,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-0e3440adf10f0dc3",
+    "title": "helix-editor/helix",
+    "url": "https://github.com/helix-editor/helix",
+    "summary": "helix 是面向模型评测、回归验证和工程质量控制的开源项目，核心能力是评测与回归；项目提供测试或评估资产，主要用于搭建模型评测、回归验证和工程质量检查流程。 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "GitHub Trending Rust weekly",
+    "section": "github_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 72,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-464e108a8a04d874",
+    "title": "hexgrad/Kokoro-82M",
+    "url": "https://huggingface.co/hexgrad/Kokoro-82M",
+    "summary": "Kokoro-82M 是轻量文本转语音模型，榜单热度说明语音合成应用仍关注小模型、速度和部署成本。采用前应测试目标语言、音色质量、许可证、延迟和批量生成稳定性。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 72,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力"
+    ],
+    "companies": [
+      "Hugging Face",
+      "OpenAI"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-deede0538205756c",
+    "title": "meta-llama/Llama-3.1-8B-Instruct",
+    "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
+    "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为文本生成方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 72,
+    "importance": "general",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "企业 AI 采纳",
+      "AI 工程栈",
+      "AI 算力与推理服务",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "成本与用量治理",
+      "开发者工具",
+      "模型能力",
+      "Agent 产品",
+      "RAG 与检索"
+    ],
+    "companies": [
+      "Hugging Face",
+      "Meta"
+    ],
+    "products": [
+      "Llama"
+    ]
+  },
+  {
+    "id": "article-19ee6af6e3d15e37",
+    "title": "meta-llama/Meta-Llama-3-8B",
+    "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
+    "summary": "Meta-Llama-3-8B 是通用文本生成模型，适合关注开源权重、小规模部署和指令微调的团队跟踪。评估时应结合任务语言、硬件资源、许可证要求和与更新版本的效果差距。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 72,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 算力与推理服务",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "Agent 产品",
+      "RAG 与检索"
+    ],
+    "companies": [
+      "Hugging Face",
+      "Meta"
+    ],
+    "products": [
+      "Llama",
+      "Qwen"
+    ]
+  },
+  {
+    "id": "article-3630fc138d59fae6",
+    "title": "openai/whisper-large-v3",
+    "url": "https://huggingface.co/openai/whisper-large-v3",
+    "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为语音识别方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Hugging Face Trending Models",
+    "section": "huggingface_trending",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 72,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力"
+    ],
+    "companies": [
+      "Hugging Face",
+      "OpenAI"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-c612eacf820484f3",
+    "title": "曝DeepSeek正在自研AI芯片：面向推理场景；姚顺雨前同事田永龙加盟腾讯；苹果首款折叠屏iPhone已在量产阶段；智谱：撤回A股辅导备案失实",
+    "url": "https://www.leiphone.com/category/zaobao/aNM6BTV8leU0Umws.html",
+    "summary": "要闻提示 1.曝DeepSeek正在自研AI芯片：面向推理场景，减少依赖英伟达 2.宇树科技IPO获批消息一出，600米外楼盘1小时卖出4套，总价800万起步 3.姚顺雨前同事田永龙加盟腾讯 4.小米调整“小爱同学”组织架构：罗福莉 MiMo 团队负责基础模型能力，原负责人王刚调任机器人业务 5.智谱紧急澄清：撤回A股辅导备案失实 6....",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "Leiphone",
+    "section": "community_leads",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 58,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "技术拆解"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型"
+    ],
+    "channels_l2": [
+      "具身智能",
+      "模型能力"
+    ],
+    "companies": [
+      "DeepSeek"
+    ],
+    "products": [
+      "DeepSeek"
+    ]
+  },
+  {
+    "id": "article-d215daebca8116f1",
+    "title": "AI 视频全面成熟：Seedance 2.0 领衔，6 款主流工具深度横评",
+    "url": "https://36kr.com/p/3886403765596418?f=rss",
+    "summary": "2026年，AI视频生成方向已迈入全面爆发的成熟竞速期，Seedance 2.0 的出圈更是让AI视频变成一场“全民狂欢”。 短短两年间，AI视频从最初几秒的碎片化模糊画面，到如今分钟级长视频的连贯叙事、真实物理世界的精准还原，AI视频工具的迭代速度远超预期，AI视频工具完成了从“能用”到“好用”再到“专业”的三级跳，让创意落地的门槛降...",
+    "date": "2026-07-08",
+    "month": "2026-07",
+    "source": "36Kr",
+    "section": "community_leads",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 58,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "快讯"
+    ],
+    "channels_l1": [
+      "多模态 AI"
+    ],
+    "channels_l2": [
+      "多模态生成"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-ac4ae95d73434499",
+    "title": "Google Keyword更新公开产品或工程信息",
+    "url": "https://blog.google/innovation-and-ai/models-and-research/google-research/firesat-satellites/",
+    "summary": "Google Keyword更新公开产品或工程信息，重点包括标题、适用场景、访问条件、限制说明和后续链接，使用前提是读者还要查看原文中的访问条件、地区范围、价格和使用限制。 可观察的是产品入口、目标用户、上线范围和采购节奏",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Google Keyword Blog",
+    "section": "stories",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 92,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "快讯",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "工作场景 AI 软件",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "AI 应用工具"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-3d4095ac732ad8b7",
+    "title": "Meta Newsroom说明 AIGC 创作工作流",
+    "url": "https://about.fb.com/news/2026/07/introducing-muse-image-meta-ai/",
+    "summary": "Meta Newsroom说明模型能力和评估方法更新，重点包括能力边界、评估设置、数据来源、使用场景和限制说明，使用前提是结论仍要依赖可复现评测、真实任务和公开限制。 可观察的是素材生成质量、创作者工具链成本和交付方式",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Meta Newsroom",
+    "section": "stories",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 92,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "Meta"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-1ec294ada9f40d0a",
+    "title": "Microsoft说明模型权重和使用说明",
+    "url": "https://huggingface.co/blog/microsoft/foundry-managed-compute",
+    "summary": "微软研究院说明模型能力和评估方法更新，重点包括能力边界、评估设置、数据来源、使用场景和限制说明，使用前提是结论仍要依赖可复现评测、真实任务和公开限制。 可观察的是代码、权重、示例、许可证和生态复用条件",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Microsoft Hugging Face Organization",
+    "section": "stories",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 92,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "论文",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "Hugging Face",
+      "Microsoft"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-ab9ea62ec59ebe1a",
+    "title": "OpenAI更新公开产品或工程信息",
+    "url": "https://openai.com/index/australian-payments-plus",
+    "summary": "OpenAI更新公开产品或工程信息，重点包括标题、适用场景、访问条件、限制说明和后续链接，使用前提是读者还要查看原文中的访问条件、地区范围、价格和使用限制。 可观察的是 agent、开发工具和自动化工作流的接入成本",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "OpenAI News RSS",
+    "section": "stories",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 91,
+    "importance": "general",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "快讯",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "工作场景 AI 软件",
+      "企业 AI 采纳",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "成本与用量治理",
+      "Agent 产品",
+      "AI 应用工具"
+    ],
+    "companies": [
+      "OpenAI"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-b7195bbec0581aa4",
+    "title": "OpenAI说明 agent 与开发者工具能力",
+    "url": "https://openai.com/index/mufg",
+    "summary": "OpenAI 继续强化面向开发者的智能体与代码工具能力，重点放在任务编排、上下文管理、权限控制和工程集成。团队评估时应结合权限模型、回放评估、现有流程和可观测性指标。 可观察的是 agent、开发工具和自动化工作流的接入成本",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "OpenAI News RSS",
+    "section": "stories",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 91,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "技术拆解",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "AI 编程"
+    ],
+    "companies": [
+      "OpenAI"
+    ],
+    "products": [
+      "ChatGPT",
+      "Codex",
+      "GPT"
+    ]
+  },
+  {
+    "id": "article-316dbe88a826d644",
+    "title": "Google Keyword更新公开产品或工程信息",
+    "url": "https://blog.google/innovation-and-ai/technology/research/technology-global-crisis-resilience/",
+    "summary": "博客说明政府和组织如何在危机韧性场景中使用技术，围绕灾害信息汇总、跨机构响应和基础设施恢复展开案例。公共部门、安全团队和企业运营团队可关注数据共享流程、权限边界、公众沟通、系统冗余、演练指标和应急协作风险。这些案例能支撑演练方案、系统采购和响应责任划分。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Google Keyword Blog",
+    "section": "hot_blogs",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 82,
+    "importance": "notable",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "技术拆解",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "企业 AI 采纳"
+    ],
+    "channels_l2": [
+      "企业治理与落地"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-ecda44a79d6b631e",
+    "title": "Google说明 Claude Code agent 工具工作流",
+    "url": "https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/",
+    "summary": "文章说明托管智能体接口的扩展，围绕后台任务、远程执行、状态保持和开发者接入流程展开。材料给出接口和权限相关线索，工程团队可关注长任务调度、失败恢复、结果回传、权限隔离、日志审计、成本管理和现有自动化系统之间的衔接成本。这些信息能支撑试点范围、日志留存和验收指标设计。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Google Keyword Blog",
+    "section": "hot_blogs",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 82,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "技术拆解",
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "AI 编程"
+    ],
+    "companies": [
+      "Google"
+    ],
+    "products": [
+      "Claude"
+    ]
+  },
+  {
+    "id": "article-40cd61882ce63afd",
+    "title": "NVIDIA说明模型权重和使用说明",
+    "url": "https://blogs.nvidia.com/blog/hugging-face-lerobot-models-frameworks-open-robotics/",
+    "summary": "博客说明英伟达与开源模型社区在机器人生态中的合作，围绕开放机器人学习、数据集、模型权重和开发工具展开。机器人团队可关注代码接口、训练流程、仿真评测、部署限制、硬件适配成本和实验复现难度，评估开源资产能否降低实验门槛。这些线索能支撑实验路线、设备预算和维护计划。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "NVIDIA Newsroom RSS",
+    "section": "hot_blogs",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 82,
+    "importance": "notable",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "技术拆解",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型"
+    ],
+    "channels_l2": [
+      "具身智能",
+      "模型能力"
+    ],
+    "companies": [
+      "NVIDIA"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-0c0363eaa217d8ab",
+    "title": "Alibaba Cloud更新公开产品或工程信息",
+    "url": "https://www.alibabacloud.com/blog/the-tipping-point-for-ai-glasses_603338",
+    "summary": "博客说明智能眼镜正从展示型设备转向日常入口，围绕端侧计算、语音视觉交互、应用生态和佩戴场景展开。文章依据硬件形态与云端服务的配合案例，帮助硬件、内容和应用团队关注设备续航、输入方式、隐私风险、应用分发、供应链支持和场景落地节奏。",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Alibaba Cloud Blog",
+    "section": "hot_blogs",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 80,
+    "importance": "notable",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "技术拆解"
+    ],
+    "channels_l1": [
+      "多模态 AI"
+    ],
+    "channels_l2": [
+      "多模态生成"
+    ],
+    "companies": [
+      "Alibaba"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-38264e1d1b3176be",
+    "title": "Guillermo Rauch: 🆒 eve evals itself with 𝚎𝚟𝚎 𝚎𝚟𝚊𝚕.…",
+    "url": "https://x.com/rauchg/status/2074287795028512773",
+    "summary": "🆒 eve evals itself with 𝚎𝚟𝚎 𝚎𝚟𝚊𝚕. Web frameworks made testing an ecosystem choice. e.g.: React didn’t ship with a built-in testing solution. For agents, evals are essential… thus we ship 𝚎𝚟𝚎 𝚎𝚟𝚊𝚕 out of the box. For your agents and eve’s own evolution. https://t.co/Ujh4FHpPdN",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Guillermo Rauch",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "notable",
+    "domain": "行业动态与政策地缘",
+    "flavors": [
+      "观点专访"
+    ],
+    "channels_l1": [
+      "AI 市场动态"
+    ],
+    "channels_l2": [
+      "行业动态"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-0e8e2a8381d32d03",
+    "title": "Swyx: imo this is the most impt part of anthrop…",
+    "url": "https://x.com/swyx/status/2074344727202463832",
+    "summary": "imo this is the most impt part of anthropic's J-space paper today. it's a two-parter: 1) ant proved that they can do \"brain surgery\" interventions into reasoning to change topics midstream* 2) THE MODEL IS ABLE TO DETECT WHAT INTERVENTION WAS DONE - close cousin to eval awareness *control > correlation - this convincingly demonstrates understanding this was prompted awareness... surely @mlpowered's team also tried to eval unprompted awareness but i didn't see evidence of that",
+    "date": "2026-07-07",
+    "month": "2026-07",
+    "source": "Swyx",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "论文",
+      "技术拆解",
+      "观点专访"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力"
+    ],
+    "companies": [
+      "Anthropic"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-33ff9177ca69de68",
+    "title": "Anthropic说明安全治理和平台控制变化",
+    "url": "https://www.anthropic.com/news/alberta-government-claude-cybersecurity",
+    "summary": "Anthropic 发布 Claude Fable 5 和 Claude Mythos 5：Fable 5 是面向通用使用开放的 Mythos-class 安全版，Mythos 5 是同一底层模型的可信访问版本，差别主要在安全限制和访问范围。 可观察的是合规、安全和平台治理口径变化",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Anthropic News",
+    "section": "stories",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 93,
+    "importance": "general",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "企业 AI 采纳"
+    ],
+    "channels_l2": [
+      "模型能力",
+      "企业治理与落地"
+    ],
+    "companies": [
+      "Anthropic"
+    ],
+    "products": [
+      "Claude"
+    ]
+  },
+  {
+    "id": "article-7aa724ea24d5d2d3",
+    "title": "Tencent AI Business发布 agent 与开发者工具能力",
+    "url": "https://www.tencent.com/en-us/articles/2202386.html",
+    "summary": "Tencent AI Business 继续推进智能体与开发者工具能力，重点放在任务编排、上下文管理、权限控制和工程集成。团队评估时应结合权限模型、回放评估、现有流程和可观测性指标。 可观察的是 agent、开发工具和自动化工作流的接入成本",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Tencent AI Business",
+    "section": "stories",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 93,
+    "importance": "general",
+    "domain": "基础模型与算力技术栈",
+    "flavors": [
+      "商业洞察",
+      "实战方法"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "AI 工程栈",
+      "AI 助手与 Agent"
+    ],
+    "channels_l2": [
+      "开发者工具",
+      "模型能力",
+      "Agent 产品"
+    ],
+    "companies": [
+      "Tencent"
+    ],
+    "products": []
+  },
+  {
     "id": "article-ae19178305e34908",
     "title": "这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口",
     "url": "https://github.com/sansan0/TrendRadar",
@@ -174,61 +1959,56 @@
     "products": []
   },
   {
-    "id": "article-810460beb79df931",
-    "title": "SWE-bench Pro",
-    "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
-    "summary": "Scale Labs 公开榜单显示，SWE-bench Pro Public Dataset 当前第一是 SWE-Agent + claude-4-5-Sonnet（anthropic，Resolve Rate 43.72%）。 前三名为 SWE-Agent + claude-4-5-Sonnet 43.72%、SWE-Agent + claude-4-Sonnet 42.70%、SWE-Agent + claude-4-5-haiku 39.45%，Top 10 供应商分布为 anthropic 3、openai 2、moonshot 1、unknown 1。 这个榜单适合观察 coding agent 在长周期真实工程任务上的相对表现，但生产选型仍要结合 scaffold、成本上限、置信区间和团队自有仓库复测。",
+    "id": "article-b36169a44d2ecc6a",
+    "title": "Anthropic说明模型评估和研究结果",
+    "url": "https://www.anthropic.com/research/global-workspace",
+    "summary": "文章分析语言模型中的全局工作空间假设，围绕信息整合、上下文保持和推理过程展开实验。研究团队可关注实验方法、评估限制、可解释性证据、工作记忆表现、错误案例和模型可靠性之间的关系，用于改进平台评测与安全审查。这些结果能支撑后续评测口径、风险分类和模型分析。",
     "date": "2026-07-06",
     "month": "2026-07",
-    "source": "Scale Labs SWE-Bench Pro",
-    "section": "daily_tracking",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 90,
-    "importance": "major",
-    "domain": "企业落地与业务应用",
+    "source": "Anthropic Research",
+    "section": "hot_blogs",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 82,
+    "importance": "notable",
+    "domain": "基础模型与算力技术栈",
     "flavors": [
-      "快讯",
-      "商业洞察"
+      "论文",
+      "技术拆解",
+      "实战方法"
     ],
     "channels_l1": [
       "基础模型",
-      "企业 AI 采纳",
-      "AI 助手与 Agent"
+      "AI 算力与推理服务"
     ],
     "channels_l2": [
-      "成本与用量治理",
-      "模型能力",
-      "AI 编程"
+      "开发者工具",
+      "模型能力"
     ],
     "companies": [
-      "Anthropic",
-      "Moonshot",
-      "OpenAI"
+      "Anthropic"
     ],
-    "products": [
-      "Claude"
-    ]
+    "products": []
   },
   {
-    "id": "article-07e9d51e749eb918",
-    "title": "Artificial Analysis",
-    "url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
-    "summary": "Artificial Analysis 公开榜单显示，当前 Intelligence Index 第一是 Claude Fable 5 (with fallback)（anthropic，60 分）。 前三名为 Claude Fable 5 (with fallback) 60 分、Claude Opus 4.8 (max) 56 分、GPT-5.5 (xhigh) 55 分，Top 10 供应商分布为 anthropic 4、google 2、alibaba 1、minimax 1、openai 1、zhipu 1。 这个榜单适合做模型 shortlist 和能力变化监测，但生产选型仍要结合延迟、价格、上下文长度和自有任务复测。",
+    "id": "article-c5ad96cf2c009296",
+    "title": "BioMysteryBench 完整数据集",
+    "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-full",
+    "summary": "文章说明生物谜题基准完整版材料，围绕生物领域谜题任务、评分方式和复现实验展开。研究团队可关注样例覆盖、数据许可、专业审查流程、安全门槛、结果解释方式和专家复核要求，把它用于比较模型能力与风险响应。这些材料能支撑实验复现、结果解释和安全分级。",
     "date": "2026-07-06",
     "month": "2026-07",
-    "source": "Artificial Analysis Intelligence Index",
-    "section": "daily_tracking",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 86,
+    "source": "Anthropic Hugging Face Organization",
+    "section": "hot_blogs",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 82,
     "importance": "notable",
-    "domain": "行业动态与政策地缘",
+    "domain": "基础模型与算力技术栈",
     "flavors": [
-      "技术拆解",
-      "快讯"
+      "论文",
+      "技术拆解"
     ],
     "channels_l1": [
       "基础模型",
@@ -239,157 +2019,40 @@
       "模型能力"
     ],
     "companies": [
-      "Alibaba",
       "Anthropic",
-      "Google",
-      "Moonshot",
-      "OpenAI",
-      "Zhipu"
-    ],
-    "products": [
-      "Claude",
-      "GPT"
-    ]
-  },
-  {
-    "id": "article-e3bfb0c3548ab358",
-    "title": "OpenRouter",
-    "url": "https://openrouter.ai/rankings",
-    "summary": "OpenRouter 公开榜单显示，本周调用热度第一是 DeepSeek V4 Flash（deepseek，5.34T tokens，周变化 15%）。 Top 10 供应商分布为 anthropic 3、deepseek 2、minimax 1、stepfun 1、tencent 1、xiaomi 1、z-ai 1，可用来观察开发者在 OpenRouter 平台内的真实调用偏好。 该快照只说明 OpenRouter 平台内使用热度，不能替代能力榜单或全市场份额判断。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "OpenRouter Rankings",
-    "section": "daily_tracking",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 86,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "AI 工程栈",
-      "AI 市场动态"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力",
-      "市场与商业化"
-    ],
-    "companies": [
-      "Anthropic",
-      "DeepSeek",
-      "Tencent"
-    ],
-    "products": [
-      "DeepSeek"
-    ]
-  },
-  {
-    "id": "article-0446821518e71993",
-    "title": "diegosouzapw/OmniRoute",
-    "url": "https://github.com/diegosouzapw/OmniRoute",
-    "summary": "diegosouzapw/OmniRoute 的公开仓库提供了可检查的代码、示例和配置入口，适合从 多模型路由和请求分发 角度做小范围试验。使用前还应关注安装路径、默认配置、安全权限、近期提交、issue 讨论和维护节奏，避免把短期热度误认为生产可用性。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "GitHub Trending weekly",
-    "section": "github_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 78,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "AI 工程栈",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力",
-      "AI 编程"
-    ],
-    "companies": [
-      "GitHub"
-    ],
-    "products": [
-      "Claude",
-      "Codex",
-      "MCP"
-    ]
-  },
-  {
-    "id": "article-3c44be280a6c9e15",
-    "title": "stabilityai/stable-diffusion-xl-base-1.0",
-    "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
-    "summary": "Stable Diffusion XL 仍是图像生成选型中的常见基线，适合对比画质、生态兼容性、推理资源和商用条款。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 78,
-    "importance": "notable",
-    "domain": "多模态与具身等前沿",
-    "flavors": [
-      "快讯",
-      "商业洞察",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "基础模型"
-    ],
-    "channels_l2": [
-      "多模态生成",
-      "模型能力"
-    ],
-    "companies": [
       "Hugging Face"
     ],
     "products": []
   },
   {
-    "id": "article-c7c9684abfb72529",
-    "title": "usestrix/strix",
-    "url": "https://github.com/usestrix/strix",
-    "summary": "usestrix/strix 的公开仓库提供了可检查的代码、示例和配置入口，适合从 安全测试 agent 和自动化漏洞验证 角度做小范围试验。使用前还应关注安装路径、默认配置、安全权限、近期提交、issue 讨论和维护节奏，避免把短期热度误认为生产可用性。",
+    "id": "article-c755c8d918ae5e91",
+    "title": "BioMysteryBench 预览数据集",
+    "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-preview",
+    "summary": "文章说明生物谜题基准预览版的评测样例，围绕任务形式、问题结构和限制说明展开。安全、评测和生命科学团队可关注样例覆盖、专业审查、数据许可、评分方式、专家参与程度和模型风险测试的适用范围，再决定是否纳入内部材料。这些信息能支撑评测集筛选、专家复核和风险登记。",
     "date": "2026-07-06",
     "month": "2026-07",
-    "source": "GitHub Trending weekly",
-    "section": "github_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 78,
+    "source": "Anthropic Hugging Face Organization",
+    "section": "hot_blogs",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 82,
     "importance": "notable",
     "domain": "基础模型与算力技术栈",
     "flavors": [
-      "报告",
-      "快讯"
+      "技术拆解"
     ],
     "channels_l1": [
-      "AI 工程栈",
-      "AI 助手与 Agent"
+      "基础模型",
+      "AI 工程栈"
     ],
     "channels_l2": [
       "开发者工具",
-      "Agent 产品",
-      "AI 编程"
+      "模型能力"
     ],
     "companies": [
-      "GitHub"
+      "Anthropic",
+      "Hugging Face"
     ],
     "products": []
   },
@@ -518,76 +2181,6 @@
     "products": []
   },
   {
-    "id": "article-d1946b21c02e5fa5",
-    "title": "alibaba/page-agent",
-    "url": "https://github.com/alibaba/page-agent",
-    "summary": "alibaba/page-agent 的公开仓库提供了可检查的代码、示例和配置入口，适合从 网页操作 agent 和页面理解 角度做小范围试验。使用前还应关注安装路径、默认配置、安全权限、近期提交、issue 讨论和维护节奏，避免把短期热度误认为生产可用性。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "GitHub Trending weekly",
-    "section": "github_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 76,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "技术拆解",
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "AI 工程栈",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "Agent 产品",
-      "AI 编程"
-    ],
-    "companies": [
-      "Alibaba",
-      "GitHub"
-    ],
-    "products": [
-      "MCP"
-    ]
-  },
-  {
-    "id": "article-4d5e92d1978119e8",
-    "title": "black-forest-labs/FLUX.1-dev",
-    "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
-    "summary": "FLUX.1-dev 面向高质量图像生成，适合关注开源图像模型的画质、提示词控制和授权边界。评估时应结合模型卡、推理成本和内容安全策略。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 76,
-    "importance": "notable",
-    "domain": "多模态与具身等前沿",
-    "flavors": [
-      "快讯",
-      "商业洞察",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "基础模型"
-    ],
-    "channels_l2": [
-      "多模态生成",
-      "模型能力"
-    ],
-    "companies": [
-      "Hugging Face"
-    ],
-    "products": []
-  },
-  {
     "id": "article-ddd7486148a91958",
     "title": "browser-use/video-use",
     "url": "https://github.com/browser-use/video-use",
@@ -619,44 +2212,6 @@
     "products": []
   },
   {
-    "id": "article-3ce63bb1cf5241de",
-    "title": "deepseek-ai/DeepSeek-R1",
-    "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
-    "summary": "DeepSeek-R1 面向推理和文本生成任务，适合关注开源推理模型的团队继续观察部署成本、长上下文表现和许可证约束。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 76,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "AI 工程栈",
-      "AI 算力与推理服务"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力",
-      "RAG 与检索"
-    ],
-    "companies": [
-      "DeepSeek",
-      "Hugging Face"
-    ],
-    "products": [
-      "DeepSeek",
-      "Qwen"
-    ]
-  },
-  {
     "id": "article-55bda1aed5a8659b",
     "title": "interviewstreet/hiring-agent",
     "url": "https://github.com/interviewstreet/hiring-agent",
@@ -684,69 +2239,6 @@
     "channels_l2": [
       "开发者工具",
       "Agent 产品",
-      "AI 编程",
-      "RAG 与检索"
-    ],
-    "companies": [
-      "GitHub"
-    ],
-    "products": []
-  },
-  {
-    "id": "article-2b4f6c034c8e44fa",
-    "title": "logto-io/logto",
-    "url": "https://github.com/logto-io/logto",
-    "summary": "logto-io/logto 的公开仓库提供了可检查的代码、示例和配置入口，适合从 身份认证和多租户接入 角度做小范围试验。使用前还应关注安装路径、默认配置、安全权限、近期提交、issue 讨论和维护节奏，避免把短期热度误认为生产可用性。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "GitHub Trending weekly",
-    "section": "github_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 76,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "AI 工程栈"
-    ],
-    "channels_l2": [
-      "开发者工具"
-    ],
-    "companies": [
-      "GitHub"
-    ],
-    "products": []
-  },
-  {
-    "id": "article-c87b77df69f1bb71",
-    "title": "ogulcancelik/herdr",
-    "url": "https://github.com/ogulcancelik/herdr",
-    "summary": "ogulcancelik/herdr 的公开仓库提供了可检查的代码、示例和配置入口，适合从 个人知识采集和检索 角度做小范围试验。使用前还应关注安装路径、默认配置、安全权限、近期提交、issue 讨论和维护节奏，避免把短期热度误认为生产可用性。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "GitHub Trending weekly",
-    "section": "github_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 76,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "AI 工程栈",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "开发者工具",
       "AI 编程",
       "RAG 与检索"
     ],
@@ -850,36 +2342,92 @@
     "products": []
   },
   {
-    "id": "article-2e124a6790ad32c3",
-    "title": "Zackriya-Solutions/meetily",
-    "url": "https://github.com/Zackriya-Solutions/meetily",
-    "summary": "Zackriya-Solutions/meetily 的公开仓库提供了可检查的代码、示例和配置入口，适合从 会议记录和本地协作 角度做小范围试验。使用前还应关注安装路径、默认配置、安全权限、近期提交、issue 讨论和维护节奏，避免把短期热度误认为生产可用性。",
+    "id": "article-deecc7aa4900247e",
+    "title": "Aaron Levie: Great post on how to think about open sou…",
+    "url": "https://x.com/levie/status/2074163686990913576",
+    "summary": "Great post on how to think about open source AI and the applied AI layer. Two things will always be true in AI. Frontier intelligence will likely remain at the forefront of solving brand new used cases and often be used for orchestrating and planning of any type of complex workflow. At the same time, as use-cases become mature and predictable in an enterprise context, you can begin to peel off some set of the tokens to either lower cost open or closed models *or* models that are trained for the...",
     "date": "2026-07-06",
     "month": "2026-07",
-    "source": "GitHub Trending weekly",
-    "section": "github_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 76,
+    "source": "Aaron Levie",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
     "importance": "notable",
     "domain": "基础模型与算力技术栈",
     "flavors": [
-      "快讯",
-      "商业洞察"
+      "商业洞察",
+      "实战方法",
+      "观点专访"
     ],
     "channels_l1": [
-      "AI 工程栈",
+      "AI 工程栈"
+    ],
+    "channels_l2": [
+      "开发者工具"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-d2c9494989c0470c",
+    "title": "Amjad Masad: Many are asking how Replit is improving s…",
+    "url": "https://x.com/amasad/status/2074257906594177279",
+    "summary": "Many are asking how Replit is improving so rapidly—we closed the loop and the agent is self-improving. Technical details here: https://t.co/jfyBidPEQo",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Amjad Masad",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "notable",
+    "domain": "行业动态与政策地缘",
+    "flavors": [
+      "观点专访"
+    ],
+    "channels_l1": [
       "AI 助手与 Agent"
     ],
     "channels_l2": [
-      "开发者工具",
       "Agent 产品"
     ],
-    "companies": [
-      "GitHub"
-    ],
+    "companies": [],
     "products": []
+  },
+  {
+    "id": "article-27f541a6c7df32ed",
+    "title": "Boris Cherny: This is our first time telling the story…",
+    "url": "https://x.com/bcherny/status/2074247226038063316",
+    "summary": "This is our first time telling the story of how we first built and launched Claude Code, starting with its origins in Anthropic safety research. So much more to do. We are 1% done. https://t.co/QSkt89cB8q",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Boris Cherny",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "notable",
+    "domain": "行业动态与政策地缘",
+    "flavors": [
+      "论文",
+      "观点专访"
+    ],
+    "channels_l1": [
+      "基础模型"
+    ],
+    "channels_l2": [
+      "模型能力"
+    ],
+    "companies": [
+      "Anthropic"
+    ],
+    "products": [
+      "Claude"
+    ]
   },
   {
     "id": "article-379642deb53f3714",
@@ -916,39 +2464,6 @@
     "products": [
       "MCP"
     ]
-  },
-  {
-    "id": "article-f3aa7dbdb63c9465",
-    "title": "CompVis/stable-diffusion-v1-4",
-    "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
-    "summary": "Stable Diffusion v1-4 代表较成熟的图像生成基线，适合用于兼容性测试、插件生态验证和历史项目维护。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 74,
-    "importance": "general",
-    "domain": "多模态与具身等前沿",
-    "flavors": [
-      "快讯",
-      "商业洞察",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "基础模型"
-    ],
-    "channels_l2": [
-      "多模态生成",
-      "模型能力"
-    ],
-    "companies": [
-      "Hugging Face"
-    ],
-    "products": []
   },
   {
     "id": "article-dfd36ca8ef6ea092",
@@ -1015,35 +2530,6 @@
     "products": []
   },
   {
-    "id": "article-068fdb7f37d07979",
-    "title": "elastic/elasticsearch",
-    "url": "https://github.com/elastic/elasticsearch",
-    "summary": "README拉取失败；此条仅展示仓库排名、语言、星标变化和趋势方向，不补写项目能力说明。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "GitHub Trending Java weekly",
-    "section": "github_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 74,
-    "importance": "general",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "快讯"
-    ],
-    "channels_l1": [
-      "AI 工程栈"
-    ],
-    "channels_l2": [
-      "开发者工具"
-    ],
-    "companies": [
-      "GitHub"
-    ],
-    "products": []
-  },
-  {
     "id": "article-cb2c51bc30a37065",
     "title": "every-app/open-seo",
     "url": "https://github.com/every-app/open-seo",
@@ -1079,6 +2565,33 @@
     "products": [
       "MCP"
     ]
+  },
+  {
+    "id": "article-32584987f8dae5b7",
+    "title": "Guillermo Rauch: The ultimate test for coding AI: is softw…",
+    "url": "https://x.com/rauchg/status/2074222247548735996",
+    "summary": "The ultimate test for coding AI: is software as a whole getting better? Are companies shipping faster? Do you now have apps and games you couldn't even dream of before? Is the software you're getting bug-free? For me: my own ability to influence my productivity has radically increased. I feel a level of agency and autonomy I never had before. I'm free to create and execute. I can communicate a vision with my colleagues instantly. Personal software is real and a big win, I have a bunch of web to...",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Guillermo Rauch",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "notable",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "观点专访"
+    ],
+    "channels_l1": [
+      "多模态 AI"
+    ],
+    "channels_l2": [
+      "多模态生成"
+    ],
+    "companies": [],
+    "products": []
   },
   {
     "id": "article-75267d807e2f909d",
@@ -1146,6 +2659,65 @@
     "products": []
   },
   {
+    "id": "article-8949a9459894d1f5",
+    "title": "Nan Yu: Yeah, this resonates. I was horribly inef…",
+    "url": "https://x.com/thenanyu/status/2074258147015897357",
+    "summary": "Yeah, this resonates. I was horribly inefficient, so I brute forced a lot of stuff. The biggest difference now, even for early stage startups, is you can do way more in parallel because of agents. https://t.co/Bplx8imZ9n",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Nan Yu",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "notable",
+    "domain": "行业动态与政策地缘",
+    "flavors": [
+      "观点专访"
+    ],
+    "channels_l1": [
+      "AI 市场动态"
+    ],
+    "channels_l2": [
+      "行业动态"
+    ],
+    "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-1ebd4c9bd4f6024b",
+    "title": "Peter Yang: Fable 5 will leave Claude subscriptions t…",
+    "url": "https://x.com/petergyang/status/2074206798631071796",
+    "summary": "Fable 5 will leave Claude subscriptions tomorrow at midnight. Here are 5 use cases worth trying before then, with prompts you can copy and paste: 1) FIND FABLE-WORTHY WORK You're Fable 5, the most capable model available. Look through my projects, docs, and your memory, and list the top 5 tasks genuinely worth running on you. Rank them with a one-line reason each. Don't do the work yet. 2) GET LIFE & BUSINESS ADVICE You're my business advisor. Read my plan doc and pull live data from my connect...",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Peter Yang",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 74,
+    "importance": "notable",
+    "domain": "企业落地与业务应用",
+    "flavors": [
+      "商业洞察",
+      "观点专访"
+    ],
+    "channels_l1": [
+      "基础模型",
+      "企业 AI 采纳"
+    ],
+    "channels_l2": [
+      "模型能力",
+      "企业治理与落地"
+    ],
+    "companies": [],
+    "products": [
+      "Claude"
+    ]
+  },
+  {
     "id": "article-f95ed07ac3c66e6d",
     "title": "prometheus/prometheus",
     "url": "https://github.com/prometheus/prometheus",
@@ -1178,248 +2750,93 @@
     "products": []
   },
   {
-    "id": "article-022c4327710cbfe7",
-    "title": "TencentCloud/CubeSandbox",
-    "url": "https://github.com/TencentCloud/CubeSandbox",
-    "summary": "TencentCloud/CubeSandbox 的公开仓库提供了可检查的代码、示例和配置入口，适合从 云端沙箱和隔离执行 角度做小范围试验。使用前还应关注安装路径、默认配置、安全权限、近期提交、issue 讨论和维护节奏，避免把短期热度误认为生产可用性。",
+    "id": "article-372539874401f26c",
+    "title": "Thibault Sottiaux: Closing this week. Much of the teams buil…",
+    "url": "https://x.com/thsottiaux/status/2074195169990357398",
+    "summary": "Closing this week. Much of the teams building ChatGPT, Codex and OpenClaw will be there and we'll have a few surprises for folks. Hope to see many of you 👀 https://t.co/0bvnIVPbwb",
     "date": "2026-07-06",
     "month": "2026-07",
-    "source": "GitHub Trending Rust weekly",
-    "section": "github_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
+    "source": "Thibault Sottiaux",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
     "quality_score": 74,
-    "importance": "general",
-    "domain": "基础模型与算力技术栈",
+    "importance": "notable",
+    "domain": "AI 产品与应用工具",
     "flavors": [
-      "快讯",
-      "商业洞察"
+      "观点专访"
     ],
     "channels_l1": [
-      "AI 工程栈"
-    ],
-    "channels_l2": [
-      "开发者工具"
-    ],
-    "companies": [
-      "GitHub",
-      "Tencent"
-    ],
-    "products": []
-  },
-  {
-    "id": "article-4143cf1471f6ab87",
-    "title": "black-forest-labs/FLUX.1-schnell",
-    "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
-    "summary": "FLUX.1-schnell 面向快速图像生成，适合观察速度、质量、推理资源和输出内容审核之间的取舍。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 72,
-    "importance": "general",
-    "domain": "多模态与具身等前沿",
-    "flavors": [
-      "快讯",
-      "实战方法"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "基础模型"
-    ],
-    "channels_l2": [
-      "多模态生成",
-      "模型能力"
-    ],
-    "companies": [
-      "Hugging Face"
-    ],
-    "products": []
-  },
-  {
-    "id": "article-a0d5aaf3b3e59dfb",
-    "title": "deepseek-ai/DeepSeek-V4-Pro",
-    "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
-    "summary": "DeepSeek V4 Pro 面向文本生成和推理场景，适合继续观察模型卡、评测样本、许可证、部署成本和安全限制。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 72,
-    "importance": "general",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "AI 算力与推理服务"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力"
-    ],
-    "companies": [
-      "DeepSeek",
-      "Hugging Face"
-    ],
-    "products": [
-      "DeepSeek"
-    ]
-  },
-  {
-    "id": "article-464e108a8a04d874",
-    "title": "hexgrad/Kokoro-82M",
-    "url": "https://huggingface.co/hexgrad/Kokoro-82M",
-    "summary": "Kokoro-82M 面向文本转语音场景，关注点在音色质量、语种覆盖、推理速度和实际集成成本。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 72,
-    "importance": "general",
-    "domain": "多模态与具身等前沿",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "基础模型"
-    ],
-    "channels_l2": [
-      "多模态生成",
-      "模型能力"
-    ],
-    "companies": [
-      "Hugging Face",
-      "OpenAI"
-    ],
-    "products": []
-  },
-  {
-    "id": "article-deede0538205756c",
-    "title": "meta-llama/Llama-3.1-8B-Instruct",
-    "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
-    "summary": "Llama 3.1 8B Instruct 面向对话和指令跟随任务，适合做轻量应用原型、边缘部署和成本敏感场景的基线。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 72,
-    "importance": "general",
-    "domain": "企业落地与业务应用",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "企业 AI 采纳",
-      "AI 工程栈",
-      "AI 算力与推理服务",
       "AI 助手与 Agent"
     ],
     "channels_l2": [
-      "成本与用量治理",
-      "开发者工具",
-      "模型能力",
-      "Agent 产品",
-      "RAG 与检索"
+      "AI 编程"
     ],
-    "companies": [
-      "Hugging Face",
-      "Meta"
-    ],
+    "companies": [],
     "products": [
-      "Llama"
+      "ChatGPT",
+      "Codex",
+      "GPT"
     ]
   },
   {
-    "id": "article-19ee6af6e3d15e37",
-    "title": "meta-llama/Meta-Llama-3-8B",
-    "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
-    "summary": "Meta Llama 3 8B 适合关注轻量文本生成和本地部署的团队，评估时要同时看许可证、微调成本和推理延迟。",
+    "id": "article-76a51cf90094bd4a",
+    "title": "Cat Wu: a retrospective on making claude code fro…",
+    "url": "https://x.com/_catwu/status/2074258446686536167",
+    "summary": "a retrospective on making claude code from our early team! https://t.co/Kk9mz4BYXx",
     "date": "2026-07-06",
     "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
+    "source": "Cat Wu",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
     "quality_score": 72,
-    "importance": "general",
-    "domain": "基础模型与算力技术栈",
+    "importance": "notable",
+    "domain": "行业动态与政策地缘",
     "flavors": [
-      "快讯",
-      "商业洞察"
+      "观点专访"
     ],
     "channels_l1": [
-      "基础模型",
-      "AI 算力与推理服务",
-      "AI 助手与 Agent"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力",
-      "Agent 产品",
-      "RAG 与检索"
-    ],
-    "companies": [
-      "Hugging Face",
-      "Meta"
-    ],
-    "products": [
-      "Llama",
-      "Qwen"
-    ]
-  },
-  {
-    "id": "article-3630fc138d59fae6",
-    "title": "openai/whisper-large-v3",
-    "url": "https://huggingface.co/openai/whisper-large-v3",
-    "summary": "Whisper large-v3 面向语音识别与转写，关注点在多语言表现、长音频稳定性、硬件消耗和数据处理合规。",
-    "date": "2026-07-06",
-    "month": "2026-07",
-    "source": "Hugging Face Trending Models",
-    "section": "huggingface_trending",
-    "report_date": "2026-07-06",
-    "report_url": "reports/2026/07/2026-07-06.html",
-    "data_url": "data/2026/07/2026-07-06.json",
-    "quality_score": 72,
-    "importance": "general",
-    "domain": "多模态与具身等前沿",
-    "flavors": [
-      "快讯",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "多模态 AI",
       "基础模型"
     ],
     "channels_l2": [
-      "多模态生成",
       "模型能力"
     ],
-    "companies": [
-      "Hugging Face",
-      "OpenAI"
+    "companies": [],
+    "products": [
+      "Claude"
+    ]
+  },
+  {
+    "id": "article-fb74c984e58e2d6a",
+    "title": "Thariq: this is now on the Claude blog! https://t…",
+    "url": "https://x.com/trq212/status/2074186977147273540",
+    "summary": "this is now on the Claude blog! https://t.co/7LW0yDuixR",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Thariq",
+    "section": "builder_observations",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 72,
+    "importance": "notable",
+    "domain": "行业动态与政策地缘",
+    "flavors": [
+      "观点专访"
     ],
-    "products": []
+    "channels_l1": [
+      "基础模型"
+    ],
+    "channels_l2": [
+      "模型能力"
+    ],
+    "companies": [],
+    "products": [
+      "Claude"
+    ]
   },
   {
     "id": "article-d61ab7ec115d822b",
@@ -1449,6 +2866,41 @@
     "products": []
   },
   {
+    "id": "article-9dcb65dacb6fd27d",
+    "title": "人脸与人体识别",
+    "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=27",
+    "summary": "人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【新品上线】Unlimited-OCR 企业级服务邀您体验！ 2026-07-06 07:19 GitHub Star五天破万，位列HuggingFace全球多模态大模型榜单第一。最高可享1000页免...",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Baidu AI News",
+    "section": "community_leads",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 58,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "技术拆解",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型",
+      "AI 市场动态"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力",
+      "市场与商业化"
+    ],
+    "companies": [
+      "Baidu",
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
     "id": "article-f0c9d4488f3ddcfd",
     "title": "沙利文全栈AI云服务报告：阿里云占比40.1%，超第二至第四名总和",
     "url": "https://www.leiphone.com/category/industrynews/NN8pPZMe5DQqTILU.html",
@@ -1474,6 +2926,109 @@
       "市场与商业化"
     ],
     "companies": [],
+    "products": []
+  },
+  {
+    "id": "article-c6e4fd53d81af2f2",
+    "title": "图像技术",
+    "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=68",
+    "summary": "图像技术 文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【新品上线】Unlimited-OCR 企业级服务邀您体验！ 2026-07-06 07:19 GitHub Star五天破万，位列HuggingFace全球多模态大模型榜单第一。...",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Baidu AI News",
+    "section": "community_leads",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 58,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "技术拆解",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型",
+      "AI 市场动态"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力",
+      "市场与商业化"
+    ],
+    "companies": [
+      "Baidu",
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-de5e5abc3e3f13af",
+    "title": "文字识别",
+    "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=2",
+    "summary": "文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【新品上线】Unlimited-OCR 企业级服务邀您体验！ 2026-07-06 07:19 GitHub Star五天破万，位列HuggingFace全球多模态大模型榜单第一。最高可享1...",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Baidu AI News",
+    "section": "community_leads",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 58,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "技术拆解",
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型",
+      "AI 市场动态"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力",
+      "市场与商业化"
+    ],
+    "companies": [
+      "Baidu",
+      "GitHub"
+    ],
+    "products": []
+  },
+  {
+    "id": "article-7219f68a4adbdeaa",
+    "title": "语音技术",
+    "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=13",
+    "summary": "语音技术 图像技术 文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【新品上线】Unlimited-OCR 企业级服务邀您体验！ 2026-07-06 07:19。",
+    "date": "2026-07-06",
+    "month": "2026-07",
+    "source": "Baidu AI News",
+    "section": "community_leads",
+    "report_date": "2026-07-08",
+    "report_url": "reports/2026/07/2026-07-08.html",
+    "data_url": "data/2026/07/2026-07-08.json",
+    "quality_score": 58,
+    "importance": "general",
+    "domain": "多模态与具身等前沿",
+    "flavors": [
+      "商业洞察"
+    ],
+    "channels_l1": [
+      "多模态 AI",
+      "基础模型",
+      "AI 市场动态"
+    ],
+    "channels_l2": [
+      "多模态生成",
+      "模型能力",
+      "市场与商业化"
+    ],
+    "companies": [
+      "Baidu"
+    ],
     "products": []
   },
   {
@@ -7401,39 +8956,6 @@
     ],
     "companies": [
       "OpenAI"
-    ],
-    "products": []
-  },
-  {
-    "id": "article-32e2db27eca9a8cc",
-    "title": "相关团队披露模型能力和评估方法更新",
-    "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
-    "summary": "相关团队披露模型能力和评估方法更新，重点落在能力边界、评估设置、数据来源、使用场景和限制说明。更有价值的信息是模型能力、评估设置、数据来源和限制说明，判断这类方案时还要看结论仍要依赖可复现评测、真实任务和公开限制。文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。",
-    "date": "2026-06-28",
-    "month": "2026-06",
-    "source": "Hugging Face Trending Models",
-    "section": "hot_blogs",
-    "report_date": "2026-06-28",
-    "report_url": "reports/2026/06/2026-06-28.html",
-    "data_url": "data/2026/06/2026-06-28.json",
-    "quality_score": 82,
-    "importance": "notable",
-    "domain": "基础模型与算力技术栈",
-    "flavors": [
-      "技术拆解",
-      "实战方法",
-      "观点专访"
-    ],
-    "channels_l1": [
-      "基础模型",
-      "AI 工程栈"
-    ],
-    "channels_l2": [
-      "开发者工具",
-      "模型能力"
-    ],
-    "companies": [
-      "Hugging Face"
     ],
     "products": []
   },
@@ -13777,107 +15299,6 @@
     "products": []
   },
   {
-    "id": "article-c6e4fd53d81af2f2",
-    "title": "图像技术",
-    "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=68",
-    "summary": "图像技术 文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【商用】端到端语音语言大模型Pro版火热开售，最高享100万免费tokens 2026-06-17 03:09 全新智能语音交互，即刻感受“开口即真人”的全新体验。",
-    "date": "2026-06-17",
-    "month": "2026-06",
-    "source": "Baidu AI News",
-    "section": "community_leads",
-    "report_date": "2026-06-17",
-    "report_url": "reports/2026/06/2026-06-17.html",
-    "data_url": "data/2026/06/2026-06-17.json",
-    "quality_score": 58,
-    "importance": "general",
-    "domain": "多模态与具身等前沿",
-    "flavors": [
-      "技术拆解",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "基础模型",
-      "AI 市场动态"
-    ],
-    "channels_l2": [
-      "多模态生成",
-      "模型能力",
-      "市场与商业化"
-    ],
-    "companies": [
-      "Baidu"
-    ],
-    "products": []
-  },
-  {
-    "id": "article-de5e5abc3e3f13af",
-    "title": "文字识别",
-    "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=2",
-    "summary": "文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【商用】端到端语音语言大模型Pro版火热开售，最高享100万免费tokens 2026-06-17 03:09 全新智能语音交互，即刻感受“开口即真人”的全新体验。",
-    "date": "2026-06-17",
-    "month": "2026-06",
-    "source": "Baidu AI News",
-    "section": "community_leads",
-    "report_date": "2026-06-17",
-    "report_url": "reports/2026/06/2026-06-17.html",
-    "data_url": "data/2026/06/2026-06-17.json",
-    "quality_score": 58,
-    "importance": "general",
-    "domain": "多模态与具身等前沿",
-    "flavors": [
-      "技术拆解",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "基础模型",
-      "AI 市场动态"
-    ],
-    "channels_l2": [
-      "多模态生成",
-      "模型能力",
-      "市场与商业化"
-    ],
-    "companies": [
-      "Baidu"
-    ],
-    "products": []
-  },
-  {
-    "id": "article-7219f68a4adbdeaa",
-    "title": "语音技术",
-    "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=13",
-    "summary": "语音技术 图像技术 文字识别 人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【商用】端到端语音语言大模型Pro版火热开售，最高享100万免费tokens 2026-06-17 03:。",
-    "date": "2026-06-17",
-    "month": "2026-06",
-    "source": "Baidu AI News",
-    "section": "community_leads",
-    "report_date": "2026-06-17",
-    "report_url": "reports/2026/06/2026-06-17.html",
-    "data_url": "data/2026/06/2026-06-17.json",
-    "quality_score": 58,
-    "importance": "general",
-    "domain": "多模态与具身等前沿",
-    "flavors": [
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "多模态 AI",
-      "基础模型",
-      "AI 市场动态"
-    ],
-    "channels_l2": [
-      "多模态生成",
-      "模型能力",
-      "市场与商业化"
-    ],
-    "companies": [
-      "Baidu"
-    ],
-    "products": []
-  },
-  {
     "id": "article-6e6ffc018c9c2989",
     "title": "派早报：SpaceX 宣布收购 Cursor、字节跳动推出 Seedance 2.0 Mini 等",
     "url": "https://sspai.com/post/111124",
@@ -17851,36 +19272,6 @@
     "title": "内容审核",
     "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=85",
     "summary": "内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，欢迎使用！ 【重磅上线】「通用卡证票...",
-    "date": "2026-06-12",
-    "month": "2026-06",
-    "source": "Baidu AI News",
-    "section": "community_leads",
-    "report_date": "2026-06-14",
-    "report_url": "reports/2026/06/2026-06-14.html",
-    "data_url": "data/2026/06/2026-06-14.json",
-    "quality_score": 58,
-    "importance": "general",
-    "domain": "行业动态与政策地缘",
-    "flavors": [
-      "技术拆解",
-      "商业洞察"
-    ],
-    "channels_l1": [
-      "AI 市场动态"
-    ],
-    "channels_l2": [
-      "市场与商业化"
-    ],
-    "companies": [
-      "Baidu"
-    ],
-    "products": []
-  },
-  {
-    "id": "article-9dcb65dacb6fd27d",
-    "title": "人脸与人体识别",
-    "url": "https://ai.baidu.com/support/news?module=AIOfficialWeb&tag=27",
-    "summary": "人脸与人体识别 内容审核 自然语言处理 EasyDL UNIT 知识图谱 深度学习 AI Studio BML AI市场 月度盘点 其它 【重磅升级】文档解析（PaddleOCR-VL）1.6发布，文本/表格/公式解析能力全面增强 2026-06-12 02:04 准确率96.33%登顶全球第一。新人专享9元/千页，欢迎使用！ 【。",
     "date": "2026-06-12",
     "month": "2026-06",
     "source": "Baidu AI News",
