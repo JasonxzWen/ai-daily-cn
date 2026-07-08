@@ -99,3 +99,5 @@ If validation fails, the runner invokes exactly one repair pass. If the repair o
 ## Replacement Boundary
 
 The production entrypoint must remain `npm run daily:codex-pipeline`. The legacy daily workflow is invoked only behind that single script so scheduled automation does not expand old manual stage commands.
+
+The next accepted infrastructure slice migrates repository commands to `corepack pnpm`. After that migration lands, scheduled automation must call `corepack pnpm run daily:codex-pipeline` and old `npm run` scheduler instructions are intentionally unsupported.

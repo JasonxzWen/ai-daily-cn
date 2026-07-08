@@ -13,6 +13,10 @@ AI news moves across model labs, product launches, open-source projects, enginee
 
 The site is static. It needs no backend, database, queue, or hosted runtime.
 
+## Modernization track
+
+The accepted ADC modernization plan is tracked in [`docs/adc-modernization-roadmap.md`](docs/adc-modernization-roadmap.md). It supersedes the previous React/npm/shadcn-oriented PR stack and moves the project toward pnpm workspaces, Astryx, the `ADC.` visual identity, design workflow tooling, and medium-trust Wechat2RSS source leads.
+
 ## What it publishes
 
 - Daily HTML reports under `docs/reports/`
