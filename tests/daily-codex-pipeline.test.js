@@ -308,6 +308,7 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
   const workflowRunner = async ({ summaryPath }) => {
     const legacySummary = {
       report_date: reportDate,
+      mode: "publish",
       final_status: "published_degraded",
       next_action: { kind: "none" },
       clean_repo_root: cleanRoot,
@@ -346,6 +347,7 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
   const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
 
   assert.equal(summary.automation_pipeline_mode, "single_script_dag_orchestrator");
+  assert.equal(summary.mode, "publish");
   assert.equal(summary.final_status, "published");
   assert.equal(summary.legacy_final_status, "published_degraded");
   assert.equal(summary.orchestration.node_count, 2);
@@ -375,7 +377,55 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
 
   const saved = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
   assert.equal(saved.automation_pipeline_mode, "single_script_dag_orchestrator");
+  assert.equal(saved.mode, "publish");
   assert.equal(saved.final_status, "published");
+});
+
+test("daily Codex production orchestrator preserves daily runner mode for AI repair resume", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-repair-mode-"));
+  const reportDate = "2026-07-06";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  const workflowRunner = async ({ summaryPath }) => {
+    const legacySummary = {
+      report_date: reportDate,
+      mode: "publish",
+      final_status: "needs_ai_repair",
+      clean_repo_root: cleanRoot,
+      next_action: {
+        kind: "codex_ai_repair_contract",
+        contract_path: contractPath,
+        summary_path: summaryPath
+      },
+      stages: [
+        { id: "report_draft", status: "passed" },
+        { id: "quality_review", status: "failed" }
+      ]
+    };
+    await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+    return { summary: legacySummary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+
+  assert.equal(summary.final_status, "needs_ai_repair");
+  assert.equal(summary.mode, "publish");
+  assert.equal(summary.automation_pipeline_mode, "single_script_dag_orchestrator");
+  assert.equal(summary.next_action.contract_path, contractPath);
+
+  const saved = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
+  assert.equal(saved.mode, "publish");
+  assert.equal(saved.automation_pipeline_mode, "single_script_dag_orchestrator");
 });
 
 test("daily Codex DAG-lite CLI publishes explicit Source Watch admitted artifact into public articles", async () => {

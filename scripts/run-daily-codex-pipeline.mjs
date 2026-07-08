@@ -214,7 +214,7 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
   const summary = {
     ...legacySummary,
     ok: finalStatus === "published" || finalStatus === "published_pending_pages_verification",
-    mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
+    mode: legacySummary.mode || "publish",
     automation_pipeline_mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
     report_date: plan.report_date,
     final_status: finalStatus,
