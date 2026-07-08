@@ -2307,7 +2307,7 @@ test("official blog workflow runbook is executable and safety-backed", async () 
     "official_blog_authoring_brief",
     "official_blog_reviewed_authoring",
     "official_blog_knowledge_drafts",
-    "npm run validate"
+    "pnpm run validate"
   ]) {
     assert(runbook.includes(requiredText), `runbook must include ${requiredText}`);
   }

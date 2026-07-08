@@ -20,7 +20,7 @@ test("repo has Chinese agent instructions and effective-interact routing", async
 
   assert.match(agents, /始终使用中文回复用户/);
   assert.match(agents, /\.codex\/skills\/effective-interact/);
-  assert.match(agents, /npm run validate/);
+  assert.match(agents, /corepack pnpm run validate/);
 });
 
 test("effective-interact skill is installed with generator, validator, schema, and templates", async () => {
@@ -1233,8 +1233,10 @@ test("GitHub Pages deployment workflow publishes the generated docs artifact", a
   assert.match(workflow, /name: Setup Node\r?\n\s+uses: actions\/setup-node@v6\r?\n\s+with:\r?\n\s+node-version: "22"/);
   assert.match(workflow, /uses: actions\/checkout@v6/);
   assert.match(workflow, /uses: actions\/setup-node@v6/);
-  assert.match(workflow, /run: npm ci/);
-  assert.match(workflow, /run: npm run build/);
+  assert.match(workflow, /cache: pnpm/);
+  assert.match(workflow, /run: corepack enable/);
+  assert.match(workflow, /run: corepack pnpm install --frozen-lockfile/);
+  assert.match(workflow, /run: corepack pnpm run build/);
   assert.match(workflow, /uses: actions\/configure-pages@v5/);
   assert.match(workflow, /uses: actions\/upload-pages-artifact@v4/);
   assert.match(workflow, /path: docs/);

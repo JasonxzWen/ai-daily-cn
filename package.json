@@ -33,8 +33,8 @@
     "sources:display-contract": "node scripts/validate-source-display-contract.mjs",
     "privacy:validate": "node scripts/scan-public-artifacts.mjs",
     "build:check-clean": "node scripts/check-build-clean.mjs",
-    "validate:docs": "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run sources:display-contract && npm run privacy:validate && git diff --check",
-    "validate": "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run content:contract && npm run content:contract:self-test && npm run feedback:validate && npm run dag:validate && npm run workflow:validate && npm run resilience:validate && npm run source-reset:preflight && npm run sources:validate && npm run sources:display-contract && npm run test && npm run build:check-clean && npm run privacy:validate && npm run test:e2e && git diff --check",
+    "validate:docs": "pnpm run harness:init && pnpm run harness:validate && pnpm run retrospectives:validate && pnpm run sources:display-contract && pnpm run privacy:validate && git diff --check",
+    "validate": "pnpm run harness:init && pnpm run harness:validate && pnpm run retrospectives:validate && pnpm run content:contract && pnpm run content:contract:self-test && pnpm run feedback:validate && pnpm run dag:validate && pnpm run workflow:validate && pnpm run resilience:validate && pnpm run source-reset:preflight && pnpm run sources:validate && pnpm run sources:display-contract && pnpm run test && pnpm run build:check-clean && pnpm run privacy:validate && pnpm run test:e2e && git diff --check",
     "publish:prepare-worktree": "node src/cli.js publish:prepare-worktree",
     "publish:prepare-clean-worktree": "node src/cli.js publish:prepare-clean-worktree",
     "publish:preflight": "node src/cli.js publish:preflight",
@@ -62,6 +62,7 @@
     "ajv": "^8.17.1"
   },
   "engines": {
-    "node": ">=20"
-  }
+    "node": ">=20.19.0"
+  },
+  "packageManager": "pnpm@11.10.0+sha512.0b7f8b98060031904c017e3a41eb187a16d40eeb829b95c4f8cb03681761fc4ab53dd219115b9b447f4dce1a05a214764461e7d3703392a9f32f9511ce8c86c8"
 }

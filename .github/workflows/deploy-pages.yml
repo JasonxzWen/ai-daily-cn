@@ -28,13 +28,16 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "22"
-          cache: npm
+          cache: pnpm
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install dependencies
-        run: npm ci
+        run: corepack pnpm install --frozen-lockfile
 
       - name: Build static site
-        run: npm run build
+        run: corepack pnpm run build
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

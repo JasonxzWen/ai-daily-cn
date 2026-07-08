@@ -18,28 +18,28 @@ export function mergeCommandEnv(overrides = {}, options = {}) {
   return { ...env, ...normalizedOverrides };
 }
 
-export function npmExecutable(options = {}) {
+export function pnpmExecutable(options = {}) {
   const platform = options.platform || os.platform();
-  return platform === "win32" ? "npm.cmd" : "npm";
+  return platform === "win32" ? "corepack.cmd" : "corepack";
 }
 
-export function npmInvocationForArgs(args, options = {}) {
+export function pnpmInvocationForArgs(args, options = {}) {
   const platform = options.platform || os.platform();
   if (platform !== "win32") {
     return {
-      file: npmExecutable({ platform }),
-      args
+      file: pnpmExecutable({ platform }),
+      args: ["pnpm", ...args]
     };
   }
 
   return {
     file: "cmd.exe",
-    args: ["/d", "/s", "/c", ["npm", ...args.map(quoteCmdArg)].join(" ")]
+    args: ["/d", "/s", "/c", ["corepack", "pnpm", ...args.map(quoteCmdArg)].join(" ")]
   };
 }
 
-export function npmCommandText(args) {
-  return `npm ${args.join(" ")}`;
+export function pnpmCommandText(args) {
+  return `corepack pnpm ${args.join(" ")}`;
 }
 
 export function quoteCmdArg(value) {

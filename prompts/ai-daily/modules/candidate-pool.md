@@ -3,7 +3,7 @@
 日报正文只能从候选池中选条目。默认流程是先运行固定发现命令，再运行：
 
 ```powershell
-npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
+corepack pnpm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
 ```
 
 `report:draft` 会从发现输出合并 `source_audit`、写入 `.tmp/source-candidates-YYYY-MM-DD.json`、为入选候选标记 `status:"included"` / `included_in`，并生成 `.tmp/daily-report.json`。不要再用临时手工脚本绕过这个步骤。
@@ -28,6 +28,6 @@ npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-D
 执行顺序：
 
 1. 运行发现命令并写出 `.tmp/*-YYYY-MM-DD.json`。
-2. 运行 `npm run report:draft ...` 生成 `.tmp/source-candidates-YYYY-MM-DD.json` 和 `.tmp/daily-report.json`。
-3. 运行 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`。
+2. 运行 `corepack pnpm run report:draft ...` 生成 `.tmp/source-candidates-YYYY-MM-DD.json` 和 `.tmp/daily-report.json`。
+3. 运行 `corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`。
 4. 如果返回 `candidate_pool_missing`、`candidate_pool_reference_invalid` 或 schema 错误，修正候选池或正文回指，不要绕过门禁。

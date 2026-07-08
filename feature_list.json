@@ -6,11 +6,11 @@
       "status": "active",
       "summary": "Collect and audit daily AI sources before writing the structured report.",
       "commands": [
-        "npm run prompt:build -- YYYY-MM-DD",
-        "npm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
-        "npm run discover:builders -- --date YYYY-MM-DD --limit 20",
-        "npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
-        "npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20"
+        "corepack pnpm run prompt:build -- YYYY-MM-DD",
+        "corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
+        "corepack pnpm run discover:builders -- --date YYYY-MM-DD --limit 20",
+        "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
+        "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20"
       ],
       "artifacts": [
         ".tmp/source-candidates-YYYY-MM-DD.json",
@@ -28,11 +28,11 @@
       "behavior": "Collect and audit daily AI sources before writing the structured report.",
       "validation": {
         "commands": [
-          "npm run prompt:build -- YYYY-MM-DD",
-          "npm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
-          "npm run discover:builders -- --date YYYY-MM-DD --limit 20",
-          "npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
-          "npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20"
+          "corepack pnpm run prompt:build -- YYYY-MM-DD",
+          "corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
+          "corepack pnpm run discover:builders -- --date YYYY-MM-DD --limit 20",
+          "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
+          "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20"
         ]
       },
       "evidence": {
@@ -51,7 +51,7 @@
       "status": "active",
       "summary": "Normalize the structured draft into report data and candidate audit files.",
       "commands": [
-        "npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD"
+        "corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD"
       ],
       "artifacts": [
         "reports-data/YYYY/MM/YYYY-MM-DD.json",
@@ -68,7 +68,7 @@
       "behavior": "Normalize the structured draft into report data and candidate audit files.",
       "validation": {
         "commands": [
-          "npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD"
+          "corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD"
         ]
       },
       "evidence": {
@@ -86,8 +86,8 @@
       "status": "active",
       "summary": "Turn user-confirmed recurring feedback into durable validation-backed project behavior.",
       "commands": [
-        "npm run feedback:validate",
-        "npm run validate"
+        "corepack pnpm run feedback:validate",
+        "corepack pnpm run validate"
       ],
       "artifacts": [
         "config/feedback-ledger.json",
@@ -96,8 +96,8 @@
         "schemas/report.schema.json"
       ],
       "acceptance": [
-        "Open P1 feedback ledger items include existing scope paths, a validation command covered by `npm run validate`, and a test name that exists in `tests/**`.",
-        "`npm run validate` runs the feedback contract gate.",
+        "Open P1 feedback ledger items include existing scope paths, a validation command covered by `corepack pnpm run validate`, and a test name that exists in `tests/**`.",
+        "`corepack pnpm run validate` runs the feedback contract gate.",
         "Prompt module metadata remains aligned with `prompts/ai-daily/manifest.json`."
       ],
       "stop_conditions": [
@@ -107,8 +107,8 @@
       "behavior": "Turn user-confirmed recurring feedback into durable validation-backed project behavior.",
       "validation": {
         "commands": [
-          "npm run feedback:validate",
-          "npm run validate"
+          "corepack pnpm run feedback:validate",
+          "corepack pnpm run validate"
         ]
       },
       "evidence": {
@@ -129,8 +129,8 @@
       "status": "active",
       "summary": "Render the daily report to static GitHub Pages output through effective-interact.",
       "commands": [
-        "npm run build",
-        "npm run validate"
+        "corepack pnpm run build",
+        "corepack pnpm run validate"
       ],
       "artifacts": [
         "docs/reports/YYYY/MM/YYYY-MM-DD.html",
@@ -140,19 +140,19 @@
         "docs/index.html"
       ],
       "acceptance": [
-        "`npm run build` writes the daily HTML, JSON data, feed, and index.",
+        "`corepack pnpm run build` writes the daily HTML, JSON data, feed, and index.",
         "Daily HTML is generated by `.codex/skills/effective-interact` in `pre-rendered` mode.",
-        "`npm run validate` passes before any real publish attempt."
+        "`corepack pnpm run validate` passes before any real publish attempt."
       ],
       "stop_conditions": [
         "The report renderer falls back to a hand-written daily template.",
-        "`npm run validate` fails."
+        "`corepack pnpm run validate` fails."
       ],
       "behavior": "Render the daily report to static GitHub Pages output through effective-interact.",
       "validation": {
         "commands": [
-          "npm run build",
-          "npm run validate"
+          "corepack pnpm run build",
+          "corepack pnpm run validate"
         ]
       },
       "evidence": {
@@ -165,7 +165,7 @@
         ],
         "stop_conditions": [
           "The report renderer falls back to a hand-written daily template.",
-          "`npm run validate` fails."
+          "`corepack pnpm run validate` fails."
         ]
       }
     },
@@ -174,8 +174,8 @@
       "status": "active",
       "summary": "Prepare or inspect the publish worktree before publishing artifacts.",
       "commands": [
-        "npm run publish:prepare-worktree -- --message \"chore: save local changes before AI daily report YYYY-MM-DD\"",
-        "npm run publish:preflight"
+        "corepack pnpm run publish:prepare-worktree -- --message \"chore: save local changes before AI daily report YYYY-MM-DD\"",
+        "corepack pnpm run publish:preflight"
       ],
       "artifacts": [
         "git status --short --branch output",
@@ -193,8 +193,8 @@
       "behavior": "Prepare or inspect the publish worktree before publishing artifacts.",
       "validation": {
         "commands": [
-          "npm run publish:prepare-worktree -- --message \"chore: save local changes before AI daily report YYYY-MM-DD\"",
-          "npm run publish:preflight"
+          "corepack pnpm run publish:prepare-worktree -- --message \"chore: save local changes before AI daily report YYYY-MM-DD\"",
+          "corepack pnpm run publish:preflight"
         ]
       },
       "evidence": {
@@ -213,7 +213,7 @@
       "status": "active",
       "summary": "Preview publish artifacts, commit message, and expected Pages URL.",
       "commands": [
-        "npm run publish:dry-run"
+        "corepack pnpm run publish:dry-run"
       ],
       "artifacts": [
         "dry-run file plan",
@@ -231,7 +231,7 @@
       "behavior": "Preview publish artifacts, commit message, and expected Pages URL.",
       "validation": {
         "commands": [
-          "npm run publish:dry-run"
+          "corepack pnpm run publish:dry-run"
         ]
       },
       "evidence": {
@@ -250,8 +250,8 @@
       "status": "active",
       "summary": "Publish generated artifacts to `main` only after explicit confirmation.",
       "commands": [
-        "npm run publish -- confirm-push YYYY-MM-DD",
-        "npm run publish:github-api -- confirm-push YYYY-MM-DD"
+        "corepack pnpm run publish -- confirm-push YYYY-MM-DD",
+        "corepack pnpm run publish:github-api -- confirm-push YYYY-MM-DD"
       ],
       "artifacts": [
         "remote `main` commit containing publisher-managed files",
@@ -270,8 +270,8 @@
       "behavior": "Publish generated artifacts to `main` only after explicit confirmation.",
       "validation": {
         "commands": [
-          "npm run publish -- confirm-push YYYY-MM-DD",
-          "npm run publish:github-api -- confirm-push YYYY-MM-DD"
+          "corepack pnpm run publish -- confirm-push YYYY-MM-DD",
+          "corepack pnpm run publish:github-api -- confirm-push YYYY-MM-DD"
         ]
       },
       "evidence": {
@@ -291,9 +291,9 @@
       "status": "active",
       "summary": "Keep Codex task state, runbook, and validation gates aligned with the daily publishing workflow.",
       "commands": [
-        "npm run harness:init",
+        "corepack pnpm run harness:init",
         "node scripts/harness-validate.mjs",
-        "npm run validate"
+        "corepack pnpm run validate"
       ],
       "artifacts": [
         "tasks/current-task.example.md",
@@ -303,7 +303,7 @@
         "session-handoff.example.md"
       ],
       "acceptance": [
-        "`npm run harness:init` seeds per-worktree local state files before implementation or publish work starts.",
+        "`corepack pnpm run harness:init` seeds per-worktree local state files before implementation or publish work starts.",
         "`tasks/current-task.md` defines scope locally before implementation or publish work starts.",
         "`tasks/daily-publish-runbook.md` remains the operating sequence for daily publish runs.",
         "`session-handoff.md` records validation, publish status, residual risk, and next action locally."
@@ -315,9 +315,9 @@
       "behavior": "Keep Codex task state, runbook, and validation gates aligned with the daily publishing workflow.",
       "validation": {
         "commands": [
-          "npm run harness:init",
+          "corepack pnpm run harness:init",
           "node scripts/harness-validate.mjs",
-          "npm run validate"
+          "corepack pnpm run validate"
         ]
       },
       "evidence": {

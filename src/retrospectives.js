@@ -59,7 +59,7 @@ function buildDailyPublishRecord({ id, reportDate, status, summary }) {
       html: `docs/reports/${year}/${month}/${reportDate}.html`,
       validation_commands: [
         "node scripts/validate-retrospectives.mjs",
-        "npm run validate"
+        "corepack pnpm run validate"
       ]
     },
     blockers,
@@ -126,7 +126,7 @@ function buildDailyPublishCorrectionRecord({ id, reportDate, status, summary }) 
       html: `docs/reports/${year}/${month}/${reportDate}.html`,
       validation_commands: [
         "node scripts/validate-retrospectives.mjs",
-        "npm run validate"
+        "corepack pnpm run validate"
       ]
     },
     blockers: effectiveBlockers,

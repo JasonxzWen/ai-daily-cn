@@ -31,14 +31,14 @@ The canonical report data lives in `reports-data/`. Public artifacts in `docs/` 
 
 Requirements:
 
-- Node.js 20 or newer
-- npm
+- Node.js 20.19 or newer
+- Corepack-managed pnpm
 
 Install dependencies and build the site:
 
 ```powershell
-npm ci
-npm run build
+corepack pnpm install --frozen-lockfile
+corepack pnpm run build
 ```
 
 Open the generated site:
@@ -55,21 +55,21 @@ You can also open `docs/index.html` directly in a browser.
 
 | Command | Purpose |
 | --- | --- |
-| `npm run preflight:worktree` | Check branch, dirty state, `origin/main` freshness, sibling worktrees, and GitHub CLI auth before PR work. |
-| `npm run build` | Build the static site from `reports-data/` and `reports-source/`. |
-| `npm run validate:docs` | Run the faster documentation and process checks for docs-only changes. |
-| `npm run validate` | Run the full validation suite before shipping changes. |
-| `npm test` | Run the Node.js test suite. |
-| `npm run test:e2e` | Run browser-level checks. |
-| `npm run sources:validate` | Validate configured source registries. |
-| `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json` | Inspect site, source, and publish readiness for a date. |
+| `corepack pnpm run preflight:worktree` | Check branch, dirty state, `origin/main` freshness, sibling worktrees, and GitHub CLI auth before PR work. |
+| `corepack pnpm run build` | Build the static site from `reports-data/` and `reports-source/`. |
+| `corepack pnpm run validate:docs` | Run the faster documentation and process checks for docs-only changes. |
+| `corepack pnpm run validate` | Run the full validation suite before shipping changes. |
+| `corepack pnpm test` | Run the Node.js test suite. |
+| `corepack pnpm run test:e2e` | Run browser-level checks. |
+| `corepack pnpm run sources:validate` | Validate configured source registries. |
+| `corepack pnpm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json` | Inspect site, source, and publish readiness for a date. |
 
 ## Generate a daily report
 
 Maintainers can generate a dated report with:
 
 ```powershell
-npm run daily:run -- --date YYYY-MM-DD
+corepack pnpm run daily:run -- --date YYYY-MM-DD
 ```
 
 The command prepares local artifacts and stops at a dry-run publish plan. It does not publish to GitHub Pages unless a maintainer explicitly requests publishing.
@@ -84,7 +84,7 @@ Typical outputs:
 Run validation before publishing:
 
 ```powershell
-npm run validate
+corepack pnpm run validate
 ```
 
 ## Repository layout
@@ -131,7 +131,7 @@ Useful contributions include:
 Before opening a pull request, run:
 
 ```powershell
-npm run validate
+corepack pnpm run validate
 ```
 
 If your change affects HTML, CSS, or browser behavior, also inspect the generated site on desktop and mobile viewports.

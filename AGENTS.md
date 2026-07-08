@@ -5,7 +5,7 @@ always respond in Chinese unless the user explicitly asks for another language.
 ## Project Local Rules
 
 - Route interaction-reporting and handoff artifact work through `.codex/skills/effective-interact`.
-- Run `npm run validate` before final handoff when repository behavior or harness contracts change.
+- Run `corepack pnpm run validate` before final handoff when repository behavior or harness contracts change.
 
 # Codex Harness
 

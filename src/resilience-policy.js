@@ -4,7 +4,7 @@ import { buildDailyWorkflowStages } from "./daily-runner.js";
 
 const DEFAULT_POLICY_PATH = path.join("config", "daily-resilience-policy.json");
 const DEFAULT_REPORT_DATE = "2099-01-01";
-const REQUIRED_VALIDATE_COMMAND = "npm run resilience:validate";
+const REQUIRED_VALIDATE_COMMAND = "pnpm run resilience:validate";
 const REQUIRED_PACKAGE_SCRIPT = "node scripts/validate-daily-resilience-policy.mjs";
 
 const REQUIRED_TERMINAL_STATUSES = [
@@ -47,7 +47,7 @@ const DOC_MARKERS = [
     path: "tasks/daily-publish-runbook.md",
     contains: [
       "config/daily-resilience-policy.json",
-      "npm run resilience:validate",
+      "corepack pnpm run resilience:validate",
       "published_degraded",
       "infrastructure_blocked_after_fallback_exhausted"
     ]
@@ -56,7 +56,7 @@ const DOC_MARKERS = [
     path: "prompts/ai-daily/modules/publish-workflow.md",
     contains: [
       "config/daily-resilience-policy.json",
-      "npm run resilience:validate",
+      "corepack pnpm run resilience:validate",
       "published_degraded",
       "infrastructure_blocked_after_fallback_exhausted"
     ]
@@ -65,7 +65,7 @@ const DOC_MARKERS = [
     path: "docs/codex-automation-setup.md",
     contains: [
       "config/daily-resilience-policy.json",
-      "npm run resilience:validate",
+      "corepack pnpm run resilience:validate",
       "published_degraded",
       "infrastructure_blocked_after_fallback_exhausted"
     ]
@@ -74,7 +74,7 @@ const DOC_MARKERS = [
     path: "tasks/templates/daily-publish-task.md",
     contains: [
       "config/daily-resilience-policy.json",
-      "npm run resilience:validate",
+      "corepack pnpm run resilience:validate",
       "published_degraded",
       "infrastructure_blocked_after_fallback_exhausted"
     ]
@@ -311,7 +311,7 @@ async function validateWorkflowContractGate({ rootDir, failures, checkedFiles })
   const markerText = JSON.stringify(contract.required_markers || []);
   for (const marker of [
     "config/daily-resilience-policy.json",
-    "npm run resilience:validate",
+    "corepack pnpm run resilience:validate",
     "published_degraded",
     "infrastructure_blocked_after_fallback_exhausted"
   ]) {

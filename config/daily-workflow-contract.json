@@ -36,15 +36,15 @@
     "publish:dry-run:daily": "node src/cli.js publish:dry-run:daily --data-input reports-data --input reports-source --out docs"
   },
   "validate_must_include": [
-    "npm run dag:validate",
-    "npm run workflow:validate",
-    "npm run resilience:validate"
+    "pnpm run dag:validate",
+    "pnpm run workflow:validate",
+    "pnpm run resilience:validate"
   ],
   "required_markers": [
     {
       "path": "tasks/daily-publish-runbook.md",
       "contains": [
-        "npm run daily:codex-pipeline",
+        "corepack pnpm run daily:codex-pipeline",
         "--execute",
         "--publish",
         "completed_stages",
@@ -56,7 +56,7 @@
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
-        "npm run resilience:validate",
+        "corepack pnpm run resilience:validate",
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         "21:30",
@@ -66,17 +66,16 @@
     {
       "path": "prompts/ai-daily/modules/publish-workflow.md",
       "contains": [
-        "npm run daily:codex-pipeline",
+        "corepack pnpm run daily:codex-pipeline",
         "--execute",
         "--publish",
         "completed_stages",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD",
-        "legacy_daily_run_compatibility",
         "publish:dry-run:daily",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
-        "npm run resilience:validate",
+        "corepack pnpm run resilience:validate",
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         ".tmp/run-summary-YYYY-MM-DD.json",
@@ -90,7 +89,7 @@
     {
       "path": "docs/codex-automation-setup.md",
       "contains": [
-        "npm run daily:codex-pipeline",
+        "corepack pnpm run daily:codex-pipeline",
         "--execute",
         "--publish",
         "completed_stages",
@@ -99,7 +98,7 @@
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
-        "npm run resilience:validate",
+        "corepack pnpm run resilience:validate",
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         "21:30",
@@ -114,7 +113,7 @@
     {
       "path": "tasks/templates/daily-publish-task.md",
       "contains": [
-        "npm run daily:codex-pipeline",
+        "corepack pnpm run daily:codex-pipeline",
         "--execute",
         "--publish",
         "completed_stages",
@@ -123,7 +122,7 @@
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
-        "npm run resilience:validate",
+        "corepack pnpm run resilience:validate",
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         ".tmp/run-summary-YYYY-MM-DD.json",
@@ -159,7 +158,7 @@
   "external_automation_prompt": {
     "target": "active_daily_publish",
     "contains": [
-      "npm run daily:codex-pipeline",
+      "corepack pnpm run daily:codex-pipeline",
       "--execute",
       "--publish",
       ".tmp/run-summary-YYYY-MM-DD.json",
@@ -172,7 +171,8 @@
     ],
     "not_contains": [
       "publish:prepare-worktree",
-      "npm run publish:dry-run --"
+      "corepack pnpm run publish:dry-run --",
+      "pnpm run publish:dry-run --"
     ]
   },
   "external_automation_inventory": {

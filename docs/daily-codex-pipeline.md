@@ -19,13 +19,13 @@ In production mode (`--execute --publish` without a fixture), the script runs as
 Run the local DAG-lite pipeline:
 
 ```powershell
-npm run daily:codex-pipeline -- --date YYYY-MM-DD
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD
 ```
 
 Use a specific Codex model or work directory:
 
 ```powershell
-npm run daily:codex-pipeline -- --date YYYY-MM-DD --model gpt-5 --work-dir .tmp/daily-codex-mvp/YYYY-MM-DD
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --model gpt-5 --work-dir .tmp/daily-codex-mvp/YYYY-MM-DD
 ```
 
 Custom work directories must stay under `.tmp/daily-codex-mvp/` and must name a child run directory. The runner refuses to clean or write arbitrary repository paths.
@@ -33,13 +33,13 @@ Custom work directories must stay under `.tmp/daily-codex-mvp/` and must name a 
 Run the deterministic fixture path for local validation:
 
 ```powershell
-npm run daily:codex-pipeline -- --date YYYY-MM-DD --fixture success
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --fixture success
 ```
 
 Production execution and publishing use the same entrypoint:
 
 ```powershell
-npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --codex-bin codex.cmd
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --codex-bin codex.cmd
 ```
 
 `--execute` records the production intent and configures the Codex command. `codex.cmd` and arguments after `--` are command configuration, not fixture modes. In a full repository checkout this command runs the single-script production orchestrator and may publish.
@@ -47,7 +47,7 @@ npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --codex-bi
 When `.tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json` exists, callers may pass it explicitly:
 
 ```powershell
-npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json
 ```
 
 The runner does not scan `.tmp` for the newest artifact. The summary records `source_watch_admitted_artifact_path` so scheduled automation can report which admitted artifact was used. If the artifact is not provided, the field remains empty; the normal daily publish flow still runs.
@@ -98,6 +98,6 @@ If validation fails, the runner invokes exactly one repair pass. If the repair o
 
 ## Replacement Boundary
 
-The production entrypoint must remain `npm run daily:codex-pipeline`. The legacy daily workflow is invoked only behind that single script so scheduled automation does not expand old manual stage commands.
+The production entrypoint must remain `corepack pnpm run daily:codex-pipeline`. The legacy daily workflow is invoked only behind that single script so scheduled automation does not expand old manual stage commands.
 
 The next accepted infrastructure slice migrates repository commands to `corepack pnpm`. After that migration lands, scheduled automation must call `corepack pnpm run daily:codex-pipeline` and old `npm run` scheduler instructions are intentionally unsupported.

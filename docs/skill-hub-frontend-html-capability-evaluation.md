@@ -17,7 +17,7 @@
 - 已新增 `.codex/skills/html-work-reports/`，来源为本地 skill hub 的 `html-work-reports` 技能资产。
 - 已新增根级 `AGENTS.md`，把中文回复、仓库边界、HTML 工作汇报路由和验证门写入 agent 指令面。
 - 已新增 `tests/skills.test.js`，用内置 fixture 生成单文件 HTML，并运行 `validate-html-report.mjs --skip-browser` 校验结构、证据、代码行号、diff、自包含与交互控制。
-- 已把技能 smoke 测试纳入 `npm test`，因此 `npm run validate` 会覆盖该能力。
+- 已把技能 smoke 测试纳入 `corepack pnpm test`，因此 `corepack pnpm run validate` 会覆盖该能力。
 - 未安装完整 `web` profile，未引入 `frontend-design`、`web-artifacts-builder`、`frontend-slides` 等与当前日报发布目标无直接关系的技能。
 
 ## 调研来源
@@ -38,7 +38,7 @@ node bin\skill-hub.mjs analyze D:\ai-daily-cn --profile web --agent codex --agen
 
 - `web` profile 推荐了 HTML 报告、前端模式、浏览器测试、E2E、UI/a11y 审计等能力。
 - 当时仓库缺少 agent 指令面，现已补充根级 `AGENTS.md`。
-- 当时仓库缺少明确成功标准、任务规格或 Definition of Done；当前主动流程以 `tasks/current-task.md`、`definition-of-done.md` 和 `npm run validate` 门为准。
+- 当时仓库缺少明确成功标准、任务规格或 Definition of Done；当前主动流程以 `tasks/current-task.md`、`definition-of-done.md` 和 `corepack pnpm run validate` 门为准。
 - 当时仓库缺少可重复验证命令，现已有 `build`、`test`、`test:e2e`、`validate`，并新增技能 smoke 测试。
 - 当时仓库缺少 skill routing、agent roles 或任务路由资产，现已补充 `html-work-reports` repo-local 技能路由。
 - 自动化候选应保持手动，直到存在可检查的 `build/test/validate` gate。

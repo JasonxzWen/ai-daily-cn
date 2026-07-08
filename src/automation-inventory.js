@@ -63,7 +63,7 @@ function parseAutomationToml(text, filePath) {
     : role
       ? false
       : /status:self-check|status self-check/i.test(text);
-  const legacyFlow = /publish:prepare-worktree|npm run publish:dry-run(?!:daily)|node src\/cli\.js publish:dry-run(?!:daily)/i.test(text);
+  const legacyFlow = /publish:prepare-worktree|(?:npm|pnpm|corepack\s+pnpm)\s+run\s+publish:dry-run(?!:daily)|node src\/cli\.js publish:dry-run(?!:daily)/i.test(text);
   const dailyPublish = role === "daily_publish"
     ? true
     : role

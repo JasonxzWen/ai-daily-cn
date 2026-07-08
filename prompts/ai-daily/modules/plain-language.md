@@ -30,4 +30,4 @@
 1. 先读 `summary`、`stories[*].what_happened`、`stories[*].why_it_matters`、兼容 `main_items[*].bullets`、`hot_blogs[*].summary`、`projects[*].description`、`self_check.notes` 和 `optimization_suggestions`；只有兼容字段非空时才检查 `model_releases[*].summary` 是否已被主体新闻覆盖。
 2. 删掉重复解释，只保留会影响读者判断的信息。
 3. 对每条主体信息、博客和项目检查是否有明确重点；不要超过 3 处高亮/加粗，不要整句高亮。
-4. 再运行 `npm run report:write`；如果返回 `plain_language_failed`，按错误路径改写，不要绕过校验。
+4. 再运行 `corepack pnpm run report:write`；如果返回 `plain_language_failed`，按错误路径改写，不要绕过校验。

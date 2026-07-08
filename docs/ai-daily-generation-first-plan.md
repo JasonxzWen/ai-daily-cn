@@ -46,7 +46,7 @@ generation-first，不是 gate-first：
 
 - `node --test tests/generation-first.test.js` 由红转绿（对真实 `reports-data`）。
 - 重新生成 `2026-06-23` 样例：主线 8–12 条、标题与来源主题一致、无跨条目复用 bullet、builder 逐帖不同。
-- 不破坏既有 `npm run test` 与发布链路。
+- 不破坏既有 `corepack pnpm run test` 与发布链路。
 
 ## 6. 信源真问题（与作者层并行处理）
 

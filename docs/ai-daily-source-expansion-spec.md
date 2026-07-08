@@ -274,12 +274,12 @@
 9. 测试：添加 unit/golden/browser 断言覆盖本规格。
 10. 搜索与健康检查：`discover:search-news --shadow` 只生成候选和 `source_audit.search_sources`；`sources:health` 检查配置源可用性、feed 形态、48 小时条目数和原始 URL 要求。这里的 48 小时仅是源活跃度指标，不是 `main_items` 准入窗口；主体不足时仍按 72 小时 sparse-day 补位和 7 天历史去重合同执行。
 11. 审计合并：把 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health` 合并进最终日报 JSON，而不是只保留临时命令输出。
-12. 发布前验证：运行 `npm run validate`；连续运行验收另跑 `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`。
+12. 发布前验证：运行 `corepack pnpm run validate`；连续运行验收另跑 `corepack pnpm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`。
 
 ## 验收清单
 
-- `npm run validate` 通过。
-- `npm run sources:validate` 通过；缺少 `tier`、`authority`、`candidate_category` 或 `source_kind` 的信源会失败。
+- `corepack pnpm run validate` 通过。
+- `corepack pnpm run sources:validate` 通过；缺少 `tier`、`authority`、`candidate_category` 或 `source_kind` 的信源会失败。
 - 最终日报 JSON 的 `source_audit` 包含 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health`；`phase5_complete:false` 时说明缺失项，但不冒充完成。
 - 新日报 HTML header 不包含“其余条目见后文”。
 - 新日报 HTML 不包含“为什么重要”。

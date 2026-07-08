@@ -73,9 +73,9 @@ Use only when a direct red test is not practical. Explain the reason and the det
 
 ## Validation Commands
 
-- `npm run harness:init`
+- `corepack pnpm run harness:init`
 - `node scripts/harness-validate.mjs`
-- `npm run validate`
+- `corepack pnpm run validate`
 - `git diff --check`
 
 ## Parallel Writes

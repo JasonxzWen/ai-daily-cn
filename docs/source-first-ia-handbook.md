@@ -172,7 +172,7 @@ Codex may propose the baseline placement, but the fixed importance order is user
 6. 判断是否是英文媒体或搜索聚合。是则进入 `english_media_search`。
 7. 选择 rank：优先使用相邻源之间的空位；没有空位时重排该 section，保持 10 点间隔。
 8. 在同一 PR 中补充测试，证明新 logical source 有 section、rank、display mode 和可推导状态。
-9. 若新增或移动底层采集入口，运行 `node scripts/generate-source-inventory-order.mjs` 刷新 `docs/source-inventory-order.md`，并用 `npm run sources:display-contract` 确认 153+ 全量入口参考表仍完整。
+9. 若新增或移动底层采集入口，运行 `node scripts/generate-source-inventory-order.mjs` 刷新 `docs/source-inventory-order.md`，并用 `corepack pnpm run sources:display-contract` 确认 153+ 全量入口参考表仍完整。
 
 不要把 source `tier`、`authority`、当日候选数或当天是否阻塞作为 public display rank 的动态输入。它们可以影响采集和候选排序，但不能改变固定图谱顺序。
 
@@ -198,16 +198,16 @@ Codex may propose the baseline placement, but the fixed importance order is user
 修改 source display order、handbook 或新增 logical source 时至少运行：
 
 ```powershell
-npm run sources:display-contract
+corepack pnpm run sources:display-contract
 node --test --test-name-pattern "source display contract governance" tests/unit.test.js
-npm run validate
+corepack pnpm run validate
 ```
 
 如果改动影响公开页面内容或生成 HTML，还要运行：
 
 ```powershell
-npm run build:check-clean
-npm run test:e2e
+corepack pnpm run build:check-clean
+corepack pnpm run test:e2e
 ```
 
 ## Source-First V2 Operating Contract
@@ -318,8 +318,8 @@ Default loop:
 Required commands:
 
 ```powershell
-npm run sources:display-contract
-npm run validate
+corepack pnpm run sources:display-contract
+corepack pnpm run validate
 ```
 
 Contract checks must reject:
@@ -336,5 +336,5 @@ Contract checks must reject:
 
 - `config/source-display-contract.json` 覆盖 `buildSourceEffectivenessTable` 输出的每个 logical source。
 - Handbook 包含所有 section id 和 logical source id。
-- `npm run validate` 包含 `npm run sources:display-contract`。
+- `corepack pnpm run validate` 包含 `corepack pnpm run sources:display-contract`。
 - Public data 和 HTML 不暴露 `source_audit`、candidate pool、selection snapshot、score、repair 或 debug 信息。

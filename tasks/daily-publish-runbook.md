@@ -7,14 +7,14 @@ Use this runbook for daily AI report generation and GitHub Pages publishing.
 
 ## Codex-Native Runner Contract
 
-- Scheduled and long-running publish tasks start from the launcher worktree and invoke `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
+- Scheduled and long-running publish tasks start from the launcher worktree and invoke `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
 - Dry-run-only mode is the default. It runs generation and quality gates, writes `.tmp/run-summary-YYYY-MM-DD.json`, and reports `final_status:"generated_only"`.
-- Real publish requires `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`. Publish mode runs `publish:dry-run:daily` before real publish and Pages verification.
+- Real publish requires `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`. Publish mode runs `publish:dry-run:daily` before real publish and Pages verification.
 - Source Watch public promotion is explicit. If `.tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json` exists, scheduled publish must append `--source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json`; otherwise it must omit the flag and leave `source_watch_admitted_artifact_path` empty in the run summary.
 - The pipeline owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Information collection, admission, per-item summarization, assembly, quality review, source Phase 5 audit, content contract, page check, publish dry-run, real publish, and Pages verification are separate stages and should be read from `completed_stages`.
 - To intentionally discard same-date pipeline state, delete or replace `.tmp/daily-codex-pipeline/YYYY-MM-DD` before rerunning the same command.
 - Scheduled automation must use `publish:dry-run:daily` as the only dry-run command. The older `publish:dry-run -- --date YYYY-MM-DD` remains for manual diagnostics only.
-- A separate 21:30 status self-check runs `npm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json`.
+- A separate 21:30 status self-check runs `corepack pnpm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json`.
 - `status:self-check` checks current artifacts, Pages HTTP, `quality_status`, `sources:health`, `publish:dry-run:daily`, and active Codex automations; `multiple_active_daily_publish_automations` is a blocking issue.
 
 ## Preflight
@@ -24,25 +24,25 @@ Use this runbook for daily AI report generation and GitHub Pages publishing.
 - 如果当天为了修正文风、板块、选题阈值或坏例复发而改 prompt / 规则，必须把 `editorial-authority.md` 里的 `本轮修改清单`、`Good Case`、`Bad Case`、`迭代历史` 一并更新，不要只改实现不留维护面。
 - Review `git status --short --branch` before mutating files.
 - For automation and publish runs, treat the latest `origin/main` as the only authoritative baseline. Unmerged PR branches, detached HEAD work, and local experiment branches must not affect the daily report.
-- User-confirmed feedback that must persist is P1 by default. It must be recorded in `config/feedback-ledger.json` with existing scope files, a validation command covered by `npm run validate`, and an existing test assertion or runtime gate; otherwise it is only a session-local suggestion.
+- User-confirmed feedback that must persist is P1 by default. It must be recorded in `config/feedback-ledger.json` with existing scope files, a validation command covered by `corepack pnpm run validate`, and an existing test assertion or runtime gate; otherwise it is only a session-local suggestion.
 - Preserve unrelated user changes in the launcher worktree; do not run manual `git reset --hard`, force push, or automatic stash there.
 - Automation runs must not modify or commit `progress.md`, `session-handoff.md`, or `tasks/current-task.md`; those files are for human handoff and project iteration sessions.
 - The runner prepares a dedicated clean publish checkout internally before generation. Use the command below only for manual diagnostics or when debugging checkout preparation:
 
 ```powershell
-npm run publish:prepare-clean-worktree
+corepack pnpm run publish:prepare-clean-worktree
 ```
 
 - When run manually, read `prepared.next_cwd` from the command output before executing lower-level generation commands. The default location is `.tmp/publish-worktrees/main` under the launcher repository; it is an isolated clone that may be reset to `origin/main` without touching user work in the launcher worktree.
 - Do not use `publish:prepare-worktree` for scheduled automation. It is retained only for manual recovery sessions where the user explicitly wants to save and switch the current worktree.
-- Use `npm run publish:preflight` as the read-only publish boundary check when generation is not yet needed.
+- Use `corepack pnpm run publish:preflight` as the read-only publish boundary check when generation is not yet needed.
 
 ## Source Discovery
 
 - Build the run contract:
 
 ```powershell
-npm run prompt:build -- YYYY-MM-DD
+corepack pnpm run prompt:build -- YYYY-MM-DD
 ```
 
 - Check source lanes before writing the draft:
@@ -77,7 +77,7 @@ node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enab
 - Generate the draft and candidate pool from discovery outputs; do not hand-write the final draft:
 
 ```powershell
-npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/huggingface-trending-YYYY-MM-DD.json,.tmp/china-ai-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
+corepack pnpm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/huggingface-trending-YYYY-MM-DD.json,.tmp/china-ai-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
 ```
 
 - `report:draft` writes source successes, failures, empty results, selected `included` markers, and cached `image_url` evidence assets. If it cannot cache an image, keep the skipped reason in command output and let `quality_status.degraded_sections` disclose evidence coverage gaps.
@@ -85,7 +85,7 @@ npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-D
 - If `daily:codex-pipeline` ends with `next_action.kind:"restart_latest_main"` after publish dry-run or real publish, do not reuse the stale generated artifacts. Re-run from the launcher worktree so the pipeline fetches the current `origin/main` and regenerates the report against that baseline:
 
 ```powershell
-npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
 ```
 
   Add `--publish` only when the original run was an explicitly approved real publish run.
@@ -120,20 +120,20 @@ npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
 - After writing `.tmp/daily-report.json` and before `report:write`, run the local quality review:
 
 ```powershell
-npm run quality:review -- .tmp/daily-report.json .tmp/quality-review-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
+corepack pnpm run quality:review -- .tmp/daily-report.json .tmp/quality-review-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
 ```
 
 - The review checks public text for AI stock phrasing, automatic `report:draft` template wording, overly broad or missing inline `==...==` highlights, thin main-item bullets, Builder translation/content mismatches, and selected-item back-references to `.tmp/source-candidates-YYYY-MM-DD.json`. Treat `ai_review_tasks` as the Codex/AI semantic review checklist; translation fidelity and factual wording may be fixed only from existing `candidate_pool`, `source_audit`, original links, or `original_text`.
 - Apply safe automatic repairs to a new optimized draft rather than mutating facts in place:
 
 ```powershell
-npm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.json .tmp/quality-repair-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
+corepack pnpm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.json .tmp/quality-repair-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
 ```
 
 - If Codex or another AI reviewer proposes wording changes, save them as a repair contract and apply them through the restricted contract gate:
 
 ```powershell
-npm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.json .tmp/quality-repair-YYYY-MM-DD.json .tmp/quality-ai-repair-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
+corepack pnpm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.json .tmp/quality-repair-YYYY-MM-DD.json .tmp/quality-ai-repair-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
 ```
 
 - AI repair contracts may edit only public text fields. They must include `status:"ready"` and non-empty `edits` before runner execution; `status:"template"` files are placeholders and the runner will keep `final_status:"needs_ai_repair"` without applying them. They must not change URLs, dates, source names, `candidate_id`, `source_audit`, `quality_status`, evidence paths, or publish metadata. If the optimized draft still has blocking review issues after the runner's mode budget is exhausted, stop and report `.tmp/run-summary-YYYY-MM-DD.json`, `.tmp/quality-review-YYYY-MM-DD.json`, and `.tmp/quality-repair-YYYY-MM-DD.json`; dry-run defaults to 1 review/repair loop, publish mode defaults to max 5.
@@ -141,30 +141,30 @@ npm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.jso
 
 ## Report Write
 
-- The structured draft should already be written by `npm run report:draft`; if you edit it manually, rerun `report:draft` or update `.tmp/source-candidates-YYYY-MM-DD.json` so every selected item still points to an included candidate.
+- The structured draft should already be written by `corepack pnpm run report:draft`; if you edit it manually, rerun `report:draft` or update `.tmp/source-candidates-YYYY-MM-DD.json` so every selected item still points to an included candidate.
 - Normalize it with:
 
 ```powershell
-npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
+corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 ```
 
 - Stop and repair the draft when `candidate_pool_missing`, `candidate_pool_reference_invalid`, or `freshness_gate_failed` appears.
 - Stop and repair the draft when `mainline_source_authority_gate_failed` appears. If `editorial_summary_gate_failed`, `editorial_context_gate_failed`, or `non_primary_source_disclosure_gate_failed` appears in `degraded_sections`, repair before publish unless the user explicitly accepts a degraded report.
-- If you commit/push any workflow, prompt, source, renderer, or quality-gate code after `report:write`, rerun `report:write` and `npm run build` so `self_check.automation_revision.git_commit` matches current `HEAD` and `origin_main_sha` proves the latest remote baseline.
+- If you commit/push any workflow, prompt, source, renderer, or quality-gate code after `report:write`, rerun `report:write` and `corepack pnpm run build` so `self_check.automation_revision.git_commit` matches current `HEAD` and `origin_main_sha` proves the latest remote baseline.
 
 ## Build And Validate
 
 - Generate static Pages output:
 
 ```powershell
-npm run build
+corepack pnpm run build
 ```
 
 - The daily HTML must come from `.codex/skills/effective-interact/scripts/create-interaction.mjs` in `pre-rendered` mode.
 - Run the targeted page checklist for the affected daily page:
 
 ```powershell
-npm run quality:page-check -- YYYY-MM-DD docs .tmp/page-check-YYYY-MM-DD.json
+corepack pnpm run quality:page-check -- YYYY-MM-DD docs .tmp/page-check-YYYY-MM-DD.json
 ```
 - Run the deterministic content-contract gate before dry-run or real publish:
 
@@ -173,13 +173,13 @@ node scripts/check-daily-content-contract.mjs --report reports-data/YYYY/MM/YYYY
 ```
 
 - REQ-001, REQ-006, REQ-007, and REQ-008 failures are blocking. REQ-010 source unavailability can be degraded, but fake OpenRouter or Artificial Analysis components are blocking.
-- Daily resilience policy is versioned in `config/daily-resilience-policy.json`; run `npm run resilience:validate` before treating a changed workflow as publishable. The policy favors retry and fallback before degradation, allows `published_degraded` only for public safe degraded content, reports `published_pending_pages_verification` when a successful publish is waiting on Pages cache propagation, and reserves `infrastructure_blocked_after_fallback_exhausted` for exhausted publish or infrastructure paths.
+- Daily resilience policy is versioned in `config/daily-resilience-policy.json`; run `corepack pnpm run resilience:validate` before treating a changed workflow as publishable. The policy favors retry and fallback before degradation, allows `published_degraded` only for public safe degraded content, reports `published_pending_pages_verification` when a successful publish is waiting on Pages cache propagation, and reserves `infrastructure_blocked_after_fallback_exhausted` for exhausted publish or infrastructure paths.
 - After build, inspect the affected daily HTML and confirm it contains the coverage window, has no `模型发布` heading, has no `今日值得关注的项目` heading or `项目 highlights` subheading, has keyword spans/classes for inline highlights, has star/project highlight tags only inside GitHub Trending items, has no duplicate star tags on a single Trending item, and opens body/blog/card images in the lightbox on desktop and mobile.
 - Inspect the affected HTML or interaction input and confirm there is no `source_audit`, `candidate_pool`, `public-source-coverage`, access-gate wording, retired WeChat/Zhihu/Reddit platform section, or banned public-copy wording such as `披露` / `准入门槛`.
 - Run the full gate before any real publish:
 
 ```powershell
-npm run validate
+corepack pnpm run validate
 ```
 
 ## Dry Run
@@ -187,7 +187,7 @@ npm run validate
 - Preview the publish plan:
 
 ```powershell
-npm run publish:dry-run:daily -- --date YYYY-MM-DD
+corepack pnpm run publish:dry-run:daily -- --date YYYY-MM-DD
 ```
 
 - Capture changed files, commit message, and expected Pages URL.
@@ -200,7 +200,7 @@ npm run publish:dry-run:daily -- --date YYYY-MM-DD
 - Only publish after explicit confirmation:
 
 ```powershell
-npm run publish -- confirm-push YYYY-MM-DD
+corepack pnpm run publish -- confirm-push YYYY-MM-DD
 ```
 
 - This path may commit and push only publisher-managed `docs/` and `reports-data/` files.
@@ -211,7 +211,7 @@ npm run publish -- confirm-push YYYY-MM-DD
 - Use this only when local git metadata, branch switching, or Git transport (`git_fetch_unavailable` / `git_push_unavailable`) blocks real publish after report artifacts passed validation. Do not use it to bypass `remote_ahead`; the runner reports `next_action.kind:"restart_latest_main"` for that case and the correct recovery is to regenerate from current `origin/main`:
 
 ```powershell
-npm run publish:github-api -- confirm-push YYYY-MM-DD
+corepack pnpm run publish:github-api -- confirm-push YYYY-MM-DD
 ```
 
 - Required token source: `GH_TOKEN`, `GITHUB_TOKEN`, or `gh auth token`.
