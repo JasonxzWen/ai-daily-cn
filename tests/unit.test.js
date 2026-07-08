@@ -19083,6 +19083,48 @@ test("public daily followups reject generic GitHub Trending README summaries", a
   assert.match(`${html}\n${publicJson}`, /codebase-memory-mcp|7,560|GitHub Trending weekly/);
 });
 
+test("buildSite writes reader-safe GitHub Trending fallback copy when README context is missing", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-github-fallback-copy-"));
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const [year, month] = report.report_date.split("-");
+  const dataInputDir = path.join(tmp, "reports-data", year, month);
+  const outDir = path.join(tmp, "docs");
+  await fs.mkdir(dataInputDir, { recursive: true });
+
+  report.github_trending = [
+    {
+      name: "elastic/elasticsearch",
+      repo: "elastic/elasticsearch",
+      url: "https://github.com/elastic/elasticsearch",
+      event_date: report.report_date,
+      source: "GitHub Trending Java weekly",
+      language: "Java",
+      window: "weekly",
+      rank: 20,
+      trend: "new",
+      evidence: "elastic/elasticsearch appeared on GitHub Trending Java weekly with 391 stars this week.",
+      importance: "notable"
+    }
+  ];
+  await fs.writeFile(path.join(dataInputDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir: path.join(tmp, "reports-data"),
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath,
+    fetchImpl: async () => new Response("", { status: 404 })
+  });
+
+  const data = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
+  const description = data.github_trending[0].description;
+  assert.match(description, /榜单热度记录/);
+  assert.doesNotMatch(description, /当前只能确认榜单动量|正式采用前还要核对\s*README|核对\s*README|复现门槛|优先核对|阅读时先看/);
+});
+
 test("public daily followups infer localized X avatars from avatar_url during clean build", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-builder-avatar-"));
   const outDir = path.join(tmp, "docs");

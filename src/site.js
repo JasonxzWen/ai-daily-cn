@@ -2211,7 +2211,7 @@ function githubTrendingFactSummary(item = {}) {
   const repo = firstNonEmpty(item.repo, item.name, "该项目");
   const scope = source.replace(/GitHub\s*Trending/ig, "开源榜单").replace(/\s+/g, " ").trim() || "开源榜单";
   const rankText = rank ? `${scope} ${rank}` : scope;
-  return `${repo} 本周出现在${rankText}${starsText ? `，${starsText}` : ""}；当前只能确认榜单动量，正式采用前还要核对 README、许可证、维护状态和 issue 反馈。`;
+  return `${repo} 本周出现在${rankText}${starsText ? `，${starsText}` : ""}；目前作为榜单热度记录保留，详情以仓库主页为准。`;
 }
 
 function publicStories(stories = []) {

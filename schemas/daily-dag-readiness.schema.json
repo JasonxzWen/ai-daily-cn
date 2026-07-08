@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "daily-dag-readiness.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "manifest_path",
+    "node_count",
+    "counts",
+    "production_ready_node_ids",
+    "nodes"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "generated_at": { "type": "string", "minLength": 1 },
+    "manifest_path": { "type": "string", "minLength": 1 },
+    "node_count": { "type": "integer", "minimum": 0 },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "real",
+        "mapped",
+        "fixture",
+        "planned",
+        "production_ready",
+        "standalone_executable",
+        "blocked"
+      ],
+      "properties": {
+        "real": { "type": "integer", "minimum": 0 },
+        "mapped": { "type": "integer", "minimum": 0 },
+        "fixture": { "type": "integer", "minimum": 0 },
+        "planned": { "type": "integer", "minimum": 0 },
+        "production_ready": { "type": "integer", "minimum": 0 },
+        "standalone_executable": { "type": "integer", "minimum": 0 },
+        "blocked": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "production_ready_node_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "nodes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/node" }
+    }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "kind",
+        "readiness_state",
+        "execution_status",
+        "execution_readiness",
+        "runner_stage_ref",
+        "standalone_executable",
+        "production_ready",
+        "blocking_reason",
+        "evidence_files"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string" },
+        "kind": { "type": "string" },
+        "readiness_state": { "enum": ["real", "mapped", "fixture", "planned"] },
+        "execution_status": { "type": "string" },
+        "execution_readiness": { "type": "string" },
+        "runner_stage_ref": { "type": "string" },
+        "standalone_executable": { "type": "boolean" },
+        "production_ready": { "type": "boolean" },
+        "blocking_reason": { "type": "string" },
+        "evidence_files": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["manifest", "input_schema", "output_schema", "fixture"],
+          "properties": {
+            "manifest": { "type": "string", "minLength": 1 },
+            "input_schema": { "type": "string" },
+            "output_schema": { "type": "string" },
+            "fixture": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
