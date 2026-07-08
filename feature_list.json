@@ -213,6 +213,53 @@
       }
     },
     {
+      "id": "adc-illustration-workflow",
+      "status": "active",
+      "summary": "Track ADC illustration assets with prompt, decision, rights, source, and generated public asset evidence.",
+      "commands": [
+        "corepack pnpm run illustration:validate",
+        "corepack pnpm run validate:docs"
+      ],
+      "artifacts": [
+        "design/illustration-workflow.md",
+        "design/illustrations/*.asset.json",
+        "apps/web/public/assets/*.svg",
+        "docs/assets/*.svg",
+        "scripts/validate-illustration-assets.mjs"
+      ],
+      "acceptance": [
+        "Shipped ADC illustration assets declare prompt, decision, rights, source asset, and generated public asset paths.",
+        "SVG assets include accessibility metadata and do not embed remote or base64 image assets.",
+        "Generated public assets match their Vite public source assets."
+      ],
+      "stop_conditions": [
+        "An ADC illustration asset copies third-party illustration IP.",
+        "The generated public asset drifts from the source asset.",
+        "An SVG embeds remote or base64 images."
+      ],
+      "behavior": "Track ADC illustration assets with prompt, decision, rights, source, and generated public asset evidence.",
+      "validation": {
+        "commands": [
+          "corepack pnpm run illustration:validate",
+          "corepack pnpm run validate:docs"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "design/illustration-workflow.md",
+          "design/illustrations/*.asset.json",
+          "apps/web/public/assets/*.svg",
+          "docs/assets/*.svg",
+          "scripts/validate-illustration-assets.mjs"
+        ],
+        "stop_conditions": [
+          "An ADC illustration asset copies third-party illustration IP.",
+          "The generated public asset drifts from the source asset.",
+          "An SVG embeds remote or base64 images."
+        ]
+      }
+    },
+    {
       "id": "publish-preflight",
       "status": "active",
       "summary": "Prepare or inspect the publish worktree before publishing artifacts.",
