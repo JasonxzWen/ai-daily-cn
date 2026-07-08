@@ -6,7 +6,8 @@ import { mergeCommandEnv, pnpmInvocationForArgs } from "./process-runner.js";
 export const WEB_APP_GENERATED_FILES = [
   "index.html",
   "assets/adc-home.css",
-  "assets/adc-home.js"
+  "assets/adc-home.js",
+  "assets/adc-character.svg"
 ];
 
 export async function buildWebApp(options = {}) {

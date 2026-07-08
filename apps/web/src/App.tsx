@@ -121,11 +121,16 @@ export function App() {
           <h1>ADC. AI 资讯流</h1>
           <p>{model.heroSummary}</p>
         </div>
-        <div className="adc-metrics" aria-label="资讯概览">
-          <Metric label="最新日期" value={formatDateShort(model.latestDate) || "--"} icon={<CalendarDays size={18} />} />
-          <Metric label="今日入库" value={String(model.todayCount)} icon={<Newspaper size={18} />} />
-          <Metric label="信源" value={String(model.sourceCount)} icon={<Radio size={18} />} />
-          <Metric label="总量" value={String(state.articles.length)} icon={<FileText size={18} />} />
+        <div className="adc-hero-panel" aria-label="资讯概览">
+          <div className="adc-character-card">
+            <img src="assets/adc-character.svg" alt="ADC. 黑白线稿角色" />
+          </div>
+          <div className="adc-metrics">
+            <Metric label="最新日期" value={formatDateShort(model.latestDate) || "--"} icon={<CalendarDays size={18} />} />
+            <Metric label="今日入库" value={String(model.todayCount)} icon={<Newspaper size={18} />} />
+            <Metric label="信源" value={String(model.sourceCount)} icon={<Radio size={18} />} />
+            <Metric label="总量" value={String(state.articles.length)} icon={<FileText size={18} />} />
+          </div>
         </div>
       </section>
 
