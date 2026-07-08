@@ -170,6 +170,49 @@
       }
     },
     {
+      "id": "design-toolchain",
+      "status": "active",
+      "summary": "Keep AI design-generation artifacts as auditable prototype evidence instead of direct production code.",
+      "commands": [
+        "corepack pnpm run design:validate",
+        "corepack pnpm run validate:docs"
+      ],
+      "artifacts": [
+        "design/design-toolchain.md",
+        "design/prototypes/*.design.json",
+        "design/prototypes/**/*.design.json",
+        "scripts/validate-design-artifacts.mjs"
+      ],
+      "acceptance": [
+        "Stitch, v0, image-generation, Figma, and manual prototype records use the same design artifact contract.",
+        "Prototype records include prompt evidence, decision record, production-code boundary, and screenshot evidence when accepted.",
+        "`corepack pnpm run validate` runs the design artifact contract."
+      ],
+      "stop_conditions": [
+        "Generated prototype code is committed directly to production paths.",
+        "A design-generation artifact influences implementation without prompt or decision evidence."
+      ],
+      "behavior": "Keep AI design-generation artifacts as auditable prototype evidence instead of direct production code.",
+      "validation": {
+        "commands": [
+          "corepack pnpm run design:validate",
+          "corepack pnpm run validate:docs"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "design/design-toolchain.md",
+          "design/prototypes/*.design.json",
+          "design/prototypes/**/*.design.json",
+          "scripts/validate-design-artifacts.mjs"
+        ],
+        "stop_conditions": [
+          "Generated prototype code is committed directly to production paths.",
+          "A design-generation artifact influences implementation without prompt or decision evidence."
+        ]
+      }
+    },
+    {
       "id": "publish-preflight",
       "status": "active",
       "summary": "Prepare or inspect the publish worktree before publishing artifacts.",
