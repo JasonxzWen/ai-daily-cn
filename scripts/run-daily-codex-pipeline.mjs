@@ -1186,6 +1186,16 @@ async function readJsonOrNull(filePath) {
   }
 }
 
+async function fileExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
 function normalizeFixtureMode(value) {
   const mode = String(value || "").trim();
   if (!mode) return "";
