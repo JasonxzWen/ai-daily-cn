@@ -1,0 +1,50 @@
+{
+  "schema_version": "1",
+  "adopted_sources": [
+    {
+      "id": "taste-skill",
+      "name": "Leonxlnx/taste-skill",
+      "url": "https://github.com/Leonxlnx/taste-skill",
+      "local_skill": ".codex/skills/design-taste-frontend/SKILL.md",
+      "source_skill": "skills/taste-skill",
+      "license": "MIT",
+      "upstream_commit": "3c7017d636c3a4aad378433ea6d0cfa6c921da4a",
+      "role": "design_read_and_anti_template_calibration",
+      "status": "local_adapted",
+      "production_dependency": false
+    },
+    {
+      "id": "impeccable",
+      "name": "pbakaus/impeccable",
+      "url": "https://github.com/pbakaus/impeccable",
+      "docs_url": "https://impeccable.style/",
+      "license": "Apache-2.0",
+      "role": "external_design_audit_vocabulary_and_optional_detector",
+      "status": "project_workflow_reference",
+      "install_command": "npx impeccable install",
+      "init_command": "/impeccable init",
+      "production_dependency": false
+    }
+  ],
+  "quality_contract": {
+    "default_surface": "desktop_ai_news_data_product",
+    "implementation_stack": [
+      "React",
+      "Astryx",
+      "Vite"
+    ],
+    "required_frontend_pr_evidence": [
+      "design_read",
+      "design_dials",
+      "source_or_tool_evidence",
+      "audit_or_skip_reason",
+      "browser_acceptance"
+    ],
+    "forbidden": [
+      "direct_generated_code_to_production",
+      "landing_page_replacement_for_data_product",
+      "unreviewed_external_tool_output",
+      "unbounded_runtime_dependency"
+    ]
+  }
+}
