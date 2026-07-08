@@ -1,0 +1,100 @@
+[
+  {
+    "id": "anthropic-engineering-blog",
+    "title": "Anthropic 发布新的 agent 工程实践文章",
+    "summary": "Anthropic 官方技术博客给出 agent 工程实践、安全边界和评测方法，适合进入今日主线。",
+    "source_type": "official",
+    "event_type": "official_technical_blog",
+    "entities": ["anthropic"],
+    "topics": ["ai_engineering_stack", "ai_assistants_agents", "ai_practice_methods"],
+    "verification_status": "confirmed",
+    "evidence_level": "high",
+    "source_count": 1,
+    "priority": "high",
+    "expected": {
+      "today_selected": true,
+      "must_read": true,
+      "selection_reasons": ["official_technical_signal", "major_company_priority", "engineering_practice_value"],
+      "demotion_reasons": []
+    }
+  },
+  {
+    "id": "openai-model-release",
+    "title": "OpenAI 发布新一代推理模型",
+    "summary": "OpenAI 官方发布新模型并说明能力边界、API 可用性和评测变化。",
+    "source_type": "official",
+    "event_type": "model_release",
+    "entities": ["openai"],
+    "topics": ["foundation_models", "ai_compute_inference"],
+    "verification_status": "confirmed",
+    "evidence_level": "high",
+    "source_count": 1,
+    "priority": "high",
+    "expected": {
+      "today_selected": true,
+      "must_read": true,
+      "selection_reasons": ["official_technical_signal", "major_company_priority", "model_or_platform_increment"],
+      "demotion_reasons": []
+    }
+  },
+  {
+    "id": "google-platform-launch",
+    "title": "Google 推出企业 AI 平台更新",
+    "summary": "Google 官方更新企业 AI 平台，影响模型服务、工程接入和企业采纳路径。",
+    "source_type": "official",
+    "event_type": "platform_update",
+    "entities": ["google"],
+    "topics": ["enterprise_ai_adoption", "ai_compute_inference"],
+    "verification_status": "confirmed",
+    "evidence_level": "high",
+    "source_count": 1,
+    "priority": "high",
+    "expected": {
+      "today_selected": true,
+      "must_read": true,
+      "selection_reasons": ["major_company_priority", "model_or_platform_increment"],
+      "demotion_reasons": []
+    }
+  },
+  {
+    "id": "bytedance-unconfirmed-high-signal",
+    "title": "媒体称字节跳动正测试新一代视频模型",
+    "summary": "未确认高信号：媒体称字节跳动正在测试新一代视频模型，来源性质仍是媒体线索，需要后续等待官方或多源确认。",
+    "source_type": "media",
+    "event_type": "model_release",
+    "entities": ["bytedance"],
+    "topics": ["multimodal_ai", "foundation_models"],
+    "verification_status": "unconfirmed_high_signal",
+    "public_label": "未确认高信号",
+    "evidence_level": "medium",
+    "source_count": 1,
+    "priority": "high",
+    "expected": {
+      "today_selected": true,
+      "must_read": true,
+      "selection_reasons": ["major_company_priority", "model_or_platform_increment", "unconfirmed_high_signal_disclosed"],
+      "demotion_reasons": []
+    }
+  },
+  {
+    "id": "github-repo-with-context",
+    "title": "高信号 AI 工程仓库提供可复用评测工具",
+    "summary": "仓库 README 清楚说明用途、面向工程团队、核心能力和今天值得看的新增动量。",
+    "source_type": "github",
+    "event_type": "github_repo_with_context",
+    "entities": [],
+    "topics": ["ai_engineering_stack"],
+    "verification_status": "confirmed",
+    "github_context_state": "readme_sufficient",
+    "evidence_level": "high",
+    "source_count": 1,
+    "priority": "high",
+    "expected": {
+      "today_selected": true,
+      "must_read": true,
+      "selection_reasons": ["github_repo_context_sufficient"],
+      "demotion_reasons": [],
+      "github_summary_mode": "reader_repo_summary"
+    }
+  }
+]
