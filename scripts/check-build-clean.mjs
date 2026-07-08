@@ -3,6 +3,7 @@ import { spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { pnpmInvocationForArgs } from "../src/process-runner.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -55,16 +56,8 @@ async function gitStatus(cwd) {
 
 async function runBuild(cwd) {
   await new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [
-      "src/cli.js",
-      "build",
-      "--data-input",
-      "reports-data",
-      "--input",
-      "reports-source",
-      "--out",
-      "docs"
-    ], {
+    const invocation = pnpmInvocationForArgs(["run", "build"]);
+    const child = spawn(invocation.file, invocation.args, {
       cwd,
       stdio: "inherit",
       windowsHide: true

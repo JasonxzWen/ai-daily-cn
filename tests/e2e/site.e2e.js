@@ -9,6 +9,7 @@ import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 import { buildSite } from "../../src/site.js";
+import { buildWebApp } from "../../src/web-app-build.js";
 import { renderIndexHtml } from "../../src/render.js";
 import { evaluateDailyPageChecklist, evaluateIndexPageChecklist } from "../../src/page-checklist.js";
 
@@ -471,6 +472,7 @@ await fs.writeFile(path.join(syntheticDir, "index.html"), renderIndexHtml({
   styleVersion: "synthetic"
 }), "utf8");
 await fs.writeFile(path.join(syntheticDir, "articles.json"), `${JSON.stringify(syntheticArticles, null, 2)}\n`, "utf8");
+await buildWebApp({ rootDir, outDir, forwardOutput: false });
 
 const positionalPageCheckOutput = path.join(tmp, "page-check-positional-viewports.json");
 await execFileAsync(process.execPath, [
@@ -495,32 +497,20 @@ const browser = await chromium.launch();
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await page.goto(`${server.url}/index.html`);
-  assert.match(await page.locator("h1").textContent(), /AI 资讯库/);
+  assert.match(await page.locator("h1").textContent(), /ADC\. AI 资讯流/);
   assert.equal(await hasRemoteScripts(page), false);
-  assert.equal(await page.locator('[data-article-index="aify-style"]').count(), 1);
+  assert.equal(await page.locator('[data-article-index="adc-react-astryx"]').count(), 1);
   assert.equal(await page.locator('a[href="ops.html"]').count() >= 1, true);
   assert.equal(await page.locator('a[href="articles.json"]').count() >= 1, true);
-  assert.equal(await page.locator('[data-article-filter="today"]').count(), 1);
-  assert.equal(await page.locator('[data-article-filter="yesterday"]').count(), 1);
-  assert.equal(await page.locator('[data-article-filter="all"]').count(), 1);
-  assert.equal(await page.locator("#articleSearch").count(), 1);
-  assert.equal(await page.locator("#articleSource").count(), 1);
-  assert.equal(await page.locator("#articleScore").count(), 1);
+  assert.equal(await page.locator("#articleSearch").count(), 0);
+  assert.equal(await page.locator("#articleSource").count(), 0);
+  assert.equal(await page.locator("#articleScore").count(), 0);
   assert.equal(await page.locator("[data-article-card]").count() >= 2, true);
-  await page.locator("#articleSearch").fill("harness");
-  assert.equal(await page.locator("[data-article-card]").count() >= 1, true);
-  await page.locator("#articleSearch").fill("");
-  await page.locator('[data-article-filter="yesterday"]').click();
+  await page.getByRole("radio", { name: "昨日回看" }).click();
   assert.equal(await page.locator("#article-results-title").textContent(), "昨日回看");
-  await page.locator('[data-article-filter="all"]').click();
-  await page.waitForFunction(() => document.documentElement.dataset.articleIndexLoaded === "full");
-  assert.equal(await page.locator("#article-results-title").textContent(), "全部资讯");
-  await page.locator("#articleScore").selectOption("90");
-  assert.equal(await page.locator("[data-article-card]").count() >= 1, true);
-  assert.equal(await page.locator("[data-article-card][data-article-score]").evaluateAll((cards) =>
-    cards.every((card) => Number(card.getAttribute("data-article-score") || "0") >= 90)
-  ), true);
-  await page.locator("#articleScore").selectOption("0");
+  await page.getByRole("radio", { name: "历史流" }).click();
+  assert.equal(await page.locator("#article-results-title").textContent(), "历史流");
+  assert.equal(await allExternalLinksHaveRel(page), true);
   await page.goto(`${server.url}/synthetic/index.html`);
   assert.equal(await page.locator("#articleSource option").count(), syntheticArticles.length + 1);
   await page.locator('[data-article-filter="all"]').click();
@@ -867,6 +857,7 @@ async function startStaticServer(root) {
 function contentType(filePath) {
   if (filePath.endsWith(".html")) return "text/html; charset=utf-8";
   if (filePath.endsWith(".css")) return "text/css; charset=utf-8";
+  if (filePath.endsWith(".js")) return "text/javascript; charset=utf-8";
   if (filePath.endsWith(".json")) return "application/json; charset=utf-8";
   if (filePath.endsWith(".md")) return "text/markdown; charset=utf-8";
   return "application/octet-stream";
@@ -876,7 +867,8 @@ async function hasRemoteScripts(page) {
   return page.evaluate(() =>
     Array.from(document.scripts).some((script) => {
       if (!script.src) return false;
-      return /^https?:\/\//.test(script.src);
+      const scriptUrl = new URL(script.src, window.location.href);
+      return scriptUrl.origin !== window.location.origin;
     })
   );
 }

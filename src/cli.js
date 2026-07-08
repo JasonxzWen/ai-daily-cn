@@ -35,6 +35,7 @@ import { generateReportDraft } from "./draft.js";
 import { cacheEvidenceImages } from "./evidence-cache.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
+import { buildWebApp } from "./web-app-build.js";
 import { checkWorktreePreflight } from "./worktree-preflight.js";
 import { checkSourceResetPreflight } from "./source-reset-preflight.js";
 import {
@@ -64,20 +65,27 @@ const [command, ...argv] = process.argv.slice(2);
 try {
   if (command === "build") {
     const args = parseArgs(argv);
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const outDir = args.out || "docs";
     const result = await buildSite({
-      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      rootDir,
       inputDir: args.input || "reports-source",
       dataInputDir: args["data-input"] || "reports-data",
-      outDir: args.out || "docs",
+      outDir,
       siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
       generatedAt: args["generated-at"],
       sourceWatchAdmittedArtifactPath: args["source-watch-admitted-artifact"]
     });
+    const webApp = await buildWebApp({ rootDir, outDir });
     printJson({
       ok: true,
       out_dir: result.outDir,
       reports: result.reports.map((report) => report.report_date),
-      written_files: result.writtenFiles
+      written_files: uniqueStrings([...result.writtenFiles, ...webApp.writtenFiles]),
+      web_app: {
+        ok: webApp.ok,
+        written_files: webApp.writtenFiles
+      }
     });
   } else if (command === "publish:dry-run:daily") {
     const args = parseArgs(argv);
@@ -1211,6 +1219,10 @@ function positionalArgs(args) {
     values.push(token);
   }
   return values;
+}
+
+function uniqueStrings(values) {
+  return Array.from(new Set(values.filter(Boolean)));
 }
 
 function printJson(value, explicitOutputPath = "") {

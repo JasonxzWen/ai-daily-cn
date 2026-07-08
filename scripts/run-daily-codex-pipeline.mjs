@@ -8,6 +8,7 @@ import { finished } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 import { runDailyWorkflow } from "../src/daily-runner.js";
 import { buildSite } from "../src/site.js";
+import { buildWebApp } from "../src/web-app-build.js";
 
 const DEFAULT_WORK_DIR = path.join(".tmp", "daily-codex-mvp");
 const DEFAULT_SANDBOX = "workspace-write";
@@ -496,6 +497,11 @@ async function runPublishStage(state) {
       trendConfigPath: publishConfig.trend_config_path || undefined,
       sourceWatchAdmittedArtifactPath
     });
+    const webApp = await buildWebApp({
+      rootDir: state.plan.root_dir,
+      outDir: publishConfig.out_dir,
+      skipUnavailable: true
+    });
     const articlesPath = path.resolve(state.plan.root_dir, publishConfig.out_dir || "docs", "articles.json");
     state.publication = {
       ok: true,
@@ -505,7 +511,10 @@ async function runPublishStage(state) {
       source_watch_admitted_artifact_path: sourceWatchAdmittedArtifactPath,
       article_count: result.articles.length,
       source_watch_articles: result.articles.filter((article) => article.section === "source_watch").length,
-      written_files: result.writtenFiles
+      written_files: uniqueStrings([...result.writtenFiles, ...webApp.writtenFiles]),
+      web_app: webApp.skipped
+        ? { ok: true, skipped: true, skipped_reason: webApp.skipped_reason }
+        : { ok: true, skipped: false, written_files: webApp.writtenFiles }
     };
     await writeJson(state.plan.outputs.publish_summary, state.publication);
     return {
@@ -1138,6 +1147,10 @@ function buildOutputs({ rootDir, workDir, reportDate }) {
     repair_stdout: path.join(workDir, "logs", "repair-once.stdout.jsonl"),
     repair_stderr: path.join(workDir, "logs", "repair-once.stderr.log")
   };
+}
+
+function uniqueStrings(values) {
+  return Array.from(new Set(values.filter(Boolean)));
 }
 
 function buildPublishConfig(options = {}) {
