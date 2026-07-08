@@ -745,7 +745,7 @@ function collectPublicItemFields(fields, basePath, item) {
 }
 
 function isInternalPublicCopyKey(key) {
-  return /^(?:candidate_id|source_audit|self_check|quality_status|selection_snapshot|debug|raw|notes|status|source_id|rule_id|verification_status|verification_note|matched_terms|included_in|published_by|degraded_sections|evidence|evidence_assets)$/i.test(String(key || ""));
+  return /^(?:candidate_id|source_audit|self_check|quality_status|selection_snapshot|debug|raw|notes|status|source_id|rule_id|verification_status|verification_note|matched_terms|included_in|published_by|degraded_sections|evidence|evidence_assets|readme_summary|github_readme_summary|tracking_component_snapshot|component_snapshot|source_component_snapshot|public_trace|diff|key_points)$/i.test(String(key || ""));
 }
 
 function pushPublicText(fields, pathName, value) {

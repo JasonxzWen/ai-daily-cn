@@ -51,6 +51,7 @@ test("publish dry-run 在干净工作树输出发布计划", async () => {
   assert(plan.will_write_files.includes("docs/reports/2026/05/2026-05-13.html"));
   assert(plan.will_stage_files.includes("docs/feed.json"));
   assert(plan.will_stage_files.includes("docs/articles.json"));
+  assert(plan.will_stage_files.includes("docs/ops.html"));
   assert(plan.will_stage_files.includes("docs/trends.json"));
 });
 
@@ -85,6 +86,7 @@ test("daily dry-run requires an explicit report date and stays date-scoped", asy
   assert.equal(plan.expected_pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
   assert(plan.will_write_files.includes("docs/articles.json"));
   assert(plan.will_stage_files.includes("docs/articles.json"));
+  assert(plan.will_stage_files.includes("docs/ops.html"));
   assert(plan.will_stage_files.includes("docs/data/official-blogs.json"));
   assert(plan.will_stage_files.includes("docs/official-blogs/index.html"));
   assert(plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.json"));

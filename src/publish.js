@@ -864,6 +864,7 @@ function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
     `${outPrefix}/assets/style.css`,
     `${outPrefix}/feed.json`,
     `${outPrefix}/index.html`,
+    `${outPrefix}/ops.html`,
     `${outPrefix}/trends.json`,
     `${outPrefix}/data/official-blogs.json`,
     `${outPrefix}/official-blogs/index.html`,
@@ -1176,6 +1177,7 @@ function isPublisherOwnedPath(filePath) {
     filePath === "docs/articles.json" ||
     filePath === "docs/feed.json" ||
     filePath === "docs/index.html" ||
+    filePath === "docs/ops.html" ||
     filePath === "docs/trends.json" ||
     filePath === "retrospectives/index.json" ||
     isPublishRetrospectiveRecordPath(filePath) ||
