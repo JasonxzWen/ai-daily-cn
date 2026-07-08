@@ -79,3 +79,34 @@ test("handoff source plan registers official GitHub org feeds and removes placeh
     assert.equal(allById.has(id), false, `${id} should not remain registered as an inactive placeholder source`);
   }
 });
+
+test("Wechat2RSS public feeds are registered as medium-trust Chinese AI leads", () => {
+  const wechat2rssFeeds = [
+    "wechat2rss-jiqizhixin",
+    "wechat2rss-xinzhiyuan",
+    "wechat2rss-qbitai",
+    "wechat2rss-paperweekly",
+    "wechat2rss-xixiaoyao",
+    "wechat2rss-ml-beginner",
+    "wechat2rss-cv-ai",
+    "wechat2rss-datawhale",
+    "wechat2rss-swarma",
+    "wechat2rss-aliyun-developer",
+    "wechat2rss-ali-tech",
+    "wechat2rss-tencent-tech"
+  ];
+
+  for (const id of wechat2rssFeeds) {
+    const source = allById.get(id);
+    assert.ok(source, `${id} must be registered in config/sources`);
+    assert.equal(source.source_kind, "rss", `${id} must use Wechat2RSS RSS output`);
+    assert.equal(source.candidate_category, "community_lead", `${id} must stay in lead discovery`);
+    assert.equal(source.tier, "T3", `${id} must remain a low-priority discovery tier`);
+    assert.equal(source.authority, "intermediary", `${id} must not be treated as primary authority`);
+    assert.equal(source.enablement, "optional", `${id} should run in default content discovery`);
+    assert.equal(source.verification_policy, "primary_required", `${id} must require primary-source confirmation`);
+    assert.equal(source.platform, "wechat", `${id} must be marked as a WeChat-derived feed`);
+    assert.equal(source.source_level, "wechat2rss_medium_trust", `${id} must declare the medium-trust lane`);
+    assert.match(source.url, /^https:\/\/wechat2rss\.xlab\.app\/feed\/[a-f0-9]+\.xml$/i, `${id} must point at a public Wechat2RSS feed`);
+  }
+});

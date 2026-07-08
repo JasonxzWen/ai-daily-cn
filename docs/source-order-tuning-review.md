@@ -19,17 +19,17 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:68 -->
+<!-- order-tuning-total-unmapped:78 -->
 
-These counts come from the 153-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
+These counts come from the 165-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
 | `core_primary` | 3 | Phase 22 promotes the reviewed Apple, Meta Engineering, NVIDIA Developer, and xAI official sources; keep reviewing the remaining durable company/platform blogs. |
-| `china_models` | 20 | Phase 17 promotes the first five official China model sources; continue with platform/lab sources in later batches. |
+| `china_models` | 21 | Phase 17 promotes the first five official China model sources; continue with platform/lab sources in later batches. |
 | `open_source_platforms` | 1 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
 | `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
-| `builder_community` | 41 | Promote named expert/community sources sparingly; keep broad aggregators collection-only. |
+| `builder_community` | 50 | Promote named expert/community sources sparingly; keep broad aggregators and WeChat-derived clue feeds collection-only. |
 | `platform_cn_media` | 1 | Promote stable direct Chinese RSS/media clue sources only after they prove durable reader value. |
 | `english_media_search` | 2 | Keep most search/media aggregation low priority; Product Hunt can be promoted if product discovery remains useful. |
 

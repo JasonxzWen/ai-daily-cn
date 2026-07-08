@@ -47,6 +47,48 @@
       }
     },
     {
+      "id": "wechat2rss-medium-trust-sources",
+      "status": "active",
+      "summary": "Use curated public Wechat2RSS feeds as medium-trust Chinese AI and engineering discovery leads.",
+      "commands": [
+        "corepack pnpm run sources:validate",
+        "corepack pnpm exec node --test tests/source-coverage.test.js",
+        "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3"
+      ],
+      "artifacts": [
+        "config/sources/wechat2rss-sources.json",
+        ".tmp/source-candidates-YYYY-MM-DD.json"
+      ],
+      "acceptance": [
+        "Twelve Wechat2RSS public feeds are registered as optional T3 intermediary RSS sources.",
+        "Each Wechat2RSS source requires primary-source confirmation before report inclusion.",
+        "The sources remain in the default content discovery enablement set without replacing direct Chinese RSS sources."
+      ],
+      "stop_conditions": [
+        "Wechat2RSS public feed URLs stop resolving as RSS/XML.",
+        "A source is downgraded to primary authority or bypasses primary-source confirmation.",
+        "The upstream free list removes a selected public account."
+      ],
+      "behavior": "Wechat2RSS expands Chinese AI and engineering signal discovery as a medium-trust lead lane, not as final evidence.",
+      "validation": {
+        "commands": [
+          "corepack pnpm run sources:validate",
+          "corepack pnpm exec node --test tests/source-coverage.test.js"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "config/sources/wechat2rss-sources.json",
+          ".tmp/source-candidates-YYYY-MM-DD.json"
+        ],
+        "stop_conditions": [
+          "Wechat2RSS public feed URLs stop resolving as RSS/XML.",
+          "A source is downgraded to primary authority or bypasses primary-source confirmation.",
+          "The upstream free list removes a selected public account."
+        ]
+      }
+    },
+    {
       "id": "structured-report-write",
       "status": "active",
       "summary": "Normalize the structured draft into report data and candidate audit files.",

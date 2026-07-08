@@ -10175,7 +10175,10 @@ test("configured source reset includes GitHub watchlist, Chinese direct RSS, and
   assert(communityHotspots.sources.every((source) => source.public_degraded_on_blocked === false));
   assert(!communityHotspots.sources.some((source) => /reddit/i.test(`${source.id} ${source.name} ${source.url}`)));
   assert(githubWatchlist.sources.some((source) => source.repository === "zarazhangrui/follow-builders"));
-  assert(![...byId.keys()].some((id) => /wechat|zhihu|rsshub/i.test(id)));
+  const legacyPlatformIds = [...byId.keys()].filter((id) =>
+    /zhihu|rsshub/i.test(id) || (/wechat/i.test(id) && !/^wechat2rss-/i.test(id))
+  );
+  assert.deepEqual(legacyPlatformIds, []);
 });
 
 test("configured source reset excludes ineffective Reddit community hotspot feeds", async () => {
@@ -16568,7 +16571,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -16654,7 +16657,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 39);
   assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
 
   const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
   assert(logical, "CORE_SOURCE_CONTRACTS should include anthropic-research-engineering");
@@ -16684,7 +16687,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
 
   assert(handbook.includes("anthropic-research-engineering"), "handbook should document the promoted logical source");
   assert(!review.includes("| `content-anthropic-research` | `anthropic-research-engineering` |"), "review should no longer list the promoted source as a future candidate");
-  assert.match(review, /order-tuning-total-unmapped:68/);
+  assert.match(review, /order-tuning-total-unmapped:78/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -16738,7 +16741,7 @@ test("core primary official logical source promotions are executable and review-
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 39);
   assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
 
   const promotions = [
     {
@@ -16821,7 +16824,7 @@ test("core primary official logical source promotions are executable and review-
   for (const replacementSourceId of ["content-azure-blog", "content-tiktok-developers-blog", "content-cloudflare-blog", "content-google-keyword"]) {
     assert(review.includes(`| \`${replacementSourceId}\``), `review should include replacement promotion candidate ${replacementSourceId}`);
   }
-  assert.match(review, /order-tuning-total-unmapped:68/);
+  assert.match(review, /order-tuning-total-unmapped:78/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -16868,7 +16871,7 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 39);
   assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -16906,7 +16909,7 @@ test("china model logical sources are promoted into the fixed display contract",
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 39);
   assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 68);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official"]) {
@@ -17552,8 +17555,8 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
   const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
   const inventoryEntryCount = String(inventoryRows.length);
-  const inheritedRuntimeCount = 9;
-  const collectionOnlyCount = 68;
+  const inheritedRuntimeCount = 11;
+  const collectionOnlyCount = 78;
   const unreportedRuntimeCount = inventoryRows.length - inheritedRuntimeCount - collectionOnlyCount;
   const metricByTitle = new Map((dashboard?.items || []).map((item) => [item.title, item]));
   const statValue = (title, label = "数量") =>
