@@ -39,6 +39,24 @@ test("design quality validator rejects direct production dependency adoption", a
   assert(result.issues.some((issue) => issue.message.includes("impeccable.production_dependency")));
 });
 
+test("design quality validator requires source or tool evidence in frontend PR contract", async () => {
+  const manifest = validManifest();
+  manifest.quality_contract.required_frontend_pr_evidence =
+    manifest.quality_contract.required_frontend_pr_evidence.filter((item) => item !== "source_or_tool_evidence");
+  const rootDir = await createFixture({ manifest });
+
+  const result = await validateDesignQuality({ rootDir });
+
+  assert.equal(result.ok, false);
+  assert(
+    result.issues.some(
+      (issue) =>
+        issue.code === "design_quality_evidence_missing" &&
+        issue.message.includes("source_or_tool_evidence")
+    )
+  );
+});
+
 test("design quality validator rejects incomplete workflow boundaries", async () => {
   const rootDir = await createFixture({
     workflowDoc: "ADC frontend workflow without markers.\n"
@@ -69,6 +87,64 @@ test("design quality validator rejects missing package script chaining", async (
   assert(result.issues.some((issue) => issue.code === "design_quality_script_not_chained"));
 });
 
+test("design quality validator rejects package-level external design tool adoption", async () => {
+  const packageJson = validPackageJson();
+  packageJson.devDependencies = {
+    "impeccable-cli": "^1.0.0"
+  };
+  packageJson.scripts["impeccable:audit"] = "npx impeccable audit";
+  const rootDir = await createFixture({ packageJson });
+
+  const result = await validateDesignQuality({ rootDir });
+
+  assert.equal(result.ok, false);
+  assert(result.issues.some((issue) => issue.code === "design_quality_external_tool_dependency_forbidden"));
+  assert(result.issues.some((issue) => issue.code === "design_quality_external_tool_script_forbidden"));
+});
+
+test("design quality validator rejects workspace package external design tool dependencies", async () => {
+  const rootDir = await createFixture({
+    workspacePackages: [
+      {
+        path: "apps/web/package.json",
+        packageJson: {
+          name: "@adc/web",
+          type: "module",
+          devDependencies: {
+            "@impeccable/cli": "^1.0.0"
+          }
+        }
+      },
+      {
+        path: "packages/design/package.json",
+        packageJson: {
+          name: "@adc/design",
+          type: "module",
+          dependencies: {
+            "@vendor/taste-skill-adapter": "^1.0.0"
+          }
+        }
+      }
+    ]
+  });
+
+  const result = await validateDesignQuality({ rootDir });
+
+  assert.equal(result.ok, false);
+  assert(
+    result.issues.some(
+      (issue) => issue.code === "design_quality_external_tool_dependency_forbidden" && issue.path === "apps/web/package.json"
+    )
+  );
+  assert(
+    result.issues.some(
+      (issue) =>
+        issue.code === "design_quality_external_tool_dependency_forbidden" &&
+        issue.path === "packages/design/package.json"
+    )
+  );
+});
+
 async function createFixture(options = {}) {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "adc-design-quality-"));
   await write(path.join(rootDir, "design", "design-quality-sources.json"), `${JSON.stringify(options.manifest || validManifest(), null, 2)}\n`);
@@ -79,6 +155,12 @@ async function createFixture(options = {}) {
     options.tasteSkill || validTasteSkill()
   );
   await write(path.join(rootDir, "package.json"), `${JSON.stringify(options.packageJson || validPackageJson(), null, 2)}\n`);
+  for (const workspacePackage of options.workspacePackages || []) {
+    await write(
+      path.join(rootDir, workspacePackage.path),
+      `${JSON.stringify(workspacePackage.packageJson, null, 2)}\n`
+    );
+  }
   return rootDir;
 }
 
@@ -112,7 +194,13 @@ function validManifest() {
 function validQualityContract() {
   return {
     implementation_stack: ["React", "Astryx", "Vite"],
-    required_frontend_pr_evidence: ["design_read", "design_dials", "audit_or_skip_reason", "browser_acceptance"],
+    required_frontend_pr_evidence: [
+      "design_read",
+      "design_dials",
+      "source_or_tool_evidence",
+      "audit_or_skip_reason",
+      "browser_acceptance"
+    ],
     forbidden: ["direct_generated_code_to_production", "landing_page_replacement_for_data_product"]
   };
 }
