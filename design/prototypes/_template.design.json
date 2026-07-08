@@ -1,0 +1,39 @@
+{
+  "schema_version": "1",
+  "id": "template",
+  "title": "Prototype record template",
+  "tool": "manual",
+  "status": "draft",
+  "source": {
+    "tool_url": "",
+    "generated_at": "",
+    "references": []
+  },
+  "prompt": {
+    "path": "design/prototypes/_template.prompt.md",
+    "summary": "Start every design-generation run from a product-scope prompt."
+  },
+  "evidence": {
+    "screenshots": [],
+    "decision_record": "design/prototypes/_template.decision.md",
+    "notes": "Accepted records should add a compressed screenshot."
+  },
+  "production_boundary": {
+    "generated_code_policy": "reference_only",
+    "allowed_output": [
+      "prompt",
+      "compressed screenshot",
+      "decision record",
+      "translation notes"
+    ],
+    "forbidden_output": [
+      "directly committed generated production source",
+      "hosted runtime dependency",
+      "third-party illustration IP copy"
+    ]
+  },
+  "handoff": {
+    "target_surface": "apps/web React homepage",
+    "translation_notes": "Translate accepted decisions into Astryx components and ADC CSS tokens."
+  }
+}
