@@ -206,16 +206,93 @@ function addDays(dateText, deltaDays) {
 }
 
 function visibleHtmlText(html) {
-  return String(html)
-    .replace(/<script[\s\S]*?<\/script>/giu, " ")
-    .replace(/<style[\s\S]*?<\/style>/giu, " ")
+  const withoutRawTextBlocks = ["script", "style"].reduce(
+    (text, tagName) => stripRawTextElementBlocks(text, tagName),
+    String(html)
+  );
+
+  return withoutRawTextBlocks
     .replace(/<[^>]+>/gu, " ")
-    .replace(/&nbsp;/giu, " ")
-    .replace(/&amp;/giu, "&")
-    .replace(/&lt;/giu, "<")
-    .replace(/&gt;/giu, ">")
-    .replace(/&#39;/giu, "'")
-    .replace(/&quot;/giu, "\"");
+    .replace(/&(nbsp|amp|lt|gt|#39|quot);/giu, (_match, entity) => decodeHtmlEntity(entity));
+}
+
+function stripRawTextElementBlocks(html, tagName) {
+  const source = String(html);
+  const lower = source.toLowerCase();
+  const openNeedle = `<${tagName}`;
+  const closeNeedle = `</${tagName}`;
+  let output = "";
+  let index = 0;
+
+  while (index < source.length) {
+    const openIndex = lower.indexOf(openNeedle, index);
+    if (openIndex === -1) {
+      output += source.slice(index);
+      break;
+    }
+
+    if (!isHtmlTagNameBoundary(source.at(openIndex + openNeedle.length))) {
+      output += source.slice(index, openIndex + openNeedle.length);
+      index = openIndex + openNeedle.length;
+      continue;
+    }
+
+    output += `${source.slice(index, openIndex)} `;
+    const openEnd = source.indexOf(">", openIndex + openNeedle.length);
+    if (openEnd === -1) {
+      break;
+    }
+
+    const closeIndex = findRawTextClosingTag(source, lower, closeNeedle, openEnd + 1);
+    if (closeIndex === -1) {
+      break;
+    }
+
+    const closeEnd = source.indexOf(">", closeIndex + closeNeedle.length);
+    if (closeEnd === -1) {
+      break;
+    }
+
+    index = closeEnd + 1;
+  }
+
+  return output;
+}
+
+function findRawTextClosingTag(source, lower, closeNeedle, fromIndex) {
+  let searchFrom = fromIndex;
+  while (searchFrom < source.length) {
+    const closeIndex = lower.indexOf(closeNeedle, searchFrom);
+    if (closeIndex === -1) {
+      return -1;
+    }
+    if (isHtmlTagNameBoundary(source.at(closeIndex + closeNeedle.length))) {
+      return closeIndex;
+    }
+    searchFrom = closeIndex + closeNeedle.length;
+  }
+  return -1;
+}
+
+function isHtmlTagNameBoundary(char) {
+  return char === undefined || char === ">" || char === "/" || isHtmlWhitespace(char);
+}
+
+function isHtmlWhitespace(char) {
+  return char === " " || char === "\n" || char === "\t" || char === "\r" || char === "\f";
+}
+
+function decodeHtmlEntity(entity) {
+  const normalized = String(entity).toLowerCase();
+  const replacements = {
+    nbsp: " ",
+    amp: "&",
+    lt: "<",
+    gt: ">",
+    "#39": "'",
+    quot: "\""
+  };
+  return replacements[normalized] || `&${entity};`;
 }
 
 function normalizeWhitespace(value) {

@@ -56,6 +56,25 @@ test("public copy replay scans docs data, reports data, and rendered HTML inside
   assert(result.issues.every((issue) => !issue.path.includes("2026-06-10")));
 });
 
+test("public copy replay ignores script and style content with loose end tags", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "public-copy-replay-html-"));
+  await writeText(tmp, "docs/reports/2026/07/2026-07-08.html", `
+    <main>这是一段读者可见摘要，详情以仓库主页为准。</main>
+    <script >当前只能确认榜单动量</script >
+    <style >.note::before { content: "优先核对"; }</style >
+  `);
+
+  const result = await evaluatePublicCopyReplay({
+    rootDir: tmp,
+    currentDate: "2026-07-08",
+    latestDays: 14
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.summary.artifacts_checked, 1);
+  assert.deepEqual(result.issues, []);
+});
+
 test("public copy replay CLI exits non-zero with JSON issue output when banned wording is found", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "public-copy-replay-cli-"));
   await writeText(tmp, "docs/data/2026/07/2026-07-08.json", JSON.stringify({
