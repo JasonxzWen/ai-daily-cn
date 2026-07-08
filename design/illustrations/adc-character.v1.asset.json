@@ -1,0 +1,35 @@
+{
+  "schema_version": "1",
+  "id": "adc-character-v1",
+  "title": "ADC character v1",
+  "status": "active",
+  "style_family": "adc-line-art",
+  "source_asset": "apps/web/public/assets/adc-character.svg",
+  "public_asset": "docs/assets/adc-character.svg",
+  "prompt": {
+    "path": "design/illustrations/adc-character.v1.prompt.md",
+    "summary": "Original black-and-white rough-line ADC observer character."
+  },
+  "decision_record": "design/illustrations/adc-character.v1.decision.md",
+  "rights": {
+    "original": true,
+    "copied_from_third_party": false,
+    "external_references": []
+  },
+  "production_boundary": {
+    "allowed_surfaces": [
+      "apps/web React homepage"
+    ],
+    "forbidden_uses": [
+      "third-party illustration IP copy",
+      "remote embedded image",
+      "base64 embedded image",
+      "illustration-first landing page redesign"
+    ]
+  },
+  "build": {
+    "generated_by": "Vite public asset copy",
+    "source_directory": "apps/web/public/assets",
+    "output_directory": "docs/assets"
+  }
+}
