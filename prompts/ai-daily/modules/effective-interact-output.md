@@ -4,8 +4,8 @@
 
 执行边界：
 
-- 结构化草稿可以由 `npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute` 分阶段生成；该入口会把信息收集、准入判断、逐条新闻概括和组装拆成独立 Codex CLI 上下文。旧的 `npm run report:draft -- --date YYYY-MM-DD --input <discovery-jsons> --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json` 仍保留为确定性回退路径。两条路径最终都必须用 `npm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 标准化。
-- `npm run build` 会把标准化后的日报 JSON 转成 effective-interact interaction input，并调用 `.codex/skills/effective-interact/scripts/create-interaction.mjs` 生成公开 HTML。
+- 结构化草稿可以由 `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute` 分阶段生成；该入口会把信息收集、准入判断、逐条新闻概括和组装拆成独立 Codex CLI 上下文。旧的 `corepack pnpm run report:draft -- --date YYYY-MM-DD --input <discovery-jsons> --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json` 仍保留为确定性回退路径。两条路径最终都必须用 `corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 标准化。
+- `corepack pnpm run build` 会把标准化后的日报 JSON 转成 effective-interact interaction input，并调用 `.codex/skills/effective-interact/scripts/create-interaction.mjs` 生成公开 HTML。
 - 公开日报使用 `renderMode: "pre-rendered"`，不得依赖远程脚本、远程字体或 CDN runtime。
 - interaction input 必须保留日报日期、覆盖时间范围、摘要、主体信息、非空热门博客、GitHub Trending weekly Top20、Builder 观察、社区线索、公开“信源覆盖与缺口”摘要、结构化 JSON 链接和 effective-interact 组件能力；空数组对应板块不要渲染到正文和导航中；国内/中文动态并入现有栏目，不生成独立“国内动态”导航项。
 - 正文证据图和热门博客/卡片图片必须通过 effective-interact 的 lightbox 交互支持点开放大；内嵌来源 icon 不参与放大。

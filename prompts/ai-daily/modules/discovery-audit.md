@@ -1,11 +1,11 @@
 ## 发现源与审计
 
-每天生成日报前，必须先完成固定发现面，并把结果写入结构化草稿的 `source_audit`。信源配置来自 `config/sources/*.json`，新增或修改信源后先运行 `npm run sources:validate`。
+每天生成日报前，必须先完成固定发现面，并把结果写入结构化草稿的 `source_audit`。信源配置来自 `config/sources/*.json`，新增或修改信源后先运行 `corepack pnpm run sources:validate`。
 
 1. GitHub Trending / 开源趋势面：
    - 必查 `github-ai-trending` 技能规则。
-   - 优先运行 `npm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data`，把输出的 `source_audit.github_trending` 和 `candidates` 作为开源趋势候选池。
-   - 如果 shell 网络受限但浏览器可以保存 GitHub Trending HTML 或采样 JSON，改用 `npm run discover:github-trending -- --browser-export <path>`，让同一解析器处理浏览器导出的内容。
+   - 优先运行 `corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data`，把输出的 `source_audit.github_trending` 和 `candidates` 作为开源趋势候选池。
+   - 如果 shell 网络受限但浏览器可以保存 GitHub Trending HTML 或采样 JSON，改用 `corepack pnpm run discover:github-trending -- --browser-export <path>`，让同一解析器处理浏览器导出的内容。
    - 至少检查 GitHub Trending daily 与 weekly：`https://github.com/trending?since=daily`、`https://github.com/trending?since=weekly`。
    - 对 AI 工程常用语言补扫 Python、TypeScript、Rust、Go 的 daily/weekly trending。
    - 至少补看一个趋势交叉源：OSSInsight AI / AI Agent Frameworks collection、Trendshift GitHub trending repositories，或等价可访问来源。
@@ -15,7 +15,7 @@
 
 2. Builder 原始源面：
    - 必查 `follow-builders` 技能规则，但不要把二手转述当成 Builder 观察。
-   - `npm run discover:builders -- --date YYYY-MM-DD --limit 20` 必须优先检查 `follow-builders central feed` 的 X、podcast、blog JSON；central feed 中带原始 X URL 的内容视为可审计 Builder 一手候选。
+   - `corepack pnpm run discover:builders -- --date YYYY-MM-DD --limit 20` 必须优先检查 `follow-builders central feed` 的 X、podcast、blog JSON；central feed 中带原始 X URL 的内容视为可审计 Builder 一手候选。
    - central feed 不可用时，才退到 raw feed、本地新鲜缓存和固定 RSS/Atom fallback；过期缓存只用于 `last_successful_feed_at` 和阻塞说明，不直接入选。
    - Builder 观察只收录 builder、researcher、founder、maintainer 的原始帖子、个人博客、公开视频或播客片段；没有原始 URL 就不收录。
    - 如果 X/YouTube/feed 无法访问，`builder_observations` 保持空数组，但 `source_audit.builder_sources` 必须记录 `checked:true`、检查过的来源、阻塞状态和原因，并填写 `blocked_reason` 与 `last_successful_feed_at`。
@@ -27,7 +27,7 @@
    - 至少检查 OpenAI、Anthropic Engineering/News、GitHub Changelog、Google DeepMind/Research、Meta AI、Microsoft Research、Hugging Face Blog 中可访问的官方或工程博客源。
    - AI 日报不局限在狭义 AI：也要检查科技行业、大厂动态、平台政策、开发者生态、算力/芯片、云服务、产品分发和产业趋势。广义来源已注册为 `optional`，包括 TechCrunch AI/Enterprise、The Verge AI/main、Ars Technica、Product Hunt、Latent.Space、Interconnects、Planet AI 等。
    - 至少检查一个高质量博客/访谈聚合源，例如 Latent.Space、Interconnects、Planet AI、Product Hunt、TechCrunch AI、The Verge AI 或 Follow AI Builders。
-   - 优先运行 `npm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3`，默认检查 `core,optional` 官方/工程/研究源、广义科技/大厂来源、AIGC 图片/视频/游戏创作产品源、Product Hunt 和聚合源。公众号/中文自媒体等 `manual` 来源必须显式加 `--enablement core,optional,manual` 或通过人工白名单录入。arXiv 等易限流固定源成功抓取后可写入 `.tmp/source-cache`，后续 429/5xx/timeout 时使用未过期缓存并在 `source_audit` 标注 `cache_fallback_used`。`--per-source-limit` 用于避免单一大源挤掉其他来源。
+   - 优先运行 `corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3`，默认检查 `core,optional` 官方/工程/研究源、广义科技/大厂来源、AIGC 图片/视频/游戏创作产品源、Product Hunt 和聚合源。公众号/中文自媒体等 `manual` 来源必须显式加 `--enablement core,optional,manual` 或通过人工白名单录入。arXiv 等易限流固定源成功抓取后可写入 `.tmp/source-cache`，后续 429/5xx/timeout 时使用未过期缓存并在 `source_audit` 标注 `cache_fallback_used`。`--per-source-limit` 用于避免单一大源挤掉其他来源。
    - Product Hunt 和新产品榜单只产生候选；入选项目区前必须用官网、GitHub、文档或 README 交叉确认，并补充“领域”和“作用”。
    - Product Hunt 必须同时覆盖 developer-tools feed 和 Product Hunt Trending feed；Product Hunt 本身只证明“上榜/热度”，不证明产品事实。
    - 普通微信公众号、华尔街见闻、自媒体和中文科技媒体默认作为 `category:"intermediary"` 的中介发现源；入选事实性栏目之前，必须先追溯它们引用的一手来源。用户确认的公众号白名单可使用 `source_level:"wechat_primary_like"` 或 `source_level:"wechat_industry_whitelist"`，低风险行业动态可进入 `main_items`，但必须保留公众号名、发布时间、待核验点和风险等级。
@@ -41,18 +41,18 @@
    - AI 开发工具计费、配额、成本归因、usage dashboard、Service Quotas、seat/usage-based billing 和 credit 变化是常规候选；影响开发工作流、团队预算、上线容量或采购口径时进 `main_items`，否则进 `community_leads`。
 
 5. 搜索 / 新闻影子发现面：
-   - 用 `npm run discover:search-news -- --date YYYY-MM-DD --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --shadow` 补漏和回源。
+   - 用 `corepack pnpm run discover:search-news -- --date YYYY-MM-DD --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --shadow` 补漏和回源。
    - 搜索结果默认只进入候选池和 `source_audit.search_sources`，不得直接进入正文；连续影子运行质量稳定前，不放宽正文入选门槛。
    - Brave、Tavily、Exa、SerPAPI、Semantic Scholar 只在对应环境变量存在时启用；缺 key 记录 `skipped_missing_token`，不得让日报失败。
    - 搜索命中官方域名、论文、GitHub release 或产品文档时才可标记 `primary_confirmed`；媒体/自媒体/聚合站命中只能作为 `community_lead`。
 
 6. RSSHub / RSS-Bridge / 聚合健康检查：
-   - 用 `npm run sources:health -- --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual` 检查 feed 形态、HTTP 状态、近 48 小时条目数和原始 URL 要求；`manual` 来源应记录跳过原因，不做自动抓取失败处理。
+   - 用 `corepack pnpm run sources:health -- --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual` 检查 feed 形态、HTTP 状态、近 48 小时条目数和原始 URL 要求；`manual` 来源应记录跳过原因，不做自动抓取失败处理。
    - 自托管 RSSHub/RSS-Bridge 未配置 base URL 时记录 `skipped_missing_base_url`，不是日报失败。
 
 7. 连续运行验收：
-   - 发现命令输出保存为临时 JSON 后，用 `npm run sources:audit-merge -- --date YYYY-MM-DD --input <search-news.json>,<sources-health.json>` 把 `search_sources` 与 `sources_health` 合并进最终 `reports-data` 日报；只保留 stdout 不算连续运行证据。
-   - 用 `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3` 审计最近 3 个日报日的 `source_audit` 和候选池。
+   - 发现命令输出保存为临时 JSON 后，用 `corepack pnpm run sources:audit-merge -- --date YYYY-MM-DD --input <search-news.json>,<sources-health.json>` 把 `search_sources` 与 `sources_health` 合并进最终 `reports-data` 日报；只保留 stdout 不算连续运行证据。
+   - 用 `corepack pnpm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3` 审计最近 3 个日报日的 `source_audit` 和候选池。
    - `phase5_complete:false` 不阻塞当天日报发布，但必须说明缺失的是日报天数、必要审计组、还是中介/T3 候选误入事实栏目。
 
 结构化草稿必须包含：
@@ -127,13 +127,13 @@
 
 ### 固定兜底命令
 
-- `npm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data` 现在会先抓 GitHub Trending daily/weekly 与 Python/TypeScript/Rust/Go 页面；对 `fetch failed`、超时、429 或 5xx 默认延迟重试一次，并把重试结果写入 `source_audit.github_trending.sources[].notes`。如果这些页面全部失败或没有解析出仓库，会自动调用 OSSInsight `List trending repos` API 作为机器可复现的项目候选兜底，并尽量和前一日日报的 `github_trending` 做排名变化比较。浏览器导出仍使用 `npm run discover:github-trending -- --date YYYY-MM-DD --browser-export <path>`。
-- `npm run discover:builders -- --date YYYY-MM-DD --limit 20` 优先消费 `follow-builders central feed`，再用少量固定原始 RSS/Atom 源补充 Builder 候选。它只产生带原始 URL 的候选；候选足够时最终 `builder_observations` 入选 5-20 条；没有近期条目时记录 `no_signal`，不要手工改写成入选。
-- `npm run discover:content-sources -- --date YYYY-MM-DD --limit 100 --per-source-limit 3` 默认解析 `config/sources` 中 `enablement:"core"` 和 `enablement:"optional"` 的官方/工程/研究 RSS/Atom、HTML index、广义科技、AIGC 内容产业、Product Hunt、Latent.Space、Interconnects、Planet AI 等候选，并自动检查日期级公众号文章输入 `$CODEX_HOME/automations/ai-daily/inputs/wechat/YYYY-MM-DD.json`；也可用 `--wechat-input <json>` 显式指定输入。Product Hunt 候选会自动尝试打开产品页并用 GitHub、docs、README 或官网确认用途；确认成功的候选优先使用确认页 URL，确认失败的候选不得直接入选项目区。通过 `--sources` 追加普通微信公众号/自媒体时使用 `category:"intermediary"`；追加白名单公众号时必须带 `source_level:"wechat_primary_like"` 或 `source_level:"wechat_industry_whitelist"`，或使用日期级文章输入；追加 X 热点 feed 时使用 `category:"x_hotspot"` 并保留原始 X status URL。
+- `corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data` 现在会先抓 GitHub Trending daily/weekly 与 Python/TypeScript/Rust/Go 页面；对 `fetch failed`、超时、429 或 5xx 默认延迟重试一次，并把重试结果写入 `source_audit.github_trending.sources[].notes`。如果这些页面全部失败或没有解析出仓库，会自动调用 OSSInsight `List trending repos` API 作为机器可复现的项目候选兜底，并尽量和前一日日报的 `github_trending` 做排名变化比较。浏览器导出仍使用 `corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --browser-export <path>`。
+- `corepack pnpm run discover:builders -- --date YYYY-MM-DD --limit 20` 优先消费 `follow-builders central feed`，再用少量固定原始 RSS/Atom 源补充 Builder 候选。它只产生带原始 URL 的候选；候选足够时最终 `builder_observations` 入选 5-20 条；没有近期条目时记录 `no_signal`，不要手工改写成入选。
+- `corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 100 --per-source-limit 3` 默认解析 `config/sources` 中 `enablement:"core"` 和 `enablement:"optional"` 的官方/工程/研究 RSS/Atom、HTML index、广义科技、AIGC 内容产业、Product Hunt、Latent.Space、Interconnects、Planet AI 等候选，并自动检查日期级公众号文章输入 `$CODEX_HOME/automations/ai-daily/inputs/wechat/YYYY-MM-DD.json`；也可用 `--wechat-input <json>` 显式指定输入。Product Hunt 候选会自动尝试打开产品页并用 GitHub、docs、README 或官网确认用途；确认成功的候选优先使用确认页 URL，确认失败的候选不得直接入选项目区。通过 `--sources` 追加普通微信公众号/自媒体时使用 `category:"intermediary"`；追加白名单公众号时必须带 `source_level:"wechat_primary_like"` 或 `source_level:"wechat_industry_whitelist"`，或使用日期级文章输入；追加 X 热点 feed 时使用 `category:"x_hotspot"` 并保留原始 X status URL。
 - 日期级公众号文章输入每条必须包含 `url`、`account_name`、`published_at`、`title`、`summary`、`risk_level`、`verification_notes`，可选 `primary_urls`、`allowed_sections`、`reader_relevance`、`source_level`。发现器只接受 `https://mp.weixin.qq.com` 原文链接，必须在 `source_audit.content_sources` 写入 `WeChat Article Link Input`，并保留 `input_path_redacted=true`、`primary_verification_required=true`，不得把本机绝对路径、`$CODEX_HOME`、私有 feed URL、cookie 或 token 写入候选池、日报 JSON 或 HTML。
-- `npm run discover:search-news -- --date YYYY-MM-DD --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --shadow` 影子运行搜索/新闻补漏；结果默认是 `community_lead` 候选和 `source_audit.search_sources`，不得自动进入正文。
-- `npm run sources:health -- --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual` 检查配置源健康状态；用于解释空板块、发现抓取失败和确认 RSSHub/RSS-Bridge 自托管依赖是否可用，`manual` 来源只记录 `skipped_manual_source`。
-- `npm run sources:audit-merge -- --date YYYY-MM-DD --input .tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json` 把独立发现命令输出中的审计组合并进最终日报 JSON，并在写回前运行 report schema 校验。
-- `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3` 读取最近 3 个日报日的 source audit 和候选池，输出连续运行验收状态；只有返回 `phase5_complete:true` 才能宣称 Phase 5 完成。
-- `npm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20` 解析 OpenAI/Claude 等 Statuspage Atom/RSS，把近期 incident 转成 `community_lead` 轻量运营候选。状态页、模型网关上架、preview access、区域/账号可用性和短时限流默认不写入 `model_releases`；只有影响生产迁移、成本边界或上线排期时才可人工升格为 `main_items`。
-- `npm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json` 必须在 `report:write` 前运行；它从候选池自动选取主体、AIGC、GitHub Trending、Builder、博客和社区线索，回写 `included` 标记，并 best-effort 缓存候选 `image_url` 到 `docs/assets/evidence/**`。
+- `corepack pnpm run discover:search-news -- --date YYYY-MM-DD --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --shadow` 影子运行搜索/新闻补漏；结果默认是 `community_lead` 候选和 `source_audit.search_sources`，不得自动进入正文。
+- `corepack pnpm run sources:health -- --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual` 检查配置源健康状态；用于解释空板块、发现抓取失败和确认 RSSHub/RSS-Bridge 自托管依赖是否可用，`manual` 来源只记录 `skipped_manual_source`。
+- `corepack pnpm run sources:audit-merge -- --date YYYY-MM-DD --input .tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json` 把独立发现命令输出中的审计组合并进最终日报 JSON，并在写回前运行 report schema 校验。
+- `corepack pnpm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3` 读取最近 3 个日报日的 source audit 和候选池，输出连续运行验收状态；只有返回 `phase5_complete:true` 才能宣称 Phase 5 完成。
+- `corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20` 解析 OpenAI/Claude 等 Statuspage Atom/RSS，把近期 incident 转成 `community_lead` 轻量运营候选。状态页、模型网关上架、preview access、区域/账号可用性和短时限流默认不写入 `model_releases`；只有影响生产迁移、成本边界或上线排期时才可人工升格为 `main_items`。
+- `corepack pnpm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json` 必须在 `report:write` 前运行；它从候选池自动选取主体、AIGC、GitHub Trending、Builder、博客和社区线索，回写 `included` 标记，并 best-effort 缓存候选 `image_url` 到 `docs/assets/evidence/**`。

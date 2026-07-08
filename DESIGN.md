@@ -110,10 +110,10 @@ AI 日报是给读者快速判断当天 AI 生态变化的新闻产品，不是�
 任何触碰日报渲染、文案生成、准入逻辑或自动化 prompt 的改动，至少运行：
 
 ```powershell
-npm run content:contract
+corepack pnpm run content:contract
 node --test tests/generation-first.test.js tests/content-contract.test.js
 node --test tests/unit.test.js
-npm run quality:page-check -- --date YYYY-MM-DD
+corepack pnpm run quality:page-check -- --date YYYY-MM-DD
 ```
 
 涉及页面结构、icon、tag、左栏或折叠行为时，还要跑相关 unit/e2e，并保留桌面和移动 viewport 的浏览器验收记录。

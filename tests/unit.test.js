@@ -81,7 +81,7 @@ import {
 } from "../src/quality-loop.js";
 import { runDailyWorkflow } from "../src/daily-runner.js";
 import { runStatusSelfCheck } from "../src/status-self-check.js";
-import { npmInvocationForArgs } from "../src/process-runner.js";
+import { pnpmInvocationForArgs } from "../src/process-runner.js";
 import { normalizeUrlIdentity } from "../src/url.js";
 import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { checkWorktreePreflight } from "../src/worktree-preflight.js";
@@ -6022,16 +6022,16 @@ test("shared URL identity normalizes tracking parameters for dedupe gates", () =
   );
 });
 
-test("shared npm invocation wraps npm through cmd on Windows", () => {
-  const windows = npmInvocationForArgs(["ci", "--cache", "C:\\tmp\\npm cache"], { platform: "win32" });
+test("shared pnpm invocation wraps corepack pnpm through cmd on Windows", () => {
+  const windows = pnpmInvocationForArgs(["install", "--frozen-lockfile", "--store-dir", "C:\\tmp\\pnpm store"], { platform: "win32" });
   assert.equal(windows.file, "cmd.exe");
   assert.deepEqual(windows.args.slice(0, 3), ["/d", "/s", "/c"]);
-  assert.match(windows.args[3], /^npm ci --cache /);
-  assert.match(windows.args[3], /npm cache/);
+  assert.match(windows.args[3], /^corepack pnpm install --frozen-lockfile --store-dir /);
+  assert.match(windows.args[3], /pnpm store/);
 
-  const linux = npmInvocationForArgs(["ci"], { platform: "linux" });
-  assert.equal(linux.file, "npm");
-  assert.deepEqual(linux.args, ["ci"]);
+  const linux = pnpmInvocationForArgs(["install", "--frozen-lockfile"], { platform: "linux" });
+  assert.equal(linux.file, "corepack");
+  assert.deepEqual(linux.args, ["pnpm", "install", "--frozen-lockfile"]);
 });
 
 test("public artifact privacy scan blocks local machine path leakage", async () => {
@@ -8144,7 +8144,7 @@ test("status:self-check blocks when multiple daily publish automations are activ
       'id = "ai-push-github-pages"',
       'kind = "cron"',
       'name = "AI 日报生成、push 与 GitHub Pages 发布"',
-      'prompt = "npm run publish:prepare-worktree && npm run publish:dry-run"',
+      'prompt = "pnpm run publish:prepare-worktree && pnpm run publish:dry-run"',
       'status = "ACTIVE"',
       'rrule = "RRULE:FREQ=WEEKLY;BYHOUR=2;BYMINUTE=30;BYDAY=SU,MO,TU,WE,TH,FR,SA"'
     ].join("\n"),
@@ -8245,7 +8245,7 @@ test("automation inventory recognizes daily codex pipeline publish automation", 
       'id = "ai-2"',
       'kind = "cron"',
       'name = "AI Daily publish"',
-      'prompt = "npm run daily:codex-pipeline -- --date 2026-07-02 --execute --publish"',
+      'prompt = "pnpm run daily:codex-pipeline -- --date 2026-07-02 --execute --publish"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8416,7 +8416,7 @@ test("daily workflow contract validates repository workflow markers", async () =
     [
       'id = "ai-daily"',
       'kind = "cron"',
-      `prompt = "npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact ${expectedSourceWatchArtifactPath}; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch_admitted_artifact_path"`,
+      `prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact ${expectedSourceWatchArtifactPath}; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch_admitted_artifact_path"`,
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8456,7 +8456,7 @@ test("daily workflow contract rejects active publish automation missing Source W
     [
       'id = "ai-daily"',
       'kind = "cron"',
-      'prompt = "npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8886,7 +8886,7 @@ test("feedback contract rejects quick reference missing ledger item", async () =
           validation: {
             command: "node --test tests/unit.test.js",
             test_name: "fixture",
-            gate: "npm run validate"
+            gate: "pnpm run validate"
           }
         },
         {
@@ -8900,7 +8900,7 @@ test("feedback contract rejects quick reference missing ledger item", async () =
           validation: {
             command: "node --test tests/unit.test.js",
             test_name: "fixture",
-            gate: "npm run validate"
+            gate: "pnpm run validate"
           }
         }
       ]
@@ -9073,8 +9073,8 @@ test("OpenSpec removed from active package workflow", async () => {
   assert.equal("validate:openspec" in scripts, false);
   assert.equal(scripts["harness:init"], "node scripts/harness-init.mjs");
   assert.equal(scripts["harness:validate"], "node scripts/harness-validate.mjs");
-  assert.match(scripts.validate || "", /npm run harness:init/);
-  assert.match(scripts.validate || "", /npm run harness:validate/);
+  assert.match(scripts.validate || "", /pnpm run harness:init/);
+  assert.match(scripts.validate || "", /pnpm run harness:validate/);
   assert.doesNotMatch(scripts.test || "", /openspec/i);
   assert.doesNotMatch(scripts.validate || "", /openspec/i);
   assert.equal(await exists(path.join(rootDir, "scripts", "validate-openspec.mjs")), false);
@@ -9189,8 +9189,8 @@ test("validate uses build clean check wrapper", async () => {
   const scripts = manifest.scripts || {};
 
   assert.equal(scripts["build:check-clean"], "node scripts/check-build-clean.mjs");
-  assert.match(scripts.validate || "", /npm run build:check-clean/);
-  assert.doesNotMatch(scripts.validate || "", /npm run build &&/);
+  assert.match(scripts.validate || "", /pnpm run build:check-clean/);
+  assert.doesNotMatch(scripts.validate || "", /pnpm run build &&/);
 });
 
 test("package exposes worktree preflight and docs validation tiers", async () => {
@@ -9198,12 +9198,12 @@ test("package exposes worktree preflight and docs validation tiers", async () =>
   const scripts = manifest.scripts || {};
 
   assert.equal(scripts["preflight:worktree"], "node src/cli.js preflight:worktree");
-  assert.match(scripts["validate:docs"] || "", /npm run harness:init/);
-  assert.match(scripts["validate:docs"] || "", /npm run harness:validate/);
-  assert.match(scripts["validate:docs"] || "", /npm run retrospectives:validate/);
-  assert.match(scripts["validate:docs"] || "", /npm run privacy:validate/);
+  assert.match(scripts["validate:docs"] || "", /pnpm run harness:init/);
+  assert.match(scripts["validate:docs"] || "", /pnpm run harness:validate/);
+  assert.match(scripts["validate:docs"] || "", /pnpm run retrospectives:validate/);
+  assert.match(scripts["validate:docs"] || "", /pnpm run privacy:validate/);
   assert.match(scripts["validate:docs"] || "", /git diff --check/);
-  assert.match(scripts.validate || "", /npm run test:e2e/);
+  assert.match(scripts.validate || "", /pnpm run test:e2e/);
 });
 
 function createWorktreePreflightRunner(overrides = {}) {
@@ -9323,7 +9323,7 @@ test("daily runner turns remote ahead publish dry-run into restart latest main a
   assert.equal(result.summary.next_action.summary_path, result.summaryPath);
   assert.equal(result.summary.next_action.remote.upstream, "origin/main");
   assert.equal(result.summary.next_action.remote.remoteAhead, 2);
-  assert.match(result.summary.next_action.command, /npm run daily:run -- --date 2026-06-26 --restart/);
+  assert.match(result.summary.next_action.command, /corepack pnpm run daily:codex-pipeline -- --date 2026-06-26 --execute/);
   assert.match(result.summary.next_action.message, /latest origin\/main/i);
 });
 
@@ -16407,8 +16407,8 @@ test("source display contract governance is handbook-backed and complete", async
   assert(result.summary.required_handbook_markers.includes("source-display-governance:v1"));
   assert(result.summary.required_handbook_markers.includes("new-source-insertion-rules"));
   assert(result.summary.required_handbook_markers.includes("baseline-fixed-order"));
-  assert(result.summary.validation_commands.includes("npm run sources:display-contract"));
-  assert(result.summary.validation_commands.includes("npm run validate"));
+  assert(result.summary.validation_commands.includes("corepack pnpm run sources:display-contract"));
+  assert(result.summary.validation_commands.includes("corepack pnpm run validate"));
 });
 
 test("source insertion handbook is a validator-backed decision tree", async () => {
@@ -21985,7 +21985,7 @@ test("feedback contract rejects P1 bindings whose test name is not present in te
           validation: {
             command: "node --test tests/unit.test.js",
             test_name: "this test name does not exist",
-            gate: "npm run validate"
+            gate: "pnpm run validate"
           }
         }
       ]
@@ -22000,7 +22000,7 @@ test("feedback contract rejects P1 bindings whose test name is not present in te
     ],
     packageJson: {
       scripts: {
-        validate: "npm run test",
+        validate: "pnpm run test",
         test: "node --test tests/unit.test.js"
       }
     }
@@ -22022,12 +22022,12 @@ test("feedback contract rejects P1 validation commands outside npm validate", as
           status: "implemented",
           title: "Command not covered",
           problem: "A ledger item can cite a command that validate never runs.",
-          expected_behavior: "The validator proves the command is covered by npm run validate.",
+          expected_behavior: "The validator proves the command is covered by pnpm run validate.",
           scope: ["src/feedback-contract.js"],
           validation: {
             command: "node --test tests/not-in-validate.test.js",
             test_name: "covered assertion",
-            gate: "npm run validate"
+            gate: "pnpm run validate"
           }
         }
       ]
@@ -22042,14 +22042,14 @@ test("feedback contract rejects P1 validation commands outside npm validate", as
     ],
     packageJson: {
       scripts: {
-        validate: "npm run test",
+        validate: "pnpm run test",
         test: "node --test tests/unit.test.js"
       }
     }
   });
 
   assert.equal(result.ok, false);
-  assert(result.failures.some((failure) => failure.includes("validation.command is not covered by npm run validate")));
+  assert(result.failures.some((failure) => failure.includes("validation.command is not covered by pnpm run validate")));
 });
 
 test("feedback contract rejects P1 scope paths that do not exist", async () => {
@@ -22069,7 +22069,7 @@ test("feedback contract rejects P1 scope paths that do not exist", async () => {
           validation: {
             command: "node --test tests/unit.test.js",
             test_name: "covered assertion",
-            gate: "npm run validate"
+            gate: "pnpm run validate"
           }
         }
       ]
@@ -22084,7 +22084,7 @@ test("feedback contract rejects P1 scope paths that do not exist", async () => {
     ],
     packageJson: {
       scripts: {
-        validate: "npm run test",
+        validate: "pnpm run test",
         test: "node --test tests/unit.test.js"
       }
     }
@@ -25031,9 +25031,7 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(!prompt.includes("src/public-daily-renderer.js"));
   assert(prompt.includes("pre-rendered"));
   assert(prompt.includes("定时任务和长程发布任务必须从 launcher worktree 启动"));
-  assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD"));
-  assert(prompt.includes("npm run daily:run -- --date YYYY-MM-DD --publish"));
-  assert(prompt.includes("npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish"));
+  assert(prompt.includes("pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish"));
   assert(prompt.includes(".tmp/run-summary-YYYY-MM-DD.json"));
   assert(prompt.includes("publish:dry-run:daily"));
   assert(prompt.includes("反思与迭代建议"));
@@ -25046,16 +25044,16 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("GitHub Trending"));
   assert(prompt.includes("github_trending"));
   assert(prompt.includes("排名变化"));
-  assert(prompt.includes("npm run discover:github-trending"));
+  assert(prompt.includes("pnpm run discover:github-trending"));
   assert(prompt.includes("--browser-export"));
-  assert(prompt.includes("npm run discover:builders"));
-  assert(prompt.includes("npm run discover:content-sources"));
-  assert(prompt.includes("npm run sources:validate"));
-  assert(prompt.includes("npm run discover:search-news"));
-  assert(prompt.includes("npm run sources:health"));
-  assert(prompt.includes("npm run sources:audit-merge"));
-  assert(prompt.includes("npm run sources:phase5-audit"));
-  assert(prompt.includes("npm run discover:statuspage-incidents"));
+  assert(prompt.includes("pnpm run discover:builders"));
+  assert(prompt.includes("pnpm run discover:content-sources"));
+  assert(prompt.includes("pnpm run sources:validate"));
+  assert(prompt.includes("pnpm run discover:search-news"));
+  assert(prompt.includes("pnpm run sources:health"));
+  assert(prompt.includes("pnpm run sources:audit-merge"));
+  assert(prompt.includes("pnpm run sources:phase5-audit"));
+  assert(prompt.includes("pnpm run discover:statuspage-incidents"));
   assert(prompt.includes("轻量运营"));
   assert(prompt.includes("pricing_quota_cost_items"));
   assert(prompt.includes("source_level"));
@@ -26106,7 +26104,7 @@ function retrospectiveRecordFixture({
       html: "docs/reports/2026/06/2026-06-12.html",
       commits: ["4e48249"],
       prs: ["79"],
-      validation_commands: ["node scripts/validate-retrospectives.mjs", "npm run validate"]
+      validation_commands: ["node scripts/validate-retrospectives.mjs", "pnpm run validate"]
     },
     blockers: [],
     degraded_sections: [
@@ -26219,7 +26217,7 @@ async function createHarnessFixture(options = {}) {
           validation: {
             command: "node --test tests/unit.test.js",
             test_name: "fixture",
-            gate: "npm run validate"
+            gate: "pnpm run validate"
           }
         }
       ]
@@ -26248,9 +26246,9 @@ async function createHarnessFixture(options = {}) {
       "## GitHub API Fallback",
       "## Handoff",
       "",
-      "npm run publish:dry-run",
-      "npm run publish -- confirm-push YYYY-MM-DD",
-      "npm run publish:github-api -- confirm-push YYYY-MM-DD",
+      "pnpm run publish:dry-run",
+      "pnpm run publish -- confirm-push YYYY-MM-DD",
+      "pnpm run publish:github-api -- confirm-push YYYY-MM-DD",
       ""
     ].join("\n"),
     "utf8"
@@ -26264,8 +26262,8 @@ async function createHarnessFixture(options = {}) {
       "YYYY-MM-DD",
       "Asia/Shanghai",
       "Real publish requires explicit confirmation",
-      "npm run validate",
-      "npm run publish:dry-run",
+      "pnpm run validate",
+      "pnpm run publish:dry-run",
       ""
     ].join("\n"),
     "utf8"
@@ -26350,8 +26348,8 @@ async function createHarnessFixture(options = {}) {
         "retrospectives:validate": "node scripts/validate-retrospectives.mjs",
         "content:contract": "node scripts/check-daily-content-contract.mjs",
         "content:contract:self-test": "node scripts/check-daily-content-contract.mjs --self-test --json",
-        "validate:docs": "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run privacy:validate && git diff --check",
-        validate: "npm run harness:init && npm run harness:validate && npm run retrospectives:validate && npm run content:contract && npm run content:contract:self-test && npm run test && npm run build && npm run test:e2e && git diff --check",
+        "validate:docs": "pnpm run harness:init && pnpm run harness:validate && pnpm run retrospectives:validate && pnpm run privacy:validate && git diff --check",
+        validate: "pnpm run harness:init && pnpm run harness:validate && pnpm run retrospectives:validate && pnpm run content:contract && pnpm run content:contract:self-test && pnpm run test && pnpm run build && pnpm run test:e2e && git diff --check",
         "publish:prepare-worktree": "node src/cli.js publish:prepare-worktree",
         "publish:prepare-clean-worktree": "node src/cli.js publish:prepare-clean-worktree",
         "publish:preflight": "node src/cli.js publish:preflight",

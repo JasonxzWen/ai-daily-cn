@@ -1,6 +1,6 @@
 # AI 日报主体流生成修复规格
 
-状态：spec-locked / implementation-validation-pending。本文是后续实现与验收的控制性规格，不表示当前代码已经稳定完成。`feedback/p1-main-stream-blacklist-refill` 是 confirmed durable requirement：需求、范围和测试绑定已经固定，但不是生成修复已稳定的声明。当前已经确认的事实是：2026-06-15 的生成结果只有 3 条 `main_items`，页面已经能如实显示 `主体偏少`，但生成端是否真正解决主体不足，必须等真实日期重跑、页面检查、截图验收和 `npm run validate` 都通过后才能声称完成。
+状态：spec-locked / implementation-validation-pending。本文是后续实现与验收的控制性规格，不表示当前代码已经稳定完成。`feedback/p1-main-stream-blacklist-refill` 是 confirmed durable requirement：需求、范围和测试绑定已经固定，但不是生成修复已稳定的声明。当前已经确认的事实是：2026-06-15 的生成结果只有 3 条 `main_items`，页面已经能如实显示 `主体偏少`，但生成端是否真正解决主体不足，必须等真实日期重跑、页面检查、截图验收和 `corepack pnpm run validate` 都通过后才能声称完成。
 
 当前执行门禁：本轮只落成计划、规范、测试标准和交接状态；不得继续修改 `src/**`、`tests/**`、生成报告数据、公开 HTML、发布流程或自动化配置。已有脏改动必须在后续实现阶段用红灯测试、真实日期重跑、页面检查、浏览器截图和完整验证重新证明，不能因为本规格存在就被视为正确。
 
@@ -55,7 +55,7 @@
 | 7. 每个候选写清楚为什么没进主体 | 每个被评估候选都要写 `main_reject_reason` 或 `main_selection_stage` | 公开页隐藏这些字段；候选池和 self_check 保留 per-candidate 与汇总统计 | `.candidates.json` 可追踪候选入选、补位、合并、拒绝原因 |
 | 8. 修复源而不是只修页面 | 页面只展示生成结果和 degraded 状态；真正修复点在 discovery、source registry、daily-runner 和候选标准化 | 不允许通过公开模板填充假内容或隐藏源失败 | source health 能解释源失败如何影响主体、附属栏目和替代路径 |
 | 9. 主体不足是生成期质量事件 | 主体不足不直接阻塞日报，但必须记录 `main_stream_shortfall` | 只有主体为 0 且无可信来源支撑时才升级为阻塞 | 真实日期不足时有 selected/refill/shortfall/rejection/source impact 事件 |
-| 10. 回归测试 | 单元、E2E、page-check、真实日期重跑和浏览器截图共同构成验收 | 不能只用 fixture 或一次页面静态检查声称稳定 | `npm run validate`、date-specific page-check、桌面/移动截图和 runtime artifacts 同时存在 |
+| 10. 回归测试 | 单元、E2E、page-check、真实日期重跑和浏览器截图共同构成验收 | 不能只用 fixture 或一次页面静态检查声称稳定 | `corepack pnpm run validate`、date-specific page-check、桌面/移动截图和 runtime artifacts 同时存在 |
 
 ## 黑名单制准入规范
 
@@ -376,7 +376,7 @@ node --test tests/unit.test.js --test-name-pattern "main stream candidates by bl
 | 源健康与降级 | blocked、no_signal、unconfigured、degraded、effective candidate count 均有 fixture | `source_audit` / source health 记录 source group、last checked、candidate count、included count、fallback、source impact | registry 里有 URL，或公开页只写 degraded 但无法定位源 |
 | effective-interact 生产渲染 | 单测确认 `buildSite` 调用 effective-interact pre-rendered，并保留组件 affordance | 构建后的单日报 HTML 含 effective-interact generator marker、filterable cards、导航/组件能力 | 手写模板伪造 marker，或只检查 HTML 文件存在 |
 | index 影响 | E2E/page-check 覆盖 3、5、21-30、31+ 主体数量状态 | `docs/index.html` 对真实报告显示正确主体流状态，不把 21-30 判 oversized | 只看单日报页，不检查 index |
-| 完整完成声明 | 目标测试、真实日期 draft/write/build、page-check、桌面/移动截图、`npm run validate` 全部存在 | handoff 引用具体文件、命令、截图和计数 | 只跑 `npm run validate`，或只跑真实日期但没有截图/page-check |
+| 完整完成声明 | 目标测试、真实日期 draft/write/build、page-check、桌面/移动截图、`corepack pnpm run validate` 全部存在 | handoff 引用具体文件、命令、截图和计数 | 只跑 `corepack pnpm run validate`，或只跑真实日期但没有截图/page-check |
 
 ### Runtime Evidence
 
@@ -407,13 +407,13 @@ node --test tests/unit.test.js --test-name-pattern "main stream candidates by bl
 ```powershell
 node --test tests/unit.test.js
 node --test tests/e2e/site.e2e.js
-npm run build
+corepack pnpm run build
 node scripts/check-daily-page.mjs --date YYYY-MM-DD --out docs --output .tmp/page-check-main-stream-generation-repair.json
 node scripts/harness-validate.mjs
-npm run validate
+corepack pnpm run validate
 ```
 
-如果修改 `.codex/skills/effective-interact`，还要确认技能 smoke 测试包含在 `npm test` 中并通过。
+如果修改 `.codex/skills/effective-interact`，还要确认技能 smoke 测试包含在 `corepack pnpm test` 中并通过。
 
 ## 明确非目标
 
@@ -433,4 +433,4 @@ npm run validate
 - 官方源健康表能解释失败和替代入口。
 - 公开页没有内部诊断字段和垃圾句。
 - index 页不把整体强信号和主体达标混为一谈。
-- 单元、E2E、页面检查、浏览器视觉验收和 `npm run validate` 都通过。
+- 单元、E2E、页面检查、浏览器视觉验收和 `corepack pnpm run validate` 都通过。

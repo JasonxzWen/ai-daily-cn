@@ -1,20 +1,18 @@
 ## Codex-native runner contract
 
-Daily resilience policy: `config/daily-resilience-policy.json` is the authoritative retry/fallback/degrade/block table for the Codex-native runner. Workflow, prompt, and automation changes must pass `npm run resilience:validate`; safe public source/coverage failures may end as `published_degraded`; successful repository publish with delayed Pages propagation may end as `published_pending_pages_verification`; unsafe content, unrecoverable rendering/schema failures, internal leakage, fake tracking components, and exhausted publish infrastructure end as `infrastructure_blocked_after_fallback_exhausted` or another whitelisted blocker.
+Daily resilience policy: `config/daily-resilience-policy.json` is the authoritative retry/fallback/degrade/block table for the Codex-native runner. Workflow, prompt, and automation changes must pass `corepack pnpm run resilience:validate`; safe public source/coverage failures may end as `published_degraded`; successful repository publish with delayed Pages propagation may end as `published_pending_pages_verification`; unsafe content, unrecoverable rendering/schema failures, internal leakage, fake tracking components, and exhausted publish infrastructure end as `infrastructure_blocked_after_fallback_exhausted` or another whitelisted blocker.
 
 Status self-check: the 21:30 automation must call `status:self-check` after the daily publish window. It records `.tmp/status-self-check-YYYY-MM-DD.json`, verifies `sources:phase5-audit`/`publish:dry-run:daily` still pass from the clean runner baseline, and treats `multiple_active_daily_publish_automations` as a blocking issue.
 
 定时任务和长程发布任务必须从 launcher worktree 启动，统一调用可调试的 Codex 分阶段 pipeline：
 
 ```powershell
-npm run daily:codex-pipeline -- --date YYYY-MM-DD --dry-run
-npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
-npm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --dry-run
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
 ```
 
 Source Watch admitted candidates are a conditional explicit handoff: when .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json exists, append --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json and expect source_watch_admitted_artifact_path in .tmp/run-summary-YYYY-MM-DD.json; do not scan .tmp for a newest artifact.
-
-旧 `daily:run` 只保留为人工恢复和短期兼容入口；scheduled automation 不得优先使用旧 runner，也不得在 prompt 中内联旧手工 discovery/repair/build/publish 链路。脚本缺失时才允许临时 `legacy_daily_run_compatibility`，合并新管线后应自动回到分阶段入口。
 
 - 该脚本把 collect、admit、每条 summarize 和 assemble 拆成独立 `codex exec --ephemeral` 上下文；定时任务迁移到该入口后，只传日期和执行意图，不在 automation prompt 中内联信息收集、准入、逐条概括或发布流水线。
 - 默认不带 `--publish` 只生成和验证，终态为 `final_status:"generated_only"`。
@@ -23,15 +21,6 @@ Source Watch admitted candidates are a conditional explicit handoff: when .tmp/d
 - pipeline 固定写 `.tmp/run-summary-YYYY-MM-DD.json`；定时任务只读取 `final_status`、`completed_stages`、`next_action`、报告 JSON/HTML 路径和 publish 日志路径。
 - 如果需要丢弃同日未完成的 pipeline 状态，删除或换用 `.tmp/daily-codex-pipeline/YYYY-MM-DD` 工作目录后重新运行同一命令；不要回退到旧 `daily:run` 手工修复链路。
 - 不要在定时任务 prompt 中展开旧手工流水线；`publish:dry-run -- --date YYYY-MM-DD` 只保留给人工诊断，不是 scheduled dry-run 入口。
-
-兼容标记：旧 runner 的 AI repair 合同仍可能在历史 run summary 中出现 `status:"ready"`，旧 CLI 也仍保留 `--restart` 作为人工恢复标记；`npm run daily:run` 这个字面 marker 也只用于历史兼容和 workflow contract 校验，不是新定时任务入口。
-
-历史兼容示例，仅供人工恢复和合同校验，不得作为 scheduled automation 首选入口：
-
-```powershell
-npm run daily:run -- --date YYYY-MM-DD
-npm run daily:run -- --date YYYY-MM-DD --publish
-```
 
 阻塞处理：
 

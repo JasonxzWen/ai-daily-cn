@@ -256,7 +256,7 @@ async function resolveCheckRoot({ rootDir, options, checks }) {
       allowExternalWorktree: options.allowExternalWorktree,
       installDependencies: options.installDependencies,
       forceInstall: options.forceInstall,
-      npmCache: options.npmCache
+      pnpmStoreDir: options.pnpmStoreDir
     })
   );
   const repoRoot = path.resolve(prepared.output?.repo_root || prepared.output?.next_cwd || rootDir);

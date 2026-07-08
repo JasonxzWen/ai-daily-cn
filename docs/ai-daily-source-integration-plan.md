@@ -15,12 +15,12 @@
 本计划已落到以下仓库能力：
 
 - `config/sources/*.json`：配置化信源注册表，区分 `core`、`optional`、`manual`。
-- `schemas/sources.schema.json` 与 `npm run sources:validate`：校验新增源必须带 `source_kind`、`candidate_category`、`tier`、`authority`、`enablement`、`verification_policy`。
-- `npm run discover:content-sources`：默认运行 `core,optional`，覆盖广义科技、Product Hunt 和聚合源；公众号/中文自媒体等 `manual` 来源需要显式打开或人工录入。
-- `npm run discover:search-news -- --shadow`：GDELT、OpenAlex、arXiv 默认影子运行；Brave/Tavily/Exa/SerPAPI/Semantic Scholar 只在有环境变量时启用。
-- `npm run sources:health`：检查配置源 HTTP 状态、feed 形态、近 48 小时条目数和原始 URL 要求。
-- `npm run sources:audit-merge`：把独立发现命令输出的 `source_audit` 固定组合并进最终日报 JSON，避免 Phase 5 只能看到临时 stdout。
-- `npm run sources:phase5-audit`：读取最近 N 个 `reports-data` 日报和候选池，判断连续运行验证是否达标。
+- `schemas/sources.schema.json` 与 `corepack pnpm run sources:validate`：校验新增源必须带 `source_kind`、`candidate_category`、`tier`、`authority`、`enablement`、`verification_policy`。
+- `corepack pnpm run discover:content-sources`：默认运行 `core,optional`，覆盖广义科技、Product Hunt 和聚合源；公众号/中文自媒体等 `manual` 来源需要显式打开或人工录入。
+- `corepack pnpm run discover:search-news -- --shadow`：GDELT、OpenAlex、arXiv 默认影子运行；Brave/Tavily/Exa/SerPAPI/Semantic Scholar 只在有环境变量时启用。
+- `corepack pnpm run sources:health`：检查配置源 HTTP 状态、feed 形态、近 48 小时条目数和原始 URL 要求。
+- `corepack pnpm run sources:audit-merge`：把独立发现命令输出的 `source_audit` 固定组合并进最终日报 JSON，避免 Phase 5 只能看到临时 stdout。
+- `corepack pnpm run sources:phase5-audit`：读取最近 N 个 `reports-data` 日报和候选池，判断连续运行验证是否达标。
 - 候选池支持 `intermediary_url`、`primary_url`、`original_url`、`verification_status`、`verification_sources`；`report:write` 会阻止未完成一手/多源核验的中介候选进入事实栏目。
 
 ## 本轮 Grill-Me 修订
@@ -28,7 +28,7 @@
 这轮压测后，最需要修改的是五个会直接影响健壮性的地方：
 
 1. **把“命令跑过”改成“日报 JSON 留痕”**：`discover:search-news` 和 `sources:health` 的 stdout 不算连续运行证据，必须通过 `sources:audit-merge` 或等价写入流程合并进最终 `reports-data/YYYY/MM/YYYY-MM-DD.json` 的 `source_audit.search_sources` 与 `source_audit.sources_health`。否则 Phase 5 会持续显示缺审计组。
-2. **把“计划阶段”拆成状态表**：Phase 0-4 可以用单测和命令证明已落地；Phase 5 只能用连续日报日证明，不能因为当天 `npm run validate` 通过就宣称完成。
+2. **把“计划阶段”拆成状态表**：Phase 0-4 可以用单测和命令证明已落地；Phase 5 只能用连续日报日证明，不能因为当天 `corepack pnpm run validate` 通过就宣称完成。
 3. **把“搜索补漏”固定为影子运行**：搜索命中只能先进入候选池和审计；进入事实栏目必须另有 `primary_confirmed` 或 `multi_source_confirmed`。
 4. **把“内容质量”纳入验收**：高信源不等于高信息熵。每条公开内容必须有具体事实锚点、变化、限制或工程用途；泛化判断和执行痕迹不得进入正文。
 5. **把“重点标注”作为渲染能力计划**：正文 Markdown 已支持 `**加粗**` 和 `==高亮==`；卡片类 body 也需要安全 inline Markdown 后才能要求每日草稿稳定使用重点标注。
@@ -154,7 +154,7 @@
 独立发现命令输出可用以下命令合并；该命令只改 `source_audit`，写回前会校验 report schema，不改正文和候选池：
 
 ```powershell
-npm run sources:audit-merge -- --date YYYY-MM-DD --input .tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json
+corepack pnpm run sources:audit-merge -- --date YYYY-MM-DD --input .tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json
 ```
 
 ### 3. 发现器规范
@@ -182,7 +182,7 @@ npm run sources:audit-merge -- --date YYYY-MM-DD --input .tmp/search-news-YYYY-M
 实现上建议新增统一命令：
 
 ```powershell
-npm run discover:search-news -- --date YYYY-MM-DD --providers gdelt,openalex --queries config/search-queries.json --limit 40 --shadow
+corepack pnpm run discover:search-news -- --date YYYY-MM-DD --providers gdelt,openalex --queries config/search-queries.json --limit 40 --shadow
 ```
 
 Provider 规则：
@@ -207,7 +207,7 @@ Provider 规则：
 计划中的统一命令：
 
 ```powershell
-npm run sources:health -- --sources config/sources --date YYYY-MM-DD
+corepack pnpm run sources:health -- --sources config/sources --date YYYY-MM-DD
 ```
 
 健康检查必须输出：
@@ -360,11 +360,11 @@ npm run sources:health -- --sources config/sources --date YYYY-MM-DD
 
 | 阶段 | 当前状态 | 不能混淆的验收口径 |
 |---|---|---|
-| Phase 0：基线和配置化 | 已有命令与 schema | 以 `npm run sources:validate`、registry fixture 和 `npm run validate` 为准 |
+| Phase 0：基线和配置化 | 已有命令与 schema | 以 `corepack pnpm run sources:validate`、registry fixture 和 `corepack pnpm run validate` 为准 |
 | Phase 1：Core RSS / 新闻源扩容 | 已接入 core/optional/manual | 以 `discover:content-sources` 的候选与 `source_audit.content_sources` 为准 |
 | Phase 2：搜索 / 新闻工具影子运行 | 已有 `discover:search-news` | 只证明补漏和审计，不证明可自动进入正文 |
 | Phase 3：RSSHub / RSS-Bridge / 聚合器 | 已有健康检查入口 | 以 `sources:health` 和跳过/阻塞原因留痕为准 |
-| Phase 4：生成质量门 | 已有候选回源字段和事实栏目门禁 | 以中介候选 fixture 被拒绝、`npm run validate` 通过为准 |
+| Phase 4：生成质量门 | 已有候选回源字段和事实栏目门禁 | 以中介候选 fixture 被拒绝、`corepack pnpm run validate` 通过为准 |
 | Phase 5：连续运行验证 | 需要真实连续日报证据；合并命令已补齐 | 只有 `sources:phase5-audit` 返回 `phase5_complete:true` 才算完成 |
 
 ### Phase 0：基线和配置化
@@ -374,11 +374,11 @@ npm run sources:health -- --sources config/sources --date YYYY-MM-DD
 - 新增 `config/sources/default-content-sources.json`、`config/sources/intermediary-sources.json`、`config/search-queries.json`。
 - 新增 source registry schema，字段使用 `source_kind`、`candidate_category`、`authority`、`enablement`、`verification_policy`。
 - `src/discovery.js` 支持从配置读取默认源，同时保留当前硬编码源作为 fallback。
-- 增加 `npm run sources:validate`。
+- 增加 `corepack pnpm run sources:validate`。
 
 验收：
 
-- `npm run validate` 通过。
+- `corepack pnpm run validate` 通过。
 - registry schema 拒绝缺少 `tier`、`authority`、`candidate_category`、`source_kind`、`url` 的源。
 - 当前硬编码默认源和配置默认源输出一致或配置源为超集。
 - 旧 `category` 输入仍兼容，但新增 fixture 使用新字段。
@@ -453,11 +453,11 @@ npm run sources:health -- --sources config/sources --date YYYY-MM-DD
 - 每天把 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health` 合并进最终日报 JSON 的 `source_audit`。
 - 记录每类源 checked / candidates_found / included / skipped_primary_verification。
 - 对比旧流程：空板块数量、候选多样性、回源成功率、重复率。
-- 每天运行 `npm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`，把结果作为 Phase 5 是否完成的机器证据。
+- 每天运行 `corepack pnpm run sources:phase5-audit -- --date YYYY-MM-DD --history-dir reports-data --days 3`，把结果作为 Phase 5 是否完成的机器证据。
 
 验收：
 
-- 连续 3 次 `npm run validate` 通过。
+- 连续 3 次 `corepack pnpm run validate` 通过。
 - `sources:phase5-audit` 返回 `phase5_complete:true`。
 - 如果返回 `phase5_complete:false`，当天发布可以继续，但自检或汇报必须列出缺失的日期、审计组和 T3/中介事实栏目泄漏数量。
 - `source_audit` 能解释每个空板块，不出现“命令失败但空板块无说明”。
@@ -493,4 +493,4 @@ npm run sources:health -- --sources config/sources --date YYYY-MM-DD
 - 所有新增源可配置、可禁用、可健康检查。
 - 自媒体、公众号、媒体和 X 热点不会绕过一手来源门禁。
 - `source_audit` 可以回答：查了哪些源、失败了哪些源、重试结果是什么、候选为什么没入选、哪些候选完成一手回源。
-- `npm run validate` 通过，且新增 unit/e2e 覆盖三层发现流程。
+- `corepack pnpm run validate` 通过，且新增 unit/e2e 覆盖三层发现流程。

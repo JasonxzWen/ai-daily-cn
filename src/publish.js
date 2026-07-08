@@ -9,7 +9,7 @@ import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
 import { classifyPublishQuality, requirePublishableQuality } from "./quality-status.js";
 import { planGeneratedFiles, reportManagedAssetPaths } from "./site.js";
 import { buildAutomationRevision } from "./automation-revision.js";
-import { mergeCommandEnv, npmCommandText, npmInvocationForArgs } from "./process-runner.js";
+import { mergeCommandEnv, pnpmCommandText, pnpmInvocationForArgs } from "./process-runner.js";
 
 const execFileAsync = promisify(execFile);
 const SOURCE_STATUS_HISTORY_REPO_PATH = "reports-data/source-status-history.json";
@@ -261,7 +261,7 @@ export async function prepareCleanPublishWorktree(options = {}) {
     run,
     installDependencies: options.installDependencies !== false,
     forceInstall: Boolean(options.forceInstall),
-    npmCache: options.npmCache,
+    pnpmStoreDir: options.pnpmStoreDir,
     timeoutMs: options.installTimeoutMs || 10 * 60 * 1000
   });
 
@@ -280,8 +280,8 @@ export async function prepareCleanPublishWorktree(options = {}) {
     next_cwd: worktreeDir,
     next_steps: [
       `Set-Location ${quotePowerShellPath(worktreeDir)}`,
-      "npm run prompt:build -- YYYY-MM-DD",
-      "npm run publish:dry-run:daily -- --date YYYY-MM-DD"
+      "corepack pnpm run prompt:build -- YYYY-MM-DD",
+      "corepack pnpm run publish:dry-run:daily -- --date YYYY-MM-DD"
     ]
   };
 }
@@ -1601,34 +1601,32 @@ async function ensurePublishWorktreeDependencies(repoRoot, options = {}) {
       installed: false,
       ok: false,
       reason: "node_modules_missing",
-      command: "npm ci"
+      command: "corepack pnpm install --frozen-lockfile"
     };
   }
 
-  const npmCache = options.npmCache || process.env.NPM_CONFIG_CACHE || process.env.npm_config_cache || "";
-  const npmArgs = ["ci"];
-  const npmEnv = {};
-  if (npmCache) {
-    npmArgs.push("--cache", npmCache);
-    npmEnv.NPM_CONFIG_CACHE = npmCache;
+  const pnpmStoreDir = options.pnpmStoreDir || process.env.PNPM_STORE_DIR || process.env.pnpm_store_dir || "";
+  const pnpmArgs = ["install", "--frozen-lockfile"];
+  const pnpmEnv = {};
+  if (pnpmStoreDir) {
+    pnpmArgs.push("--store-dir", pnpmStoreDir);
+    pnpmEnv.PNPM_STORE_DIR = pnpmStoreDir;
   }
-  npmEnv.NPM_CONFIG_AUDIT = process.env.NPM_CONFIG_AUDIT || "false";
-  npmEnv.NPM_CONFIG_FUND = process.env.NPM_CONFIG_FUND || "false";
-  const npmCommand = npmCommandText(npmArgs);
-  const npmInvocation = npmInvocationForArgs(npmArgs);
+  const pnpmCommand = pnpmCommandText(pnpmArgs);
+  const pnpmInvocation = pnpmInvocationForArgs(pnpmArgs);
 
   try {
-    await options.run(npmInvocation.file, npmInvocation.args, {
+    await options.run(pnpmInvocation.file, pnpmInvocation.args, {
       cwd: repoRoot,
-      env: npmEnv,
+      env: pnpmEnv,
       timeoutMs: options.timeoutMs,
       trim: false
     });
   } catch (error) {
     throw new PublisherError("dependency_install_failed", "Unable to install dependencies in the clean publish worktree.", {
       repoRoot,
-      command: npmCommand,
-      npm_cache: npmCache || null,
+      command: pnpmCommand,
+      pnpm_store_dir: pnpmStoreDir || null,
       cause: error.message
     });
   }
@@ -1637,8 +1635,8 @@ async function ensurePublishWorktreeDependencies(repoRoot, options = {}) {
     required: true,
     installed: true,
     ok: true,
-    command: npmCommand,
-    npm_cache: npmCache || null
+    command: pnpmCommand,
+    pnpm_store_dir: pnpmStoreDir || null
   };
 }
 

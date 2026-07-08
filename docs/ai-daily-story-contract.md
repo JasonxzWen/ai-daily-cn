@@ -215,7 +215,7 @@ Phase 1 起必须新增或调整的测试：
 - 至少一个真实日期重新生成的 JSON/HTML 产物。
 - 2026-06-23 失败样本通过 story 去重和模板拒绝回归。
 - 桌面和移动截图证明主列表、GitHub 模块和补充模块可读。
-- `npm run validate` 通过。
+- `corepack pnpm run validate` 通过。
 - handoff 明确报告 blocking/degraded、自动降级和剩余风险。
 
 当次真实发布仍有单独边界：不能仅凭这些本地实现证据声称某天日报发布成功；必须以该日期 `daily:run --publish` 的 run summary、`publish:dry-run:daily`、真实发布或兜底结果、Pages 验证为准。

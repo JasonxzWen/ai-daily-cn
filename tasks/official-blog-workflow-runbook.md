@@ -156,9 +156,9 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 
    ```powershell
    node --test --test-name-pattern "official blog runbook replay fixtures" tests/official-blog-knowledge.test.js
-   npm run build:check-clean
-   npm run privacy:validate
-   npm run validate
+   corepack pnpm run build:check-clean
+   corepack pnpm run privacy:validate
+   corepack pnpm run validate
    ```
 
    The replay fixture test exercises OpenAI and Anthropic examples locally without live network access before the broader validation suite runs.

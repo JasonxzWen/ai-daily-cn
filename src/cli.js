@@ -167,6 +167,7 @@ try {
       allowExternalWorktree: Boolean(args["allow-external-worktree"]),
       installDependencies: args["no-install"] !== true,
       forceInstall: Boolean(args["force-install"]),
+      pnpmStoreDir: args["pnpm-store-dir"],
       cleanWorktree: args["skip-clean-worktree"] !== true
     });
     printJson(result);
@@ -550,7 +551,8 @@ try {
       remoteUrl: args["remote-url"],
       allowExternalWorktree: Boolean(args["allow-external-worktree"]),
       installDependencies: args["no-install"] !== true,
-      forceInstall: Boolean(args["force-install"])
+      forceInstall: Boolean(args["force-install"]),
+      pnpmStoreDir: args["pnpm-store-dir"]
     });
     printJson({
       ok: true,

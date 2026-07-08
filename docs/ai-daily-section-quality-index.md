@@ -111,9 +111,9 @@
 - `registered discovery sources cover the user requested AI source list`
 
 必跑命令：
-- `npm run sources:validate`
+- `corepack pnpm run sources:validate`
 - `node --test tests/unit.test.js --test-name-pattern "GitHub report markdown|same-file GitHub markdown|GitHub weekly repositories|registered discovery sources cover the user requested AI source list"`
-- `npm run validate`
+- `corepack pnpm run validate`
 
 ## 质量要求
 

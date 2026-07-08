@@ -17,7 +17,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "schema rejects arbitrary optimization_suggestions objects",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -26,7 +26,7 @@
       "status": "implemented",
       "title": "Require ledger-backed feedback gates",
       "problem": "User-confirmed feedback could be written as advice without becoming a durable test or gate.",
-      "expected_behavior": "Every open P1 feedback ledger item includes existing scope files, a validation command covered by `npm run validate`, and a test name that exists in `tests/**`.",
+      "expected_behavior": "Every open P1 feedback ledger item includes existing scope files, a validation command covered by `pnpm run validate`, and a test name that exists in `tests/**`.",
       "scope": [
         "config/feedback-ledger.json",
         "scripts/validate-feedback-contract.mjs",
@@ -35,7 +35,7 @@
       "validation": {
         "command": "node scripts/validate-feedback-contract.mjs",
         "test_name": "feedback contract requires P1 ledger items to bind to tests or gates",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -75,9 +75,9 @@
         "tests/publish.test.js"
       ],
       "validation": {
-        "command": "npm run test",
+        "command": "pnpm run test",
         "test_name": "publish prepare-clean-worktree clones a dedicated main checkout without touching launcher changes",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -99,7 +99,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "publish quality exposes network-wide source outage even when sections are populated",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -119,7 +119,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "content source discovery keeps late fixed sources effective under global candidate limit",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -139,7 +139,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "search news discovery preserves provider-level partial results and timing",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -159,7 +159,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "CLI JSON commands can write clean UTF-8 output files",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -177,7 +177,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "日报可以转换为 effective-interact 输入",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -195,7 +195,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "日报可以转换为 effective-interact 输入",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -214,7 +214,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "domestic community leads are omitted from public interaction sections",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -238,7 +238,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "quality review flags AI tone highlight and translation issues",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -271,7 +271,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily contract accepts no-image short news without explanation fields",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -307,7 +307,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "report:draft fills sparse main stream from unified candidate roles",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -337,7 +337,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily contract rejects invalid public media but allows missing media",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -361,7 +361,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "semantic evidence asset gate rejects decorative article images",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -389,7 +389,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "china ai hard gate blocks strict publish when China lane is missing",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -409,7 +409,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "tracking visual components render OpenRouter and Artificial Analysis without screenshots or summary log cards",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -430,7 +430,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "report:draft reserves Chinese hot blog slot when qualified",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -458,7 +458,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "huggingface trending discovery and public section",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -477,7 +477,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily IA reset enforces stories original X compact tracking hover and source effectiveness",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -496,7 +496,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public source coverage visualization is retired from public daily reports",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -519,7 +519,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily contract renders structured tracking components instead of screenshots and hides audit appendices",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -539,7 +539,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily rejects machine audit logs from reader-facing sections",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -562,7 +562,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "report:draft promotes official product and platform deep dives into main_items",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -581,7 +581,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "buildSite writes reader-safe public data without internal fields or candidate pools",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -601,7 +601,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "daily runner omits retired platform discovery outputs from report draft",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -621,7 +621,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily omits source coverage gaps and retired platform diagnostics",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -644,7 +644,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily contract replays 2026-06-09 bad media and short-main regression",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -668,7 +668,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "feedback memory self-check rejects quick reference missing ledger item",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -689,7 +689,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "ai daily requirements reconciliation maps user requirements to ledger tests and runtime evidence",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -713,7 +713,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "report:draft caps public signal coverage beyond strict factual sections",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -742,7 +742,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "report:draft promotes original Anthropic Fable/Mythos launch over platform availability duplicates",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -763,7 +763,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "icon resolver uses link domain icons and records fallback metadata",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -784,7 +784,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "GitHub Trending enriches descriptions from cached README summaries",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -808,7 +808,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "Chinese media dynamics include all in-window QbitAI SSPAI and Machine Heart entries",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -830,7 +830,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "official organization updates render separately from Builder observations",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -850,7 +850,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "retired WeChat and Zhihu source audit fields do not create public degradation",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -876,9 +876,9 @@
         "tests/e2e/site.e2e.js"
       ],
       "validation": {
-        "command": "npm run test",
+        "command": "pnpm run test",
         "test_name": "collectContentSources stores Artificial Analysis token cost and scatter tabs",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -902,7 +902,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "interaction input starts with story-first judgment trends and story list",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -926,7 +926,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily renders story-first sections without compact full list",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -953,7 +953,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily IA reset enforces stories original X compact tracking hover and source effectiveness",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -979,7 +979,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "buildSite writes effective-interact report html for 2026-06-15 without internal leakage",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1003,7 +1003,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "daily runner creates a new empty AI repair template for public editorial repair failures",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1012,7 +1012,7 @@
       "status": "implemented",
       "title": "Gate daily content quality before publish",
       "problem": "The 2026-06-17 run exposed weak generated content that structural checks did not reject: one-bullet main details, filler-heavy hot blog text, shallow GitHub Trending descriptions, zero Builder/X selections despite enough eligible X feed candidates, and fake simplified tracking components.",
-      "expected_behavior": "A deterministic content-contract checker blocks REQ-001, REQ-006, REQ-007, and REQ-008 failures before publish; REQ-010 may degrade when an official snapshot is unavailable, but fake OpenRouter or Artificial Analysis components are blocking. The contract records GitHub Trending weekly all-language plus Python, TypeScript, Rust, Go, and Java Top10 merged to Top20, README-failure fallback behavior, Builder/X eligible threshold, hot-blog 100-200 character public summaries without rendered key_points, and official tracking snapshot requirements. `npm run validate` runs the checker against recent real `reports-data` artifacts, not only the synthetic self-test fixture.",
+      "expected_behavior": "A deterministic content-contract checker blocks REQ-001, REQ-006, REQ-007, and REQ-008 failures before publish; REQ-010 may degrade when an official snapshot is unavailable, but fake OpenRouter or Artificial Analysis components are blocking. The contract records GitHub Trending weekly all-language plus Python, TypeScript, Rust, Go, and Java Top10 merged to Top20, README-failure fallback behavior, Builder/X eligible threshold, hot-blog 100-200 character public summaries without rendered key_points, and official tracking snapshot requirements. `pnpm run validate` runs the checker against recent real `reports-data` artifacts, not only the synthetic self-test fixture.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1028,9 +1028,9 @@
         "tests/unit.test.js"
       ],
       "validation": {
-        "command": "npm run content:contract",
+        "command": "pnpm run content:contract",
         "test_name": "real artifact content contract scans report directory and surfaces blocking issues",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1055,9 +1055,9 @@
         "tests/skills.test.js"
       ],
       "validation": {
-        "command": "npm run test",
+        "command": "pnpm run test",
         "test_name": "daily tracking broad official snapshots degrade instead of rendering full-page dumps",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1077,7 +1077,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "report:draft prunes duplicate and templated hot blogs before quality review",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1103,7 +1103,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "story-centered daily contract is implemented with generator and rendering gates",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1127,7 +1127,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "daily runner writes sanitized daily publish retrospective before validation",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1150,7 +1150,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "report:write accepts source-unavailable daily tracking as degraded",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1159,7 +1159,7 @@
       "status": "implemented",
       "title": "Keep daily publish recovery policy executable",
       "problem": "Recent scheduled daily runs failed for different causes because retry, fallback, degradation, and blocking behavior were scattered across runner code, prompts, runbooks, and automation expectations instead of being checked as one workflow contract.",
-      "expected_behavior": "The repository keeps `config/daily-resilience-policy.json` as the authoritative retry/fallback/degrade/block table for current daily runner stages. Validation must prove required runner stages are covered, terminal status and blocking taxonomies exist, docs/package workflow gates include `npm run resilience:validate`, safe public source or coverage failures can end as degraded publish states, and unsafe content, unrecoverable schema/rendering, internal leakage, fake tracking components, or exhausted publish infrastructure remain blocking.",
+      "expected_behavior": "The repository keeps `config/daily-resilience-policy.json` as the authoritative retry/fallback/degrade/block table for current daily runner stages. Validation must prove required runner stages are covered, terminal status and blocking taxonomies exist, docs/package workflow gates include `pnpm run resilience:validate`, safe public source or coverage failures can end as degraded publish states, and unsafe content, unrecoverable schema/rendering, internal leakage, fake tracking components, or exhausted publish infrastructure remain blocking.",
       "scope": [
         "config/daily-resilience-policy.json",
         "config/daily-workflow-contract.json",
@@ -1177,7 +1177,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "daily resilience policy validates current runner stages and workflow gates",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1201,7 +1201,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "public daily followups hide empty Artificial Analysis fallback tabs",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1230,9 +1230,9 @@
         "tests/content-contract.test.js"
       ],
       "validation": {
-        "command": "npm run test",
+        "command": "pnpm run test",
         "test_name": "configured source reset includes GitHub watchlist, Chinese direct RSS, and community hotspots",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1264,9 +1264,9 @@
         "tests/unit.test.js"
       ],
       "validation": {
-        "command": "npm run test",
+        "command": "pnpm run test",
         "test_name": "daily Codex DAG-lite runner plans the six MVP stages",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     },
     {
@@ -1285,7 +1285,7 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "automation inventory uses explicit readonly insight role",
-        "gate": "npm run validate"
+        "gate": "pnpm run validate"
       }
     }
   ]

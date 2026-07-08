@@ -4,7 +4,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { PublisherError } from "./errors.js";
 import { prepareCleanPublishWorktree } from "./publish.js";
-import { mergeCommandEnv, npmInvocationForArgs } from "./process-runner.js";
+import { mergeCommandEnv, pnpmInvocationForArgs } from "./process-runner.js";
 import { createPublicDegradationEvent } from "./degradation-events.js";
 import {
   writeDailyPublishCorrectionRetrospective,
@@ -567,7 +567,7 @@ async function runPostQualityStages({
         absoluteCleanPath(summary.clean_repo_root, `reports-data/${year}/${month}/${reportDate}.json`),
         decision
       );
-      const rerender = await runAndRecordStage({ stage: npmStage("build_disclosure", ["run", "build"]), context, summary, runStage, now });
+      const rerender = await runAndRecordStage({ stage: pnpmStage("build_disclosure", ["run", "build"]), context, summary, runStage, now });
       if (rerender.blocked || !rerender.normalized.ok) {
         summary.final_status = "blocked";
         summary.next_action = { kind: "inspect_stage_failure", stage_id: "build_disclosure", summary_path: summaryPath };
@@ -829,8 +829,8 @@ function buildInitialWorkflowStages({ reportDate }) {
     nodeCliStage("source_reset_preflight", [
       "source-reset:preflight"
     ]),
-    npmStage("prompt_build", ["run", "prompt:build", "--", reportDate]),
-    npmStage("sources_validate", ["run", "sources:validate"]),
+    pnpmStage("prompt_build", ["run", "prompt:build", "--", reportDate]),
+    pnpmStage("sources_validate", ["run", "sources:validate"]),
     nodeCliStage("discover_github_trending", [
       "discover:github-trending",
       "--date",
@@ -975,8 +975,8 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       "reports-data",
       reportDate
     ]),
-    npmStage("build", ["run", "build"]),
-    npmStage("quality_page_check", [
+    pnpmStage("build", ["run", "build"]),
+    pnpmStage("quality_page_check", [
       "run",
       "quality:page-check",
       "--",
@@ -984,8 +984,8 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       "docs",
       tmp("page-check")
     ]),
-    npmStage("validate", ["run", "validate"]),
-    npmStage("sources_phase5_audit", [
+    pnpmStage("validate", ["run", "validate"]),
+    pnpmStage("sources_phase5_audit", [
       "run",
       "sources:phase5-audit",
       "--",
@@ -998,10 +998,10 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       "--output",
       tmp("sources-phase5-audit")
     ]),
-    npmStage("publish_dry_run_daily", ["run", "publish:dry-run:daily", "--", "--date", reportDate])
+    pnpmStage("publish_dry_run_daily", ["run", "publish:dry-run:daily", "--", "--date", reportDate])
   ];
   if (publish) {
-    stages.push(npmStage("publish_real", [
+    stages.push(pnpmStage("publish_real", [
       "run",
       "publish",
       "--",
@@ -1015,7 +1015,7 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
 }
 
 function buildPublishFallbackStage(reportDate) {
-  return npmStage("publish_github_api_fallback", [
+  return pnpmStage("publish_github_api_fallback", [
     "run",
     "publish:github-api",
     "--",
@@ -2193,8 +2193,8 @@ function remoteAheadRestartNextAction({ outcome, stage, context, summary, summar
     report_date: reportDate,
     mode,
     remote: remoteAheadDetails(output, outcome?.error),
-    command: `npm run daily:run -- --date ${reportDate}${publishFlag} --restart`,
-    message: "Remote origin/main advanced after this run started. Restart daily:run from the latest origin/main clean checkout; do not use GitHub API fallback for remote_ahead."
+    command: `corepack pnpm run daily:codex-pipeline -- --date ${reportDate} --execute${publishFlag}`,
+    message: "Remote origin/main advanced after this run started. Restart daily:codex-pipeline from the latest origin/main clean checkout; do not use GitHub API fallback for remote_ahead."
   };
 }
 
@@ -2314,11 +2314,11 @@ function infrastructurePublishRecoveryNextAction({ outcome, stageId, previousSta
   };
 }
 
-function npmStage(id, args) {
+function pnpmStage(id, args) {
   return {
     id,
     command: {
-      tool: "npm",
+      tool: "pnpm",
       args
     }
   };
@@ -2335,16 +2335,13 @@ function nodeCliStage(id, args) {
 }
 
 function resolveStageCommand(stage) {
-  if (stage.command.tool === "npm") {
-    const npmCache = process.env.NPM_CONFIG_CACHE || process.env.npm_config_cache || "";
-    const env = {
-      NPM_CONFIG_AUDIT: process.env.NPM_CONFIG_AUDIT || "false",
-      NPM_CONFIG_FUND: process.env.NPM_CONFIG_FUND || "false"
-    };
-    if (npmCache) {
-      env.NPM_CONFIG_CACHE = npmCache;
+  if (stage.command.tool === "pnpm") {
+    const pnpmStoreDir = process.env.PNPM_STORE_DIR || process.env.pnpm_store_dir || "";
+    const env = {};
+    if (pnpmStoreDir) {
+      env.PNPM_STORE_DIR = pnpmStoreDir;
     }
-    const invocation = npmInvocationForArgs(stage.command.args);
+    const invocation = pnpmInvocationForArgs(stage.command.args);
     return {
       ...invocation,
       env

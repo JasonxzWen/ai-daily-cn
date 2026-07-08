@@ -25,9 +25,9 @@
     "infrastructure_exhausted"
   ],
   "required_workflow_gates": [
-    "npm run resilience:validate",
-    "npm run workflow:validate",
-    "npm run validate"
+    "pnpm run resilience:validate",
+    "pnpm run workflow:validate",
+    "pnpm run validate"
   ],
   "stage_defaults": {
     "summary_fields": ["stage_id", "status", "attempts", "duration_ms", "outcome", "error_code"],

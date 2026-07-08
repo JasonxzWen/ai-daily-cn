@@ -157,7 +157,7 @@ function validateP1Binding(item, failures, context) {
     failures.push(`config/feedback-ledger.json: ${id} validation.test_name or validation.gate is required`);
   }
   if (command && !isCommandCoveredByValidate(command, context.validateCommands)) {
-    failures.push(`config/feedback-ledger.json: ${id} validation.command is not covered by npm run validate: ${command}`);
+    failures.push(`config/feedback-ledger.json: ${id} validation.command is not covered by pnpm run validate: ${command}`);
   }
   if (testName && !testNameExists(testName, context.testFiles)) {
     failures.push(`config/feedback-ledger.json: ${id} validation.test_name not found in tests: ${testName}`);
@@ -240,10 +240,11 @@ function collectValidateCommands(packageJson) {
     if (!script) {
       return;
     }
-    commands.add(normalizeCommand(`npm run ${scriptName}`));
+    commands.add(normalizeCommand(`pnpm run ${scriptName}`));
+    commands.add(normalizeCommand(`corepack pnpm run ${scriptName}`));
     for (const part of splitScriptParts(script)) {
       commands.add(normalizeCommand(part));
-      for (const nestedScript of npmRunScripts(part)) {
+      for (const nestedScript of pnpmRunScripts(part)) {
         visit(nestedScript);
       }
     }
@@ -260,9 +261,9 @@ function splitScriptParts(script) {
     .filter(Boolean);
 }
 
-function npmRunScripts(command) {
+function pnpmRunScripts(command) {
   const scripts = [];
-  const pattern = /\bnpm\s+run\s+([^\s&]+)/g;
+  const pattern = /\bpnpm\s+run\s+([^\s&]+)/g;
   let match;
   while ((match = pattern.exec(command)) !== null) {
     scripts.push(match[1].replace(/^['"]|['"]$/g, ""));

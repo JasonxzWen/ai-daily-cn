@@ -85,8 +85,8 @@ Keep these classes collection-only unless the user explicitly promotes a source:
 Run these before merging future source-order changes:
 
 ```powershell
-npm run sources:display-contract
-npm run validate
+corepack pnpm run sources:display-contract
+corepack pnpm run validate
 ```
 
 Acceptance before a later rank-changing PR:

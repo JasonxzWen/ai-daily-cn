@@ -41,7 +41,7 @@ The main bottleneck is target mismatch: previous work often optimized schema com
 | Slice | Independently Verifiable | Minimum Evidence |
 |---|---|---|
 | 0 Cross-agent roadmap | yes | This document, REQ mapping, ledger scope, quick reference row, unit test, retrospective index entry. |
-| 1 Real artifact validation | yes | A fixture or latest-report command that fails on templated phrases, blank GitHub metadata, and self-test-only coverage; `npm run validate` must include it. |
+| 1 Real artifact validation | yes | A fixture or latest-report command that fails on templated phrases, blank GitHub metadata, and self-test-only coverage; `corepack pnpm run validate` must include it. |
 | 2 Admission rewrite | mostly yes | Candidate fixtures where Anthropic/OpenAI/DeepMind research or engineering beats or explicitly rejects low-value vendor availability PR; real dated draft evidence before claiming stable. |
 | 3 LLM authoring | partly | A bounded slice can prove stories or hot blogs are authored before repair; full success needs real daily runs with no routine AI repair for public prose. |
 | 4 GitHub Trending enrichment | yes | Top items include stars, star growth or trend, topics/language where available, README summary status, and non-generic Chinese description. |
@@ -64,7 +64,7 @@ The main bottleneck is target mismatch: previous work often optimized schema com
 
 - One PR should own one slice unless the slice is explicitly a documentation/test binding like slice 0.
 - Any slice that touches generation, rendering, source discovery, or public HTML must update `tasks/current-task.md` with concrete allowed paths and a red test or deterministic substitute.
-- A slice may be called implemented only when it has a ledger item or existing ledger coverage, a validation command covered by `npm run validate`, and a real artifact or fixture proving the target behavior.
+- A slice may be called implemented only when it has a ledger item or existing ledger coverage, a validation command covered by `corepack pnpm run validate`, and a real artifact or fixture proving the target behavior.
 - If a slice only improves documentation, do not claim the generated daily report has improved.
 
 ## Not In This Phase

@@ -3110,7 +3110,7 @@ test("daily codex DAG contract-run semantic validator rejects misleading executi
     {
       name: "executed commands are not allowed",
       mutate(value) {
-        value.executed_commands = [{ command: "npm run build" }];
+        value.executed_commands = [{ command: "corepack pnpm run build" }];
       },
       failure: "executed_commands must be empty"
     },

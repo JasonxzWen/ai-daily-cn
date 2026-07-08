@@ -761,10 +761,10 @@ test("publish prepare-clean-worktree resets only the dedicated checkout when it 
   );
 });
 
-test("publish prepare-clean-worktree installs dependencies with the configured npm cache", async () => {
-  const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-npm-cache-"));
+test("publish prepare-clean-worktree installs dependencies with the configured pnpm store", async () => {
+  const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-pnpm-store-"));
   const worktreeDir = path.join(repoRoot, ".tmp", "publish-worktrees", "main");
-  const npmCache = path.join(repoRoot, ".tmp", "npm-cache");
+  const pnpmStoreDir = path.join(repoRoot, ".tmp", "pnpm-store");
   await fs.mkdir(path.join(worktreeDir, ".git"), { recursive: true });
   await fs.writeFile(path.join(worktreeDir, "package.json"), JSON.stringify({ scripts: {} }));
   const calls = [];
@@ -773,24 +773,24 @@ test("publish prepare-clean-worktree installs dependencies with the configured n
     repoRoot,
     worktreeDir,
     remoteUrl: "git@github.com:owner/repo.git",
-    npmCache,
+    pnpmStoreDir,
     commandRunner: fakeCommandRunner({ calls })
   });
 
-  const npmCall = calls.find((call) => call.file === "npm" || call.file === "npm.cmd" || call.file === "cmd.exe");
-  assert.ok(npmCall, "expected npm ci to run");
+  const pnpmCall = calls.find((call) => call.file === "corepack" || call.file === "corepack.cmd" || call.file === "cmd.exe");
+  assert.ok(pnpmCall, "expected pnpm install to run");
   if (os.platform() === "win32") {
-    assert.equal(npmCall.file, "cmd.exe");
-    assert.deepEqual(npmCall.args.slice(0, 3), ["/d", "/s", "/c"]);
-    assert.match(npmCall.args[3], /^npm ci --cache /);
-    assert.match(npmCall.args[3], /npm-cache/);
+    assert.equal(pnpmCall.file, "cmd.exe");
+    assert.deepEqual(pnpmCall.args.slice(0, 3), ["/d", "/s", "/c"]);
+    assert.match(pnpmCall.args[3], /^corepack pnpm install --frozen-lockfile --store-dir /);
+    assert.match(pnpmCall.args[3], /pnpm-store/);
   } else {
-    assert.deepEqual(npmCall.args, ["ci", "--cache", npmCache]);
+    assert.deepEqual(pnpmCall.args, ["pnpm", "install", "--frozen-lockfile", "--store-dir", pnpmStoreDir]);
   }
-  assert.equal(npmCall.env.NPM_CONFIG_CACHE, npmCache);
-  assert.equal(npmCall.env.npm_config_cache, undefined);
-  assert.equal(result.dependency_status.command, `npm ci --cache ${npmCache}`);
-  assert.equal(result.dependency_status.npm_cache, npmCache);
+  assert.equal(pnpmCall.env.PNPM_STORE_DIR, pnpmStoreDir);
+  assert.equal(pnpmCall.env.pnpm_store_dir, undefined);
+  assert.equal(result.dependency_status.command, `corepack pnpm install --frozen-lockfile --store-dir ${pnpmStoreDir}`);
+  assert.equal(result.dependency_status.pnpm_store_dir, pnpmStoreDir);
 });
 
 test("publish prepare-clean-worktree rejects external paths unless explicitly allowed", async () => {
@@ -1382,7 +1382,7 @@ async function writeRetrospectiveFixture(repoRoot, reportDate, options = {}) {
     evidence: {
       report_json: `reports-data/${year}/${month}/${reportDate}.json`,
       html: `docs/reports/${year}/${month}/${reportDate}.html`,
-      validation_commands: ["npm run validate"]
+      validation_commands: ["corepack pnpm run validate"]
     },
     blockers: [],
     degraded_sections: [],

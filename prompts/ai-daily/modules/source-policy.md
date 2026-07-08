@@ -7,7 +7,7 @@
 
 优先扩展信源：
 
-- 信源注册表：固定源统一维护在 `config/sources/*.json`，新增源必须带 `source_kind`、`candidate_category`、`tier`、`authority`、`enablement` 和 `verification_policy`，并通过 `npm run sources:validate`。默认日报只运行 `core`，`optional/manual` 需要显式启用或用户提供。
+- 信源注册表：固定源统一维护在 `config/sources/*.json`，新增源必须带 `source_kind`、`candidate_category`、`tier`、`authority`、`enablement` 和 `verification_policy`，并通过 `corepack pnpm run sources:validate`。默认日报只运行 `core`，`optional/manual` 需要显式启用或用户提供。
 - Builder/X/播客：优先使用 `follow-builders central feed`，再回到原始 X URL、公开视频、播客页或个人博客；Follow AI Builders 可作为 builder 名录和标签线索。需要更大 X 覆盖面时，只使用能保留原始 X status URL 的自托管 RSSHub、twscrape、列表导出或等价工具。Builder 观点入选时必须保留完整 `original_text` 并提供忠实中文 `translation`，不能用二手摘要或自己概括替代；能拿到 handle/头像时同步写入 `handle` 和 `avatar_url`。
 - 官方与实验室工程博客：OpenAI News/RSS、Anthropic Engineering/News、Google DeepMind、Google Research、Meta AI、Microsoft Research、Hugging Face Blog。
 - 广义科技、大厂和行业趋势：TechCrunch AI/Enterprise、The Verge AI/main、Ars Technica、Google Keyword Blog、Official Microsoft Blog、Apple Newsroom、Meta Newsroom、Amazon News 等可以作为候选源；只有当它们影响 AI 供给、开发者工作流、平台政策、算力/云、产品分发、监管或产业结构时才入选。

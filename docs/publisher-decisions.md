@@ -9,7 +9,7 @@
 - Pages 目录：`docs/`。
 - 站点 URL：使用 GitHub Pages 默认 project site，当前配置为 `https://jasonxzwen.github.io/ai-daily-cn/`。
 - 定时任务启动目录：由用户在项目内启动；自动化提示词不需要再切换到指定路径。
-- 提示词：由 repo 内 `prompts/ai-daily/` 分模块存储，并通过 `npm run prompt:build` 组装。
+- 提示词：由 repo 内 `prompts/ai-daily/` 分模块存储，并通过 `corepack pnpm run prompt:build` 组装。
 - 每日主产物：高度可读、对人类界面友好的自包含静态 HTML。
 - 结构化输入：优先生成 `reports-data/YYYY/MM/YYYY-MM-DD.json`，由 repo 工具渲染 HTML、feed 和 data JSON。
 - Markdown 原文：允许公开，但不再作为每日任务的主产物；仅作为兼容输入保留。

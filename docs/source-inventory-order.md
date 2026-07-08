@@ -45,8 +45,8 @@ Daily source status must not reorder this reference. Blocked, unconfigured, manu
 
 ```powershell
 node scripts/generate-source-inventory-order.mjs
-npm run sources:display-contract
-npm run validate
+corepack pnpm run sources:display-contract
+corepack pnpm run validate
 ```
 
 ## Full Order

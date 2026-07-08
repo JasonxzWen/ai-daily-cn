@@ -18,7 +18,7 @@ const REQUIRED_MAINTENANCE = {
   handbook_path: "docs/source-first-ia-handbook.md",
   inventory_order_reference_path: "docs/source-inventory-order.md",
   order_tuning_review_path: "docs/source-order-tuning-review.md",
-  validation_commands: ["npm run sources:display-contract", "npm run validate"],
+  validation_commands: ["corepack pnpm run sources:display-contract", "corepack pnpm run validate"],
   handbook_required_markers: [
     "source-display-governance:v1",
     "baseline-fixed-order",
@@ -690,8 +690,8 @@ function validatePackageScripts(packageJson, failures) {
   if (scripts["sources:display-contract"] !== "node scripts/validate-source-display-contract.mjs") {
     failures.push("package.json scripts.sources:display-contract must run the source display validator");
   }
-  if (!String(scripts.validate || "").includes("npm run sources:display-contract")) {
-    failures.push("package.json scripts.validate must include npm run sources:display-contract");
+  if (!String(scripts.validate || "").includes("pnpm run sources:display-contract")) {
+    failures.push("package.json scripts.validate must include pnpm run sources:display-contract");
   }
 }
 
