@@ -24713,6 +24713,20 @@ test("GitHub README public summaries clamp on sentence boundaries", () => {
   assert(summary.endsWith("。"), summary);
 });
 
+test("GitHub README public summaries normalize clean template variants", () => {
+  const summary = normalizeGithubReadmeSummary(
+    "agent-workbench 公开描述指向 agent 工作流和自动化工程，关键词包括 Agent 构建、评测与回归、工具调用和工作流编排。正式采用前还要核对 README、复现门槛、许可证和测试或评估资产。",
+    "example/agent-workbench"
+  );
+
+  assert(summary.length >= 80, summary);
+  assert.match(summary, /agent-workbench|Agent 构建|评测|工作流/);
+  assert.doesNotMatch(
+    summary,
+    /公开描述指向|关键词包括|正式采用前|核对 README|核心能力是|它的价值在于|沉淀为代码|方便和同类方案|适合先|复现门槛|测试或评估资产|阅读时先看|README 主要围绕|README 显示/
+  );
+});
+
 test("Chinese media dynamics include all in-window QbitAI SSPAI and Machine Heart entries", () => {
   const reportDate = "2026-06-12";
   const result = selectChineseMediaDynamics(
