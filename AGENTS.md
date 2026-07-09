@@ -5,7 +5,7 @@ always respond in Chinese unless the user explicitly asks for another language.
 ## Project Local Rules
 
 - Route interaction-reporting and handoff artifact work through `.codex/skills/effective-interact`.
-- Run `corepack pnpm run validate` before final handoff when repository behavior or harness contracts change.
+- During development, run focused tests plus the affected suite; reserve full `corepack pnpm run validate` for slice PR preparation or final material delivery.
 
 # Codex Harness
 
@@ -34,8 +34,11 @@ Do not start implementation until the harness is fully landed and the active tas
 - Follow the Interrupt Policy in `.harness-hub/loop/policies/interrupt-policy.md`: continue low-risk local work when scope and validation are clear, but interrupt when risk signals require human review.
 - Record auditable loop decisions in `.harness-hub/state/interrupt-decisions.jsonl`, loop runs in `.harness-hub/state/loop-runs.jsonl`, and capability events in `.harness-hub/state/capability-events.jsonl`.
 - Use a separate git worktree or branch for each write task.
+- Treat roadmap slices as PR units: open one main PR per slice and use multiple commits inside it instead of separate PRs for small audit, tag, or guard increments.
 - Start from `.harness-hub/state/current-task.md` before changing files.
 - Respect the task's allowed paths and forbidden paths.
+- Before slice implementation, review the 8-slice completion definition table in `docs/ai-daily-cross-agent-iteration-roadmap.md`, record what remains unsolved, and check whether the implementation path is still aligned.
+- Centralize repeated runtime, schema, and test contracts before expanding them; for example, do not duplicate main-stream stage vocabulary across schema/runtime/tests without a shared source or explicit synchronization point.
 - Treat Harness Hub source-repo packaging as non-target material: do not copy `.claude-plugin/`, root `openspec/`, `docs/`, `config/`, `package.json`, `README*`, source `AGENTS.md`, or this repo's source tree into target projects. Use the managed outputs from `harness-hub init-harness`, `install`, and `activate-codex` instead.
 - Do not run parallel writes against the same file, module, or feature state.
 - Use read-only parallel work only for research, review, log analysis, or validation.
@@ -52,7 +55,7 @@ Do not start implementation until the harness is fully landed and the active tas
 - Use verified checkpoint commits for completed atomic work units when the task permits commits. Do not commit failing, unrelated, or half-done work. Record each checkpoint commit hash, or the reason commits were skipped, in progress and handoff state.
 - Promote repeated review feedback into a harness rule, validation command, or documented follow-up instead of relying on memory.
 - After creating or updating a PR, record the PR URL or number, branch, base, commit, validation status, skipped checks, residual risk, and next action in progress and handoff state.
-- Record progress in `.harness-hub/state/progress.md` and leave restart notes in `.harness-hub/state/session-handoff.md`.
+- Keep harness state writes low-frequency during implementation: record decision-level changes as they happen, then write complete progress, validation evidence, and restart notes during final handoff.
 - Record decision-level changes in `.harness-hub/state/decisions.md`.
 - Run `node scripts/harness-validate.mjs` before handoff.
 
