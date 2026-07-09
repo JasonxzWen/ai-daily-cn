@@ -1904,6 +1904,10 @@ function githubTrendingItem(candidate, meta, index) {
   const readmeCache = meta.readme_cache || candidate.readme_cache || null;
   const readmeFetchStatus = String(meta.readme_fetch_status || candidate.readme_fetch_status || meta.readme_status || candidate.readme_status || "").trim();
   const readmeError = String(meta.readme_error || candidate.readme_error || "").trim();
+  const topics = publicGithubTopics(meta.topics || candidate.topics);
+  const license = String(meta.license || candidate.license || "").trim();
+  const stargazersTotal = nonNegativeInteger(meta.stargazers_total ?? candidate.stargazers_total);
+  const pushedAt = String(meta.pushed_at || candidate.pushed_at || "").trim();
   const description = readmeSummary;
   return {
     name: meta.name || repo,
@@ -1914,6 +1918,10 @@ function githubTrendingItem(candidate, meta, index) {
     ...(readmeCache ? { readme_cache: readmeCache } : {}),
     ...(readmeFetchStatus ? { readme_fetch_status: readmeFetchStatus } : {}),
     ...(readmeError ? { readme_error: readmeError } : {}),
+    ...(topics.length > 0 ? { topics } : {}),
+    ...(license ? { license } : {}),
+    ...(stargazersTotal !== null ? { stargazers_total: stargazersTotal } : {}),
+    ...(pushedAt ? { pushed_at: pushedAt } : {}),
     url: candidate.url,
     event_date: candidate.event_date,
     source: candidate.source || "GitHub Trending",
@@ -1927,6 +1935,21 @@ function githubTrendingItem(candidate, meta, index) {
     trend: ["new", "up", "down", "same"].includes(meta.trend || candidate.trend) ? (meta.trend || candidate.trend) : "new",
     evidence: candidate.evidence || meta.evidence || `${repo} appeared in GitHub Trending.`
   };
+}
+
+function publicGithubTopics(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return [...new Set(value
+    .map((item) => String(item || "").trim())
+    .filter(Boolean))]
+    .slice(0, 12);
+}
+
+function nonNegativeInteger(value) {
+  const number = Number(value);
+  return Number.isInteger(number) && number >= 0 ? number : null;
 }
 
 function huggingFaceTrendingItem(candidate, index) {

@@ -3424,7 +3424,16 @@ function renderGithubTrending(items, projects = []) {
     .slice(0, 10)
     .map((item) => {
       const project = projectForTrendRender(item, projectIndex);
-      return `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}</td><td>${renderTags([importanceLabel(item.importance), githubTrendStatusTag(item), githubStarsTag(item), ...(project ? projectHeatTags(project) : [])].filter(Boolean))}</td><td>${renderGithubTrendDetails(item, project)}</td></tr>`;
+      const tags = [
+        importanceLabel(item.importance),
+        githubTrendStatusTag(item),
+        githubStarsTag(item),
+        githubReadmeStatusTag(item),
+        githubLanguageTag(item),
+        ...githubTopicTags(item),
+        ...githubProjectHeatTags(item, project)
+      ].filter(Boolean);
+      return `<tr><td>#${escapeHtml(item.rank)}</td><td>${externalLink(item.url, item.name || item.repo)}</td><td>${renderTags(tags)}</td><td>${renderGithubTrendDetails(item, project)}</td></tr>`;
     })
     .join("\n");
   return `<table class="project-table">
@@ -3442,9 +3451,63 @@ function renderGithubTrendDetails(item, project = null) {
 }
 
 function githubStarsTag(item) {
+  const weekly = structuredGithubStarCount(item?.stars_this_week ?? item?.weekly_stars ?? item?.star_growth ?? item?.weekly_star_delta);
+  if (weekly !== null) {
+    return `本周 +${formatCompactNumber(weekly)} stars`;
+  }
+  const daily = structuredGithubStarCount(item?.stars_today ?? item?.daily_stars ?? item?.daily_star_delta);
+  if (daily !== null) {
+    return `今日 +${formatCompactNumber(daily)} stars`;
+  }
+  const total = structuredGithubStarCount(item?.stargazers_total ?? item?.stars);
+  if (total !== null) {
+    return `${formatCompactNumber(total)} stars`;
+  }
   const evidence = String(item.evidence || "");
   const match = evidence.match(/with\s+([0-9,]+)\s+stars today/i) || evidence.match(/显示\s*([0-9,]+)\s+stars today/i);
   return match ? `今日 +${match[1]} stars` : "";
+}
+
+function githubReadmeStatusTag(item) {
+  if (isGithubReadmeFetchFailed(item)) {
+    return "README failed";
+  }
+  const status = String(item?.readme_fetch_status || item?.readme_status || item?.readme?.status || "").trim();
+  return status || item?.readme_summary || item?.github_readme_summary ? "README OK" : "";
+}
+
+function isGithubReadmeFetchFailed(item = {}) {
+  const status = String(item.readme_fetch_status || item.readme_status || item.readme?.status || "").toLowerCase();
+  return /fail|failed|error|unavailable|blocked|timeout/.test(status) || Boolean(item.readme_error);
+}
+
+function githubLanguageTag(item) {
+  const language = String(item?.language || "").trim();
+  return language && language.toLowerCase() !== "all" ? language : "";
+}
+
+function githubTopicTags(item) {
+  return Array.isArray(item?.topics)
+    ? item.topics.map((topic) => String(topic || "").trim()).filter(Boolean).slice(0, 3)
+    : [];
+}
+
+function githubProjectHeatTags(item, project) {
+  const tags = project ? projectHeatTags(project) : [];
+  return githubStarsTag(item) ? tags.filter((tag) => !/stars/i.test(tag)) : tags;
+}
+
+function structuredGithubStarCount(value) {
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return null;
+  }
+  const number = Number(text.replaceAll(",", ""));
+  return Number.isFinite(number) && number >= 0 ? Math.round(number) : null;
+}
+
+function formatCompactNumber(value) {
+  return Number(value).toLocaleString("en-US");
 }
 
 function renderProjectHighlightText(project, baseDescription = "") {
