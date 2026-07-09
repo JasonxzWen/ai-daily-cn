@@ -43,6 +43,7 @@ import { renderIndexHtml, renderOfficialBlogsHtml, renderReportHtml } from "../s
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { buildSourceInventoryRows } from "../src/source-effectiveness.js";
 import { generateReportDraft, canPromoteToBuilderObservation } from "../src/draft.js";
+import { CANDIDATE_AUDIT_ROLES, MAIN_SELECTION_STAGES } from "../src/main-audit-contract.js";
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite, planGeneratedFiles } from "../src/site.js";
@@ -170,6 +171,14 @@ test("candidate pool schema accepts curated first-party builder candidates", () 
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
 });
 
+test("candidate audit contract stays aligned with candidate schema", async () => {
+  const schema = JSON.parse(await fs.readFile(path.join(rootDir, "schemas", "candidates.schema.json"), "utf8"));
+  const candidateProperties = schema.$defs.candidate.properties;
+
+  assert.deepEqual(candidateProperties.main_selection_stage.enum, MAIN_SELECTION_STAGES);
+  assert.deepEqual(candidateProperties.roles.items.enum, CANDIDATE_AUDIT_ROLES);
+});
+
 test("candidate pool schema accepts specific main refill selection stages", () => {
   const baseCandidate = {
     id: "hot-blog-refill-stage",
@@ -258,6 +267,49 @@ test("candidate pool schema accepts candidate roles", () => {
   const rejected = validateCandidatePool({
     ...candidatePool,
     candidates: [{ ...baseCandidate, roles: ["main_stream_candidate", "unknown_signal"] }]
+  });
+  assert.equal(rejected.valid, false);
+});
+
+test("candidate pool schema accepts window fill audit flag", () => {
+  const baseCandidate = {
+    id: "window-fill-main-candidate",
+    source_id: "window-source",
+    category: "hot_blog",
+    title: "A prior-window engineering writeup",
+    url: "https://example.com/blog/prior-window-agent-engineering",
+    source: "Example Blog",
+    event_date: "2026-06-24",
+    status: "included",
+    included_in: "main_items",
+    verification_status: "primary_confirmed",
+    verification_sources: ["https://example.com/blog/prior-window-agent-engineering"],
+    source_level: "primary",
+    main_selection_stage: "refill_hot_blog",
+    window_fill: true
+  };
+  const candidatePool = {
+    schema_version: 1,
+    report_date: "2026-06-26",
+    generated_at: "2026-06-26T08:00:00.000Z",
+    sources: [
+      {
+        id: "window-source",
+        name: "Example Blog",
+        url: "https://example.com/blog",
+        category: "blog",
+        status: "checked"
+      }
+    ],
+    candidates: [baseCandidate]
+  };
+
+  const accepted = validateCandidatePool(candidatePool);
+  assert.equal(accepted.valid, true, JSON.stringify(accepted.errors));
+
+  const rejected = validateCandidatePool({
+    ...candidatePool,
+    candidates: [{ ...baseCandidate, window_fill: "true" }]
   });
   assert.equal(rejected.valid, false);
 });
@@ -16428,7 +16480,8 @@ test("report:draft fills sparse main stream from unified candidate roles", async
     verificationStatus: "primary_confirmed",
     title: "Latent.Space explains memory architecture for AI agents",
     url: "https://www.latent.space/p/example-agent-memory",
-    evidence: "The post explains memory architecture, retrieval boundaries, session persistence, and deployment tradeoffs for AI agents."
+    evidence: "The post explains memory architecture, retrieval boundaries, session persistence, and deployment tradeoffs for AI agents.",
+    eventDate: "2026-06-13"
   });
   const communityCandidate = mainStreamRepairCandidate(reportDate, {
     id: "reddit-agent-tooling-discussion",
@@ -16494,6 +16547,14 @@ test("report:draft fills sparse main stream from unified candidate roles", async
   assert.deepEqual(candidatePoolById.get(hotBlogCandidate.id)?.roles, ["main_stream_candidate", "hot_blog"]);
   assert.deepEqual(candidatePoolById.get(builderCandidate.id)?.roles, ["main_stream_candidate", "builder_signal"]);
   assert.deepEqual(candidatePoolById.get(communityCandidate.id)?.roles, ["main_stream_candidate", "community_signal"]);
+  assert.equal(candidatePoolById.get(hotBlogCandidate.id)?.window_fill, true);
+  assert.notEqual(candidatePoolById.get(projectCandidate.id)?.window_fill, true);
+  const hotBlogMainCandidate = drafted.candidatePool.candidates.find((candidate) =>
+    candidate.category === "main_item" &&
+    candidate.url === hotBlogCandidate.url
+  );
+  assert.equal(hotBlogMainCandidate?.window_fill, true);
+  assert.equal(JSON.stringify(drafted.report).includes("\"window_fill\""), false, "window fill audit must stay out of public report output");
   assert.equal(JSON.stringify(drafted.report).includes("\"roles\""), false, "candidate roles must stay out of public report output");
   assert(drafted.report.self_check.selection_snapshot.main_items.refill_selected >= 2);
 });
@@ -21513,6 +21574,8 @@ test("report:draft rejects refill candidates outside the 72 hour main stream win
   const snapshot = drafted.report.self_check.selection_snapshot.main_items;
   assert.equal(snapshot.shortfall, true);
   assert(snapshot.rejection_counts.outside_main_window >= 1);
+  const oldLeadPoolEntry = drafted.candidatePool.candidates.find((candidate) => candidate.id === oldLead.id);
+  assert.equal(oldLeadPoolEntry?.window_fill, undefined, "outside-window rejected lead must not be marked as window fill");
 });
 
 test("report:draft keeps Chinese interview single-source leads out of stories", async () => {

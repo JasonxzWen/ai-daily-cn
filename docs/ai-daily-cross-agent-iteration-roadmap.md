@@ -49,6 +49,36 @@ The main bottleneck is target mismatch: previous work often optimized schema com
 | 6 Automation observability | yes | Automation config is readable, status is consistent, and run summaries produce a simple published/degraded/repaired/stage-failure view. |
 | 7 Frontend IA | yes after content slices | Desktop and mobile screenshots show dense sections, no overlap, no hidden source-quality failures, and no public internal diagnostics. |
 
+## Slice Execution Policy
+
+- Treat each roadmap slice as the PR unit. Open one main PR per slice and use multiple commits inside that PR for audit, tags, guards, runtime changes, schema sync, tests, and docs.
+- Do not open separate PRs for each small audit/tag/guard increment unless the user explicitly approves an exception.
+- During development, run focused tests plus the affected suite. Before preparing a slice PR or final material delivery, run full `corepack pnpm run validate`.
+- Before implementing a slice, review the completion definition table below, state how many slices still have unresolved implementation or evidence gaps, and confirm the current path has not drifted into partial increments.
+- Centralize repeated contracts before expanding them. Stage vocabulary, role vocabulary, reject reasons, schema enums, runtime guards, and tests should come from one shared source or an explicitly documented synchronization point.
+- Keep `.harness-hub/state/` writes low-frequency during implementation: record decision-level changes as they happen, then write complete progress, validation evidence, and restart notes during final handoff.
+
+## Slice Completion Definition Table
+
+This table is the pre-development checkpoint. A slice is not "done" because a partial guard, audit field, or renderer patch landed; it is done only when the completion definition and evidence boundary are satisfied.
+
+| Slice | Completion Definition | Current Gap / Next Evidence |
+|---|---|---|
+| 0 Cross-agent memory and roadmap contract | Repository-owned roadmap, requirement reconciliation, ledger binding, quick reference, tests, and operating rules preserve accepted diagnosis before implementation. | This update closes the missing execution policy/completion-table gap; continue treating slice 0 as the durable planning contract, not product behavior evidence. |
+| 1 Real artifact validation gate | Full validation includes real generated report artifacts that fail on templated prose, blank GitHub metadata, self-test-only coverage, stale public claims, and public/internal diagnostic leaks. | Partial: content contracts check real artifacts, but the gate still needs broader latest-report evidence before later slices can claim public quality is stable. |
+| 2 Admission and scoring rewrite | Unified candidate admission ranks first-party research/engineering and strong builder/project/community signals above low-value vendor availability PRs, records `main_selection_stage` or `main_reject_reason` for every evaluated candidate, captures duplicate/merge/source-health/window-fill evidence, and proves behavior on real dated drafts. | Partial and currently at risk of PR fragmentation: story merge audit, stage labels, roles, and `window_fill` WIP are useful but do not complete scoring/admission. Next Slice 2 main PR should centralize vocabularies first, then finish admission, audit, and tests in one PR. |
+| 3 LLM authoring before repair | First-pass report authoring produces story, hot-blog, and GitHub copy before repair; repair becomes a fallback, and real daily runs show public prose no longer depends on routine AI cleanup. | Partial: quality gates and repair checks exist, but first-pass authoring remains downstream of admission and real-artifact gates. |
+| 4 GitHub Trending enrichment | GitHub Trending Top items carry repo-specific stars, star growth/trend, topics/language, README status, failed-README metadata preservation, and non-generic Chinese explanations in public and interaction outputs. | Partial: recent PRs improved metadata, tags, and README guards, but real daily-run evidence and remaining watchlist/direct-source interactions still need verification before stable completion. |
+| 5 Source lane health repair | Each source lane records configured/reachable/parsed_recent/candidate_created/public_included/not_included_reason evidence or an explicit blocked/no-signal state, lane by lane. | Partial: source health exists as a concept, but individual lanes such as official labs, HF, builders, Chinese RSS/WeChat/Zhihu, Reddit/community, and blogs still need lane-specific repair evidence. |
+| 6 Automation observability cleanup | Automation inventory, status, and run summaries produce a consistent published/degraded/repaired/stage-failure view with enough evidence for unattended operation and recovery. | Partial: publishing can reach degraded states, but the operator-facing status view and failure classification still need cleanup and validation. |
+| 7 Frontend information architecture | After content/admission/authoring improve, desktop and mobile pages present dense scannable sections with source quality visible, no overlap, no public internal diagnostics, and browser acceptance evidence. | Deferred: do not spend major effort here until slices 1, 2, 3, and 4 produce content worth compressing into the UI. |
+
+## Current Path Review
+
+As of 2026-07-09, 7 of the 8 roadmap slices still have material implementation or real-evidence gaps. Slice 0 is the only slice that can be completed mainly through repository governance and tests; this update is part of that closeout.
+
+The recent implementation path improved Slice 2 auditability through small increments, but it drifted toward partial audit PRs instead of one completed admission/scoring slice. The correction is to stop opening narrow audit/tag/guard PRs and fold remaining Slice 2 work into a single main Slice 2 PR with commits for shared vocabulary, audit completion, scoring behavior, and focused plus affected-suite validation.
+
 ## Recommended Sequence
 
 1. Finish slice 0 as a small documentation/test/ledger change.
@@ -62,10 +92,12 @@ The main bottleneck is target mismatch: previous work often optimized schema com
 
 ## Scope Rules
 
-- One PR should own one slice unless the slice is explicitly a documentation/test binding like slice 0.
-- Any slice that touches generation, rendering, source discovery, or public HTML must update `tasks/current-task.md` with concrete allowed paths and a red test or deterministic substitute.
+- One main PR owns one slice. A slice PR may contain multiple commits, but small audit, tag, or guard increments should not become separate PRs.
+- Any slice that touches generation, rendering, source discovery, or public HTML must update `.harness-hub/state/current-task.md` with concrete allowed paths and a red test or deterministic substitute.
 - A slice may be called implemented only when it has a ledger item or existing ledger coverage, a validation command covered by `corepack pnpm run validate`, and a real artifact or fixture proving the target behavior.
 - If a slice only improves documentation, do not claim the generated daily report has improved.
+- During development, run focused validation plus the affected suite; run full `corepack pnpm run validate` when preparing the slice PR or final material delivery.
+- Before adding another copy of a vocabulary or audit contract, centralize it or document the synchronization point across runtime, schema, and tests.
 
 ## Not In This Phase
 

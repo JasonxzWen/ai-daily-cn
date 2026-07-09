@@ -24,6 +24,11 @@ import { normalizeStoryFirstReport } from "./story-first.js";
 import { buildSourceEffectivenessTable } from "./source-effectiveness.js";
 import { createPublicDegradationEvent } from "./degradation-events.js";
 import { normalizeGithubReadmeSummary } from "./github-readme.js";
+import {
+  CANDIDATE_AUDIT_ROLE,
+  MAIN_SELECTION_STAGE,
+  normalizeCandidateAuditRoles
+} from "./main-audit-contract.js";
 
 const REQUIRED_AUDIT_GROUPS = [
   "github_trending",
@@ -181,14 +186,6 @@ const MAIN_TARGET_MIN = 5;
 const MAIN_TARGET = STORY_TARGET;
 const MAIN_TARGET_MAX = STORY_TARGET_MAX;
 const MAIN_REFILL_WINDOW_DAYS = 3;
-const CANDIDATE_ROLE_VALUES = new Set([
-  "main_stream_candidate",
-  "github_trending",
-  "hot_blog",
-  "builder_signal",
-  "community_signal",
-  "official_update"
-]);
 const NON_MAIN_STREAM_AUDIT_REASONS = new Set([
   "not_evaluated_section_item",
   "retired_platform_lane"
@@ -486,11 +483,11 @@ function selectReportItems(merged, options = {}) {
     metaById
   });
   const strictMainPool = mainEvaluations
-    .filter((entry) => entry.eligible && entry.stage === "strict")
+    .filter((entry) => entry.eligible && entry.stage === MAIN_SELECTION_STAGE.STRICT)
     .map((entry) => entry.candidate)
     .sort(compareMainCandidates);
   const refillMainPool = mainEvaluations
-    .filter((entry) => entry.eligible && entry.stage !== "strict")
+    .filter((entry) => entry.eligible && entry.stage !== MAIN_SELECTION_STAGE.STRICT)
     .map((entry) => entry.candidate)
     .sort(compareMainCandidates);
   const mainPool = mainEvaluations
@@ -512,6 +509,7 @@ function selectReportItems(merged, options = {}) {
   });
   const stories = [];
   const mainItems = storyClusters.map((cluster) => {
+    markMainWindowFillAudit(cluster, reportDate);
     const candidate = cluster.primary;
     const mainCandidate = derivedCandidate(candidate, {
       idPrefix: "main",
@@ -731,15 +729,6 @@ function isRepeatedTemplateHotBlogCopy(item) {
   return hits >= 2;
 }
 
-function normalizeCandidateRoles(roles) {
-  if (!Array.isArray(roles)) return [];
-  return uniqueValues(
-    roles
-      .map((role) => String(role || "").trim())
-      .filter((role) => CANDIDATE_ROLE_VALUES.has(role))
-  );
-}
-
 function shouldMarkMainStreamCandidateRole(candidate) {
   if (candidate.included_in === "main_items" || candidate.category === "main_item") return true;
   if (candidate.main_selection_stage) return true;
@@ -748,7 +737,7 @@ function shouldMarkMainStreamCandidateRole(candidate) {
 }
 
 function candidateAuditRoles(candidate) {
-  const roles = normalizeCandidateRoles(candidate.roles);
+  const roles = normalizeCandidateAuditRoles(candidate.roles);
   const category = candidate.category;
   const includedIn = candidate.included_in;
   const explicitSourceLevel = String(candidate.source_level || "").trim();
@@ -756,18 +745,18 @@ function candidateAuditRoles(candidate) {
   const sourceLevels = new Set([sourceLevel, explicitSourceLevel].filter(Boolean));
   const sourceText = `${candidate.source_id || ""} ${candidate.source || ""} ${candidate.url || ""}`;
 
-  if (shouldMarkMainStreamCandidateRole(candidate)) roles.push("main_stream_candidate");
+  if (shouldMarkMainStreamCandidateRole(candidate)) roles.push(CANDIDATE_AUDIT_ROLE.MAIN_STREAM_CANDIDATE);
   if (category === "github_trending" || includedIn === "github_trending" || sourceLevels.has("github") || /github trending/i.test(sourceText)) {
-    roles.push("github_trending");
+    roles.push(CANDIDATE_AUDIT_ROLE.GITHUB_TRENDING);
   }
   if (category === "hot_blog" || includedIn === "hot_blogs") {
-    roles.push("hot_blog");
+    roles.push(CANDIDATE_AUDIT_ROLE.HOT_BLOG);
   }
   if (category === "builder_observation" || includedIn === "builder_observations") {
-    roles.push("builder_signal");
+    roles.push(CANDIDATE_AUDIT_ROLE.BUILDER_SIGNAL);
   }
   if (includedIn === "community_leads" || sourceLevels.has("community") || sourceLevels.has("community_api")) {
-    roles.push("community_signal");
+    roles.push(CANDIDATE_AUDIT_ROLE.COMMUNITY_SIGNAL);
   }
   if (
     category === "model_release" ||
@@ -777,10 +766,10 @@ function candidateAuditRoles(candidate) {
     sourceLevels.has("official_open_source_account") ||
     sourceLevels.has("official_model_host_account")
   ) {
-    roles.push("official_update");
+    roles.push(CANDIDATE_AUDIT_ROLE.OFFICIAL_UPDATE);
   }
 
-  return normalizeCandidateRoles(roles);
+  return normalizeCandidateAuditRoles(roles);
 }
 
 function applyCandidateAuditRoles(candidate) {
@@ -3054,7 +3043,7 @@ function addCandidateSource(sourceMap, source, generatedAt) {
 function normalizeCandidate(rawCandidate, context) {
   const id = uniqueCandidateId(context.existing, rawCandidate.id || `${rawCandidate.source_id || rawCandidate.source}-${rawCandidate.title || rawCandidate.url}`);
   const sourceId = rawCandidate.source_id || sourceIdFromCandidate(rawCandidate);
-  const roles = normalizeCandidateRoles(rawCandidate.roles);
+  const roles = normalizeCandidateAuditRoles(rawCandidate.roles);
   if (!context.sourceMap.has(sourceId)) {
     addCandidateSource(context.sourceMap, {
       id: sourceId,
@@ -3290,6 +3279,14 @@ function storySelectionSnapshotFor(evaluations, clusters) {
   };
 }
 
+function markMainWindowFillAudit(cluster, reportDate) {
+  for (const candidate of cluster.candidates) {
+    if (isMainWindowFillCandidate(candidate, reportDate)) {
+      candidate.window_fill = true;
+    }
+  }
+}
+
 function storyItemFromCluster(cluster, mainItemValue, storyId) {
   const candidate = cluster.primary;
   const sources = storySourcesForCluster(cluster);
@@ -3397,12 +3394,12 @@ function evaluateMainCandidates(candidates, options = {}) {
       };
     }
     if (canPromoteToMainStrict(candidate, options.reportDate)) {
-      candidate.main_selection_stage = "strict";
+      candidate.main_selection_stage = MAIN_SELECTION_STAGE.STRICT;
       return {
         candidate,
         meta,
         eligible: true,
-        stage: "strict"
+        stage: MAIN_SELECTION_STAGE.STRICT
       };
     }
     if (!canPromoteToMainRefill(candidate, meta, options.reportDate)) {
@@ -3433,7 +3430,7 @@ function mainSelectionSnapshotFor(evaluations, selectedCandidates, options = {})
     }
   }
   const selected = selectedCandidates.length;
-  const strictSelected = selectedCandidates.filter((candidate) => candidate.main_selection_stage === "strict").length;
+  const strictSelected = selectedCandidates.filter((candidate) => candidate.main_selection_stage === MAIN_SELECTION_STAGE.STRICT).length;
   const refillSelected = selected - strictSelected;
   const shortfall = selected < MAIN_TARGET_MIN;
   const snapshot = {
@@ -3596,25 +3593,25 @@ function canPromoteToMainRefill(candidate, meta = {}, reportDate = "") {
 function mainRefillStage(candidate, meta = {}, reportDate = "") {
   const sourceLevel = sourceLevelForCandidate(candidate);
   if (candidate.category === "project" || sourceLevel === "github") {
-    return "refill_github";
+    return MAIN_SELECTION_STAGE.REFILL_GITHUB;
   }
   if (candidate.category === "builder_observation") {
-    return "refill_builder";
+    return MAIN_SELECTION_STAGE.REFILL_BUILDER;
   }
   if (candidate.category === "hot_blog") {
-    return "refill_hot_blog";
+    return MAIN_SELECTION_STAGE.REFILL_HOT_BLOG;
   }
   if (candidate.category === "community_lead") {
-    return "refill_community";
+    return MAIN_SELECTION_STAGE.REFILL_COMMUNITY;
   }
   if (
     isPrimaryRequiredIntermediaryMainCandidate(candidate) ||
     canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta) ||
     isOutsideMainWindowCandidate(candidate, reportDate)
   ) {
-    return "refill_window";
+    return MAIN_SELECTION_STAGE.REFILL_WINDOW;
   }
-  return "refill_weak_signal";
+  return MAIN_SELECTION_STAGE.REFILL_WEAK_SIGNAL;
 }
 
 function hasEvidenceBackedPaperMainRefill(candidate, meta = {}) {
@@ -4850,6 +4847,15 @@ function isOutsideMainWindowCandidate(candidate, reportDate = "", windowDays = M
     return false;
   }
   return candidateDate < shiftDateOnly(baseline, -windowDays);
+}
+
+function isMainWindowFillCandidate(candidate, reportDate = "", windowDays = MAIN_REFILL_WINDOW_DAYS) {
+  const candidateDate = dateOnly(candidate?.event_date);
+  const baseline = dateOnly(reportDate);
+  if (!candidateDate || !baseline) {
+    return false;
+  }
+  return candidateDate < baseline && candidateDate >= shiftDateOnly(baseline, -windowDays);
 }
 
 function shiftDateOnly(value, offsetDays) {
