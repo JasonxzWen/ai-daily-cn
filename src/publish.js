@@ -229,6 +229,15 @@ export async function prepareCleanPublishWorktree(options = {}) {
     });
   }
 
+  const pushRemoteUrl = githubSshPushUrlForHttpsRemote(remoteUrl);
+  if (pushRemoteUrl) {
+    await runGitCommand(worktreeDir, ["remote", "set-url", "--push", "origin", pushRemoteUrl], {
+      run,
+      errorCode: "git_not_writable",
+      errorMessage: "Unable to configure the clean publish worktree push remote."
+    });
+  }
+
   const branch = await runGitCommand(worktreeDir, ["rev-parse", "--abbrev-ref", "HEAD"], {
     run,
     errorCode: "git_not_writable",
@@ -284,6 +293,7 @@ export async function prepareCleanPublishWorktree(options = {}) {
     allowed_branch: allowedBranch,
     remote_main_sha: remoteMainSha,
     remote_url: redactRemoteUrl(remoteUrl),
+    push_remote_url: pushRemoteUrl ? redactRemoteUrl(pushRemoteUrl) : "",
     cloned: !targetExists,
     clone_reference_root: !targetExists && cloneReferenceRoot ? cloneReferenceRoot : "",
     reset_to_remote: targetExists,
@@ -1349,6 +1359,22 @@ function parseGitHubRepository(remoteUrl) {
     }
     const [owner, repo] = parsed.pathname.replace(/^\/+/, "").replace(/\.git$/, "").split("/");
     return owner && repo ? `${owner}/${repo}` : "";
+  } catch {
+    return "";
+  }
+}
+
+function githubSshPushUrlForHttpsRemote(remoteUrl) {
+  try {
+    const parsed = new URL(remoteUrl);
+    if (parsed.protocol !== "https:" || parsed.hostname.toLowerCase() !== "github.com") {
+      return "";
+    }
+    const [owner, repo, ...rest] = parsed.pathname.replace(/^\/+/, "").replace(/\.git$/, "").split("/");
+    if (!owner || !repo || rest.length > 0) {
+      return "";
+    }
+    return `git@github.com:${owner}/${repo}.git`;
   } catch {
     return "";
   }

@@ -769,6 +769,32 @@ test("publish prepare-clean-worktree clones a dedicated main checkout without to
   );
 });
 
+test("publish prepare-clean-worktree uses SSH pushurl for GitHub HTTPS remotes", async () => {
+  const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-ssh-pushurl-"));
+  const worktreeDir = path.join(repoRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  const result = await prepareCleanPublishWorktree({
+    repoRoot,
+    worktreeDir,
+    remoteUrl: "https://github.com/owner/repo.git",
+    installDependencies: false,
+    commandRunner: fakeCommandRunner({ calls })
+  });
+
+  const pushUrlCall = calls.find((call) => call.args.slice(0, 4).join(" ") === "remote set-url --push origin");
+  assert.ok(pushUrlCall, "expected clean worktree pushurl configuration");
+  assert.deepEqual(pushUrlCall.args, [
+    "remote",
+    "set-url",
+    "--push",
+    "origin",
+    "git@github.com:owner/repo.git"
+  ]);
+  assert.equal(result.remote_url, "https://github.com/owner/repo.git");
+  assert.equal(result.push_remote_url, "git@github.com:owner/repo.git");
+});
+
 test("publish prepare-clean-worktree resets only the dedicated checkout when it already exists", async () => {
   const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-existing-"));
   const worktreeDir = path.join(repoRoot, ".tmp", "publish-worktrees", "main");
