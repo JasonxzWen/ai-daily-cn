@@ -328,6 +328,38 @@ test("daily dry-run stages source status history metadata", async () => {
   assert(plan.will_stage_files.includes("reports-data/internal/source-status-history.json"));
 });
 
+test("daily dry-run stages date-scoped editorial rank artifact", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  const rankArtifactPath = path.join(
+    repoRoot,
+    "reports-data",
+    "2026",
+    "05",
+    "internal",
+    "editorial-rank-2026-05-13.json"
+  );
+  await fs.mkdir(path.dirname(rankArtifactPath), { recursive: true });
+  await fs.writeFile(
+    rankArtifactPath,
+    `${JSON.stringify({ schema_version: 1, report_date: "2026-05-13", items: [] }, null, 2)}\n`,
+    "utf8"
+  );
+
+  const plan = await createDailyPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate: "2026-05-13",
+    git: fakeGit({
+      status: " M reports-data/2026/05/internal/editorial-rank-2026-05-13.json"
+    })
+  });
+
+  assert(plan.will_stage_files.includes("reports-data/2026/05/internal/editorial-rank-2026-05-13.json"));
+});
+
 test("publish dry-run stages evidence and builder avatar assets for the selected report", async () => {
   const repoRoot = await tempRepoWithFixture();
   await fs.rm(path.join(repoRoot, "reports-source"), { recursive: true, force: true });
