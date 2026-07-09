@@ -13753,22 +13753,33 @@ test("report writer consumes editorial rank artifact without leaking internal fi
     generatedAt: fixedGeneratedAt
   });
 
-  assert.deepEqual(result.editorialRankAdmission, {
-    ok: true,
-    artifact_path: rankArtifactPath,
-    policy_id: rankArtifact.policy_id,
-    generated_at: rankArtifact.generated_at,
-    source_window: rankArtifact.source_window,
-    item_count: 5,
-    today_selected_count: 3,
-    must_read_count: 3,
-    lane_counts: {
-      major_company_strategy: 2,
-      must_read: 3,
-      open_source_github: 2,
-      product_industry: 1
-    }
+  assert.equal(result.editorialRankAdmission.ok, true);
+  assert.equal(result.editorialRankAdmission.artifact_path, rankArtifactPath);
+  assert.equal(result.editorialRankAdmission.policy_id, rankArtifact.policy_id);
+  assert.equal(result.editorialRankAdmission.generated_at, rankArtifact.generated_at);
+  assert.deepEqual(result.editorialRankAdmission.source_window, rankArtifact.source_window);
+  assert.equal(result.editorialRankAdmission.item_count, 5);
+  assert.equal(result.editorialRankAdmission.today_selected_count, 3);
+  assert.equal(result.editorialRankAdmission.must_read_count, 3);
+  assert.deepEqual(result.editorialRankAdmission.lane_counts, {
+    major_company_strategy: 2,
+    must_read: 3,
+    open_source_github: 2,
+    product_industry: 1
   });
+  assert.deepEqual(
+    result.editorialRankAdmission.today_selected_items.map((item) => item.source_id),
+    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
+  );
+  assert.deepEqual(
+    result.editorialRankAdmission.must_read_items.map((item) => item.source_id),
+    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
+  );
+  assert.equal("editorial_rank" in result.editorialRankAdmission.today_selected_items[0], false);
+  assert.equal("rank_policy" in result.editorialRankAdmission.today_selected_items[0], false);
+  assert.equal("selection_reasons" in result.editorialRankAdmission.today_selected_items[0], false);
+  assert.equal("demotion_reasons" in result.editorialRankAdmission.today_selected_items[0], false);
+  assert.equal("admission" in result.editorialRankAdmission.today_selected_items[0], false);
 
   const publicReport = JSON.parse(await fs.readFile(result.path, "utf8"));
   const serializedPublicReport = JSON.stringify(publicReport);
@@ -13871,6 +13882,20 @@ test("report:write CLI emits editorial rank admission summary", async () => {
   assert.equal(parsed.editorial_rank_admission.today_selected_count, 3);
   assert.equal(parsed.editorial_rank_admission.must_read_count, 3);
   assert.equal(parsed.editorial_rank_admission.lane_counts.open_source_github, 2);
+  assert.deepEqual(
+    parsed.editorial_rank_admission.today_selected_items.map((item) => item.source_id),
+    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
+  );
+  assert.deepEqual(
+    parsed.editorial_rank_admission.must_read_items.map((item) => item.source_id),
+    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
+  );
+  assert.equal(parsed.editorial_rank_admission.today_selected_items.some((item) => item.source_id === "github-momentum-only-repo"), false);
+  assert.equal("editorial_rank" in parsed.editorial_rank_admission.today_selected_items[0], false);
+  assert.equal("rank_policy" in parsed.editorial_rank_admission.today_selected_items[0], false);
+  assert.equal("selection_reasons" in parsed.editorial_rank_admission.today_selected_items[0], false);
+  assert.equal("demotion_reasons" in parsed.editorial_rank_admission.today_selected_items[0], false);
+  assert.equal("admission" in parsed.editorial_rank_admission.today_selected_items[0], false);
 });
 
 test("report writer rejects rank-blocked mainline items", async () => {
@@ -13984,6 +14009,21 @@ test("report writer accepts rank-selected mainline items", async () => {
 
   assert.equal(result.report.main_items[0].candidate_id, "anthropic-official-agent-practice");
   assert.equal(result.editorialRankAdmission.must_read_count, 3);
+  assert.deepEqual(
+    result.editorialRankAdmission.today_selected_items.map((item) => item.source_id),
+    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
+  );
+  assert.deepEqual(
+    result.editorialRankAdmission.must_read_items.map((item) => item.source_id),
+    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
+  );
+  const writtenReport = JSON.parse(await fs.readFile(result.path, "utf8"));
+  const publicReportText = JSON.stringify(writtenReport);
+  assert.equal(publicReportText.includes("editorial_rank"), false);
+  assert.equal(publicReportText.includes("rank_policy"), false);
+  assert.equal(publicReportText.includes("selection_reasons"), false);
+  assert.equal(publicReportText.includes("demotion_reasons"), false);
+  assert.equal(publicReportText.includes("\"admission\""), false);
 });
 
 test("report:write 允许热门博客和社区线索携带公开图片字段", async () => {
