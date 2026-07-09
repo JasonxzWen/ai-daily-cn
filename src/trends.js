@@ -8,6 +8,7 @@ const STATUS_WEIGHT = {
   active: 2,
   watching: 1
 };
+const PUBLIC_TOPIC_STATUSES = new Set(["hot", "active"]);
 
 export async function loadTrendConfig(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -97,9 +98,13 @@ export function buildTrendIndex(reports, options = {}) {
   }
 
   const topics = currentSummaries
-    .filter((summary) => summary.status)
+    .filter((summary) => PUBLIC_TOPIC_STATUSES.has(summary.status))
     .sort(compareTopicSummaries)
     .map(publicTopicSummary);
+  const internalTopics = currentSummaries
+    .filter((summary) => summary.status)
+    .sort(compareTopicSummaries)
+    .map(internalTopicSummary);
 
   return {
     schema_version: 1,
@@ -112,6 +117,7 @@ export function buildTrendIndex(reports, options = {}) {
     },
     thresholds: configToPublicThresholds(config.thresholds),
     topics,
+    internal_topics: internalTopics,
     candidate_topics: buildCandidateTopics(orderedReports, config, latestDate),
     annotations_by_date: stableAnnotations(annotationsByDate, currentSummaryById)
   };
@@ -264,6 +270,13 @@ function publicTopicSummary(summary) {
   };
 }
 
+function internalTopicSummary(summary) {
+  return {
+    ...publicTopicSummary(summary),
+    public_visibility: PUBLIC_TOPIC_STATUSES.has(summary.status) ? "public" : "internal"
+  };
+}
+
 function trendTag(summary, windowDays) {
   const entities = summary.entities.slice(0, 4);
   return {
@@ -312,8 +325,10 @@ function buildCandidateTopics(reports, config, dateTo) {
     .slice(0, 20)
     .map((candidate) => ({
       term: candidate.term,
+      status: "candidate",
       occurrences: candidate.occurrences,
       active_days: candidate.dates.size,
+      public_visibility: "internal",
       display: false
     }));
 }
