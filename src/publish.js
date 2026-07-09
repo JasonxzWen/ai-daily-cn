@@ -177,6 +177,8 @@ export async function prepareCleanPublishWorktree(options = {}) {
   });
   const targetExists = await pathExists(worktreeDir);
   const targetIsGitCheckout = targetExists && (await pathExists(path.join(worktreeDir, ".git")));
+  const cloneReferenceRoot =
+    options.cloneReferenceRoot === false ? "" : path.resolve(options.cloneReferenceRoot || launcherRepoRoot);
 
   if (targetExists && !targetIsGitCheckout) {
     throw new PublisherError(
@@ -188,7 +190,12 @@ export async function prepareCleanPublishWorktree(options = {}) {
 
   if (!targetExists) {
     await fs.mkdir(path.dirname(worktreeDir), { recursive: true });
-    await runGitCommand(launcherRepoRoot, ["clone", "--branch", allowedBranch, "--single-branch", remoteUrl, worktreeDir], {
+    const cloneArgs = ["clone"];
+    if (cloneReferenceRoot) {
+      cloneArgs.push("--reference-if-able", cloneReferenceRoot, "--dissociate");
+    }
+    cloneArgs.push("--branch", allowedBranch, "--single-branch", remoteUrl, worktreeDir);
+    await runGitCommand(launcherRepoRoot, cloneArgs, {
       run,
       errorCode: "git_clone_unavailable",
       errorMessage: "Unable to clone the clean publish worktree.",
@@ -274,6 +281,7 @@ export async function prepareCleanPublishWorktree(options = {}) {
     remote_main_sha: remoteMainSha,
     remote_url: redactRemoteUrl(remoteUrl),
     cloned: !targetExists,
+    clone_reference_root: !targetExists && cloneReferenceRoot ? cloneReferenceRoot : "",
     reset_to_remote: targetExists,
     clean: true,
     dependency_status: dependencyStatus,
