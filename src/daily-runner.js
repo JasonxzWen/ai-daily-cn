@@ -146,6 +146,7 @@ export async function runDailyWorkflow(options = {}) {
     review_repair_attempts: 0,
     current_report_path: DEFAULT_REPORT_PATH,
     candidate_pool_path: candidatePoolPath(reportDate),
+    editorial_rank_artifact_path: editorialRankArtifactPath(reportDate),
     quality_review_path: qualityReviewPath(reportDate),
     quality_repair_path: qualityRepairPath(reportDate),
     stages: [],
@@ -370,6 +371,7 @@ async function resumeDailyWorkflowFromAiRepair({
   const rawSourceReportPath = summary.current_report_path || previousNextAction.source_report_path || DEFAULT_REPORT_PATH;
   summary.current_report_path = stagePath(rawSourceReportPath, path.resolve(summary.clean_repo_root)) || DEFAULT_REPORT_PATH;
   summary.candidate_pool_path = summary.candidate_pool_path || candidatePoolPath(reportDate);
+  summary.editorial_rank_artifact_path = summary.editorial_rank_artifact_path || editorialRankArtifactPath(reportDate);
   summary.quality_review_path = summary.quality_review_path || qualityReviewPath(reportDate);
   summary.quality_repair_path = summary.quality_repair_path || qualityRepairPath(reportDate);
 
@@ -969,6 +971,17 @@ function buildAiRepairWorkflowStages({
 function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
   const tmp = (name) => `.tmp/${name}-${reportDate}.json`;
   const stages = [
+    pnpmStage("editorial_rank_artifact", [
+      "run",
+      "content:editorial-rank:build",
+      "--",
+      "--input",
+      candidatePoolPath(reportDate),
+      "--source-date",
+      reportDate,
+      "--out",
+      editorialRankArtifactPath(reportDate)
+    ]),
     nodeCliStage("report_write", [
       "report:write",
       reportPath,
@@ -2074,6 +2087,11 @@ async function fileExists(filePath) {
 
 function candidatePoolPath(reportDate) {
   return `.tmp/source-candidates-${reportDate}.json`;
+}
+
+function editorialRankArtifactPath(reportDate) {
+  const [year, month] = String(reportDate).split("-");
+  return `reports-data/${year}/${month}/internal/editorial-rank-${reportDate}.json`;
 }
 
 function qualityReviewPath(reportDate) {
