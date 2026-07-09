@@ -1478,6 +1478,12 @@ function isChinesePolicyBoilerplateSentence(sentence) {
 
 function rewritePublicStockPhrases(value) {
   return String(value || "")
+    .replace(/已披露事实集中在/g, "公开信息集中在")
+    .replace(/已披露细节覆盖/g, "公开信息包括")
+    .replace(/披露/g, "说明")
+    .replace(/落地质量取决于/g, "能否落地要看")
+    .replace(/启示录/g, "观察记录")
+    .replace(/启示/g, "观察")
     .replace(/打开[“"]?([^”"\n。；;]{0,30})[”"]?协作想象空间/g, "提供$1协作观察样本")
     .replace(/打开了?[^。；;\n]{0,48}想象空间/g, "提供了可继续观察的落地样本")
     .replace(/想象空间/g, "落地样本")
@@ -1519,11 +1525,11 @@ function summaryForSelection(selection, aigcCount) {
   }
   const parts = [];
   if (mainTitles.length > 0) {
-    parts.push(mainTitles.length === 1 ? `今天最值得看的主线是 ${mainTitles[0]}` : `今天最值得看的主线有 ${mainTitles.join("；")}`);
+    parts.push(mainTitles.length === 1 ? `今日主线：${mainTitles[0]}` : `今日主线：${mainTitles.join("；")}`);
   }
   const hotBlogCue = hotBlogSummaryCue(selection.hot_blogs);
   if (hotBlogCue) {
-    parts.push(`热门博客这轮主要看 ${hotBlogCue}`);
+    parts.push(`技术博客补充 ${hotBlogCue}`);
   }
   const cleanParts = parts
     .map((part) => String(part || "").replace(/[。；\s]+$/u, "").trim())
@@ -1693,13 +1699,13 @@ function mainItemScopeBulletText(candidate, category) {
 function mainItemScopeFactText(candidate, category) {
   const text = candidateText(candidate);
   if (/whatsapp.*spyware|spyware.*whatsapp|nso/i.test(text)) {
-    return "当前公开的是攻击归因、拦截动作和受影响对象描述，完整受害面仍未披露";
+    return "当前公开的是攻击归因、拦截动作和受影响对象描述，完整受害面尚未说明";
   }
   if (/sovereign ai|london tech week|ai maker, not an ai taker/i.test(text)) {
     return "当前公开的是基础设施路线、合作方口径和英国本地落地节奏";
   }
   if (category === "company_business") {
-    return "已披露细节覆盖投入方向、合作节奏、组织动作、执行安排和后续资源配置";
+    return "公开信息包括投入方向、合作节奏、组织动作、执行安排和后续资源配置";
   }
   if (category === "product_radar") {
     return "当前公开的是产品入口、适用对象、价格地区限制、权限要求和后续上线节奏";
@@ -1719,7 +1725,7 @@ function mainItemScopeFactText(candidate, category) {
   if (/policy|safety|governance|regulation|security/i.test(text)) {
     return "当前公开的是生效范围、执行主体、例外条款、落地安排和责任边界";
   }
-  return "已披露细节覆盖适用对象、证据来源、执行安排、后续时间表和风险边界";
+  return "公开信息包括适用对象、证据来源、执行安排、后续时间表和风险边界";
 }
 
 function mainItemScopePhrase(candidate, category) {
@@ -1769,15 +1775,15 @@ function mainItemDecisionSentence(candidate, category) {
     return "这会影响内容团队判断创作工具能否进入正式生产流程、预算清单和版权审查";
   }
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
-    return "这会影响研发团队安排 agent 工具接入顺序、权限设计、评估回放和落地成本";
+    return "研发团队需要据此排序 agent 工具接入、权限设计、评估回放和落地成本";
   }
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
-    return "这会改变模型和平台团队对能力边界、推理成本、可靠性和内部实验设计的预期";
+    return "模型和平台团队需要据此重估能力边界、推理成本、可靠性和内部实验设计";
   }
   if (/policy|safety|governance|regulation|security/i.test(text)) {
     return "这类更新会直接牵动产品上线流程、风控口径、合规检查和责任分工";
   }
-  return "这会影响产品团队判断路线优先级、接入时机、资源投入和后续风险预案";
+  return "产品团队需要据此判断路线优先级、接入时机、资源投入和后续风险预案";
 }
 
 function highlightMainItemFact(candidate, fact) {
@@ -2072,9 +2078,9 @@ function huggingFaceTrendingItem(candidate, index) {
   const repo = repoFromUrl(candidate.url) || candidate.title;
   const task = String(candidate.task || "").trim();
   const metrics = [
-    Number.isFinite(Number(candidate.likes)) && Number(candidate.likes) > 0 ? `${Number(candidate.likes)} likes` : "",
-    Number.isFinite(Number(candidate.downloads)) && Number(candidate.downloads) > 0 ? `${Number(candidate.downloads)} downloads` : "",
-    task ? `task: ${task}` : ""
+    Number.isFinite(Number(candidate.likes)) && Number(candidate.likes) > 0 ? `${Number(candidate.likes)} 个收藏` : "",
+    Number.isFinite(Number(candidate.downloads)) && Number(candidate.downloads) > 0 ? `${Number(candidate.downloads)} 次下载` : "",
+    task ? `任务：${huggingFaceTaskLabel(task).replace(/模型$/u, "")}` : ""
   ].filter(Boolean).join("; ");
   return {
     name: repo,
@@ -5140,6 +5146,7 @@ function publicActorLabel(candidate) {
   const text = `${source} ${title}`.toLowerCase();
   if (/github trending/.test(text) || candidate.source_level === "github" || candidate.repo) return "该开源项目";
   if (/microsoft/.test(text)) return "微软研究院";
+  if (/apple machine learning|machinelearning\.apple|apple/.test(text)) return "苹果机器学习团队";
   if (/google deepmind|deepmind/.test(text)) return "DeepMind";
   if (/openai/.test(text)) return "OpenAI";
   if (/\bqwen\b|qwenlm/.test(text)) return "Qwen 团队";
@@ -5162,7 +5169,7 @@ function publicActorLabel(candidate) {
 function englishSignalProfile(text) {
   if (/simulated conversations|model deployments?|pre-release|red-team|safety monitoring/.test(text)) {
     return {
-      verb: "披露",
+      verb: "介绍",
       topic: "模拟对话评估与模型部署流程",
       scope: "预发布评估、策略检查、红队审查和上线监控",
       boundary: "模型发布不只依赖单次 benchmark，而是把安全评估接入部署链路",
@@ -5201,7 +5208,7 @@ function englishSignalProfile(text) {
       verb: "发布",
       topic: "面向软件团队的 agent 平台",
       scope: "代码仓库上下文、工作流编排、IDE 集成、企业控制和评估钩子",
-      boundary: "工程落地取决于仓库权限、上下文质量、评估回放和团队治理",
+      boundary: "工程采用时要同时处理仓库权限、上下文质量、评估回放和团队治理",
       factFocus: "coding agent、仓库上下文、IDE 集成和评估钩子"
     };
   }
@@ -5273,7 +5280,7 @@ function englishSignalProfile(text) {
       verb: "拆解",
       topic: "XR 眼镜里的端侧 agent 开发流程",
       scope: "端侧推理、语音交互、感知输入、avatar 渲染、SDK 集成和部署边界",
-      boundary: "落地质量取决于设备算力、延迟、隐私权限、场景数据和开发者工具成熟度",
+      boundary: "能否进入真实项目要看设备算力、延迟、隐私权限、场景数据和开发者工具成熟度",
       factFocus: "XR AI、端侧推理、语音交互、感知输入和 SDK 集成"
     };
   }
@@ -5288,7 +5295,7 @@ function englishSignalProfile(text) {
   }
   if (/mlperf|blackwell|training performance|benchmark/.test(text)) {
     return {
-      verb: "披露",
+      verb: "给出",
       topic: "Blackwell MLPerf 训练性能结果",
       scope: "训练基准、硬件吞吐、模型规模、对比设置和数据中心部署前提",
       boundary: "benchmark 结果仍要结合任务类型、集群配置、能耗和真实训练负载判断",
@@ -5297,17 +5304,17 @@ function englishSignalProfile(text) {
   }
   if (/agent|workflow|developer|coding|software|repository|ide|tool|platform/.test(text)) {
     return {
-      verb: "更新",
-      topic: "agent 工作流和开发工具能力",
+      verb: "调整",
+      topic: "开发者 agent 工作流",
       scope: "任务编排、上下文、权限控制、工程集成和失败恢复",
-      boundary: "落地质量取决于权限模型、评估回放、团队流程和可观测性",
+      boundary: "实际效果要看权限模型、评估回放、团队流程和可观测性",
       factFocus: "agent 工作流、开发工具入口、权限控制和工程集成"
     };
   }
   if (/model|llm|reasoning|multimodal|benchmark|evaluation|research|planning/.test(text)) {
     return {
-      verb: "披露",
-      topic: "模型能力和评估方法更新",
+      verb: "梳理",
+      topic: "模型评测与能力边界",
       scope: "能力边界、评估设置、数据来源、使用场景和限制说明",
       boundary: "结论仍要依赖可复现评测、真实任务和公开限制",
       factFocus: "模型能力、评估设置、数据来源和限制说明"
@@ -5323,7 +5330,7 @@ function englishSignalProfile(text) {
     };
   }
   return {
-    verb: "更新",
+    verb: "整理",
     topic: "公开产品或工程信息",
     scope: "标题、适用场景、访问条件、限制说明和后续链接",
     boundary: "读者还要查看原文中的访问条件、地区范围、价格和使用限制",
@@ -5389,13 +5396,13 @@ function huggingFaceModelDescription(candidate, repo, metrics) {
   const downloads = Number(candidate?.downloads);
   const likes = Number(candidate?.likes);
   const metricParts = [
-    Number.isFinite(downloads) && downloads > 0 ? `${downloads} downloads` : "",
-    Number.isFinite(likes) && likes > 0 ? `${likes} likes` : ""
+    Number.isFinite(downloads) && downloads > 0 ? `${downloads} 次下载` : "",
+    Number.isFinite(likes) && likes > 0 ? `${likes} 个收藏` : ""
   ].filter(Boolean);
   const metricText = metricParts.length > 0
-    ? `本周榜单记录 ${metricParts.join("、")}，可作为社区使用热度参考`
-    : "本周榜单只提供基础排名信息";
-  const taskText = task ? `任务类型是 ${task}` : "任务类型需要回到模型卡核对";
+    ? `榜单给出 ${metricParts.join("、")}，显示模型仍有持续使用记录`
+    : "榜单只提供基础排名信息";
+  const taskText = task ? `任务标签已归一为${taskLabel.replace(/模型$/u, "")}` : "任务标签需要回到模型卡核对";
   const metricsHint = metrics ? `；榜单元数据包括 ${metrics}` : "";
   return trimText(`${repo} 是 Hugging Face 上的${taskLabel}。${metricText}；${taskText}${metricsHint}。选型前还要看模型卡、许可证、推理成本和适用限制。`, 190);
 }
@@ -5739,6 +5746,7 @@ function shortEntityForChineseTitle(candidate = {}) {
   if (/google\s*deepmind|deepmind/i.test(text)) return "DeepMind";
   if (/google/i.test(text)) return "Google";
   if (/nvidia/i.test(text)) return "NVIDIA";
+  if (/apple/i.test(text)) return "苹果机器学习团队";
   if (/\baws\b|amazon/i.test(text)) return "AWS";
   if (/qwen/i.test(text)) return "Qwen";
   if (/alibaba/i.test(text)) return "Alibaba Cloud";
@@ -5747,16 +5755,16 @@ function shortEntityForChineseTitle(candidate = {}) {
 }
 
 function englishConcreteVerb(lowerTitle) {
-  if (/\b(launches|introduces|unveils|ships|releases|publishes)\b/.test(lowerTitle)) {
+  if (/\b(announces|launches|introduces|unveils|ships|releases|publishes)\b/.test(lowerTitle)) {
     return "发布";
   }
   if (/\b(changes|updates|adds|expands|improves|upgrades)\b/.test(lowerTitle)) {
-    return "更新";
+    return "调整";
   }
   if (/\b(explains|details|summarizes|breaks down|covers|tracks)\b/.test(lowerTitle)) {
-    return "说明";
+    return "梳理";
   }
-  return "披露";
+  return "介绍";
 }
 
 function englishConcreteTopic(lowerTitle, candidate = {}) {
@@ -6731,17 +6739,56 @@ function builderFocusPoints(text) {
   if (/training data|knowledge work|domain-specific/.test(text)) {
     return "高价值训练数据为什么难拿，以及这会卡住哪些知识工作 agent";
   }
-  return "真实场景、落地边界和哪些做法可以直接复用";
+  if (/memory|trace|debug|incident/.test(text)) {
+    return "跨会话记忆、工具轨迹和生产事故排查";
+  }
+  if (/rollback|permission|auditable|unattended/.test(text)) {
+    return "无人值守工作流里的回滚、权限和审计";
+  }
+  if (/latency|routing|budget|policy/.test(text)) {
+    return "模型路由、预算、延迟和策略控制";
+  }
+  return "具体场景、约束条件和可复用做法";
 }
 
 function builderGenericEnglishSummary(text) {
   const normalized = String(text || "").replace(/\s+/g, " ").trim().toLowerCase();
+  if (/agent labs.*chinese model|chinese model use|multilingual propaganda|censorship eval/.test(normalized)) {
+    return "Swyx 观察到部分 agent 实验室会回避谈中国模型使用，但 Cog 团队把难点落到生产化：建立多语言宣传与审查 eval、在后训练里校正，并以较低成本提供约 1000 tok/s 的服务。";
+  }
+  if (/sushi and tacos|orders pile.*office|openai is cooking/.test(normalized)) {
+    return "Thibault Sottiaux 用 OpenAI 深夜办公室餐食打趣，暗示团队近期产品或模型节奏很紧；这只能当作社区气氛观察，不能替代官方发布。";
+  }
+  if (/all software native|platform affinity|uncompromising performance/.test(normalized)) {
+    return "Guillermo Rauch 认为 AI 会让软件更接近原生应用体验，重点是性能和平台贴合度，而不是只把网页界面换一层智能输入。";
+  }
+  if (/complex knowledge worker tasks|legal|professional services|healthcare|enterprise data|documents/.test(normalized)) {
+    return "Aaron Levie 认为新模型在法律、专业服务、医疗等复杂知识工作上进步明显，企业数据和文档工作流会因此出现更多可验证用例。";
+  }
+  if (/new in claude code:?\s*\/checkup|clean up unused skills|dedup.*claude\.md|slow hooks/.test(normalized)) {
+    return "Boris Cherny 介绍 Claude Code 的 /checkup：它会清理未使用的 skills、MCP、plugins 并保存上下文，对比本地与仓库版 CLAUDE.md 去重，把根目录 CLAUDE.md 拆成嵌套文件和 skills，关闭慢 hooks，更新 Claude Code，默认启用 auto mode，预批准常被拒绝的只读命令；执行任何改动前都会先确认。";
+  }
+  if (/single-player claude code|multi-player claude tag|monitor your channels|remembers what you told it/.test(normalized)) {
+    return "Cat Wu 预告 Claude Tag walkthrough，重点是从单人 Claude Code 走向团队协作：监控频道、主动执行任务、接受团队共同调度，并记住上周给过的上下文。";
+  }
+  if (/rewrites can be good, cheap and fast|bun|models will continue to get better/.test(normalized)) {
+    return "Thariq 认为模型会改变软件工程里对重写的判断：像 Bun 这样可测试、可验证的项目更容易受益，但多数应用还要补齐测试和验证条件。";
+  }
+  if (/comparing autonomous agents to hand-written code|compilers.*assembly/.test(normalized)) {
+    return "Amjad Masad 质疑继续把 autonomous agents 和手写代码逐项比较，类比编译器不再和工程师手写汇编竞争；他关注评价基准是否需要换一套。";
+  }
+  if (/agent stack clicking together|personal productivity agents/.test(normalized)) {
+    return "Guillermo Rauch 说 agent stack 的各部分开始拼到一起，并会支撑他的个人 productivity agents；重点是多组件协同是否真的能进入日常工作流。";
+  }
+  if (/grok .*cursor|try grok.*cursor|new era/.test(normalized)) {
+    return "Ryo Lu 提到 Grok 4.5 已可在 Cursor 中试用，重点是开发者能否直接比较它在编码、推理和交互体验上的表现。";
+  }
   const topic = builderTopicName(normalized);
   const focus = builderFocusPoints(normalized);
-  const sourceSignal = /eval|benchmark|trace|rollback|permission|policy|routing|memory|workflow|production|agent|model/.test(normalized)
-    ? "工程落地"
+  const angle = /eval|benchmark|trace|rollback|permission|policy|routing|memory|workflow|production|agent|model/.test(normalized)
+    ? "工程采用"
     : "产品判断";
-  return `原帖围绕${topic}给出一条${sourceSignal}线索，重点是${focus}；读者可把它作为 Builder/X 讨论信号，继续核对官方入口、可复现做法和失败边界。`;
+  return `这条 Builder 动态关注${topic}里的${focus}，更接近一条${angle}观点；后续需要用官方文档、代码入口或可复现实验确认。`;
 }
 
 function topicForCandidate(candidate) {

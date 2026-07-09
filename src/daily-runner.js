@@ -977,10 +977,8 @@ function buildAiRepairWorkflowStages({
 function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
   const tmp = (name) => `.tmp/${name}-${reportDate}.json`;
   const stages = [
-    pnpmStage("editorial_rank_artifact", [
-      "run",
-      "content:editorial-rank:build",
-      "--",
+    nodeStage("editorial_rank_artifact", [
+      "scripts/build-editorial-rank-artifact.mjs",
       "--input",
       candidatePoolPath(reportDate),
       "--source-date",
@@ -2377,11 +2375,15 @@ function pnpmStage(id, args) {
 }
 
 function nodeCliStage(id, args) {
+  return nodeStage(id, ["src/cli.js", ...args]);
+}
+
+function nodeStage(id, args) {
   return {
     id,
     command: {
       tool: "node",
-      args: ["src/cli.js", ...args]
+      args
     }
   };
 }

@@ -433,6 +433,90 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
   assert.equal(saved.artifact_sizes.html_path.bytes, Buffer.byteLength(reportHtml));
 });
 
+test("daily Codex production orchestrator runs no-publish execute as production dry-run", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-dry-run-"));
+  const reportDate = "2026-07-06";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const reportJsonPath = path.join(cleanRoot, "reports-data", "2026", "07", `${reportDate}.json`);
+  const candidatesJsonPath = path.join(cleanRoot, "reports-data", "internal", "candidates", "2026", "07", `${reportDate}.candidates.json`);
+  const reportHtmlPath = path.join(cleanRoot, "docs", "reports", "2026", "07", `${reportDate}.html`);
+  const docsDataJsonPath = path.join(cleanRoot, "docs", "data", "2026", "07", `${reportDate}.json`);
+  await fs.mkdir(path.dirname(reportJsonPath), { recursive: true });
+  await fs.mkdir(path.dirname(candidatesJsonPath), { recursive: true });
+  await fs.mkdir(path.dirname(reportHtmlPath), { recursive: true });
+  await fs.mkdir(path.dirname(docsDataJsonPath), { recursive: true });
+  await fs.writeFile(reportJsonPath, `${JSON.stringify({
+    report_date: reportDate,
+    quality_status: {
+      status: "ok",
+      degraded_sections: [],
+      blocking_issues: []
+    }
+  }, null, 2)}\n`, "utf8");
+  await fs.writeFile(candidatesJsonPath, "{\"candidates\":[]}\n", "utf8");
+  await fs.writeFile(reportHtmlPath, "<!doctype html><title>Dry run</title>\n", "utf8");
+  await fs.writeFile(docsDataJsonPath, "{}\n", "utf8");
+
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: false,
+    codexBin: "codex.cmd"
+  });
+  let seenPublishFlag = null;
+  const workflowRunner = async ({ publish, summaryPath }) => {
+    seenPublishFlag = publish;
+    const legacySummary = {
+      report_date: reportDate,
+      mode: "dry-run",
+      final_status: "generated_only",
+      next_action: { kind: "none" },
+      clean_repo_root: cleanRoot,
+      stages: [
+        { id: "report_write", status: "passed", updated_at: "2026-07-06T00:00:01.000Z" },
+        { id: "build", status: "passed", updated_at: "2026-07-06T00:00:03.000Z" },
+        { id: "quality_page_check", status: "passed", updated_at: "2026-07-06T00:00:06.000Z" },
+        { id: "validate", status: "passed", updated_at: "2026-07-06T00:00:10.000Z" },
+        { id: "publish_dry_run_daily", status: "passed", updated_at: "2026-07-06T00:00:15.000Z" }
+      ]
+    };
+    await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+    return { summary: legacySummary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+
+  assert.equal(seenPublishFlag, false);
+  assert.equal(summary.automation_pipeline_mode, "single_script_dag_orchestrator");
+  assert.equal(summary.mode, "dry-run");
+  assert.equal(summary.final_status, "generated_only");
+  assert.equal(summary.ok, true);
+  assert.equal(summary.publish_requested, false);
+  assert.equal(summary.execute_requested, true);
+  assert.equal(summary.structured_json_path, reportJsonPath);
+  assert.equal(summary.html_path, reportHtmlPath);
+  assert.equal(summary.docs_data_json_path, docsDataJsonPath);
+  assert.equal(summary.artifact_sizes.structured_json_path.exists, true);
+  assert.equal(summary.artifact_sizes.html_path.exists, true);
+  assert.equal(summary.publication.repo_pushed, false);
+  assert.equal(summary.publication.skipped_reason, "publish_stage_not_reached");
+  assert.deepEqual(summary.completed_stages.map((stage) => stage.id), [
+    "report_write",
+    "build",
+    "quality_page_check",
+    "validate",
+    "publish_dry_run_daily"
+  ]);
+
+  const saved = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
+  assert.equal(saved.mode, "dry-run");
+  assert.equal(saved.publish_requested, false);
+  assert.equal(saved.artifact_sizes.html_path.exists, true);
+});
+
 test("daily Codex production orchestrator preserves daily runner mode for AI repair resume", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-repair-mode-"));
   const reportDate = "2026-07-06";
@@ -477,11 +561,13 @@ test("daily Codex production orchestrator preserves daily runner mode for AI rep
   const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
 
   assert.equal(summary.final_status, "needs_ai_repair");
+  assert.equal(summary.ok, false);
   assert.equal(summary.mode, "publish");
   assert.equal(summary.automation_pipeline_mode, "single_script_dag_orchestrator");
   assert.equal(summary.next_action.contract_path, contractPath);
 
   const saved = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
+  assert.equal(saved.ok, false);
   assert.equal(saved.mode, "publish");
   assert.equal(saved.automation_pipeline_mode, "single_script_dag_orchestrator");
 });
