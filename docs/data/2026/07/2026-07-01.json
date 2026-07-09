@@ -377,7 +377,7 @@
     {
       "name": "calesthio/OpenMontage",
       "repo": "calesthio/OpenMontage",
-      "description": "OpenMontage 是开源的 agentic 视频生产系统，围绕 12 条 pipeline、52 个工具和多种 agent skill 组织剪辑、生成、配音与合成流程；适合关注 AI 视频生产链路的人看它如何把素材、脚本、模型服务和 ffmpeg/remotion 串起来。",
+      "description": "OpenMontage 是开源的 agentic 视频生产系统，围绕 12 条 pipeline、52 个工具和多种 agent skill 组织剪辑、生成、配音与合成流程；适合关注 AI 视频生产链路的人看它如何把素材、脚本、模型服务和 ffmpeg/remotion 串起来。评估时还要看素材输入、模型服务、渲染队列和长视频任务的失败恢复。",
       "readme_cache": {
         "key": "github-readme/calesthio/openmontage/main/unknown",
         "hit": true,
@@ -663,7 +663,7 @@
     {
       "name": "diegosouzapw/OmniRoute",
       "repo": "diegosouzapw/OmniRoute",
-      "description": "OmniRoute 是 AI gateway，提供统一 endpoint、模型供应商路由、token 压缩、fallback、MCP/A2A 和桌面/PWA 接入；适合工程团队评估多模型接入时的免费额度、自动降级、可靠性、隐私边界和与 Claude Code/Codex 等工具的兼容性。",
+      "description": "OmniRoute 是 AI gateway，提供统一 endpoint、模型供应商路由、token 压缩、fallback、MCP/A2A 和桌面/PWA 接入；适合工程团队评估多模型接入时的免费额度、自动降级、可靠性、隐私边界和与 Claude Code/Codex 等工具的兼容性。正式接入还要压测延迟、错误语义、账单透明度和密钥隔离。",
       "readme_cache": {
         "key": "github-readme/diegosouzapw/omniroute/main/unknown",
         "hit": true,
@@ -689,7 +689,7 @@
     {
       "name": "googleworkspace/cli",
       "repo": "googleworkspace/cli",
-      "description": "Google Workspace CLI 是用一条命令操作 Drive、Gmail、Calendar、Sheets、Docs、Chat、Admin 等服务的 Rust CLI，并带 AI agent skills；适合评估企业协作系统自动化时的 OAuth 权限、审计边界、批量操作能力和 agent 工具接入方式。",
+      "description": "Google Workspace CLI 是用一条命令操作 Drive、Gmail、Calendar、Sheets、Docs、Chat、Admin 等服务的 Rust CLI，并带 AI agent skills；适合评估企业协作系统自动化时的 OAuth 权限、审计边界、批量操作能力和 agent 工具接入方式。正式使用时还要设计最小权限、批量操作保护、日志留存和回滚流程。并能回滚。",
       "readme_cache": {
         "key": "github-readme/googleworkspace/cli/main/unknown",
         "hit": true,
@@ -767,7 +767,7 @@
     {
       "name": "google/agents-cli",
       "repo": "google/agents-cli",
-      "description": "agents-cli 是 Google Cloud 面向 AI agents 创建、评估和部署的 CLI 与 skills；适合团队评估 Agent Development Kit、云端部署、评测流程和 coding assistant 的技能化交付。",
+      "description": "agents-cli 是 Google Cloud 面向 AI agents 创建、评估和部署的 CLI 与 skills；适合团队评估 Agent Development Kit、云端部署、评测流程和 coding assistant 的技能化交付。它更像把 Google Cloud agent 生命周期产品化，重点在模板、评测、发布和权限配置能否标准化。还要看它与 IAM、Cloud Run 和评测流水线的配合集成细节。",
       "readme_cache": {
         "key": "github-readme/google/agents-cli/main/unknown",
         "hit": true,
