@@ -181,6 +181,18 @@ const MAIN_TARGET_MIN = 5;
 const MAIN_TARGET = STORY_TARGET;
 const MAIN_TARGET_MAX = STORY_TARGET_MAX;
 const MAIN_REFILL_WINDOW_DAYS = 3;
+const CANDIDATE_ROLE_VALUES = new Set([
+  "main_stream_candidate",
+  "github_trending",
+  "hot_blog",
+  "builder_signal",
+  "community_signal",
+  "official_update"
+]);
+const NON_MAIN_STREAM_AUDIT_REASONS = new Set([
+  "not_evaluated_section_item",
+  "retired_platform_lane"
+]);
 const GITHUB_TRENDING_TARGET = 20;
 const GITHUB_TRENDING_LANGUAGE_SCOPES = ["python", "typescript", "rust", "go", "java"];
 const HUGGINGFACE_TRENDING_TARGET = 10;
@@ -719,20 +731,84 @@ function isRepeatedTemplateHotBlogCopy(item) {
   return hits >= 2;
 }
 
+function normalizeCandidateRoles(roles) {
+  if (!Array.isArray(roles)) return [];
+  return uniqueValues(
+    roles
+      .map((role) => String(role || "").trim())
+      .filter((role) => CANDIDATE_ROLE_VALUES.has(role))
+  );
+}
+
+function shouldMarkMainStreamCandidateRole(candidate) {
+  if (candidate.included_in === "main_items" || candidate.category === "main_item") return true;
+  if (candidate.main_selection_stage) return true;
+  const rejectReason = String(candidate.main_reject_reason || "").trim();
+  return Boolean(rejectReason && !NON_MAIN_STREAM_AUDIT_REASONS.has(rejectReason));
+}
+
+function candidateAuditRoles(candidate) {
+  const roles = normalizeCandidateRoles(candidate.roles);
+  const category = candidate.category;
+  const includedIn = candidate.included_in;
+  const explicitSourceLevel = String(candidate.source_level || "").trim();
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  const sourceLevels = new Set([sourceLevel, explicitSourceLevel].filter(Boolean));
+  const sourceText = `${candidate.source_id || ""} ${candidate.source || ""} ${candidate.url || ""}`;
+
+  if (shouldMarkMainStreamCandidateRole(candidate)) roles.push("main_stream_candidate");
+  if (category === "github_trending" || includedIn === "github_trending" || sourceLevels.has("github") || /github trending/i.test(sourceText)) {
+    roles.push("github_trending");
+  }
+  if (category === "hot_blog" || includedIn === "hot_blogs") {
+    roles.push("hot_blog");
+  }
+  if (category === "builder_observation" || includedIn === "builder_observations") {
+    roles.push("builder_signal");
+  }
+  if (includedIn === "community_leads" || sourceLevels.has("community") || sourceLevels.has("community_api")) {
+    roles.push("community_signal");
+  }
+  if (
+    category === "model_release" ||
+    includedIn === "model_releases" ||
+    sourceLevels.has("official") ||
+    sourceLevels.has("official_company_news") ||
+    sourceLevels.has("official_open_source_account") ||
+    sourceLevels.has("official_model_host_account")
+  ) {
+    roles.push("official_update");
+  }
+
+  return normalizeCandidateRoles(roles);
+}
+
+function applyCandidateAuditRoles(candidate) {
+  const roles = candidateAuditRoles(candidate);
+  if (roles.length > 0) {
+    candidate.roles = roles;
+  } else {
+    delete candidate.roles;
+  }
+}
+
 function finalizeMainAudit(candidates) {
   for (const candidate of candidates) {
     if (isPlatformExemptCategory(candidate.category)) {
       candidate.status = "excluded";
       delete candidate.included_in;
       candidate.main_reject_reason = candidate.main_reject_reason || "retired_platform_lane";
+      applyCandidateAuditRoles(candidate);
       continue;
     }
     if (candidate.main_selection_stage || candidate.main_reject_reason) {
+      applyCandidateAuditRoles(candidate);
       continue;
     }
     candidate.main_reject_reason = candidate.included_in === "main_items"
       ? "selected_main_item"
       : "not_evaluated_section_item";
+    applyCandidateAuditRoles(candidate);
   }
   return candidates;
 }
@@ -2978,6 +3054,7 @@ function addCandidateSource(sourceMap, source, generatedAt) {
 function normalizeCandidate(rawCandidate, context) {
   const id = uniqueCandidateId(context.existing, rawCandidate.id || `${rawCandidate.source_id || rawCandidate.source}-${rawCandidate.title || rawCandidate.url}`);
   const sourceId = rawCandidate.source_id || sourceIdFromCandidate(rawCandidate);
+  const roles = normalizeCandidateRoles(rawCandidate.roles);
   if (!context.sourceMap.has(sourceId)) {
     addCandidateSource(context.sourceMap, {
       id: sourceId,
@@ -3015,6 +3092,7 @@ function normalizeCandidate(rawCandidate, context) {
     ...(Number.isInteger(Number(rawCandidate.likes)) ? { likes: Number(rawCandidate.likes) } : {}),
     ...(rawCandidate.task ? { task: trimText(rawCandidate.task, 80) } : {}),
     ...(Array.isArray(rawCandidate.tags) ? { tags: rawCandidate.tags.map((tag) => String(tag || "").trim()).filter(Boolean).slice(0, 8) } : {}),
+    ...(roles.length > 0 ? { roles } : {}),
     ...(rawCandidate.notes ? { notes: trimText(rawCandidate.notes, 400) } : {}),
     ...(rawCandidate.intermediary_url ? { intermediary_url: rawCandidate.intermediary_url } : {}),
     ...(rawCandidate.primary_url ? { primary_url: rawCandidate.primary_url } : {}),
