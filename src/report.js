@@ -32,9 +32,17 @@ import {
 } from "./platform-exempt.js";
 import { attachTrackingComponentSnapshots } from "./tracking-components.js";
 import { isTemplatedStoryTitle, normalizeStoryFirstReport, STORY_FIRST_MAX } from "./story-first.js";
+import { formatEditorialRankErrors, validateEditorialRankArtifact } from "./editorial-rank.js";
 
 const PUBLIC_PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source", "model_registry"]);
 const PUBLIC_NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified"]);
+const PRIVATE_EDITORIAL_RANK_FIELDS = [
+  "admission",
+  "demotion_reasons",
+  "editorial_rank",
+  "rank_policy",
+  "selection_reasons"
+];
 
 export async function writeReportDraft(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -49,6 +57,11 @@ export async function writeReportDraft(options = {}) {
     rootDir,
     reportDate,
     inputPath: options.candidatePoolPath
+  });
+  const editorialRankAdmission = await loadEditorialRankAdmission({
+    rootDir,
+    reportDate,
+    artifactPath: options.editorialRankArtifactPath
   });
   const automationRevision = options.automationRevision || (await buildAutomationRevision({ rootDir }));
   const sourceStatusUpdate = await prepareSourceStatusHistoryUpdate({
@@ -85,7 +98,74 @@ export async function writeReportDraft(options = {}) {
     report,
     path: target,
     candidatePoolPath,
-    sourceStatusHistoryPath
+    sourceStatusHistoryPath,
+    editorialRankAdmission
+  };
+}
+
+async function loadEditorialRankAdmission({ rootDir, reportDate, artifactPath }) {
+  if (!artifactPath) {
+    return null;
+  }
+  const resolvedPath = path.resolve(rootDir, artifactPath);
+  let artifact;
+  try {
+    artifact = JSON.parse(await fs.readFile(resolvedPath, "utf8"));
+  } catch (error) {
+    throw new PublisherError("editorial_rank_artifact_invalid", "Editorial rank artifact must be readable JSON.", {
+      artifact_path: artifactPath,
+      cause: error.message
+    });
+  }
+
+  const validation = validateEditorialRankArtifact(artifact, { rootDir });
+  if (!validation.valid) {
+    throw new PublisherError("editorial_rank_artifact_invalid", "Editorial rank artifact failed validation.", {
+      artifact_path: artifactPath,
+      errors: validation.errors,
+      error_summary: formatEditorialRankErrors(validation.errors)
+    });
+  }
+
+  const artifactDate = validation.value.source_window?.date;
+  if (artifactDate && artifactDate !== reportDate) {
+    throw new PublisherError("editorial_rank_artifact_date_mismatch", "Editorial rank artifact date does not match report date.", {
+      artifact_path: artifactPath,
+      artifact_date: artifactDate,
+      report_date: reportDate
+    });
+  }
+
+  return summarizeEditorialRankAdmission(validation.value, { artifactPath });
+}
+
+function summarizeEditorialRankAdmission(artifact, { artifactPath }) {
+  const laneCounts = {};
+  let todaySelectedCount = 0;
+  let mustReadCount = 0;
+
+  for (const item of Array.isArray(artifact.items) ? artifact.items : []) {
+    if (item?.admission?.today_selected?.selected) {
+      todaySelectedCount += 1;
+    }
+    if (item?.admission?.must_read?.selected) {
+      mustReadCount += 1;
+    }
+    for (const laneId of Array.isArray(item?.lane_ids) ? item.lane_ids : []) {
+      laneCounts[laneId] = (laneCounts[laneId] || 0) + 1;
+    }
+  }
+
+  return {
+    ok: true,
+    artifact_path: artifactPath,
+    policy_id: artifact.policy_id,
+    generated_at: artifact.generated_at,
+    source_window: artifact.source_window,
+    item_count: Array.isArray(artifact.items) ? artifact.items.length : 0,
+    today_selected_count: todaySelectedCount,
+    must_read_count: mustReadCount,
+    lane_counts: Object.fromEntries(Object.entries(laneCounts).sort(([left], [right]) => left.localeCompare(right)))
   };
 }
 
@@ -242,10 +322,18 @@ function stripPrivateDisclosureFields(report) {
         delete next.risk_note;
       }
       delete next.source_item_refs;
+      stripPrivateEditorialRankFields(next);
       return next;
     });
   }
+  stripPrivateEditorialRankFields(publicReport);
   return publicReport;
+}
+
+function stripPrivateEditorialRankFields(item) {
+  for (const field of PRIVATE_EDITORIAL_RANK_FIELDS) {
+    delete item[field];
+  }
 }
 
 function requiresPublicDisclosureFields(item = {}) {
