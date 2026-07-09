@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-08T04:24:21.689Z",
+  "generated_at": "2026-07-09T13:04:42.993Z",
   "window_days": 7,
   "source": {
-    "report_count": 48,
-    "date_from": "2026-07-02",
-    "date_to": "2026-07-08"
+    "report_count": 49,
+    "date_from": "2026-07-03",
+    "date_to": "2026-07-09"
   },
   "thresholds": {
     "watching": {
@@ -33,7 +33,7 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 29,
+      "occurrences": 21,
       "active_days": 6,
       "sections": [
         "builder_observations",
@@ -44,6 +44,7 @@
       ],
       "entities": [
         "Anthropic",
+        "AWS",
         "Claude Code",
         "Codex",
         "GitHub",
@@ -51,52 +52,51 @@
         "OpenAI"
       ],
       "dates": [
-        "2026-07-02",
         "2026-07-03",
         "2026-07-04",
         "2026-07-05",
         "2026-07-06",
-        "2026-07-08"
+        "2026-07-08",
+        "2026-07-09"
       ],
       "related_reports": [
-        "2026-07-02",
         "2026-07-03",
         "2026-07-04",
         "2026-07-05",
         "2026-07-06",
-        "2026-07-08"
+        "2026-07-08",
+        "2026-07-09"
       ]
     },
     {
       "id": "mcp",
       "label": "MCP",
       "status": "hot",
-      "occurrences": 12,
+      "occurrences": 9,
       "active_days": 5,
       "sections": [
+        "builder_observations",
         "github_trending",
         "main_items",
         "projects"
       ],
       "entities": [
         "Claude Code",
-        "Codex",
-        "GitHub",
-        "Google"
+        "GitHub"
       ],
       "dates": [
-        "2026-07-02",
         "2026-07-03",
         "2026-07-04",
         "2026-07-05",
-        "2026-07-06"
+        "2026-07-06",
+        "2026-07-09"
       ],
       "related_reports": [
-        "2026-07-02",
         "2026-07-03",
         "2026-07-04",
         "2026-07-05",
-        "2026-07-06"
+        "2026-07-06",
+        "2026-07-09"
       ]
     }
   ],
@@ -105,7 +105,7 @@
       "id": "coding-agent",
       "label": "coding agent",
       "status": "hot",
-      "occurrences": 29,
+      "occurrences": 21,
       "active_days": 6,
       "sections": [
         "builder_observations",
@@ -116,6 +116,7 @@
       ],
       "entities": [
         "Anthropic",
+        "AWS",
         "Claude Code",
         "Codex",
         "GitHub",
@@ -123,20 +124,20 @@
         "OpenAI"
       ],
       "dates": [
-        "2026-07-02",
         "2026-07-03",
         "2026-07-04",
         "2026-07-05",
         "2026-07-06",
-        "2026-07-08"
+        "2026-07-08",
+        "2026-07-09"
       ],
       "related_reports": [
-        "2026-07-02",
         "2026-07-03",
         "2026-07-04",
         "2026-07-05",
         "2026-07-06",
-        "2026-07-08"
+        "2026-07-08",
+        "2026-07-09"
       ],
       "public_visibility": "public"
     },
@@ -144,32 +145,31 @@
       "id": "mcp",
       "label": "MCP",
       "status": "hot",
-      "occurrences": 12,
+      "occurrences": 9,
       "active_days": 5,
       "sections": [
+        "builder_observations",
         "github_trending",
         "main_items",
         "projects"
       ],
       "entities": [
         "Claude Code",
-        "Codex",
-        "GitHub",
-        "Google"
+        "GitHub"
       ],
       "dates": [
-        "2026-07-02",
         "2026-07-03",
         "2026-07-04",
         "2026-07-05",
-        "2026-07-06"
+        "2026-07-06",
+        "2026-07-09"
       ],
       "related_reports": [
-        "2026-07-02",
         "2026-07-03",
         "2026-07-04",
         "2026-07-05",
-        "2026-07-06"
+        "2026-07-06",
+        "2026-07-09"
       ],
       "public_visibility": "public"
     }
@@ -194,7 +194,7 @@
     {
       "term": "github",
       "status": "candidate",
-      "occurrences": 187,
+      "occurrences": 188,
       "active_days": 6,
       "public_visibility": "internal",
       "display": false
@@ -202,7 +202,7 @@
     {
       "term": "week",
       "status": "candidate",
-      "occurrences": 185,
+      "occurrences": 184,
       "active_days": 6,
       "public_visibility": "internal",
       "display": false
@@ -2583,6 +2583,70 @@
                 "Anthropic",
                 "Claude Code",
                 "Codex",
+                "GitHub"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "2026-07-09": {
+      "main_items": [
+        {
+          "index": 7,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 21x/6d",
+              "window_days": 7,
+              "occurrences": 21,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        }
+      ],
+      "github_trending": [
+        {
+          "index": 5,
+          "tags": [
+            {
+              "topic_id": "coding-agent",
+              "label": "coding agent",
+              "status": "hot",
+              "text": "coding agent: 7d 21x/6d",
+              "window_days": 7,
+              "occurrences": 21,
+              "active_days": 6,
+              "entities": [
+                "Anthropic",
+                "AWS",
+                "Claude Code",
+                "Codex"
+              ]
+            }
+          ]
+        },
+        {
+          "index": 11,
+          "tags": [
+            {
+              "topic_id": "mcp",
+              "label": "MCP",
+              "status": "hot",
+              "text": "MCP: 7d 9x/5d",
+              "window_days": 7,
+              "occurrences": 9,
+              "active_days": 5,
+              "entities": [
+                "Claude Code",
                 "GitHub"
               ]
             }
