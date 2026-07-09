@@ -10,6 +10,12 @@ import {
   writeDailyPublishCorrectionRetrospective,
   writeDailyPublishRetrospective
 } from "./retrospectives.js";
+import {
+  FIRST_PASS_AUTHORING_CONTRACT,
+  FIRST_PASS_AUTHORING_INTENT,
+  FIRST_PASS_AUTHORING_PHASE,
+  annotateAuthoringTasks
+} from "./quality-loop.js";
 
 const execFileAsync = promisify(execFile);
 const DEFAULT_PUBLISH_MAX_REVIEW_REPAIR_LOOPS = 5;
@@ -1686,13 +1692,14 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
 
   const reviewRepairAttempt = Number(summary.review_repair_attempts || 0) + 1;
   summary.review_repair_attempts = reviewRepairAttempt;
-  const aiTasks = Array.isArray(review?.ai_review_tasks)
+  const aiTasks = annotateAuthoringTasks(Array.isArray(review?.ai_review_tasks)
     ? review.ai_review_tasks
     : Array.isArray(stageResult.output?.ai_review_tasks)
       ? stageResult.output.ai_review_tasks
-      : [];
+      : []);
   if (aiTasks.length > 0 && reviewRepairAttempt <= maxReviewRepairLoops) {
     const contractPath = aiRepairContractPath(summary.launcher_root, reportDate, reviewRepairAttempt);
+    const authoringHandoff = authoringHandoffMetadata(aiTasks);
     return {
       final_status: "needs_ai_repair",
       next_action: {
@@ -1704,10 +1711,13 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
         quality_review_path: absoluteCleanPath(summary.clean_repo_root, summary.quality_review_path || qualityReviewPath(reportDate)),
         max_review_repair_loops: maxReviewRepairLoops,
         remaining_review_repair_loops: maxReviewRepairLoops - reviewRepairAttempt,
+        ...authoringHandoff,
         ai_review_tasks: aiTasks,
         required_contract_status: "ready",
         required_contract_fields: ["schema_version", "report_date", "status", "edits"],
-        message: "Write the AI repair contract with status:\"ready\" and non-empty edits before resuming daily:run."
+        message: authoringHandoff.handoff_phase
+          ? "Author the public prose fields from source evidence, write the compatible AI repair contract with status:\"ready\" and non-empty edits, then resume daily:run."
+          : "Write the AI repair contract with status:\"ready\" and non-empty edits before resuming daily:run."
       }
     };
   }
@@ -1768,7 +1778,7 @@ async function classifyAiRepairReviewFailure(stageResult, {
   }
 
   const review = output.review && typeof output.review === "object" ? output.review : null;
-  const aiTasks = Array.isArray(review?.ai_review_tasks) ? review.ai_review_tasks : [];
+  const aiTasks = annotateAuthoringTasks(Array.isArray(review?.ai_review_tasks) ? review.ai_review_tasks : []);
   if (!review || review.ok === true || aiTasks.length === 0 || !aiTasks.every(isPublicEditorialRepairTask)) {
     return null;
   }
@@ -1809,6 +1819,7 @@ async function classifyAiRepairReviewFailure(stageResult, {
     aiTasks
   });
 
+  const authoringHandoff = authoringHandoffMetadata(aiTasks);
   return {
     final_status: "needs_ai_repair",
     next_action: {
@@ -1820,11 +1831,14 @@ async function classifyAiRepairReviewFailure(stageResult, {
       quality_review_path: absoluteCleanPath(summary.clean_repo_root, summary.quality_review_path || qualityReviewPath(reportDate)),
       max_review_repair_loops: maxReviewRepairLoops,
       remaining_review_repair_loops: maxReviewRepairLoops - nextAttempt.attempt,
+      ...authoringHandoff,
       ai_review_tasks: aiTasks,
       contract_status: "template",
       required_contract_status: "ready",
       required_contract_fields: ["schema_version", "report_date", "status", "edits"],
-      message: "Fill this template with public-text edits, set status:\"ready\", and resume daily:run."
+      message: authoringHandoff.handoff_phase
+        ? "Author the public prose fields from source evidence, fill this compatible AI repair template with edits, set status:\"ready\", and resume daily:run."
+        : "Fill this template with public-text edits, set status:\"ready\", and resume daily:run."
     }
   };
 }
@@ -1839,7 +1853,7 @@ function isPublicEditorialRepairTask(task) {
 // whole daily. Returns the degraded sections, or null when any residual issue is
 // not safely degradable (then the caller keeps the hard block).
 function residualEditorialDegradation(review) {
-  const tasks = Array.isArray(review?.ai_review_tasks) ? review.ai_review_tasks : [];
+  const tasks = annotateAuthoringTasks(Array.isArray(review?.ai_review_tasks) ? review.ai_review_tasks : []);
   if (tasks.length === 0 || !tasks.every(isPublicEditorialRepairTask)) {
     return null;
   }
@@ -1942,10 +1956,12 @@ async function nextAiRepairAttempt({ launcherRoot, reportDate, startAttempt, max
 }
 
 async function writeAiRepairContractTemplate(contractPath, { reportDate, review, aiTasks }) {
+  const authoringHandoff = authoringHandoffMetadata(aiTasks);
   const template = {
     schema_version: 1,
     report_date: reportDate,
     status: "template",
+    ...authoringHandoff,
     edits: [],
     review_issues: summarizeAiRepairReviewIssues(review, aiTasks),
     bad_examples: [
@@ -1974,6 +1990,16 @@ async function writeAiRepairContractTemplate(contractPath, { reportDate, review,
   });
 }
 
+function authoringHandoffMetadata(aiTasks) {
+  return (Array.isArray(aiTasks) ? aiTasks : []).some((task) => task?.phase === FIRST_PASS_AUTHORING_PHASE)
+    ? {
+        handoff_phase: FIRST_PASS_AUTHORING_PHASE,
+        handoff_intent: FIRST_PASS_AUTHORING_INTENT,
+        authoring_contract: FIRST_PASS_AUTHORING_CONTRACT
+      }
+    : {};
+}
+
 function summarizeAiRepairReviewIssues(review, aiTasks) {
   const taskByPath = new Map(
     aiTasks
@@ -1990,6 +2016,9 @@ function summarizeAiRepairReviewIssues(review, aiTasks) {
         path: String(issue?.path || ""),
         message: String(issue?.message || ""),
         task_kind: String(task?.kind || ""),
+        phase: String(task?.phase || ""),
+        intent: String(task?.intent || ""),
+        authoring_contract: String(task?.authoring_contract || ""),
         instruction: String(task?.instruction || "")
       };
     });
@@ -2000,6 +2029,9 @@ function summarizeAiRepairReviewIssues(review, aiTasks) {
     path: String(task?.path || ""),
     message: "",
     task_kind: String(task?.kind || ""),
+    phase: String(task?.phase || ""),
+    intent: String(task?.intent || ""),
+    authoring_contract: String(task?.authoring_contract || ""),
     instruction: String(task?.instruction || "")
   }));
 }

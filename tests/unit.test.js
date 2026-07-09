@@ -10547,6 +10547,9 @@ test("daily runner hands AI repair back to Codex with publish review budget", as
   assert.equal(result.summary.next_action.max_review_repair_loops, 5);
   assert.equal(result.summary.next_action.remaining_review_repair_loops, 4);
   assert.equal(result.summary.next_action.required_contract_status, "ready");
+  assert.equal("handoff_phase" in result.summary.next_action, false);
+  assert.equal(result.summary.next_action.ai_review_tasks[0].kind, "translation_fidelity");
+  assert.equal("phase" in result.summary.next_action.ai_review_tasks[0], false);
   assert.match(result.summary.next_action.contract_path, /quality-ai-repair-2026-06-04\.json$/);
   assert(!result.summary.stages.some((stage) => stage.id === "publish_real"));
 });
@@ -10584,6 +10587,11 @@ test("daily runner allows one AI repair loop in default dry-run mode", async () 
   assert.equal(result.summary.next_action.kind, "codex_ai_repair_contract");
   assert.equal(result.summary.next_action.max_review_repair_loops, 1);
   assert.equal(result.summary.next_action.remaining_review_repair_loops, 0);
+  assert.equal(result.summary.next_action.handoff_phase, "first_pass_authoring");
+  assert.equal(result.summary.next_action.handoff_intent, "source_grounded_public_authoring");
+  assert.equal(result.summary.next_action.authoring_contract, "public_prose_authoring_v1");
+  assert.equal(result.summary.next_action.ai_review_tasks[0].phase, "first_pass_authoring");
+  assert.equal(result.summary.next_action.ai_review_tasks[0].intent, "source_grounded_public_authoring");
 });
 
 test("daily runner degrades instead of blocking when only editorial residue remains after the loop budget", async () => {
@@ -10876,6 +10884,11 @@ test("daily runner creates a new empty AI repair template for public editorial r
   });
 
   const firstContractPath = first.summary.next_action.contract_path;
+  assert.equal(first.summary.next_action.handoff_phase, "first_pass_authoring");
+  assert.equal(first.summary.next_action.handoff_intent, "source_grounded_public_authoring");
+  assert.equal(first.summary.next_action.authoring_contract, "public_prose_authoring_v1");
+  assert.equal(first.summary.next_action.ai_review_tasks[0].phase, "first_pass_authoring");
+  assert.equal(first.summary.next_action.ai_review_tasks[0].authoring_contract, "public_prose_authoring_v1");
   await fs.mkdir(path.dirname(firstContractPath), { recursive: true });
   await fs.writeFile(firstContractPath, JSON.stringify({
     schema_version: 1,
@@ -10932,15 +10945,25 @@ test("daily runner creates a new empty AI repair template for public editorial r
   assert.match(resumed.summary.next_action.contract_path, /quality-ai-repair-2026-06-04-attempt-2\.json$/);
   assert.equal(resumed.summary.next_action.contract_status, "template");
   assert.equal(resumed.summary.next_action.required_contract_status, "ready");
+  assert.equal(resumed.summary.next_action.handoff_phase, "first_pass_authoring");
+  assert.equal(resumed.summary.next_action.handoff_intent, "source_grounded_public_authoring");
+  assert.equal(resumed.summary.next_action.authoring_contract, "public_prose_authoring_v1");
+  assert.equal(resumed.summary.next_action.ai_review_tasks[0].phase, "first_pass_authoring");
   assert.deepEqual(calls, ["quality_ai_repair"]);
 
   const template = JSON.parse(await fs.readFile(resumed.summary.next_action.contract_path, "utf8"));
   assert.equal(template.schema_version, 1);
   assert.equal(template.report_date, "2026-06-04");
   assert.equal(template.status, "template");
+  assert.equal(template.handoff_phase, "first_pass_authoring");
+  assert.equal(template.handoff_intent, "source_grounded_public_authoring");
+  assert.equal(template.authoring_contract, "public_prose_authoring_v1");
   assert.deepEqual(template.edits, []);
   assert.equal(template.review_issues[0].path, "hot_blogs[1].summary");
   assert.equal(template.review_issues[0].task_kind, "hot_blog_editorial_rewrite");
+  assert.equal(template.review_issues[0].phase, "first_pass_authoring");
+  assert.equal(template.review_issues[0].intent, "source_grounded_public_authoring");
+  assert.equal(template.review_issues[0].authoring_contract, "public_prose_authoring_v1");
   assert(template.bad_examples.some((example) => example.value.includes("价值在于")));
 });
 

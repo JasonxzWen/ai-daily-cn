@@ -55,6 +55,17 @@ const DEFAULT_HIGHLIGHT_LIMITS = {
   maxRatio: 0.35
 };
 
+const FIRST_PASS_AUTHORING_TASK_KINDS = new Set([
+  "public_editorial_rewrite",
+  "rewrite_autodraft_template",
+  "main_item_editorial_rewrite",
+  "hot_blog_editorial_rewrite",
+  "builder_translation_rewrite"
+]);
+export const FIRST_PASS_AUTHORING_PHASE = "first_pass_authoring";
+export const FIRST_PASS_AUTHORING_INTENT = "source_grounded_public_authoring";
+export const FIRST_PASS_AUTHORING_CONTRACT = "public_prose_authoring_v1";
+
 const AI_TONE_PHRASES = [
   "high-signal",
   "core signal",
@@ -224,17 +235,39 @@ export function reviewReportQuality(report, options = {}) {
   collectCandidatePoolIssues(report, candidatePool, issues, { autoDraft });
 
   const blockingIssues = issues.filter((issue) => issue.severity === "error");
+  const annotatedAiReviewTasks = annotateAuthoringTasks(aiReviewTasks);
   return {
     ok: blockingIssues.length === 0,
     status: blockingIssues.length > 0 ? "needs_repair" : "ok",
     report_date: report?.report_date || "",
-    checklist: buildChecklist(issues, aiReviewTasks, {
+    checklist: buildChecklist(issues, annotatedAiReviewTasks, {
       autoDraft,
       candidatePoolChecked: Boolean(candidatePool)
     }),
     issues,
-    ai_review_tasks: aiReviewTasks,
+    ai_review_tasks: annotatedAiReviewTasks,
     safe_repair_available: issues.some((issue) => issue.repairable === true)
+  };
+}
+
+export function annotateAuthoringTasks(tasks = []) {
+  return (Array.isArray(tasks) ? tasks : []).map((task) => annotateAuthoringTask(task));
+}
+
+export function annotateAuthoringTask(task = {}) {
+  if (!task || typeof task !== "object" || Array.isArray(task)) {
+    return task;
+  }
+  const kind = String(task.kind || "");
+  if (!FIRST_PASS_AUTHORING_TASK_KINDS.has(kind)) {
+    return task;
+  }
+  return {
+    ...task,
+    phase: FIRST_PASS_AUTHORING_PHASE,
+    intent: FIRST_PASS_AUTHORING_INTENT,
+    authoring_contract: FIRST_PASS_AUTHORING_CONTRACT,
+    requires_source_grounding: true
   };
 }
 
