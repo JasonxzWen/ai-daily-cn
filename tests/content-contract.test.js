@@ -52,6 +52,58 @@ test("content contract is clean for authored story narrative", () => {
   assert.equal(result.degraded.filter((d) => d.code === "story_template_narrative").length, 0);
 });
 
+test("GitHub Trending README failure keeps trend metadata", () => {
+  const languages = ["all", "Python", "TypeScript", "Rust", "Go", "Java"];
+  const reportDate = "2026-07-09";
+  const readmeSummary = "example/repo 是面向 AI 工程团队的开源项目，README 展示核心能力、安装入口、运行示例、集成边界和维护信号，适合先验证依赖、许可证、示例质量和团队接入成本后再进入试点。";
+  const githubEntry = (index, overrides = {}) => ({
+    repo: `example/github-metadata-${index}`,
+    name: `example/github-metadata-${index}`,
+    url: `https://github.com/example/github-metadata-${index}`,
+    event_date: reportDate,
+    source: `GitHub Trending ${languages[index % languages.length]} weekly`,
+    language: languages[index % languages.length],
+    window: "weekly",
+    rank: index + 1,
+    stars_this_week: 1000 - index,
+    trend: index === 0 ? "new" : "same",
+    readme_fetch_status: "ok",
+    readme_summary: readmeSummary,
+    ...overrides
+  });
+
+  const validReport = {
+    ...storyFixture("阿里云公布视频生成模型 HappyHorse 的新版本，提升人物动作表现力、跨帧生成一致性和整体画面质量。"),
+    report_date: reportDate,
+    github_trending: Array.from({ length: 20 }, (_unused, index) => githubEntry(index))
+  };
+  validReport.github_trending[0] = githubEntry(0, {
+    readme_fetch_status: "failed",
+    readme_error: "timeout",
+    stars_this_week: "1,000",
+    description: undefined,
+    readme_summary: undefined
+  });
+
+  const validResult = evaluateDailyContentContract(validReport);
+  assert.equal(
+    validResult.issues.some((issue) => issue.code === "github_trending_failed_readme_metadata_missing"),
+    false,
+    "failed README item with rank, star velocity, and trend should pass this gate"
+  );
+
+  const invalidReport = structuredClone(validReport);
+  delete invalidReport.github_trending[0].rank;
+  delete invalidReport.github_trending[0].stars_this_week;
+  delete invalidReport.github_trending[0].trend;
+  const invalidResult = evaluateDailyContentContract(invalidReport);
+  const issue = invalidResult.issues.find((item) => item.code === "github_trending_failed_readme_metadata_missing");
+
+  assert(issue, "missing rank/star/trend metadata on README failure must block");
+  assert.equal(issue.requirement, "REQ-006");
+  assert(issue.examples.includes("example/github-metadata-0"));
+});
+
 test("public copy gate blocks user-banned audit and AI-flavored wording from 2026-06-30", () => {
   const report = {
     ...storyFixture("OpenAI 披露模型能力更新，材料覆盖评测设置和候选池筛选。"),
