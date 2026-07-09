@@ -716,13 +716,18 @@ test("publish prepare-clean-worktree clones a dedicated main checkout without to
   assert.equal(result.repo_root, worktreeDir);
   assert.equal(result.remote_main_sha, "1111111111111111111111111111111111111111");
   assert.equal(result.cloned, true);
+  assert.equal(result.clone_reference_root, repoRoot);
   assert.equal(result.clean, true);
   assert.equal(result.dependency_status.required, false);
+  const cloneCall = calls.find((call) => call.args[0] === "clone");
+  assert.ok(cloneCall, "expected clean worktree clone command");
+  assert.deepEqual(cloneCall.args.slice(0, 4), ["clone", "--reference-if-able", repoRoot, "--dissociate"]);
+  assert.deepEqual(cloneCall.args.slice(-2), ["git@github.com:owner/repo.git", worktreeDir]);
   assert.deepEqual(
     calls.map((call) => call.args.slice(0, 2).join(" ")),
     [
       "ls-remote git@github.com:owner/repo.git",
-      "clone --branch",
+      "clone --reference-if-able",
       "rev-parse --abbrev-ref",
       "rev-parse HEAD",
       "status --porcelain"
