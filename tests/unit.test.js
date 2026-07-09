@@ -16354,6 +16354,60 @@ test("report:draft builds deduped stories as the canonical main list", async () 
   assert.equal(snapshot.selected, drafted.report.stories.length);
 });
 
+test("report:draft records story cluster merge audit fields", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-story-cluster-audit-"));
+  const reportDate = "2026-06-23";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const primary = storyContractCandidate(reportDate, 201, {
+    id: "story-audit-primary",
+    storyKey: "agent-runtime-audit",
+    claimFingerprint: "agent-runtime-audit",
+    source: "Example AI News",
+    title: "Example AI launches agent runtime for enterprise teams",
+    url: "https://example.com/story-audit/primary",
+    evidence: "Example AI describes an agent runtime launch with deployment controls, tool permissions, workflow reliability, enterprise rollout boundaries, and migration guidance."
+  });
+  const supporting = storyContractCandidate(reportDate, 202, {
+    id: "story-audit-supporting",
+    storyKey: "agent-runtime-audit",
+    claimFingerprint: "agent-runtime-audit",
+    source: "Example Engineering Blog",
+    title: "Engineering blog details the same agent runtime launch",
+    url: "https://example.com/story-audit/supporting",
+    evidence: "The engineering blog gives additional details about the same agent runtime launch, including permission boundaries, trace capture, rollout sequencing, and operational safeguards."
+  });
+  const controls = Array.from({ length: 7 }, (_unused, index) =>
+    storyContractCandidate(reportDate, index + 1)
+  );
+  const discovery = discoveryEnvelope({
+    candidates: [primary, supporting, ...controls],
+    sourceNames: ["Example AI News", "Example Engineering Blog"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const primaryAudit = drafted.candidatePool.candidates.find((candidate) => candidate.id === primary.id);
+  const supportingAudit = drafted.candidatePool.candidates.find((candidate) => candidate.id === supporting.id);
+  assert(primaryAudit, "primary candidate must stay in the candidate pool");
+  assert(supportingAudit, "supporting candidate must stay in the candidate pool");
+  assert.equal(primaryAudit.main_story_role, "primary");
+  assert.equal(supportingAudit.main_story_role, "supporting");
+  assert.equal(primaryAudit.main_story_id, supportingAudit.main_story_id);
+  assert.equal(primaryAudit.main_story_primary_id, primaryAudit.id);
+  assert.equal(supportingAudit.main_story_primary_id, primaryAudit.id);
+
+  const story = drafted.report.stories.find((item) => item.story_id === primaryAudit.main_story_id);
+  assert(story, "cluster audit story id must point to a generated public story");
+  assert.equal(story.sources.length, 2, "merged story should preserve both public sources");
+});
+
 test("report:draft rejects templated story titles instead of filling to eight", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-story-template-reject-"));
   const reportDate = "2026-06-23";

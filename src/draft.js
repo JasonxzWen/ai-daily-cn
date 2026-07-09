@@ -508,6 +508,7 @@ function selectReportItems(merged, options = {}) {
       existing: [...includedCandidates, ...derived]
     });
     mainCandidate.id = uniqueCandidateId([...includedCandidates, ...derived], storyIdForCluster(cluster));
+    markStoryClusterAudit(cluster, mainCandidate.id);
     derived.push(mainCandidate);
     for (const sourceCandidate of cluster.candidates) {
       selectedIds.add(sourceCandidate.id);
@@ -3150,6 +3151,15 @@ function explicitStoryKey(candidate) {
 
 function storyClusterUrls(cluster) {
   return uniqueValues(cluster.candidates.map((candidate) => normalizeUrl(candidate?.url)).filter(Boolean));
+}
+
+function markStoryClusterAudit(cluster, storyId) {
+  const primaryId = String(cluster?.primary?.id || "").trim() || storyId;
+  for (const candidate of Array.isArray(cluster?.candidates) ? cluster.candidates : []) {
+    candidate.main_story_id = storyId;
+    candidate.main_story_primary_id = primaryId;
+    candidate.main_story_role = String(candidate?.id || "").trim() === primaryId ? "primary" : "supporting";
+  }
 }
 
 function storyIdForCluster(cluster) {

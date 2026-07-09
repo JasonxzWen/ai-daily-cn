@@ -245,6 +245,17 @@
         "main_selection_stage": {
           "enum": ["strict", "refill"]
         },
+        "main_story_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "main_story_role": {
+          "enum": ["primary", "supporting"]
+        },
+        "main_story_primary_id": {
+          "type": "string",
+          "minLength": 1
+        },
         "evidence": {
           "type": "string"
         },
