@@ -43,6 +43,32 @@ const PRIVATE_EDITORIAL_RANK_FIELDS = [
   "rank_policy",
   "selection_reasons"
 ];
+const EDITORIAL_SELECTION_TARGETS = [
+  {
+    key: "today_selected",
+    sourceKey: "today_selected_items",
+    maxItems: 20
+  },
+  {
+    key: "must_read",
+    sourceKey: "must_read_items",
+    maxItems: 8
+  }
+];
+const EDITORIAL_SELECTION_SECTIONS = [
+  "stories",
+  "main_items",
+  "github_trending",
+  "huggingface_trending",
+  "model_releases",
+  "hot_blogs",
+  "chinese_media_dynamics",
+  "daily_tracking",
+  "projects",
+  "builder_observations",
+  "official_org_updates",
+  "community_leads"
+];
 
 export async function writeReportDraft(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -73,7 +99,7 @@ export async function writeReportDraft(options = {}) {
     days: options.sourceStatusWindowDays || 10
   });
   const draftWithSourceSuggestions = appendSourceStatusSuggestionsToDraft(draft, sourceStatusUpdate);
-  const report = normalizeReportDraft(draftWithSourceSuggestions, {
+  let report = normalizeReportDraft(draftWithSourceSuggestions, {
     reportDate,
     siteUrl: options.siteUrl || DEFAULT_SITE.siteUrl,
     generatedAt: options.generatedAt,
@@ -82,6 +108,8 @@ export async function writeReportDraft(options = {}) {
     rootDir
   });
   requireEditorialRankAdmission(report, editorialRankAdmissionContext);
+  applyEditorialSelection(report, editorialRankAdmissionContext);
+  report = requireReportSchemaForWrite(report);
   await requireFreshReport(report, {
     historyDir: outputDir,
     historyDays: options.historyDays,
@@ -142,11 +170,12 @@ async function loadEditorialRankAdmission({ rootDir, reportDate, artifactPath })
 
 function buildEditorialRankAdmissionContext(artifact, { artifactPath }) {
   const itemsBySourceId = new Map();
+  const items = Array.isArray(artifact.items) ? artifact.items : [];
   const laneCounts = {};
   let todaySelectedCount = 0;
   let mustReadCount = 0;
 
-  for (const item of Array.isArray(artifact.items) ? artifact.items : []) {
+  for (const item of items) {
     if (item?.source_id) {
       itemsBySourceId.set(item.source_id, item);
     }
@@ -168,12 +197,33 @@ function buildEditorialRankAdmissionContext(artifact, { artifactPath }) {
       policy_id: artifact.policy_id,
       generated_at: artifact.generated_at,
       source_window: artifact.source_window,
-      item_count: Array.isArray(artifact.items) ? artifact.items.length : 0,
+      item_count: items.length,
       today_selected_count: todaySelectedCount,
       must_read_count: mustReadCount,
-      lane_counts: Object.fromEntries(Object.entries(laneCounts).sort(([left], [right]) => left.localeCompare(right)))
+      lane_counts: Object.fromEntries(Object.entries(laneCounts).sort(([left], [right]) => left.localeCompare(right))),
+      today_selected_items: projectAdmissionItems(items, "today_selected"),
+      must_read_items: projectAdmissionItems(items, "must_read")
     },
     itemsBySourceId
+  };
+}
+
+function projectAdmissionItems(items, target) {
+  return items
+    .filter((item) => item?.admission?.[target]?.selected)
+    .sort((left, right) => (left.editorial_rank || 0) - (right.editorial_rank || 0))
+    .map(projectAdmissionItem);
+}
+
+function projectAdmissionItem(item) {
+  return {
+    source_id: item.source_id,
+    title: item.title,
+    lane_ids: Array.isArray(item.lane_ids) ? [...item.lane_ids] : [],
+    topic_ids: Array.isArray(item.topic_ids) ? [...item.topic_ids] : [],
+    entity_ids: Array.isArray(item.entity_ids) ? [...item.entity_ids] : [],
+    event_type: item.event_type,
+    verification_status: item.verification_status
   };
 }
 
@@ -210,10 +260,133 @@ function requireEditorialRankAdmission(report, context) {
   }
 }
 
+function applyEditorialSelection(report, context) {
+  delete report.editorial_selection;
+  if (!context?.summary) {
+    return report;
+  }
+
+  const reportItemsByCandidateId = buildReportSelectionIndex(report);
+  const editorialSelection = {
+    schema_version: 1
+  };
+  let matchedCount = 0;
+
+  for (const target of EDITORIAL_SELECTION_TARGETS) {
+    const seenCandidateIds = new Set();
+    const items = [];
+    const projectedItems = Array.isArray(context.summary[target.sourceKey]) ? context.summary[target.sourceKey] : [];
+    for (const projectedItem of projectedItems) {
+      const candidateId = publicString(projectedItem?.source_id);
+      if (!candidateId || seenCandidateIds.has(candidateId)) {
+        continue;
+      }
+      const matched = reportItemsByCandidateId.get(candidateId);
+      if (!matched) {
+        continue;
+      }
+      seenCandidateIds.add(candidateId);
+      items.push(projectEditorialSelectionItem(matched, projectedItem, candidateId));
+    }
+    editorialSelection[target.key] = {
+      target: target.key,
+      max_items: target.maxItems,
+      items
+    };
+    matchedCount += items.length;
+  }
+
+  if (matchedCount > 0) {
+    report.editorial_selection = editorialSelection;
+  }
+  return report;
+}
+
+function buildReportSelectionIndex(report) {
+  const itemsByCandidateId = new Map();
+  for (const section of EDITORIAL_SELECTION_SECTIONS) {
+    const items = Array.isArray(report?.[section]) ? report[section] : [];
+    for (const item of items) {
+      for (const candidateId of reportItemCandidateIds(item)) {
+        if (!itemsByCandidateId.has(candidateId)) {
+          itemsByCandidateId.set(candidateId, { section, item });
+        }
+      }
+    }
+  }
+  return itemsByCandidateId;
+}
+
+function projectEditorialSelectionItem(matched, projectedItem, candidateId) {
+  const item = matched.item || {};
+  const firstSource = Array.isArray(item.sources) ? item.sources.find((source) => source && typeof source === "object") : null;
+  const projected = {
+    candidate_id: candidateId,
+    title: firstPublicString(item.title, item.headline, item.name, item.repo, projectedItem?.title, candidateId),
+    section: matched.section
+  };
+  addPublicString(projected, "url", item.url, firstSource?.url);
+  addPublicString(
+    projected,
+    "source",
+    item.source,
+    item.publisher,
+    item.author,
+    item.repo,
+    item.name,
+    firstSource?.label,
+    item.primary_entity
+  );
+  addPublicString(
+    projected,
+    "summary",
+    item.summary,
+    item.description,
+    item.what_happened,
+    item.why_it_matters,
+    item.content,
+    item.evidence
+  );
+  addPublicString(projected, "event_type", item.event_type, projectedItem?.event_type);
+  addPublicString(projected, "verification_status", item.verification_status);
+  return projected;
+}
+
+function requireReportSchemaForWrite(report) {
+  const validation = validateReport(report);
+  if (!validation.valid) {
+    throw new PublisherError("schema_validation_failed", "Report failed schema validation before write.", {
+      errors: validation.errors
+    });
+  }
+  return validation.value;
+}
+
 function reportItemCandidateIds(item = {}) {
-  return [item.candidate_id, item.source_id, item.id]
+  return [
+    item.candidate_id,
+    item.source_id,
+    item.id,
+    item.story_id,
+    ...(Array.isArray(item.source_item_refs) ? item.source_item_refs : [])
+  ]
     .map((value) => (typeof value === "string" ? value.trim() : ""))
     .filter(Boolean);
+}
+
+function firstPublicString(...values) {
+  return values.map(publicString).find(Boolean) || "";
+}
+
+function addPublicString(target, key, ...values) {
+  const value = firstPublicString(...values);
+  if (value) {
+    target[key] = value;
+  }
+}
+
+function publicString(value) {
+  return typeof value === "string" ? value.trim() : "";
 }
 
 function selectedAdmissionBlockingReasons(rankedItem = {}) {
