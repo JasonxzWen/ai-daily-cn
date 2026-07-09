@@ -91,7 +91,7 @@ export function normalizeGithubReadmeSummary(value, repo = "", maxChars = DEFAUL
 }
 
 function isLegacyGithubSummary(value) {
-  return /README\s*主要围绕|阅读时先看|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时|README\s*显示核心能力|读者应先确认|适合先从/u.test(String(value || ""));
+  return /README\s*主要围绕|阅读时先看|README 将该仓库定位为|核心能力集中在|它的价值在于|具体阅读时|README\s*显示核心能力|读者应先确认|适合先从|公开描述指向|关键词包括|正式采用前还要核对\s*README|核对\s*README|复现门槛|适合先验证/u.test(String(value || ""));
 }
 
 function parseLegacyGithubSummary(value) {
@@ -121,6 +121,24 @@ function parseLegacyGithubSummary(value) {
       subject: generated[3] || "",
       deliverables: generated[4] || "",
       checkpoints: generated[5] || ""
+    };
+  }
+  const publicTemplate = text.match(/^(?:(.*?)\s+)?公开描述指向(.+?)，关键词包括(.+?)。/u);
+  if (publicTemplate) {
+    return {
+      label: publicTemplate[1] || "",
+      subject: publicTemplate[3] || publicTemplate[2] || "",
+      deliverables: ZH.readmeUsage,
+      checkpoints: ZH.defaultChecks
+    };
+  }
+  const capabilityTemplate = text.match(/^(?:(.*?)\s+)?(?:是)?(?:面向|服务于|主要用于)(.+?)，核心能力(?:包括|是)(.+?)。/u);
+  if (capabilityTemplate) {
+    return {
+      label: capabilityTemplate[1] || "",
+      subject: capabilityTemplate[3] || capabilityTemplate[2] || "",
+      deliverables: ZH.readmeUsage,
+      checkpoints: ZH.defaultChecks
     };
   }
   return {
