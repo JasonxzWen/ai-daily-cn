@@ -1971,7 +1971,27 @@ function githubTrendingItem(candidate, meta, index) {
   const readmeError = String(meta.readme_error || candidate.readme_error || "").trim();
   const topics = publicGithubTopics(meta.topics || candidate.topics);
   const license = String(meta.license || candidate.license || "").trim();
-  const stargazersTotal = nonNegativeInteger(meta.stargazers_total ?? candidate.stargazers_total);
+  const starsToday = firstNonNegativeInteger(
+    meta.stars_today,
+    candidate.stars_today,
+    meta.daily_stars,
+    candidate.daily_stars,
+    meta.daily_star_delta,
+    candidate.daily_star_delta
+  );
+  const starsThisWeek = firstNonNegativeInteger(
+    meta.stars_this_week,
+    candidate.stars_this_week,
+    meta.weekly_stars,
+    candidate.weekly_stars,
+    meta.star_growth,
+    candidate.star_growth,
+    meta.weekly_star_delta,
+    candidate.weekly_star_delta
+  );
+  const stargazersTotal = firstNonNegativeInteger(meta.stargazers_total, candidate.stargazers_total);
+  const previousRank = positiveInteger(meta.previous_rank ?? candidate.previous_rank);
+  const rankDelta = integerOrNull(meta.rank_delta ?? candidate.rank_delta);
   const pushedAt = String(meta.pushed_at || candidate.pushed_at || "").trim();
   const description = readmeSummary;
   return {
@@ -1985,6 +2005,8 @@ function githubTrendingItem(candidate, meta, index) {
     ...(readmeError ? { readme_error: readmeError } : {}),
     ...(topics.length > 0 ? { topics } : {}),
     ...(license ? { license } : {}),
+    ...(starsToday !== null ? { stars_today: starsToday } : {}),
+    ...(starsThisWeek !== null ? { stars_this_week: starsThisWeek } : {}),
     ...(stargazersTotal !== null ? { stargazers_total: stargazersTotal } : {}),
     ...(pushedAt ? { pushed_at: pushedAt } : {}),
     url: candidate.url,
@@ -1995,8 +2017,8 @@ function githubTrendingItem(candidate, meta, index) {
     rank: index + 1,
     source_rank: rankOf(meta, index + 1),
     source_scope: githubTrendingSourceScope(candidate, meta),
-    previous_rank: Number.isInteger(meta.previous_rank) ? meta.previous_rank : null,
-    rank_delta: Number.isInteger(meta.rank_delta) ? meta.rank_delta : null,
+    previous_rank: previousRank,
+    rank_delta: rankDelta,
     trend: ["new", "up", "down", "same"].includes(meta.trend || candidate.trend) ? (meta.trend || candidate.trend) : "new",
     evidence: candidate.evidence || meta.evidence || `${repo} appeared in GitHub Trending.`
   };
@@ -2013,8 +2035,37 @@ function publicGithubTopics(value) {
 }
 
 function nonNegativeInteger(value) {
-  const number = Number(value);
+  const number = integerOrNull(value);
   return Number.isInteger(number) && number >= 0 ? number : null;
+}
+
+function positiveInteger(value) {
+  const number = integerOrNull(value);
+  return Number.isInteger(number) && number > 0 ? number : null;
+}
+
+function firstNonNegativeInteger(...values) {
+  for (const value of values) {
+    const number = nonNegativeInteger(value);
+    if (number !== null) {
+      return number;
+    }
+  }
+  return null;
+}
+
+function integerOrNull(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+  if (typeof value === "number") {
+    return Number.isInteger(value) ? value : null;
+  }
+  const normalized = String(value).trim().replace(/,/g, "");
+  if (!/^-?\d+$/.test(normalized)) {
+    return null;
+  }
+  return Number(normalized);
 }
 
 function huggingFaceTrendingItem(candidate, index) {
