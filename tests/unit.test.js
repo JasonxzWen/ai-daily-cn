@@ -8773,6 +8773,7 @@ test("daily resilience policy validates current runner stages and workflow gates
     "editorial_rank_artifact",
     "report_write",
     "quality_page_check",
+    "content_contract",
     "publish_real",
     "pages_verify"
   ]) {
@@ -9648,6 +9649,77 @@ test("daily runner ignores incidental remote ahead text from failed stage stdout
   assert.notEqual(result.summary.next_action.kind, "restart_latest_main");
   assert.equal(result.summary.next_action.kind, "inspect_stage_failure");
   assert.equal(result.summary.next_action.stage_id, "validate");
+});
+
+test("daily runner routes post-write content contract failures back to AI repair", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-content-contract-repair-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const reportDate = "2026-06-04";
+  const reportPath = path.join(cleanRoot, "reports-data", "2026", "06", `${reportDate}.json`);
+  const calls = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate,
+    publish: true,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1212121212121212121212121212121212121212"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage.id);
+      if (stage.id === "quality_review") {
+        return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
+      }
+      if (stage.id === "report_write") {
+        await fs.mkdir(path.dirname(reportPath), { recursive: true });
+        await fs.writeFile(reportPath, JSON.stringify({
+          report_date: reportDate,
+          summary: "今日 AI 主线。",
+          main_items: [],
+          hot_blogs: [
+            {
+              title: "Google Keyword调整开发者 agent 工作流",
+              summary:
+                "Google Keyword调整开发者 agent 工作流，重点落在任务编排、上下文、权限控制、工程集成和失败恢复。更有价值的信息是agent 工作流、开发工具入口、权限控制和工程集成，判断这类方案时还要看实际效果要看权限模型、评估回放、团队流程和可观测性。文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。"
+            }
+          ],
+          builder_observations: []
+        }, null, 2), "utf8");
+        return { ok: true, output: { stage: stage.id } };
+      }
+      if (stage.id === "content_contract") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            blocking: true,
+            issues: [
+              {
+                code: "hot_blog_summary_contract_failed",
+                requirement: "REQ-008",
+                section: "hot_blogs",
+                message: "Public hot blogs need only a 100-200 Chinese-character article summary plus source, not low-information filler."
+              }
+            ]
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "needs_ai_repair");
+  assert.equal(result.summary.next_action.kind, "codex_ai_repair_contract");
+  assert.equal(result.summary.next_action.source_report_path, reportPath);
+  assert.equal(result.summary.next_action.ai_review_tasks[0].kind, "hot_blog_editorial_rewrite");
+  assert.equal(result.summary.next_action.ai_review_tasks[0].path, "hot_blogs[0].summary");
+  assert(calls.includes("content_contract"), "content contract stage must run before validate");
+  assert(!calls.includes("validate"), "validate must wait until content-contract repair is complete");
+  const contentStage = result.summary.stages.find((stage) => stage.id === "content_contract");
+  assert.equal(contentStage.status, "failed");
 });
 
 test("daily runner retries clean worktree preparation according to resilience policy", async () => {
@@ -10829,6 +10901,7 @@ test("daily runner resumes from AI repair contract and continues with optimized 
     "report_write",
     "build",
     "quality_page_check",
+    "content_contract",
     "validate",
     "sources_phase5_audit",
     "publish_dry_run_daily",

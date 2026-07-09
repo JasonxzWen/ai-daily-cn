@@ -44,7 +44,12 @@ const PUBLIC_COPY_BANNED_TERMS = [
   "published this intermediary lead entry",
   "This is an intermediary/self-media lead",
   "This is an intermediary/self-media le",
-  "trace it to a primary source"
+  "trace it to a primary source",
+  "更有价值的信息是",
+  "判断这类方案时还要看",
+  "文章梳理一个 AI 产品",
+  "文章拆解 agent",
+  "读者还要查看原文"
 ];
 const PUBLIC_COPY_BANNED_PATTERN = new RegExp(PUBLIC_COPY_BANNED_TERMS.map(escapeRegex).join("|"), "i");
 const PUBLIC_COPY_GATE_START_DATE = "2026-07-01";
@@ -102,8 +107,10 @@ const MAIN_ITEM_REPORT_WRITE_MIN_CHARS = 70;
 const BUILDER_TRANSLATION_MIN_CHINESE_CHARS = 10;
 const BUILDER_TRANSLATION_MIN_CHINESE_RATIO = 0.35;
 const MAIN_ITEM_GENERIC_TEMPLATE_RE = /(?:重点看|如果你在评估新工具|值不值得试|何时接入|风险放在哪|决策信号)/u;
+const MAIN_ITEM_CONTENT_CONTRACT_FILLER_RE = /(?:当前公开的是|这会影响(?:研发|产品)?团队是否|这会影响(?:研发|产品)?团队判断|可核对事实包括|公开材料仍需|读者可核对|后续观察|信息较为有限)/u;
 const PUBLIC_TITLE_MAX_LATIN_CHARS = 24;
 const HOT_BLOG_TEMPLATE_RE = /(?:\u8fd9\u7bc7\u6587\u7ae0\u7684\u770b\u70b9\u4e0d\u662f|\u4e0d\u662f\u5355\u4e2a\u6280\u672f\u540d\u8bcd|\u8bfb\u8005\u53ef\u4ee5\u91cd\u70b9\u770b|\u5bf9\u975e\s*AI\s*\u76f4\u63a5\u4ece\u4e1a\u8005|\u4ef7\u503c\u5728\u4e8e)/iu;
+const HOT_BLOG_CONTENT_CONTRACT_FILLER_RE = /(?:更有价值的信息是|判断这类方案时还要看|文章梳理一个\s*AI\s*产品|文章拆解\s*agent|读者还要查看原文)/iu;
 const HOT_BLOG_COVERAGE_PATTERNS = [
   /(?:\u6587\u7ae0|\u535a\u5ba2|\u4f5c\u8005|\u539f\u6587|\u5b83).{0,32}(?:\u8bb2|\u68b3\u7406|\u8bf4\u660e|\u5206\u6790|\u62c6\u89e3|\u5c55\u793a|\u56f4\u7ed5|\u9a8c\u8bc1|\u5c55\u5f00)/u,
   /(?:\u4f9d\u636e|\u8bc1\u636e|\u65b9\u6cd5|\u5b9e\u9a8c|\u6848\u4f8b|\u4ee3\u7801|\u63a5\u53e3|\u6570\u636e|\u5bf9\u6bd4|\u9650\u5236|\u6743\u9650|\u5931\u8d25|\u6d41\u7a0b|\u95e8\u69db|\u8fb9\u754c)/u,
@@ -853,7 +860,7 @@ function collectMainItemLanguageIssues(item, index, issues, aiReviewTasks) {
     const maxLatinChars = entry.maxLatinChars || MAIN_ITEM_MAX_LATIN_CHARS;
     const ratioBase = chineseChars + latinChars;
     const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 1;
-    if (MAIN_ITEM_GENERIC_TEMPLATE_RE.test(plain)) {
+    if (MAIN_ITEM_GENERIC_TEMPLATE_RE.test(plain) || MAIN_ITEM_CONTENT_CONTRACT_FILLER_RE.test(plain)) {
       issues.push({
         code: "main_item_template_bullet",
         severity: "error",
@@ -1035,7 +1042,8 @@ function hotBlogPublicPoints(summary) {
 }
 
 function looksLikeTemplatedHotBlogSummary(value) {
-  return HOT_BLOG_TEMPLATE_RE.test(String(value || ""));
+  const text = String(value || "");
+  return HOT_BLOG_TEMPLATE_RE.test(text) || HOT_BLOG_CONTENT_CONTRACT_FILLER_RE.test(text);
 }
 
 function lacksHotBlogEditorialCoverage(value) {

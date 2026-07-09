@@ -1699,31 +1699,31 @@ function mainItemScopeBulletText(candidate, category) {
 function mainItemScopeFactText(candidate, category) {
   const text = candidateText(candidate);
   if (/whatsapp.*spyware|spyware.*whatsapp|nso/i.test(text)) {
-    return "当前公开的是攻击归因、拦截动作和受影响对象描述，完整受害面尚未说明";
+    return "公开细节集中在攻击归因、拦截动作和受影响对象描述，完整受害面尚未说明";
   }
   if (/sovereign ai|london tech week|ai maker, not an ai taker/i.test(text)) {
-    return "当前公开的是基础设施路线、合作方口径和英国本地落地节奏";
+    return "公开细节集中在基础设施路线、合作方口径和英国本地落地节奏";
   }
   if (category === "company_business") {
     return "公开信息包括投入方向、合作节奏、组织动作、执行安排和后续资源配置";
   }
   if (category === "product_radar") {
-    return "当前公开的是产品入口、适用对象、价格地区限制、权限要求和后续上线节奏";
+    return "公开细节覆盖产品入口、适用对象、价格地区限制、权限要求和后续上线节奏";
   }
   if (category === "open_source") {
-    return "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界";
+    return "公开细节覆盖代码接口、许可证、维护节奏、集成门槛和团队可复用边界";
   }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
-    return "当前公开的是试用入口、样例质量、版权边界、价格信息和生产可用范围";
+    return "公开细节覆盖试用入口、样例质量、版权边界、价格信息和生产可用范围";
   }
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
-    return "当前公开的是部署方式、权限、上下文管理和失败恢复边界";
+    return "公开细节覆盖部署方式、权限、上下文管理和失败恢复边界";
   }
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
-    return "当前公开的是实验设置、数据范围、对比基线、复现材料和作者承认的限制";
+    return "公开细节覆盖实验设置、数据范围、对比基线、复现材料和作者承认的限制";
   }
   if (/policy|safety|governance|regulation|security/i.test(text)) {
-    return "当前公开的是生效范围、执行主体、例外条款、落地安排和责任边界";
+    return "公开细节覆盖生效范围、执行主体、例外条款、落地安排和责任边界";
   }
   return "公开信息包括适用对象、证据来源、执行安排、后续时间表和风险边界";
 }
@@ -1769,10 +1769,10 @@ function mainItemDecisionSentence(candidate, category) {
     return "这会改变产品和采购团队安排试用、预算审批、替换工具和风险复盘的优先级";
   }
   if (category === "open_source") {
-    return "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划";
+    return "研发团队需要据此决定是否进入 PoC、评估清单、现有工作流或长期维护计划";
   }
   if (category === "content_aigc" || AIGC_RE.test(text)) {
-    return "这会影响内容团队判断创作工具能否进入正式生产流程、预算清单和版权审查";
+    return "内容团队需要据此判断创作工具能否进入正式生产流程、预算清单和版权审查";
   }
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
     return "研发团队需要据此排序 agent 工具接入、权限设计、评估回放和落地成本";
@@ -5131,10 +5131,10 @@ function englishPublicSignal(candidate) {
   const profile = englishSignalProfile(text);
   const headline = `${actor}${profile.verb}${profile.topic}`;
   const summary = `${actor}${profile.verb}${profile.topic}，重点包括${profile.scope}，使用前提是${profile.boundary}`;
-  const detail = `${profile.topic}对应${profile.scope}，可核对事实包括${profile.factFocus}`;
+  const detail = `${profile.topic}对应${profile.scope}，事实线索集中在${profile.factFocus}`;
   const points = [
     `核心变化围绕${profile.topic}，范围包括${profile.scope}`,
-    `可核对信息包括${profile.factFocus}`,
+    `事实线索包括${profile.factFocus}`,
     `使用前提是${profile.boundary}`
   ];
   return { headline, summary, detail, points };
@@ -5333,7 +5333,7 @@ function englishSignalProfile(text) {
     verb: "整理",
     topic: "公开产品或工程信息",
     scope: "标题、适用场景、访问条件、限制说明和后续链接",
-    boundary: "读者还要查看原文中的访问条件、地区范围、价格和使用限制",
+    boundary: "访问条件、地区范围、价格和使用限制决定可采用性",
     factFocus: "标题、适用场景、访问条件和限制说明"
   };
 }
@@ -6449,7 +6449,7 @@ function hotBlogEvidenceDrivenSummary(candidate) {
   if (!profile) {
     return "";
   }
-  return `${actor}${profile.verb}${profile.topic}，重点落在${profile.scope}。更有价值的信息是${profile.factFocus}，判断这类方案时还要看${profile.boundary}。`;
+  return `${actor}${profile.verb}${profile.topic}。原文说明${profile.scope}，并列出方法、数据或限制：${profile.factFocus}。适用边界是${profile.boundary}。`;
 }
 
 function hotBlogEvidenceDrivenPoints(candidate) {
@@ -6499,18 +6499,18 @@ function hotBlogFallbackPoint(candidate, index) {
 function hotBlogClaimForCandidate(candidate) {
   const text = candidateText(candidate);
   if (/agent|workflow|mcp|tool|developer|coding|codex|copilot|cursor/i.test(text)) {
-    return "文章拆解 agent、开发工具或自动化流程里的任务规划、权限、上下文、工具调用和失败恢复";
+    return "原文把 agent、开发工具或自动化流程拆成任务规划、权限、上下文、工具调用和失败恢复几类问题";
   }
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
-    return "文章梳理模型评测或研究结论怎样改变能力边界、成本预期和可靠性判断";
+    return "原文说明模型评测或研究结论怎样改变能力边界、成本预期和可靠性判断";
   }
   if (/policy|safety|governance|regulation|security/i.test(text)) {
-    return "文章说明安全、治理或平台规则会怎样变成团队需要执行的产品和上线约束";
+    return "原文说明安全、治理或平台规则会怎样变成团队需要执行的产品和上线约束";
   }
   if (AIGC_RE.test(text)) {
-    return "文章分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界";
+    return "原文分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界";
   }
-  return "文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点";
+  return "原文围绕 AI 产品、平台或工程实践的具体变化展开，并给出可核对的功能或案例线索";
 }
 
 function hotBlogEvidenceForCandidate(candidate) {

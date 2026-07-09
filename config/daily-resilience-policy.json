@@ -225,6 +225,16 @@
       "replay_fixtures": ["page-check-promptlayer-layout", "page-check-broad-official-snapshot"]
     },
     {
+      "id": "content_contract",
+      "description": "Run the post-write public content contract before full repository validation.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "ai_repair_contract", "action": "route_repairable_public_copy_failures_to_ai_repair_loop" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "unrecoverable_schema", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "issue_count", "repair_task_count", "error_code"],
+      "replay_fixtures": ["content-contract-public-copy-repair"]
+    },
+    {
       "id": "validate",
       "description": "Run repository validation before any publish attempt.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },

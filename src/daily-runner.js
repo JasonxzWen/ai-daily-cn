@@ -14,7 +14,8 @@ import {
   FIRST_PASS_AUTHORING_CONTRACT,
   FIRST_PASS_AUTHORING_INTENT,
   FIRST_PASS_AUTHORING_PHASE,
-  annotateAuthoringTasks
+  annotateAuthoringTasks,
+  reviewReportQuality
 } from "./quality-loop.js";
 
 const execFileAsync = promisify(execFile);
@@ -586,6 +587,34 @@ async function runPostQualityStages({
       await writeSummary(summaryPath, summary);
       continue;
     }
+    if (stage.id === "content_contract" && !outcome.blocked && !outcome.normalized.ok) {
+      const repairDecision = await classifyContentContractRepairResult(outcome.normalized, {
+        summary,
+        reportDate,
+        maxReviewRepairLoops: context.maxReviewRepairLoops,
+        reportPath: reportDataPath(reportDate)
+      });
+      if (repairDecision?.degrade) {
+        markStageDegraded(summary, stage.id, repairDecision);
+        await annotateReportDegraded(absoluteCleanPath(summary.clean_repo_root, reportDataPath(reportDate)), repairDecision);
+        await writeSummary(summaryPath, summary);
+        continue;
+      }
+      if (repairDecision) {
+        summary.final_status = repairDecision.final_status;
+        summary.next_action = repairDecision.next_action;
+        await writeSummary(summaryPath, summary);
+        return { summary, summaryPath };
+      }
+      summary.final_status = "blocked";
+      summary.next_action = {
+        kind: "inspect_stage_failure",
+        stage_id: stage.id,
+        summary_path: summaryPath
+      };
+      await writeSummary(summaryPath, summary);
+      return { summary, summaryPath };
+    }
     if (publish && stage.id === "publish_real" && (outcome.blocked || !outcome.normalized.ok)) {
       const fallbackStage = buildPublishFallbackStage(reportDate);
       const fallbackOutcome = await runAndRecordStage({ stage: fallbackStage, context, summary, runStage, now });
@@ -1003,6 +1032,14 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       "docs",
       tmp("page-check")
     ]),
+    nodeStage("content_contract", [
+      "scripts/check-daily-content-contract.mjs",
+      "--report",
+      reportDataPath(reportDate),
+      "--html",
+      reportHtmlPath(reportDate),
+      "--json"
+    ], { parse_json_failure: true }),
     pnpmStage("validate", ["run", "validate"]),
     pnpmStage("sources_phase5_audit", [
       "run",
@@ -1661,16 +1698,32 @@ function stageAttemptOutput({ output, attempts, retryAttempts }) {
 
 async function defaultRunStage(stage, context) {
   const command = resolveStageCommand(stage);
-  const { stdout, stderr } = await execFileAsync(command.file, command.args, {
-    cwd: context.cleanRoot,
-    env: mergeCommandEnv(command.env),
-    timeout: stage.timeout_ms || 20 * 60 * 1000,
-    maxBuffer: 50 * 1024 * 1024
-  });
-  return {
-    ok: true,
-    output: parseJsonOutput(stdout) || { stdout: trimOutput(stdout), stderr: trimOutput(stderr) }
-  };
+  try {
+    const { stdout, stderr } = await execFileAsync(command.file, command.args, {
+      cwd: context.cleanRoot,
+      env: mergeCommandEnv(command.env),
+      timeout: stage.timeout_ms || 20 * 60 * 1000,
+      maxBuffer: 50 * 1024 * 1024
+    });
+    return {
+      ok: true,
+      output: parseJsonOutput(stdout) || { stdout: trimOutput(stdout), stderr: trimOutput(stderr) }
+    };
+  } catch (error) {
+    if (stage.parse_json_failure) {
+      const parsed = parseJsonOutput(error.stdout);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return {
+          ok: false,
+          output: {
+            ...parsed,
+            ...(error.stderr ? { stderr: trimOutput(error.stderr) } : {})
+          }
+        };
+      }
+    }
+    throw error;
+  }
 }
 
 function classifyQualityReviewResult(stageResult, { summary, reportDate, maxReviewRepairLoops, reportPath }) {
@@ -1838,6 +1891,138 @@ async function classifyAiRepairReviewFailure(stageResult, {
         ? "Author the public prose fields from source evidence, fill this compatible AI repair template with edits, set status:\"ready\", and resume daily:run."
         : "Fill this template with public-text edits, set status:\"ready\", and resume daily:run."
     }
+  };
+}
+
+async function classifyContentContractRepairResult(stageResult, {
+  summary,
+  reportDate,
+  maxReviewRepairLoops,
+  reportPath
+}) {
+  const output = stageResult.output || {};
+  const contractIssues = collectContentContractIssues(output);
+  if (stageResult.ok || output.ok === true || contractIssues.length === 0) {
+    return null;
+  }
+
+  const absoluteReportPath = absoluteCleanPath(summary.clean_repo_root, reportPath);
+  const report = await readJsonIfExists(absoluteReportPath);
+  if (!report || typeof report !== "object") {
+    return null;
+  }
+
+  const candidatePool = await readJsonIfExists(
+    absoluteCleanPath(summary.clean_repo_root, summary.candidate_pool_path || candidatePoolPath(reportDate))
+  );
+  const qualityReview = reviewReportQuality(report, {
+    ...(candidatePool ? { candidatePool } : {})
+  });
+  const matchingTasks = annotateAuthoringTasks(
+    (Array.isArray(qualityReview.ai_review_tasks) ? qualityReview.ai_review_tasks : [])
+      .filter((task) => contentContractIssueMatchesTask(contractIssues, task))
+  );
+  if (matchingTasks.length === 0) {
+    return null;
+  }
+
+  const matchingIssues = (Array.isArray(qualityReview.issues) ? qualityReview.issues : [])
+    .filter((issue) => contentContractIssueMatchesPath(contractIssues, issue?.path));
+  const review = {
+    ...qualityReview,
+    ok: false,
+    status: "content_contract_failed",
+    report_date: reportDate,
+    issues: matchingIssues.length > 0
+      ? matchingIssues
+      : contractIssues.map(contentContractIssueToQualityIssue),
+    ai_review_tasks: matchingTasks,
+    safe_repair_available: true,
+    content_contract: {
+      issues: contractIssues,
+      summary: output.summary || {}
+    }
+  };
+
+  summary.current_report_path = reportPath;
+  return classifyQualityReviewResult({ ok: false, output: { review } }, {
+    summary,
+    reportDate,
+    maxReviewRepairLoops,
+    reportPath
+  });
+}
+
+function collectContentContractIssues(output) {
+  const issues = [];
+  if (Array.isArray(output?.issues)) {
+    issues.push(...output.issues);
+  }
+  if (Array.isArray(output?.reports)) {
+    for (const report of output.reports) {
+      if (Array.isArray(report?.issues)) {
+        issues.push(...report.issues);
+      }
+    }
+  }
+  return issues.filter((issue) => issue && typeof issue === "object");
+}
+
+function contentContractIssueMatchesTask(issues, task) {
+  if (!task?.path) return false;
+  return issues.some((issue) => contentContractIssueMatchesPath([issue], task.path, task));
+}
+
+function contentContractIssueMatchesPath(issues, pathName, task = null) {
+  const text = String(pathName || "");
+  if (!text) return false;
+  return issues.some((issue) => {
+    const explicitPaths = contentContractIssuePaths(issue);
+    if (explicitPaths.has(text)) return true;
+    const sections = contentContractIssueSections(issue);
+    if ([...sections].some((section) => sectionPathMatches(section, text))) return true;
+    if (sections.has("public_copy") && isPublicEditorialRepairTask(task)) return true;
+    return false;
+  });
+}
+
+function contentContractIssuePaths(issue) {
+  const paths = new Set();
+  if (issue?.path) paths.add(String(issue.path));
+  if (Array.isArray(issue?.examples)) {
+    for (const example of issue.examples) {
+      if (example && typeof example === "object" && example.path) {
+        paths.add(String(example.path));
+      }
+    }
+  }
+  return paths;
+}
+
+function contentContractIssueSections(issue) {
+  const sections = new Set();
+  const section = String(issue?.section || "");
+  if (section) sections.add(section);
+  const code = String(issue?.code || "");
+  if (/main_news|main_item/i.test(code)) sections.add("main_items");
+  if (/hot_blog/i.test(code)) sections.add("hot_blogs");
+  if (/public_copy/i.test(code)) sections.add("public_copy");
+  return sections;
+}
+
+function sectionPathMatches(section, pathName) {
+  if (!section || section === "public_copy") return false;
+  return pathName === section || pathName.startsWith(`${section}.`) || pathName.startsWith(`${section}[`);
+}
+
+function contentContractIssueToQualityIssue(issue) {
+  const explicitPath = [...contentContractIssuePaths(issue)][0] || String(issue?.section || "content_contract");
+  return {
+    code: String(issue?.code || "content_contract_failed"),
+    severity: "error",
+    path: explicitPath,
+    message: String(issue?.message || "Daily content contract failed."),
+    repairable: true
   };
 }
 
@@ -2126,6 +2311,16 @@ function editorialRankArtifactPath(reportDate) {
   return `reports-data/${year}/${month}/internal/editorial-rank-${reportDate}.json`;
 }
 
+function reportDataPath(reportDate) {
+  const [year, month] = String(reportDate).split("-");
+  return `reports-data/${year}/${month}/${reportDate}.json`;
+}
+
+function reportHtmlPath(reportDate) {
+  const [year, month] = String(reportDate).split("-");
+  return `docs/reports/${year}/${month}/${reportDate}.html`;
+}
+
 function qualityReviewPath(reportDate) {
   return `.tmp/quality-review-${reportDate}.json`;
 }
@@ -2378,9 +2573,10 @@ function nodeCliStage(id, args) {
   return nodeStage(id, ["src/cli.js", ...args]);
 }
 
-function nodeStage(id, args) {
+function nodeStage(id, args, options = {}) {
   return {
     id,
+    ...options,
     command: {
       tool: "node",
       args

@@ -223,3 +223,55 @@ test("review flags deterministic boilerplate why_it_matters (价值/信号集中
   assert.equal(tasks.length, 2, "both boilerplate why_it_matters must route to authoring, got: " + JSON.stringify(review.ai_review_tasks));
   tasks.forEach(assertFirstPassAuthoringTask);
 });
+
+test("review routes content-contract hot blog filler to editorial repair", () => {
+  const report = {
+    report_date: "2026-07-09",
+    summary: "今日 AI 主线。",
+    main_items: [],
+    hot_blogs: [
+      {
+        title: "Google Keyword调整开发者 agent 工作流",
+        summary:
+          "Google Keyword调整开发者 agent 工作流，重点落在任务编排、上下文、权限控制、工程集成和失败恢复。更有价值的信息是agent 工作流、开发工具入口、权限控制和工程集成，判断这类方案时还要看实际效果要看权限模型、评估回放、团队流程和可观测性。文章梳理一个 AI 产品、平台或工程实践的具体变化，而不是只给观点。"
+      }
+    ],
+    builder_observations: []
+  };
+
+  const review = reviewReportQuality(report);
+  const tasks = review.ai_review_tasks.filter(
+    (task) => task.kind === "hot_blog_editorial_rewrite" && task.path === "hot_blogs[0].summary"
+  );
+  assert.equal(tasks.length, 1, "content-contract hot blog filler must route to repair: " + JSON.stringify(review));
+  assert(review.issues.some((issue) => issue.code === "hot_blog_summary_template"));
+  tasks.forEach(assertFirstPassAuthoringTask);
+});
+
+test("review routes content-contract main item filler bullets to editorial repair", () => {
+  const report = {
+    report_date: "2026-07-09",
+    summary: "今日 AI 主线。",
+    main_items: [
+      {
+        title: "Microsoft介绍 agent 与开发者工具能力",
+        summary: "微软研究院调整开发者 agent 工作流，重点包括任务编排、上下文、权限控制、工程集成和失败恢复。",
+        bullets: [
+          "**Microsoft介绍 agent 与开发者工具能力**：开发者 agent 工作流对应任务编排、上下文、权限控制、工程集成和失败恢复，可核对事实包括agent 工作流、开发工具入口、权限控制和工程集成。",
+          "当前公开的是代码接口、许可证、维护节奏、集成门槛和团队可复用边界。",
+          "这会影响研发团队是否把它放进 PoC、评估清单、现有工作流或长期维护计划。"
+        ]
+      }
+    ],
+    hot_blogs: [],
+    builder_observations: []
+  };
+
+  const review = reviewReportQuality(report);
+  const tasks = review.ai_review_tasks.filter(
+    (task) => task.kind === "main_item_editorial_rewrite" && /^main_items\[0\]\.bullets\[\d+\]$/.test(task.path)
+  );
+  assert(tasks.length >= 2, "content-contract main item filler bullets must route to repair: " + JSON.stringify(review));
+  assert(review.issues.some((issue) => issue.code === "main_item_template_bullet"));
+  tasks.forEach(assertFirstPassAuthoringTask);
+});
