@@ -23,6 +23,7 @@ import { normalizeOfficialComponentSnapshot } from "./official-component-snapsho
 import { normalizeStoryFirstReport } from "./story-first.js";
 import { buildSourceEffectivenessTable } from "./source-effectiveness.js";
 import { createPublicDegradationEvent } from "./degradation-events.js";
+import { normalizeGithubReadmeSummary } from "./github-readme.js";
 
 const REQUIRED_AUDIT_GROUPS = [
   "github_trending",
@@ -1895,7 +1896,10 @@ function uniqueEditorialSentences(items) {
 
 function githubTrendingItem(candidate, meta, index) {
   const repo = meta.repo || repoFromUrl(candidate.url) || candidate.title;
-  const readmeSummary = String(meta.readme_summary || candidate.readme_summary || candidate.github_readme_summary || "").trim();
+  const readmeSummary = normalizeGithubReadmeSummary(
+    meta.readme_summary || candidate.readme_summary || candidate.github_readme_summary || "",
+    repo
+  );
   const readmeCache = meta.readme_cache || candidate.readme_cache || null;
   const readmeFetchStatus = String(meta.readme_fetch_status || candidate.readme_fetch_status || meta.readme_status || candidate.readme_status || "").trim();
   const readmeError = String(meta.readme_error || candidate.readme_error || "").trim();
@@ -1955,7 +1959,15 @@ function huggingFaceTrendingItem(candidate, index) {
 
 function projectItem(candidate, meta) {
   const repo = meta.repo || repoFromUrl(candidate.url) || candidate.title;
-  const readmeSummary = String(meta.readme_summary || candidate.readme_summary || candidate.github_readme_summary || "").trim();
+  const readmeSummary = normalizeGithubReadmeSummary(
+    meta.readme_summary || candidate.readme_summary || candidate.github_readme_summary || "",
+    repo
+  );
+  const safeMeta = {
+    ...meta,
+    readme_summary: readmeSummary,
+    description: readmeSummary || meta.description
+  };
   return {
     name: repo,
     candidate_id: candidate.id,
@@ -1965,7 +1977,7 @@ function projectItem(candidate, meta) {
     description: readmeSummary || chineseGithubDescription(meta.description || candidate.evidence || repo, repo),
     ...(readmeSummary ? { readme_summary: readmeSummary } : {}),
     domains: projectDomains(meta.description || candidate.title || ""),
-    use_case: githubProjectUseCase(candidate, meta, repo),
+    use_case: githubProjectUseCase(candidate, safeMeta, repo),
     url: candidate.url,
     event_date: candidate.event_date,
     source: candidate.source || "GitHub Trending",

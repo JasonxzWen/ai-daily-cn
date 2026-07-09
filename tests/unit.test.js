@@ -24135,6 +24135,7 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   const repo = "example/agent-workbench";
   const sha = "0123456789abcdef";
   const key = githubReadmeCacheKey({ repo, defaultBranch: "main", sha });
+  const bannedReadmePublicTemplate = /README 将|主要围绕|阅读时先看|它的价值在于|具体阅读时|README 显示|读者应先|优先核对|适合先|准入|复现门槛|面向\s*agent 工作流和自动化工程|核心能力是|沉淀为代码、示例和集成入口|方便和同类方案做功能与工程成本比较|测试或评估资产/;
   assert.equal(key, "github-readme/example/agent-workbench/main/0123456789abcdef");
 
   const summary = summarizeGithubReadme({
@@ -24150,8 +24151,8 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   });
   assert(summary.length >= 80, summary);
   assert(summary.length <= 130, summary);
-  assert.doesNotMatch(summary, /README 将|主要围绕|阅读时先看|它的价值在于|具体阅读时|README 显示|读者应先|优先核对|适合先|准入|复现门槛/);
-  assert.match(summary, /agent-workbench 是面向/);
+  assert.doesNotMatch(summary, bannedReadmePublicTemplate);
+  assert.match(summary, /agent-workbench 是服务于/);
   assert.match(summary, /包含|覆盖|提供/);
   assert.match(summary, /Agent 构建|评测|调试|工具调用/);
   assert.doesNotMatch(summary, /[A-Za-z](?:[A-Za-z0-9 ,;:'"()[\]/.!?+~#-]){45,}/);
@@ -24167,6 +24168,7 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   });
   assert(securitySummary.length >= 80, securitySummary);
   assert.doesNotMatch(securitySummary, /SkillSpector Security scanner for AI agent skills/i);
+  assert.doesNotMatch(securitySummary, bannedReadmePublicTemplate);
   assert.doesNotMatch(securitySummary, /[A-Za-z](?:[A-Za-z0-9 ,;:'"()[\]/.!?+~#-]){45,}/);
 
   const item = applyGithubReadmeSummary(
@@ -24185,7 +24187,7 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
   );
   assert(item.description.startsWith(summary));
   assert(item.readme_summary.startsWith(summary));
-  assert.doesNotMatch(item.readme_summary, /README 显示|读者应先|优先核对|适合先|准入|复现门槛/);
+  assert.doesNotMatch(item.readme_summary, bannedReadmePublicTemplate);
   assert.equal(item.readme_cache.key, key);
   assert.equal(item.readme_cache.hit, true);
   assert.equal(item.readme_cache.sha, sha);
@@ -24197,8 +24199,8 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
     }
   );
   assert.doesNotMatch(legacyItem.readme_summary, /主要围绕|阅读时先看/);
-  assert.doesNotMatch(legacyItem.readme_summary, /README 显示|读者应先|优先核对|适合先|准入|复现门槛/);
-  assert.match(legacyItem.readme_summary, /agent-workbench 是面向|Agent 构建/);
+  assert.doesNotMatch(legacyItem.readme_summary, bannedReadmePublicTemplate);
+  assert.match(legacyItem.readme_summary, /agent-workbench 是服务于|Agent 构建|主要能力包括/);
 });
 
 test("GitHub README public summaries clamp on sentence boundaries", () => {
