@@ -58,7 +58,7 @@ export async function writeReportDraft(options = {}) {
     reportDate,
     inputPath: options.candidatePoolPath
   });
-  const editorialRankAdmission = await loadEditorialRankAdmission({
+  const editorialRankAdmissionContext = await loadEditorialRankAdmission({
     rootDir,
     reportDate,
     artifactPath: options.editorialRankArtifactPath
@@ -81,6 +81,7 @@ export async function writeReportDraft(options = {}) {
     automationRevision,
     rootDir
   });
+  requireEditorialRankAdmission(report, editorialRankAdmissionContext);
   await requireFreshReport(report, {
     historyDir: outputDir,
     historyDays: options.historyDays,
@@ -99,7 +100,7 @@ export async function writeReportDraft(options = {}) {
     path: target,
     candidatePoolPath,
     sourceStatusHistoryPath,
-    editorialRankAdmission
+    editorialRankAdmission: editorialRankAdmissionContext?.summary || null
   };
 }
 
@@ -136,15 +137,19 @@ async function loadEditorialRankAdmission({ rootDir, reportDate, artifactPath })
     });
   }
 
-  return summarizeEditorialRankAdmission(validation.value, { artifactPath });
+  return buildEditorialRankAdmissionContext(validation.value, { artifactPath });
 }
 
-function summarizeEditorialRankAdmission(artifact, { artifactPath }) {
+function buildEditorialRankAdmissionContext(artifact, { artifactPath }) {
+  const itemsBySourceId = new Map();
   const laneCounts = {};
   let todaySelectedCount = 0;
   let mustReadCount = 0;
 
   for (const item of Array.isArray(artifact.items) ? artifact.items : []) {
+    if (item?.source_id) {
+      itemsBySourceId.set(item.source_id, item);
+    }
     if (item?.admission?.today_selected?.selected) {
       todaySelectedCount += 1;
     }
@@ -157,16 +162,75 @@ function summarizeEditorialRankAdmission(artifact, { artifactPath }) {
   }
 
   return {
-    ok: true,
-    artifact_path: artifactPath,
-    policy_id: artifact.policy_id,
-    generated_at: artifact.generated_at,
-    source_window: artifact.source_window,
-    item_count: Array.isArray(artifact.items) ? artifact.items.length : 0,
-    today_selected_count: todaySelectedCount,
-    must_read_count: mustReadCount,
-    lane_counts: Object.fromEntries(Object.entries(laneCounts).sort(([left], [right]) => left.localeCompare(right)))
+    summary: {
+      ok: true,
+      artifact_path: artifactPath,
+      policy_id: artifact.policy_id,
+      generated_at: artifact.generated_at,
+      source_window: artifact.source_window,
+      item_count: Array.isArray(artifact.items) ? artifact.items.length : 0,
+      today_selected_count: todaySelectedCount,
+      must_read_count: mustReadCount,
+      lane_counts: Object.fromEntries(Object.entries(laneCounts).sort(([left], [right]) => left.localeCompare(right)))
+    },
+    itemsBySourceId
   };
+}
+
+function requireEditorialRankAdmission(report, context) {
+  if (!context) {
+    return;
+  }
+  const issues = [];
+  for (const sectionName of ["stories", "main_items"]) {
+    const items = Array.isArray(report?.[sectionName]) ? report[sectionName] : [];
+    for (const item of items) {
+      const candidateIds = reportItemCandidateIds(item);
+      const rankedItem = candidateIds.map((candidateId) => context.itemsBySourceId.get(candidateId)).find(Boolean);
+      if (!rankedItem) {
+        continue;
+      }
+      const demotionReasons = selectedAdmissionBlockingReasons(rankedItem);
+      if (demotionReasons.length === 0) {
+        continue;
+      }
+      issues.push({
+        section: sectionName,
+        candidate_id: candidateIds[0],
+        title: item?.title || item?.headline || "",
+        demotion_reasons: demotionReasons
+      });
+    }
+  }
+  if (issues.length > 0) {
+    throw new PublisherError("editorial_rank_admission_blocked", "Report includes rank-blocked mainline items.", {
+      artifact_path: context.summary.artifact_path,
+      issues
+    });
+  }
+}
+
+function reportItemCandidateIds(item = {}) {
+  return [item.candidate_id, item.source_id, item.id]
+    .map((value) => (typeof value === "string" ? value.trim() : ""))
+    .filter(Boolean);
+}
+
+function selectedAdmissionBlockingReasons(rankedItem = {}) {
+  const todaySelected = rankedItem?.admission?.today_selected;
+  const mustRead = rankedItem?.admission?.must_read;
+  if (todaySelected?.selected || mustRead?.selected) {
+    return [];
+  }
+  const reasons = new Set();
+  for (const admission of [todaySelected, mustRead]) {
+    for (const reason of Array.isArray(admission?.blocking_demotion_reasons)
+      ? admission.blocking_demotion_reasons
+      : []) {
+      reasons.add(reason);
+    }
+  }
+  return [...reasons].sort();
 }
 
 export function normalizeReportDraft(draft, options = {}) {
