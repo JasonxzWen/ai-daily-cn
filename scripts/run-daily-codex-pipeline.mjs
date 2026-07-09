@@ -99,7 +99,7 @@ export async function runDailyCodexPipeline(plan, options = {}) {
 }
 
 async function shouldRunSingleScriptDagOrchestrator(plan, options = {}) {
-  if (!plan.execute_requested || !plan.publish_requested || plan.codex?.fixture_mode) {
+  if (!plan.execute_requested || plan.codex?.fixture_mode) {
     return false;
   }
   if (typeof options.workflowRunner === "function") {
@@ -128,7 +128,7 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
     report_date: plan.report_date,
     root_dir: plan.root_dir,
     execute_requested: true,
-    publish_requested: true,
+    publish_requested: Boolean(plan.publish_requested),
     codex: {
       bin: plan.codex?.bin || defaultCodexBin(),
       model: plan.codex?.model || "",
@@ -139,7 +139,7 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
     legacy_runner: {
       module: "src/daily-runner.js",
       export: "runDailyWorkflow",
-      publish: true
+      publish: Boolean(plan.publish_requested)
     }
   });
   const existingSummary = await readJsonOrNull(plan.outputs.run_summary);
@@ -171,6 +171,8 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
         orchestration_node_count: orchestration.node_count,
         completed_stages: [],
         source_watch_admitted_artifact_path: plan.publish?.source_watch_admitted_artifact_path || "",
+        publish_requested: Boolean(plan.publish_requested),
+        execute_requested: true,
         updated_at: new Date().toISOString()
       });
 
@@ -181,7 +183,7 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
     result = await workflowRunner({
       launcherRoot: plan.root_dir,
       reportDate: plan.report_date,
-      publish: true,
+      publish: Boolean(plan.publish_requested),
       summaryPath: plan.outputs.run_summary,
       allowedBranch: options.allowedBranch,
       worktreeDir: options.publishWorktreeDir,
@@ -239,8 +241,8 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
   const failures = collectLegacyFailures(legacySummary, completedStages);
   const summary = {
     ...legacySummary,
-    ok: finalStatus === "published" || finalStatus === "published_pending_pages_verification",
-    mode: legacySummary.mode || "publish",
+    ok: productionSummaryOk(finalStatus),
+    mode: legacySummary.mode || (plan.publish_requested ? "publish" : "dry-run"),
     automation_pipeline_mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
     report_date: plan.report_date,
     final_status: finalStatus,
@@ -255,7 +257,7 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
     completed_stages: completedStages,
     stage_timing: buildStageTimingSummary(completedStages),
     failures,
-    publish_requested: true,
+    publish_requested: Boolean(plan.publish_requested),
     execute_requested: true,
     source_watch_admitted_artifact_path: plan.publish?.source_watch_admitted_artifact_path || "",
     clean_repo_root: cleanRoot,
@@ -281,6 +283,15 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
   }
   await writeJson(plan.outputs.run_summary, summary);
   return summary;
+}
+
+function productionSummaryOk(finalStatus) {
+  return [
+    "generated_only",
+    "generated_degraded",
+    "published",
+    "published_pending_pages_verification"
+  ].includes(String(finalStatus || ""));
 }
 
 export function validateDailyCodexMvpArtifact(value, { reportDate } = {}) {

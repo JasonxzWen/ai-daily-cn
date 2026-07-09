@@ -3426,7 +3426,7 @@ test("GitHub Trending public signal tags render structured metadata", async () =
       trend: "up",
       stars_this_week: 678,
       stargazers_total: 12345,
-      topics: ["agent", "llm", "browser-automation", "workflow"],
+      topics: ["agent", "browser-automation", "ai-hacking", "workflow"],
       license: "MIT",
       pushed_at: "2026-06-16T10:00:00Z",
       evidence: "GitHub Trending weekly rank #1."
@@ -3440,8 +3440,10 @@ test("GitHub Trending public signal tags render structured metadata", async () =
   const section = html.slice(html.indexOf('id="github-trending"'), html.indexOf('id="source-audit"'));
   assert(section.includes("TypeScript"));
   assert(section.includes("agent"));
-  assert(section.includes("llm"));
-  assert(section.includes("browser-automation"));
+  assert(section.includes("浏览器自动化"));
+  assert(section.includes("安全测试"));
+  assert(!section.includes("browser-automation"));
+  assert(!section.includes("ai-hacking"));
   assert(section.includes("README OK"));
   assert(section.includes("+678 stars"));
   assert(!section.includes("GitHub Trending weekly rank #1."));
@@ -3452,8 +3454,10 @@ test("GitHub Trending public signal tags render structured metadata", async () =
   const serialized = JSON.stringify(trendingSection);
   assert(serialized.includes("TypeScript"));
   assert(serialized.includes("agent"));
-  assert(serialized.includes("llm"));
-  assert(serialized.includes("browser-automation"));
+  assert(serialized.includes("浏览器自动化"));
+  assert(serialized.includes("安全测试"));
+  assert(!serialized.includes("browser-automation"));
+  assert(!serialized.includes("ai-hacking"));
   assert(serialized.includes("README OK"));
   assert(serialized.includes("+678 stars"));
 
@@ -9508,9 +9512,7 @@ test("daily runner writes launcher summary and stops before real publish by defa
   const editorialRankCall = calls.find((call) => call.id === "editorial_rank_artifact");
   assert(editorialRankCall, "daily runner should build internal editorial rank artifact before public write");
   assert.deepEqual(editorialRankCall.args, [
-    "run",
-    "content:editorial-rank:build",
-    "--",
+    "scripts/build-editorial-rank-artifact.mjs",
     "--input",
     ".tmp/source-candidates-2026-06-04.json",
     "--source-date",
@@ -11695,6 +11697,27 @@ test("quality review rejects builder translations that are too weak for rendered
   assert(weakIssues.every((issue) => issue.details.chinese_chars < 10));
   assert(review.ai_review_tasks.some((task) => task.kind === "builder_translation_rewrite" && task.path === "builder_observations[0].translation"));
   assert.equal(review.checklist.find((item) => item.id === "builder_translation").status, "failed");
+});
+
+test("quality review accepts concrete Claude Code checkup builder translation", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const translation = "Boris Cherny 介绍 Claude Code 的 /checkup：它会清理未使用的 skills、MCP、plugins 并保存上下文，对比本地与仓库版 CLAUDE.md 去重，把根目录 CLAUDE.md 拆成嵌套文件和 skills，关闭慢 hooks，更新 Claude Code，默认启用 auto mode，预批准常被拒绝的只读命令；执行任何改动前都会先确认。";
+  report.builder_observations = [
+    {
+      author: "Boris Cherny",
+      handle: "bcherny",
+      original_text: "New in Claude Code: /checkup Run /checkup to: 1. Clean up unused skills/MCPs/plugins and save context 2. Dedup your local CLAUDE.md against the checked in CLAUDE.md 3. Break up root CLAUDE.md into nested CLAUDE.md's + skills 4. Turn off slow hooks 5. Update your Claude Code to the latest version 6. Enable auto mode by default 7. Pre-approve frequently denied read-only commands .. And a few other goodies. /checkup confirms with you before making any changes. Enjoy!",
+      translation,
+      content: translation,
+      url: "https://x.com/bcherny/status/2074997570317779038"
+    }
+  ];
+  report.self_check.builder_observations = report.builder_observations.length;
+
+  const review = reviewReportQuality(report);
+  const weakIssues = review.issues.filter((issue) => issue.code === "builder_translation_too_weak");
+
+  assert.deepEqual(weakIssues, [], "concrete /checkup translation must not be flagged too weak");
 });
 
 test("quality review accepts a faithful short translation of a short builder post", async () => {
@@ -15271,6 +15294,7 @@ test("report:draft selects eligible English follow-builders X posts with determi
   for (const item of drafted.report.builder_observations.filter((entry) => selectedIds.has(entry.candidate_id))) {
     assert.match(item.translation, /\p{Script=Han}/u);
     assert.doesNotMatch(item.translation, /durable memory layers|not another demo|application policy problem/i);
+    assert.doesNotMatch(item.translation, /原帖围绕|读者可把它作为 Builder\/X 讨论信号|真实场景、落地边界/u);
   }
 });
 
@@ -15543,6 +15567,8 @@ test("report:draft rewrites public autodraft text instead of shipping templates"
 
   const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
   const issueCodes = review.issues.map((issue) => issue.code);
+  assert(!issueCodes.includes("public_copy_banned_term"));
+  assert(!issueCodes.includes("story_template_narrative"));
   assert(!issueCodes.includes("public_text_untranslated"));
   assert(!issueCodes.includes("public_template_body"));
   assert(!issueCodes.includes("plain_language_stock_phrase"));
@@ -20451,18 +20477,19 @@ test("draft generator emits reader-facing Chinese sections without AI repair", a
   const nonStoryBlockingIssues = review.issues.filter((issue) =>
     issue.severity === "error" && !/^stories\[/.test(String(issue.path || ""))
   );
-  assert.equal(review.ok, false, JSON.stringify(review.issues, null, 2));
-  assert.equal(review.status, "needs_repair");
   assert.deepEqual(nonStoryBlockingIssues, [], JSON.stringify(review.issues, null, 2));
   // Generation-first: the deterministic draft's summary/main_items/hot_blogs/
-  // builders must need no repair, but templated story narrative is expected to
-  // route to the LLM editorial loop (public_editorial_rewrite on stories[*]).
-  assert(review.ai_review_tasks.some((task) => /^stories\[/.test(String(task.path || ""))));
+  // builders must need no repair. Older drafts could still route templated
+  // stories to the editorial loop; concrete first-pass stories may pass here.
   assert.deepEqual(
     review.ai_review_tasks.filter((task) => !/^stories\[/.test(String(task.path || ""))),
     [],
     JSON.stringify(review.ai_review_tasks, null, 2)
   );
+  if (!review.ok) {
+    assert.equal(review.status, "needs_repair");
+    assert(review.ai_review_tasks.some((task) => /^stories\[/.test(String(task.path || ""))));
+  }
 });
 
 test("report:draft prunes duplicate and templated hot blogs before quality review", async () => {
@@ -28654,6 +28681,7 @@ test("report:draft keeps Hugging Face model-registry entries out of the main str
     source: "Hugging Face Trending Models",
     event_date: reportDate,
     evidence: "Hugging Face trending models list shows openai/gpt-oss-120b with 4917 likes and 4053657 downloads.",
+    task: "text-generation",
     likes: 4917,
     downloads: 4053657
   });
@@ -28668,5 +28696,12 @@ test("report:draft keeps Hugging Face model-registry entries out of the main str
   const inMain = drafted.report.main_items.some(
     (m) => /hugging\s*face trending models/i.test(String(m.source || "")) || /gpt-oss-120b/i.test(String(m.url || ""))
   );
+  const hfItem = drafted.report.huggingface_trending.find((item) => item.candidate_id === "huggingface-trending-models-openai-gpt-oss-120b");
+  assert(hfItem);
+  assert.doesNotMatch(hfItem.description, /task:|text-generation|downloads|likes|本周榜单记录|社区使用热度/i);
+  const review = reviewReportQuality(drafted.report, { candidatePool: drafted.candidatePool });
+  assert(!review.issues.some((issue) =>
+    issue.code === "public_text_untranslated" && String(issue.path || "").startsWith("huggingface_trending")
+  ));
   assert.equal(inMain, false, "HF model-registry entries must not fill the main stream");
 });

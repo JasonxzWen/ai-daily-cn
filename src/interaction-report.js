@@ -1816,9 +1816,38 @@ function githubStarsTag(item) {
 }
 
 function githubTopicTags(item) {
-  return Array.isArray(item?.topics)
-    ? item.topics.map((topic) => String(topic || "").trim()).filter(Boolean).slice(0, 3)
-    : [];
+  if (!Array.isArray(item?.topics)) return [];
+  const tags = [];
+  const seen = new Set();
+  for (const topic of item.topics) {
+    const label = publicGithubTopicLabel(topic);
+    const key = label.toLowerCase();
+    if (!label || seen.has(key)) continue;
+    seen.add(key);
+    tags.push(label);
+    if (tags.length >= 3) break;
+  }
+  return tags;
+}
+
+function publicGithubTopicLabel(topic) {
+  const text = String(topic || "").trim();
+  const lower = text.toLowerCase();
+  if (!lower) return "";
+  if (/^(ai|llm|rag|aigc)$/.test(lower)) return lower.toUpperCase();
+  if (/mcp/.test(lower)) return "MCP";
+  if (/agent/.test(lower)) return "agent";
+  if (/security|cyber|hacking|pentest|bug-bounty|ctf/.test(lower)) return "安全测试";
+  if (/browser|playwright/.test(lower)) return "浏览器自动化";
+  if (/code-quality|developer|devtools|coding|cli/.test(lower)) return "开发工具";
+  if (/sandbox|container/.test(lower)) return "沙箱";
+  if (/typescript/.test(lower)) return "TypeScript";
+  if (/javascript/.test(lower)) return "JavaScript";
+  if (/python/.test(lower)) return "Python";
+  if (/rust/.test(lower)) return "Rust";
+  if (/^go$|golang/.test(lower)) return "Go";
+  if (/java/.test(lower)) return "Java";
+  return text.length <= 12 && !text.includes("-") ? text : "";
 }
 
 function githubLanguageTag(item) {
