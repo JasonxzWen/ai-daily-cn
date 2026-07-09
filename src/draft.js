@@ -6449,7 +6449,7 @@ function hotBlogEvidenceDrivenSummary(candidate) {
   if (!profile) {
     return "";
   }
-  return `${actor}${profile.verb}${profile.topic}。原文说明${profile.scope}，并列出方法、数据或限制：${profile.factFocus}。适用边界是${profile.boundary}。`;
+  return `${actor}${profile.verb}${profile.topic}。原文围绕${profile.scope}展开，并列出方法、数据或限制：${profile.factFocus}。适用边界是${profile.boundary}。`;
 }
 
 function hotBlogEvidenceDrivenPoints(candidate) {
@@ -6502,10 +6502,10 @@ function hotBlogClaimForCandidate(candidate) {
     return "原文把 agent、开发工具或自动化流程拆成任务规划、权限、上下文、工具调用和失败恢复几类问题";
   }
   if (/benchmark|eval|paper|research|arxiv|reasoning|long context|memory/i.test(text)) {
-    return "原文说明模型评测或研究结论怎样改变能力边界、成本预期和可靠性判断";
+    return "原文梳理模型评测或研究结论怎样改变能力边界、成本预期和可靠性判断";
   }
   if (/policy|safety|governance|regulation|security/i.test(text)) {
-    return "原文说明安全、治理或平台规则会怎样变成团队需要执行的产品和上线约束";
+    return "原文分析安全、治理或平台规则会怎样变成团队需要执行的产品和上线约束";
   }
   if (AIGC_RE.test(text)) {
     return "原文分析内容生成工具怎样改变素材生产、创作流程、质量判断或商业边界";
