@@ -10,9 +10,13 @@ import { classifyPublishQuality, requirePublishableQuality } from "./quality-sta
 import { planGeneratedFiles, reportManagedAssetPaths } from "./site.js";
 import { buildAutomationRevision } from "./automation-revision.js";
 import { mergeCommandEnv, pnpmCommandText, pnpmInvocationForArgs } from "./process-runner.js";
+import {
+  candidatePoolRelativePaths,
+  sourceStatusHistoryRelativePaths,
+  toRepoPath
+} from "./reports-data-layout.js";
 
 const execFileAsync = promisify(execFile);
-const SOURCE_STATUS_HISTORY_REPO_PATH = "reports-data/source-status-history.json";
 const DEFAULT_GIT_COMMAND_TIMEOUT_MS = 2 * 60 * 1000;
 const GIT_AUTH_COMMAND_TIMEOUT_MS = 10 * 1000;
 const NON_INTERACTIVE_GIT_ENV = {
@@ -957,13 +961,19 @@ async function resolveCurrentAutomationRevision(options, repoRoot) {
 
 async function plannedReportsDataFiles(repoRoot, dates) {
   const files = [];
-  if (await exists(path.join(repoRoot, ...SOURCE_STATUS_HISTORY_REPO_PATH.split("/")))) {
-    files.push(SOURCE_STATUS_HISTORY_REPO_PATH);
+  for (const relativePath of sourceStatusHistoryRelativePaths()) {
+    const repoPath = toRepoPath("reports-data", relativePath);
+    if (await exists(path.join(repoRoot, ...repoPath.split("/")))) {
+      files.push(repoPath);
+    }
   }
   for (const date of dates) {
     const [year, month] = date.split("-");
-    const base = `reports-data/${year}/${month}/${date}`;
-    for (const file of [`${base}.json`, `${base}.candidates.json`]) {
+    const filesForDate = [
+      `reports-data/${year}/${month}/${date}.json`,
+      ...candidatePoolRelativePaths(date).map((relativePath) => toRepoPath("reports-data", relativePath))
+    ];
+    for (const file of filesForDate) {
       if (await exists(path.join(repoRoot, ...file.split("/")))) {
         files.push(file);
       }

@@ -17,6 +17,7 @@ import {
   sectionForPlatformCategory
 } from "./platform-exempt.js";
 import { createOfficialComponentSnapshot } from "./official-component-snapshot.js";
+import { candidatePoolRelativePaths } from "./reports-data-layout.js";
 
 const GITHUB_BASE_URL = "https://github.com";
 const FETCH_RETRY_NOTES = new WeakMap();
@@ -3492,9 +3493,11 @@ async function loadGitHubTrendingHistoryRecordsFromRoot(historyRoot, reportDate,
   const records = [];
   for (const date of previousDateStrings(reportDate, lookbackDays)) {
     const [year, month] = date.split("-");
-    const baseDir = path.join(historyRoot, year, month);
-    for (const fileName of [`${date}.candidates.json`, `${date}.json`]) {
-      const filePath = path.join(baseDir, fileName);
+    const candidatePaths = candidatePoolRelativePaths(date).map((relativePath) =>
+      path.join(historyRoot, ...relativePath.split(path.sep))
+    );
+    const reportPath = path.join(historyRoot, year, month, `${date}.json`);
+    for (const filePath of [...candidatePaths, reportPath]) {
       try {
         records.push({
           date,

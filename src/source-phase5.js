@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { candidatePoolRelativePaths } from "./reports-data-layout.js";
 import { isValidDateString } from "./time.js";
 
 const REQUIRED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
@@ -108,13 +109,15 @@ async function auditDay(record, historyDir) {
 }
 
 async function readCandidatePoolForDate(historyDir, reportDate) {
-  const [year, month] = reportDate.split("-");
-  const filePath = path.join(historyDir, year, month, `${reportDate}.candidates.json`);
-  try {
-    return JSON.parse(await fs.readFile(filePath, "utf8"));
-  } catch {
-    return null;
+  for (const relativePath of candidatePoolRelativePaths(reportDate)) {
+    const filePath = path.join(historyDir, ...relativePath.split(path.sep));
+    try {
+      return JSON.parse(await fs.readFile(filePath, "utf8"));
+    } catch {
+      // Try the next layered or legacy location.
+    }
   }
+  return null;
 }
 
 function auditGroupStatus(group) {

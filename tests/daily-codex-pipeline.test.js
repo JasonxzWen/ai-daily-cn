@@ -316,11 +316,12 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
   await writeMinimalRepoFiles(rootDir);
   const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
   const reportJsonPath = path.join(cleanRoot, "reports-data", "2026", "07", `${reportDate}.json`);
-  const candidatesJsonPath = path.join(cleanRoot, "reports-data", "2026", "07", `${reportDate}.candidates.json`);
+  const candidatesJsonPath = path.join(cleanRoot, "reports-data", "internal", "candidates", "2026", "07", `${reportDate}.candidates.json`);
   const reportHtmlPath = path.join(cleanRoot, "docs", "reports", "2026", "07", `${reportDate}.html`);
   const docsDataJsonPath = path.join(cleanRoot, "docs", "data", "2026", "07", `${reportDate}.json`);
   const reportHtml = "<!doctype html><title>Daily</title>\n";
   await fs.mkdir(path.dirname(reportJsonPath), { recursive: true });
+  await fs.mkdir(path.dirname(candidatesJsonPath), { recursive: true });
   await fs.mkdir(path.dirname(reportHtmlPath), { recursive: true });
   await fs.mkdir(path.dirname(docsDataJsonPath), { recursive: true });
   await fs.writeFile(reportJsonPath, `${JSON.stringify({

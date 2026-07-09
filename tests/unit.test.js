@@ -95,6 +95,11 @@ import {
   promptLayerInspiredDailyThemeCss
 } from "../src/daily-theme.js";
 import { buildEditorialRankArtifact } from "../src/editorial-rank.js";
+import {
+  internalCandidatePoolRelativePath,
+  internalSourceStatusHistoryRelativePath,
+  legacyCandidatePoolRelativePath
+} from "../src/reports-data-layout.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -13782,9 +13787,45 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(result.report.source_audit.builder_sources.checked, true);
   assert.equal(result.report.self_check.automation_revision.schema_version, 1);
   assert.equal(result.path, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.json"));
-  assert.equal(result.candidatePoolPath, path.join(tmp, "reports-data", "2026", "05", "2026-05-16.candidates.json"));
+  assert.equal(
+    result.candidatePoolPath,
+    path.join(tmp, "reports-data", ...internalCandidatePoolRelativePath("2026-05-16").split(path.sep))
+  );
   assert.equal(await exists(result.path), true);
   assert.equal(await exists(result.candidatePoolPath), true);
+  assert.equal(await exists(path.join(tmp, "reports-data", ...legacyCandidatePoolRelativePath("2026-05-16").split(path.sep))), false);
+});
+
+test("buildSite copies layered internal candidate pools only when internal data is requested", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-layered-candidates-"));
+  const result = await writeReportDraft({
+    rootDir: tmp,
+    inputPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.json"),
+    outputDir: "reports-data",
+    candidatePoolPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.candidates.json"),
+    siteUrl,
+    generatedAt: fixedGeneratedAt
+  });
+  const outDir = path.join(tmp, "docs");
+  const [year, month] = result.report.report_date.split("-");
+
+  const build = await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir: path.join(tmp, "reports-data"),
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath,
+    includeInternalData: true
+  });
+
+  const publicCandidatePath = path.join(outDir, "data", year, month, `${result.report.report_date}.candidates.json`);
+  assert(build.writtenFiles.includes(`data/${year}/${month}/${result.report.report_date}.candidates.json`));
+  assert.equal(await exists(publicCandidatePath), true);
+  const copiedCandidatePool = JSON.parse(await fs.readFile(publicCandidatePath, "utf8"));
+  assert.equal(copiedCandidatePool.report_date, result.report.report_date);
+  assert.equal(copiedCandidatePool.candidates.some((candidate) => candidate.id === "main-report-write"), true);
 });
 
 test("report writer consumes editorial rank artifact without leaking internal fields", async () => {
@@ -14352,9 +14393,10 @@ test("report:write tracks source status history and appends stale source optimiz
   const draftPath = path.join(tmp, "daily-report.json");
   await fs.writeFile(draftPath, `${JSON.stringify(draft, null, 2)}\n`, "utf8");
 
-  const historyPath = path.join(tmp, "reports-data", "source-status-history.json");
-  await fs.mkdir(path.dirname(historyPath), { recursive: true });
-  await fs.writeFile(historyPath, `${JSON.stringify({
+  const legacyHistoryPath = path.join(tmp, "reports-data", "source-status-history.json");
+  const historyPath = path.join(tmp, "reports-data", ...internalSourceStatusHistoryRelativePath().split(path.sep));
+  await fs.mkdir(path.dirname(legacyHistoryPath), { recursive: true });
+  await fs.writeFile(legacyHistoryPath, `${JSON.stringify({
     schema_version: 1,
     records: datesThrough("2026-05-07", 9).map((date) => ({
       date,

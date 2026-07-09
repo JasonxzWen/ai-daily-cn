@@ -26,7 +26,7 @@ test("repo size audit measures tracked payload and duplicate docs assets", async
   assert.equal(audit.duplicate_assets.duplicate_file_count, 2);
   assert.equal(audit.duplicate_assets.wasted_bytes, Buffer.byteLength("same-image"));
   assert(audit.docs_assets_by_extension.some((group) => group.path === ".png" && group.files === 2));
-  assert.equal(audit.largest_files[0].path, "reports-data/source-status-history.json");
+  assert.equal(audit.largest_files[0].path, "reports-data/internal/source-status-history.json");
 });
 
 test("repo size budget reports warnings separately from blocking errors", async () => {
@@ -96,8 +96,9 @@ async function createFixtureRepo() {
   await fs.writeFile(path.join(rootDir, "docs", "assets", "b.png"), "same-image", "utf8");
   await fs.writeFile(path.join(rootDir, "docs", "assets", "c.webp"), "different-image", "utf8");
   await fs.writeFile(path.join(rootDir, "docs", "reports", "2026", "07", "2026-07-09.html"), "<!doctype html>\n", "utf8");
-  await fs.writeFile(path.join(rootDir, "reports-data", "2026", "07", "2026-07-09.candidates.json"), "{\"items\":[]}\n", "utf8");
-  await fs.writeFile(path.join(rootDir, "reports-data", "source-status-history.json"), "x".repeat(2048), "utf8");
+  await fs.mkdir(path.join(rootDir, "reports-data", "internal", "candidates", "2026", "07"), { recursive: true });
+  await fs.writeFile(path.join(rootDir, "reports-data", "internal", "candidates", "2026", "07", "2026-07-09.candidates.json"), "{\"items\":[]}\n", "utf8");
+  await fs.writeFile(path.join(rootDir, "reports-data", "internal", "source-status-history.json"), "x".repeat(2048), "utf8");
 
   await execFileAsync("git", ["init"], { cwd: rootDir });
   await execFileAsync("git", ["add", "."], { cwd: rootDir });

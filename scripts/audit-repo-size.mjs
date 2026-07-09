@@ -4,6 +4,11 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  legacySourceStatusHistoryRelativePath,
+  sourceStatusHistoryRelativePaths,
+  toRepoPath
+} from "../src/reports-data-layout.js";
 
 const DEFAULT_LARGEST_FILE_LIMIT = 20;
 const DOCS_ASSETS_PREFIX = "docs/assets/";
@@ -119,6 +124,7 @@ export function formatRepoSizeAudit(audit, budgetResult = null) {
     `docs/assets: ${formatBytes(audit.notable_paths.docs_assets?.bytes || 0)}`,
     `reports-data: ${formatBytes(audit.notable_paths.reports_data?.bytes || 0)}`,
     `candidate JSON: ${formatBytes(audit.notable_paths.reports_data_candidates_json?.bytes || 0)}`,
+    `internal candidate JSON: ${formatBytes(audit.notable_paths.reports_data_internal_candidates_json?.bytes || 0)}`,
     `duplicate docs/assets waste: ${formatBytes(audit.duplicate_assets.wasted_bytes || 0)}`,
     `git pack: ${formatBytes(audit.git_objects.pack_bytes || 0)}`
   ];
@@ -282,8 +288,16 @@ function buildNotablePaths(entries) {
   const docsArticles = entries.filter((entry) => entry.path === "docs/articles.json");
   const reportsData = filterPrefix(entries, "reports-data/");
   const reportsData2026 = filterPrefix(entries, "reports-data/2026/");
+  const reportsDataInternal = filterPrefix(entries, "reports-data/internal/");
   const candidateJson = reportsData.filter((entry) => entry.path.endsWith(".candidates.json"));
-  const sourceStatusHistory = entries.filter((entry) => entry.path === "reports-data/source-status-history.json");
+  const internalCandidateJson = reportsDataInternal.filter((entry) => entry.path.endsWith(".candidates.json"));
+  const sourceStatusHistoryPaths = new Set(sourceStatusHistoryRelativePaths().map((relativePath) =>
+    toRepoPath("reports-data", relativePath)
+  ));
+  const sourceStatusHistory = entries.filter((entry) => sourceStatusHistoryPaths.has(entry.path));
+  const legacySourceStatusHistory = entries.filter((entry) =>
+    entry.path === toRepoPath("reports-data", legacySourceStatusHistoryRelativePath())
+  );
   return {
     docs_assets: summarizeEntries(docsAssets),
     docs_reports: summarizeEntries(docsReports),
@@ -291,8 +305,11 @@ function buildNotablePaths(entries) {
     docs_articles_json: summarizeEntries(docsArticles),
     reports_data: summarizeEntries(reportsData),
     reports_data_2026: summarizeEntries(reportsData2026),
+    reports_data_internal: summarizeEntries(reportsDataInternal),
     reports_data_candidates_json: summarizeEntries(candidateJson),
-    source_status_history_json: summarizeEntries(sourceStatusHistory)
+    reports_data_internal_candidates_json: summarizeEntries(internalCandidateJson),
+    source_status_history_json: summarizeEntries(sourceStatusHistory),
+    legacy_source_status_history_json: summarizeEntries(legacySourceStatusHistory)
   };
 }
 

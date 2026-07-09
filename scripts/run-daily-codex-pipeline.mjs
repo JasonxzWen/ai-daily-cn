@@ -7,6 +7,10 @@ import path from "node:path";
 import { finished } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 import { runDailyWorkflow } from "../src/daily-runner.js";
+import {
+  internalCandidatePoolRelativePath,
+  legacyCandidatePoolRelativePath
+} from "../src/reports-data-layout.js";
 import { buildSite } from "../src/site.js";
 import { buildWebApp } from "../src/web-app-build.js";
 
@@ -684,7 +688,8 @@ function buildDailyReportArtifactPaths({ cleanRoot, reportDate }) {
   const month = reportDate.slice(5, 7);
   return {
     structured_json_path: path.join(cleanRoot, "reports-data", year, month, `${reportDate}.json`),
-    candidates_json_path: path.join(cleanRoot, "reports-data", year, month, `${reportDate}.candidates.json`),
+    candidates_json_path: path.join(cleanRoot, "reports-data", ...internalCandidatePoolRelativePath(reportDate).split(path.sep)),
+    legacy_candidates_json_path: path.join(cleanRoot, "reports-data", ...legacyCandidatePoolRelativePath(reportDate).split(path.sep)),
     html_path: path.join(cleanRoot, "docs", "reports", year, month, `${reportDate}.html`),
     docs_data_json_path: path.join(cleanRoot, "docs", "data", year, month, `${reportDate}.json`)
   };
