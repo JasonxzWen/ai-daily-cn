@@ -1,8 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import {
+  internalSourceStatusHistoryRelativePath,
+  sourceStatusHistoryRelativePaths
+} from "./reports-data-layout.js";
 import { isValidDateString } from "./time.js";
 
-const DEFAULT_HISTORY_FILE = "source-status-history.json";
 const TRACKED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
 const EFFECTIVE_SIGNAL_STATUSES = new Set(["checked"]);
 const NO_SIGNAL_STATUSES = new Set(["blocked", "no_signal"]);
@@ -11,8 +14,10 @@ export async function prepareSourceStatusHistoryUpdate(options = {}) {
   const rootDir = options.rootDir || process.cwd();
   const outputDir = path.resolve(rootDir, options.outputDir || "reports-data");
   const reportDate = requireReportDate(options.reportDate);
-  const historyPath = path.join(outputDir, DEFAULT_HISTORY_FILE);
-  const currentHistory = await readSourceStatusHistory(historyPath);
+  const historyPath = path.join(outputDir, ...internalSourceStatusHistoryRelativePath().split(path.sep));
+  const currentHistory = await readFirstSourceStatusHistory(sourceStatusHistoryRelativePaths().map((relativePath) =>
+    path.join(outputDir, ...relativePath.split(path.sep))
+  ));
   const currentRecords = extractSourceStatusRecords(options.sourceAudit, {
     reportDate,
     generatedAt: options.generatedAt
@@ -70,7 +75,7 @@ export function appendSourceStatusSuggestionsToDraft(draft, update) {
       ...selfCheck,
       optimization_suggestions: appended,
       source_status_history: {
-        path: DEFAULT_HISTORY_FILE,
+        path: internalSourceStatusHistoryRelativePath().split(path.sep).join("/"),
         tracked_sources: update?.summary?.tracked_sources || 0,
         no_signal_or_blocked: update?.summary?.no_signal_or_blocked || 0,
         stale_sources: update?.summary?.stale_sources || 0,
@@ -219,6 +224,17 @@ async function readSourceStatusHistory(historyPath) {
   } catch {
     return { schema_version: 1, records: [] };
   }
+}
+
+async function readFirstSourceStatusHistory(historyPaths) {
+  for (const historyPath of historyPaths) {
+    try {
+      return JSON.parse(await fs.readFile(historyPath, "utf8"));
+    } catch {
+      // Try the next layered or legacy location.
+    }
+  }
+  return { schema_version: 1, records: [] };
 }
 
 function normalizeHistoryRecord(record) {

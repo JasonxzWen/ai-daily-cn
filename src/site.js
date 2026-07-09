@@ -7,6 +7,10 @@ import { parseDailyMarkdown } from "./parser.js";
 import { defaultStyleCss, renderIndexHtml, renderOfficialBlogsHtml, renderOpsIndexHtml } from "./render.js";
 import { renderReportWithEffectiveInteract } from "./interaction-report.js";
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
+import {
+  candidatePoolRelativePaths,
+  REPORTS_DATA_INTERNAL_DIR
+} from "./reports-data-layout.js";
 import { defaultGeneratedAt } from "./time.js";
 import { validateArticles, validateFeed, validateReport, validateTrends } from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
@@ -591,6 +595,7 @@ export async function collectJsonFiles(inputDir) {
   await walk(inputDir, files);
   return files
     .filter((file) => file.toLowerCase().endsWith(".json"))
+    .filter((file) => !toPosixRelative(inputDir, file).split("/").includes(REPORTS_DATA_INTERNAL_DIR))
     .filter((file) => !file.toLowerCase().endsWith(".candidates.json"))
     .filter((file) => !REPORT_DATA_AUXILIARY_JSON.has(path.basename(file).toLowerCase()))
     .sort();
@@ -633,7 +638,7 @@ export async function planGeneratedFiles(options = {}) {
     const paths = reportRelativePaths(report.report_date);
     files.push(paths.dataPath, paths.htmlPath);
     files.push(...reportManagedAssetPaths(report));
-    if (options.includeInternalData && (report.candidate_pool_path || (await exists(candidatePoolPathForReportFile(file, report.report_date))))) {
+    if (options.includeInternalData && (report.candidate_pool_path || (await existingCandidatePoolPath(file, report.report_date)))) {
       files.push(paths.candidateDataPath);
     }
     if (report.markdown_path) {
@@ -2594,14 +2599,14 @@ function slugForAsset(value) {
 }
 
 async function copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writtenFiles) {
-  const candidatePath = candidatePoolPathForReportFile(reportJsonPath, report.report_date);
-  const candidateExists = await exists(candidatePath);
-  if (!candidateExists && !report.candidate_pool_path) {
+  const candidatePath = await existingCandidatePoolPath(reportJsonPath, report.report_date);
+  if (!candidatePath && !report.candidate_pool_path) {
     return;
   }
-  if (!candidateExists) {
-    throw new PublisherError("candidate_pool_missing", `日报声明了候选池，但文件不存在：${candidatePath}`, {
-      path: candidatePath
+  if (!candidatePath) {
+    const preferredPath = candidatePoolPathsForReportFile(reportJsonPath, report.report_date)[0];
+    throw new PublisherError("candidate_pool_missing", `日报声明了候选池，但文件不存在：${preferredPath}`, {
+      path: preferredPath
     });
   }
 
@@ -2609,8 +2614,21 @@ async function copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writte
   await writeJsonTracked(outDir, reportRelativePaths(report.report_date).candidateDataPath, candidatePool, writtenFiles);
 }
 
-function candidatePoolPathForReportFile(reportJsonPath, reportDate) {
-  return path.join(path.dirname(reportJsonPath), `${reportDate}.candidates.json`);
+async function existingCandidatePoolPath(reportJsonPath, reportDate) {
+  const candidates = candidatePoolPathsForReportFile(reportJsonPath, reportDate);
+  for (const candidatePath of candidates) {
+    if (await exists(candidatePath)) {
+      return candidatePath;
+    }
+  }
+  return null;
+}
+
+function candidatePoolPathsForReportFile(reportJsonPath, reportDate) {
+  const reportsDataRoot = path.resolve(path.dirname(reportJsonPath), "..", "..");
+  return candidatePoolRelativePaths(reportDate).map((relativePath) =>
+    path.join(reportsDataRoot, ...relativePath.split(path.sep))
+  );
 }
 
 async function exists(filePath) {

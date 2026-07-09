@@ -7,6 +7,10 @@ import path from "node:path";
 import { finished } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 import { runDailyWorkflow } from "../src/daily-runner.js";
+import {
+  internalCandidatePoolRelativePath,
+  legacyCandidatePoolRelativePath
+} from "../src/reports-data-layout.js";
 import { buildSite } from "../src/site.js";
 import { buildWebApp } from "../src/web-app-build.js";
 
@@ -215,6 +219,13 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
   const finalStatus = normalizeProductionFinalStatus(legacyFinalStatus);
   const cleanRoot = path.resolve(legacySummary.clean_repo_root || plan.root_dir);
   const artifactPaths = buildDailyReportArtifactPaths({ cleanRoot, reportDate: plan.report_date });
+  const artifactSizes = await collectArtifactSizes({
+    pipeline_plan_path: pipelinePlanPath,
+    ...artifactPaths,
+    ...(plan.publish?.source_watch_admitted_artifact_path
+      ? { source_watch_admitted_artifact_path: plan.publish.source_watch_admitted_artifact_path }
+      : {})
+  });
   const report = await readJsonOrNull(artifactPaths.structured_json_path);
   const qualityStatus = report?.quality_status && typeof report.quality_status === "object"
     ? report.quality_status
@@ -242,6 +253,7 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
     orchestration,
     orchestration_node_count: orchestration.node_count,
     completed_stages: completedStages,
+    stage_timing: buildStageTimingSummary(completedStages),
     failures,
     publish_requested: true,
     execute_requested: true,
@@ -251,6 +263,7 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
     html_path: artifactPaths.html_path,
     docs_data_json_path: artifactPaths.docs_data_json_path,
     artifacts: artifactPaths,
+    artifact_sizes: artifactSizes,
     validation,
     publication,
     publish: publication,
@@ -589,6 +602,7 @@ async function writeRunSummary(state, { finalStatus }) {
       ? stage.failures.map((failure) => failure.message || failure.code || String(failure)).filter(Boolean)
       : []
   ));
+  const artifactSizes = await collectArtifactSizes(buildDagLiteArtifactSizePaths(state.plan));
   const summary = {
     ok: finalStatus === "generated_only" || finalStatus === "published",
     mode: "daily_codex_dag_lite",
@@ -600,11 +614,13 @@ async function writeRunSummary(state, { finalStatus }) {
     plan_path: state.plan.outputs.plan,
     final_artifact: state.plan.outputs.final,
     completed_stages: state.completedStages,
+    stage_timing: buildStageTimingSummary(state.completedStages),
     failures,
     summary_path: state.plan.outputs.run_summary,
     publish_requested: Boolean(state.plan.publish_requested),
     execute_requested: Boolean(state.plan.execute_requested),
     source_watch_admitted_artifact_path: state.plan.publish?.source_watch_admitted_artifact_path || "",
+    artifact_sizes: artifactSizes,
     publication: state.publication,
     validation: state.finalValidation || state.validation || null,
     repair_attempted: state.repairAttempted,
@@ -672,23 +688,73 @@ function buildDailyReportArtifactPaths({ cleanRoot, reportDate }) {
   const month = reportDate.slice(5, 7);
   return {
     structured_json_path: path.join(cleanRoot, "reports-data", year, month, `${reportDate}.json`),
-    candidates_json_path: path.join(cleanRoot, "reports-data", year, month, `${reportDate}.candidates.json`),
+    candidates_json_path: path.join(cleanRoot, "reports-data", ...internalCandidatePoolRelativePath(reportDate).split(path.sep)),
+    legacy_candidates_json_path: path.join(cleanRoot, "reports-data", ...legacyCandidatePoolRelativePath(reportDate).split(path.sep)),
     html_path: path.join(cleanRoot, "docs", "reports", year, month, `${reportDate}.html`),
     docs_data_json_path: path.join(cleanRoot, "docs", "data", year, month, `${reportDate}.json`)
   };
 }
 
 function normalizeCompletedStages(stages) {
-  return stages.map((stage) => ({
-    id: stage.id || stage.stage || "",
+  let previousFinishedAt = "";
+  return stages.map((stage) => {
+    const normalized = {
+      id: stage.id || stage.stage || "",
+      status: stage.status || "",
+      ...(stage.command ? { command: stage.command } : {}),
+      ...(stage.output ? { output: stage.output } : {}),
+      ...(stage.error ? { error: stage.error } : {}),
+      ...(stage.error_code ? { error_code: stage.error_code } : {}),
+      ...(stage.updated_at ? { updated_at: stage.updated_at } : {}),
+      ...(Array.isArray(stage.failures) ? { failures: stage.failures } : {})
+    };
+    applyStageTiming(normalized, stage, previousFinishedAt);
+    previousFinishedAt = normalized.finished_at || normalized.updated_at || previousFinishedAt;
+    return normalized;
+  }).filter((stage) => stage.id);
+}
+
+function applyStageTiming(normalized, sourceStage, previousFinishedAt) {
+  const explicitStartedAt = nonEmptyString(sourceStage.started_at) ? sourceStage.started_at : "";
+  const explicitFinishedAt = nonEmptyString(sourceStage.finished_at) ? sourceStage.finished_at : "";
+  const updatedAt = nonEmptyString(sourceStage.updated_at) ? sourceStage.updated_at : "";
+  const explicitDurationMs = Number(sourceStage.duration_ms);
+  if (explicitStartedAt) normalized.started_at = explicitStartedAt;
+  if (explicitFinishedAt) normalized.finished_at = explicitFinishedAt;
+  if (Number.isFinite(explicitDurationMs) && explicitDurationMs >= 0) {
+    normalized.duration_ms = explicitDurationMs;
+    normalized.duration_source = "explicit";
+    return;
+  }
+
+  const startCandidate = explicitStartedAt || previousFinishedAt;
+  const finishCandidate = explicitFinishedAt || updatedAt;
+  if (!finishCandidate) return;
+  normalized.finished_at = normalized.finished_at || finishCandidate;
+  if (!startCandidate) return;
+  const startedMs = Date.parse(startCandidate);
+  const finishedMs = Date.parse(finishCandidate);
+  if (!Number.isFinite(startedMs) || !Number.isFinite(finishedMs) || finishedMs < startedMs) return;
+  normalized.started_at = normalized.started_at || startCandidate;
+  normalized.duration_ms = finishedMs - startedMs;
+  normalized.duration_source = explicitStartedAt || explicitFinishedAt ? "timestamp_delta" : "updated_at_delta";
+}
+
+function buildStageTimingSummary(stages) {
+  const timedStages = stages.map((stage) => ({
+    id: stage.id,
     status: stage.status || "",
-    ...(stage.command ? { command: stage.command } : {}),
-    ...(stage.output ? { output: stage.output } : {}),
-    ...(stage.error ? { error: stage.error } : {}),
-    ...(stage.error_code ? { error_code: stage.error_code } : {}),
-    ...(stage.updated_at ? { updated_at: stage.updated_at } : {}),
-    ...(Array.isArray(stage.failures) ? { failures: stage.failures } : {})
-  })).filter((stage) => stage.id);
+    ...(stage.started_at ? { started_at: stage.started_at } : {}),
+    ...(stage.finished_at ? { finished_at: stage.finished_at } : {}),
+    ...(Number.isFinite(stage.duration_ms) ? { duration_ms: stage.duration_ms } : {}),
+    ...(stage.duration_source ? { duration_source: stage.duration_source } : {})
+  })).filter((stage) => stage.started_at || stage.finished_at || Number.isFinite(stage.duration_ms));
+  return {
+    stage_count: stages.length,
+    timed_stage_count: timedStages.length,
+    known_stage_duration_ms: timedStages.reduce((total, stage) => total + (Number.isFinite(stage.duration_ms) ? stage.duration_ms : 0), 0),
+    stages: timedStages
+  };
 }
 
 function buildValidationSummary(completedStages) {
@@ -780,6 +846,7 @@ function summarizeStageForContract(stages, id) {
     reached: true,
     status: stage.status || "",
     ok: stagePassed(stage),
+    ...(Number.isFinite(stage.duration_ms) ? { duration_ms: stage.duration_ms } : {}),
     ...(stage.error ? { error: stage.error } : {}),
     ...(stage.error_code ? { error_code: stage.error_code } : {})
   };
@@ -1210,6 +1277,51 @@ async function readJsonOrNull(filePath) {
     return await readJson(filePath);
   } catch {
     return null;
+  }
+}
+
+function buildDagLiteArtifactSizePaths(plan) {
+  return {
+    plan_path: plan.outputs.plan,
+    context_path: plan.outputs.context,
+    generated_path: plan.outputs.generated,
+    repaired_path: plan.outputs.repaired,
+    final_artifact: plan.outputs.final,
+    validation_path: plan.outputs.validation,
+    repair_validation_path: plan.outputs.repair_validation,
+    stage_summary_path: plan.outputs.stage_summary,
+    publish_summary_path: plan.outputs.publish_summary,
+    ...(plan.publish?.source_watch_admitted_artifact_path
+      ? { source_watch_admitted_artifact_path: plan.publish.source_watch_admitted_artifact_path }
+      : {})
+  };
+}
+
+async function collectArtifactSizes(pathsByKey) {
+  const result = {};
+  for (const [key, filePath] of Object.entries(pathsByKey || {})) {
+    if (!filePath) continue;
+    result[key] = await statArtifact(filePath);
+  }
+  return result;
+}
+
+async function statArtifact(filePath) {
+  try {
+    const stat = await fs.stat(filePath);
+    return {
+      path: filePath,
+      exists: true,
+      bytes: stat.isFile() ? stat.size : 0,
+      mtime: stat.mtime.toISOString()
+    };
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+    return {
+      path: filePath,
+      exists: false,
+      bytes: 0
+    };
   }
 }
 

@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
 import { reportRelativePaths } from "./paths.js";
+import { internalCandidatePoolRelativePath } from "./reports-data-layout.js";
 import { validateCandidatePool } from "./schema.js";
 import {
   isPlatformExemptCategory,
@@ -277,8 +278,7 @@ function hasNonPrimaryDisclosure(candidate, item = {}) {
 }
 
 export async function writeCandidatePool(outputDir, reportDate, candidatePool) {
-  const [year, month] = reportDate.split("-");
-  const target = path.join(outputDir, year, month, `${reportDate}.candidates.json`);
+  const target = path.join(outputDir, ...internalCandidatePoolRelativePath(reportDate).split(path.sep));
   await fs.mkdir(path.dirname(target), { recursive: true });
   await fs.writeFile(target, `${JSON.stringify(candidatePool, null, 2)}\n`, "utf8");
   return target;
