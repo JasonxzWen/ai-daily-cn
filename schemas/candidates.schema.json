@@ -243,7 +243,16 @@
           "minLength": 1
         },
         "main_selection_stage": {
-          "enum": ["strict", "refill"]
+          "enum": [
+            "strict",
+            "refill",
+            "refill_github",
+            "refill_builder",
+            "refill_hot_blog",
+            "refill_community",
+            "refill_window",
+            "refill_weak_signal"
+          ]
         },
         "main_story_id": {
           "type": "string",

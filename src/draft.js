@@ -3295,8 +3295,16 @@ function evaluateMainCandidates(candidates, options = {}) {
         reject_reason: rejectReason
       };
     }
-    const stage = canPromoteToMainStrict(candidate, options.reportDate) ? "strict" : "refill";
-    if (stage === "refill" && !canPromoteToMainRefill(candidate, meta, options.reportDate)) {
+    if (canPromoteToMainStrict(candidate, options.reportDate)) {
+      candidate.main_selection_stage = "strict";
+      return {
+        candidate,
+        meta,
+        eligible: true,
+        stage: "strict"
+      };
+    }
+    if (!canPromoteToMainRefill(candidate, meta, options.reportDate)) {
       candidate.main_reject_reason = "not_main_refill_material";
       return {
         candidate,
@@ -3305,6 +3313,7 @@ function evaluateMainCandidates(candidates, options = {}) {
         reject_reason: "not_main_refill_material"
       };
     }
+    const stage = mainRefillStage(candidate, meta, options.reportDate);
     candidate.main_selection_stage = stage;
     return {
       candidate,
@@ -3481,6 +3490,30 @@ function canPromoteToMainRefill(candidate, meta = {}, reportDate = "") {
     return hasMainRefillOperationalSignal(candidate, meta) && hasSubstantialMainRefillEvidence(candidate, meta);
   }
   return hasMainRefillOperationalSignal(candidate, meta) && hasSubstantialMainRefillEvidence(candidate, meta);
+}
+
+function mainRefillStage(candidate, meta = {}, reportDate = "") {
+  const sourceLevel = sourceLevelForCandidate(candidate);
+  if (candidate.category === "project" || sourceLevel === "github") {
+    return "refill_github";
+  }
+  if (candidate.category === "builder_observation") {
+    return "refill_builder";
+  }
+  if (candidate.category === "hot_blog") {
+    return "refill_hot_blog";
+  }
+  if (candidate.category === "community_lead") {
+    return "refill_community";
+  }
+  if (
+    isPrimaryRequiredIntermediaryMainCandidate(candidate) ||
+    canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta) ||
+    isOutsideMainWindowCandidate(candidate, reportDate)
+  ) {
+    return "refill_window";
+  }
+  return "refill_weak_signal";
 }
 
 function hasEvidenceBackedPaperMainRefill(candidate, meta = {}) {

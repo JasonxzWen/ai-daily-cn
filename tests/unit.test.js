@@ -170,6 +170,48 @@ test("candidate pool schema accepts curated first-party builder candidates", () 
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
 });
 
+test("candidate pool schema accepts specific main refill selection stages", () => {
+  const baseCandidate = {
+    id: "hot-blog-refill-stage",
+    source_id: "hot-blog-source",
+    category: "hot_blog",
+    title: "A detailed engineering writeup",
+    url: "https://example.com/blog/agent-engineering",
+    source: "Example Blog",
+    event_date: "2026-06-26",
+    status: "included",
+    included_in: "main_items",
+    verification_status: "intermediary_only",
+    intermediary_url: "https://example.com/blog/agent-engineering",
+    verification_sources: [],
+    main_selection_stage: "refill_hot_blog"
+  };
+  const candidatePool = {
+    schema_version: 1,
+    report_date: "2026-06-26",
+    generated_at: "2026-06-26T08:00:00.000Z",
+    sources: [
+      {
+        id: "hot-blog-source",
+        name: "Example Blog",
+        url: "https://example.com/blog",
+        category: "blog",
+        status: "checked"
+      }
+    ],
+    candidates: [baseCandidate]
+  };
+
+  const accepted = validateCandidatePool(candidatePool);
+  assert.equal(accepted.valid, true, JSON.stringify(accepted.errors));
+
+  const rejected = validateCandidatePool({
+    ...candidatePool,
+    candidates: [{ ...baseCandidate, main_selection_stage: "refill_misc" }]
+  });
+  assert.equal(rejected.valid, false);
+});
+
 function mainMarkdownSections(input) {
   return input.sections.filter((section) => section.group === "main" && section.type === "markdown");
 }
@@ -16322,6 +16364,9 @@ test("report:draft fills sparse main stream from unified candidate roles", async
       `main stream item must not repeat in lower-priority sections: ${item.url}`
     );
   }
+  const candidatePoolById = new Map(drafted.candidatePool.candidates.map((candidate) => [candidate.id, candidate]));
+  assert.equal(candidatePoolById.get(projectCandidate.id)?.main_selection_stage, "refill_github");
+  assert.equal(candidatePoolById.get(hotBlogCandidate.id)?.main_selection_stage, "refill_hot_blog");
   assert(drafted.report.self_check.selection_snapshot.main_items.refill_selected >= 2);
 });
 
@@ -24583,11 +24628,23 @@ test("report:write allows disclosed low-risk refill candidates in main_items", a
     verification_status: "intermediary_only",
     intermediary_url: item.url,
     verification_sources: [],
-    main_selection_stage: "refill",
+    main_selection_stage: "refill_hot_blog",
     main_reject_reason: "",
     evidence: "Claude Code is a layered agentic coding tool. This guide breaks down features from CLAUDE.md, skills, subagents, hooks, MCP and Auto Mode.",
     editorial_category: "engineering_toolchain"
   });
+
+  candidate.main_selection_stage = "refill_misc";
+  assertPublisherCode(
+    () =>
+      normalizeReportDraft(draft, {
+        siteUrl,
+        generatedAt: fixedGeneratedAt,
+        candidatePool
+      }),
+    "candidate_pool_reference_invalid"
+  );
+  candidate.main_selection_stage = "refill_hot_blog";
 
   const report = normalizeReportDraft(draft, {
     siteUrl,
