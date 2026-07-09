@@ -228,6 +228,22 @@ test("public copy gate blocks GitHub/HF template summaries and Chinese-media Eng
   assert(terms.includes("No previous component snapshot was available for comparison."));
 });
 
+test("validate script runs real artifact content contract before self-test", () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
+  const validateSteps = pkg.scripts.validate.split("&&").map((step) => step.trim());
+  const realArtifactStep = validateSteps.indexOf("pnpm run content:contract");
+  const selfTestStep = validateSteps.indexOf("pnpm run content:contract:self-test");
+
+  assert.equal(pkg.scripts["content:contract"], "node scripts/check-daily-content-contract.mjs");
+  assert.match(pkg.scripts["content:contract:self-test"], /--self-test\b/);
+  assert.notEqual(realArtifactStep, -1, "validate must run the real artifact content contract");
+  assert.notEqual(selfTestStep, -1, "validate must keep the deterministic self-test");
+  assert(
+    realArtifactStep < selfTestStep,
+    "validate must check real artifacts before content-contract self-test"
+  );
+});
+
 test("public copy gate ignores internal source audit fields", () => {
   const report = {
     ...storyFixture("OpenAI 发布模型能力更新，说明评测设置和使用范围。"),
@@ -293,6 +309,28 @@ test("real artifact content contract scans report directory and surfaces blockin
   assert(result.issues.some((issue) => issue.code === "github_trending_top20_missing"));
   assert(result.issues.some((issue) => issue.report_path === "reports-data/2026/06/2026-06-26.json"));
   assert(result.degraded.some((issue) => issue.code === "story_template_narrative"));
+});
+
+test("real artifact content contract blocks missing matching public HTML", async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-content-contract-missing-html-"));
+  const dataDir = path.join(tmp, "reports-data", "2026", "06");
+  fs.mkdirSync(dataDir, { recursive: true });
+  const realReport = JSON.parse(fs.readFileSync(path.join(REPORTS_DIR, "2026", "06", "2026-06-24.json"), "utf8"));
+  fs.writeFileSync(path.join(dataDir, "2026-06-27.json"), JSON.stringify(realReport), "utf8");
+
+  const result = await evaluateRealArtifactContentContract({
+    rootDir: tmp,
+    dataInput: "reports-data",
+    htmlInput: path.join("docs", "reports"),
+    latest: 1
+  });
+  const issue = result.issues.find((item) => item.code === "real_artifact_html_missing");
+
+  assert.equal(result.ok, false);
+  assert.equal(result.reports[0].html_path, "docs/reports/2026/06/2026-06-27.html");
+  assert(issue, "missing public HTML must block real artifact validation");
+  assert.equal(issue.requirement, "REQ-003");
+  assert.equal(issue.details.expected_html_path, "docs/reports/2026/06/2026-06-27.html");
 });
 
 test("real artifact content contract enforces public copy gate by default", async () => {

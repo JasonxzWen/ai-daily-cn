@@ -177,25 +177,38 @@ export async function evaluateRealArtifactContentContract(options = {}) {
 
   for (const artifact of artifacts) {
     const report = JSON.parse(await fs.readFile(artifact.reportPath, "utf8"));
-    const html = artifact.htmlPath ? await readOptionalText(artifact.htmlPath) : "";
+    const reportPath = normalizePath(path.relative(rootDir, artifact.reportPath));
+    const htmlPath = artifact.htmlPath ? normalizePath(path.relative(rootDir, artifact.htmlPath)) : null;
+    const htmlExists = artifact.htmlPath ? await fileExists(artifact.htmlPath) : false;
+    const html = htmlExists ? await fs.readFile(artifact.htmlPath, "utf8") : "";
     const result = evaluateDailyContentContract(report, {
       html,
       enforcePublicCopyGate: options.enforcePublicCopyGate
     });
+    const reportIssues = [...result.issues];
+    if (artifact.htmlPath && !htmlExists) {
+      reportIssues.unshift(blockingIssue({
+        code: "real_artifact_html_missing",
+        requirement: "REQ-003",
+        section: "public_html",
+        message: `Real report artifact ${reportPath} must have matching public HTML at ${htmlPath}.`,
+        details: { expected_html_path: htmlPath }
+      }));
+    }
     const reportEntry = {
       report_date: artifact.reportDate,
-      report_path: normalizePath(path.relative(rootDir, artifact.reportPath)),
-      html_path: artifact.htmlPath ? normalizePath(path.relative(rootDir, artifact.htmlPath)) : null,
-      ok: result.ok,
-      blocking: result.blocking,
-      issue_count: result.issues.length,
+      report_path: reportPath,
+      html_path: htmlPath,
+      ok: reportIssues.length === 0,
+      blocking: reportIssues.length > 0,
+      issue_count: reportIssues.length,
       degraded_count: result.degraded.length,
-      issues: result.issues,
+      issues: reportIssues,
       degraded: result.degraded,
       summary: result.summary
     };
     reports.push(reportEntry);
-    for (const issue of result.issues) {
+    for (const issue of reportIssues) {
       issues.push({ report_date: artifact.reportDate, report_path: reportEntry.report_path, ...issue });
     }
     for (const issue of result.degraded) {
@@ -260,11 +273,11 @@ function matchingHtmlPath(htmlRoot, reportDate) {
   return path.join(htmlRoot, year, month, `${reportDate}.html`);
 }
 
-async function readOptionalText(filePath) {
+async function fileExists(filePath) {
   try {
-    return await fs.readFile(filePath, "utf8");
+    return (await fs.stat(filePath)).isFile();
   } catch {
-    return "";
+    return false;
   }
 }
 
