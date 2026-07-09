@@ -12237,6 +12237,65 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert.equal(feed.reports[0].markdown_url, undefined);
 });
 
+test("buildSite preserves specific GitHub Trending descriptions in public data", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-github-description-build-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.github_trending = [
+    {
+      name: "example/specific-tool",
+      repo: "example/specific-tool",
+      description: "Specific Tool 聚焦终端代码审查工作流，适合用来检查补丁、标注风险和整理 reviewer 反馈。",
+      readme_summary: "specific-tool 是服务于 agent 工作流和自动化工程的开源项目，主要能力包括评测与回归、工具调用和工作流编排；项目提供测试样例和评测材料，主要用于构建、调试和编排 agent 工作流。",
+      url: "https://github.com/example/specific-tool",
+      event_date: "2026-05-15",
+      source: "GitHub Trending daily",
+      language: "TypeScript",
+      window: "daily",
+      rank: 1,
+      trend: "new",
+      evidence: "GitHub Trending daily rank #1 with 321 stars today."
+    },
+    {
+      name: "example/generic-tool",
+      repo: "example/generic-tool",
+      description: "README 主要围绕Agent 构建、评测与回归，阅读时先看快速开始和运行前提。",
+      readme_summary: "generic-tool 是服务于 agent 工作流和自动化工程的开源项目，主要能力包括Agent 构建、评测与回归、工具调用和工作流编排；项目提供测试样例和评测材料，主要用于构建、调试和编排 agent 工作流。",
+      url: "https://github.com/example/generic-tool",
+      event_date: "2026-05-15",
+      source: "GitHub Trending daily",
+      language: "TypeScript",
+      window: "daily",
+      rank: 2,
+      trend: "new",
+      evidence: "GitHub Trending daily rank #2 with 123 stars today."
+    }
+  ];
+  const [year, month] = report.report_date.split("-");
+  const reportDir = path.join(dataInputDir, year, month);
+  await fs.mkdir(reportDir, { recursive: true });
+  await fs.writeFile(path.join(reportDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+  await buildSite({
+    rootDir: tmp,
+    inputDir: path.join(tmp, "reports-source"),
+    dataInputDir,
+    outDir,
+    siteUrl,
+    generatedAt: fixedGeneratedAt,
+    trendConfigPath
+  });
+
+  const publicData = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
+  assert.equal(
+    publicData.github_trending[0].description,
+    "Specific Tool 聚焦终端代码审查工作流，适合用来检查补丁、标注风险和整理 reviewer 反馈。"
+  );
+  assert.match(publicData.github_trending[1].description, /generic-tool 是服务于|Agent 构建|主要能力包括/);
+  assert.equal("readme_summary" in publicData.github_trending[0], false);
+});
+
 test("buildSite preserves explicit report quality status in docs data and homepage", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-quality-status-build-"));
   const dataInputDir = path.join(tmp, "reports-data");
@@ -14040,9 +14099,51 @@ test("report writer accepts rank-selected mainline items", async () => {
   assert.equal(selectionText.includes("selection_reasons"), false);
   assert.equal(selectionText.includes("demotion_reasons"), false);
   assert.equal(selectionText.includes("\"admission\""), false);
+  assert.equal(result.report.daily_lanes.schema_version, 1);
+  assert.deepEqual(
+    result.report.daily_lanes.lanes.map((lane) => lane.lane_id),
+    [
+      "must_read",
+      "major_company_strategy",
+      "watch_source_updates",
+      "open_source_github",
+      "product_industry",
+      "builder_twitter",
+      "trend_tracking"
+    ]
+  );
+  const dailyLanesById = new Map(result.report.daily_lanes.lanes.map((lane) => [lane.lane_id, lane]));
+  assert.equal(dailyLanesById.get("must_read").title, "今日必看");
+  assert.equal(dailyLanesById.get("must_read").max_items, 8);
+  assert.deepEqual(
+    dailyLanesById.get("must_read").items,
+    result.report.editorial_selection.must_read.items
+  );
+  assert.equal(dailyLanesById.get("must_read").items.length <= 8, true);
+  assert.deepEqual(
+    dailyLanesById.get("major_company_strategy").items.map((item) => item.candidate_id),
+    ["anthropic-official-agent-practice"]
+  );
+  assert.equal(dailyLanesById.get("open_source_github").items.length, 0);
+  const dailyLaneCandidateIds = result.report.daily_lanes.lanes.flatMap((lane) =>
+    lane.items.map((item) => item.candidate_id)
+  );
+  assert.deepEqual([...new Set(dailyLaneCandidateIds)], ["anthropic-official-agent-practice"]);
+  assert.equal(
+    dailyLaneCandidateIds.every((candidateId) => candidateId === "anthropic-official-agent-practice"),
+    true
+  );
+  const dailyLaneText = JSON.stringify(result.report.daily_lanes);
+  assert.equal(dailyLaneText.includes("github-momentum-only-repo"), false);
+  assert.equal(dailyLaneText.includes("editorial_rank"), false);
+  assert.equal(dailyLaneText.includes("rank_policy"), false);
+  assert.equal(dailyLaneText.includes("selection_reasons"), false);
+  assert.equal(dailyLaneText.includes("demotion_reasons"), false);
+  assert.equal(dailyLaneText.includes("\"admission\""), false);
   const writtenReport = JSON.parse(await fs.readFile(result.path, "utf8"));
   assert.equal(validateReport(writtenReport).valid, true, JSON.stringify(validateReport(writtenReport).errors));
   assert.deepEqual(writtenReport.editorial_selection, result.report.editorial_selection);
+  assert.deepEqual(writtenReport.daily_lanes, result.report.daily_lanes);
   const publicReportText = JSON.stringify(writtenReport);
   assert.equal(publicReportText.includes("editorial_rank"), false);
   assert.equal(publicReportText.includes("rank_policy"), false);

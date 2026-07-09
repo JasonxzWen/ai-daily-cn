@@ -2121,17 +2121,21 @@ function publicCommunityLeads(items = []) {
 function publicGithubTrending(items = []) {
   return arrayValue(items).map((item) => {
     const result = sanitizePublicValue(item);
-    const normalizedSummary = normalizeGithubReadmeSummary(
-      firstNonEmpty(result.readme_summary, result.github_readme_summary, result.description),
-      result.repo || result.name || ""
-    );
+    const rawDescription = result.description;
+    const rawSummary = firstNonEmpty(result.readme_summary, result.github_readme_summary);
     for (const key of ["readme_summary", "github_readme_summary", "description", "use_case"]) {
       if (isGenericGithubPublicText(result[key])) {
         delete result[key];
       }
     }
-    if (normalizedSummary && !isGenericGithubPublicText(normalizedSummary)) {
-      result.description = normalizedSummary;
+    if (!String(result.description || "").trim()) {
+      const normalizedSummary = normalizeGithubReadmeSummary(
+        firstNonEmpty(rawSummary, rawDescription),
+        result.repo || result.name || ""
+      );
+      if (normalizedSummary && !isGenericGithubPublicText(normalizedSummary)) {
+        result.description = normalizedSummary;
+      }
     }
     if (!String(result.description || "").trim()) {
       result.description = githubTrendingFactSummary(item);

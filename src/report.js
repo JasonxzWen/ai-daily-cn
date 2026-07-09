@@ -55,6 +55,16 @@ const EDITORIAL_SELECTION_TARGETS = [
     maxItems: 8
   }
 ];
+const DAILY_LANE_DEFINITIONS = [
+  { id: "must_read", title: "今日必看", maxItems: 8 },
+  { id: "major_company_strategy", title: "大厂与战略", maxItems: 20 },
+  { id: "watch_source_updates", title: "关注源动态", maxItems: 20 },
+  { id: "open_source_github", title: "开源与 GitHub", maxItems: 20 },
+  { id: "product_industry", title: "产品与行业", maxItems: 20 },
+  { id: "builder_twitter", title: "Builder / Twitter 讨论", maxItems: 20 },
+  { id: "trend_tracking", title: "趋势追踪", maxItems: 20 }
+];
+const DAILY_LANE_IDS = new Set(DAILY_LANE_DEFINITIONS.map((lane) => lane.id));
 const EDITORIAL_SELECTION_SECTIONS = [
   "stories",
   "main_items",
@@ -109,6 +119,7 @@ export async function writeReportDraft(options = {}) {
   });
   requireEditorialRankAdmission(report, editorialRankAdmissionContext);
   applyEditorialSelection(report, editorialRankAdmissionContext);
+  applyDailyLanes(report, editorialRankAdmissionContext);
   report = requireReportSchemaForWrite(report);
   await requireFreshReport(report, {
     historyDir: outputDir,
@@ -300,6 +311,86 @@ function applyEditorialSelection(report, context) {
     report.editorial_selection = editorialSelection;
   }
   return report;
+}
+
+function applyDailyLanes(report, context) {
+  delete report.daily_lanes;
+  if (!context?.summary || !report?.editorial_selection) {
+    return report;
+  }
+
+  const laneItemsById = new Map(DAILY_LANE_DEFINITIONS.map((lane) => [lane.id, []]));
+  const seenCandidateIdsByLaneId = new Map(DAILY_LANE_DEFINITIONS.map((lane) => [lane.id, new Set()]));
+  const todaySelectedItems = Array.isArray(report.editorial_selection.today_selected?.items)
+    ? report.editorial_selection.today_selected.items
+    : [];
+  const mustReadItems = Array.isArray(report.editorial_selection.must_read?.items)
+    ? report.editorial_selection.must_read.items
+    : [];
+  const projectedAdmissionItemsById = new Map(
+    (Array.isArray(context.summary.today_selected_items) ? context.summary.today_selected_items : [])
+      .map((item) => [publicString(item?.source_id), item])
+      .filter(([candidateId]) => candidateId)
+  );
+
+  for (const item of mustReadItems.slice(0, 8)) {
+    addDailyLaneItem(laneItemsById, seenCandidateIdsByLaneId, "must_read", item);
+  }
+
+  for (const item of todaySelectedItems) {
+    const candidateId = publicString(item?.candidate_id);
+    const projectedAdmissionItem = projectedAdmissionItemsById.get(candidateId);
+    const laneIds = Array.isArray(projectedAdmissionItem?.lane_ids) ? projectedAdmissionItem.lane_ids : [];
+    for (const laneId of laneIds) {
+      if (laneId === "must_read" || !DAILY_LANE_IDS.has(laneId)) {
+        continue;
+      }
+      addDailyLaneItem(laneItemsById, seenCandidateIdsByLaneId, laneId, item);
+    }
+  }
+
+  const lanes = DAILY_LANE_DEFINITIONS.map((lane) => ({
+    lane_id: lane.id,
+    title: lane.title,
+    max_items: lane.maxItems,
+    items: laneItemsById.get(lane.id).slice(0, lane.maxItems)
+  }));
+  if (lanes.some((lane) => lane.items.length > 0)) {
+    report.daily_lanes = {
+      schema_version: 1,
+      lanes
+    };
+  }
+  return report;
+}
+
+function addDailyLaneItem(laneItemsById, seenCandidateIdsByLaneId, laneId, item) {
+  const candidateId = publicString(item?.candidate_id);
+  if (!candidateId) {
+    return;
+  }
+  const seenCandidateIds = seenCandidateIdsByLaneId.get(laneId);
+  if (!seenCandidateIds || seenCandidateIds.has(candidateId)) {
+    return;
+  }
+  seenCandidateIds.add(candidateId);
+  laneItemsById.get(laneId).push(projectDailyLaneItem(item));
+}
+
+function projectDailyLaneItem(item = {}) {
+  const projected = {
+    candidate_id: publicString(item.candidate_id),
+    title: firstPublicString(item.title, item.candidate_id),
+    section: publicString(item.section)
+  };
+  for (const key of ["url", "source", "summary", "event_type", "verification_status"]) {
+    addPublicString(projected, key, item[key]);
+  }
+  const badges = Array.isArray(item.badges) ? item.badges.map(publicString).filter(Boolean) : [];
+  if (badges.length > 0) {
+    projected.badges = [...new Set(badges)];
+  }
+  return projected;
 }
 
 function buildReportSelectionIndex(report) {
