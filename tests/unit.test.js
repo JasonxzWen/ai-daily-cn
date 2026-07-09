@@ -8538,6 +8538,7 @@ test("daily resilience policy validates current runner stages and workflow gates
   for (const stageId of [
     "discover_github_trending",
     "discover_builders",
+    "editorial_rank_artifact",
     "report_write",
     "quality_page_check",
     "publish_real",
@@ -9272,6 +9273,27 @@ test("daily runner writes launcher summary and stops before real publish by defa
   assert.equal(result.summary.launcher_root, launcherRoot);
   assert.equal(result.summary.clean_repo_root, cleanRoot);
   assert.equal(result.summaryPath, path.join(launcherRoot, ".tmp", "run-summary-2026-06-04.json"));
+  assert.equal(
+    result.summary.editorial_rank_artifact_path,
+    "reports-data/2026/06/internal/editorial-rank-2026-06-04.json"
+  );
+  const editorialRankCall = calls.find((call) => call.id === "editorial_rank_artifact");
+  assert(editorialRankCall, "daily runner should build internal editorial rank artifact before public write");
+  assert.deepEqual(editorialRankCall.args, [
+    "run",
+    "content:editorial-rank:build",
+    "--",
+    "--input",
+    ".tmp/source-candidates-2026-06-04.json",
+    "--source-date",
+    "2026-06-04",
+    "--out",
+    "reports-data/2026/06/internal/editorial-rank-2026-06-04.json"
+  ]);
+  assert(
+    calls.findIndex((call) => call.id === "editorial_rank_artifact") < calls.findIndex((call) => call.id === "report_write"),
+    "internal editorial rank artifact must be built before report_write"
+  );
   assert(calls.some((call) => call.id === "sources_phase5_audit"));
   assert(calls.some((call) => call.id === "publish_dry_run_daily"));
   assert(!calls.some((call) => call.id === "publish_real"));
@@ -10562,6 +10584,7 @@ test("daily runner resumes from AI repair contract and continues with optimized 
   assert.deepEqual(calls.map((stage) => stage.id), [
     "quality_ai_repair",
     "quality_review",
+    "editorial_rank_artifact",
     "report_write",
     "build",
     "quality_page_check",
@@ -10574,6 +10597,10 @@ test("daily runner resumes from AI repair contract and continues with optimized 
   ]);
   const repairStage = calls.find((stage) => stage.id === "quality_ai_repair");
   assert(repairStage.command.args.includes(contractPath));
+  const rankStage = calls.find((stage) => stage.id === "editorial_rank_artifact");
+  assert(rankStage, "AI repair resume should build internal editorial rank artifact before report_write");
+  assert(rankStage.command.args.includes(".tmp/source-candidates-2026-06-04.json"));
+  assert(rankStage.command.args.includes("reports-data/2026/06/internal/editorial-rank-2026-06-04.json"));
   const reportWriteStage = calls.find((stage) => stage.id === "report_write");
   assert(reportWriteStage.command.args.includes(".tmp/daily-report.optimized.json"));
 });
