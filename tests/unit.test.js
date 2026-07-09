@@ -3148,6 +3148,10 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     trend: rank === 1 ? "new" : "same",
     language,
     window: "weekly",
+    topics: ["agent", "llm", "workflow", "browser-automation"],
+    license: "MIT",
+    stargazers_total: 50000 - rank,
+    pushed_at: "2026-06-16T10:00:00Z",
     stars_this_week: 1000 - rank,
     evidence: `${repo} appeared on ${source} rank #${rank} with ${1000 - rank} stars this week.`,
     verification_status: "primary_confirmed",
@@ -3218,6 +3222,11 @@ test("report:draft merges weekly GitHub all-language and selected language pools
   assert(failedReadmeItem);
   assert.equal(failedReadmeItem.readme_fetch_status, "failed");
   assert.equal(Object.hasOwn(failedReadmeItem, "description"), false);
+  const apiMetadataItem = drafted.report.github_trending.find((item) => item.repo === "example/all-weekly-1");
+  assert.deepEqual(apiMetadataItem.topics, ["agent", "llm", "workflow", "browser-automation"]);
+  assert.equal(apiMetadataItem.license, "MIT");
+  assert.equal(apiMetadataItem.stargazers_total, 49999);
+  assert.equal(apiMetadataItem.pushed_at, "2026-06-16T10:00:00Z");
 
   const input = reportToInteractionInput(drafted.report);
   const section = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
@@ -3244,6 +3253,70 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     }
     assert(!section.content.includes("仓库名指向java weekly"));
   }
+});
+
+test("GitHub Trending public signal tags render structured metadata", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.projects = [];
+  report.builder_observations = [];
+  report.github_trending = [
+    {
+      name: "example/browser-agent",
+      repo: "example/browser-agent",
+      description: "Browser Agent organizes browser automation tasks, replay, failure screenshots, local debugging hooks, and permission notes for agent workflows.",
+      readme_summary: "Browser Agent organizes browser automation tasks, replay, failure screenshots, local debugging hooks, and permission notes for agent workflows.",
+      readme_fetch_status: "ok",
+      url: "https://github.com/example/browser-agent",
+      event_date: "2026-06-17",
+      source: "GitHub Trending weekly",
+      language: "TypeScript",
+      window: "weekly",
+      rank: 1,
+      previous_rank: 4,
+      rank_delta: 3,
+      trend: "up",
+      stars_this_week: 678,
+      stargazers_total: 12345,
+      topics: ["agent", "llm", "browser-automation", "workflow"],
+      license: "MIT",
+      pushed_at: "2026-06-16T10:00:00Z",
+      evidence: "GitHub Trending weekly rank #1."
+    }
+  ];
+
+  const validation = validateReport(report);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const html = renderReportHtml(validation.value);
+  const section = html.slice(html.indexOf('id="github-trending"'), html.indexOf('id="source-audit"'));
+  assert(section.includes("TypeScript"));
+  assert(section.includes("agent"));
+  assert(section.includes("llm"));
+  assert(section.includes("browser-automation"));
+  assert(section.includes("README OK"));
+  assert(section.includes("+678 stars"));
+  assert(!section.includes("GitHub Trending weekly rank #1."));
+
+  const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
+  const trendingSection = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
+  assert(trendingSection);
+  const serialized = JSON.stringify(trendingSection);
+  assert(serialized.includes("TypeScript"));
+  assert(serialized.includes("agent"));
+  assert(serialized.includes("llm"));
+  assert(serialized.includes("browser-automation"));
+  assert(serialized.includes("README OK"));
+  assert(serialized.includes("+678 stars"));
+
+  report.github_trending[0].language = "all";
+  report.github_trending[0].window = "weekly";
+  const allLanguageInput = reportToInteractionInput(report, { includeInternalSections: true });
+  const allLanguageTrendingSection = allLanguageInput.sections.find((item) => item.title.startsWith("GitHub Trending"));
+  const allLanguageSerialized = JSON.stringify(allLanguageTrendingSection);
+  assert(!allLanguageSerialized.includes("all"));
+  assert(!allLanguageSerialized.includes("weekly"));
+  assert(allLanguageSerialized.includes("README OK"));
+  assert(allLanguageSerialized.includes("+678 stars"));
 });
 
 test("GitHub trending 发现器可以解析浏览器导出的 HTML", async () => {

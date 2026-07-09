@@ -1526,7 +1526,9 @@ function formatGithubTrending(items, context = {}) {
         tag,
         githubStarsTag(item),
         githubReadmeStatusTag(item),
-        ...(project ? projectHeatTags(project) : []),
+        githubLanguageTag(item),
+        ...githubTopicTags(item),
+        ...githubProjectHeatTags(item, project),
         ...trendTagsFor(context.trendAnnotations, "github_trending", index)
       ].filter(Boolean));
       const details = githubTrendDetails(item, project).join("；");
@@ -1551,9 +1553,9 @@ function formatGithubTrendingCards(items, context = {}) {
       githubTrendStatusHighlightTag(item),
       githubStarsTag(item),
       readmeStatus,
-      item.language ? cardTag(item.language, "topic") : "",
-      item.window ? cardTag(item.window, "topic") : "",
-      ...(project ? projectHeatTags(project) : []),
+      githubLanguageTag(item) ? cardTag(githubLanguageTag(item), "topic") : "",
+      ...githubTopicTags(item).map((tag) => cardTag(tag, "topic")),
+      ...githubProjectHeatTags(item, project),
       ...trendTagsFor(context.trendAnnotations, "github_trending", index)
     ].filter(Boolean);
 
@@ -1763,6 +1765,10 @@ function githubTrendDetails(item, project) {
 }
 
 function githubReadmeStatusTag(item) {
+  if (!isGithubReadmeFetchFailed(item)) {
+    const status = String(item?.readme_fetch_status || item?.readme_status || item?.readme?.status || "").trim();
+    return status || item?.readme_summary || item?.github_readme_summary ? "README OK" : "";
+  }
   return isGithubReadmeFetchFailed(item) ? "README拉取失败" : "";
 }
 
@@ -1788,6 +1794,18 @@ function githubRankMove(item) {
 }
 
 function githubTrendVelocity(item) {
+  const weekly = structuredGithubStarCount(item?.stars_this_week ?? item?.weekly_stars ?? item?.star_growth ?? item?.weekly_star_delta);
+  if (weekly !== null) {
+    return `本周 +${formatCompactNumber(weekly)} stars`;
+  }
+  const daily = structuredGithubStarCount(item?.stars_today ?? item?.daily_stars ?? item?.daily_star_delta);
+  if (daily !== null) {
+    return `今日 +${formatCompactNumber(daily)} stars`;
+  }
+  const total = structuredGithubStarCount(item?.stargazers_total ?? item?.stars);
+  if (total !== null) {
+    return `${formatCompactNumber(total)} stars`;
+  }
   const evidence = String(item.evidence || "");
   const match = evidence.match(/with\s+([0-9,]+)\s+stars today/i);
   return match ? `今日 +${match[1]} stars` : "";
@@ -1795,6 +1813,35 @@ function githubTrendVelocity(item) {
 
 function githubStarsTag(item) {
   return githubTrendVelocity(item);
+}
+
+function githubTopicTags(item) {
+  return Array.isArray(item?.topics)
+    ? item.topics.map((topic) => String(topic || "").trim()).filter(Boolean).slice(0, 3)
+    : [];
+}
+
+function githubLanguageTag(item) {
+  const language = String(item?.language || "").trim();
+  return language && language.toLowerCase() !== "all" ? language : "";
+}
+
+function githubProjectHeatTags(item, project) {
+  const tags = project ? projectHeatTags(project) : [];
+  return githubStarsTag(item) ? tags.filter((tag) => !/stars/i.test(tag)) : tags;
+}
+
+function structuredGithubStarCount(value) {
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return null;
+  }
+  const number = Number(text.replaceAll(",", ""));
+  return Number.isFinite(number) && number >= 0 ? Math.round(number) : null;
+}
+
+function formatCompactNumber(value) {
+  return Number(value).toLocaleString("en-US");
 }
 
 function indexProjects(projects) {

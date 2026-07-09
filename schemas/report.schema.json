@@ -1358,6 +1358,25 @@
         "readme_cache": {
           "$ref": "#/$defs/github_readme_cache"
         },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "maxItems": 12
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stargazers_total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pushed_at": {
+          "type": "string"
+        },
         "url": {
           "$ref": "#/$defs/absolute_url"
         },
