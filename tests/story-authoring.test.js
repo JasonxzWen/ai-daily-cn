@@ -26,6 +26,13 @@ function templatedStoryReport() {
   };
 }
 
+function assertFirstPassAuthoringTask(task) {
+  assert.equal(task.phase, "first_pass_authoring");
+  assert.equal(task.intent, "source_grounded_public_authoring");
+  assert.equal(task.authoring_contract, "public_prose_authoring_v1");
+  assert.equal(task.requires_source_grounding, true);
+}
+
 test("review routes templated story narrative to the editorial loop", () => {
   const review = reviewReportQuality(templatedStoryReport());
   const storyTasks = review.ai_review_tasks.filter(
@@ -36,6 +43,7 @@ test("review routes templated story narrative to the editorial loop", () => {
     "expected a public_editorial_rewrite task on a story what_happened path, got: " +
       JSON.stringify(review.ai_review_tasks)
   );
+  storyTasks.forEach(assertFirstPassAuthoringTask);
 });
 
 test("applier now accepts authored story edits (previously path_not_allowed)", () => {
@@ -100,12 +108,14 @@ test("full loop: every templated story is flagged, authored, and cleared", () =>
     (t) => /^stories\[\d+\]\.what_happened$/.test(String(t.path || "")) && t.kind === "public_editorial_rewrite"
   );
   assert.equal(storyTasks.length, 3, "all three templated stories must be flagged for authoring");
+  storyTasks.forEach(assertFirstPassAuthoringTask);
 
   // 2) author EVERY flagged story field (what_happened and why_it_matters) and
   // apply through the real applier
   const allStoryTasks = review.ai_review_tasks.filter(
     (t) => /^stories\[\d+\]\.(what_happened|why_it_matters|title)$/.test(String(t.path || "")) && t.kind === "public_editorial_rewrite"
   );
+  allStoryTasks.forEach(assertFirstPassAuthoringTask);
   const edits = allStoryTasks.map((t, i) => ({
     path: t.path,
     value: `编辑已根据原始来源改写的具体事实与读者影响片段 ${i + 1}。`,
@@ -155,6 +165,7 @@ test("review routes deterministic templated story TITLE to the editorial loop", 
     "both deterministic templated story titles must be routed to authoring, got: " +
       JSON.stringify(review.ai_review_tasks)
   );
+  titleTasks.forEach(assertFirstPassAuthoringTask);
 });
 
 test("review keeps a concrete story title out of the editorial loop", () => {
@@ -210,4 +221,5 @@ test("review flags deterministic boilerplate why_it_matters (价值/信号集中
     (t) => /^stories\[\d+\]\.why_it_matters$/.test(String(t.path || "")) && t.kind === "public_editorial_rewrite"
   );
   assert.equal(tasks.length, 2, "both boilerplate why_it_matters must route to authoring, got: " + JSON.stringify(review.ai_review_tasks));
+  tasks.forEach(assertFirstPassAuthoringTask);
 });
