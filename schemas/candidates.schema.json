@@ -254,6 +254,21 @@
             "refill_weak_signal"
           ]
         },
+        "roles": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "main_stream_candidate",
+              "github_trending",
+              "hot_blog",
+              "builder_signal",
+              "community_signal",
+              "official_update"
+            ]
+          },
+          "uniqueItems": true,
+          "default": []
+        },
         "main_story_id": {
           "type": "string",
           "minLength": 1

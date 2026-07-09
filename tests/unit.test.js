@@ -212,6 +212,56 @@ test("candidate pool schema accepts specific main refill selection stages", () =
   assert.equal(rejected.valid, false);
 });
 
+test("candidate pool schema accepts candidate roles", () => {
+  const baseCandidate = {
+    id: "role-tagged-main-candidate",
+    source_id: "role-source",
+    category: "project",
+    title: "A role-tagged GitHub project",
+    url: "https://github.com/example/role-tagged-project",
+    source: "GitHub Trending",
+    event_date: "2026-06-26",
+    status: "included",
+    included_in: "main_items",
+    verification_status: "primary_confirmed",
+    verification_sources: ["https://github.com/example/role-tagged-project"],
+    source_level: "github",
+    main_selection_stage: "refill_github",
+    roles: [
+      "main_stream_candidate",
+      "github_trending",
+      "hot_blog",
+      "builder_signal",
+      "community_signal",
+      "official_update"
+    ]
+  };
+  const candidatePool = {
+    schema_version: 1,
+    report_date: "2026-06-26",
+    generated_at: "2026-06-26T08:00:00.000Z",
+    sources: [
+      {
+        id: "role-source",
+        name: "GitHub Trending",
+        url: "https://github.com/trending",
+        category: "github_trending",
+        status: "checked"
+      }
+    ],
+    candidates: [baseCandidate]
+  };
+
+  const accepted = validateCandidatePool(candidatePool);
+  assert.equal(accepted.valid, true, JSON.stringify(accepted.errors));
+
+  const rejected = validateCandidatePool({
+    ...candidatePool,
+    candidates: [{ ...baseCandidate, roles: ["main_stream_candidate", "unknown_signal"] }]
+  });
+  assert.equal(rejected.valid, false);
+});
+
 function mainMarkdownSections(input) {
   return input.sections.filter((section) => section.group === "main" && section.type === "markdown");
 }
@@ -16440,6 +16490,11 @@ test("report:draft fills sparse main stream from unified candidate roles", async
   const candidatePoolById = new Map(drafted.candidatePool.candidates.map((candidate) => [candidate.id, candidate]));
   assert.equal(candidatePoolById.get(projectCandidate.id)?.main_selection_stage, "refill_github");
   assert.equal(candidatePoolById.get(hotBlogCandidate.id)?.main_selection_stage, "refill_hot_blog");
+  assert.deepEqual(candidatePoolById.get(projectCandidate.id)?.roles, ["main_stream_candidate", "github_trending"]);
+  assert.deepEqual(candidatePoolById.get(hotBlogCandidate.id)?.roles, ["main_stream_candidate", "hot_blog"]);
+  assert.deepEqual(candidatePoolById.get(builderCandidate.id)?.roles, ["main_stream_candidate", "builder_signal"]);
+  assert.deepEqual(candidatePoolById.get(communityCandidate.id)?.roles, ["main_stream_candidate", "community_signal"]);
+  assert.equal(JSON.stringify(drafted.report).includes("\"roles\""), false, "candidate roles must stay out of public report output");
   assert(drafted.report.self_check.selection_snapshot.main_items.refill_selected >= 2);
 });
 
@@ -21706,7 +21761,9 @@ test("report:draft records main stream rejection reason counts", async () => {
   for (const candidate of rejected) {
     const poolEntry = drafted.candidatePool.candidates.find((entry) => entry.id === candidate.id);
     assert(poolEntry?.main_reject_reason, `candidate should record why it did not enter main_items: ${candidate.id}`);
+    assert(poolEntry.roles?.includes("main_stream_candidate"), `candidate should record main stream role: ${candidate.id}`);
   }
+  assert(drafted.candidatePool.candidates.find((entry) => entry.id === "generic-github-reject-reason")?.roles?.includes("github_trending"));
   const unaudited = drafted.candidatePool.candidates.filter((candidate) => !candidate.main_selection_stage && !candidate.main_reject_reason);
   assert.deepEqual(unaudited.map((candidate) => candidate.id), [], "every candidate should record main stream selection or rejection audit");
 });
