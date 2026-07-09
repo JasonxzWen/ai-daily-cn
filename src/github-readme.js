@@ -13,7 +13,7 @@ const ZH = {
   projectFramework: "\u9879\u76ee\u6846\u67b6\u3001\u793a\u4f8b\u4ee3\u7801\u548c\u53ef\u590d\u7528\u5de5\u5177\u94fe",
   reusablePackage: "\u53ef\u590d\u7528\u5305",
   examples: "\u793a\u4f8b",
-  testAssets: "\u6d4b\u8bd5\u6216\u8bc4\u4f30\u8d44\u4ea7",
+  testAssets: "\u6d4b\u8bd5\u6837\u4f8b\u548c\u8bc4\u6d4b\u6750\u6599",
   deployDocs: "\u90e8\u7f72\u8bf4\u660e",
   readmeUsage: "README \u8bf4\u660e\u548c\u4f7f\u7528\u5165\u53e3",
   quickStart: "\u5feb\u901f\u5f00\u59cb\u548c\u8fd0\u884c\u524d\u63d0",
@@ -43,7 +43,7 @@ export function summarizeGithubReadme(input = {}) {
   const projectLabel = label ? `${label} 是` : "该仓库是";
   const audience = pickAudience(source);
   const usage = pickProjectUsage(source, subject);
-  const summary = `${projectLabel}面向${audience}的开源项目，核心能力是${subject}；项目提供${deliverables}，主要用于${usage}。`;
+  const summary = `${projectLabel}服务于${audience}的开源项目，主要能力包括${subject}；项目提供${deliverables}，主要用于${usage}。`;
   return finalizeGithubSummary(summary, maxChars);
 }
 
@@ -272,13 +272,21 @@ function finalizeGithubSummary(value, maxChars) {
   let summary = String(value || "")
     .replace(/和近期维护和近期维护/g, "和近期维护")
     .replace(/、近期维护、近期维护/g, "、近期维护")
-    .replace(/README\s*显示核心能力包括/g, "核心能力是")
+    .replace(/README\s*显示核心能力包括/g, "主要能力包括")
+    .replace(/面向\s*agent 工作流和自动化工程的开源项目/gi, "服务于 agent 工作流和自动化工程的开源项目")
+    .replace(/面向\s*AI 工程实践的开源项目/gi, "服务于 AI 工程实践的开源项目")
+    .replace(/核心能力是/g, "主要能力包括")
+    .replace(/测试或评估资产/g, "测试样例和评测材料")
+    .replace(/给出\s*README 说明和使用入口/g, "提供安装说明和使用入口")
+    .replace(/README\s*显示核心能力/g, "公开说明列出能力")
+    .replace(/沉淀为代码、示例和集成入口/g, "整理成代码、示例和集成入口")
+    .replace(/方便和同类方案做功能与工程成本比较/g, "便于团队评估功能边界和接入成本")
     .replace(/读者应先确认[^。]*。?/g, "")
     .replace(/这类项目适合先从[^。]*。?/g, "")
     .replace(/\s+/g, " ")
     .trim();
   if (chineseCharCount(summary) < 80) {
-    summary = `${summary} 它把相关能力沉淀为代码、示例和集成入口，方便和同类方案做功能与工程成本比较。`;
+    summary = `${summary} 这些说明让团队能核对安装入口、示例质量、许可证、维护节奏和接入成本。`;
   }
   return clampChineseSummary(summary, maxChars);
 }

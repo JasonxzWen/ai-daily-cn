@@ -276,6 +276,37 @@ test("daily Codex DAG-lite CLI accepts production execute publish flags with cod
   assert.equal(plan.publish_requested, true);
 });
 
+test("daily Codex DAG-lite CLI accepts a leading npm argument separator", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-mvp-cli-leading-separator-"));
+  await writeMinimalRepoFiles(rootDir);
+  const codexCmd = await writeSuccessfulCodexCommand(rootDir, "2026-07-06");
+
+  const { stdout } = await execFileAsync(process.execPath, [
+    path.join(repoRoot, "scripts", "run-daily-codex-pipeline.mjs"),
+    "--",
+    "--repo-root",
+    rootDir,
+    "--date",
+    "2026-07-06",
+    "--execute",
+    "--publish",
+    "--codex-bin",
+    codexCmd
+  ]);
+
+  const result = JSON.parse(stdout);
+  assert.equal(result.ok, true);
+  assert.equal(result.final_status, "generated_only");
+  assert.equal(result.execute_requested, true);
+  assert.equal(result.publish_requested, true);
+  assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
+
+  const summary = JSON.parse(await fs.readFile(result.summary_path, "utf8"));
+  assert.equal(summary.execute_requested, true);
+  assert.equal(summary.publish_requested, true);
+  assert.equal(summary.failures.length, 0);
+});
+
 test("daily Codex production orchestrator normalizes legacy daily publish summary", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-orchestrator-"));
   const reportDate = "2026-07-06";
