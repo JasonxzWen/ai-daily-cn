@@ -43,6 +43,32 @@ const PRIVATE_EDITORIAL_RANK_FIELDS = [
   "rank_policy",
   "selection_reasons"
 ];
+const EDITORIAL_SELECTION_TARGETS = [
+  {
+    key: "today_selected",
+    sourceKey: "today_selected_items",
+    maxItems: 20
+  },
+  {
+    key: "must_read",
+    sourceKey: "must_read_items",
+    maxItems: 8
+  }
+];
+const EDITORIAL_SELECTION_SECTIONS = [
+  "stories",
+  "main_items",
+  "github_trending",
+  "huggingface_trending",
+  "model_releases",
+  "hot_blogs",
+  "chinese_media_dynamics",
+  "daily_tracking",
+  "projects",
+  "builder_observations",
+  "official_org_updates",
+  "community_leads"
+];
 
 export async function writeReportDraft(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -73,7 +99,7 @@ export async function writeReportDraft(options = {}) {
     days: options.sourceStatusWindowDays || 10
   });
   const draftWithSourceSuggestions = appendSourceStatusSuggestionsToDraft(draft, sourceStatusUpdate);
-  const report = normalizeReportDraft(draftWithSourceSuggestions, {
+  let report = normalizeReportDraft(draftWithSourceSuggestions, {
     reportDate,
     siteUrl: options.siteUrl || DEFAULT_SITE.siteUrl,
     generatedAt: options.generatedAt,
@@ -82,6 +108,8 @@ export async function writeReportDraft(options = {}) {
     rootDir
   });
   requireEditorialRankAdmission(report, editorialRankAdmissionContext);
+  applyEditorialSelection(report, editorialRankAdmissionContext);
+  report = requireReportSchemaForWrite(report);
   await requireFreshReport(report, {
     historyDir: outputDir,
     historyDays: options.historyDays,
@@ -232,10 +260,133 @@ function requireEditorialRankAdmission(report, context) {
   }
 }
 
+function applyEditorialSelection(report, context) {
+  delete report.editorial_selection;
+  if (!context?.summary) {
+    return report;
+  }
+
+  const reportItemsByCandidateId = buildReportSelectionIndex(report);
+  const editorialSelection = {
+    schema_version: 1
+  };
+  let matchedCount = 0;
+
+  for (const target of EDITORIAL_SELECTION_TARGETS) {
+    const seenCandidateIds = new Set();
+    const items = [];
+    const projectedItems = Array.isArray(context.summary[target.sourceKey]) ? context.summary[target.sourceKey] : [];
+    for (const projectedItem of projectedItems) {
+      const candidateId = publicString(projectedItem?.source_id);
+      if (!candidateId || seenCandidateIds.has(candidateId)) {
+        continue;
+      }
+      const matched = reportItemsByCandidateId.get(candidateId);
+      if (!matched) {
+        continue;
+      }
+      seenCandidateIds.add(candidateId);
+      items.push(projectEditorialSelectionItem(matched, projectedItem, candidateId));
+    }
+    editorialSelection[target.key] = {
+      target: target.key,
+      max_items: target.maxItems,
+      items
+    };
+    matchedCount += items.length;
+  }
+
+  if (matchedCount > 0) {
+    report.editorial_selection = editorialSelection;
+  }
+  return report;
+}
+
+function buildReportSelectionIndex(report) {
+  const itemsByCandidateId = new Map();
+  for (const section of EDITORIAL_SELECTION_SECTIONS) {
+    const items = Array.isArray(report?.[section]) ? report[section] : [];
+    for (const item of items) {
+      for (const candidateId of reportItemCandidateIds(item)) {
+        if (!itemsByCandidateId.has(candidateId)) {
+          itemsByCandidateId.set(candidateId, { section, item });
+        }
+      }
+    }
+  }
+  return itemsByCandidateId;
+}
+
+function projectEditorialSelectionItem(matched, projectedItem, candidateId) {
+  const item = matched.item || {};
+  const firstSource = Array.isArray(item.sources) ? item.sources.find((source) => source && typeof source === "object") : null;
+  const projected = {
+    candidate_id: candidateId,
+    title: firstPublicString(item.title, item.headline, item.name, item.repo, projectedItem?.title, candidateId),
+    section: matched.section
+  };
+  addPublicString(projected, "url", item.url, firstSource?.url);
+  addPublicString(
+    projected,
+    "source",
+    item.source,
+    item.publisher,
+    item.author,
+    item.repo,
+    item.name,
+    firstSource?.label,
+    item.primary_entity
+  );
+  addPublicString(
+    projected,
+    "summary",
+    item.summary,
+    item.description,
+    item.what_happened,
+    item.why_it_matters,
+    item.content,
+    item.evidence
+  );
+  addPublicString(projected, "event_type", item.event_type, projectedItem?.event_type);
+  addPublicString(projected, "verification_status", item.verification_status);
+  return projected;
+}
+
+function requireReportSchemaForWrite(report) {
+  const validation = validateReport(report);
+  if (!validation.valid) {
+    throw new PublisherError("schema_validation_failed", "Report failed schema validation before write.", {
+      errors: validation.errors
+    });
+  }
+  return validation.value;
+}
+
 function reportItemCandidateIds(item = {}) {
-  return [item.candidate_id, item.source_id, item.id]
+  return [
+    item.candidate_id,
+    item.source_id,
+    item.id,
+    item.story_id,
+    ...(Array.isArray(item.source_item_refs) ? item.source_item_refs : [])
+  ]
     .map((value) => (typeof value === "string" ? value.trim() : ""))
     .filter(Boolean);
+}
+
+function firstPublicString(...values) {
+  return values.map(publicString).find(Boolean) || "";
+}
+
+function addPublicString(target, key, ...values) {
+  const value = firstPublicString(...values);
+  if (value) {
+    target[key] = value;
+  }
+}
+
+function publicString(value) {
+  return typeof value === "string" ? value.trim() : "";
 }
 
 function selectedAdmissionBlockingReasons(rankedItem = {}) {
