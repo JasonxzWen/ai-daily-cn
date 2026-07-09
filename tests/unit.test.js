@@ -3238,6 +3238,8 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     status: "excluded",
     rank,
     trend: rank === 1 ? "new" : "same",
+    previous_rank: rank === 1 ? 4 : null,
+    rank_delta: rank === 1 ? 3 : null,
     language,
     window: "weekly",
     topics: ["agent", "llm", "workflow", "browser-automation"],
@@ -3317,7 +3319,10 @@ test("report:draft merges weekly GitHub all-language and selected language pools
   const apiMetadataItem = drafted.report.github_trending.find((item) => item.repo === "example/all-weekly-1");
   assert.deepEqual(apiMetadataItem.topics, ["agent", "llm", "workflow", "browser-automation"]);
   assert.equal(apiMetadataItem.license, "MIT");
+  assert.equal(apiMetadataItem.stars_this_week, 999);
   assert.equal(apiMetadataItem.stargazers_total, 49999);
+  assert.equal(apiMetadataItem.previous_rank, 4);
+  assert.equal(apiMetadataItem.rank_delta, 3);
   assert.equal(apiMetadataItem.pushed_at, "2026-06-16T10:00:00Z");
 
   const input = reportToInteractionInput(drafted.report);
