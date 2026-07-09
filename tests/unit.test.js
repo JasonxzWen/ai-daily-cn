@@ -13873,6 +13873,119 @@ test("report:write CLI emits editorial rank admission summary", async () => {
   assert.equal(parsed.editorial_rank_admission.lane_counts.open_source_github, 2);
 });
 
+test("report writer rejects rank-blocked mainline items", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-rank-admission-blocked-"));
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const rankCandidates = JSON.parse(await readFixture("editorial-rank/mixed-candidates.json"));
+  const blocked = rankCandidates.find((candidate) => candidate.id === "github-momentum-only-repo");
+
+  draft.main_items[0] = {
+    ...draft.main_items[0],
+    candidate_id: blocked.id,
+    title: blocked.title,
+    url: blocked.url || "https://github.com/example/momentum-only",
+    source: "GitHub Trending"
+  };
+  candidatePool.candidates[0] = {
+    ...candidatePool.candidates[0],
+    id: blocked.id,
+    title: blocked.title,
+    url: draft.main_items[0].url,
+    source: "GitHub Trending"
+  };
+
+  const draftPath = path.join(tmp, "draft.json");
+  const candidatePoolPath = path.join(tmp, "candidates.json");
+  const rankArtifactPath = path.join(tmp, "editorial-rank.json");
+  const rankArtifact = buildEditorialRankArtifact({
+    rootDir,
+    candidates: rankCandidates,
+    generatedAt: fixedGeneratedAt,
+    sourceWindow: {
+      date: "2026-05-16",
+      relative_hours: 24
+    }
+  });
+  await fs.writeFile(draftPath, `${JSON.stringify(draft, null, 2)}\n`, "utf8");
+  await fs.writeFile(candidatePoolPath, `${JSON.stringify(candidatePool, null, 2)}\n`, "utf8");
+  await fs.writeFile(rankArtifactPath, `${JSON.stringify(rankArtifact, null, 2)}\n`, "utf8");
+
+  await assert.rejects(
+    () =>
+      writeReportDraft({
+        rootDir: tmp,
+        inputPath: draftPath,
+        outputDir: "reports-data",
+        candidatePoolPath,
+        editorialRankArtifactPath: rankArtifactPath,
+        siteUrl,
+        generatedAt: fixedGeneratedAt
+      }),
+    (error) => {
+      assert(error instanceof PublisherError);
+      assert.equal(error.code, "editorial_rank_admission_blocked");
+      assert.equal(error.details.issues[0].section, "main_items");
+      assert.equal(error.details.issues[0].candidate_id, "github-momentum-only-repo");
+      assert(error.details.issues[0].demotion_reasons.includes("github_readme_context_insufficient"));
+      assert(error.details.issues[0].demotion_reasons.includes("momentum_only"));
+      return true;
+    }
+  );
+});
+
+test("report writer accepts rank-selected mainline items", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-rank-admission-selected-"));
+  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
+  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
+  const rankCandidates = JSON.parse(await readFixture("editorial-rank/mixed-candidates.json"));
+  const selected = rankCandidates.find((candidate) => candidate.id === "anthropic-official-agent-practice");
+
+  draft.main_items[0] = {
+    ...draft.main_items[0],
+    candidate_id: selected.id,
+    title: selected.title,
+    url: selected.url || "https://www.anthropic.com/news/agent-practice",
+    source: "Anthropic"
+  };
+  candidatePool.candidates[0] = {
+    ...candidatePool.candidates[0],
+    id: selected.id,
+    title: selected.title,
+    url: draft.main_items[0].url,
+    source: "Anthropic"
+  };
+
+  const draftPath = path.join(tmp, "draft.json");
+  const candidatePoolPath = path.join(tmp, "candidates.json");
+  const rankArtifactPath = path.join(tmp, "editorial-rank.json");
+  const rankArtifact = buildEditorialRankArtifact({
+    rootDir,
+    candidates: rankCandidates,
+    generatedAt: fixedGeneratedAt,
+    sourceWindow: {
+      date: "2026-05-16",
+      relative_hours: 24
+    }
+  });
+  await fs.writeFile(draftPath, `${JSON.stringify(draft, null, 2)}\n`, "utf8");
+  await fs.writeFile(candidatePoolPath, `${JSON.stringify(candidatePool, null, 2)}\n`, "utf8");
+  await fs.writeFile(rankArtifactPath, `${JSON.stringify(rankArtifact, null, 2)}\n`, "utf8");
+
+  const result = await writeReportDraft({
+    rootDir: tmp,
+    inputPath: draftPath,
+    outputDir: "reports-data",
+    candidatePoolPath,
+    editorialRankArtifactPath: rankArtifactPath,
+    siteUrl,
+    generatedAt: fixedGeneratedAt
+  });
+
+  assert.equal(result.report.main_items[0].candidate_id, "anthropic-official-agent-practice");
+  assert.equal(result.editorialRankAdmission.must_read_count, 3);
+});
+
 test("report:write 允许热门博客和社区线索携带公开图片字段", async () => {
   const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
   const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
