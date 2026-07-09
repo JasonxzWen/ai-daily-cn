@@ -142,11 +142,12 @@ async function loadEditorialRankAdmission({ rootDir, reportDate, artifactPath })
 
 function buildEditorialRankAdmissionContext(artifact, { artifactPath }) {
   const itemsBySourceId = new Map();
+  const items = Array.isArray(artifact.items) ? artifact.items : [];
   const laneCounts = {};
   let todaySelectedCount = 0;
   let mustReadCount = 0;
 
-  for (const item of Array.isArray(artifact.items) ? artifact.items : []) {
+  for (const item of items) {
     if (item?.source_id) {
       itemsBySourceId.set(item.source_id, item);
     }
@@ -168,12 +169,33 @@ function buildEditorialRankAdmissionContext(artifact, { artifactPath }) {
       policy_id: artifact.policy_id,
       generated_at: artifact.generated_at,
       source_window: artifact.source_window,
-      item_count: Array.isArray(artifact.items) ? artifact.items.length : 0,
+      item_count: items.length,
       today_selected_count: todaySelectedCount,
       must_read_count: mustReadCount,
-      lane_counts: Object.fromEntries(Object.entries(laneCounts).sort(([left], [right]) => left.localeCompare(right)))
+      lane_counts: Object.fromEntries(Object.entries(laneCounts).sort(([left], [right]) => left.localeCompare(right))),
+      today_selected_items: projectAdmissionItems(items, "today_selected"),
+      must_read_items: projectAdmissionItems(items, "must_read")
     },
     itemsBySourceId
+  };
+}
+
+function projectAdmissionItems(items, target) {
+  return items
+    .filter((item) => item?.admission?.[target]?.selected)
+    .sort((left, right) => (left.editorial_rank || 0) - (right.editorial_rank || 0))
+    .map(projectAdmissionItem);
+}
+
+function projectAdmissionItem(item) {
+  return {
+    source_id: item.source_id,
+    title: item.title,
+    lane_ids: Array.isArray(item.lane_ids) ? [...item.lane_ids] : [],
+    topic_ids: Array.isArray(item.topic_ids) ? [...item.topic_ids] : [],
+    entity_ids: Array.isArray(item.entity_ids) ? [...item.entity_ids] : [],
+    event_type: item.event_type,
+    verification_status: item.verification_status
   };
 }
 
