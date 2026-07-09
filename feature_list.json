@@ -429,8 +429,8 @@
       "status": "active",
       "summary": "Publish generated artifacts to `main` only after explicit confirmation.",
       "commands": [
-        "corepack pnpm run publish -- confirm-push YYYY-MM-DD",
-        "corepack pnpm run publish:github-api -- confirm-push YYYY-MM-DD"
+        "corepack pnpm run publish -- --confirm-push --date YYYY-MM-DD",
+        "corepack pnpm run publish:github-api -- --confirm-push --date YYYY-MM-DD"
       ],
       "artifacts": [
         "remote `main` commit containing publisher-managed files",
@@ -449,8 +449,8 @@
       "behavior": "Publish generated artifacts to `main` only after explicit confirmation.",
       "validation": {
         "commands": [
-          "corepack pnpm run publish -- confirm-push YYYY-MM-DD",
-          "corepack pnpm run publish:github-api -- confirm-push YYYY-MM-DD"
+          "corepack pnpm run publish -- --confirm-push --date YYYY-MM-DD",
+          "corepack pnpm run publish:github-api -- --confirm-push --date YYYY-MM-DD"
         ]
       },
       "evidence": {

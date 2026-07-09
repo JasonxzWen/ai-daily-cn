@@ -1061,7 +1061,8 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       "run",
       "publish",
       "--",
-      "confirm-push",
+      "--confirm-push",
+      "--date",
       reportDate,
       "--skip-pages-verify"
     ]));
@@ -1075,7 +1076,8 @@ function buildPublishFallbackStage(reportDate) {
     "run",
     "publish:github-api",
     "--",
-    "confirm-push",
+    "--confirm-push",
+    "--date",
     reportDate,
     "--skip-pages-verify"
   ]);

@@ -95,7 +95,7 @@ corepack pnpm run publish:preflight
 真实发布命令：
 
 ```powershell
-corepack pnpm run publish -- confirm-push YYYY-MM-DD
+corepack pnpm run publish -- --confirm-push --date YYYY-MM-DD
 ```
 
 该命令只允许提交 `docs/` 与 `reports-data/` 下的发布产物；如果存在 `src/`、`prompts/`、`schemas/` 等非发布器管理改动，会停止并返回 `dirty_worktree`。
@@ -105,7 +105,7 @@ push 成功后，`.github/workflows/deploy-pages.yml` 会在 `main` 上自动执
 本机 Git 元数据不可写时的兜底发布命令：
 
 ```powershell
-corepack pnpm run publish:github-api -- confirm-push YYYY-MM-DD
+corepack pnpm run publish:github-api -- --confirm-push --date YYYY-MM-DD
 ```
 
 该命令需要 `GH_TOKEN`、`GITHUB_TOKEN` 或当前机器可用的 `gh auth token` 具备当前仓库 `contents:write` 权限。它只允许发布由最新 `origin/main` 发布工作树生成并通过验证的产物；执行时通过 GitHub API 读取远端 `main` 当前 commit/tree，比较 `docs/` 与 `reports-data/`，只把远端缺失或内容不同的发布文件写成一个远端提交，并用 `force:false` 更新分支。输出必须包含 `publish_mode: github-api-fallback` 与 `base_commit_sha`，本机 `.git` 不会被写入。

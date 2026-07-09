@@ -200,7 +200,7 @@ corepack pnpm run publish:dry-run:daily -- --date YYYY-MM-DD
 - Only publish after explicit confirmation:
 
 ```powershell
-corepack pnpm run publish -- confirm-push YYYY-MM-DD
+corepack pnpm run publish -- --confirm-push --date YYYY-MM-DD
 ```
 
 - This path may commit and push only publisher-managed `docs/` and `reports-data/` files.
@@ -211,7 +211,7 @@ corepack pnpm run publish -- confirm-push YYYY-MM-DD
 - Use this only when local git metadata, branch switching, or Git transport (`git_fetch_unavailable` / `git_push_unavailable`) blocks real publish after report artifacts passed validation. Do not use it to bypass `remote_ahead`; the runner reports `next_action.kind:"restart_latest_main"` for that case and the correct recovery is to regenerate from current `origin/main`:
 
 ```powershell
-corepack pnpm run publish:github-api -- confirm-push YYYY-MM-DD
+corepack pnpm run publish:github-api -- --confirm-push --date YYYY-MM-DD
 ```
 
 - Required token source: `GH_TOKEN`, `GITHUB_TOKEN`, or `gh auth token`.

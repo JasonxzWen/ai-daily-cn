@@ -19,7 +19,7 @@
    在 clean checkout 内检查分支、远端领先、`.git` 写权限和 push dry-run。
 3. `corepack pnpm run publish:resume-push -- confirm-push YYYY-MM-DD`
    当本地 `main` 已领先远端且工作树干净时，优先续推已有提交，并验证 Pages。
-4. `corepack pnpm run publish:github-api -- confirm-push YYYY-MM-DD`
+4. `corepack pnpm run publish:github-api -- --confirm-push --date YYYY-MM-DD`
    GitHub API 兜底适用于本机 Git 元数据不可写，或 Git fetch/push 传输返回 `git_fetch_unavailable` / `git_push_unavailable` 的情况；该路径只发布由最新 `origin/main` 发布工作树生成并验证通过的 `docs/` 与 `reports-data/` 文件，使用 `force:false`，不得绕过 `remote_ahead`。
    当本机 Git 元数据或 push 通道不可用，但 `GH_TOKEN`、`GITHUB_TOKEN` 或 `gh auth token` 可用时，用 API 读取远端 `main` 当前 commit/tree 并写入远端提交。输出必须包含 `publish_mode: github-api-fallback` 和 `base_commit_sha`。
 5. 仍失败时只报告 `publish_error`、失败原因和修复建议，不在 launcher worktree 执行 `reset --hard`、`push --force`、自动 `stash` 或覆盖用户改动。
@@ -42,7 +42,7 @@ corepack pnpm run publish:preflight
 如果本地存在已提交但未推送的日报提交，还要运行：
 
 ```powershell
-corepack pnpm run publish:resume-push -- confirm-push YYYY-MM-DD
+corepack pnpm run publish:resume-push -- --confirm-push --date YYYY-MM-DD
 ```
 
 最后必须确认当日 Pages URL 返回 HTTP 200，且页面内容包含 `YYYY-MM-DD`。

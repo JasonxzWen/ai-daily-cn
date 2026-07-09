@@ -11214,7 +11214,8 @@ test("daily runner verifies Pages after successful real publish", async () => {
     "run",
     "publish",
     "--",
-    "confirm-push",
+    "--confirm-push",
+    "--date",
     "2026-06-04",
     "--skip-pages-verify"
   ]);
@@ -11279,7 +11280,8 @@ test("daily runner verifies Pages after GitHub API fallback publish", async () =
     "run",
     "publish:github-api",
     "--",
-    "confirm-push",
+    "--confirm-push",
+    "--date",
     "2026-06-04",
     "--skip-pages-verify"
   ]);
@@ -11380,7 +11382,8 @@ test("daily runner falls back to GitHub API when real publish fails", async () =
     "run",
     "publish:github-api",
     "--",
-    "confirm-push",
+    "--confirm-push",
+    "--date",
     "2026-06-04",
     "--skip-pages-verify"
   ]);
@@ -27239,8 +27242,8 @@ async function createHarnessFixture(options = {}) {
       "## Handoff",
       "",
       "pnpm run publish:dry-run",
-      "pnpm run publish -- confirm-push YYYY-MM-DD",
-      "pnpm run publish:github-api -- confirm-push YYYY-MM-DD",
+      "pnpm run publish -- --confirm-push --date YYYY-MM-DD",
+      "pnpm run publish:github-api -- --confirm-push --date YYYY-MM-DD",
       ""
     ].join("\n"),
     "utf8"
