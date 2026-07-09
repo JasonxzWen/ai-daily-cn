@@ -11,6 +11,7 @@
     "source",
     "thresholds",
     "topics",
+    "internal_topics",
     "candidate_topics",
     "annotations_by_date"
   ],
@@ -52,7 +53,13 @@
     "topics": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/topic_summary"
+        "$ref": "#/$defs/public_topic_summary"
+      }
+    },
+    "internal_topics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/internal_topic_summary"
       }
     },
     "candidate_topics": {
@@ -69,7 +76,7 @@
     }
   },
   "$defs": {
-    "topic_summary": {
+    "topic_summary_base": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -133,14 +140,47 @@
         }
       }
     },
-    "candidate_topic": {
+    "public_topic_summary": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/topic_summary_base"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": ["active", "hot"]
+            }
+          }
+        }
+      ]
+    },
+    "internal_topic_summary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["term", "occurrences", "active_days", "display"],
+      "required": [
+        "id",
+        "label",
+        "status",
+        "occurrences",
+        "active_days",
+        "sections",
+        "entities",
+        "dates",
+        "related_reports",
+        "public_visibility"
+      ],
       "properties": {
-        "term": {
+        "id": {
           "type": "string",
           "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": ["watching", "active", "hot"]
         },
         "occurrences": {
           "type": "integer",
@@ -149,6 +189,62 @@
         "active_days": {
           "type": "integer",
           "minimum": 1
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "dates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "related_reports": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "public_visibility": {
+          "enum": ["public", "internal"]
+        }
+      }
+    },
+    "candidate_topic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term", "status", "occurrences", "active_days", "public_visibility", "display"],
+      "properties": {
+        "term": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "const": "candidate"
+        },
+        "occurrences": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "active_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "public_visibility": {
+          "const": "internal"
         },
         "display": {
           "const": false

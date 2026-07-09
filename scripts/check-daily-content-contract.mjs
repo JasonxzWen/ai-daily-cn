@@ -13,6 +13,7 @@ const HOT_BLOG_FILLER_PATTERN = /原文说明|读者可核对|继续留意|本�
 const GITHUB_FILLER_PATTERN = /公开描述提到|进入 GitHub Trending|需要结合仓库页面确认|优先核对 README|实现线索|值得关注的项目|本轮开源榜单|公开页面显示|读者应看项目说明|公开信息只能说明开发者关注度增加|这类项目不应只看星标变化/i;
 const TRACKING_FAKE_PATTERN = /openrouter-mini-card|artificial-analysis-mini-card|local_simplified|simplified_metric|simplified_bars|fake benchmark|toy component/i;
 const PUBLIC_COPY_GATE_START_DATE = "2026-06-30";
+const GITHUB_FAILED_README_METADATA_GATE_START_DATE = "2026-07-09";
 const PUBLIC_COPY_BANNED_TERMS = [
   "准入门槛",
   "候选池",
@@ -485,11 +486,19 @@ function checkGitHubTrending(report, issues) {
 
   const weakSummaries = [];
   const inventedReadmeFailures = [];
+  const failedReadmeMetadataMissing = [];
+  const enforceFailedReadmeMetadata = isAtOrAfterDate(
+    report?.report_date,
+    GITHUB_FAILED_README_METADATA_GATE_START_DATE
+  );
   for (const item of entries.slice(0, Math.max(entries.length, 20))) {
     if (isReadmeFetchFailed(item)) {
       const description = textValue(item?.description);
       if (description && !/README拉取失败/i.test(description) && chineseCharCount(description) >= 20) {
         inventedReadmeFailures.push(repoName(item));
+      }
+      if (enforceFailedReadmeMetadata && !hasFailedReadmeTrendMetadata(item)) {
+        failedReadmeMetadataMissing.push(repoName(item));
       }
       continue;
     }
@@ -521,6 +530,52 @@ function checkGitHubTrending(report, issues) {
       examples: inventedReadmeFailures.slice(0, 5)
     }));
   }
+
+  if (failedReadmeMetadataMissing.length > 0) {
+    issues.push(blockingIssue({
+      code: "github_trending_failed_readme_metadata_missing",
+      requirement: "REQ-006",
+      section: "github_trending",
+      message: "When README fetch fails, GitHub Trending items must keep rank, star velocity, and trend metadata.",
+      count: failedReadmeMetadataMissing.length,
+      examples: failedReadmeMetadataMissing.slice(0, 5)
+    }));
+  }
+}
+
+function hasFailedReadmeTrendMetadata(item) {
+  return hasPositiveNumber(item?.rank ?? item?.source_rank) &&
+    hasStarVelocity(item) &&
+    /^(new|up|down|same)$/i.test(textValue(item?.trend));
+}
+
+function hasStarVelocity(item) {
+  return [
+    item?.stars_this_week,
+    item?.stars_today,
+    item?.weekly_stars,
+    item?.daily_stars,
+    item?.star_growth,
+    item?.stars_delta,
+    item?.weekly_star_delta,
+    item?.daily_star_delta
+  ].some((value) => hasNonNegativeNumber(value));
+}
+
+function hasPositiveNumber(value) {
+  const number = numericMetadataValue(value);
+  return Number.isFinite(number) && number > 0;
+}
+
+function hasNonNegativeNumber(value) {
+  const number = numericMetadataValue(value);
+  return Number.isFinite(number) && number >= 0;
+}
+
+function numericMetadataValue(value) {
+  const text = textValue(value).replace(/,/g, "");
+  if (!text) return NaN;
+  return Number(text);
 }
 
 function checkHotBlogs(report, options, issues) {
@@ -679,8 +734,12 @@ function shouldRunPublicCopyGate(report, options = {}) {
   if (options.enforcePublicCopyGate === false) {
     return false;
   }
-  const reportDate = textValue(report?.report_date);
-  return /^\d{4}-\d{2}-\d{2}$/.test(reportDate) && reportDate >= PUBLIC_COPY_GATE_START_DATE;
+  return isAtOrAfterDate(report?.report_date, PUBLIC_COPY_GATE_START_DATE);
+}
+
+function isAtOrAfterDate(value, cutoff) {
+  const date = textValue(value);
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) && date >= cutoff;
 }
 
 function publicCopyHits(report, options = {}) {
