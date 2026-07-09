@@ -986,7 +986,9 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       "report:write",
       reportPath,
       "reports-data",
-      reportDate
+      reportDate,
+      "--editorial-rank-artifact",
+      editorialRankArtifactPath(reportDate)
     ]),
     pnpmStage("build", ["run", "build"]),
     pnpmStage("quality_page_check", [

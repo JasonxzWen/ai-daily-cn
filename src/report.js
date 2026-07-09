@@ -32,9 +32,43 @@ import {
 } from "./platform-exempt.js";
 import { attachTrackingComponentSnapshots } from "./tracking-components.js";
 import { isTemplatedStoryTitle, normalizeStoryFirstReport, STORY_FIRST_MAX } from "./story-first.js";
+import { formatEditorialRankErrors, validateEditorialRankArtifact } from "./editorial-rank.js";
 
 const PUBLIC_PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source", "model_registry"]);
 const PUBLIC_NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified"]);
+const PRIVATE_EDITORIAL_RANK_FIELDS = [
+  "admission",
+  "demotion_reasons",
+  "editorial_rank",
+  "rank_policy",
+  "selection_reasons"
+];
+const EDITORIAL_SELECTION_TARGETS = [
+  {
+    key: "today_selected",
+    sourceKey: "today_selected_items",
+    maxItems: 20
+  },
+  {
+    key: "must_read",
+    sourceKey: "must_read_items",
+    maxItems: 8
+  }
+];
+const EDITORIAL_SELECTION_SECTIONS = [
+  "stories",
+  "main_items",
+  "github_trending",
+  "huggingface_trending",
+  "model_releases",
+  "hot_blogs",
+  "chinese_media_dynamics",
+  "daily_tracking",
+  "projects",
+  "builder_observations",
+  "official_org_updates",
+  "community_leads"
+];
 
 export async function writeReportDraft(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -50,6 +84,11 @@ export async function writeReportDraft(options = {}) {
     reportDate,
     inputPath: options.candidatePoolPath
   });
+  const editorialRankAdmissionContext = await loadEditorialRankAdmission({
+    rootDir,
+    reportDate,
+    artifactPath: options.editorialRankArtifactPath
+  });
   const automationRevision = options.automationRevision || (await buildAutomationRevision({ rootDir }));
   const sourceStatusUpdate = await prepareSourceStatusHistoryUpdate({
     rootDir,
@@ -60,7 +99,7 @@ export async function writeReportDraft(options = {}) {
     days: options.sourceStatusWindowDays || 10
   });
   const draftWithSourceSuggestions = appendSourceStatusSuggestionsToDraft(draft, sourceStatusUpdate);
-  const report = normalizeReportDraft(draftWithSourceSuggestions, {
+  let report = normalizeReportDraft(draftWithSourceSuggestions, {
     reportDate,
     siteUrl: options.siteUrl || DEFAULT_SITE.siteUrl,
     generatedAt: options.generatedAt,
@@ -68,6 +107,9 @@ export async function writeReportDraft(options = {}) {
     automationRevision,
     rootDir
   });
+  requireEditorialRankAdmission(report, editorialRankAdmissionContext);
+  applyEditorialSelection(report, editorialRankAdmissionContext);
+  report = requireReportSchemaForWrite(report);
   await requireFreshReport(report, {
     historyDir: outputDir,
     historyDays: options.historyDays,
@@ -85,8 +127,283 @@ export async function writeReportDraft(options = {}) {
     report,
     path: target,
     candidatePoolPath,
-    sourceStatusHistoryPath
+    sourceStatusHistoryPath,
+    editorialRankAdmission: editorialRankAdmissionContext?.summary || null
   };
+}
+
+async function loadEditorialRankAdmission({ rootDir, reportDate, artifactPath }) {
+  if (!artifactPath) {
+    return null;
+  }
+  const resolvedPath = path.resolve(rootDir, artifactPath);
+  let artifact;
+  try {
+    artifact = JSON.parse(await fs.readFile(resolvedPath, "utf8"));
+  } catch (error) {
+    throw new PublisherError("editorial_rank_artifact_invalid", "Editorial rank artifact must be readable JSON.", {
+      artifact_path: artifactPath,
+      cause: error.message
+    });
+  }
+
+  const validation = validateEditorialRankArtifact(artifact, { rootDir });
+  if (!validation.valid) {
+    throw new PublisherError("editorial_rank_artifact_invalid", "Editorial rank artifact failed validation.", {
+      artifact_path: artifactPath,
+      errors: validation.errors,
+      error_summary: formatEditorialRankErrors(validation.errors)
+    });
+  }
+
+  const artifactDate = validation.value.source_window?.date;
+  if (artifactDate && artifactDate !== reportDate) {
+    throw new PublisherError("editorial_rank_artifact_date_mismatch", "Editorial rank artifact date does not match report date.", {
+      artifact_path: artifactPath,
+      artifact_date: artifactDate,
+      report_date: reportDate
+    });
+  }
+
+  return buildEditorialRankAdmissionContext(validation.value, { artifactPath });
+}
+
+function buildEditorialRankAdmissionContext(artifact, { artifactPath }) {
+  const itemsBySourceId = new Map();
+  const items = Array.isArray(artifact.items) ? artifact.items : [];
+  const laneCounts = {};
+  let todaySelectedCount = 0;
+  let mustReadCount = 0;
+
+  for (const item of items) {
+    if (item?.source_id) {
+      itemsBySourceId.set(item.source_id, item);
+    }
+    if (item?.admission?.today_selected?.selected) {
+      todaySelectedCount += 1;
+    }
+    if (item?.admission?.must_read?.selected) {
+      mustReadCount += 1;
+    }
+    for (const laneId of Array.isArray(item?.lane_ids) ? item.lane_ids : []) {
+      laneCounts[laneId] = (laneCounts[laneId] || 0) + 1;
+    }
+  }
+
+  return {
+    summary: {
+      ok: true,
+      artifact_path: artifactPath,
+      policy_id: artifact.policy_id,
+      generated_at: artifact.generated_at,
+      source_window: artifact.source_window,
+      item_count: items.length,
+      today_selected_count: todaySelectedCount,
+      must_read_count: mustReadCount,
+      lane_counts: Object.fromEntries(Object.entries(laneCounts).sort(([left], [right]) => left.localeCompare(right))),
+      today_selected_items: projectAdmissionItems(items, "today_selected"),
+      must_read_items: projectAdmissionItems(items, "must_read")
+    },
+    itemsBySourceId
+  };
+}
+
+function projectAdmissionItems(items, target) {
+  return items
+    .filter((item) => item?.admission?.[target]?.selected)
+    .sort((left, right) => (left.editorial_rank || 0) - (right.editorial_rank || 0))
+    .map(projectAdmissionItem);
+}
+
+function projectAdmissionItem(item) {
+  return {
+    source_id: item.source_id,
+    title: item.title,
+    lane_ids: Array.isArray(item.lane_ids) ? [...item.lane_ids] : [],
+    topic_ids: Array.isArray(item.topic_ids) ? [...item.topic_ids] : [],
+    entity_ids: Array.isArray(item.entity_ids) ? [...item.entity_ids] : [],
+    event_type: item.event_type,
+    verification_status: item.verification_status
+  };
+}
+
+function requireEditorialRankAdmission(report, context) {
+  if (!context) {
+    return;
+  }
+  const issues = [];
+  for (const sectionName of ["stories", "main_items"]) {
+    const items = Array.isArray(report?.[sectionName]) ? report[sectionName] : [];
+    for (const item of items) {
+      const candidateIds = reportItemCandidateIds(item);
+      const rankedItem = candidateIds.map((candidateId) => context.itemsBySourceId.get(candidateId)).find(Boolean);
+      if (!rankedItem) {
+        continue;
+      }
+      const demotionReasons = selectedAdmissionBlockingReasons(rankedItem);
+      if (demotionReasons.length === 0) {
+        continue;
+      }
+      issues.push({
+        section: sectionName,
+        candidate_id: candidateIds[0],
+        title: item?.title || item?.headline || "",
+        demotion_reasons: demotionReasons
+      });
+    }
+  }
+  if (issues.length > 0) {
+    throw new PublisherError("editorial_rank_admission_blocked", "Report includes rank-blocked mainline items.", {
+      artifact_path: context.summary.artifact_path,
+      issues
+    });
+  }
+}
+
+function applyEditorialSelection(report, context) {
+  delete report.editorial_selection;
+  if (!context?.summary) {
+    return report;
+  }
+
+  const reportItemsByCandidateId = buildReportSelectionIndex(report);
+  const editorialSelection = {
+    schema_version: 1
+  };
+  let matchedCount = 0;
+
+  for (const target of EDITORIAL_SELECTION_TARGETS) {
+    const seenCandidateIds = new Set();
+    const items = [];
+    const projectedItems = Array.isArray(context.summary[target.sourceKey]) ? context.summary[target.sourceKey] : [];
+    for (const projectedItem of projectedItems) {
+      const candidateId = publicString(projectedItem?.source_id);
+      if (!candidateId || seenCandidateIds.has(candidateId)) {
+        continue;
+      }
+      const matched = reportItemsByCandidateId.get(candidateId);
+      if (!matched) {
+        continue;
+      }
+      seenCandidateIds.add(candidateId);
+      items.push(projectEditorialSelectionItem(matched, projectedItem, candidateId));
+    }
+    editorialSelection[target.key] = {
+      target: target.key,
+      max_items: target.maxItems,
+      items
+    };
+    matchedCount += items.length;
+  }
+
+  if (matchedCount > 0) {
+    report.editorial_selection = editorialSelection;
+  }
+  return report;
+}
+
+function buildReportSelectionIndex(report) {
+  const itemsByCandidateId = new Map();
+  for (const section of EDITORIAL_SELECTION_SECTIONS) {
+    const items = Array.isArray(report?.[section]) ? report[section] : [];
+    for (const item of items) {
+      for (const candidateId of reportItemCandidateIds(item)) {
+        if (!itemsByCandidateId.has(candidateId)) {
+          itemsByCandidateId.set(candidateId, { section, item });
+        }
+      }
+    }
+  }
+  return itemsByCandidateId;
+}
+
+function projectEditorialSelectionItem(matched, projectedItem, candidateId) {
+  const item = matched.item || {};
+  const firstSource = Array.isArray(item.sources) ? item.sources.find((source) => source && typeof source === "object") : null;
+  const projected = {
+    candidate_id: candidateId,
+    title: firstPublicString(item.title, item.headline, item.name, item.repo, projectedItem?.title, candidateId),
+    section: matched.section
+  };
+  addPublicString(projected, "url", item.url, firstSource?.url);
+  addPublicString(
+    projected,
+    "source",
+    item.source,
+    item.publisher,
+    item.author,
+    item.repo,
+    item.name,
+    firstSource?.label,
+    item.primary_entity
+  );
+  addPublicString(
+    projected,
+    "summary",
+    item.summary,
+    item.description,
+    item.what_happened,
+    item.why_it_matters,
+    item.content,
+    item.evidence
+  );
+  addPublicString(projected, "event_type", item.event_type, projectedItem?.event_type);
+  addPublicString(projected, "verification_status", item.verification_status);
+  return projected;
+}
+
+function requireReportSchemaForWrite(report) {
+  const validation = validateReport(report);
+  if (!validation.valid) {
+    throw new PublisherError("schema_validation_failed", "Report failed schema validation before write.", {
+      errors: validation.errors
+    });
+  }
+  return validation.value;
+}
+
+function reportItemCandidateIds(item = {}) {
+  return [
+    item.candidate_id,
+    item.source_id,
+    item.id,
+    item.story_id,
+    ...(Array.isArray(item.source_item_refs) ? item.source_item_refs : [])
+  ]
+    .map((value) => (typeof value === "string" ? value.trim() : ""))
+    .filter(Boolean);
+}
+
+function firstPublicString(...values) {
+  return values.map(publicString).find(Boolean) || "";
+}
+
+function addPublicString(target, key, ...values) {
+  const value = firstPublicString(...values);
+  if (value) {
+    target[key] = value;
+  }
+}
+
+function publicString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function selectedAdmissionBlockingReasons(rankedItem = {}) {
+  const todaySelected = rankedItem?.admission?.today_selected;
+  const mustRead = rankedItem?.admission?.must_read;
+  if (todaySelected?.selected || mustRead?.selected) {
+    return [];
+  }
+  const reasons = new Set();
+  for (const admission of [todaySelected, mustRead]) {
+    for (const reason of Array.isArray(admission?.blocking_demotion_reasons)
+      ? admission.blocking_demotion_reasons
+      : []) {
+      reasons.add(reason);
+    }
+  }
+  return [...reasons].sort();
 }
 
 export function normalizeReportDraft(draft, options = {}) {
@@ -242,10 +559,18 @@ function stripPrivateDisclosureFields(report) {
         delete next.risk_note;
       }
       delete next.source_item_refs;
+      stripPrivateEditorialRankFields(next);
       return next;
     });
   }
+  stripPrivateEditorialRankFields(publicReport);
   return publicReport;
+}
+
+function stripPrivateEditorialRankFields(item) {
+  for (const field of PRIVATE_EDITORIAL_RANK_FIELDS) {
+    delete item[field];
+  }
 }
 
 function requiresPublicDisclosureFields(item = {}) {

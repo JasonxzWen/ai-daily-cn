@@ -590,6 +590,7 @@ try {
       inputPath: args.input || positional[0],
       outputDir: args.out || positional[1] || "reports-data",
       candidatePoolPath: args["candidate-pool"],
+      editorialRankArtifactPath: args["editorial-rank-artifact"],
       reportDate: args.date || firstPositionalDate(argv),
       siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
       generatedAt: args["generated-at"] || firstPositionalDateTime(argv)
@@ -601,7 +602,8 @@ try {
       source_status_history_path: result.sourceStatusHistoryPath,
       canonical_url: result.report.canonical_url,
       quality_status: result.report.quality_status || null,
-      degraded_sections: result.report.quality_status?.degraded_sections || []
+      degraded_sections: result.report.quality_status?.degraded_sections || [],
+      editorial_rank_admission: result.editorialRankAdmission || null
     });
   } else if (command === "report:draft") {
     const args = parseArgs(argv);
