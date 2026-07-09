@@ -25,6 +25,15 @@ const FACT_SECTION_NAMES = new Set(["main_items", "model_releases"]);
 const NON_PRIMARY_DISCLOSURE_SECTIONS = new Set(["main_items", "hot_blogs", "projects", "builder_observations"]);
 const PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source", "model_registry"]);
 const NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified"]);
+const MAIN_REFILL_SELECTION_STAGES = new Set([
+  "refill",
+  "refill_github",
+  "refill_builder",
+  "refill_hot_blog",
+  "refill_community",
+  "refill_window",
+  "refill_weak_signal"
+]);
 const MAIN_REFILL_HIGH_RISK_RE = /\b(funding|raised|valuation|ipo|go public|acquisition|revenue|earnings|profit|pricing|price|benchmark|outperform|faster than|slower than|accuracy|leaderboard|safety|regulation|policy|lawsuit|ban|security|vulnerability|attack|government|minister|capability|capabilities|suspend(?:s|ed)? access|model access|access to new models|new model capabilities)\b|\b\d+(?:\.\d+)?x\s+faster\b|\$[\d,.]+\s*(?:m|b|million|billion)?|融资|估值|上市|收购|营收|财报|定价|价格|基准|跑分|安全|监管|政策|诉讼|禁令|漏洞|攻击|政府/u;
 
 export async function readCandidatePool(options = {}) {
@@ -213,7 +222,7 @@ function requiresPrimaryVerification(sectionName, candidate, item = {}) {
 }
 
 function allowsLowRiskMainRefill(candidate, item = {}) {
-  if (candidate?.main_selection_stage !== "refill") {
+  if (!isMainRefillSelectionStage(candidate?.main_selection_stage)) {
     return false;
   }
   const rejectReason = String(candidate?.main_reject_reason || "").trim();
@@ -224,6 +233,11 @@ function allowsLowRiskMainRefill(candidate, item = {}) {
     return false;
   }
   return !isHighRiskMainRefillCandidate(candidate, item);
+}
+
+function isMainRefillSelectionStage(value) {
+  const stage = String(value || "").trim();
+  return MAIN_REFILL_SELECTION_STAGES.has(stage);
 }
 
 function isHighRiskMainRefillCandidate(candidate, item = {}) {
