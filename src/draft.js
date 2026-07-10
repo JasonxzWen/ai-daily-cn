@@ -29,6 +29,10 @@ import {
   MAIN_SELECTION_STAGE,
   normalizeCandidateAuditRoles
 } from "./main-audit-contract.js";
+import {
+  applyDirectPrimaryTargetVerification,
+  isDirectPrimaryPublicationUrl
+} from "./source-verification.js";
 
 const REQUIRED_AUDIT_GROUPS = [
   "github_trending",
@@ -3172,7 +3176,7 @@ function normalizeCandidate(rawCandidate, context) {
   if (!candidate.verification_status && candidate.source_level && TRUSTED_PRIMARY_SOURCE_LEVELS.has(candidate.source_level)) {
     candidate.verification_status = candidate.source_level === "multi_source" ? "multi_source_confirmed" : "primary_confirmed";
   }
-  return candidate;
+  return applyDirectPrimaryTargetVerification(candidate);
 }
 
 function markIncludedCandidate(candidate, category, includedIn) {
@@ -3805,41 +3809,6 @@ function hasPrimaryStoryEvidence(candidate) {
   const primaryUrl = normalizeUrl(candidate.primary_url);
   const ownUrl = normalizeUrl(candidate.url);
   return Boolean(primaryUrl && primaryUrl !== ownUrl);
-}
-
-function isDirectPrimaryPublicationUrl(candidate) {
-  const declaredSourceLevel = String(candidate?.source_level || "").trim();
-  if (declaredSourceLevel !== "paper" && declaredSourceLevel !== "paper_api") {
-    return false;
-  }
-  let publicationUrl;
-  let pathname;
-  try {
-    publicationUrl = new URL(String(candidate?.url || ""));
-    pathname = decodeURIComponent(publicationUrl.pathname).replace(/\/+$/, "") || "/";
-  } catch {
-    return false;
-  }
-  const hostname = publicationUrl.hostname.toLowerCase().replace(/^www\./, "");
-  if (hostname === "arxiv.org") {
-    return /^\/(?:abs|pdf)\/(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z-]+)?\/\d{7})(?:v\d+)?(?:\.pdf)?$/i.test(pathname);
-  }
-  if (hostname === "openreview.net") {
-    return /^\/(?:forum|pdf)$/i.test(pathname) && Boolean(publicationUrl.searchParams.get("id")?.trim());
-  }
-  if (hostname === "biorxiv.org" || hostname === "medrxiv.org") {
-    return /^\/content\/(?:10\.\d{4,9}\/[^/]+|\d{4}\.\d{2}\.\d{2}\.\d+)(?:v\d+)?(?:\.full|\.full\.pdf)?$/i.test(pathname);
-  }
-  if (hostname === "aclanthology.org") {
-    return /^\/\d{4}\.[a-z0-9-]+\.\d+$/i.test(pathname);
-  }
-  if (hostname === "papers.nips.cc") {
-    return /^\/(?:paper_files\/paper|paper)\/\d{4}\/hash\/[a-f0-9]+-(?:Abstract-Conference|Paper-Conference)(?:\.html|\.pdf)$/i.test(pathname);
-  }
-  if (hostname === "proceedings.mlr.press") {
-    return /^\/v\d+\/[a-z0-9-]+(?:\.html|\/[a-z0-9-]+\.pdf)$/i.test(pathname);
-  }
-  return false;
 }
 
 function hasMainStreamSignal(candidate, meta = {}, reportDate = "") {

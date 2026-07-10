@@ -12451,6 +12451,198 @@ test("phase 5 audit reports missing continuous source audit groups", async () =>
   assert.equal(complete.summary.primary_verified, 3);
 });
 
+test("phase 5 audits final report backrefs and reports concrete source admission outcomes", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-phase5-final-report-"));
+  const reportDate = "2026-05-27";
+  const historyDir = path.join(tmp, "reports-data");
+  const reportDir = path.join(historyDir, "2026", "05");
+  await fs.mkdir(reportDir, { recursive: true });
+  const sourceAudit = {
+    github_trending: auditGroupFixture("GitHub Trending", 1, 0),
+    builder_sources: auditGroupFixture("Builder", 1, 1),
+    content_sources: auditGroupFixture("Content", 5, 4),
+    search_sources: auditGroupFixture("Search", 1, 0),
+    sources_health: auditGroupFixture("Health", 5, 0)
+  };
+  const disclosed = {
+    verification_note: "This item remains attributed to its non-primary source.",
+    risk_note: "High-risk claims require primary or multi-source confirmation."
+  };
+  const report = {
+    report_date: reportDate,
+    source_audit: sourceAudit,
+    main_items: [
+      {
+        candidate_id: "sspai-high-risk",
+        title: "SSPAI reports Alibaba suspends access to Claude models",
+        summary: "The report claims model access was suspended.",
+        url: "https://sspai.com/post/example",
+        source_level: "intermediary",
+        verification_status: "intermediary_only",
+        ...disclosed
+      },
+      {
+        candidate_id: "builder-low-risk",
+        title: "Builder shares an agent workflow observation",
+        summary: "The author describes a personal tool workflow.",
+        url: "https://x.com/builder/status/1",
+        source_level: "original_social",
+        verification_status: "original_social_only",
+        ...disclosed
+      },
+      {
+        candidate_id: "paper-primary-target",
+        title: "A bioRxiv paper introduces an epigenetic foundation model",
+        summary: "The canonical paper page describes the model and evaluation.",
+        url: "https://www.biorxiv.org/content/10.1101/2025.07.16.665231v1",
+        source_level: "primary",
+        verification_status: "intermediary_only",
+        ...disclosed
+      },
+      {
+        candidate_id: "github-primary-target",
+        title: "TrendRadar repository documents MCP analysis",
+        summary: "The canonical repository documents the project.",
+        url: "https://github.com/sansan0/TrendRadar",
+        source_level: "github",
+        verification_status: "intermediary_only",
+        ...disclosed
+      }
+    ],
+    hot_blogs: [
+      {
+        candidate_id: "wechat-viewpoint",
+        title: "A WeChat article discusses model evaluation",
+        summary: "The article is retained as an attributed viewpoint.",
+        url: "https://mp.weixin.qq.com/s/example",
+        source_level: "intermediary",
+        verification_status: "intermediary_only",
+        ...disclosed
+      },
+      {
+        candidate_id: "missing-candidate-backref",
+        title: "A final report item lost its candidate record",
+        summary: "The report item must remain visible as a lineage violation.",
+        url: "https://example.com/missing-candidate",
+        source_level: "primary",
+        verification_status: "primary_confirmed"
+      }
+    ]
+  };
+  const candidates = [
+    {
+      id: "sspai-high-risk",
+      source_id: "intermediary-sspai",
+      category: "main_item",
+      status: "included",
+      included_in: "main_items",
+      title: report.main_items[0].title,
+      evidence: report.main_items[0].summary,
+      url: report.main_items[0].url,
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      main_selection_stage: "refill",
+      ...disclosed
+    },
+    {
+      id: "builder-low-risk",
+      source_id: "follow-builders-x",
+      category: "main_item",
+      status: "included",
+      included_in: "main_items",
+      title: report.main_items[1].title,
+      evidence: report.main_items[1].summary,
+      url: report.main_items[1].url,
+      source_level: "original_social",
+      verification_status: "original_social_only",
+      main_selection_stage: "refill",
+      ...disclosed
+    },
+    {
+      id: "paper-primary-target",
+      source_id: "content-paper-weekly",
+      category: "main_item",
+      status: "included",
+      included_in: "main_items",
+      title: report.main_items[2].title,
+      evidence: report.main_items[2].summary,
+      url: report.main_items[2].url,
+      source_level: "primary",
+      verification_status: "intermediary_only",
+      main_selection_stage: "refill",
+      ...disclosed
+    },
+    {
+      id: "github-primary-target",
+      source_id: "content-awesome-ai-news",
+      category: "main_item",
+      status: "included",
+      included_in: "main_items",
+      title: report.main_items[3].title,
+      evidence: report.main_items[3].summary,
+      url: report.main_items[3].url,
+      source_level: "github",
+      verification_status: "intermediary_only",
+      main_selection_stage: "refill",
+      ...disclosed
+    },
+    {
+      id: "wechat-viewpoint",
+      source_id: "wechat2rss-paperweekly",
+      category: "hot_blog",
+      status: "included",
+      included_in: "hot_blogs",
+      title: report.hot_blogs[0].title,
+      evidence: report.hot_blogs[0].summary,
+      url: report.hot_blogs[0].url,
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      ...disclosed
+    },
+    {
+      id: "candidate-only-orphan",
+      source_id: "content-planet-ai",
+      category: "hot_blog",
+      status: "included",
+      included_in: "hot_blogs",
+      title: "This candidate was not published",
+      url: "https://example.com/orphan",
+      source_level: "intermediary",
+      verification_status: "intermediary_only"
+    }
+  ];
+  await fs.writeFile(path.join(reportDir, reportDate + ".json"), JSON.stringify(report, null, 2) + "\n", "utf8");
+  await fs.writeFile(
+    path.join(reportDir, reportDate + ".candidates.json"),
+    JSON.stringify({ schema_version: 1, report_date: reportDate, generated_at: reportDate + "T00:00:00Z", sources: [], candidates }, null, 2) + "\n",
+    "utf8"
+  );
+
+  const result = await auditSourceRunHistory({
+    rootDir: tmp,
+    historyDir: "reports-data",
+    reportDate,
+    days: 1
+  });
+  const day = result.days[0];
+
+  assert.equal(result.phase5_complete, false);
+  assert.equal(day.metrics.t3_fact_leak_count, 1);
+  assert.deepEqual(day.violations.map((item) => item.candidate_id), ["sspai-high-risk"]);
+  assert.equal(day.violations[0].reason_code, "primary_verification_required");
+  assert.deepEqual(day.verification_upgrades.map((item) => item.candidate_id).sort(), [
+    "github-primary-target",
+    "paper-primary-target"
+  ]);
+  assert.deepEqual(day.candidate_only_included.map((item) => item.candidate_id), ["candidate-only-orphan"]);
+  assert.deepEqual(day.missing_candidate_backrefs.map((item) => item.candidate_id), ["missing-candidate-backref"]);
+  assert.equal(day.metrics.candidate_only_included_count, 1);
+  assert.equal(day.metrics.missing_candidate_backref_count, 1);
+  assert.match(result.summary.notes, /1 source admission violation/);
+  assert.match(result.summary.notes, /1 missing candidate backref/);
+  assert.doesNotMatch(result.summary.notes, /missing days or required audit groups remain/);
+});
+
 test("statuspage discovery parses Atom incidents into light operations candidates", async () => {
   const collected = await collectStatuspageIncidents({
     reportDate: "2026-05-26",
@@ -17541,7 +17733,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -17575,6 +17767,79 @@ test("source order tuning review is validator-backed and complete", async () => 
   }
 });
 
+test("logical source promotion proposals follow multi-day evidence decisions", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const { CORE_SOURCE_CONTRACTS } = await import("../src/source-effectiveness.js");
+  const result = await validateSourceDisplayContract({ rootDir });
+  const review = await fs.readFile(path.join(rootDir, "docs/source-order-tuning-review.md"), "utf8");
+  const tick = String.fromCharCode(96);
+  const decisionRows = review
+    .split("\n")
+    .filter((line) => line.startsWith("| " + tick) && line.split("|").length >= 7);
+  const actionBySource = new Map(decisionRows.map((line) => {
+    const cells = line
+      .split("|")
+      .map((cell) => cell.trim().replaceAll(tick, ""))
+      .filter(Boolean);
+    return [cells[0], cells[4]];
+  }));
+  const promoted = [
+    ["content-azure-blog", "azure-ai-blog"],
+    ["content-cloudflare-blog", "cloudflare-ai-platform"],
+    ["content-google-keyword", "google-keyword-ai"],
+    ["china-ai-baidu-ai-news", "baidu-ai"],
+    ["content-alibaba-cloud-blog", "alibaba-cloud-ai"],
+    ["content-latent-space", "latent-space"],
+    ["content-nature-machine-learning", "nature-machine-learning"],
+    ["intermediary-sspai", "sspai-ai"],
+    ["intermediary-leiphone", "leiphone-ai"]
+  ];
+  const deferred = [
+    "content-tiktok-developers-blog",
+    "content-tencent-hunyuan-blog",
+    "content-bytedance-seed-blog",
+    "content-builder-simon-willison",
+    "content-builder-lilian-weng",
+    "content-interconnects",
+    "content-runway-changelog",
+    "content-luma-changelog",
+    "content-the-magnifier-ai",
+    "content-pika-product",
+    "content-kling-product",
+    "intermediary-ifanr"
+  ];
+  const retired = [
+    "content-smol-ai-news",
+    "content-product-hunt-trending",
+    "content-product-hunt-devtools"
+  ];
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.equal(actionBySource.size, 24);
+  for (const [sourceId] of promoted) {
+    assert.equal(actionBySource.get(sourceId), "promoted", sourceId + " must be promoted");
+  }
+  for (const sourceId of deferred) {
+    assert.equal(actionBySource.get(sourceId), "defer", sourceId + " must remain deferred");
+  }
+  for (const sourceId of retired) {
+    assert.equal(actionBySource.get(sourceId), "retire", sourceId + " must retire only its promotion proposal");
+  }
+  const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
+  for (const [, logicalId] of promoted) {
+    assert(logicalIds.has(logicalId), logicalId + " must be an executable logical source");
+  }
+  for (const sourceId of [...deferred, ...retired]) {
+    assert.equal(
+      CORE_SOURCE_CONTRACTS.some((source) => source.aliases.includes(sourceId)),
+      false,
+      sourceId + " must stay collection-only"
+    );
+  }
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
+});
+
 test("source order tuning review validator rejects drift and private fields", async () => {
   const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "source-order-tuning-review-validator-"));
@@ -17596,20 +17861,24 @@ test("source order tuning review validator rejects drift and private fields", as
   }
 
   await expectInvalid(
-    review.replace("| `core_primary` | 3 |", "| `core_primary` | 2 |"),
-    /unmapped count for core_primary must be 3/
+    review.replace("| `core_primary` | 1 |", "| `core_primary` | 0 |"),
+    /unmapped count for core_primary must be 1/
   );
   await expectInvalid(
     review.replace("`content-azure-blog`", "`unknown-source-id`"),
     /promotion candidate references unknown source id: unknown-source-id/
   );
   await expectInvalid(
-    review.replace("`content-azure-blog`", "`content-openai-news`"),
-    /promotion candidate is already mapped to logical source: content-openai-news/
+    review.replace("`content-tiktok-developers-blog`", "`content-openai-news`"),
+    /defer source content-openai-news must remain collection-only/
   );
   await expectInvalid(
-    review.replace("| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 95 | `promote` |", "| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 93 | `promote` |"),
+    review.replace("| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 95 | `promoted` |", "| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 93 | `promoted` |"),
     /promotion candidate content-azure-blog suggested rank must use 5-point spacing/
+  );
+  await expectInvalid(
+    review.replace("| `content-tiktok-developers-blog` | `tiktok-developer-ai` | `core_primary` | 105 | `defer` |", "| `content-tiktok-developers-blog` | `tiktok-developer-ai` | `core_primary` | 105 | `promote` |"),
+    /action must be promoted, defer, or retire/
   );
   await expectInvalid(`${review}\nhttps://example.com/internal\n`, /order tuning review must not expose raw URLs/);
   await expectInvalid(`${review}\nAI_DAILY_RSSHUB_BASE_URL\n`, /order tuning review must not expose internal source fields/);
@@ -17625,9 +17894,9 @@ test("Anthropic Research logical source promotion is executable and review-backe
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 39);
-  assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
   assert(logical, "CORE_SOURCE_CONTRACTS should include anthropic-research-engineering");
@@ -17657,7 +17926,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
 
   assert(handbook.includes("anthropic-research-engineering"), "handbook should document the promoted logical source");
   assert(!review.includes("| `content-anthropic-research` | `anthropic-research-engineering` |"), "review should no longer list the promoted source as a future candidate");
-  assert.match(review, /order-tuning-total-unmapped:78/);
+  assert.match(review, /order-tuning-total-unmapped:69/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -17709,9 +17978,9 @@ test("core primary official logical source promotions are executable and review-
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 39);
-  assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const promotions = [
     {
@@ -17770,7 +18039,10 @@ test("core primary official logical source promotions are executable and review-
       ["aws-ml", 70],
       ["nvidia-ai-developer", 75],
       ["hugging-face-blog", 80],
-      ["xai-news", 85]
+      ["xai-news", 85],
+      ["azure-ai-blog", 95],
+      ["cloudflare-ai-platform", 115],
+      ["google-keyword-ai", 125]
     ]
   );
 
@@ -17794,7 +18066,7 @@ test("core primary official logical source promotions are executable and review-
   for (const replacementSourceId of ["content-azure-blog", "content-tiktok-developers-blog", "content-cloudflare-blog", "content-google-keyword"]) {
     assert(review.includes(`| \`${replacementSourceId}\``), `review should include replacement promotion candidate ${replacementSourceId}`);
   }
-  assert.match(review, /order-tuning-total-unmapped:78/);
+  assert.match(review, /order-tuning-total-unmapped:69/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -17839,9 +18111,9 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 39);
-  assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -17877,12 +18149,12 @@ test("china model logical sources are promoted into the fixed display contract",
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 39);
-  assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
-  for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official"]) {
+  for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official", "baidu-ai", "alibaba-cloud-ai"]) {
     assert(logicalIds.has(id), `CORE_SOURCE_CONTRACTS should include ${id}`);
   }
 
@@ -17894,7 +18166,9 @@ test("china model logical sources are promoted into the fixed display contract",
       ["qwen-official", 20],
       ["kimi-official", 30],
       ["minimax-official", 40],
-      ["zhipu-official", 50]
+      ["zhipu-official", 50],
+      ["baidu-ai", 80],
+      ["alibaba-cloud-ai", 90]
     ]
   );
 
@@ -17914,7 +18188,9 @@ test("china model logical sources are promoted into the fixed display contract",
     ["content-minimax-blog", "minimax-official"],
     ["china-ai-zhipu-news", "zhipu-official"],
     ["content-zhipu-zh-news", "zhipu-official"],
-    ["content-zhipu-research", "zhipu-official"]
+    ["content-zhipu-research", "zhipu-official"],
+    ["china-ai-baidu-ai-news", "baidu-ai"],
+    ["content-alibaba-cloud-blog", "alibaba-cloud-ai"]
   ]) {
     assert.equal(inventoryById.get(sourceId)?.logical_source_id, logicalSourceId, `${sourceId} should map to ${logicalSourceId}`);
   }
@@ -17984,12 +18260,12 @@ test("source inventory order reference validator rejects drift and private field
     /duplicates source id|must list source id exactly once/
   );
   await expectInvalid(
-    reference.replace("inventory-section:core_primary count:23", "inventory-section:core_primary count:22"),
-    /section core_primary count must be 23/
+    reference.replace("inventory-section:core_primary count:24", "inventory-section:core_primary count:23"),
+    /section core_primary count must be 24/
   );
   await expectInvalid(
-    reference.replace("| `core_primary` 核心一手源 | 23 |", "| `core_primary` 核心一手源 | 22 |"),
-    /summary table section core_primary count must be 23/
+    reference.replace("| `core_primary` 核心一手源 | 24 |", "| `core_primary` 核心一手源 | 23 |"),
+    /summary table section core_primary count must be 24/
   );
   await expectInvalid(
     reference.replace("source-inventory-order:v1", "source-inventory-order:missing"),
@@ -18104,6 +18380,43 @@ test("source-first IA contract extends source effectiveness rows with stable dis
   const orderedIds = rows.map((row) => row.id);
   assert(orderedIds.indexOf("openai-news") < orderedIds.indexOf("github-trending"));
   assert(orderedIds.indexOf("github-trending") < orderedIds.indexOf("chinese-direct-rss"));
+});
+
+test("source effectiveness does not inherit parsed signal from another source in the same audit group", async () => {
+  const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
+  const report = strictPublishReportFixture();
+  report.source_audit = sourceAuditFixture();
+  report.source_audit.content_sources.candidates_found = 1;
+  report.source_audit.content_sources.included = 0;
+  report.source_audit.content_sources.sources = [
+    {
+      id: "content-openai-news-rss",
+      name: "OpenAI News RSS",
+      url: "https://openai.com/news/rss.xml",
+      source_kind: "rss",
+      status: "checked",
+      parsed_count: 1,
+      recent_48h_entries: 1
+    },
+    {
+      id: "content-google-deepmind-rss",
+      name: "Google DeepMind RSS",
+      url: "https://deepmind.google/blog/rss.xml",
+      source_kind: "rss",
+      status: "no_signal",
+      parsed_count: 0,
+      recent_48h_entries: 0
+    }
+  ];
+
+  const rows = buildSourceEffectivenessTable({ report, candidates: [] });
+  const openai = rows.find((row) => row.id === "openai-news");
+  const deepmind = rows.find((row) => row.id === "google-deepmind");
+
+  assert.equal(openai.parsed_recent, true, "the productive source keeps its own parsed signal");
+  assert.equal(deepmind.parsed_recent, false, "group candidates must not make an unproductive source look parsed");
+  assert.equal(deepmind.status_label, "no_recent_update");
+  assert.equal(deepmind.not_included_reason, "reachable_but_no_recent_parsed_signal");
 });
 
 test("internal source-first IA dashboard promotes source metrics and fixed source graph", () => {
@@ -21715,6 +22028,15 @@ test("report:draft rewrites evidence-backed paper refill instead of repeating En
 
   const item = drafted.report.main_items.find((entry) => entry.url === paperLead.url);
   assert(item, "evidence-backed paper lead should be eligible as sparse main stream refill");
+  const normalizedPaper = drafted.candidatePool.candidates.find((entry) => entry.url === paperLead.url);
+  assert.equal(
+    normalizedPaper?.verification_status,
+    "primary_confirmed",
+    "a canonical bioRxiv publication must explicitly upgrade stale intermediary verification"
+  );
+  assert.equal(normalizedPaper?.source_level, "paper");
+  assert.equal(normalizedPaper?.primary_url, paperLead.url);
+  assert(normalizedPaper?.verification_sources?.includes(paperLead.url));
   assert.equal(
     drafted.report.main_items.some((entry) => entry.url === arxivSearchLead.url),
     false,
@@ -21735,6 +22057,80 @@ test("report:draft rewrites evidence-backed paper refill instead of repeating En
     normalizePublicCopyForComparison(bullet) !== normalizePublicCopyForComparison(item.summary)
   ), "paper refill bullet must add detail beyond title/summary");
   assert(!/This is an intermediary|trace it to a primary source|primary_verification_required/i.test([item.summary, ...(item.bullets || [])].join("\n")));
+});
+
+test("report:draft explicitly upgrades canonical GitHub repositories discovered through intermediary lists", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-github-primary-target-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const repositoryUrl = "https://github.com/sansan0/TrendRadar";
+  const repositoryLead = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "awesome-ai-news-trendradar-primary-target",
+      category: "community_lead",
+      source: "Awesome AI News",
+      sourceId: "content-awesome-ai-news",
+      sourceLevel: "github",
+      verificationStatus: "intermediary_only",
+      title: "TrendRadar adds MCP analysis and multi-channel AI news delivery",
+      url: repositoryUrl,
+      evidence:
+        "The repository documents MCP analysis, deduplicated AI topic monitoring, enterprise messaging channels, deployment steps, and maintenance boundaries.",
+      editorialCategory: "open_source"
+    }),
+    intermediary_url: "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README_CN.md",
+    notes:
+      "source_report_url=https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README_CN.md; primary_verification_required=true"
+  };
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-github-primary-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-github-primary-control",
+        title: "OpenAI updates API workflow controls",
+        evidence: "OpenAI describes API workflow controls, availability, migration guidance, and developer impact."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "anthropic-github-primary-control",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/example-github-primary-control",
+        title: "Anthropic updates deployment controls",
+        evidence: "Anthropic describes deployment controls, availability, admin settings, and developer impact."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "google-github-primary-control",
+        source: "Google AI Blog",
+        url: "https://blog.google/technology/ai/example-github-primary-control/",
+        title: "Google updates AI developer controls",
+        evidence: "Google describes developer controls, release behavior, availability, and migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "meta-github-primary-control",
+        source: "Meta AI Blog",
+        url: "https://ai.meta.com/blog/example-github-primary-control/",
+        title: "Meta updates AI release controls",
+        evidence: "Meta describes release controls, platform availability, rollout details, and developer impact."
+      }),
+      repositoryLead
+    ],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Meta AI Blog", "Awesome AI News"]
+  });
+  await fs.writeFile(discoveryPath, JSON.stringify(discovery, null, 2) + "\n", "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+  const normalized = drafted.candidatePool.candidates.find((entry) => entry.url === repositoryUrl);
+
+  assert.equal(normalized?.verification_status, "primary_confirmed");
+  assert.equal(normalized?.source_level, "github");
+  assert.equal(normalized?.primary_url, repositoryUrl);
+  assert(normalized?.verification_sources?.includes(repositoryUrl));
 });
 
 test("report:draft rejects refill candidates outside the 72 hour main stream window", async () => {
@@ -27961,7 +28357,19 @@ async function writePhase5Day(historyDir, reportDate, options = {}) {
     path.join(dir, `${reportDate}.json`),
     `${JSON.stringify({
       report_date: reportDate,
-      source_audit: sourceAudit
+      source_audit: sourceAudit,
+      main_items: [
+        {
+          candidate_id: "candidate-main",
+          title: "Main Item",
+          url: ["https://example.com", reportDate].join("/"),
+          event_date: reportDate,
+          source_level: "primary",
+          verification_status: options.candidateVerificationStatus || "primary_confirmed",
+          verification_note: "Fixture source attribution.",
+          risk_note: "High-risk facts require primary verification."
+        }
+      ]
     }, null, 2)}\n`,
     "utf8"
   );
@@ -27991,6 +28399,7 @@ async function writePhase5Day(historyDir, reportDate, options = {}) {
           event_date: reportDate,
           status: "included",
           included_in: "main_items",
+          source_level: "primary",
           verification_status: options.candidateVerificationStatus || "primary_confirmed",
           verification_sources: [`https://example.com/${reportDate}`]
         }

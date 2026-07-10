@@ -182,10 +182,11 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Type: production admission / source truth.
 - Fact evidence: the three-day Phase5 audit for 2026-07-09 reports `phase5_complete:false` and seven T3 fact leaks. Wechat2RSS PaperWeekly entered 2026-07-09 hot_blogs as intermediary-only; six non-primary records entered fact surfaces on 2026-07-06. A real 2026-07-10 run selected Simon Willison's intermediary-only OpenAI quotation into main_items and passed quality before report_write blocked it.
 - Root cause: source ownership, claim verification, blacklist refill, Phase5, quality review, and report_write evolved as separate predicates. A vendor keyword in a third-party URL path could infer official ownership, while quality only checked ID/status/included_in.
-- State: implementing.
-- Current-Slice action: claim-level intermediary/original-social/unverified status now overrides a misleading source level for story admission; ownership inference uses source identity and URL hostname, not arbitrary URL path; quality and report_write share `collectCandidateCoverageIssues`; terminal summaries identify the latest unresolved failure. Real discovery replay excludes Simon with `secondary_single_source_story` and passes candidate_backrefs.
-- Remaining action: centralize the remaining Phase5 and low-risk disclosure policy, upgrade verified original URLs explicitly, return concrete violating candidate IDs, and correct misleading missing-day/group notes.
-- Acceptance: the 2026-07-06/08/09 three-day audit passes; high-risk Wechat/SSPAI fixtures block; verified GitHub/bioRxiv targets upgrade; quality pass implies report_write cannot later fail candidate coverage.
+- State: locally_verified.
+- Current-Slice action: claim-level status overrides misleading source level; quality/report_write share `collectCandidateCoverageIssues`; Phase5 now joins final report backrefs and consumes the same source-admission decision; canonical paper/GitHub targets upgrade explicitly; high-risk Chinese access terms block; concrete violations, upgrades, orphan included flags, missing backrefs, and accurate notes are emitted.
+- Focused/runtime evidence: 12 focused admission/Phase5/effectiveness tests pass. The real 2026-07-06/08/09 audit now reports one true historical SSPAI high-risk violation, two trusted-target upgrades, three candidate-only flags, and one missing backref; 2026-07-08 and 2026-07-09 each pass.
+- Remaining action: final real non-publish pipeline must prove newly generated artifacts satisfy the shared policy; do not rewrite the immutable 2026-07-06 raw report merely to manufacture a green history.
+- Acceptance: high-risk WeChat/SSPAI fixtures block; disclosed low-risk signals remain attributable; verified GitHub/bioRxiv targets upgrade; Phase5 reports only final-report truth; quality pass implies report_write cannot later fail candidate coverage.
 
 ### REC-312 - Repair real official-source effectiveness, China first
 
@@ -210,8 +211,9 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Type: observability correctness.
 - Fact evidence: `collectAuditSources()` copies group-level candidates_found to every source; `sourceHasRecentParsedSignal()` then treats that group count as a per-source parse signal. DeepSeek, Qwen, Kimi, MiniMax, and Zhipu can therefore show parsed_recent even when their own parsed_count is zero.
 - Root cause: group success is attributed to every source in the group.
-- State: discovered.
-- Action: parsed_recent must use only per-source parsed_count/recent_48h_entries; missing evidence remains unknown/no_recent.
+- State: locally_verified.
+- Action completed: `parsed_recent` now uses only per-source `parsed_count/recent_48h_entries`; synthetic group candidate/included fields were removed from per-source rows.
+- Evidence: the two-source regression keeps the productive source true and the zero-signal sibling false; focused source-effectiveness tests pass.
 - Acceptance: in a two-source group where only one source emits candidates, the other remains parsed_recent false.
 
 ### REC-315 - Preserve terminal decisions for 24 historical source IDs
@@ -240,9 +242,11 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Type: source ranking / planned-only configuration.
 - Fact evidence: none of the 24 proposal IDs in source-order-tuning-review entered the display contract; 78 collection entries remain unmapped. Eleven of the 24 produced candidates on 2026-07-09, but only Google Keyword, Alibaba Cloud, and Leiphone contributed included items.
 - Root cause: a review proposal was later read as implementation progress without a production promotion decision.
-- State: discovered.
-- Action: after REC-311/314, decide promote/defer/retire per productive source using multi-day evidence; keep source-first diagnostics internal.
-- Acceptance: display contract, source_effectiveness, candidate output, and public inclusion agree per logical source.
+- State: locally_verified.
+- Decision: 38 stored daily artifacts support 9 promotions (`azure-ai-blog`, `cloudflare-ai-platform`, `google-keyword-ai`, `baidu-ai`, `alibaba-cloud-ai`, `latent-space`, `nature-machine-learning`, `sspai-ai`, `leiphone-ai`), 12 deferrals, and 3 retired promotion proposals. Retired proposals keep their collection entries.
+- Implementation: 48 logical sources now map through `CORE_SOURCE_CONTRACTS` and the display contract; 69 collection entries remain unmapped. `docs/source-order-tuning-review.md` records every per-source decision and evidence; the validator rejects invalid actions or mapped defer/retire rows.
+- Evidence: source display validation passes; 8 focused governance/promotion/inventory tests pass.
+- Acceptance: display contract, source_effectiveness, candidate output, and public inclusion agree per logical source; promotion never raises source authority or bypasses story admission.
 
 ### REC-317 - Keep RSSHub/RSS-Bridge optional, not default
 

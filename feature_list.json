@@ -111,7 +111,10 @@
       "acceptance": [
         "Candidate sources record successful, failed, and empty checks.",
         "Selected items point back to candidate IDs.",
-        "Freshness, duplicate URL, and source-window decisions are recorded before report writing."
+        "Freshness, duplicate URL, and source-window decisions are recorded before report writing.",
+        "Per-source parsed_recent uses only that source's parsed_count or recent_48h_entries; group candidate totals never create per-source success.",
+        "Phase5 joins final report candidate backrefs, applies the shared source-admission decision, and reports concrete violations, trusted-target upgrades, orphan included flags, and missing backrefs.",
+        "Logical-source promotion is evidence-decided per collection entry; defer and retire decisions remain collection-only and never raise source authority."
       ],
       "stop_conditions": [
         "Required source audit fields cannot be reconstructed.",
@@ -130,11 +133,19 @@
       "evidence": {
         "artifacts": [
           ".tmp/source-candidates-YYYY-MM-DD.json",
-          ".tmp/daily-report.json"
+          ".tmp/daily-report.json",
+          "src/source-verification.js",
+          "src/source-phase5.js",
+          "src/source-effectiveness.js",
+          "config/source-display-contract.json",
+          "docs/source-order-tuning-review.md"
         ],
         "stop_conditions": [
           "Required source audit fields cannot be reconstructed.",
-          "The draft would bypass candidate-pool or freshness gates."
+          "The draft would bypass candidate-pool or freshness gates.",
+          "A group-level count is reported as a member source's parsed signal.",
+          "Phase5 counts candidate-only included flags as public facts or omits final-report lineage violations.",
+          "A deferred or retired promotion proposal appears as a first-class logical source."
         ]
       }
     },

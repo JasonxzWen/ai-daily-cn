@@ -311,6 +311,15 @@ Default loop:
 4. Keep mirrors, duplicate org feeds, broad aggregators, and private/manual bridges collection-only unless the user explicitly promotes them.
 5. Run the source display validator and full validation before merging.
 
+The 2026-07 evidence decision promoted nine named identities without changing story admission or authority:
+
+- `azure-ai-blog`, `cloudflare-ai-platform`, and `google-keyword-ai` in `core_primary`;
+- `baidu-ai` and `alibaba-cloud-ai` in `china_models`;
+- `latent-space` and `nature-machine-learning` in `builder_community`;
+- `sspai-ai` and `leiphone-ai` in `platform_cn_media`.
+
+The remaining original proposals are explicitly `defer` or `retire` in `docs/source-order-tuning-review.md` and stay collection-only.
+
 <!-- source-first-v2-validation -->
 
 ### Source-First V2 Validation
