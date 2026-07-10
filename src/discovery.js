@@ -6036,25 +6036,30 @@ function parseHtmlIndexEntries(html, sourceInfo = {}) {
       continue;
     }
 
-    const forwardBlock = html.slice(match.index, Math.min(html.length, match.index + 1800));
-    const surroundingBlock = html.slice(Math.max(0, match.index - 600), Math.min(html.length, match.index + 1800));
+    const anchorBlock = match[0];
+    const containerBlock = htmlIndexContainerBlock(html, match.index, match.index + match[0].length);
     const metadata = structuredMetadata.get(htmlIndexMetadataKey(url));
     const anchorTitle = extractHtmlTitle(match[4]);
     const title = genericHtmlAnchorTitle(anchorTitle)
-      ? metadata?.title || extractHtmlTitle(forwardBlock)
-      : anchorTitle || metadata?.title || extractHtmlTitle(forwardBlock);
-    const eventDate = extractHtmlDate(forwardBlock) || extractHtmlDate(surroundingBlock) || metadata?.event_date;
+      ? metadata?.title || ""
+      : anchorTitle || metadata?.title || "";
+    const anchorEventDate = extractHtmlDate(anchorBlock);
+    const eventDate = anchorEventDate || metadata?.event_date || extractHtmlDate(containerBlock);
     if (!title || !eventDate) {
       continue;
     }
 
-    const imageUrl = extractHtmlImageUrl(forwardBlock, url) || metadata?.image_url || "";
+    // Treat the exact anchor (or same-URL structured metadata) as the fact boundary.
+    // Reading past its closing tag can attach the next card's title, image, or facts
+    // to the current candidate. An exact article/list-item container may supply only
+    // an external date; arbitrary surrounding markup is never used as evidence.
+    const imageUrl = extractHtmlImageUrl(anchorBlock, url) || metadata?.image_url || "";
     seenUrls.add(url);
     entries.push({
       title,
       url,
       event_date: eventDate,
-      summary: metadata?.summary || extractHtmlSummary(forwardBlock),
+      summary: metadata?.summary || extractHtmlSummary(anchorBlock),
       ...(imageUrl ? { image_url: imageUrl, image_source: "html_index" } : {})
     });
   }
@@ -6088,6 +6093,35 @@ function htmlIndexStructuredMetadata(html, baseUrl) {
     });
   }
   return byUrl;
+}
+
+function htmlIndexContainerBlock(html, anchorStart, anchorEnd) {
+  const prefix = html.slice(0, anchorStart);
+  const lowerPrefix = prefix.toLowerCase();
+  const candidates = [];
+
+  for (const tag of ["article", "li"]) {
+    let openingIndex = -1;
+    for (const match of prefix.matchAll(new RegExp(`<${tag}\\b`, "gi"))) {
+      openingIndex = match.index;
+    }
+    if (openingIndex < 0 || lowerPrefix.lastIndexOf(`</${tag}`) > openingIndex) {
+      continue;
+    }
+
+    const suffix = html.slice(anchorEnd);
+    const closingMatch = suffix.match(new RegExp(`</${tag}\\s*>`, "i"));
+    if (!closingMatch || closingMatch.index === undefined) {
+      continue;
+    }
+    candidates.push({
+      start: openingIndex,
+      end: anchorEnd + closingMatch.index + closingMatch[0].length
+    });
+  }
+
+  const nearest = candidates.sort((left, right) => right.start - left.start)[0];
+  return nearest ? html.slice(nearest.start, nearest.end) : "";
 }
 
 function genericHtmlAnchorTitle(value) {
@@ -6504,7 +6538,7 @@ function extractHtmlTitle(block) {
 
 function cleanHtmlTitle(value) {
   return String(value || "")
-    .replace(/^(?:(?:[A-Z][a-z]+\.?\s+\d{1,2},\s+\d{4}|\d{4}[.-]\d{2}[.-]\d{2})\s+)?(?:Announcements|Blog|Company|Featured|Product|Research)\s+/i, "")
+    .replace(/^(?:(?:[A-Z][a-z]+\.?\s+\d{1,2},\s+\d{4}|\d{4}[.-]\d{2}[.-]\d{2})\s+)?(?:Announcements|Blog|Case\s+Study|Company|Featured|Product|Research)\s+/i, "")
     .trim();
 }
 

@@ -2,15 +2,15 @@
   "schema_version": 1,
   "report_date": "2026-07-08",
   "title": "AI 日报 2026-07-08",
-  "summary": "今天的重点集中在三条线：Anthropic 推进安全治理与平台控制更新，GitHub 扩展 Copilot 的企业使用范围，OpenAI 与腾讯继续补强智能体和开发者工具。开源榜单则显示，评测、自动化任务和工程工具仍是开发者关注的主要方向。",
+  "summary": "今天的重点集中在三条线：阿尔伯塔政府用 Claude Code 大规模审查遗留系统，GitHub 扩展 Copilot 的企业使用范围，OpenAI 与腾讯继续补强智能体和开发者工具。开源榜单则显示，评测、自动化任务和工程工具仍是开发者关注的主要方向。",
   "hero_highlights": [
     {
-      "title": "Anthropic 推进安全治理与平台控制更新",
+      "title": "阿尔伯塔政府用 Claude Code 审查 4.66 亿行代码",
       "url": "https://www.anthropic.com/news/alberta-government-claude-cybersecurity",
-      "reason": "可观察的是合规、安全和平台治理口径变化",
-      "what_happened": "Anthropic 发布 Claude Fable 5 和 Claude Mythos 5：Fable 5 是面向通用使用开放的 Mythos-class 安全版，Mythos 5 是同一底层模型的可信访问版本，差别主要在安全限制和访问范围",
-      "why_watch": "可观察的是合规、安全和平台治理口径变化",
-      "category": "model_platform",
+      "reason": "政府遗留系统的大规模 AI 安全审计已进入真实落地",
+      "what_happened": "阿尔伯塔省技术与创新部让约 50 个 Claude Code agent 并行审查 4.66 亿行政府代码，约 20 小时完成扫描，并把发现、修复、测试和人工批准串成安全整改流程",
+      "why_watch": "政府遗留系统的大规模 AI 安全审计已进入真实落地",
+      "category": "product_tool",
       "source_item_ref": "https://www.anthropic.com/news/alberta-government-claude-cybersecurity"
     },
     {
@@ -35,24 +35,19 @@
   "stories": [
     {
       "story_id": "story-content-anthropic-news-jul-6-2026-case-study-government-of-alberta-uses-claude-t",
-      "title": "Anthropic说明安全治理和平台控制变化",
+      "title": "阿尔伯塔政府用 Claude Code 审查 4.66 亿行代码",
       "importance": "general",
       "trend": "AI industry",
       "event_date": "2026-07-06",
-      "primary_entity": "Anthropic News",
+      "primary_entity": "阿尔伯塔省政府",
       "event_type": "signal",
-      "object": "Anthropic说明安全治理和平台控制变化",
-      "what_happened": "Anthropic 发布 Claude Fable 5 和 Claude Mythos 5：Fable 5 是面向通用使用开放的 Mythos-class 安全版，Mythos 5 是同一底层模型的可信访问版本，差别主要在安全限制和访问范围。",
-      "why_it_matters": "可观察的是合规、安全和平台治理口径变化",
-      "evidence_level": "multi_source",
+      "object": "Claude Code 政府代码安全审计",
+      "what_happened": "阿尔伯塔省技术与创新部让约 50 个 Claude Code agent 并行审查 4.66 亿行政府代码，约 20 小时完成扫描；Claude Code 还参与生成修复和测试，所有上线变更仍由工程师审核批准。",
+      "why_it_matters": "这是政府遗留系统把 AI agent 用于大规模安全审计和现代化的真实案例，重点不只是发现问题，还包括可回看的证据、自动化修复与人工发布门禁。",
+      "evidence_level": "primary",
       "sources": [
         {
           "label": "Anthropic News",
-          "url": "https://www.anthropic.com/news/alberta-government-claude-cybersecurity",
-          "type": "official"
-        },
-        {
-          "label": "Anthropic Company News",
           "url": "https://www.anthropic.com/news/alberta-government-claude-cybersecurity",
           "type": "official"
         }
@@ -226,7 +221,7 @@
   ],
   "main_items": [
     {
-      "title": "Anthropic说明安全治理和平台控制变化",
+      "title": "阿尔伯塔政府用 Claude Code 审查 4.66 亿行代码",
       "editorial_category": "ai_industry",
       "event_date": "2026-07-06",
       "url": "https://www.anthropic.com/news/alberta-government-claude-cybersecurity",
@@ -235,11 +230,11 @@
       "entities": [
         "Anthropic News"
       ],
-      "summary": "Anthropic 发布 Claude Fable 5 和 Claude Mythos 5：Fable 5 是面向通用使用开放的 Mythos-class 安全版，Mythos 5 是同一底层模型的可信访问版本，差别主要在安全限制和访问范围。",
+      "summary": "阿尔伯塔政府 4 亿 6600 万行代码由约 50 个 Claude Code agent 在 20 小时内完成扫描。系统还参与漏洞定位、修复与测试，所有上线变更仍需工程师审核。",
       "bullets": [
-        "**模型关系**：Anthropic 把 Fable 5 解释为面向通用使用开放的 ==Mythos-class== 模型；Mythos 5 是同一底层模型、面向可信访问放宽部分安全限制。",
-        "**安全策略**：Fable 5 在网络安全、生物、化学和模型蒸馏等敏感场景由分类器接管，并回退到 Claude Opus 4.8；官方称平均少于 5% 的会话会触发。",
-        "**可用性/价格**：Fable 5 面向公开产品和 API 可用；Mythos 5 仅限 Project Glasswing/可信访问，两者标价都是 $10/M input、$50/M output。"
+        "**审查规模**：阿尔伯塔省技术与创新部让约 50 个 Claude Code agent 并行审查 ==4.66 亿行代码==，约 20 小时完成扫描。",
+        "**修复流程**：Claude Code 先用规则引擎标记模式，再逐项复核并给出文件和行号；它还能生成修复和测试，但变更上线前必须由工程师审核。",
+        "**适用范围**：案例覆盖 27 个省级部门、约 1,280 个应用和 3,400 个代码仓库，展示了政府遗留系统用 agent 加速安全审计与现代化的路径。"
       ],
       "importance": "general",
       "image_urls": []

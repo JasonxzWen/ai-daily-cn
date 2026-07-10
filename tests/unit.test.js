@@ -5727,6 +5727,84 @@ test("handoff source plan parses html_index entries with JSON-LD metadata fallba
   assert.match(collected.candidates[0].evidence, /agent safety evaluations/i);
 });
 
+test("content source discovery keeps dated HTML index anchor cards isolated", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-07-07",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-anthropic-news",
+        name: "Anthropic News",
+        url: "https://www.anthropic.com/news",
+        source_kind: "html_index",
+        candidate_category: "hot_blog",
+        authority: "primary",
+        verification_policy: "primary_allowed",
+        format: "html_index",
+        linkPattern: "/news/",
+        source_level: "official_company_news"
+      }
+    ],
+    fetchImpl: async () => textResponse(`
+      <ul>
+        <li>
+          <a href="/news/alberta-government-claude-cybersecurity">
+            <div><time>Jul 6, 2026</time><span>Case Study</span></div>
+            <span>Government of Alberta uses Claude to find and fix cybersecurity vulnerabilities across government systems</span>
+          </a>
+        </li>
+        <li>
+          <a href="/news/fable-safeguards-jailbreak-framework">
+            <div><time>Jul 5, 2026</time><span>Announcements</span></div>
+            <span>More details on Fable 5's cyber safeguards and our jailbreak framework</span>
+          </a>
+        </li>
+      </ul>
+    `)
+  });
+
+  assert.equal(collected.candidates.length, 2);
+  const alberta = collected.candidates.find((candidate) => candidate.url.endsWith("/alberta-government-claude-cybersecurity"));
+  const fable = collected.candidates.find((candidate) => candidate.url.endsWith("/fable-safeguards-jailbreak-framework"));
+  assert.equal(alberta.title, "Government of Alberta uses Claude to find and fix cybersecurity vulnerabilities across government systems");
+  assert.match(alberta.evidence, /Government of Alberta uses Claude/i);
+  assert.doesNotMatch(alberta.evidence, /Fable 5/i);
+  assert.match(fable.evidence, /Fable 5/i);
+  assert.doesNotMatch(fable.evidence, /Government of Alberta/i);
+});
+
+test("content source discovery keeps external dates inside each HTML index card", async () => {
+  const collected = await collectContentSources({
+    reportDate: "2026-07-07",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-external-date-news",
+        name: "External Date News",
+        url: "https://example.com/news",
+        source_kind: "html_index",
+        candidate_category: "hot_blog",
+        authority: "primary",
+        verification_policy: "primary_allowed",
+        format: "html_index",
+        linkPattern: "/news/",
+        source_level: "official_company_news"
+      }
+    ],
+    fetchImpl: async () => textResponse(`
+      <main>
+        <article><time>Jul 6, 2026</time><a href="/news/alberta-security-review">Alberta security review</a></article>
+        <article><time>Jul 5, 2026</time><a href="/news/fable-safeguards">Fable safeguards update</a></article>
+      </main>
+    `)
+  });
+
+  assert.equal(collected.candidates.length, 2);
+  const byUrl = new Map(collected.candidates.map((candidate) => [candidate.url, candidate]));
+  assert.equal(byUrl.get("https://example.com/news/alberta-security-review").event_date, "2026-07-06");
+  assert.equal(byUrl.get("https://example.com/news/fable-safeguards").event_date, "2026-07-05");
+});
+
 test("handoff source plan keeps RSSHub routes skipped until base URL is configured", () => {
   const source = {
     id: "platform-zhihu-rsshub-hotlist",
@@ -22916,6 +22994,106 @@ test("report:draft promotes original Anthropic Fable/Mythos launch over platform
   assert.match(fableText, /Fable 5/);
   assert.match(fableText, /Mythos/);
   assert.match(fableText, /Opus 4\.8|\$10\/M|\$50\/M|trusted/i);
+});
+
+test("report:draft does not infer a Fable launch from evidence-only sibling text", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-fable-evidence-bleed-"));
+  const reportDate = "2026-07-07";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const albertaUrl = "https://www.anthropic.com/news/alberta-government-claude-cybersecurity";
+  discovery.candidates.unshift({
+    id: "anthropic-alberta-case-study",
+    source_id: "content-anthropic-news",
+    category: "hot_blog",
+    title: "Government of Alberta uses Claude to find and fix cybersecurity vulnerabilities across government systems",
+    url: albertaUrl,
+    source: "Anthropic News",
+    event_date: "2026-07-06",
+    status: "excluded",
+    evidence: "Government of Alberta uses Claude for a cybersecurity review. More details on Fable 5 safeguards and Mythos 5 trusted access appear in the next index card.",
+    verification_status: "primary_confirmed",
+    source_level: "official_company_news",
+    primary_url: albertaUrl,
+    verification_sources: [albertaUrl],
+    editorial_category: "ai_industry"
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const albertaMain = drafted.report.main_items.find((item) => item.url === albertaUrl);
+  assert(albertaMain, "the official Alberta case study should remain eligible for the main stream");
+  const publicText = `${albertaMain.title} ${albertaMain.summary} ${(albertaMain.bullets || []).join(" ")}`;
+  assert.doesNotMatch(publicText, /Fable 5|Mythos 5|Opus 4\.8|\$10\/M|\$50\/M/i);
+});
+
+test("report:draft does not apply launch facts to a same-domain Fable policy article", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-fable-policy-"));
+  const reportDate = "2026-07-07";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const policyUrl = "https://www.anthropic.com/news/fable-mythos-policy-response";
+  discovery.candidates.unshift({
+    id: "anthropic-fable-mythos-policy",
+    source_id: "content-anthropic-news",
+    category: "hot_blog",
+    title: "Claude Fable 5 and Claude Mythos 5 policy response",
+    url: policyUrl,
+    source: "Anthropic News",
+    event_date: reportDate,
+    status: "excluded",
+    evidence: "Anthropic responds to a policy discussion involving Fable 5 and Mythos 5 without announcing a model launch.",
+    verification_status: "primary_confirmed",
+    source_level: "official_company_news",
+    primary_url: policyUrl,
+    verification_sources: [policyUrl],
+    editorial_category: "ai_industry"
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const policyMain = drafted.report.main_items.find((item) => item.url === policyUrl);
+  assert(policyMain, "the official policy article should remain eligible without becoming a launch");
+  const publicText = `${policyMain.summary} ${(policyMain.bullets || []).join(" ")}`;
+  assert.doesNotMatch(publicText, /Mythos-class|Opus 4\.8|Project Glasswing|\$10\/M|\$50\/M/i);
+});
+
+test("published 2026-07-08 Alberta story stays aligned with its official source", async () => {
+  const report = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data", "2026", "07", "2026-07-08.json"), "utf8"));
+  const candidatePool = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data", "2026", "07", "2026-07-08.candidates.json"), "utf8"));
+  const albertaUrl = "https://www.anthropic.com/news/alberta-government-claude-cybersecurity";
+  const albertaMain = report.main_items.find((item) => item.url === albertaUrl);
+  const albertaStory = report.stories.find((story) => story.sources?.some((source) => source.url === albertaUrl));
+  const albertaCandidates = candidatePool.candidates.filter((candidate) => candidate.url === albertaUrl);
+
+  assert(albertaMain);
+  assert(albertaStory);
+  assert.equal(albertaCandidates.length, 3);
+  const albertaHero = report.hero_highlights.find((item) => item.url === albertaUrl);
+  assert.equal(albertaHero.category, "product_tool");
+  assert.equal(albertaStory.evidence_level, "primary");
+  assert.equal(albertaStory.sources.length, 1);
+  const publicText = `${albertaMain.title} ${albertaMain.summary} ${(albertaMain.bullets || []).join(" ")} ${albertaStory.what_happened}`;
+  assert.match(publicText, /阿尔伯塔|4\.66 亿|4\.66亿|4 亿 6600 万|4亿6600万|466 million/i);
+  assert.doesNotMatch(publicText, /Fable 5|Mythos 5|Opus 4\.8|\$10\/M|\$50\/M/i);
+  for (const candidate of albertaCandidates) {
+    assert.equal(candidate.title, "Government of Alberta uses Claude to find and fix cybersecurity vulnerabilities across government systems");
+    assert.doesNotMatch(candidate.evidence, /Fable 5|Mythos 5/i);
+  }
 });
 
 test("report:draft skips recent main duplicates and same-report hot blog duplicates", async () => {

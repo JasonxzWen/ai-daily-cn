@@ -1214,7 +1214,8 @@ function mainTopicKey(candidate) {
 
 function modelLaunchTopicKey(candidate) {
   const text = candidateText(candidate).toLowerCase();
-  if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(text)) {
+  const identityText = candidateIdentityText(candidate).toLowerCase();
+  if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(identityText)) {
     return "model:claude-fable-5-mythos-5";
   }
   const namedModel = text.match(/\b(?:claude\s+(?:opus|sonnet|haiku)\s*\d(?:\.\d+)?|gpt-\d(?:\.\d+)?(?:-[a-z0-9]+)?|gemini\s+\d(?:\.\d+)?\s*(?:pro|flash|ultra)?|grok\s+\d(?:\.\d+)?|qwen\s*\d(?:\.\d+)?|deepseek\s+[a-z0-9.-]+|mistral\s+[a-z0-9.-]+)\b/i);
@@ -1824,7 +1825,7 @@ function readerLabelForCandidate(candidate) {
   if (/sk telecom.*ai cloud|gigawatt-scale ai cloud/.test(text)) return "SKT AI Cloud";
   if (/lg group.*ai factory/.test(text)) return "LG AI Factory";
   if (/doosan.*ai factory/.test(text)) return "Doosan AI Factory";
-  if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(text)) return "Claude Fable/Mythos";
+  if (isAnthropicFableMythosLaunchCandidate(candidate)) return "Claude Fable/Mythos";
   return "";
 }
 
@@ -1991,7 +1992,7 @@ function mainItemSpecificBullets(candidate) {
       "**具身智能路线**：专访把 VLA、世界模型和机器人对物理因果的理解放在一起，重点是当前系统仍缺少稳定的物理预测能力。"
     ];
   }
-  if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(text)) {
+  if (isAnthropicFableMythosLaunchCandidate(candidate)) {
     return [
       "**模型关系**：Anthropic 把 Fable 5 解释为面向通用使用开放的 ==Mythos-class== 模型；Mythos 5 是同一底层模型、面向可信访问放宽部分安全限制。",
       "**安全边界**：Fable 5 在 cyber、bio、chemical 和模型蒸馏等敏感场景由分类器接管，并 fallback 到 Claude Opus 4.8，官方称平均少于 5% sessions 触发。",
@@ -4401,9 +4402,7 @@ function isOriginalModelLaunchCandidate(candidate) {
   const sourceText = `${candidate.source || ""} ${candidate.source_id || ""} ${candidate.url || ""}`.toLowerCase();
   const text = candidateText(candidate).toLowerCase();
   if (topicKey === "model:claude-fable-5-mythos-5") {
-    return /anthropic|claude/.test(sourceText) &&
-      /(fable\s*5|mythos\s*5)/.test(text) &&
-      /(same underlying model|mythos-class|safe for general use|trusted access|safeguards|claude fable 5 and claude mythos 5)/.test(text);
+    return isAnthropicFableMythosLaunchCandidate(candidate);
   }
   const originalProviderRe = /openai|anthropic|google|deepmind|xai|x\.ai|mistral|qwen|alibaba|deepseek|minimax|moonshot|kimi|meta|nvidia|adobe|runway|pika|luma|kling/;
   const platformOnlyRe = /aws|amazon|bedrock|azure|microsoft|foundry|github|copilot|vertex|google cloud|sagemaker|openrouter/;
@@ -5140,7 +5139,7 @@ function chineseSummary(candidate, category) {
 
 function mainItemSpecificSummary(candidate) {
   const text = candidateText(candidate).toLowerCase();
-  if (/\b(?:claude\s*)?(?:fable|mythos)\s*5\b/.test(text)) {
+  if (isAnthropicFableMythosLaunchCandidate(candidate)) {
     return "Anthropic 发布 Claude Fable 5 和 Claude Mythos 5：Fable 5 是面向通用使用开放的 Mythos-class 安全版，Mythos 5 是同一底层模型的可信访问版本，差别主要在安全限制和访问范围。";
   }
   if (/whatsapp.*spyware|spyware.*whatsapp|nso/.test(text)) {
@@ -7033,6 +7032,34 @@ function candidateText(candidate) {
     candidate.reader_relevance,
     candidate.image_alt
   ].filter(Boolean).join(" ");
+}
+
+function candidateIdentityText(candidate) {
+  return [
+    candidate.title,
+    candidate.name,
+    candidate.repo,
+    candidate.url,
+    candidate.primary_url,
+    candidate.original_url
+  ].filter(Boolean).join(" ");
+}
+
+function isAnthropicFableMythosLaunchCandidate(candidate) {
+  const titleText = `${candidate.title || ""} ${candidate.name || ""}`.toLowerCase();
+  if (!/\bfable\s*5\b/.test(titleText) || !/\bmythos\s*5\b/.test(titleText)) {
+    return false;
+  }
+
+  return [candidate.url, candidate.primary_url, candidate.original_url].filter(Boolean).some((value) => {
+    try {
+      const url = new URL(value);
+      const pathname = url.pathname.replace(/\/+$/, "").toLowerCase();
+      return /(^|\.)anthropic\.com$/i.test(url.hostname) && pathname === "/news/claude-fable-5-mythos-5";
+    } catch {
+      return false;
+    }
+  });
 }
 
 function sanitizeBuilderOriginalText(candidate) {
