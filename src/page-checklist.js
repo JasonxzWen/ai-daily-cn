@@ -156,7 +156,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       .map((node) => node.textContent?.replace(/\s+/g, " ").trim() || "")
       .filter(Boolean);
     const forbiddenTextHits = forbiddenSectionText.filter((item) =>
-      sectionTextTargets.some((text) => text.includes(item))
+      sectionTextTargets.some((text) => text === item)
     );
     const forbiddenSelectorHits = forbiddenSectionSelectors.filter((selector) =>
       document.querySelector(selector)

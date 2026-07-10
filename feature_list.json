@@ -461,7 +461,8 @@
         "Material frontend PRs record design read, visual dials, source/tool evidence, audit or skip reason, and browser acceptance.",
         "The React homepage, static shells, and every historical daily report consume one ADC paper/ink visual contract; reports reference the shared generated assets/adc-theme.css instead of embedding a duplicate theme overlay, and sampled desktop plus narrow viewports pass overflow and computed-color checks.",
         "Replacement builds preserve the official-blog home entry and Source Watch article presentation while the retired public-search UI does not return.",
-        "Source Watch headings remain visibly paper-colored on the ink panel at desktop and 390px viewports, with an automated CSS contrast contract preventing black-on-black regressions."
+        "Source Watch headings remain visibly paper-colored on the ink panel at desktop and 390px viewports, with an automated CSS contrast contract preventing black-on-black regressions.",
+        "The page gate rejects retired model/project sections by exact section label or structural selector without blocking legitimate news-card titles that merely mention model releases."
       ],
       "stop_conditions": [
         "Generated or external UI code is committed directly into production paths.",
@@ -475,6 +476,7 @@
           "node --test --test-name-pattern \"official blog knowledge homepage\" tests/unit.test.js",
           "corepack pnpm run design-quality:validate",
           "corepack pnpm run validate:docs",
+          "node --test tests/page-check-section-boundary.test.js",
           "corepack pnpm run test:e2e"
         ]
       },
@@ -486,8 +488,9 @@
         "src/adc-theme.js",
         "docs/assets/adc-theme.css",
           "apps/web/src/App.tsx",
-          "apps/web/src/styles.css",
-          "tests/e2e/site.e2e.js",
+            "apps/web/src/styles.css",
+            "tests/page-check-section-boundary.test.js",
+            "tests/e2e/site.e2e.js",
           "tests/official-blog-daily-context.test.js",
           "tests/adc-visual-contract.test.js",
           "design/prototypes/adc-public-surfaces.design.json",
