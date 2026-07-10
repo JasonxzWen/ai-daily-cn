@@ -364,7 +364,7 @@ This table is part of the same ledger, not a second review. `fixed` means implem
 
 | ID | Evidence-backed issue found this session | Action taken | State |
 | --- | --- | --- | --- |
-| S-01 | Harness task/progress/handoff and evaluator claims lagged behind the real diff | rewrote active task boundaries; scheduled final state/JSONL synchronization and validation | implementing |
+| S-01 | Harness task/progress/handoff and evaluator claims lagged behind the real diff | rewrote active task, progress, decisions, handoff and JSONL evidence against final validation/PR/monitor state | fixed |
 | S-02 | ADC rollout was date-gated at 2026-07-09, leaving older reports visually divergent | removed the date gate, generated one versioned shared asset, rebuilt all 49 reports | fixed; runtime_verified locally |
 | S-03 | visual contract was duplicated between React/static/report paths | made packages/design CSS the source, added adc-theme bridge/hash, linked static and generated surfaces | fixed |
 | S-04 | dead theme, unused Astryx CLI, and three empty packages inflated the repo | removed only reference-proven dead weight; retained active Astryx components | fixed |
@@ -387,7 +387,7 @@ This table is part of the same ledger, not a second review. `fixed` means implem
 | S-21 | official-blog home discovery and production intake were lost/half-landed | recorded REC-320/321 with exact surviving assets and minimal restoration path | discovered |
 | S-22 | README search promise, old searchable renderer, and React no-search roadmap conflict | recorded REC-322 as decision_required; blocked premature dead-code deletion | discovered |
 | S-23 | large replacements lacked keep/move/retire migration evidence | created accepted ADC design evidence and REC-327 feature-survival gate | partially fixed |
-| S-24 | quality/rubric/feature evidence still contained old rollout and no-external-change claims | scheduled same-session synchronization after final validation/PR status | implementing |
+| S-24 | quality/rubric/feature evidence still contained old rollout and no-external-change claims | synchronized 49-report rollout, live prompt mutation, validation counts, review and delivery boundary | fixed |
 | S-25 | final full validation exposed an obsolete no-stylesheet assertion and a real admission regression: a paper lead already resolved to an arXiv primary URL was still rejected because its upstream verification label remained `intermediary_only` | updated the visual contract test to require the shared ADC asset and made direct primary publication URLs override stale intermediary labels for declared paper sources | fixed; focused and full validation passed |
 | S-26 | E2E still required historical reports to have zero stylesheet links after the accepted shared-asset migration | replaced the obsolete assertion with an exact one-link, versioned `data-adc-public-theme` contract | fixed; E2E passed |
 | S-27 | final whitespace validation found that the shared-style generator emitted a second trailing newline | removed the extra newline from the source template and regenerated artifact so `git diff --check` remains a repeatable gate | fixed; Harness and diff checks passed |
@@ -395,8 +395,10 @@ This table is part of the same ledger, not a second review. `fixed` means implem
 | S-29 | Windows timeout could still wait forever if `taskkill` hung, while an overly fast direct-child fallback could orphan the real Codex grandchild | added a bounded one-second Windows termination grace, non-zero/error fallback, force settlement for a non-resolving terminator, and kept the real process-tree sentinel test | fixed; 38/38 entrypoint tests passed |
 | S-30 | top-level terminal fields used the latest duplicate stage, but validation/publication/Pages sub-summaries still selected the first occurrence | changed the shared stage lookup to reverse order and added a duplicate report_write/publish/pages summary regression | fixed; 38/38 entrypoint tests passed |
 | S-31 | candidate quality normalized malformed `candidates` to an empty list, then the shared coverage collector called `.map()` on the original non-array value | made the shared collector array-safe and added a structured `candidate_pool_empty` regression | fixed; focused and full validation passed |
-| S-32 | final review confirmed progress/handoff/rubric still carried pre-Handoff claims about no external mutation, stale live prompt, 31 tests, partial ADC rollout, and no PR authority | scheduled full Harness state rewrite and tracked evidence refresh after the latest full validation and Draft PR status | implementing |
+| S-32 | final review confirmed progress/handoff/rubric still carried pre-Handoff claims about no external mutation, stale live prompt, 31 tests, partial ADC rollout, and no PR authority | rewrote Harness state and tracked evidence after 878-test validation, three commits, PR #289, HTML report and monitor creation | fixed |
 | S-33 | re-review found that malformed percent encoding in a nominal publication path could make `decodeURIComponent` throw and abort the entire draft | moved URL construction and pathname decoding into the same fail-closed guard and added a `%ZZ` arXiv negative fixture | fixed; focused and full validation passed |
+| S-34 | the default `GH_TOKEN` and same-user keyring PAT could push but lacked GraphQL `createPullRequest` permission | preserved the pushed branch, switched to an already authenticated repo-scoped account, and created Draft PR #289 without merging | fixed |
+| S-35 | the automation creation API rejected `worktree` execution for a new cron monitor | followed the tool contract and created project-scoped local, read-only automation `ai-7` with an explicit 2026-07-17 expiry | fixed |
 
 ## Production Acceptance
 
