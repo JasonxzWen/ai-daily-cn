@@ -1,0 +1,149 @@
+/* adc-public-theme:v1 */
+:root {
+  --adc-ink: #111111;
+  --adc-paper: #f8f5ec;
+  --adc-card: #fffdf7;
+  --adc-soft: #e9e3d7;
+  --adc-muted: #57514a;
+  --adc-line: #111111;
+  --adc-shadow: 4px 5px 0 rgba(17, 17, 17, 0.12);
+  --adc-focus: 0 0 0 3px rgba(17, 17, 17, 0.2);
+}
+
+body[data-adc-public-surface] {
+  --bg: var(--adc-paper);
+  --panel: var(--adc-card);
+  --panel-soft: var(--adc-soft);
+  --text: var(--adc-ink);
+  --ink: var(--adc-ink);
+  --muted: var(--adc-muted);
+  --line: var(--adc-line);
+  --line-strong: var(--adc-line);
+  --accent: var(--adc-ink);
+  --accent-2: var(--adc-ink);
+  --ok: var(--adc-ink);
+  --warn: var(--adc-ink);
+  --danger: var(--adc-ink);
+  --info: var(--adc-ink);
+  --accent-soft: var(--adc-soft);
+  --shadow: var(--adc-shadow);
+  --focus: var(--adc-focus);
+  background-color: var(--adc-paper);
+  background-image:
+    linear-gradient(rgba(17, 17, 17, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 17, 17, 0.035) 1px, transparent 1px);
+  background-size: 34px 34px;
+  color: var(--adc-ink);
+}
+
+body[data-adc-public-surface] a {
+  color: var(--adc-ink);
+}
+
+body[data-adc-public-surface] :where(a, button, summary, select, input):focus-visible {
+  outline: 3px solid var(--adc-ink);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+body[data-adc-public-surface] .site-header {
+  border-bottom: 2px solid var(--adc-ink);
+  background: var(--adc-paper);
+  backdrop-filter: none;
+}
+
+body[data-adc-public-surface] .site-title,
+.adc-report-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--adc-ink);
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.adc-public-brand,
+.adc-report-brand > strong {
+  font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.adc-report-brand {
+  width: min(1280px, calc(100vw - 28px));
+  margin: 14px auto 0;
+}
+
+.adc-report-brand > span {
+  color: var(--adc-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+body[data-adc-public-surface] :where(
+  .report-hero,
+  .panel,
+  .item,
+  .report-card,
+  .official-blog-card,
+  .date-card,
+  .date-detail,
+  .audit-card,
+  .builder-card,
+  .index-console-copy,
+  .index-console-stat,
+  .source-lane-table,
+  .article-card
+) {
+  border: 2px solid var(--adc-ink);
+  border-radius: 8px;
+  background: var(--adc-card);
+  box-shadow: var(--adc-shadow);
+}
+
+body[data-adc-public-surface] :where(
+  .chip,
+  .tag,
+  .quality-badge,
+  .metric-pill,
+  .main-stream-chip,
+  .official-blog-stat,
+  .date-overview-stat,
+  .artifact-links a
+) {
+  border-color: var(--adc-ink) !important;
+  background: var(--adc-card) !important;
+  color: var(--adc-ink) !important;
+  box-shadow: none !important;
+}
+
+body[data-adc-public-surface] :where(
+  [class*="status-"],
+  [class*="quality-"],
+  .tag-topic,
+  .date-card[data-quality-status]
+) {
+  border-color: var(--adc-ink) !important;
+  background: var(--adc-card) !important;
+  color: var(--adc-ink) !important;
+}
+
+body[data-adc-public-surface] :where(.signal-bar, .signal-strong, .signal-medium, .signal-quiet, .source-lane-meter-fill) {
+  background: repeating-linear-gradient(135deg, var(--adc-ink) 0 5px, var(--adc-card) 5px 9px) !important;
+}
+
+body[data-adc-public-surface] mark {
+  border-bottom: 2px solid var(--adc-ink);
+  border-radius: 0;
+  background: var(--adc-soft);
+  color: var(--adc-ink);
+}
+
+@media (max-width: 640px) {
+  .adc-report-brand {
+    width: min(100vw - 18px, 1280px);
+    margin-top: 10px;
+  }
+}
