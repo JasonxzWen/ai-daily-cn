@@ -23,9 +23,6 @@
         "month",
         "source",
         "section",
-        "report_date",
-        "report_url",
-        "data_url",
         "quality_score",
         "importance",
         "domain",
@@ -34,6 +31,32 @@
         "channels_l2",
         "companies",
         "products"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": ["section"],
+            "properties": {
+              "section": { "const": "source_watch" }
+            }
+          },
+          "then": {},
+          "else": {
+            "required": ["report_date", "report_url", "data_url"],
+            "properties": {
+              "report_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "report_url": {
+                "$ref": "#/$defs/relative_url"
+              },
+              "data_url": {
+                "$ref": "#/$defs/relative_url"
+              }
+            }
+          }
+        }
       ],
       "properties": {
         "id": {

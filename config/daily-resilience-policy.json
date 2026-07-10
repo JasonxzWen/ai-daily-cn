@@ -85,6 +85,16 @@
       "replay_fixtures": ["github-trending-timeout", "github-trending-readme-fallback"]
     },
     {
+      "id": "discover_source_watch",
+      "description": "Collect material GitHub repository and watched-site snapshot changes for the separate public Source Watch rail.",
+      "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
+      "fallback": { "kind": "persistent_candidate_history_only", "action": "omit_new_source_watch_events_and_keep_existing_public_history" },
+      "degrade": { "allowed": true, "action": "publish_without_new_source_watch_events" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "output_path", "artifact_sha256", "watched_target_count", "candidate_count", "fallback_used", "degraded_reason"],
+      "replay_fixtures": ["source-watch-partial-target-outage"]
+    },
+    {
       "id": "discover_huggingface_trending",
       "description": "Collect Hugging Face trending model candidates.",
       "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
@@ -123,6 +133,16 @@
       "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
       "summary_fields": ["stage_id", "status", "attempts", "checked_source_count", "blocked_source_count", "degraded_reason"],
       "replay_fixtures": ["content-sources-node-fetch-failed"]
+    },
+    {
+      "id": "official_blog_context",
+      "description": "Build a same-day compact context from already reviewed official-blog knowledge without changing daily admission.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "summary_only_degraded_audit", "action": "continue_without_official_blog_context" },
+      "degrade": { "allowed": true, "action": "record_context_not_consumed_and_continue" },
+      "block": { "allowed": true, "reasons": ["internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "context_path", "record_count", "degraded_reason"],
+      "replay_fixtures": ["official-blog-context-empty-or-invalid"]
     },
     {
       "id": "discover_statuspage_incidents",

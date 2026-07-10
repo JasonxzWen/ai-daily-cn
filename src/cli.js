@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
@@ -57,7 +58,8 @@ import {
   createOfficialBlogRelationshipSuggestions,
   createOfficialBlogReviewDecisions,
   createOfficialBlogReviewPacket,
-  loadOfficialBlogKnowledge
+  loadOfficialBlogKnowledge,
+  normalizeOfficialBlogUrl
 } from "./official-blog-knowledge.js";
 
 const [command, ...argv] = process.argv.slice(2);
@@ -74,13 +76,14 @@ try {
       outDir,
       siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
       generatedAt: args["generated-at"],
-      sourceWatchAdmittedArtifactPath: args["source-watch-admitted-artifact"]
+      sourceWatchConsumptionReportDate: args["source-watch-report-date"]
     });
     const webApp = await buildWebApp({ rootDir, outDir });
     printJson({
       ok: true,
       out_dir: result.outDir,
       reports: result.reports.map((report) => report.report_date),
+      source_watch_consumption: result.sourceWatchConsumption,
       written_files: uniqueStrings([...result.writtenFiles, ...webApp.writtenFiles]),
       web_app: {
         ok: webApp.ok,
@@ -192,7 +195,8 @@ try {
     const resolvedInputPath = path.resolve(inputPath);
     const outputPath = typeof args.output === "string" ? args.output : "";
     assertOfficialBlogIntakeOutputPath({ outputPath, rootDir });
-    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const inputRaw = fs.readFileSync(resolvedInputPath, "utf8");
+    const input = JSON.parse(inputRaw);
     const existingIndex = await loadOfficialBlogKnowledge({
       rootDir,
       knowledgeDir: args["knowledge-dir"] ? path.resolve(args["knowledge-dir"]) : undefined
@@ -265,7 +269,8 @@ try {
     const resolvedInputPath = path.resolve(inputPath);
     const outputPath = typeof args.output === "string" ? args.output : "";
     assertOfficialBlogReviewHandoffOutputPath({ outputPath, rootDir });
-    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const inputRaw = fs.readFileSync(resolvedInputPath, "utf8");
+    const input = JSON.parse(inputRaw);
     const handoff = createOfficialBlogAiReviewHandoff(input, {
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"]
@@ -366,7 +371,8 @@ try {
     const resolvedInputPath = path.resolve(inputPath);
     const outputPath = typeof args.output === "string" ? args.output : "";
     assertOfficialBlogContextOutputPath({ outputPath, rootDir });
-    const input = JSON.parse(fs.readFileSync(resolvedInputPath, "utf8"));
+    const inputRaw = fs.readFileSync(resolvedInputPath, "utf8");
+    const input = JSON.parse(inputRaw);
     const existingIndex = await loadOfficialBlogKnowledge({
       rootDir,
       knowledgeDir: args["knowledge-dir"] ? path.resolve(args["knowledge-dir"]) : undefined
@@ -376,9 +382,27 @@ try {
       generatedAt: args["generated-at"],
       limit: args.limit || args["max-records"]
     });
+    const inputReportDate = input?.report_date || input?.reportDate || "";
+    if (args.date && inputReportDate && args.date !== inputReportDate) {
+      throw new PublisherError(
+        "official_blog_context_report_date_mismatch",
+        `official-blog:context input report_date ${inputReportDate} does not match --date ${args.date}.`
+      );
+    }
+    const reportDate = args.date || inputReportDate;
+    const bindings = officialBlogDailyContextBindings(input, context);
+    const contextSha256 = createHash("sha256").update(JSON.stringify(context)).digest("hex");
     printJson({
       ok: true,
+      kind: "official_blog_daily_context",
+      ...(reportDate ? { report_date: reportDate } : {}),
+      generated_at: args["generated-at"] || context.generated_at,
       input_path: resolvedInputPath,
+      source_artifact_path: officialBlogArtifactPath(rootDir, resolvedInputPath),
+      source_artifact_sha256: createHash("sha256").update(inputRaw).digest("hex"),
+      context_sha256: contextSha256,
+      bindings_sha256: createHash("sha256").update(JSON.stringify(bindings)).digest("hex"),
+      bindings,
       context
     }, outputPath);
   } else if (command === "official-blog:review-packet") {
@@ -618,6 +642,7 @@ try {
       outputPath,
       candidateOutputPath,
       allowDegradedInputs: Boolean(args["allow-degraded-inputs"]),
+      officialBlogContextPath: args["official-blog-context"],
       evidenceOutDir: args["evidence-out"] || "docs",
       maxEvidenceAssets: args["max-evidence-assets"] ? Number.parseInt(args["max-evidence-assets"], 10) : undefined,
       cacheEvidence: args["no-evidence-cache"] !== true
@@ -630,6 +655,7 @@ try {
       source_status_history_path: result.sourceStatusHistoryPath,
       evidence_assets: result.evidence_assets,
       evidence_skipped: result.evidence_skipped,
+      official_blog_context: result.officialBlogContextReceipt,
       counts: result.counts
     });
   } else if (command === "evidence:cache") {
@@ -748,11 +774,23 @@ try {
       endpointLimit: Number.parseInt(args["endpoint-limit"] || "5", 10),
       env: process.env
     });
-    printJson({
+    const resolvedOutputPath = path.resolve(outputPath);
+    const artifact = {
       ok: true,
-      output_path: path.resolve(outputPath),
+      output_path: resolvedOutputPath,
       ...result
-    }, outputPath);
+    };
+    const artifactJson = `${JSON.stringify(artifact, null, 2)}\n`;
+    fs.mkdirSync(path.dirname(resolvedOutputPath), { recursive: true });
+    fs.writeFileSync(resolvedOutputPath, artifactJson, "utf8");
+    process.stdout.write(`${JSON.stringify({
+      ok: true,
+      kind: "source_watch_artifact_receipt",
+      report_date: result.report_date,
+      output_path: resolvedOutputPath,
+      artifact_sha256: createHash("sha256").update(artifactJson).digest("hex"),
+      candidate_count: Array.isArray(result.candidates) ? result.candidates.length : 0
+    }, null, 2)}\n`);
   } else if (command === "discover:huggingface-trending") {
     const args = parseArgs(argv);
     const result = await collectHuggingFaceTrending({
@@ -1364,6 +1402,74 @@ function officialBlogReviewSessionManifestFeeds(manifest = {}, manifestDir = pro
 
 function officialBlogReviewSessionManifestFeedPath(feed = {}) {
   return String(feed.file || feed.path || feed.feed_path || feed.feedPath || feed.input || "").trim();
+}
+
+function officialBlogArtifactPath(rootDir, filePath) {
+  const resolvedRoot = path.resolve(rootDir);
+  const resolvedFile = path.resolve(filePath);
+  const relative = path.relative(resolvedRoot, resolvedFile);
+  if (relative && relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative)) {
+    return relative.split(path.sep).join("/");
+  }
+  return resolvedFile.split(path.sep).join("/");
+}
+
+function officialBlogDailyContextBindings(input = {}, context = {}) {
+  const entries = officialBlogDailyContextEntries(input);
+  return (Array.isArray(context.records) ? context.records : []).map((record) => {
+    const sourceEntries = (Array.isArray(record.source_entry_indexes) ? record.source_entry_indexes : [])
+      .map((index) => entries[index])
+      .filter((entry) => entry && typeof entry === "object");
+    const candidateIds = uniqueStrings(sourceEntries.map((entry) => String(entry.id || entry.candidate_id || "").trim()));
+    const normalizedUrls = uniqueStrings(sourceEntries.map((entry) => officialBlogBindingUrl(entry)).filter(Boolean));
+    return {
+      record_id: String(record.id || ""),
+      content_type: String(record.content_type || ""),
+      score: Number.isFinite(Number(record.score)) ? Number(record.score) : 0,
+      candidate_ids: candidateIds,
+      normalized_urls: normalizedUrls
+    };
+  }).filter((binding) => binding.record_id);
+}
+
+function officialBlogDailyContextEntries(input = {}) {
+  if (Array.isArray(input)) return input;
+  if (!input || typeof input !== "object") return [];
+  const entries = [];
+  for (const key of [
+    "context_entries",
+    "contextEntries",
+    "entries",
+    "reviewed_entries",
+    "reviewedEntries",
+    "review_queue",
+    "reviewQueue",
+    "records",
+    "candidates",
+    "items",
+    "stories",
+    "main_items",
+    "hot_blogs",
+    "official_org_updates"
+  ]) {
+    if (Array.isArray(input[key])) entries.push(...input[key]);
+  }
+  return entries;
+}
+
+function officialBlogBindingUrl(entry = {}) {
+  const value = entry.normalized_url
+    || entry.canonical_url
+    || entry.url
+    || entry.primary_url
+    || entry.original_url
+    || "";
+  if (!value) return "";
+  try {
+    return normalizeOfficialBlogUrl(value);
+  } catch {
+    return "";
+  }
 }
 
 function assertOfficialBlogAuthoringBriefOutputPath(options = {}) {

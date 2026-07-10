@@ -10,7 +10,7 @@ In production mode (`--execute --publish` without a fixture), the script runs as
 
 - `automation_pipeline_mode:"single_script_dag_orchestrator"`
 - `orchestration.node_count`
-- `source_watch.production_status:"not_connected"`, `consumed:false`, and diagnostic `source_watch_requested_artifact_path`
+- `source_watch.production_status`, `connected`, `consumed`, and same-run producer/persistence/build evidence
 - report JSON, docs data JSON, and HTML paths
 - validation, publish, Pages, blocking, and degraded summaries
 
@@ -48,7 +48,9 @@ corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish 
 
 When production quality returns `needs_ai_repair`, the same entrypoint owns the continuation. Codex runs with `--ignore-user-config` in a read-only sandbox and returns a JSON-Schema-constrained final object; the CLI writes that object as UTF-8, and the host validates report date, declared task paths, evidence roots, output path, status, and edits before copying the contract and resuming. The model never writes report or repository files directly. Dry-run permits one automated repair attempt; publish permits at most five.
 
-The production runner does not yet consume Source Watch artifacts. Scheduled automation must omit the fixture-only handoff flag. Production summaries keep `source_watch_admitted_artifact_path` empty and report `source_watch.production_status:"not_connected"`, `consumed:false`, and `source_watch_requested_artifact_path` so a supplied-but-unused path cannot be mistaken for published evidence. The local DAG-lite fixture path still accepts explicit Source Watch artifacts for contract tests.
+Source Watch now uses the normal production candidate path: `discover_source_watch` writes `.tmp/source-watch-YYYY-MM-DD.json` and returns a bounded stage receipt containing that exact path and SHA-256; `report:draft` classifies material snapshot changes; `report:write` persists them to `reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json`; and `build` projects `included_in:"source_watch"` records into the public article index. There is no production sidecar flag. A summary reports `connected:true` and `consumed:true` only when the same run proves the producer stage receipt, successful draft/write stages, exact equality of the producer and persisted `target_id:snapshot_fingerprint` sets, the dated persistent pool, build consumption of that exact path, and a matching SHA-256. The consumption receipt contains only the requested report date (or the latest date for an undated manual build), so proof size and counts do not grow with history; the public article index still remains all-history. A valid zero-change day may still be consumed with zero included/public items. Missing or mismatched evidence remains disconnected with a concrete reason. The local DAG-lite fixture chain remains an internal contract test and is not a production handoff.
+
+The daily runner also creates `.tmp/official-blog-context-YYYY-MM-DD.json` after `discover_content_sources` and passes it explicitly to `report:draft`. This reuses only already reviewed official-blog knowledge and keeps `official-blog-admission-v1` unchanged. The producer rejects a requested date that differs from the source artifact's own `report_date`; draft consumption rechecks both dates, source-artifact SHA-256, context SHA-256, bindings SHA-256, and each binding's record/type/score/source-entry relationship. When one candidate matches several reviewed records, the highest-score binding owns its content type instead of a later weak topical match overwriting an exact match. The receipt remains under internal `self_check` data and is removed from public site data. Zero matched records is a valid consumed empty state. Missing, stale, or malformed context degrades to `consumed:false` without promoting a candidate or blocking the rest of the daily.
 
 Fixture modes:
 
@@ -73,9 +75,9 @@ The production orchestrator writes its plan under `.tmp/daily-codex-pipeline/YYY
 - `publish-summary.json`: publish-stage metadata when `--publish` is requested.
 - `run-summary.json`: authoritative machine-readable run summary.
 
-Fixture `run-summary.json` reports `mode:"daily_codex_dag_lite"`, `final_status`, `next_action`, `completed_stages`, validation state, repair state, the final artifact path, `publish_requested`, `execute_requested`, `source_watch_admitted_artifact_path`, and `publication`.
+Fixture `run-summary.json` reports `mode:"daily_codex_dag_lite"`, `final_status`, `next_action`, `completed_stages`, validation state, repair state, the final artifact path, `publish_requested`, `execute_requested`, and `publication`.
 
-Production `run-summary.json` reports `mode:"single_script_dag_orchestrator"`, `automation_pipeline_mode:"single_script_dag_orchestrator"`, `orchestration.node_count`, `completed_stages`, validation and publish summaries, Pages status, `blocking_issues`, `degraded_sections`, `structured_json_path`, `docs_data_json_path`, `html_path`, automated repair attempts, and the honest Source Watch `not_connected`/`consumed:false` state. `stage_id`, `failed_stage_id`, and `error` describe the latest unresolved failure; a later successful retry/fallback clears stale failure metadata.
+Production `run-summary.json` reports `mode:"single_script_dag_orchestrator"`, `automation_pipeline_mode:"single_script_dag_orchestrator"`, `orchestration.node_count`, `completed_stages`, validation and publish summaries, Pages status, `blocking_issues`, `degraded_sections`, `structured_json_path`, `docs_data_json_path`, `html_path`, automated repair attempts, and evidence-derived Source Watch status. The connected record includes the producer path, persistent candidate-pool path and hash, plus normalized `source_watch_consumption`; incomplete evidence remains false instead of inferring consumption from path presence. `stage_id`, `failed_stage_id`, and `error` describe the latest unresolved failure; a later successful retry/fallback clears stale failure metadata.
 
 ## Validation Contract
 
@@ -99,5 +101,7 @@ In fixture mode, validation failure invokes exactly one repair pass. In producti
 The production entrypoint must remain `corepack pnpm run daily:codex-pipeline`. The legacy daily workflow is invoked only behind that single script so scheduled automation does not expand old manual stage commands.
 
 Production generation intentionally runs in a clean latest-origin/main worktree. Therefore an unmerged branch can prove its fix with tests and real-artifact replay, but it cannot claim scheduled production acceptance from that clean worktree until the PR lands. Post-merge automation observation is the production verification boundary.
+
+External automation may validate the evidence-backed `source_watch.connected`, `source_watch.consumed`, and `source_watch.consumption.candidate_pool_hashes` fields, but it must not hard-code `not_connected` or `consumed:false` as permanent expectations. The workflow contract treats a publish prompt that does not understand these evidence fields as stale. A Source Watch producer/consumer change must not be released to that scheduler until the prompt compatibility gate passes.
 
 The next accepted infrastructure slice migrates repository commands to `corepack pnpm`. After that migration lands, scheduled automation must call `corepack pnpm run daily:codex-pipeline` and old `npm run` scheduler instructions are intentionally unsupported.

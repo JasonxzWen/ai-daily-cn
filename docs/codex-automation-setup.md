@@ -1,18 +1,18 @@
 # Codex 自动化创建参数
 
-Production Source Watch is not connected. The daily automation must not claim an admitted artifact was consumed: `.tmp/run-summary-YYYY-MM-DD.json` records `source_watch.production_status:"not_connected"`, `consumed:false`, and diagnostic `source_watch_requested_artifact_path`, while `source_watch_admitted_artifact_path` stays empty. Do not scan `.tmp/daily-codex-pipeline/YYYY-MM-DD` for a newest artifact or pass fixture artifacts from the scheduler.
+Production Source Watch is part of the daily runner: `discover_source_watch` writes the same-run artifact and returns its exact path/SHA-256 stage receipt, `report_draft` and `report_write` persist it into `reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json`, and `build` consumes that pool. `.tmp/run-summary-YYYY-MM-DD.json` exposes `source_watch.production_status`, `source_watch.connected`, and `source_watch.consumed`; connected/consumed requires the producer receipt, exact producer/pool snapshot set, persistence, consumed path, and `candidate_pool_hashes` to agree. Zero newly included candidates remains successful. Missing or mismatched evidence stays false with a structured reason. Do not scan `.tmp/daily-codex-pipeline/YYYY-MM-DD` or pass a sidecar from the scheduler.
 
-The live `ai-2` automation is intentionally thin: bootstrap latest origin/main, call one `daily:codex-pipeline` command, then read the one run summary. Nested Codex ignores user configuration, accepts an explicit model only when the command passes `--model`, returns schema-constrained UTF-8 JSON from a read-only sandbox, and has a 20-minute per-call timeout. Do not copy business stages back into the scheduler prompt.
+The live `ai-2` automation is intentionally thin and is the only scheduled automation for this project: bootstrap latest origin/main, call one `daily:codex-pipeline` command, then read the one run summary. Its final reply records the bootstrap mainSha and publishRoot. Nested Codex ignores user configuration, accepts an explicit model only when the command passes `--model`, returns schema-constrained UTF-8 JSON from a read-only sandbox, and has a 20-minute per-call timeout. Do not copy business stages back into the scheduler prompt. `C:\Users\Admin\.codex\automations\ai-daily` is a support-only root for bootstrap/cache/evidence and must not contain `automation.toml`.
 
-## 21:30 状态自检自动化
+## 合并后的状态自检
 
-每天 21:30 另设一个 `status:self-check` 定时任务，输出 `.tmp/status-self-check-YYYY-MM-DD.json`。它只做状态自检，不生成新日报、不真实 publish；检查 `sources:phase5-audit`、`publish:dry-run:daily`、Pages HTTP、信源健康和自动化清单。若发现 `multiple_active_daily_publish_automations`，必须作为 blocking issue 报告。
+不再单独调度 `status:self-check`；生产 pipeline 的 `.tmp/run-summary-YYYY-MM-DD.json` 是发布与状态自检的唯一事实源。`status:self-check` 只保留为人工诊断命令，可检查 `sources:phase5-audit`、`publish:dry-run:daily`、Pages HTTP、信源健康和自动化清单；若发现 `multiple_active_daily_publish_automations`，仍必须作为 blocking issue 报告。
 
 ## 推荐参数
 
 | 字段 | 值 |
 |---|---|
-| Name | `AI 日报生成、push 与 GitHub Pages 发布` |
+| Name | `AI 日报生成与发布` |
 | Kind | `cron` |
 | Execution environment | `worktree` |
 | CWD | 当前项目目录；如界面要求显式路径，使用 `D:\ai-daily-cn` |

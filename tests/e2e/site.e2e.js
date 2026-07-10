@@ -10,7 +10,6 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 import { buildSite } from "../../src/site.js";
 import { buildWebApp } from "../../src/web-app-build.js";
-import { renderIndexHtml } from "../../src/render.js";
 import { evaluateDailyPageChecklist, evaluateIndexPageChecklist } from "../../src/page-checklist.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -426,6 +425,46 @@ weakBuilderReport.self_check.builder_observations = weakBuilderReport.builder_ob
 await fs.writeFile(path.join(dataInputDir, "structured-report.json"), JSON.stringify(structuredReport, null, 2), "utf8");
 await fs.writeFile(path.join(dataInputDir, "weak-hot-blog-report.json"), JSON.stringify(weakHotBlogReport, null, 2), "utf8");
 await fs.writeFile(path.join(dataInputDir, "weak-builder-report.json"), JSON.stringify(weakBuilderReport, null, 2), "utf8");
+const sourceWatchPoolDir = path.join(dataInputDir, "internal", "candidates", "2026", "05");
+await fs.mkdir(sourceWatchPoolDir, { recursive: true });
+await fs.writeFile(path.join(sourceWatchPoolDir, "2026-05-15.candidates.json"), `${JSON.stringify({
+  schema_version: 1,
+  report_date: "2026-05-15",
+  generated_at: fixedGeneratedAt,
+  sources: [{ id: "site-e2e-source-watch", name: "E2E Source Watch", url: "https://example.com/source-watch", category: "community", status: "checked" }],
+  candidates: [{
+    id: "candidate-e2e-source-watch",
+    source_id: "site-e2e-source-watch",
+    title: "E2E Source Watch Signal",
+    url: "https://example.com/source-watch/change",
+    source: "E2E Source Watch",
+    event_date: "2026-05-15",
+    category: "community_lead",
+    status: "included",
+    included_in: "source_watch",
+    verification_status: "intermediary_only",
+    source_level: "ai_news_aggregator",
+    editorial_category: "community_signal",
+    evidence: "The public source snapshot changed during the E2E fixture.",
+    source_watch: {
+      signal: "site_watch",
+      target_id: "site-e2e-source-watch",
+      source_lane: "aify",
+      source_tier: "first_class",
+      verification_policy: "no_secondary_review_required",
+      event_url: "https://example.com/source-watch/change",
+      snapshot_fingerprint: `sha256:${"1".repeat(64)}`,
+      site_snapshot: {
+        title: "E2E Source Watch Signal",
+        description: "A reader-safe changed snapshot for narrow viewport acceptance.",
+        canonical_url: "https://example.com/source-watch/change",
+        content_fingerprint: `sha256:${"2".repeat(64)}`,
+        feeds: [],
+        discovered_github_repositories: []
+      }
+    }
+  }]
+}, null, 2)}\n`, "utf8");
 
 await buildSite({
   rootDir: tmp,
@@ -440,38 +479,6 @@ await writeTinyPng(path.join(outDir, "assets/evidence/e2e-model-workflow.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-blog-architecture.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-builder-post.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-community-token-routing.png"));
-const syntheticArticles = Array.from({ length: 130 }, (_unused, index) => ({
-  id: `synthetic-full-history-${index + 1}`,
-  title: `Synthetic full history article ${index + 1}`,
-  url: `https://example.com/synthetic-full-history-${index + 1}`,
-  summary: `Synthetic article ${index + 1} verifies that full history rendering is not capped per domain.`,
-  date: "2026-05-17",
-  month: "2026-05",
-  source: `Synthetic Source ${String(index + 1).padStart(3, "0")}`,
-  section: "stories",
-  report_date: "2026-05-17",
-  report_url: "reports/2026/05/2026-05-17.html",
-  data_url: "data/2026/05/2026-05-17.json",
-  quality_score: 91,
-  importance: "notable",
-  domain: "基础模型与算力技术栈",
-  flavors: ["快讯"],
-  channels_l1: ["基础模型"],
-  channels_l2: ["模型能力"],
-  companies: [],
-  products: []
-}));
-const syntheticDir = path.join(outDir, "synthetic");
-await fs.mkdir(syntheticDir, { recursive: true });
-await fs.writeFile(path.join(syntheticDir, "index.html"), renderIndexHtml({
-  schema_version: 1,
-  site_title: "AI 日报",
-  reports: [{ url: "reports/2026/05/2026-05-17.html", report_date: "2026-05-17" }]
-}, null, null, {
-  articles: syntheticArticles,
-  styleVersion: "synthetic"
-}), "utf8");
-await fs.writeFile(path.join(syntheticDir, "articles.json"), `${JSON.stringify(syntheticArticles, null, 2)}\n`, "utf8");
 await buildWebApp({ rootDir, outDir, forwardOutput: false });
 
 const positionalPageCheckOutput = path.join(tmp, "page-check-positional-viewports.json");
@@ -508,21 +515,15 @@ try {
   assert.equal(await page.locator("#articleSource").count(), 0);
   assert.equal(await page.locator("#articleScore").count(), 0);
   assert.equal(await page.locator("[data-article-card]").count() >= 2, true);
+  assert.equal(await page.locator("[data-source-watch-rail]").count(), 1);
   await page.getByRole("radio", { name: "昨日回看" }).click();
   assert.equal(await page.locator("#article-results-title").textContent(), "昨日回看");
   await page.getByRole("radio", { name: "历史流" }).click();
   assert.equal(await page.locator("#article-results-title").textContent(), "历史流");
   assert.equal(await allExternalLinksHaveRel(page), true);
-  await page.goto(`${server.url}/synthetic/index.html`);
-  assert.equal(await page.locator("#articleSource option").count(), syntheticArticles.length + 1);
-  await page.locator('[data-article-filter="all"]').click();
-  await page.waitForFunction(() => document.documentElement.dataset.articleIndexLoaded === "full");
-  assert.equal(await page.locator("#article-results-title").textContent(), "全部资讯");
-  const fullHistoryMeta = await page.locator("#articleResultMeta").textContent();
-  assert.equal(Number(fullHistoryMeta.replace(/\D/g, "")), syntheticArticles.length);
-  assert.equal(await page.locator("[data-article-card]").count(), syntheticArticles.length);
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await hasHorizontalOverflow(page), false);
+  assert.equal(await page.locator(".adc-source-watch-header").evaluate((node) => node.scrollWidth <= node.clientWidth), true);
   await page.setViewportSize({ width: 1280, height: 900 });
 
   await page.goto(`${server.url}/ops.html`);

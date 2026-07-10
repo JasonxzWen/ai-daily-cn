@@ -39,6 +39,8 @@ test("React homepage CSS supports narrow viewports and direct Astryx badge overr
   assert.doesNotMatch(css, /body\s*\{[^}]*min-width:\s*1120px/s);
   assert.match(css, /\.astryx-badge/);
   assert.match(css, /@media\s*\(max-width:\s*720px\)/);
+  assert.match(css, /@media\s*\(max-width:\s*720px\)[\s\S]*?\.adc-source-watch-header\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+  assert.match(css, /\.adc-source-watch h2\s*\{[^}]*color:\s*var\(--adc-card\)/);
   assert.match(css, /:focus-visible/);
 });
 

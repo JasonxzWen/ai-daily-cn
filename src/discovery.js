@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import {
@@ -886,14 +887,35 @@ function sourceWatchToken(value) {
   return String(value || "").trim().toLowerCase().replace(/[^a-z0-9_:-]+/g, "_").replace(/^_+|_+$/g, "");
 }
 
-function sourceWatchVerificationStatus(target = {}, fallback = "") {
-  if (
-    target.source_tier === "first_class"
-    && target.verification_policy === "no_secondary_review_required"
-  ) {
-    return "first_class_source_confirmed";
+function sourceWatchStrategy(target = {}, signal = "") {
+  const configured = sourceWatchContractFields(target);
+  return {
+    source_lane: configured.source_lane || signal,
+    source_tier: configured.source_tier || "watchlist",
+    verification_policy: configured.verification_policy || (
+      signal === "github_watch" ? "primary_source_required" : "secondary_review_required"
+    )
+  };
+}
+
+function sourceWatchFingerprint(snapshot) {
+  return sourceWatchDigest(stableSourceWatchJson(snapshot));
+}
+
+function sourceWatchDigest(value) {
+  return `sha256:${createHash("sha256").update(String(value || "")).digest("hex")}`;
+}
+
+function stableSourceWatchJson(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => stableSourceWatchJson(item)).join(",")}]`;
   }
-  return fallback;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) => (
+      `${JSON.stringify(key)}:${stableSourceWatchJson(value[key])}`
+    )).join(",")}}`;
+  }
+  return JSON.stringify(value ?? null);
 }
 
 function normalizeSourceWatchRepo(value) {
@@ -937,6 +959,7 @@ async function collectSourceWatchGithubRepo(target, context) {
   let tags = [];
   let commits = [];
   let readme = { status: "not_fetched", excerpt: "" };
+  const incompleteMaterialEndpoints = [];
   if (repoResult.ok) {
     const releaseResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.releases, {
       headers: sourceWatchGithubHeaders(context.options)
@@ -944,6 +967,7 @@ async function collectSourceWatchGithubRepo(target, context) {
     endpointStatus.releases = sourceWatchEndpointStatus(releaseResult);
     sourceWatchMergeRateLimit(rateLimit, releaseResult.rate_limit);
     releases = sourceWatchReleases(releaseResult.payload, endpointLimit);
+    if (!releaseResult.ok) incompleteMaterialEndpoints.push("releases");
 
     const tagResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.tags, {
       headers: sourceWatchGithubHeaders(context.options)
@@ -951,6 +975,7 @@ async function collectSourceWatchGithubRepo(target, context) {
     endpointStatus.tags = sourceWatchEndpointStatus(tagResult);
     sourceWatchMergeRateLimit(rateLimit, tagResult.rate_limit);
     tags = sourceWatchTags(tagResult.payload, endpointLimit);
+    if (!tagResult.ok) incompleteMaterialEndpoints.push("tags");
 
     const commitResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.commits, {
       headers: sourceWatchGithubHeaders(context.options)
@@ -958,6 +983,7 @@ async function collectSourceWatchGithubRepo(target, context) {
     endpointStatus.commits = sourceWatchEndpointStatus(commitResult);
     sourceWatchMergeRateLimit(rateLimit, commitResult.rate_limit);
     commits = sourceWatchCommits(commitResult.payload, endpointLimit);
+    if (!commitResult.ok) incompleteMaterialEndpoints.push("commits");
 
     const readmeResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.readme, {
       headers: sourceWatchGithubHeaders(context.options)
@@ -968,9 +994,12 @@ async function collectSourceWatchGithubRepo(target, context) {
   }
 
   const metadata = repoResult.ok ? sourceWatchRepoMetadata(repoResult.payload, target) : {};
-  const status = repoResult.ok ? "checked" : "blocked";
-  const notes = repoResult.ok
-    ? `repo metadata fetched; releases=${releases.length}; tags=${tags.length}; commits=${commits.length}; readme=${readme.status}`
+  const materialSnapshotComplete = repoResult.ok && incompleteMaterialEndpoints.length === 0;
+  const status = materialSnapshotComplete ? "checked" : "blocked";
+  const notes = materialSnapshotComplete
+    ? `repo metadata and material endpoints fetched; releases=${releases.length}; tags=${tags.length}; commits=${commits.length}; readme=${readme.status}`
+    : repoResult.ok
+      ? `repo metadata fetched but material snapshot is incomplete: ${incompleteMaterialEndpoints.join(",")}`
     : `repo metadata failed: ${repoResult.error || `HTTP ${repoResult.status}`}`;
   const targetResult = {
     id: target.id,
@@ -1000,9 +1029,9 @@ async function collectSourceWatchGithubRepo(target, context) {
     repo: target.repo,
     source_level: "github",
     ...sourceWatchContractFields(target),
-    verification_status: repoResult.ok ? "primary_confirmed" : "unverified"
+    verification_status: materialSnapshotComplete ? "primary_confirmed" : "unverified"
   };
-  const candidate = repoResult.ok ? sourceWatchGithubCandidate(target, metadata, {
+  const candidate = materialSnapshotComplete ? sourceWatchGithubCandidate(target, metadata, {
     reportDate: context.reportDate,
     candidates: context.candidates,
     releases,
@@ -1070,7 +1099,7 @@ async function collectSourceWatchSite(target, context) {
     notes,
     source_level: "ai_news_aggregator",
     ...sourceWatchContractFields(target),
-    verification_status: result.ok ? sourceWatchVerificationStatus(target, "intermediary_only") : "unverified"
+    verification_status: result.ok ? "intermediary_only" : "unverified"
   };
   const candidate = result.ok ? sourceWatchSiteCandidate(target, site, {
     reportDate: context.reportDate,
@@ -1096,6 +1125,8 @@ function sourceWatchGithubCandidate(target, metadata, details) {
   const latestRelease = details.releases[0]?.tag_name || "";
   const latestTag = details.tags[0]?.name || "";
   const latestCommit = details.commits[0]?.sha || "";
+  const event = sourceWatchGithubEvent(target, metadata, details);
+  const sourceWatch = sourceWatchGithubMetadata(target, metadata, details, event);
   return {
     id: uniqueCandidateId(details.candidates, `github-watch-${target.repo}`),
     source_id: target.id,
@@ -1105,10 +1136,11 @@ function sourceWatchGithubCandidate(target, metadata, details) {
     repo: target.repo,
     url: metadata.html_url || target.url,
     source: target.name,
-    event_date: dateOnly(metadata.pushed_at) || details.reportDate,
+    event_date: dateOnly(event.date) || dateOnly(metadata.pushed_at) || details.reportDate,
     status: "excluded",
     signal: "github_watch",
     ...sourceWatchContractFields(target),
+    source_watch: sourceWatch,
     description: metadata.description || "",
     evidence: `${target.repo} is explicitly watched; stars=${metadata.stars || 0}; forks=${metadata.forks || 0}; pushed_at=${metadata.pushed_at || "unknown"}.`,
     notes: [
@@ -1121,7 +1153,7 @@ function sourceWatchGithubCandidate(target, metadata, details) {
       `readme=${details.readme.status}`
     ].filter(Boolean).join("; "),
     tags: metadata.topics || [],
-    verification_status: sourceWatchVerificationStatus(target, "primary_confirmed"),
+    verification_status: "primary_confirmed",
     source_level: "github",
     primary_url: metadata.html_url || target.url,
     verification_sources: [metadata.html_url || target.url],
@@ -1132,6 +1164,7 @@ function sourceWatchGithubCandidate(target, metadata, details) {
 
 function sourceWatchSiteCandidate(target, site, details) {
   const url = site.canonical_url || target.url;
+  const sourceWatch = sourceWatchSiteMetadata(target, site, url);
   return {
     id: uniqueCandidateId(details.candidates, `site-watch-${target.id}`),
     source_id: target.id,
@@ -1143,18 +1176,148 @@ function sourceWatchSiteCandidate(target, site, details) {
     status: "excluded",
     signal: "site_watch",
     ...sourceWatchContractFields(target),
+    source_watch: sourceWatch,
     evidence: `${target.name} is explicitly watched; feeds=${site.feeds.length}; github_links=${site.github_repositories.length}.`,
     notes: [
       site.description ? `description=${trimText(site.description, 160)}` : "",
       `feeds=${site.feeds.length}`,
       `github_links=${site.github_repositories.length}`
     ].filter(Boolean).join("; "),
-    verification_status: sourceWatchVerificationStatus(target, "intermediary_only"),
+    verification_status: "intermediary_only",
     source_level: "ai_news_aggregator",
     intermediary_url: target.url,
     verification_sources: [target.url],
     editorial_category: "community_signal",
     tags: site.github_repositories.map((repo) => repo.repo).slice(0, 5)
+  };
+}
+
+function sourceWatchGithubMetadata(target, metadata, details, event = sourceWatchGithubEvent(target, metadata, details)) {
+  const latestRelease = details.releases[0] || null;
+  const latestTag = details.tags[0] || null;
+  const latestCommit = details.commits[0] || null;
+  const repoSnapshot = {
+    repo: target.repo,
+    stars: metadata.stars || 0,
+    forks: metadata.forks || 0,
+    open_issues: metadata.open_issues || 0,
+    pushed_at: metadata.pushed_at || "",
+    updated_at: metadata.updated_at || "",
+    default_branch: metadata.default_branch || "",
+    language: metadata.language || "",
+    license: metadata.license || "",
+    latest_release: latestRelease ? {
+      tag_name: latestRelease.tag_name || "",
+      name: latestRelease.name || "",
+      html_url: latestRelease.html_url || "",
+      published_at: latestRelease.published_at || "",
+      prerelease: Boolean(latestRelease.prerelease)
+    } : null,
+    latest_tag: latestTag ? {
+      name: latestTag.name || "",
+      commit_sha: latestTag.commit_sha || ""
+    } : null,
+    latest_commit: latestCommit ? {
+      sha: latestCommit.sha || "",
+      html_url: latestCommit.html_url || "",
+      message: latestCommit.message || "",
+      author_date: latestCommit.author_date || "",
+      author_name: latestCommit.author_name || ""
+    } : null,
+    readme_status: details.readme.status || "not_fetched"
+  };
+  const materialSnapshot = {
+    repo: target.repo.toLowerCase(),
+    pushed_at: repoSnapshot.pushed_at,
+    latest_release: repoSnapshot.latest_release ? {
+      tag_name: repoSnapshot.latest_release.tag_name,
+      html_url: repoSnapshot.latest_release.html_url,
+      published_at: repoSnapshot.latest_release.published_at,
+      prerelease: repoSnapshot.latest_release.prerelease
+    } : null,
+    latest_tag: repoSnapshot.latest_tag,
+    latest_commit: repoSnapshot.latest_commit ? {
+      sha: repoSnapshot.latest_commit.sha,
+      html_url: repoSnapshot.latest_commit.html_url,
+      author_date: repoSnapshot.latest_commit.author_date
+    } : null
+  };
+  return {
+    signal: "github_watch",
+    target_id: target.id,
+    ...sourceWatchStrategy(target, "github_watch"),
+    event_url: event.url,
+    snapshot_fingerprint: sourceWatchFingerprint(materialSnapshot),
+    repo_snapshot: repoSnapshot
+  };
+}
+
+function sourceWatchGithubEvent(target, metadata, details) {
+  const repoUrl = metadata.html_url || target.url;
+  const latestRelease = details.releases[0] || null;
+  const latestTag = details.tags[0] || null;
+  const latestCommit = details.commits[0] || null;
+  const releaseTime = sourceWatchEventTime(latestRelease?.published_at);
+  const commitTime = sourceWatchEventTime(latestCommit?.author_date);
+  if (latestCommit && (!latestRelease || commitTime > releaseTime)) {
+    return {
+      kind: "commit",
+      url: latestCommit.html_url || repoUrl,
+      date: latestCommit.author_date || metadata.pushed_at || ""
+    };
+  }
+  if (latestRelease) {
+    return {
+      kind: "release",
+      url: latestRelease.html_url || repoUrl,
+      date: latestRelease.published_at || metadata.pushed_at || ""
+    };
+  }
+  if (latestCommit) {
+    return {
+      kind: "commit",
+      url: latestCommit.html_url || repoUrl,
+      date: latestCommit.author_date || metadata.pushed_at || ""
+    };
+  }
+  if (latestTag?.name) {
+    return {
+      kind: "tag",
+      url: `${repoUrl.replace(/\/$/, "")}/tree/${encodeURIComponent(latestTag.name)}`,
+      date: metadata.pushed_at || ""
+    };
+  }
+  return { kind: "repository", url: repoUrl, date: metadata.pushed_at || "" };
+}
+
+function sourceWatchEventTime(value) {
+  const timestamp = Date.parse(String(value || ""));
+  return Number.isFinite(timestamp) ? timestamp : Number.NEGATIVE_INFINITY;
+}
+
+function sourceWatchSiteMetadata(target, site, eventUrl) {
+  const siteSnapshot = {
+    title: site.title || "",
+    description: site.description || "",
+    canonical_url: site.canonical_url || target.url,
+    content_fingerprint: site.content_fingerprint || sourceWatchDigest(""),
+    feeds: site.feeds.map((feed) => ({
+      title: feed.title || "",
+      type: feed.type || "",
+      url: feed.url || ""
+    })),
+    discovered_github_repositories: site.github_repositories.map((repo) => ({
+      repo: repo.repo || "",
+      url: repo.url || ""
+    }))
+  };
+  return {
+    signal: "site_watch",
+    target_id: target.id,
+    ...sourceWatchStrategy(target, "site_watch"),
+    event_url: eventUrl,
+    snapshot_fingerprint: sourceWatchFingerprint(siteSnapshot),
+    site_snapshot: siteSnapshot
   };
 }
 
@@ -1316,9 +1479,22 @@ function parseSourceWatchSiteHtml(html, baseUrl) {
     title,
     description,
     canonical_url: canonical || baseUrl,
+    content_fingerprint: sourceWatchSiteContentFingerprint(html),
     feeds: sourceWatchFeeds(html, baseUrl),
     github_repositories: sourceWatchGithubLinks(html)
   };
+}
+
+function sourceWatchSiteContentFingerprint(html) {
+  const rawHtml = String(html || "");
+  const bodyHtml = rawHtml.match(/<body\b[^>]*>([\s\S]*?)<\/body\s*>/i)?.[1] || rawHtml;
+  const visibleText = decodeXml(bodyHtml
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
+    .replace(/<[^>]*(?:>|$)/g, " "))
+    .replace(/\s+/g, " ")
+    .trim();
+  return sourceWatchDigest(visibleText);
 }
 
 function sourceWatchMetaContent(html, name) {

@@ -137,7 +137,7 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
       model: plan.codex?.model || "",
       sandbox: plan.codex?.sandbox || DEFAULT_SANDBOX
     },
-    ...productionSourceWatchSummary(plan),
+    ...pendingProductionSourceWatchSummary(),
     orchestration,
     legacy_runner: {
       module: "src/daily-runner.js",
@@ -156,7 +156,7 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
         plan_path: pipelinePlanPath,
         orchestration,
         orchestration_node_count: orchestration.node_count,
-        ...productionSourceWatchSummary(plan),
+        ...pendingProductionSourceWatchSummary(),
         updated_at: new Date().toISOString()
       }
     : {
@@ -173,7 +173,7 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
         orchestration,
         orchestration_node_count: orchestration.node_count,
         completed_stages: [],
-        ...productionSourceWatchSummary(plan),
+        ...pendingProductionSourceWatchSummary(),
         publish_requested: Boolean(plan.publish_requested),
         execute_requested: true,
         updated_at: new Date().toISOString()
@@ -568,6 +568,12 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
     ? report.quality_status
     : {};
   const completedStages = normalizeCompletedStages(legacySummary.stages || legacySummary.completed_stages || []);
+  const sourceWatch = await deriveProductionSourceWatchSummary({
+    cleanRoot,
+    reportDate: plan.report_date,
+    completedStages,
+    legacySummary
+  });
   const publication = buildPublicationSummary({ legacySummary, completedStages, finalStatus });
   const pages = buildPagesSummary({ completedStages, finalStatus, publication });
   const validation = buildValidationSummary(completedStages);
@@ -599,7 +605,7 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
     failures,
     publish_requested: Boolean(plan.publish_requested),
     execute_requested: true,
-    ...productionSourceWatchSummary(plan),
+    source_watch: sourceWatch,
     clean_repo_root: cleanRoot,
     structured_json_path: artifactPaths.structured_json_path,
     html_path: artifactPaths.html_path,
@@ -625,19 +631,305 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
   return summary;
 }
 
-function productionSourceWatchSummary(plan) {
-  const requestedArtifactPath = plan.publish?.source_watch_admitted_artifact_path || "";
+function pendingProductionSourceWatchSummary(reason = "awaiting_same_run_source_watch_evidence") {
   return {
-    source_watch_admitted_artifact_path: "",
-    source_watch_requested_artifact_path: requestedArtifactPath,
-    source_watch: {
-      production_status: "not_connected",
-      consumed: false,
-      requested_artifact_path: requestedArtifactPath,
-      admitted_count: 0,
-      reason: "The production runner has no non-fixture admitted-candidate producer or consumed build handoff yet."
-    }
+    source_watch: disconnectedSourceWatchSummary(reason)
   };
+}
+
+async function deriveProductionSourceWatchSummary({ cleanRoot, reportDate, completedStages, legacySummary = {} }) {
+  const producerStage = findStage(completedStages, "discover_source_watch");
+  if (!stagePassed(producerStage)) {
+    return disconnectedSourceWatchSummary("producer_stage_not_completed");
+  }
+
+  const producerArtifactPath = path.join(cleanRoot, ".tmp", `source-watch-${reportDate}.json`);
+  const producerArtifact = await readJsonOrNull(producerArtifactPath);
+  const producerRecord = await artifactRecord(producerArtifactPath);
+  if (
+    !producerRecord.exists
+    || producerArtifact?.kind !== "source_watch_candidates"
+    || producerArtifact?.report_date !== reportDate
+  ) {
+    return disconnectedSourceWatchSummary("producer_artifact_missing_or_invalid", {
+      producer_artifact_path: producerArtifactPath
+    });
+  }
+  const producerReceipt = stageOutput(producerStage);
+  if (
+    producerReceipt.kind !== "source_watch_artifact_receipt"
+    || producerReceipt.report_date !== reportDate
+    || !nonEmptyString(producerReceipt.output_path)
+    || !samePath(producerReceipt.output_path, producerArtifactPath)
+    || String(producerReceipt.artifact_sha256 || "").toLowerCase() !== producerRecord.sha256
+  ) {
+    return disconnectedSourceWatchSummary("producer_stage_receipt_missing_or_mismatch", {
+      producer_artifact_path: producerArtifactPath,
+      producer_artifact_sha256: producerRecord.sha256
+    });
+  }
+
+  if (!stagePassed(findStage(completedStages, "report_draft"))) {
+    return disconnectedSourceWatchSummary("report_draft_not_completed", {
+      producer_artifact_path: producerArtifactPath,
+      producer_artifact_sha256: producerRecord.sha256
+    });
+  }
+  if (!stagePassed(findStage(completedStages, "report_write"))) {
+    return disconnectedSourceWatchSummary("report_write_not_completed", {
+      producer_artifact_path: producerArtifactPath,
+      producer_artifact_sha256: producerRecord.sha256
+    });
+  }
+
+  const candidatePoolPath = path.join(
+    cleanRoot,
+    "reports-data",
+    ...internalCandidatePoolRelativePath(reportDate).split(path.sep)
+  );
+  const candidatePool = await readJsonOrNull(candidatePoolPath);
+  const candidatePoolRecord = await artifactRecord(candidatePoolPath);
+  if (!candidatePoolRecord.exists || candidatePool?.report_date !== reportDate) {
+    return disconnectedSourceWatchSummary("candidate_pool_missing_or_invalid", {
+      producer_artifact_path: producerArtifactPath,
+      producer_artifact_sha256: producerRecord.sha256,
+      candidate_pool_path: candidatePoolPath
+    });
+  }
+
+  const lineage = compareSourceWatchCandidateLineage(producerArtifact, candidatePool);
+  if (!lineage.matches) {
+    return disconnectedSourceWatchSummary("producer_candidate_pool_lineage_mismatch", {
+      producer_artifact_path: producerArtifactPath,
+      producer_artifact_sha256: producerRecord.sha256,
+      candidate_pool_path: candidatePoolPath,
+      candidate_pool_sha256: candidatePoolRecord.sha256,
+      producer_candidate_count: lineage.producer_count,
+      persisted_candidate_count: lineage.persisted_count,
+      lineage_error: lineage.error
+    });
+  }
+
+  const buildStage = findStage(completedStages, "build");
+  if (!stagePassed(buildStage)) {
+    return disconnectedSourceWatchSummary("build_stage_not_completed", {
+      producer_artifact_path: producerArtifactPath,
+      producer_artifact_sha256: producerRecord.sha256,
+      candidate_pool_path: candidatePoolPath,
+      candidate_pool_sha256: candidatePoolRecord.sha256
+    });
+  }
+  const consumption = normalizeSourceWatchConsumption(
+    sourceWatchConsumptionFromStage(buildStage)
+      || legacySummary.source_watch_consumption
+      || legacySummary.sourceWatchConsumption
+  );
+  if (!consumption) {
+    return disconnectedSourceWatchSummary("build_consumption_missing_or_invalid", {
+      producer_artifact_path: producerArtifactPath,
+      producer_artifact_sha256: producerRecord.sha256,
+      candidate_pool_path: candidatePoolPath,
+      candidate_pool_sha256: candidatePoolRecord.sha256
+    });
+  }
+
+  const consumedPath = consumption.candidate_pool_paths.find((item) => samePath(item, candidatePoolPath));
+  if (!consumedPath) {
+    return disconnectedSourceWatchSummary("candidate_pool_not_consumed", {
+      producer_artifact_path: producerArtifactPath,
+      producer_artifact_sha256: producerRecord.sha256,
+      candidate_pool_path: candidatePoolPath,
+      candidate_pool_sha256: candidatePoolRecord.sha256,
+      consumption
+    });
+  }
+  const consumedHash = consumption.candidate_pool_hashes.find((item) => samePath(item.path, candidatePoolPath));
+  if (!consumedHash || consumedHash.sha256 !== candidatePoolRecord.sha256) {
+    return disconnectedSourceWatchSummary("candidate_pool_hash_mismatch", {
+      producer_artifact_path: producerArtifactPath,
+      producer_artifact_sha256: producerRecord.sha256,
+      candidate_pool_path: candidatePoolPath,
+      candidate_pool_sha256: candidatePoolRecord.sha256,
+      consumption
+    });
+  }
+
+  return {
+    production_status: "connected",
+    connected: true,
+    consumed: true,
+    producer_stage: "discover_source_watch",
+    persistence_stage: "report_write",
+    consumer_stage: "build",
+    producer_artifact_path: producerArtifactPath,
+    producer_artifact_sha256: producerRecord.sha256,
+    candidate_pool_path: candidatePoolPath,
+    candidate_pool_sha256: candidatePoolRecord.sha256,
+    producer_candidate_count: lineage.producer_count,
+    persisted_candidate_count: lineage.persisted_count,
+    consumption,
+    reason: "same_run_producer_persistence_build_evidence_verified"
+  };
+}
+
+function compareSourceWatchCandidateLineage(producerArtifact, candidatePool) {
+  const producer = sourceWatchCandidateLineageKeys(producerArtifact, { requireSourceWatchForEveryCandidate: true });
+  const persisted = sourceWatchCandidateLineageKeys(candidatePool);
+  if (!producer.valid || !persisted.valid) {
+    return {
+      matches: false,
+      producer_count: producer.keys.length,
+      persisted_count: persisted.keys.length,
+      error: producer.error || persisted.error || "invalid_source_watch_lineage"
+    };
+  }
+  const producerKeys = [...producer.keys].sort();
+  const persistedKeys = [...persisted.keys].sort();
+  return {
+    matches: producerKeys.length === persistedKeys.length
+      && producerKeys.every((key, index) => key === persistedKeys[index]),
+    producer_count: producerKeys.length,
+    persisted_count: persistedKeys.length,
+    error: producerKeys.length === persistedKeys.length ? "snapshot_key_mismatch" : "snapshot_count_mismatch"
+  };
+}
+
+function sourceWatchCandidateLineageKeys(payload, options = {}) {
+  if (!Array.isArray(payload?.candidates)) {
+    return { valid: false, keys: [], error: "candidates_not_array" };
+  }
+  const keys = [];
+  for (const candidate of payload.candidates) {
+    const sourceWatch = plainObject(candidate?.source_watch) ? candidate.source_watch : null;
+    if (!sourceWatch) {
+      if (options.requireSourceWatchForEveryCandidate) {
+        return { valid: false, keys, error: "producer_candidate_missing_source_watch" };
+      }
+      continue;
+    }
+    const targetId = String(sourceWatch.target_id || "").trim().toLowerCase();
+    const fingerprint = String(sourceWatch.snapshot_fingerprint || "").trim().toLowerCase();
+    if (!targetId || !/^sha256:[a-f0-9]{64}$/.test(fingerprint)) {
+      return { valid: false, keys, error: "source_watch_snapshot_identity_invalid" };
+    }
+    keys.push(`${targetId}:${fingerprint}`);
+  }
+  if (new Set(keys).size !== keys.length) {
+    return { valid: false, keys, error: "duplicate_source_watch_snapshot_identity" };
+  }
+  return { valid: true, keys, error: "" };
+}
+
+function disconnectedSourceWatchSummary(reason, evidence = {}) {
+  return {
+    production_status: "not_connected",
+    connected: false,
+    consumed: false,
+    producer_stage: "discover_source_watch",
+    persistence_stage: "report_write",
+    consumer_stage: "build",
+    ...evidence,
+    reason
+  };
+}
+
+function normalizeSourceWatchConsumption(value) {
+  if (!plainObject(value)) return null;
+  const candidatePoolCount = Number(value.candidate_pool_count);
+  const includedCandidateCount = Number(value.included_candidate_count);
+  const publicArticleCount = Number(value.public_article_count);
+  const candidatePoolPaths = Array.isArray(value.candidate_pool_paths)
+    ? value.candidate_pool_paths.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  const rawHashes = Array.isArray(value.candidate_pool_hashes)
+    ? value.candidate_pool_hashes
+    : Array.isArray(value.hashes)
+      ? value.hashes
+      : [];
+  const candidatePoolHashes = rawHashes
+    .filter(plainObject)
+    .map((item) => ({
+      path: String(item.path || "").trim(),
+      sha256: String(item.sha256 || "").trim().toLowerCase()
+    }))
+    .filter((item) => item.path && /^[a-f0-9]{64}$/.test(item.sha256));
+  if (
+    !Number.isInteger(candidatePoolCount)
+    || candidatePoolCount < 0
+    || !Number.isInteger(includedCandidateCount)
+    || includedCandidateCount < 0
+    || !Number.isInteger(publicArticleCount)
+    || publicArticleCount < 0
+    || candidatePoolCount !== candidatePoolPaths.length
+    || candidatePoolCount !== candidatePoolHashes.length
+  ) {
+    return null;
+  }
+  return {
+    candidate_pool_count: candidatePoolCount,
+    candidate_pool_paths: candidatePoolPaths,
+    candidate_pool_hashes: candidatePoolHashes,
+    included_candidate_count: includedCandidateCount,
+    public_article_count: publicArticleCount
+  };
+}
+
+function sourceWatchConsumptionFromStage(stage) {
+  const output = stageOutput(stage);
+  return output.source_watch_consumption
+    || output.sourceWatchConsumption
+    || output.result?.source_watch_consumption
+    || output.result?.sourceWatchConsumption
+    || sourceWatchConsumptionFromPreview(output.preview);
+}
+
+function sourceWatchConsumptionFromPreview(preview) {
+  for (const key of ["source_watch_consumption", "sourceWatchConsumption"]) {
+    const parsed = jsonObjectPropertyFromPrefix(preview, key);
+    if (parsed) return parsed;
+  }
+  return null;
+}
+
+function jsonObjectPropertyFromPrefix(value, key) {
+  const textValue = String(value || "");
+  const keyIndex = textValue.indexOf(`"${key}"`);
+  if (keyIndex < 0) return null;
+  const colonIndex = textValue.indexOf(":", keyIndex + key.length + 2);
+  const objectStart = textValue.indexOf("{", colonIndex + 1);
+  if (colonIndex < 0 || objectStart < 0) return null;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let index = objectStart; index < textValue.length; index += 1) {
+    const character = textValue[index];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (character === "\\") {
+        escaped = true;
+      } else if (character === '"') {
+        inString = false;
+      }
+      continue;
+    }
+    if (character === '"') {
+      inString = true;
+      continue;
+    }
+    if (character === "{") depth += 1;
+    if (character === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        try {
+          return JSON.parse(textValue.slice(objectStart, index + 1));
+        } catch {
+          return null;
+        }
+      }
+    }
+  }
+  return null;
 }
 
 function productionSummaryOk(finalStatus) {
@@ -700,7 +992,10 @@ async function recordStage(state, stageId, fn) {
     duration_ms: Math.max(0, finishedAt.getTime() - startedAt.getTime()),
     artifacts: result.artifacts || [],
     failures: result.failures || [],
-    skipped_reason: result.skipped_reason || ""
+    skipped_reason: result.skipped_reason || "",
+    ...(result.source_watch_consumption
+      ? { output: { source_watch_consumption: result.source_watch_consumption } }
+      : {})
   };
   state.completedStages.push(summary);
   await writeRunSummary(state, {
@@ -841,30 +1136,7 @@ async function runSummarizeStage(state) {
 
 async function runPublishStage(state) {
   const publishConfig = state.plan.publish || {};
-  const sourceWatchAdmittedArtifactPath = String(publishConfig.source_watch_admitted_artifact_path || "").trim();
-  if (!sourceWatchAdmittedArtifactPath) {
-    state.publication = {
-      ok: false,
-      skipped_reason: "source_watch_admitted_artifact_not_provided",
-      source_watch_admitted_artifact_path: "",
-      article_count: 0,
-      source_watch_articles: 0,
-      articles_path: ""
-    };
-    await writeJson(state.plan.outputs.publish_summary, state.publication);
-    return {
-      status: "skipped",
-      skipped_reason: "source_watch_admitted_artifact_not_provided",
-      artifacts: await artifactRecords([state.plan.outputs.publish_summary])
-    };
-  }
-
   try {
-    await preflightSourceWatchAdmittedArtifactForPublish(
-      state.plan.root_dir,
-      sourceWatchAdmittedArtifactPath,
-      state.plan.report_date
-    );
     assertPublishOutDirInsideRepo(state.plan.root_dir, publishConfig.out_dir);
     const result = await buildSite({
       rootDir: state.plan.root_dir,
@@ -874,8 +1146,15 @@ async function runPublishStage(state) {
       siteUrl: publishConfig.site_url || undefined,
       generatedAt: publishConfig.generated_at || undefined,
       trendConfigPath: publishConfig.trend_config_path || undefined,
-      sourceWatchAdmittedArtifactPath
+      sourceWatchConsumptionReportDate: state.plan.report_date
     });
+    const sourceWatchConsumption = normalizeSourceWatchConsumption(result.sourceWatchConsumption) || {
+      candidate_pool_count: 0,
+      candidate_pool_paths: [],
+      candidate_pool_hashes: [],
+      included_candidate_count: 0,
+      public_article_count: 0
+    };
     const webApp = await buildWebApp({
       rootDir: state.plan.root_dir,
       outDir: publishConfig.out_dir,
@@ -887,9 +1166,9 @@ async function runPublishStage(state) {
       report_date: state.plan.report_date,
       out_dir: result.outDir,
       articles_path: articlesPath,
-      source_watch_admitted_artifact_path: sourceWatchAdmittedArtifactPath,
       article_count: result.articles.length,
       source_watch_articles: result.articles.filter((article) => article.section === "source_watch").length,
+      source_watch_consumption: sourceWatchConsumption,
       written_files: uniqueStrings([...result.writtenFiles, ...webApp.writtenFiles]),
       web_app: webApp.skipped
         ? { ok: true, skipped: true, skipped_reason: webApp.skipped_reason }
@@ -898,55 +1177,16 @@ async function runPublishStage(state) {
     await writeJson(state.plan.outputs.publish_summary, state.publication);
     return {
       status: "success",
+      source_watch_consumption: sourceWatchConsumption,
       artifacts: await artifactRecords([state.plan.outputs.publish_summary, articlesPath])
     };
   } catch (error) {
     state.publication = {
       ok: false,
       report_date: state.plan.report_date,
-      source_watch_admitted_artifact_path: sourceWatchAdmittedArtifactPath,
       failures: [error instanceof Error ? error.message : String(error)]
     };
     await writeJson(state.plan.outputs.publish_summary, state.publication);
-    throw error;
-  }
-}
-
-async function preflightSourceWatchAdmittedArtifactForPublish(rootDir, artifactPath, expectedReportDate) {
-  if (!String(artifactPath).toLowerCase().endsWith(".json")) {
-    const error = new Error("Source Watch admitted artifact path must end with .json.");
-    error.code = "source_watch_admitted_artifact_path_invalid";
-    throw error;
-  }
-  const allowedRoot = path.resolve(rootDir, ".tmp", "daily-codex-pipeline");
-  const resolved = path.resolve(rootDir, artifactPath);
-  const relative = path.relative(allowedRoot, resolved);
-  if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
-    const error = new Error(`Source Watch admitted artifact path must stay under ${path.join(".tmp", "daily-codex-pipeline")}.`);
-    error.code = "source_watch_admitted_artifact_path_out_of_scope";
-    throw error;
-  }
-  let payload;
-  try {
-    payload = JSON.parse(await fs.readFile(resolved, "utf8"));
-  } catch (readError) {
-    const error = new Error(`Source Watch admitted artifact could not be read: ${readError.message}`);
-    error.code = "source_watch_admitted_artifact_read_failed";
-    throw error;
-  }
-  if (!isPlainObject(payload) || payload.kind !== "source_watch_admitted_candidates") {
-    const error = new Error("Source Watch admitted artifact must have kind source_watch_admitted_candidates.");
-    error.code = "source_watch_admitted_artifact_invalid";
-    throw error;
-  }
-  if (payload.report_date !== expectedReportDate) {
-    const error = new Error(`Source Watch admitted artifact report_date must match ${expectedReportDate}.`);
-    error.code = "source_watch_admitted_artifact_report_date_mismatch";
-    throw error;
-  }
-  if (payload.public_surface === true || payload.admission_audit?.public_surface === true) {
-    const error = new Error("Source Watch admitted artifact must remain an internal input before article publication.");
-    error.code = "source_watch_admitted_artifact_public_surface_invalid";
     throw error;
   }
 }
@@ -985,7 +1225,7 @@ async function writeRunSummary(state, { finalStatus }) {
     summary_path: state.plan.outputs.run_summary,
     publish_requested: Boolean(state.plan.publish_requested),
     execute_requested: Boolean(state.plan.execute_requested),
-    source_watch_admitted_artifact_path: state.plan.publish?.source_watch_admitted_artifact_path || "",
+    source_watch: disconnectedSourceWatchSummary("production_evidence_not_available_in_dag_lite"),
     artifact_sizes: artifactSizes,
     publication: state.publication,
     validation: state.finalValidation || state.validation || null,
@@ -1011,12 +1251,6 @@ function nextActionFor({ finalStatus, state }) {
     };
   }
   if (finalStatus === "generated_only") {
-    if (state.plan.publish_requested && !state.plan.publish?.source_watch_admitted_artifact_path) {
-      return {
-        kind: "provide_source_watch_admitted_artifact",
-        expected_flag: "--source-watch-admitted-artifact"
-      };
-    }
     return { kind: "promote_mvp_artifact", artifact_path: state.plan.outputs.final };
   }
   return {
@@ -1064,11 +1298,17 @@ function buildDailyReportArtifactPaths({ cleanRoot, reportDate }) {
 function normalizeCompletedStages(stages) {
   let previousFinishedAt = "";
   return stages.map((stage) => {
+    const sourceWatchConsumption = stage?.id === "build"
+      ? normalizeSourceWatchConsumption(sourceWatchConsumptionFromStage(stage))
+      : null;
+    const normalizedOutput = stage.output && sourceWatchConsumption
+      ? { ...stage.output, source_watch_consumption: sourceWatchConsumption }
+      : stage.output;
     const normalized = {
       id: stage.id || stage.stage || "",
       status: stage.status || "",
       ...(stage.command ? { command: stage.command } : {}),
-      ...(stage.output ? { output: stage.output } : {}),
+      ...(normalizedOutput ? { output: normalizedOutput } : {}),
       ...(stage.error ? { error: stage.error } : {}),
       ...(stage.error_code ? { error_code: stage.error_code } : {}),
       ...(stage.updated_at ? { updated_at: stage.updated_at } : {}),
@@ -1732,7 +1972,6 @@ function uniqueStrings(values) {
 
 function buildPublishConfig(options = {}) {
   return {
-    source_watch_admitted_artifact_path: String(options.sourceWatchAdmittedArtifactPath || options["source-watch-admitted-artifact"] || "").trim(),
     input_dir: options.inputDir || options.input || "reports-source",
     data_input_dir: options.dataInputDir || options["data-input"] || "reports-data",
     out_dir: options.outDir || options.out || "docs",
@@ -1800,10 +2039,7 @@ function buildDagLiteArtifactSizePaths(plan) {
     validation_path: plan.outputs.validation,
     repair_validation_path: plan.outputs.repair_validation,
     stage_summary_path: plan.outputs.stage_summary,
-    publish_summary_path: plan.outputs.publish_summary,
-    ...(plan.publish?.source_watch_admitted_artifact_path
-      ? { source_watch_admitted_artifact_path: plan.publish.source_watch_admitted_artifact_path }
-      : {})
+    publish_summary_path: plan.outputs.publish_summary
   };
 }
 
@@ -1944,7 +2180,6 @@ function parseArgs(argv) {
     "model",
     "sandbox",
     "fixture",
-    "source-watch-admitted-artifact",
     "input",
     "data-input",
     "out",
@@ -2066,28 +2301,13 @@ function fallbackRequestedFlag(argv, flagName, parsedValue) {
   return argv.some((token) => token === flag || token === `${flag}=true` || token === `${flag}=1`);
 }
 
-function fallbackValueFlag(argv, flagName) {
-  const flag = `--${flagName}`;
-  for (let index = 0; index < argv.length; index += 1) {
-    const token = argv[index];
-    if (token === "--") break;
-    if (token.startsWith(`${flag}=`)) return token.slice(flag.length + 1);
-    if (token === flag) {
-      const next = argv[index + 1];
-      return next && !next.startsWith("--") ? next : "";
-    }
-  }
-  return "";
-}
-
 async function writeEntryFailureRunSummary({
   rootDir,
   reportDate,
   error,
   stageId,
   executeRequested,
-  publishRequested,
-  sourceWatchRequestedArtifactPath
+  publishRequested
 }) {
   if (!validReportDate(reportDate)) return "";
   const summaryPath = path.resolve(rootDir, ".tmp", `run-summary-${reportDate}.json`);
@@ -2102,15 +2322,7 @@ async function writeEntryFailureRunSummary({
     summary_path: summaryPath,
     publish_requested: Boolean(publishRequested),
     execute_requested: Boolean(executeRequested),
-    source_watch_admitted_artifact_path: "",
-    source_watch_requested_artifact_path: sourceWatchRequestedArtifactPath || "",
-    source_watch: {
-      production_status: "not_connected",
-      consumed: false,
-      requested_artifact_path: sourceWatchRequestedArtifactPath || "",
-      admitted_count: 0,
-      reason: "Initialization failed before any Source Watch producer or consumer ran."
-    },
+    source_watch: disconnectedSourceWatchSummary("initialization_failed_before_source_watch_evidence"),
     publication: null,
     updated_at: new Date().toISOString()
   });
@@ -2138,7 +2350,6 @@ if (isMainModule(import.meta.url)) {
       fixtureMode: fixtureFromArgs(args),
       executeRequested: Boolean(args.execute),
       publishRequested: Boolean(args.publish),
-      sourceWatchAdmittedArtifactPath: args["source-watch-admitted-artifact"] || process.env.npm_config_source_watch_admitted_artifact || "",
       inputDir: args.input || process.env.npm_config_input || "reports-source",
       dataInputDir: args["data-input"] || process.env.npm_config_data_input || "reports-data",
       outDir: args.out || process.env.npm_config_out || "docs",
@@ -2164,8 +2375,6 @@ if (isMainModule(import.meta.url)) {
       docs_data_json_path: summary.docs_data_json_path || "",
       publish_requested: summary.publish_requested,
       execute_requested: summary.execute_requested,
-      source_watch_admitted_artifact_path: summary.source_watch_admitted_artifact_path,
-      source_watch_requested_artifact_path: summary.source_watch_requested_artifact_path || "",
       source_watch: summary.source_watch || null,
       publication: summary.publication,
       validation: summary.validation,
@@ -2183,21 +2392,13 @@ if (isMainModule(import.meta.url)) {
     const reportDate = plan?.report_date || (args ? dateFromArgs(args) : fallbackDateFromArgv(rawArgv));
     const rootDir = path.resolve(plan?.root_dir || args?.["repo-root"] || fallbackRootDirFromArgv(rawArgv));
     const existingSummary = plan?.outputs?.run_summary ? await readJsonOrNull(plan.outputs.run_summary) : null;
-    const sourceWatchRequestedArtifactPath = existingSummary?.source_watch_requested_artifact_path
-      || existingSummary?.source_watch?.requested_artifact_path
-      || existingSummary?.source_watch_admitted_artifact_path
-      || args?.["source-watch-admitted-artifact"]
-      || fallbackValueFlag(rawArgv, "source-watch-admitted-artifact")
-      || process.env.npm_config_source_watch_admitted_artifact
-      || "";
     const summaryPath = plan?.outputs?.run_summary || await writeEntryFailureRunSummary({
       rootDir,
       reportDate,
       error,
       stageId: error.stage_id || (args ? "initialize" : "parse-args"),
       executeRequested: fallbackRequestedFlag(rawArgv, "execute", args?.execute),
-      publishRequested: fallbackRequestedFlag(rawArgv, "publish", args?.publish),
-      sourceWatchRequestedArtifactPath
+      publishRequested: fallbackRequestedFlag(rawArgv, "publish", args?.publish)
     });
     process.stdout.write(`${JSON.stringify({
       ok: false,
@@ -2221,15 +2422,9 @@ if (isMainModule(import.meta.url)) {
       html_path: existingSummary?.html_path || "",
       publish_requested: existingSummary?.publish_requested ?? fallbackRequestedFlag(rawArgv, "publish", args?.publish),
       execute_requested: existingSummary?.execute_requested ?? fallbackRequestedFlag(rawArgv, "execute", args?.execute),
-      source_watch_admitted_artifact_path: "",
-      source_watch_requested_artifact_path: sourceWatchRequestedArtifactPath,
-      source_watch: existingSummary?.source_watch || {
-        production_status: "not_connected",
-        consumed: false,
-        requested_artifact_path: sourceWatchRequestedArtifactPath,
-        admitted_count: 0,
-        reason: "The run failed before any Source Watch consumer completed."
-      },
+      source_watch: existingSummary?.source_watch || disconnectedSourceWatchSummary(
+        args ? "run_failed_before_source_watch_evidence_completed" : "initialization_failed_before_source_watch_evidence"
+      ),
       publication: existingSummary?.publication || null,
       validation: existingSummary?.validation || null,
       publish: existingSummary?.publish || null,

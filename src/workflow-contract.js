@@ -60,6 +60,18 @@ async function validateExternalAutomationInventory({ contract, options, failures
     checkedFiles.push(toPortablePath(automation.path));
   }
 
+  const projectAutomations = inventory.automations || [];
+  if (inventoryConfig.require_single_project_automation && projectAutomations.length !== 1) {
+    failures.push(`external automations: expected exactly one project automation, found ${projectAutomations.length}.`);
+  }
+
+  const allowedProjectIds = new Set(inventoryConfig.allowed_project_automation_ids || []);
+  for (const automation of projectAutomations) {
+    if (allowedProjectIds.size > 0 && !allowedProjectIds.has(automation.id)) {
+      failures.push(`external automations: project automation ${automation.id} is not allowed.`);
+    }
+  }
+
   const activePublish = inventory.active_publish_automations || [];
   if (inventoryConfig.require_single_active_publish !== false && activePublish.length !== 1) {
     failures.push(`external automations: expected exactly one active daily publish automation, found ${activePublish.length}.`);

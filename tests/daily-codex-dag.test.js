@@ -5318,7 +5318,7 @@ function assertAifyLaneCandidate(candidate) {
   assert.equal(candidate.source_lane, "aify");
   assert.equal(candidate.source_tier, "first_class");
   assert.equal(candidate.verification_policy, "no_secondary_review_required");
-  assert.equal(candidate.verification_status, "first_class_source_confirmed");
+  assert.equal(candidate.verification_status, "intermediary_only");
 }
 
 async function forbiddenPathSnapshot() {

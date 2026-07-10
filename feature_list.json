@@ -3,7 +3,7 @@
   "features": [
     {
       "id": "daily-production-entrypoint",
-      "status": "active",
+      "status": "ready_for_validation",
       "summary": "Run daily generation, bounded AI repair, validation, publication, and terminal summary ownership through one production entrypoint.",
       "commands": [
         "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --codex-bin codex.cmd"
@@ -11,35 +11,55 @@
       "artifacts": [
         ".tmp/run-summary-YYYY-MM-DD.json",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD/pipeline-plan.json",
-        ".tmp/daily-codex-mvp/YYYY-MM-DD/artifacts/ai-repair-contract-attempt-*.json"
+        ".tmp/daily-codex-mvp/YYYY-MM-DD/artifacts/ai-repair-contract-attempt-*.json",
+        ".tmp/source-watch-YYYY-MM-DD.json",
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
       ],
       "acceptance": [
         "A needs_ai_repair handoff is preflighted for kind, clean-root evidence realpaths, and direct launcher .tmp destination before Codex authors a contract and the same entrypoint resumes.",
         "Automated repair is capped at five attempts and records attempted, authored, completed, edit count, terminal reason, and explicit failure state without treating a later block as recovery.",
         "Production repair uses read-only schema-constrained UTF-8 Codex output; the host validates and writes the contract, and a bounded timeout terminates the process tree with codex_timeout.",
         "Claim verification overrides misleading source-level inference, quality and report_write share complete candidate coverage, and terminal summaries identify only the latest unresolved failure.",
-        "Production summaries do not claim Source Watch consumption until a non-fixture producer and build consumer have actually run."
+        "Production Source Watch is connected only when the producer stage returns the exact artifact path/SHA-256 receipt, the dated producer and candidate pool have identical target_id:snapshot_fingerprint sets, and build proves the exact pool path plus SHA-256; zero inclusion remains a valid consumed state.",
+        "A live scheduler that still forces not_connected or consumed:false fails the workflow compatibility gate before release.",
+        "The project scheduler inventory contains exactly one automation, ai-2; its prompt delegates health truth to the dated run summary, while status:self-check remains a manual diagnostic rather than a second scheduled workflow."
       ],
       "stop_conditions": [
         "The entrypoint returns needs_ai_repair without exhausting or disabling its declared repair budget.",
         "Codex writes outside the bounded pipeline work directory.",
-        "A requested Source Watch path is reported as consumed by the current production runner."
+        "A requested Source Watch path is reported as consumed without producer, fingerprint-lineage, persisted-pool, and build evidence.",
+        "The live automation prompt contradicts evidence-backed Source Watch summary semantics.",
+        "Any second D:\\ai-daily-cn automation definition or publisher appears beside ai-2."
       ],
       "behavior": "Keep the automation prompt thin while the repository-owned entrypoint closes repair/resume and terminal-state transitions.",
       "validation": {
         "commands": [
           "node --test tests/daily-codex-pipeline.test.js",
-          "node --test --test-name-pattern \"report:draft.*main stream|report:write allows disclosed low-risk refill|quality review.*candidate|quality review shares\" tests/unit.test.js"
+          "node --test tests/source-watch.test.js tests/source-watch-runner-draft.test.js tests/article-index.test.js tests/official-blog-daily-context.test.js",
+          "node --test --test-name-pattern \"report:draft.*main stream|report:write allows disclosed low-risk refill|quality review.*candidate|quality review shares\" tests/unit.test.js",
+          "corepack pnpm run workflow:validate",
+          "corepack pnpm run resilience:validate"
         ]
       },
       "evidence": {
           "artifacts": [
             "scripts/run-daily-codex-pipeline.mjs",
             "src/candidates.js",
-            "src/draft.js",
-            "src/quality-loop.js",
-            "tests/daily-codex-pipeline.test.js",
-            "tests/unit.test.js",
+          "src/draft.js",
+          "src/daily-runner.js",
+          "src/discovery.js",
+          "src/site.js",
+          "src/quality-loop.js",
+          "src/automation-inventory.js",
+          "src/workflow-contract.js",
+          "schemas/candidates.schema.json",
+          "schemas/articles.schema.json",
+          "tests/daily-codex-pipeline.test.js",
+          "tests/source-watch.test.js",
+          "tests/source-watch-runner-draft.test.js",
+          "tests/article-index.test.js",
+          "tests/official-blog-daily-context.test.js",
+          "tests/unit.test.js",
             "config/daily-workflow-contract.json",
             "docs/daily-codex-pipeline.md"
         ],
@@ -60,6 +80,7 @@
         "tasks/project-recovery-ledger.md",
         "feature_list.json",
         ".harness-hub/state/current-task.md",
+        ".harness-hub/state/decisions.md",
         ".harness-hub/state/progress.md",
         ".harness-hub/state/session-handoff.md"
       ],
@@ -85,7 +106,11 @@
         "artifacts": [
           "tasks/project-recovery-ledger.md",
           "tests/unit.test.js",
-          "AGENTS.md"
+          "AGENTS.md",
+          ".harness-hub/state/current-task.md",
+          ".harness-hub/state/decisions.md",
+          ".harness-hub/state/progress.md",
+          ".harness-hub/state/session-handoff.md"
         ],
         "stop_conditions": [
           "Stable REC IDs or five-layer completion markers drift out of the ledger.",
@@ -95,18 +120,22 @@
     },
     {
       "id": "daily-source-discovery",
-      "status": "active",
+      "status": "ready_for_validation",
       "summary": "Collect and audit daily AI sources before writing the structured report.",
       "commands": [
         "corepack pnpm run prompt:build -- YYYY-MM-DD",
         "corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
+        "corepack pnpm run discover:github-watch -- --date YYYY-MM-DD --config config/source-watchlist.json",
         "corepack pnpm run discover:builders -- --date YYYY-MM-DD --limit 20",
         "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
         "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20"
       ],
       "artifacts": [
         ".tmp/source-candidates-YYYY-MM-DD.json",
-        ".tmp/daily-report.json"
+        ".tmp/daily-report.json",
+        ".tmp/source-watch-YYYY-MM-DD.json",
+        ".tmp/official-blog-context-YYYY-MM-DD.json",
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
       ],
       "acceptance": [
         "Candidate sources record successful, failed, and empty checks.",
@@ -114,7 +143,9 @@
         "Freshness, duplicate URL, and source-window decisions are recorded before report writing.",
         "Per-source parsed_recent uses only that source's parsed_count or recent_48h_entries; group candidate totals never create per-source success.",
         "Phase5 joins final report candidate backrefs, applies the shared source-admission decision, and reports concrete violations, trusted-target upgrades, orphan included flags, and missing backrefs.",
-        "Logical-source promotion is evidence-decided per collection entry; defer and retire decisions remain collection-only and never raise source authority."
+        "Logical-source promotion is evidence-decided per collection entry; defer and retire decisions remain collection-only and never raise source authority.",
+        "Source Watch suppresses a target when any material GitHub endpoint fails, selects the newest release or commit event, persists the source snapshot fingerprint, and returns a stage-bound artifact path/hash receipt.",
+        "Official-blog daily context reuses existing reviewed knowledge, preserves official-blog-admission-v1, verifies wrapper/source dates plus source/context/bindings hashes and relationships, chooses the highest-score type binding, and never auto-writes curated knowledge."
       ],
       "stop_conditions": [
         "Required source audit fields cannot be reconstructed.",
@@ -125,15 +156,28 @@
         "commands": [
           "corepack pnpm run prompt:build -- YYYY-MM-DD",
           "corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
+          "corepack pnpm run discover:github-watch -- --date YYYY-MM-DD --config config/source-watchlist.json",
           "corepack pnpm run discover:builders -- --date YYYY-MM-DD --limit 20",
           "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
-          "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20"
+          "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20",
+          "node --test tests/source-watch.test.js tests/source-watch-runner-draft.test.js tests/official-blog-daily-context.test.js",
+          "corepack pnpm run sources:display-contract"
         ]
       },
       "evidence": {
         "artifacts": [
           ".tmp/source-candidates-YYYY-MM-DD.json",
           ".tmp/daily-report.json",
+          ".tmp/source-watch-YYYY-MM-DD.json",
+          ".tmp/official-blog-context-YYYY-MM-DD.json",
+          "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+          "src/discovery.js",
+          "src/daily-runner.js",
+          "src/draft.js",
+          "schemas/candidates.schema.json",
+          "tests/source-watch.test.js",
+          "tests/source-watch-runner-draft.test.js",
+          "tests/official-blog-daily-context.test.js",
           "src/source-verification.js",
           "src/source-phase5.js",
           "src/source-effectiveness.js",
@@ -193,19 +237,21 @@
     },
     {
       "id": "structured-report-write",
-      "status": "active",
+      "status": "ready_for_validation",
       "summary": "Normalize the structured draft into report data and candidate audit files.",
       "commands": [
         "corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD"
       ],
       "artifacts": [
         "reports-data/YYYY/MM/YYYY-MM-DD.json",
-        "reports-data/YYYY/MM/YYYY-MM-DD.candidates.json"
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
       ],
       "acceptance": [
         "`report:write` succeeds without candidate-pool, freshness, or duplicate wrapping errors.",
         "The structured JSON keeps required empty arrays instead of omitting optional sections.",
-        "`self_check.optimization_suggestions` captures prompt or rule follow-up proposals with canonical fields."
+        "`self_check.optimization_suggestions` captures prompt or rule follow-up proposals with canonical fields.",
+        "Source Watch candidates retain target_id and snapshot_fingerprint in the dated internal candidate pool for exact producer/persistence lineage.",
+        "The official-blog context receipt remains under sanitized internal self_check data; public projection omits local paths, hashes, bindings, and audit fields."
       ],
       "stop_conditions": [
         "`candidate_pool_missing`, `candidate_pool_reference_invalid`, or `freshness_gate_failed` is returned."
@@ -213,13 +259,21 @@
       "behavior": "Normalize the structured draft into report data and candidate audit files.",
       "validation": {
         "commands": [
-          "corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD"
+          "corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD",
+          "node --test tests/source-watch-runner-draft.test.js tests/official-blog-daily-context.test.js",
+          "corepack pnpm run privacy:validate"
         ]
       },
       "evidence": {
         "artifacts": [
           "reports-data/YYYY/MM/YYYY-MM-DD.json",
-          "reports-data/YYYY/MM/YYYY-MM-DD.candidates.json"
+          "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+          "src/draft.js",
+          "src/cli.js",
+          "schemas/candidates.schema.json",
+          "schemas/report.schema.json",
+          "tests/source-watch-runner-draft.test.js",
+          "tests/official-blog-daily-context.test.js"
         ],
         "stop_conditions": [
           "`candidate_pool_missing`, `candidate_pool_reference_invalid`, or `freshness_gate_failed` is returned."
@@ -271,7 +325,7 @@
     },
     {
       "id": "static-html-build",
-      "status": "active",
+      "status": "ready_for_validation",
       "summary": "Render the daily report to static GitHub Pages output through effective-interact.",
       "commands": [
         "corepack pnpm run build",
@@ -283,12 +337,18 @@
         "docs/data/YYYY/MM/YYYY-MM-DD.candidates.json",
         "docs/assets/adc-theme.css",
         "docs/feed.json",
+        "docs/articles.json",
+        "docs/data/official-blogs.json",
+        "docs/official-blogs/index.html",
         "docs/index.html"
       ],
       "acceptance": [
         "`corepack pnpm run build` writes the daily HTML, JSON data, feed, and index.",
         "Daily HTML is generated by `.codex/skills/effective-interact` in `pre-rendered` mode.",
-        "`corepack pnpm run validate` passes before any real publish attempt."
+        "`corepack pnpm run validate` passes before any real publish attempt.",
+        "The public article index includes privacy-safe Source Watch records with original-source backrefs while the build receipt remains private and fixed to one report date.",
+        "The public surface deliberately has no search/filter renderer; internal discover:search-news remains a separate collection command.",
+        "Official-blog knowledge remains directly discoverable from the React home and its curated JSON/page remain public."
       ],
       "stop_conditions": [
         "The report renderer falls back to a hand-written daily template.",
@@ -298,6 +358,9 @@
       "validation": {
         "commands": [
           "corepack pnpm run build",
+          "node --test tests/article-index.test.js tests/source-watch-runner-draft.test.js tests/official-blog-knowledge.test.js",
+          "corepack pnpm run privacy:validate",
+          "corepack pnpm run build:check-clean",
           "corepack pnpm run validate"
         ]
       },
@@ -308,6 +371,14 @@
           "docs/data/YYYY/MM/YYYY-MM-DD.candidates.json",
           "docs/assets/adc-theme.css",
           "docs/feed.json",
+          "docs/articles.json",
+          "docs/data/official-blogs.json",
+          "docs/official-blogs/index.html",
+          "src/site.js",
+          "schemas/articles.schema.json",
+          "tests/article-index.test.js",
+          "tests/source-watch-runner-draft.test.js",
+          "tests/official-blog-knowledge.test.js",
           "docs/index.html"
         ],
         "stop_conditions": [
@@ -362,7 +433,7 @@
     },
     {
       "id": "frontend-quality-workflow",
-      "status": "active",
+      "status": "ready_for_validation",
       "summary": "Projectize taste-skill and Impeccable as ADC frontend design-read, audit, and browser-acceptance quality gates.",
       "commands": [
         "corepack pnpm run design-quality:validate",
@@ -388,7 +459,9 @@
         "Taste-skill is adopted through the local design-taste-frontend skill with its dashboard and data-table boundary preserved.",
         "Impeccable is adopted as optional external design audit evidence, not as a production runtime or CI network dependency.",
         "Material frontend PRs record design read, visual dials, source/tool evidence, audit or skip reason, and browser acceptance.",
-        "The React homepage, static shells, and every historical daily report consume one ADC paper/ink visual contract; reports reference the shared generated assets/adc-theme.css instead of embedding a duplicate theme overlay, and sampled desktop plus narrow viewports pass overflow and computed-color checks."
+        "The React homepage, static shells, and every historical daily report consume one ADC paper/ink visual contract; reports reference the shared generated assets/adc-theme.css instead of embedding a duplicate theme overlay, and sampled desktop plus narrow viewports pass overflow and computed-color checks.",
+        "Replacement builds preserve the official-blog home entry and Source Watch article presentation while the retired public-search UI does not return.",
+        "Source Watch headings remain visibly paper-colored on the ink panel at desktop and 390px viewports, with an automated CSS contrast contract preventing black-on-black regressions."
       ],
       "stop_conditions": [
         "Generated or external UI code is committed directly into production paths.",
@@ -398,8 +471,11 @@
       "behavior": "Projectize taste-skill and Impeccable as ADC frontend design-read, audit, and browser-acceptance quality gates.",
       "validation": {
         "commands": [
+          "corepack pnpm run typecheck",
+          "node --test --test-name-pattern \"official blog knowledge homepage\" tests/unit.test.js",
           "corepack pnpm run design-quality:validate",
-          "corepack pnpm run validate:docs"
+          "corepack pnpm run validate:docs",
+          "corepack pnpm run test:e2e"
         ]
       },
       "evidence": {
@@ -409,7 +485,10 @@
           "packages/design/src/adc-theme.css",
         "src/adc-theme.js",
         "docs/assets/adc-theme.css",
-        "apps/web/src/App.tsx",
+          "apps/web/src/App.tsx",
+          "apps/web/src/styles.css",
+          "tests/e2e/site.e2e.js",
+          "tests/official-blog-daily-context.test.js",
           "tests/adc-visual-contract.test.js",
           "design/prototypes/adc-public-surfaces.design.json",
           "design/prototypes/adc-public-surfaces.decision.md",
@@ -604,13 +683,18 @@
         "tasks/daily-publish-runbook.md",
         "tasks/templates/daily-publish-task.md",
         "progress.example.md",
-        "session-handoff.example.md"
+        "session-handoff.example.md",
+        ".harness-hub/state/current-task.md",
+        ".harness-hub/state/decisions.md",
+        ".harness-hub/state/progress.md",
+        ".harness-hub/state/session-handoff.md"
       ],
       "acceptance": [
         "`corepack pnpm run harness:init` seeds per-worktree local state files before implementation or publish work starts.",
-        "`tasks/current-task.md` defines scope locally before implementation or publish work starts.",
+        "`.harness-hub/state/current-task.md` defines goal-ready scope, acceptance, validation, runtime, and checkpoint policy before implementation or publish work starts.",
         "`tasks/daily-publish-runbook.md` remains the operating sequence for daily publish runs.",
-        "`session-handoff.md` records validation, publish status, residual risk, and next action locally."
+        "`.harness-hub/state/decisions.md` and `.harness-hub/state/progress.md` preserve changed decisions and current evidence.",
+        "`.harness-hub/state/session-handoff.md` records validation, publish status, residual risk, and next action locally."
       ],
       "stop_conditions": [
         "Harness files no longer match the daily publishing scripts.",
@@ -630,7 +714,11 @@
           "tasks/daily-publish-runbook.md",
           "tasks/templates/daily-publish-task.md",
           "progress.example.md",
-          "session-handoff.example.md"
+          "session-handoff.example.md",
+          ".harness-hub/state/current-task.md",
+          ".harness-hub/state/decisions.md",
+          ".harness-hub/state/progress.md",
+          ".harness-hub/state/session-handoff.md"
         ],
         "stop_conditions": [
           "Harness files no longer match the daily publishing scripts.",

@@ -7485,6 +7485,7 @@ test("official blog context CLI writes clean internal context", async () => {
   await fs.writeFile(inputPath, `${JSON.stringify({
     entries: [
       {
+        id: "openai-custom-context-candidate",
         company: "openai",
         canonical_url: "https://openai.com/index/custom-context-record/?utm_source=test",
         title_original: "Custom context record",
@@ -7522,6 +7523,8 @@ test("official blog context CLI writes clean internal context", async () => {
     knowledgeDir,
     "--generated-at",
     "2026-07-01T08:00:00.000Z",
+    "--date",
+    "2026-07-01",
     "--limit",
     "5"
   ], {
@@ -7533,6 +7536,16 @@ test("official blog context CLI writes clean internal context", async () => {
   const raw = await fs.readFile(outputPath, "utf8");
   const parsed = JSON.parse(raw);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.kind, "official_blog_daily_context");
+  assert.equal(parsed.report_date, "2026-07-01");
+  assert.match(parsed.source_artifact_sha256, /^[a-f0-9]{64}$/);
+  assert.match(parsed.context_sha256, /^[a-f0-9]{64}$/);
+  assert.match(parsed.bindings_sha256, /^[a-f0-9]{64}$/);
+  assert.equal(parsed.bindings.length, 1);
+  assert.equal(parsed.bindings[0].record_id, "openai-custom-context-record-2026-07-01");
+  assert.equal(parsed.bindings[0].content_type, "engineering_note");
+  assert.equal(Number.isFinite(parsed.bindings[0].score), true);
+  assert.deepEqual(parsed.bindings[0].candidate_ids, ["openai-custom-context-candidate"]);
   assert.equal(parsed.context.kind, "official_blog_knowledge_context");
   assert.equal(parsed.context.visibility, "internal");
   assert.equal(parsed.context.admission_policy.version, "official-blog-admission-v1");
@@ -8473,7 +8486,7 @@ test("automation inventory recognizes daily codex pipeline publish automation", 
       'id = "ai-2"',
       'kind = "cron"',
       'name = "AI Daily publish"',
-      'prompt = "pnpm run daily:codex-pipeline -- --date 2026-07-02 --execute --publish"',
+      'prompt = "pnpm run daily:codex-pipeline -- --date 2026-07-02 --execute --publish; 不要另行运行 status:self-check"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8626,13 +8639,28 @@ test("status:self-check runs publish checks from the prepared clean worktree", a
 
 test("daily workflow contract validates repository workflow markers", async () => {
   const expectedDagContractRunCommand = "node scripts/run-daily-codex-dag.mjs --contract-run --json";
-  const expectedSourceWatchArtifactPath = ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json";
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-workflow-contract.json"), "utf8"));
   const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
   assert.equal(contract.required_package_scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
-  assert.equal(contract.daily_runner.source_watch_production_status, "not_connected");
-  assert.equal(contract.daily_runner.source_watch_consumed, false);
-  assert.equal(contract.daily_runner.source_watch_requested_artifact_path_template, expectedSourceWatchArtifactPath);
+  assert.equal(contract.daily_runner.source_watch.producer_stage, "discover_source_watch");
+  assert.equal(contract.daily_runner.source_watch.persistence_stage, "report_write");
+  assert.equal(contract.daily_runner.source_watch.consumer_stage, "build");
+  assert.equal(
+    contract.daily_runner.source_watch.candidate_pool_path_template,
+    "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
+  );
+  assert(contract.daily_runner.source_watch.connected_requires.includes("candidate_pool_sha256_matches"));
+  assert.equal(contract.daily_runner.source_watch.zero_included_candidates_still_consumed, true);
+  assert.equal(contract.daily_runner.official_blog_context.producer_stage, "official_blog_context");
+  assert.equal(contract.daily_runner.official_blog_context.consumer_stage, "report_draft");
+  assert.equal(contract.daily_runner.official_blog_context.admission_policy_version, "official-blog-admission-v1");
+  assert.equal(contract.daily_runner.official_blog_context.zero_matched_records_still_consumed, true);
+  assert.equal(contract.external_automation_inventory.require_single_project_automation, true);
+  assert.deepEqual(contract.external_automation_inventory.allowed_project_automation_ids, ["ai-2"]);
+  assert.equal(contract.external_automation_inventory.require_active_status_self_check, false);
+  assert.equal(contract.status_self_check.scheduled, false);
+  assert.equal(contract.status_self_check.mode, "manual_diagnostic_only");
+  assert.equal(contract.status_self_check.truth_source, ".tmp/run-summary-YYYY-MM-DD.json");
   assert.equal(JSON.stringify(contract.required_markers).includes("--source-watch-admitted-artifact"), false);
   assert.equal(contract.external_automation_prompt.contains.includes("--source-watch-admitted-artifact"), false);
   assert.equal(manifest.scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
@@ -8640,26 +8668,14 @@ test("daily workflow contract validates repository workflow markers", async () =
 
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-"));
   const automationsDir = path.join(tmp, "automations");
-  const promptPath = path.join(automationsDir, "ai-daily", "automation.toml");
-  await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
-  await fs.mkdir(path.join(automationsDir, "ai-daily-status-self-check"), { recursive: true });
+  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
   await fs.writeFile(
     promptPath,
     [
-      'id = "ai-daily"',
+      'id = "ai-2"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status not_connected consumed:false source_watch_requested_artifact_path"',
-      'status = "ACTIVE"',
-      'cwds = ["D:\\\\ai-daily-cn"]'
-    ].join("\n"),
-    "utf8"
-  );
-  await fs.writeFile(
-    path.join(automationsDir, "ai-daily-status-self-check", "automation.toml"),
-    [
-      'id = "ai-daily-status-self-check"',
-      'kind = "cron"',
-      'prompt = "node src/cli.js status:self-check --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8677,29 +8693,59 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
 });
 
-test("daily workflow contract accepts active publish automation without a fake Source Watch handoff", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-missing-source-watch-"));
+test("daily workflow contract rejects any extra project automation definition", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-extra-automation-"));
   const automationsDir = path.join(tmp, "automations");
-  const promptPath = path.join(automationsDir, "ai-daily", "automation.toml");
+  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
   await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
-  await fs.mkdir(path.join(automationsDir, "ai-daily-status-self-check"), { recursive: true });
   await fs.writeFile(
     promptPath,
     [
-      'id = "ai-daily"',
+      'id = "ai-2"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
     "utf8"
   );
   await fs.writeFile(
-    path.join(automationsDir, "ai-daily-status-self-check", "automation.toml"),
+    path.join(automationsDir, "ai-daily", "automation.toml"),
     [
-      'id = "ai-daily-status-self-check"',
+      'id = "ai-daily"',
       'kind = "cron"',
-      'prompt = "node src/cli.js status:self-check --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json"',
+      'prompt = "readonly insight"',
+      'status = "PAUSED"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await validateDailyWorkflowContract({
+    rootDir,
+    automationsDir,
+    automationPromptPath: promptPath
+  });
+
+  assert.equal(result.ok, false);
+  assert(
+    result.failures.some((failure) => failure.includes("project automation ai-daily is not allowed")),
+    result.failures.join("\n")
+  );
+});
+
+test("daily workflow contract rejects an active publish automation with stale Source Watch assertions", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-missing-source-watch-"));
+  const automationsDir = path.join(tmp, "automations");
+  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
+  await fs.writeFile(
+    promptPath,
+    [
+      'id = "ai-2"',
+      'kind = "cron"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check; source_watch.production_status must stay not_connected"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8712,7 +8758,8 @@ test("daily workflow contract accepts active publish automation without a fake S
     automationPromptPath: promptPath
   });
 
-  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("not_connected")), result.failures.join("\n"));
 });
 
 test("daily workflow contract rejects DAG contract-run package script drift", async () => {
@@ -12955,7 +13002,8 @@ test("buildSite preserves explicit report quality status in docs data and homepa
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/07/2026-07-02.json"), "utf8"));
   assert.equal(publicData.quality_status.status, "degraded");
   const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert.match(indexHtml, /data-article-index="aify-style"/);
+  assert.match(indexHtml, /data-index-style="effective-interact"/);
+  assert.doesNotMatch(indexHtml, /id="articleSearch"/);
   const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
   assert.match(opsHtml, /data-quality-status="degraded"/);
   assert.doesNotMatch(indexHtml, /Report generation is blocked by validation failure/);
@@ -13694,8 +13742,9 @@ test("buildSite writes trend index and injects scoped trend tags without mutatin
   assert(html.includes("日报导航"));
 
   const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert(indexHtml.includes('data-article-index="aify-style"'));
-  assert(indexHtml.includes("articles.json"));
+  assert(indexHtml.includes('data-index-style="effective-interact"'));
+  assert(!indexHtml.includes('id="articleSearch"'));
+  assert(!indexHtml.includes("articles.json"));
   const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
   assert(opsHtml.includes('id="topic-radar"'));
   assert(opsHtml.includes('id="signal-heat-strip"'));
@@ -14301,7 +14350,8 @@ test("buildSite writes date index homepage without exposing private report field
   assert(result.writtenFiles.includes("ops.html"));
   assert.equal(result.dateIndex.items.length, 2);
   const html = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert(html.includes('data-article-index="aify-style"'));
+  assert(html.includes('data-index-style="effective-interact"'));
+  assert(!html.includes('id="articleSearch"'));
   const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
   assert(opsHtml.includes('id="date-research-index"'));
   assert(opsHtml.includes('data-date-card="2026-05-13"'));
@@ -18838,9 +18888,14 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
   const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
   const inventoryEntryCount = String(inventoryRows.length);
-  const inheritedRuntimeCount = 11;
-  const collectionOnlyCount = 78;
-  const unreportedRuntimeCount = inventoryRows.length - inheritedRuntimeCount - collectionOnlyCount;
+  const reportedLogicalSourceIds = new Set(report.source_effectiveness.map((row) => String(row.id)));
+  const inheritedRuntimeCount = inventoryRows.filter((row) =>
+    row.logical_source_id && reportedLogicalSourceIds.has(String(row.logical_source_id))
+  ).length;
+  const collectionOnlyCount = inventoryRows.filter((row) => !row.logical_source_id).length;
+  const unreportedRuntimeCount = inventoryRows.filter((row) =>
+    row.logical_source_id && !reportedLogicalSourceIds.has(String(row.logical_source_id))
+  ).length;
   const metricByTitle = new Map((dashboard?.items || []).map((item) => [item.title, item]));
   const statValue = (title, label = "数量") =>
     metricByTitle.get(title)?.stats?.find((stat) => stat.label === label)?.value;
@@ -19798,7 +19853,8 @@ test("source inventory rows expose runtime status layer", () => {
   assert.match(findInventoryLine("Anthropic News"), /运行状态：[\s\S]*updated_not_selected/);
   assert.match(findInventoryLine("QbitAI"), /运行状态：[\s\S]*not_configured_or_skipped/);
   assert.match(findInventoryLine("Hugging Face Blog"), /运行状态：[\s\S]*unreported/);
-  assert.match(findInventoryLine("Azure Blog"), /运行状态：[\s\S]*collection_only/);
+  assert.match(findInventoryLine("Azure Blog"), /运行状态：[\s\S]*unreported/);
+  assert.match(findInventoryLine("TikTok for Developers Blog"), /运行状态：[\s\S]*collection_only/);
   assert.doesNotMatch(inventoryLines.join("\n"), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
   assert.doesNotMatch(inventoryLines.join("\n"), /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });

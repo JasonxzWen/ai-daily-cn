@@ -58,21 +58,22 @@ function parseAutomationToml(text, filePath) {
   const cwds = tomlStringArray(text, "cwds");
   const active = status.toUpperCase() === "ACTIVE";
   const role = automationRole({ id, name, text });
-  const statusSelfCheck = role === "status_self_check"
-    ? true
-    : role
-      ? false
-      : /status:self-check|status self-check/i.test(text);
   const legacyFlow = /publish:prepare-worktree|(?:npm|pnpm|corepack\s+pnpm)\s+run\s+publish:dry-run(?!:daily)|node src\/cli\.js publish:dry-run(?!:daily)/i.test(text);
+  const detectedDailyPublish =
+    /daily:run[\s\S]*--publish/i.test(text) ||
+    /daily:codex-pipeline[\s\S]*(--publish|\bpublish\b)/i.test(text) ||
+    /confirm-push|publish:github-api|publish:prepare-worktree/i.test(text) ||
+    (/AI[\s\S]*Daily|AI[\s\S]*daily|AI[\s\S]*日报/i.test(text) && /GitHub Pages|publish|发布/i.test(text));
   const dailyPublish = role === "daily_publish"
     ? true
     : role
       ? false
-      : !statusSelfCheck &&
-        (/daily:run[\s\S]*--publish/i.test(text) ||
-          /daily:codex-pipeline[\s\S]*(--publish|\bpublish\b)/i.test(text) ||
-          /confirm-push|publish:github-api|publish:prepare-worktree/i.test(text) ||
-          (/AI[\s\S]*Daily|AI[\s\S]*daily|AI[\s\S]*日报/i.test(text) && /GitHub Pages|publish|发布/i.test(text)));
+      : detectedDailyPublish;
+  const statusSelfCheck = role === "status_self_check"
+    ? true
+    : role || dailyPublish
+      ? false
+      : /status:self-check|status self-check/i.test(text);
   return {
     id,
     name,
