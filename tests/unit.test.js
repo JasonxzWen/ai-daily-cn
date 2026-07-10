@@ -22186,7 +22186,11 @@ test("report:draft explicitly upgrades canonical GitHub repositories discovered 
   assert.equal(normalized?.verification_status, "primary_confirmed");
   assert.equal(normalized?.source_level, "github");
   assert.equal(normalized?.primary_url, repositoryUrl);
-  assert(normalized?.verification_sources?.includes(repositoryUrl));
+  assert(Array.isArray(normalized?.verification_sources));
+  assert.equal(
+    normalized.verification_sources.some((sourceUrl) => sourceUrl === repositoryUrl),
+    true
+  );
 });
 
 test("report:draft rejects refill candidates outside the 72 hour main stream window", async () => {
