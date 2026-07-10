@@ -8,7 +8,7 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 
 - Start from the launcher worktree with `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
 - Use `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish` only when real publish is explicitly allowed.
-- When `.tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json` exists, append `--source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json`; otherwise omit the flag and expect an empty `source_watch_admitted_artifact_path`.
+- Production Source Watch is not connected yet. Scheduled runs must omit the fixture-only artifact flag and read `source_watch.production_status:"not_connected"`, `consumed:false`, and `source_watch_requested_artifact_path` from the summary; an empty `source_watch_admitted_artifact_path` means no producer/consumer handoff actually ran.
 - Read `.tmp/run-summary-YYYY-MM-DD.json` for `final_status`, `completed_stages`, and `next_action`.
 - If `next_action` requests repair, fix the reported public text or blocker, then rerun the same `daily:codex-pipeline` command.
 - To intentionally discard same-date pipeline state, delete or replace `.tmp/daily-codex-pipeline/YYYY-MM-DD` before rerunning.

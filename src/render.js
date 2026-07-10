@@ -7,6 +7,7 @@ import {
 } from "./presentation.js";
 import { importanceLabel } from "./importance.js";
 import { normalizeUrlIdentity } from "./url.js";
+import { adcPublicThemeAssetName, adcPublicThemeVersion } from "./adc-theme.js";
 
 export function escapeHtml(value) {
   return String(value)
@@ -277,9 +278,9 @@ export function renderOpsIndexHtml(feed, trends = null, dateIndex = null, option
   <title>${escapeHtml(feed.site_title)}</title>
   <link rel="stylesheet" href="${escapeAttribute(indexStyleHref(options.styleVersion))}">
 </head>
-<body>
+<body data-adc-public-surface="ops">
   <header class="site-header">
-    <span class="site-title">AI 日报</span>
+    <span class="site-title"><span class="adc-public-brand">ADC.</span><span>AI 日报</span></span>
     <span class="site-date">更新于 ${escapeHtml(feed.updated_at)}</span>
   </header>
   <main class="report-shell index-page" data-index-style="effective-interact">
@@ -586,9 +587,9 @@ export function renderOfficialBlogsHtml(knowledge = {}, options = {}) {
   <title>官方博客知识库 | AI 日报</title>
   <link rel="stylesheet" href="${escapeAttribute(styleHref)}">
 </head>
-<body>
+<body data-adc-public-surface="official-blogs">
   <header class="site-header">
-    <a class="site-title" href="../index.html">AI 日报</a>
+    <a class="site-title" href="../index.html"><span class="adc-public-brand">ADC.</span><span>AI 日报</span></a>
     <span class="site-date">官方博客知识库</span>
   </header>
   <main class="report-shell index-page official-blog-page" data-index-style="effective-interact">
@@ -1434,7 +1435,9 @@ function isoWeek(dateString) {
   return Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
 }
 
-export const defaultStyleCss = `:root {
+export const defaultStyleCss = `@import url("./${adcPublicThemeAssetName}?v=${adcPublicThemeVersion}");
+
+:root {
   color-scheme: light;
   --bg: #faf9f5;
   --panel: #ffffff;

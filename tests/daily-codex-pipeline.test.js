@@ -9,6 +9,7 @@ import {
   buildDailyCodexPipelinePlan,
   prepareDailyCodexPipeline,
   runDailyCodexPipeline,
+  spawnWithPrompt,
   validateDailyCodexMvpArtifact
 } from "../scripts/run-daily-codex-pipeline.mjs";
 
@@ -33,6 +34,36 @@ test("daily Codex DAG-lite runner plans the six MVP stages", () => {
     "summarize"
   ]);
   assert(plan.outputs.run_summary.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
+});
+
+test("daily Codex runner records a bounded per-invocation timeout", () => {
+  const plan = buildDailyCodexPipelinePlan({
+    rootDir: path.join(os.tmpdir(), "daily-codex-timeout-plan"),
+    reportDate: "2026-07-06",
+    codexTimeoutMs: 75
+  });
+
+  assert.equal(plan.codex.timeout_ms, 75);
+});
+
+test("daily Codex timeout has a bounded kill grace even when tree termination hangs", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-timeout-hard-bound-"));
+  const startedAt = Date.now();
+
+  await assert.rejects(
+    spawnWithPrompt(process.execPath, ["-e", "setInterval(() => {}, 1000)"], {
+      cwd: rootDir,
+      stdoutPath: path.join(rootDir, "stdout.log"),
+      stderrPath: path.join(rootDir, "stderr.log"),
+      prompt: "",
+      timeoutMs: 30,
+      terminationGraceMs: 40,
+      terminateProcessTree: () => new Promise(() => {})
+    }),
+    (error) => error?.code === "codex_timeout" && error?.timeout_ms === 30
+  );
+
+  assert(Date.now() - startedAt < 1000, "timeout must settle after the bounded termination grace");
 });
 
 test("daily Codex DAG-lite runner produces a successful fixture summary", async () => {
@@ -253,7 +284,12 @@ test("daily Codex DAG-lite CLI accepts production execute publish flags with cod
     "--",
     "codex.cmd",
     "--fake-codex-argv"
-  ]);
+  ], {
+    env: {
+      ...process.env,
+      npm_config_model: "gpt-5.6-sol"
+    }
+  });
 
   const result = JSON.parse(stdout);
   assert.equal(result.ok, true);
@@ -274,9 +310,18 @@ test("daily Codex DAG-lite CLI accepts production execute publish flags with cod
 
   const plan = JSON.parse(await fs.readFile(path.join(rootDir, ".tmp", "daily-codex-mvp", "2026-07-06", "pipeline-plan.json"), "utf8"));
   assert.equal(plan.codex.bin, codexCmd);
+  assert.equal(plan.codex.model, "");
   assert.equal(plan.codex.fixture_mode, "");
   assert.equal(plan.execute_requested, true);
   assert.equal(plan.publish_requested, true);
+  const codexArgv = JSON.parse(await fs.readFile(path.join(plan.work_dir, "codex-argv.json"), "utf8"));
+  assert(codexArgv.includes("--ignore-user-config"));
+  const approvalConfigIndex = codexArgv.indexOf("-c");
+  assert.notEqual(approvalConfigIndex, -1);
+  assert.equal(codexArgv[approvalConfigIndex + 1].replaceAll('"', ""), "approval_policy=never");
+  if (process.platform === "win32") {
+    assert(codexArgv.some((arg) => arg.replaceAll('"', "") === "windows.sandbox=unelevated"));
+  }
 });
 
 test("daily Codex DAG-lite CLI accepts a leading npm argument separator", async () => {
@@ -517,7 +562,172 @@ test("daily Codex production orchestrator runs no-publish execute as production 
   assert.equal(saved.artifact_sizes.html_path.exists, true);
 });
 
-test("daily Codex production orchestrator preserves daily runner mode for AI repair resume", async () => {
+test("daily Codex production summary reports the latest unresolved failed stage", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-terminal-stage-"));
+  const reportDate = "2026-07-06";
+  await writeMinimalRepoFiles(rootDir);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: false,
+    codexBin: "codex.cmd"
+  });
+  const workflowRunner = async ({ summaryPath }) => {
+    const legacySummary = {
+      report_date: reportDate,
+      mode: "dry-run",
+      final_status: "blocked",
+      next_action: { kind: "inspect_blocker" },
+      clean_repo_root: path.join(rootDir, ".tmp", "publish-worktrees", "main"),
+      stages: [
+        { id: "quality_review", status: "failed", error: "first review needs repair" },
+        { id: "quality_ai_repair", status: "passed" },
+        { id: "quality_review", status: "passed" },
+        { id: "report_write", status: "failed", error: "candidate coverage failed" }
+      ]
+    };
+    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+    return { summary: legacySummary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+
+  assert.equal(summary.stage_id, "report_write");
+  assert.equal(summary.failed_stage_id, "report_write");
+  assert.equal(summary.error, "candidate coverage failed");
+});
+
+test("daily Codex successful fallback clears recovered failure metadata", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-recovered-publish-"));
+  const reportDate = "2026-07-06";
+  await writeMinimalRepoFiles(rootDir);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  const workflowRunner = async ({ summaryPath }) => {
+    const legacySummary = {
+      report_date: reportDate,
+      mode: "publish",
+      final_status: "published",
+      next_action: { kind: "none" },
+      clean_repo_root: path.join(rootDir, ".tmp", "publish-worktrees", "main"),
+      stages: [
+        { id: "publish_real", status: "failed", error: "git push failed" },
+        { id: "publish_github_api_fallback", status: "passed", output: { publish_status: { repo_pushed: true } } },
+        { id: "pages_verify", status: "passed", output: { http_status: 200 } }
+      ]
+    };
+    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+    return { summary: legacySummary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+
+  assert.equal(summary.final_status, "published");
+  assert.equal(summary.stage_id, "pages_verify");
+  assert.equal(summary.failed_stage_id, "");
+  assert.equal(summary.error, "");
+});
+
+test("daily Codex structured summaries use the latest duplicate stage result", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-latest-stage-contract-"));
+  const reportDate = "2026-07-06";
+  await writeMinimalRepoFiles(rootDir);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  const workflowRunner = async ({ summaryPath }) => {
+    const legacySummary = {
+      report_date: reportDate,
+      mode: "publish",
+      final_status: "published",
+      next_action: { kind: "none" },
+      clean_repo_root: path.join(rootDir, ".tmp", "publish-worktrees", "main"),
+      stages: [
+        { id: "report_write", status: "failed", error: "first write failed" },
+        { id: "report_write", status: "passed" },
+        { id: "publish_real", status: "failed", output: { repo_pushed: false } },
+        { id: "publish_real", status: "passed", output: { repo_pushed: true, commit: "latest-commit" } },
+        { id: "pages_verify", status: "failed", output: { http_status: 500, error: "first pages check failed" } },
+        { id: "pages_verify", status: "passed", output: { http_status: 200 } }
+      ]
+    };
+    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+    return { summary: legacySummary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+
+  assert.equal(summary.validation.report_write.status, "passed");
+  assert.equal(summary.validation.report_write.ok, true);
+  assert.equal(summary.publication.publish_real.status, "passed");
+  assert.equal(summary.publication.repo_pushed, true);
+  assert.equal(summary.publication.commit, "latest-commit");
+  assert.equal(summary.pages.status, "passed");
+  assert.equal(summary.pages.verified, true);
+  assert.equal(summary.pages.http_status, 200);
+  assert.equal(summary.pages.message, "");
+});
+
+test("daily Codex production orchestrator does not claim an unconsumed Source Watch artifact", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-source-watch-status-"));
+  const reportDate = "2026-07-06";
+  await writeMinimalRepoFiles(rootDir);
+  const requestedArtifactPath = path.join(
+    rootDir,
+    ".tmp",
+    "daily-codex-pipeline",
+    reportDate,
+    "artifacts",
+    "admitted-candidates.json"
+  );
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    sourceWatchAdmittedArtifactPath: requestedArtifactPath,
+    codexBin: "codex.cmd"
+  });
+  const workflowRunner = async ({ summaryPath }) => {
+    const runningSummary = JSON.parse(await fs.readFile(summaryPath, "utf8"));
+    assert.equal(runningSummary.source_watch_admitted_artifact_path, "");
+    assert.equal(runningSummary.source_watch_requested_artifact_path, requestedArtifactPath);
+    assert.equal(runningSummary.source_watch.production_status, "not_connected");
+    assert.equal(runningSummary.source_watch.consumed, false);
+    const legacySummary = {
+      report_date: reportDate,
+      mode: "publish",
+      final_status: "published",
+      clean_repo_root: path.join(rootDir, ".tmp", "publish-worktrees", "main"),
+      next_action: { kind: "none" },
+      stages: [
+        { id: "publish_real", status: "passed", output: { publish_status: { repo_pushed: true } } },
+        { id: "pages_verify", status: "passed", output: { http_status: 200 } }
+      ]
+    };
+    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+    return { summary: legacySummary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+
+  assert.equal(summary.source_watch_admitted_artifact_path, "");
+  assert.equal(summary.source_watch.requested_artifact_path, requestedArtifactPath);
+  assert.equal(summary.source_watch.consumed, false);
+  assert.equal(summary.source_watch.production_status, "not_connected");
+});
+
+test("daily Codex production orchestrator preserves daily runner mode when automated AI repair is disabled", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-repair-mode-"));
   const reportDate = "2026-07-06";
   await writeMinimalRepoFiles(rootDir);
@@ -558,7 +768,10 @@ test("daily Codex production orchestrator preserves daily runner mode for AI rep
     return { summary: seen, summaryPath };
   };
 
-  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    maxAutomatedAiRepairAttempts: 0
+  });
 
   assert.equal(summary.final_status, "needs_ai_repair");
   assert.equal(summary.ok, false);
@@ -570,6 +783,629 @@ test("daily Codex production orchestrator preserves daily runner mode for AI rep
   assert.equal(saved.ok, false);
   assert.equal(saved.mode, "publish");
   assert.equal(saved.automation_pipeline_mode, "single_script_dag_orchestrator");
+});
+
+test("daily Codex production orchestrator authors a repair contract and resumes within one entrypoint run", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-auto-repair-"));
+  const reportDate = "2026-07-10";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, `${JSON.stringify({ report_date: reportDate })}\n`, "utf8");
+  await fs.writeFile(candidatePoolPath, `${JSON.stringify({ report_date: reportDate, candidates: [] })}\n`, "utf8");
+  await fs.writeFile(qualityReviewPath, `${JSON.stringify({ report_date: reportDate, ok: false })}\n`, "utf8");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  let workflowCalls = 0;
+  let authorCalls = 0;
+
+  const workflowRunner = async ({ summaryPath }) => {
+    workflowCalls += 1;
+    if (workflowCalls === 1) {
+      const needsRepair = {
+        report_date: reportDate,
+        mode: "publish",
+        final_status: "needs_ai_repair",
+        clean_repo_root: cleanRoot,
+        next_action: {
+          kind: "codex_ai_repair_contract",
+          contract_path: contractPath,
+          summary_path: summaryPath,
+          source_report_path: sourceReportPath,
+          candidate_pool_path: candidatePoolPath,
+          quality_review_path: qualityReviewPath,
+          ai_review_tasks: [
+            { path: "stories[0].what_happened", kind: "public_editorial_rewrite" }
+          ]
+        },
+        stages: [
+          { id: "report_draft", status: "passed" },
+          { id: "quality_review", status: "failed" }
+        ]
+      };
+      await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+      await fs.writeFile(summaryPath, `${JSON.stringify(needsRepair, null, 2)}\n`, "utf8");
+      return { summary: needsRepair, summaryPath };
+    }
+
+    const contract = JSON.parse(await fs.readFile(contractPath, "utf8"));
+    assert.equal(contract.status, "ready");
+    assert.equal(contract.report_date, reportDate);
+    assert.equal(contract.edits.length, 1);
+    const published = {
+      report_date: reportDate,
+      mode: "publish",
+      final_status: "published",
+      clean_repo_root: cleanRoot,
+      next_action: { kind: "none" },
+      stages: [
+        { id: "quality_ai_repair", status: "passed" },
+        { id: "quality_review", status: "passed" },
+        { id: "publish_real", status: "passed", output: { publish_status: { repo_pushed: true } } },
+        { id: "pages_verify", status: "passed", output: { http_status: 200 } }
+      ]
+    };
+    await fs.writeFile(summaryPath, `${JSON.stringify(published, null, 2)}\n`, "utf8");
+    return { summary: published, summaryPath };
+  };
+
+  const aiRepairContractAuthor = async ({ nextAction, attempt }) => {
+    authorCalls += 1;
+    assert.equal(attempt, 1);
+    assert.equal(nextAction.contract_path, contractPath);
+    return {
+      schema_version: 1,
+      report_date: reportDate,
+      status: "ready",
+      edits: [
+        {
+          path: "stories[0].what_happened",
+          value: "修复后的事实描述。",
+          reason: "移除重复叙事。"
+        }
+      ]
+    };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    aiRepairContractAuthor,
+    maxAutomatedAiRepairAttempts: 1
+  });
+
+  assert.equal(workflowCalls, 2);
+  assert.equal(authorCalls, 1);
+  assert.equal(summary.final_status, "published");
+  assert.equal(summary.automation_ai_repair.attempted, 1);
+  assert.equal(summary.automation_ai_repair.completed, 1);
+  assert.equal(summary.automation_ai_repair.terminal_reason, "workflow_completed");
+});
+
+test("daily Codex production repair author returns schema-constrained UTF-8 JSON without sandbox writes", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-structured-repair-"));
+  const reportDate = "2026-07-10";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, `${JSON.stringify({ report_date: reportDate })}\n`, "utf8");
+  await fs.writeFile(candidatePoolPath, `${JSON.stringify({ report_date: reportDate, candidates: [] })}\n`, "utf8");
+  await fs.writeFile(qualityReviewPath, `${JSON.stringify({ report_date: reportDate, ok: false })}\n`, "utf8");
+  const codexBin = await writeStructuredRepairCodexCommand(rootDir, reportDate);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin
+  });
+  let workflowCalls = 0;
+
+  const workflowRunner = async ({ summaryPath }) => {
+    workflowCalls += 1;
+    const summary = workflowCalls === 1
+      ? {
+          report_date: reportDate,
+          mode: "publish",
+          final_status: "needs_ai_repair",
+          clean_repo_root: cleanRoot,
+          next_action: {
+            kind: "codex_ai_repair_contract",
+            contract_path: contractPath,
+            summary_path: summaryPath,
+            source_report_path: sourceReportPath,
+            candidate_pool_path: candidatePoolPath,
+            quality_review_path: qualityReviewPath,
+            ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }]
+          },
+          stages: [{ id: "quality_review", status: "failed" }]
+        }
+      : {
+          report_date: reportDate,
+          mode: "publish",
+          final_status: "published",
+          clean_repo_root: cleanRoot,
+          next_action: { kind: "none" },
+          stages: [
+            { id: "quality_ai_repair", status: "passed" },
+            { id: "quality_review", status: "passed" },
+            { id: "publish_real", status: "passed", output: { publish_status: { repo_pushed: true } } },
+            { id: "pages_verify", status: "passed", output: { http_status: 200 } }
+          ]
+        };
+    await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+    await fs.writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
+    return { summary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    maxAutomatedAiRepairAttempts: 1
+  });
+
+  assert.equal(workflowCalls, 2);
+  assert.equal(summary.final_status, "published");
+  const contract = JSON.parse(await fs.readFile(contractPath, "utf8"));
+  assert.equal(contract.edits[0].value, "修复后的事实描述。");
+  const codexArgv = JSON.parse(await fs.readFile(path.join(plan.work_dir, "structured-repair-codex-argv.json"), "utf8"));
+  assert(codexArgv.includes("--ignore-user-config"));
+  assert.equal(codexArgv[codexArgv.indexOf("--sandbox") + 1], "read-only");
+  assert.notEqual(codexArgv.indexOf("--output-schema"), -1);
+  assert.notEqual(codexArgv.indexOf("--output-last-message"), -1);
+  const prompt = await fs.readFile(path.join(plan.work_dir, "structured-repair-prompt.txt"), "utf8");
+  assert.match(prompt, /Return one JSON object as the final response/);
+  assert.match(prompt, /Chinese-character ratio of at least 0\.45/);
+  assert.doesNotMatch(prompt, /Set-Content|fs\.writeFileSync/);
+});
+
+test("daily Codex production repair author times out and terminates the spawned process tree", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-repair-timeout-"));
+  const reportDate = "2026-07-10";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, `${JSON.stringify({ report_date: reportDate })}\n`, "utf8");
+  await fs.writeFile(candidatePoolPath, `${JSON.stringify({ report_date: reportDate, candidates: [] })}\n`, "utf8");
+  await fs.writeFile(qualityReviewPath, `${JSON.stringify({ report_date: reportDate, ok: false })}\n`, "utf8");
+  const codexBin = await writeDelayedStructuredRepairCodexCommand(rootDir, reportDate, 400);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin,
+    codexTimeoutMs: 75
+  });
+  let workflowCalls = 0;
+
+  const workflowRunner = async ({ summaryPath }) => {
+    workflowCalls += 1;
+    const summary = workflowCalls === 1
+      ? {
+          report_date: reportDate,
+          mode: "publish",
+          final_status: "needs_ai_repair",
+          clean_repo_root: cleanRoot,
+          next_action: {
+            kind: "codex_ai_repair_contract",
+            contract_path: contractPath,
+            summary_path: summaryPath,
+            source_report_path: sourceReportPath,
+            candidate_pool_path: candidatePoolPath,
+            quality_review_path: qualityReviewPath,
+            ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }]
+          },
+          stages: [{ id: "quality_review", status: "failed" }]
+        }
+      : {
+          report_date: reportDate,
+          mode: "publish",
+          final_status: "published",
+          clean_repo_root: cleanRoot,
+          next_action: { kind: "none" },
+          stages: [{ id: "publish_real", status: "passed", output: { publish_status: { repo_pushed: true } } }]
+        };
+    await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+    await fs.writeFile(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
+    return { summary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    maxAutomatedAiRepairAttempts: 1
+  });
+
+  assert.equal(workflowCalls, 1);
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.error_code, "codex_timeout");
+  assert.equal(summary.automation_ai_repair.attempts[0].error_code, "codex_timeout");
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  await assert.rejects(fs.access(path.join(plan.work_dir, "delayed-codex-completed.txt")));
+});
+
+test("daily Codex production orchestrator blocks an invalid automated repair contract before resume", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-invalid-repair-"));
+  const reportDate = "2026-07-10";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, "{}\n", "utf8");
+  await fs.writeFile(candidatePoolPath, "{}\n", "utf8");
+  await fs.writeFile(qualityReviewPath, "{}\n", "utf8");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  let workflowCalls = 0;
+  const workflowRunner = async ({ summaryPath }) => {
+    workflowCalls += 1;
+    return {
+      summaryPath,
+      summary: {
+        report_date: reportDate,
+        mode: "publish",
+        final_status: "needs_ai_repair",
+        clean_repo_root: cleanRoot,
+        next_action: {
+          kind: "codex_ai_repair_contract",
+          contract_path: contractPath,
+          source_report_path: sourceReportPath,
+          candidate_pool_path: candidatePoolPath,
+          quality_review_path: qualityReviewPath,
+          ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }]
+        },
+        stages: []
+      }
+    };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    aiRepairContractAuthor: async () => ({
+      schema_version: 1,
+      report_date: reportDate,
+      status: "ready",
+      edits: [{ path: "stories[1].what_happened", value: "undeclared edit" }]
+    }),
+    maxAutomatedAiRepairAttempts: 1
+  });
+
+  assert.equal(workflowCalls, 1);
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.error_code, "automated_ai_repair_contract_invalid");
+  assert.equal(summary.automation_ai_repair.completed, 0);
+  assert.equal(summary.automation_ai_repair.terminal_reason, "repair_failed");
+  await assert.rejects(fs.access(contractPath));
+});
+
+test("daily Codex production orchestrator rejects an out-of-scope repair contract path before authoring", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-unsafe-repair-path-"));
+  const reportDate = "2026-07-10";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const unsafeContractPath = path.join(rootDir, "outside", `quality-ai-repair-${reportDate}.json`);
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, "{}\n", "utf8");
+  await fs.writeFile(candidatePoolPath, "{}\n", "utf8");
+  await fs.writeFile(qualityReviewPath, "{}\n", "utf8");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  let authorCalls = 0;
+  const workflowRunner = async ({ summaryPath }) => ({
+    summaryPath,
+    summary: {
+      report_date: reportDate,
+      mode: "publish",
+      final_status: "needs_ai_repair",
+      clean_repo_root: cleanRoot,
+      next_action: {
+        kind: "codex_ai_repair_contract",
+        contract_path: unsafeContractPath,
+        source_report_path: sourceReportPath,
+        candidate_pool_path: candidatePoolPath,
+        quality_review_path: qualityReviewPath,
+        ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }]
+      },
+      stages: []
+    }
+  });
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    aiRepairContractAuthor: async () => {
+      authorCalls += 1;
+      return {
+        schema_version: 1,
+        report_date: reportDate,
+        status: "ready",
+        edits: [{ path: "stories[0].what_happened", value: "safe copy" }]
+      };
+    },
+    maxAutomatedAiRepairAttempts: 1
+  });
+
+  assert.equal(authorCalls, 0);
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.error_code, "automated_ai_repair_handoff_invalid");
+  assert.equal(summary.automation_ai_repair.completed, 0);
+  await assert.rejects(fs.access(unsafeContractPath));
+});
+
+test("daily Codex production orchestrator rejects repair evidence outside the clean publish root", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-unsafe-repair-input-"));
+  const reportDate = "2026-07-10";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+  const unsafeSourceReportPath = path.join(rootDir, "host-secret.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(candidatePoolPath), { recursive: true });
+  await fs.writeFile(unsafeSourceReportPath, "{}\n", "utf8");
+  await fs.writeFile(candidatePoolPath, "{}\n", "utf8");
+  await fs.writeFile(qualityReviewPath, "{}\n", "utf8");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  let authorCalls = 0;
+  const workflowRunner = async ({ summaryPath }) => ({
+    summaryPath,
+    summary: {
+      report_date: reportDate,
+      mode: "publish",
+      final_status: "needs_ai_repair",
+      clean_repo_root: cleanRoot,
+      next_action: {
+        kind: "codex_ai_repair_contract",
+        contract_path: contractPath,
+        source_report_path: unsafeSourceReportPath,
+        candidate_pool_path: candidatePoolPath,
+        quality_review_path: qualityReviewPath,
+        ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }]
+      },
+      stages: []
+    }
+  });
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    aiRepairContractAuthor: async () => {
+      authorCalls += 1;
+      return {};
+    },
+    maxAutomatedAiRepairAttempts: 1
+  });
+
+  assert.equal(authorCalls, 0);
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.error_code, "automated_ai_repair_handoff_invalid");
+  assert.match(summary.error, /source_report_path must stay inside clean_repo_root/);
+});
+
+test("daily Codex production orchestrator rejects the launcher repository as clean_repo_root", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-launcher-as-clean-root-"));
+  const reportDate = "2026-07-10";
+  await writeMinimalRepoFiles(rootDir);
+  const sourceReportPath = path.join(rootDir, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(rootDir, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(rootDir, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, "{}\n", "utf8");
+  await fs.writeFile(candidatePoolPath, "{}\n", "utf8");
+  await fs.writeFile(qualityReviewPath, "{}\n", "utf8");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  let authorCalls = 0;
+  const workflowRunner = async ({ summaryPath }) => ({
+    summaryPath,
+    summary: {
+      report_date: reportDate,
+      mode: "publish",
+      final_status: "needs_ai_repair",
+      clean_repo_root: rootDir,
+      next_action: {
+        kind: "codex_ai_repair_contract",
+        contract_path: path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`),
+        source_report_path: sourceReportPath,
+        candidate_pool_path: candidatePoolPath,
+        quality_review_path: qualityReviewPath,
+        ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }]
+      },
+      stages: []
+    }
+  });
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    aiRepairContractAuthor: async () => {
+      authorCalls += 1;
+      return {};
+    },
+    maxAutomatedAiRepairAttempts: 1
+  });
+
+  assert.equal(authorCalls, 0);
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.error_code, "automated_ai_repair_handoff_invalid");
+  assert.match(summary.error, /clean_repo_root must stay inside the launcher publish-worktrees directory/);
+});
+
+test("daily Codex production orchestrator stops after the automated repair budget is exhausted", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-repair-budget-"));
+  const reportDate = "2026-07-10";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, "{}\n", "utf8");
+  await fs.writeFile(candidatePoolPath, "{}\n", "utf8");
+  await fs.writeFile(qualityReviewPath, "{}\n", "utf8");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  let workflowCalls = 0;
+  let authorCalls = 0;
+  const workflowRunner = async ({ summaryPath }) => {
+    workflowCalls += 1;
+    return {
+      summaryPath,
+      summary: {
+        report_date: reportDate,
+        mode: "publish",
+        final_status: "needs_ai_repair",
+        clean_repo_root: cleanRoot,
+        next_action: {
+          kind: "codex_ai_repair_contract",
+          contract_path: path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}-attempt-${workflowCalls}.json`),
+          source_report_path: sourceReportPath,
+          candidate_pool_path: candidatePoolPath,
+          quality_review_path: qualityReviewPath,
+          ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }]
+        },
+        stages: []
+      }
+    };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    aiRepairContractAuthor: async () => {
+      authorCalls += 1;
+      return {
+        schema_version: 1,
+        report_date: reportDate,
+        status: "ready",
+        edits: [{ path: "stories[0].what_happened", value: `repair ${authorCalls}` }]
+      };
+    },
+    maxAutomatedAiRepairAttempts: 2
+  });
+
+  assert.equal(workflowCalls, 3);
+  assert.equal(authorCalls, 2);
+  assert.equal(summary.final_status, "needs_ai_repair");
+  assert.equal(summary.automation_ai_repair.attempted, 2);
+  assert.equal(summary.automation_ai_repair.authored, 2);
+  assert.equal(summary.automation_ai_repair.completed, 0);
+  assert.equal(summary.automation_ai_repair.terminal_reason, "budget_exhausted");
+});
+
+test("daily Codex production orchestrator does not report recovery when repair is followed by a blocked workflow", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-repair-blocked-"));
+  const reportDate = "2026-07-10";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, "{}\n", "utf8");
+  await fs.writeFile(candidatePoolPath, "{}\n", "utf8");
+  await fs.writeFile(qualityReviewPath, "{}\n", "utf8");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  let workflowCalls = 0;
+  const workflowRunner = async ({ summaryPath }) => {
+    workflowCalls += 1;
+    if (workflowCalls === 2) {
+      return {
+        summaryPath,
+        summary: {
+          report_date: reportDate,
+          mode: "publish",
+          final_status: "blocked",
+          clean_repo_root: cleanRoot,
+          next_action: { kind: "inspect_publish_failure" },
+          stages: []
+        }
+      };
+    }
+    return {
+      summaryPath,
+      summary: {
+        report_date: reportDate,
+        mode: "publish",
+        final_status: "needs_ai_repair",
+        clean_repo_root: cleanRoot,
+        next_action: {
+          kind: "codex_ai_repair_contract",
+          contract_path: path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`),
+          source_report_path: sourceReportPath,
+          candidate_pool_path: candidatePoolPath,
+          quality_review_path: qualityReviewPath,
+          ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }]
+        },
+        stages: []
+      }
+    };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    aiRepairContractAuthor: async () => ({
+      schema_version: 1,
+      report_date: reportDate,
+      status: "ready",
+      edits: [{ path: "stories[0].what_happened", value: "safe copy" }]
+    }),
+    maxAutomatedAiRepairAttempts: 1
+  });
+
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.automation_ai_repair.authored, 1);
+  assert.equal(summary.automation_ai_repair.completed, 0);
+  assert.equal(summary.automation_ai_repair.terminal_reason, "workflow_failed");
 });
 
 test("daily Codex DAG-lite CLI publishes explicit Source Watch admitted artifact into public articles", async () => {
@@ -844,7 +1680,10 @@ test("daily Codex DAG-lite CLI writes root summary for missing value flags", asy
     assert.equal(result.stage_id, "parse-args");
     assert.equal(result.execute_requested, true);
     assert.equal(result.publish_requested, true);
-    assert.equal(result.source_watch_admitted_artifact_path, artifactPath);
+    assert.equal(result.source_watch_admitted_artifact_path, "");
+    assert.equal(result.source_watch_requested_artifact_path, artifactPath);
+    assert.equal(result.source_watch.production_status, "not_connected");
+    assert.equal(result.source_watch.consumed, false);
     assert.equal(result.publication, null);
     assert.match(result.failures.join("\n"), /flag --codex-bin requires a value/);
     assert(result.summary_path.endsWith(path.join(".tmp", "run-summary-2026-07-06.json")));
@@ -853,7 +1692,10 @@ test("daily Codex DAG-lite CLI writes root summary for missing value flags", asy
     assert.equal(summary.stage_id, "parse-args");
     assert.equal(summary.execute_requested, true);
     assert.equal(summary.publish_requested, true);
-    assert.equal(summary.source_watch_admitted_artifact_path, artifactPath);
+    assert.equal(summary.source_watch_admitted_artifact_path, "");
+    assert.equal(summary.source_watch_requested_artifact_path, artifactPath);
+    assert.equal(summary.source_watch.production_status, "not_connected");
+    assert.equal(summary.source_watch.consumed, false);
     assert.equal(summary.publication, null);
   }
 });
@@ -998,6 +1840,90 @@ async function writeAdmittedSourceWatchFixture(filePath, reportDate) {
   }, null, 2)}\n`, "utf8");
 }
 
+async function writeStructuredRepairCodexCommand(rootDir, reportDate) {
+  const fakeScriptPath = path.join(rootDir, "structured-repair-codex.mjs");
+  await fs.writeFile(fakeScriptPath, `
+import fs from "node:fs";
+import path from "node:path";
+
+const rootDir = ${JSON.stringify(rootDir)};
+const args = process.argv.slice(2);
+const prompt = fs.readFileSync(0, "utf8");
+const schemaIndex = args.indexOf("--output-schema");
+const outputIndex = args.indexOf("--output-last-message");
+if (schemaIndex === -1 || outputIndex === -1) process.exit(2);
+const schema = JSON.parse(fs.readFileSync(args[schemaIndex + 1], "utf8"));
+if (schema.type !== "object" || schema.properties?.status?.const !== "ready") process.exit(3);
+const outputPath = path.resolve(args[outputIndex + 1]);
+const workDir = path.dirname(path.dirname(outputPath));
+fs.mkdirSync(workDir, { recursive: true });
+fs.writeFileSync(path.join(workDir, "structured-repair-codex-argv.json"), JSON.stringify(args));
+fs.writeFileSync(path.join(workDir, "structured-repair-prompt.txt"), prompt, "utf8");
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.writeFileSync(outputPath, JSON.stringify({
+  schema_version: 1,
+  report_date: ${JSON.stringify(reportDate)},
+  status: "ready",
+  edits: [{
+    path: "stories[0].what_happened",
+    value: "修复后的事实描述。",
+    reason: "移除重复叙事。"
+  }]
+}, null, 2), "utf8");
+`, "utf8");
+
+  if (process.platform === "win32") {
+    const commandPath = path.join(rootDir, "structured-repair-codex.cmd");
+    await fs.writeFile(commandPath, `@echo off\r\n"${process.execPath}" "%~dp0structured-repair-codex.mjs" %*\r\n`, "utf8");
+    return commandPath;
+  }
+
+  const commandPath = path.join(rootDir, "structured-repair-codex");
+  await fs.writeFile(commandPath, `#!/usr/bin/env sh\nexec "${process.execPath}" "$(dirname "$0")/structured-repair-codex.mjs" "$@"\n`, "utf8");
+  await fs.chmod(commandPath, 0o755);
+  return commandPath;
+}
+
+async function writeDelayedStructuredRepairCodexCommand(rootDir, reportDate, delayMs) {
+  const fakeScriptPath = path.join(rootDir, "delayed-structured-repair-codex.mjs");
+  await fs.writeFile(fakeScriptPath, `
+import fs from "node:fs";
+import path from "node:path";
+
+const args = process.argv.slice(2);
+fs.readFileSync(0, "utf8");
+const outputIndex = args.indexOf("--output-last-message");
+if (outputIndex === -1) process.exit(2);
+const outputPath = path.resolve(args[outputIndex + 1]);
+const workDir = path.dirname(path.dirname(outputPath));
+setTimeout(() => {
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, JSON.stringify({
+    schema_version: 1,
+    report_date: ${JSON.stringify(reportDate)},
+    status: "ready",
+    edits: [{
+      path: "stories[0].what_happened",
+      value: "超时前不应写出的修复文本。",
+      reason: "timeout fixture"
+    }]
+  }, null, 2), "utf8");
+  fs.writeFileSync(path.join(workDir, "delayed-codex-completed.txt"), "completed", "utf8");
+}, ${Number(delayMs)});
+`, "utf8");
+
+  if (process.platform === "win32") {
+    const commandPath = path.join(rootDir, "delayed-structured-repair-codex.cmd");
+    await fs.writeFile(commandPath, `@echo off\r\n"${process.execPath}" "%~dp0delayed-structured-repair-codex.mjs" %*\r\n`, "utf8");
+    return commandPath;
+  }
+
+  const commandPath = path.join(rootDir, "delayed-structured-repair-codex");
+  await fs.writeFile(commandPath, `#!/usr/bin/env sh\nexec "${process.execPath}" "$(dirname "$0")/delayed-structured-repair-codex.mjs" "$@"\n`, "utf8");
+  await fs.chmod(commandPath, 0o755);
+  return commandPath;
+}
+
 async function writeFakeCodexCommand(rootDir) {
   const fakeScriptPath = path.join(rootDir, "fake-codex.mjs");
   await fs.writeFile(fakeScriptPath, `
@@ -1041,6 +1967,7 @@ const match = prompt.match(/OUTPUT_PATH=([^\\r\\n]+)/);
 if (!match) process.exit(2);
 const outputPath = match[1].trim();
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.writeFileSync(path.join(path.dirname(outputPath), "codex-argv.json"), JSON.stringify(process.argv.slice(2)));
 fs.writeFileSync(outputPath, JSON.stringify({
   report_date: "${reportDate}",
   headline: "Fake Codex output",

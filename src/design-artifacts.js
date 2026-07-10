@@ -47,21 +47,41 @@ export async function validateDesignArtifacts(options = {}) {
   }
 
   const artifacts = [];
+  const templateRecords = [];
   for (const filePath of artifactFiles) {
     const artifact = await validateArtifactRecord({ rootDir, filePath, issues, warnings });
     if (artifact) {
-      artifacts.push(artifact);
+      if (isTemplateArtifactPath(filePath)) {
+        templateRecords.push(artifact);
+      } else {
+        artifacts.push(artifact);
+      }
     }
+  }
+
+  const deliveryArtifacts = artifacts.filter((artifact) => ["candidate", "accepted"].includes(artifact.status));
+  if (deliveryArtifacts.length === 0) {
+    issues.push({
+      code: "design_artifact_evidence_missing",
+      path: PROTOTYPE_ROOT,
+      message: "At least one non-template candidate or accepted design record is required as shipped implementation evidence."
+    });
   }
 
   return {
     ok: issues.length === 0,
     required_docs: requiredDocs,
-    artifacts_checked: artifacts.length,
-    artifacts,
+    artifacts_checked: deliveryArtifacts.length,
+    artifact_records_checked: artifacts.length,
+    template_records_checked: templateRecords.length,
+    artifacts: deliveryArtifacts,
     warnings,
     issues
   };
+}
+
+function isTemplateArtifactPath(filePath) {
+  return path.basename(filePath).startsWith("_template.");
 }
 
 async function validateToolchainDoc(rootDir, issues) {

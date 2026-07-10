@@ -17,10 +17,20 @@ export async function auditRepoSize(options = {}) {
   const rootDir = path.resolve(options.rootDir || options.root || process.cwd());
   const trackedFiles = listTrackedFiles(rootDir);
   const entries = [];
+  let missingFromWorktree = 0;
 
   for (const relativePath of trackedFiles) {
     const absolutePath = path.join(rootDir, relativePath);
-    const stat = await fs.stat(absolutePath);
+    let stat;
+    try {
+      stat = await fs.stat(absolutePath);
+    } catch (error) {
+      if (error?.code === "ENOENT") {
+        missingFromWorktree += 1;
+        continue;
+      }
+      throw error;
+    }
     if (!stat.isFile()) continue;
     const normalizedPath = normalizePath(relativePath);
     entries.push({
@@ -43,6 +53,7 @@ export async function auditRepoSize(options = {}) {
     generated_at: new Date().toISOString(),
     tracked: {
       file_count: entries.length,
+      missing_from_worktree: missingFromWorktree,
       total_bytes: sumBytes(entries),
       total_mib: bytesToMiB(sumBytes(entries))
     },

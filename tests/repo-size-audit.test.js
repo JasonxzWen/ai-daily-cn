@@ -29,6 +29,17 @@ test("repo size audit measures tracked payload and duplicate docs assets", async
   assert.equal(audit.largest_files[0].path, "reports-data/internal/source-status-history.json");
 });
 
+test("repo size audit ignores tracked files deleted by the pending change", async () => {
+  const rootDir = await createFixtureRepo();
+  await fs.rm(path.join(rootDir, "docs", "assets", "c.webp"));
+
+  const audit = await auditRepoSize({ rootDir });
+
+  assert.equal(audit.tracked.file_count, 5);
+  assert.equal(audit.tracked.missing_from_worktree, 1);
+  assert.equal(audit.notable_paths.docs_assets.files, 2);
+});
+
 test("repo size budget reports warnings separately from blocking errors", async () => {
   const rootDir = await createFixtureRepo();
   const audit = await auditRepoSize({ rootDir });

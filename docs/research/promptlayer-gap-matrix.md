@@ -40,10 +40,12 @@ The remaining differences are intentional or queued rather than accidental: AI D
 
 ## Implemented In The Fidelity Pass
 
-1. `src/daily-theme.js` now adds scoped PromptLayer-like header chrome, hero preview, rail cells, ticket grids, editorial rows, tracking title layout, hover/reveal motion, and mobile collapse.
+> Superseded on 2026-07-10: this section records the earlier fidelity pass. `src/daily-theme.js` and its source-shape tests were later removed after the shared ADC paper/ink visual contract replaced the PromptLayer-specific layer across React, static shells, and every historical daily report. Reports keep their self-contained content rendering but load one shared `docs/assets/adc-theme.css` visual asset.
+
+1. `src/daily-theme.js` previously added scoped PromptLayer-like header chrome, hero preview, rail cells, ticket grids, editorial rows, tracking title layout, hover/reveal motion, and mobile collapse; that module is no longer active.
 2. `src/interaction-report.js` now emits cleaner GitHub card bodies and degrades old saved README boilerplate into rank/stars movement copy.
 3. `src/github-readme.js` now avoids the old generic "README 将 / 核心能力集中 / 它的价值在于" template for future generated reports.
-4. `tests/unit.test.js` covers scoped theme selectors, GitHub card fallback text, and README summary template avoidance.
+4. At the time, `tests/unit.test.js` covered scoped theme selectors, GitHub card fallback text, and README summary template avoidance; current visual-contract coverage lives in `tests/adc-visual-contract.test.js` and browser acceptance evidence.
 5. `docs/reports/2026/06/2026-06-17.html` was regenerated; non-target historical HTML diffs were reverted after builds.
 6. Playwright screenshots and `scripts/check-daily-page.mjs` verified desktop/mobile no-overflow, no key overlap, tracking component containment, and GitHub reader-facing card quality.
 

@@ -70,10 +70,15 @@ export function App() {
     let cancelled = false;
     async function load() {
       try {
-        const [articles, feed] = await Promise.all([
+        const [articlesResult, feedResult] = await Promise.allSettled([
           fetchJson<Article[]>("articles.json"),
           fetchJson<Feed>("feed.json")
         ]);
+        if (articlesResult.status === "rejected") {
+          throw articlesResult.reason;
+        }
+        const articles = articlesResult.value;
+        const feed = feedResult.status === "fulfilled" ? feedResult.value : null;
         if (!cancelled) {
           setState({ status: "ready", articles: Array.isArray(articles) ? articles : [], feed, error: "" });
         }
@@ -102,6 +107,7 @@ export function App() {
 
   return (
     <main className="adc-shell" data-article-index="adc-react-astryx" data-adc-react-home>
+      <a className="adc-skip-link" href="#article-results-title">跳到资讯列表</a>
       <header className="adc-topbar">
         <a className="adc-brand" href="index.html" aria-label="ADC 首页">
           <span className="adc-brand-mark">ADC.</span>
@@ -187,7 +193,7 @@ function ArticleCard({ article, index }: { article: Article; index: number }) {
       <article>
         <div className="adc-card-topline">
           <span>{String(index + 1).padStart(2, "0")}</span>
-          <Badge variant={badgeVariant(score)} label={primaryTag} />
+          <Badge variant="neutral" label={primaryTag} />
         </div>
         <h3>
           {article.url ? (
@@ -232,7 +238,7 @@ function Metric({ label, value, icon }: { label: string; value: string; icon: Re
 
 function LoadingState() {
   return (
-    <div className="adc-state-grid" aria-label="加载中">
+    <div className="adc-state-grid" role="status" aria-live="polite" aria-label="加载中">
       {Array.from({ length: 6 }, (_unused, index) => (
         <Card key={index} className="adc-skeleton" padding={0}>
           <span />
@@ -246,7 +252,7 @@ function LoadingState() {
 
 function ErrorState({ error }: { error: string }) {
   return (
-    <Card className="adc-state-card" padding={0}>
+    <Card className="adc-state-card" padding={0} role="alert">
       <h3>数据读取失败</h3>
       <p>{error}</p>
       <Button label="重新加载" variant="secondary" icon={<RefreshCw size={16} />} onClick={() => window.location.reload()} />
@@ -343,10 +349,4 @@ function formatDateLong(value: string) {
     day: "2-digit",
     weekday: "short"
   }).format(date);
-}
-
-function badgeVariant(score: number) {
-  if (score >= 90) return "success";
-  if (score >= 80) return "info";
-  return "neutral";
 }

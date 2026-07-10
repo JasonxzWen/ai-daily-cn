@@ -1,16 +1,9 @@
 :root {
-  color: #111;
-  background: #f8f5ec;
+  color: var(--adc-ink);
+  background: var(--adc-paper);
   font-family: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
   font-synthesis: none;
   letter-spacing: 0;
-  --adc-ink: #111;
-  --adc-paper: #f8f5ec;
-  --adc-card: #fffdf7;
-  --adc-muted: #57514a;
-  --adc-soft: #ede5d5;
-  --adc-rule: #d7cebd;
-  --adc-shadow: 8px 10px 0 rgba(17, 17, 17, 0.1);
 }
 
 * {
@@ -18,15 +11,14 @@
 }
 
 body {
-  min-width: 1120px;
+  min-width: 0;
   min-height: 100vh;
   margin: 0;
   background:
     linear-gradient(rgba(17, 17, 17, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(17, 17, 17, 0.028) 1px, transparent 1px),
-    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.78), transparent 28rem),
     var(--adc-paper);
-  background-size: 34px 34px, 34px 34px, auto;
+  background-size: 34px 34px, 34px 34px;
   color: var(--adc-ink);
 }
 
@@ -50,9 +42,8 @@ a {
   justify-content: space-between;
   min-height: 68px;
   padding: 10px 0 14px;
-  background: linear-gradient(rgba(248, 245, 236, 0.92), rgba(248, 245, 236, 0.78));
-  backdrop-filter: blur(12px);
-  border-bottom: 2px solid rgba(17, 17, 17, 0.08);
+  background: var(--adc-paper);
+  border-bottom: 2px solid var(--adc-ink);
 }
 
 .adc-brand {
@@ -81,8 +72,8 @@ a {
   gap: 8px;
   padding: 6px;
   border: 2px solid var(--adc-ink);
-  border-radius: 999px;
-  background: rgba(255, 253, 247, 0.78);
+  border-radius: 12px;
+  background: var(--adc-card);
   box-shadow: 4px 5px 0 rgba(17, 17, 17, 0.1);
 }
 
@@ -91,7 +82,7 @@ a {
   align-items: center;
   height: 36px;
   padding: 0 15px;
-  border-radius: 999px;
+  border-radius: 7px;
   color: var(--adc-ink);
   font-size: 14px;
   font-weight: 800;
@@ -119,7 +110,7 @@ a {
   max-width: 760px;
   margin: 20px 0 18px;
   font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
-  font-size: 76px;
+  font-size: clamp(52px, 5.4vw, 72px);
   font-weight: 900;
   line-height: 0.98;
   letter-spacing: 0;
@@ -146,7 +137,7 @@ a {
   min-height: 250px;
   overflow: hidden;
   border: 2px solid var(--adc-ink);
-  border-radius: 34px 28px 36px 30px;
+  border-radius: 14px 10px 16px 12px;
   background: var(--adc-card);
   box-shadow: var(--adc-shadow);
 }
@@ -171,13 +162,13 @@ a {
   min-height: 118px;
   padding: 17px;
   border: 2px solid var(--adc-ink);
-  border-radius: 28px 24px 30px 24px;
-  background: rgba(255, 253, 247, 0.86);
+  border-radius: 10px 7px 12px 8px;
+  background: var(--adc-card);
   box-shadow: 5px 6px 0 rgba(17, 17, 17, 0.08);
 }
 
 .adc-metric:nth-child(2n) {
-  border-radius: 24px 30px 24px 28px;
+  border-radius: 7px 12px 8px 11px;
 }
 
 .adc-metric-icon {
@@ -255,20 +246,18 @@ a {
   min-height: 324px;
   overflow: hidden;
   border: 2px solid var(--adc-ink);
-  border-radius: 30px 24px 32px 26px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 253, 247, 0.72)),
-    var(--adc-card);
+  border-radius: 12px 8px 14px 9px;
+  background: var(--adc-card);
   box-shadow: 5px 6px 0 rgba(17, 17, 17, 0.08);
   transition: transform 170ms ease, box-shadow 170ms ease, background-color 170ms ease;
 }
 
 .adc-news-card:nth-child(3n + 2) {
-  border-radius: 26px 32px 24px 30px;
+  border-radius: 8px 14px 9px 12px;
 }
 
 .adc-news-card:nth-child(3n) {
-  border-radius: 32px 26px 30px 24px;
+  border-radius: 14px 9px 12px 8px;
 }
 
 .adc-news-card:hover {
@@ -329,14 +318,13 @@ a {
   margin-top: auto;
 }
 
-.adc-card-tags :where([class*="Badge"]),
-.adc-card-topline :where([class*="Badge"]),
-.adc-hero-copy :where([class*="Badge"]) {
+.adc-card-tags .astryx-badge,
+.adc-card-topline .astryx-badge,
+.adc-hero-copy .astryx-badge {
   border: 1.5px solid rgba(17, 17, 17, 0.82);
   border-radius: 999px;
-  background: rgba(255, 253, 247, 0.74);
-  backdrop-filter: blur(10px);
-  color: var(--adc-ink);
+  background: var(--adc-card) !important;
+  color: var(--adc-ink) !important;
   box-shadow: 2px 3px 0 rgba(17, 17, 17, 0.08);
 }
 
@@ -363,13 +351,13 @@ a {
 .adc-board-header :where([role="radiogroup"]) {
   padding: 5px;
   border: 2px solid var(--adc-ink);
-  border-radius: 999px;
-  background: rgba(255, 253, 247, 0.82);
+  border-radius: 12px;
+  background: var(--adc-card);
   box-shadow: 4px 5px 0 rgba(17, 17, 17, 0.08);
 }
 
 .adc-board-header :where([role="radio"]) {
-  border-radius: 999px;
+  border-radius: 7px;
   font-weight: 800;
 }
 
@@ -415,8 +403,8 @@ a {
   max-width: 560px;
   padding: 24px;
   border: 2px solid var(--adc-ink);
-  border-radius: 30px 24px 32px 26px;
-  background: rgba(255, 253, 247, 0.82);
+  border-radius: 12px 8px 14px 9px;
+  background: var(--adc-card);
   box-shadow: var(--adc-shadow);
 }
 
@@ -429,6 +417,117 @@ a {
   margin: 0 0 18px;
   color: var(--adc-muted);
   line-height: 1.7;
+}
+
+.adc-skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+  padding: 9px 12px;
+  border: 2px solid var(--adc-ink);
+  background: var(--adc-card);
+  color: var(--adc-ink);
+  font-weight: 850;
+  transform: translateY(-180%);
+}
+
+.adc-skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.adc-shell :where(a, button, [role="radio"]):focus-visible {
+  outline: 3px solid var(--adc-ink);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1100px) {
+  .adc-shell {
+    width: min(100% - 32px, 960px);
+  }
+
+  .adc-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .adc-hero-panel {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+
+  .adc-news-grid,
+  .adc-state-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .adc-shell {
+    width: min(100% - 20px, 680px);
+    padding-top: 10px;
+  }
+
+  .adc-topbar,
+  .adc-board-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .adc-topbar {
+    position: static;
+    gap: 12px;
+  }
+
+  .adc-nav {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .adc-nav a {
+    flex: 1 0 auto;
+    justify-content: center;
+  }
+
+  .adc-hero {
+    gap: 22px;
+    padding: 34px 0 24px;
+  }
+
+  .adc-hero h1 {
+    margin-top: 14px;
+    font-size: clamp(42px, 14vw, 58px);
+  }
+
+  .adc-hero p {
+    font-size: 16px;
+  }
+
+  .adc-hero-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .adc-character-card {
+    min-height: 190px;
+  }
+
+  .adc-character-card img {
+    width: min(240px, 76vw);
+  }
+
+  .adc-board-header :where([role="radiogroup"]) {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .adc-news-grid,
+  .adc-state-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .adc-news-card,
+  .adc-news-card article {
+    min-height: 0;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

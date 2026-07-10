@@ -2,5 +2,11 @@
   "name": "@adc/design",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "exports": {
+    "./theme.css": "./src/adc-theme.css"
+  },
+  "files": [
+    "src/adc-theme.css"
+  ]
 }

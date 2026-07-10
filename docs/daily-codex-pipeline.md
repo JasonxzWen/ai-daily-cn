@@ -10,7 +10,7 @@ In production mode (`--execute --publish` without a fixture), the script runs as
 
 - `automation_pipeline_mode:"single_script_dag_orchestrator"`
 - `orchestration.node_count`
-- `source_watch_admitted_artifact_path`
+- `source_watch.production_status:"not_connected"`, `consumed:false`, and diagnostic `source_watch_requested_artifact_path`
 - report JSON, docs data JSON, and HTML paths
 - validation, publish, Pages, blocking, and degraded summaries
 
@@ -28,6 +28,8 @@ Use a specific Codex model or work directory:
 corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --model gpt-5 --work-dir .tmp/daily-codex-mvp/YYYY-MM-DD
 ```
 
+The runner does not inherit `npm_config_model` or user Codex model configuration. Pass `--model` only when an explicit compatible model is required. Every Codex invocation is bounded to 20 minutes by default; diagnosis or tests may override it with `--codex-timeout-ms 600000` (1..3600000 ms). A timeout requests complete process-tree termination and permits only a bounded grace (one second on Windows) before recording `codex_timeout`, even if the tree-kill command hangs or fails. Windows non-zero/error paths fall back to direct child termination; tests cover successful tree cleanup and a non-resolving terminator.
+
 Custom work directories must stay under `.tmp/daily-codex-mvp/` and must name a child run directory. The runner refuses to clean or write arbitrary repository paths.
 
 Run the deterministic fixture path for local validation:
@@ -44,13 +46,9 @@ corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish 
 
 `--execute` records the production intent and configures the Codex command. `codex.cmd` and arguments after `--` are command configuration, not fixture modes. In a full repository checkout this command runs the single-script production orchestrator and may publish.
 
-When `.tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json` exists, callers may pass it explicitly:
+When production quality returns `needs_ai_repair`, the same entrypoint owns the continuation. Codex runs with `--ignore-user-config` in a read-only sandbox and returns a JSON-Schema-constrained final object; the CLI writes that object as UTF-8, and the host validates report date, declared task paths, evidence roots, output path, status, and edits before copying the contract and resuming. The model never writes report or repository files directly. Dry-run permits one automated repair attempt; publish permits at most five.
 
-```powershell
-corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json
-```
-
-The runner does not scan `.tmp` for the newest artifact. The summary records `source_watch_admitted_artifact_path` so scheduled automation can report which admitted artifact was used. If the artifact is not provided, the field remains empty; the normal daily publish flow still runs.
+The production runner does not yet consume Source Watch artifacts. Scheduled automation must omit the fixture-only handoff flag. Production summaries keep `source_watch_admitted_artifact_path` empty and report `source_watch.production_status:"not_connected"`, `consumed:false`, and `source_watch_requested_artifact_path` so a supplied-but-unused path cannot be mistaken for published evidence. The local DAG-lite fixture path still accepts explicit Source Watch artifacts for contract tests.
 
 Fixture modes:
 
@@ -64,7 +62,7 @@ The DAG-lite fixture runner writes MVP artifacts under `.tmp/daily-codex-mvp/YYY
 
 The production orchestrator writes its plan under `.tmp/daily-codex-pipeline/YYYY-MM-DD/` and the authoritative run summary at `.tmp/run-summary-YYYY-MM-DD.json`.
 
-- `pipeline-plan.json`: sanitized plan with the six DAG-lite stages.
+- `pipeline-plan.json`: sanitized production orchestration plan; fixture mode still uses the six DAG-lite stages.
 - `context.json`: deterministic repository context used by the generation prompt.
 - `generated.json`: first Codex generation output.
 - `validation.json`: validation result for `generated.json`.
@@ -77,7 +75,7 @@ The production orchestrator writes its plan under `.tmp/daily-codex-pipeline/YYY
 
 Fixture `run-summary.json` reports `mode:"daily_codex_dag_lite"`, `final_status`, `next_action`, `completed_stages`, validation state, repair state, the final artifact path, `publish_requested`, `execute_requested`, `source_watch_admitted_artifact_path`, and `publication`.
 
-Production `run-summary.json` reports `mode:"single_script_dag_orchestrator"`, `automation_pipeline_mode:"single_script_dag_orchestrator"`, `orchestration.node_count`, `completed_stages`, validation and publish summaries, Pages status, `blocking_issues`, `degraded_sections`, `structured_json_path`, `docs_data_json_path`, and `html_path`.
+Production `run-summary.json` reports `mode:"single_script_dag_orchestrator"`, `automation_pipeline_mode:"single_script_dag_orchestrator"`, `orchestration.node_count`, `completed_stages`, validation and publish summaries, Pages status, `blocking_issues`, `degraded_sections`, `structured_json_path`, `docs_data_json_path`, `html_path`, automated repair attempts, and the honest Source Watch `not_connected`/`consumed:false` state. `stage_id`, `failed_stage_id`, and `error` describe the latest unresolved failure; a later successful retry/fallback clears stale failure metadata.
 
 ## Validation Contract
 
@@ -94,10 +92,12 @@ MVP validation is deliberately narrow. The final artifact must be a JSON object 
 }
 ```
 
-If validation fails, the runner invokes exactly one repair pass. If the repair output still fails validation, the runner writes a blocked summary and exits non-zero.
+In fixture mode, validation failure invokes exactly one repair pass. In production, the mode budget above applies. Candidate coverage is one shared contract used by quality review and report_write, so a quality pass cannot later become a candidate-category/URL/date/verification/disclosure failure at write time.
 
 ## Replacement Boundary
 
 The production entrypoint must remain `corepack pnpm run daily:codex-pipeline`. The legacy daily workflow is invoked only behind that single script so scheduled automation does not expand old manual stage commands.
+
+Production generation intentionally runs in a clean latest-origin/main worktree. Therefore an unmerged branch can prove its fix with tests and real-artifact replay, but it cannot claim scheduled production acceptance from that clean worktree until the PR lands. Post-merge automation observation is the production verification boundary.
 
 The next accepted infrastructure slice migrates repository commands to `corepack pnpm`. After that migration lands, scheduled automation must call `corepack pnpm run daily:codex-pipeline` and old `npm run` scheduler instructions are intentionally unsupported.

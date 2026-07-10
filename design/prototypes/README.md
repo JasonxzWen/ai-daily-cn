@@ -2,6 +2,8 @@
 
 Store AI design and prototype records here when they influence product implementation.
 
+The `_template.*` files are authoring aids only. Validation does not count them as implementation evidence; at least one non-template record with `candidate` or `accepted` status is required.
+
 Use the template files:
 
 - `_template.design.json`

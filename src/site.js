@@ -6,6 +6,11 @@ import { PublisherError } from "./errors.js";
 import { parseDailyMarkdown } from "./parser.js";
 import { defaultStyleCss, renderIndexHtml, renderOfficialBlogsHtml, renderOpsIndexHtml } from "./render.js";
 import { renderReportWithEffectiveInteract } from "./interaction-report.js";
+import {
+  adcPublicThemeAssetPath,
+  adcPublicThemeCss,
+  adcPublicThemeVersion
+} from "./adc-theme.js";
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import {
   candidatePoolRelativePaths,
@@ -456,6 +461,7 @@ export async function buildSite(options = {}) {
 
   await fs.mkdir(outDir, { recursive: true });
   await writeFileTracked(outDir, ".nojekyll", "", writtenFiles);
+  await writeFileTracked(outDir, adcPublicThemeAssetPath, `${adcPublicThemeCss}\n`, writtenFiles);
   await writeFileTracked(outDir, "assets/style.css", defaultStyleCss, writtenFiles);
   const indexStyleVersion = contentHash(defaultStyleCss);
 
@@ -612,6 +618,7 @@ export async function planGeneratedFiles(options = {}) {
   const reportJsonFiles = await collectJsonFiles(dataInputDir);
   const files = [
     ".nojekyll",
+    adcPublicThemeAssetPath,
     "assets/style.css",
     "feed.json",
     "articles.json",
@@ -2015,15 +2022,35 @@ async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markd
   }
 }
 
-function applyDailyReportHtmlOverrides(html, reportDate) {
+export function applyDailyReportHtmlOverrides(html, _reportDate) {
   let result = html;
-  if (!result || result.includes("data-ai-daily-css-overrides")) {
+  if (!result) {
     return result;
   }
-  if (result.includes("</head>")) {
-    return result.replace("</head>", `${DAILY_REPORT_HTML_OVERRIDES}\n</head>`);
+  if (result.includes("<body") && !result.includes("data-adc-public-surface=")) {
+    result = result.replace("<body", '<body data-adc-public-surface="report"');
   }
-  return `${DAILY_REPORT_HTML_OVERRIDES}\n${result}`;
+  if (result.includes("<body") && !result.includes('class="adc-report-brand"')) {
+    result = result.replace(
+      /(<body[^>]*>)/,
+      '$1\n<a class="adc-report-brand" href="../../../index.html"><strong>ADC.</strong><span>AI Daily CN</span></a>'
+    );
+  }
+  const styleBlocks = [];
+  if (!result.includes("data-adc-public-theme")) {
+    styleBlocks.push(`<link rel="stylesheet" data-adc-public-theme href="../../../${adcPublicThemeAssetPath}?v=${adcPublicThemeVersion}">`);
+  }
+  if (!result.includes("data-ai-daily-css-overrides")) {
+    styleBlocks.push(DAILY_REPORT_HTML_OVERRIDES);
+  }
+  if (styleBlocks.length === 0) {
+    return result;
+  }
+  const styles = styleBlocks.join("\n");
+  if (result.includes("</head>")) {
+    return result.replace("</head>", `${styles}\n</head>`);
+  }
+  return `${styles}\n${result}`;
 }
 
 async function readReportJson(filePath) {

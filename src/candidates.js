@@ -104,7 +104,17 @@ export function requireCandidateCoverage(report, candidatePool) {
     throw new PublisherError("candidate_pool_missing", "结构化日报必须提供候选池，正文条目不得绕过候选池。");
   }
 
-  const byId = new Map(candidatePool.candidates.map((candidate) => [candidate.id, candidate]));
+  const errors = collectCandidateCoverageIssues(report, candidatePool);
+  if (errors.length > 0) {
+    throw new PublisherError("candidate_pool_reference_invalid", "日报条目没有全部回指有效候选。", {
+      errors
+    });
+  }
+}
+
+export function collectCandidateCoverageIssues(report, candidatePool) {
+  const candidates = Array.isArray(candidatePool?.candidates) ? candidatePool.candidates : [];
+  const byId = new Map(candidates.map((candidate) => [candidate.id, candidate]));
   const errors = [];
 
   for (const [sectionName, expectedCategory] of Object.entries(REQUIRED_SECTIONS)) {
@@ -185,11 +195,7 @@ export function requireCandidateCoverage(report, candidatePool) {
     });
   }
 
-  if (errors.length > 0) {
-    throw new PublisherError("candidate_pool_reference_invalid", "日报条目没有全部回指有效候选。", {
-      errors
-    });
-  }
+  return errors;
 }
 
 function requiresPrimaryVerification(sectionName, candidate, item = {}) {
