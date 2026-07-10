@@ -396,8 +396,7 @@ async function validateAutomatedAiRepairHandoff({ plan, legacySummary, nextActio
 
   const contractPath = path.resolve(String(nextAction.contract_path || ""));
   const allowedRoot = path.resolve(plan.root_dir, ".tmp");
-  const expectedName = new RegExp(`^quality-ai-repair-${plan.report_date}(?:-attempt-\\d+)?\\.json$`);
-  if (!samePath(path.dirname(contractPath), allowedRoot) || !expectedName.test(path.basename(contractPath))) {
+  if (!samePath(path.dirname(contractPath), allowedRoot) || !isExpectedAiRepairContractName(path.basename(contractPath), plan.report_date)) {
     failures.push("contract_path must stay under the launcher .tmp directory and use the declared daily contract name");
   } else {
     try {
@@ -547,8 +546,7 @@ function validateAutomatedAiRepairContract(contract, { plan, nextAction }) {
 async function writeValidatedAiRepairContract({ plan, nextAction, contract }) {
   const contractPath = path.resolve(String(nextAction.contract_path || ""));
   const allowedRoot = path.resolve(plan.root_dir, ".tmp");
-  const expectedName = new RegExp(`^quality-ai-repair-${plan.report_date}(?:-attempt-\\d+)?\\.json$`);
-  if (!samePath(path.dirname(contractPath), allowedRoot) || !expectedName.test(path.basename(contractPath))) {
+  if (!samePath(path.dirname(contractPath), allowedRoot) || !isExpectedAiRepairContractName(path.basename(contractPath), plan.report_date)) {
     const error = new Error("AI repair contract path must stay under the launcher .tmp directory and use the declared daily contract name");
     error.code = "automated_ai_repair_contract_path_out_of_scope";
     throw error;
@@ -1885,6 +1883,15 @@ function normalizeTerminationGraceMs(value, timeoutMs) {
     throw new Error("Codex termination grace must be an integer between 1 and 5000 milliseconds");
   }
   return graceMs;
+}
+
+function isExpectedAiRepairContractName(fileName, reportDate) {
+  const exactName = `quality-ai-repair-${reportDate}.json`;
+  if (fileName === exactName) return true;
+  const attemptPrefix = `quality-ai-repair-${reportDate}-attempt-`;
+  if (!fileName.startsWith(attemptPrefix) || !fileName.endsWith(".json")) return false;
+  const attempt = fileName.slice(attemptPrefix.length, -".json".length);
+  return attempt.length > 0 && [...attempt].every((character) => character >= "0" && character <= "9");
 }
 
 function defaultCodexBin() {

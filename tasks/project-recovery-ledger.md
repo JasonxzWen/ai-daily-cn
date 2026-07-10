@@ -399,6 +399,7 @@ This table is part of the same ledger, not a second review. `fixed` means implem
 | S-33 | re-review found that malformed percent encoding in a nominal publication path could make `decodeURIComponent` throw and abort the entire draft | moved URL construction and pathname decoding into the same fail-closed guard and added a `%ZZ` arXiv negative fixture | fixed; focused and full validation passed |
 | S-34 | the default `GH_TOKEN` and same-user keyring PAT could push but lacked GraphQL `createPullRequest` permission | preserved the pushed branch, switched to an already authenticated repo-scoped account, and created Draft PR #289 without merging | fixed |
 | S-35 | the automation creation API rejected `worktree` execution for a new cron monitor | followed the tool contract and created project-scoped local, read-only automation `ai-7` with an explicit 2026-07-17 expiry | fixed |
+| S-36 | the Advanced Security CodeQL PR gate flagged two high-severity regular-expression-injection alerts where the validated report date was interpolated into a contract-name regex | removed both dynamic regexes and replaced them with exact name, fixed prefix/suffix, and digit-only attempt parsing | fixed; 38/38 focused tests and Harness passed; final CodeQL rerun pending |
 
 ## Production Acceptance
 
