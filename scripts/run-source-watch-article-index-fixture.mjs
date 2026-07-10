@@ -74,9 +74,20 @@ function buildArticleIndexArtifact({ input, reportDate }) {
     throw new Error("source watch article index fixture input.report_date must match --date");
   }
 
+  const candidatePool = {
+    schema_version: 1,
+    report_date: reportDate,
+    generated_at: `${reportDate}T00:00:00.000Z`,
+    sources: [],
+    candidates: input.candidates.map((candidate) => ({
+      ...candidate,
+      status: "included",
+      included_in: "source_watch"
+    }))
+  };
   const articles = buildArticleIndex([], {
     updatedAt: `${reportDate}T00:00:00.000Z`,
-    sourceWatchAdmittedArtifacts: [input]
+    sourceWatchCandidatePools: [candidatePool]
   });
   const validation = validateArticles(articles);
   if (!validation.valid) {

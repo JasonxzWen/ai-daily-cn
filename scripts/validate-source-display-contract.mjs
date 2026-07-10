@@ -79,6 +79,7 @@ const REQUIRED_ORDER_TUNING_REVIEW_PHRASES = [
   "Collection-Only Review",
   "Order Tuning Validation"
 ];
+const SOURCE_PROMOTION_DECISIONS = new Set(["promoted", "defer", "retire"]);
 
 const REQUIRED_PRESENTATION_CONTRACT = {
   version: "source-first-v2",
@@ -526,17 +527,14 @@ function validateOrderTuningReview(review, inventoryRows, contract, maintenance,
   const seenSourceIds = new Set();
   const seenLogicalIds = new Set();
   const candidates = extractPromotionCandidates(review);
-  if (candidates.length < 24) {
-    failures.push(`order tuning review must list at least 24 promotion candidates, found ${candidates.length}`);
+  if (candidates.length !== 24) {
+    failures.push(`order tuning review must list exactly 24 promotion decisions, found ${candidates.length}`);
   }
   for (const candidate of candidates) {
     const row = inventoryById.get(candidate.sourceId);
     if (!row) {
       failures.push(`promotion candidate references unknown source id: ${candidate.sourceId}`);
       continue;
-    }
-    if (row.logical_source_id) {
-      failures.push(`promotion candidate is already mapped to logical source: ${candidate.sourceId}`);
     }
     if (seenSourceIds.has(candidate.sourceId)) {
       failures.push(`promotion candidate duplicates source id: ${candidate.sourceId}`);
@@ -555,8 +553,18 @@ function validateOrderTuningReview(review, inventoryRows, contract, maintenance,
     if (!Number.isFinite(candidate.rank) || candidate.rank <= 0 || candidate.rank % 5 !== 0) {
       failures.push(`promotion candidate ${candidate.sourceId} suggested rank must use 5-point spacing`);
     }
-    if (candidate.action !== "promote") {
-      failures.push(`promotion candidate ${candidate.sourceId} action must be promote`);
+    if (!SOURCE_PROMOTION_DECISIONS.has(candidate.action)) {
+      failures.push(`promotion candidate ${candidate.sourceId} action must be promoted, defer, or retire`);
+    } else if (candidate.action === "promoted") {
+      if (row.logical_source_id !== candidate.logicalSourceId) {
+        failures.push(
+          `promoted source ${candidate.sourceId} must map to logical source ${candidate.logicalSourceId}, found ${row.logical_source_id || "unmapped"}`
+        );
+      }
+    } else if (row.logical_source_id) {
+      failures.push(
+        `${candidate.action} source ${candidate.sourceId} must remain collection-only, found logical source ${row.logical_source_id}`
+      );
     }
   }
 

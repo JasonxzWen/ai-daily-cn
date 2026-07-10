@@ -8,12 +8,12 @@ Generate, validate, dry-run, and publish the Chinese AI daily report for `YYYY-M
 
 - Start from the launcher worktree with `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
 - Use `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish` only when real publish is explicitly allowed.
-- Production Source Watch is not connected yet. Scheduled runs must omit the fixture-only artifact flag and read `source_watch.production_status:"not_connected"`, `consumed:false`, and `source_watch_requested_artifact_path` from the summary; an empty `source_watch_admitted_artifact_path` means no producer/consumer handoff actually ran.
+- Production Source Watch runs through `discover_source_watch`, `report_draft`, `report_write`, and `build`. Read `source_watch.production_status`, `source_watch.connected`, and `source_watch.consumed` from the run summary. Connected/consumed requires the producer stage's exact artifact path/SHA-256 receipt, equal producer/pool snapshot sets, `reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json`, and matching `source_watch.consumption.candidate_pool_hashes`; zero inclusion remains valid. Missing/mismatched evidence is false, and scheduled runs pass no sidecar.
 - Read `.tmp/run-summary-YYYY-MM-DD.json` for `final_status`, `completed_stages`, and `next_action`.
 - If `next_action` requests repair, fix the reported public text or blocker, then rerun the same `daily:codex-pipeline` command.
 - To intentionally discard same-date pipeline state, delete or replace `.tmp/daily-codex-pipeline/YYYY-MM-DD` before rerunning.
 - Scheduled dry-run uses `publish:dry-run:daily`.
-- 21:30 status self-check uses `corepack pnpm run status:self-check -- --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json` and treats `multiple_active_daily_publish_automations` as blocking.
+- `status:self-check` is manual-only; do not schedule a second task. Treat `.tmp/run-summary-YYYY-MM-DD.json` as the single publish/health truth source and keep `multiple_active_daily_publish_automations` blocking.
 - Daily resilience policy lives in `config/daily-resilience-policy.json`; changed workflows must pass `corepack pnpm run resilience:validate`. Safe public source/coverage failures can publish as `published_degraded`; exhausted publish infrastructure reports `infrastructure_blocked_after_fallback_exhausted`.
 
 ## Assumptions

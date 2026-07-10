@@ -33,6 +33,23 @@ const DISCOVERY_DEGRADE_FALLBACKS = {
     sourceUrl: "https://github.com/trending",
     sourceCategory: "github_trending"
   },
+  discover_source_watch: {
+    fallbackKind: "persistent_candidate_history_only",
+    groups: [
+      {
+        auditGroup: "github_watch",
+        sourceName: "GitHub Source Watch targets",
+        sourceUrl: "https://github.com/JasonxzWen/ai-daily-cn/blob/main/config/source-watchlist.json",
+        sourceCategory: "project"
+      },
+      {
+        auditGroup: "site_watch",
+        sourceName: "Site Source Watch targets",
+        sourceUrl: "https://github.com/JasonxzWen/ai-daily-cn/blob/main/config/source-watchlist.json",
+        sourceCategory: "community"
+      }
+    ]
+  },
   discover_huggingface_trending: {
     auditGroup: "huggingface_trending",
     sourceName: "Hugging Face Trending",
@@ -854,6 +871,7 @@ function buildInitialWorkflowStages({ reportDate }) {
   const tmp = (name) => `.tmp/${name}-${reportDate}.json`;
   const discoveryInputs = [
     tmp("github-trending"),
+    tmp("source-watch"),
     tmp("huggingface-trending"),
     tmp("builders"),
     tmp("china-ai"),
@@ -878,6 +896,15 @@ function buildInitialWorkflowStages({ reportDate }) {
       "reports-data",
       "--output",
       tmp("github-trending")
+    ]),
+    nodeCliStage("discover_source_watch", [
+      "discover:github-watch",
+      "--date",
+      reportDate,
+      "--config",
+      "config/source-watchlist.json",
+      "--output",
+      tmp("source-watch")
     ]),
     nodeCliStage("discover_huggingface_trending", [
       "discover:huggingface-trending",
@@ -918,6 +945,17 @@ function buildInitialWorkflowStages({ reportDate }) {
       String(CONTENT_SOURCE_PER_SOURCE_LIMIT),
       "--output",
       tmp("content-sources")
+    ]),
+    nodeCliStage("official_blog_context", [
+      "official-blog:context",
+      "--input",
+      tmp("content-sources"),
+      "--output",
+      tmp("official-blog-context"),
+      "--date",
+      reportDate,
+      "--limit",
+      "8"
     ]),
     nodeCliStage("discover_statuspage_incidents", [
       "discover:statuspage-incidents",
@@ -962,6 +1000,8 @@ function buildInitialWorkflowStages({ reportDate }) {
       "--input",
       discoveryInputs,
       "--allow-degraded-inputs",
+      "--official-blog-context",
+      tmp("official-blog-context"),
       "--output",
       DEFAULT_REPORT_PATH,
       "--candidate-output",
@@ -1023,7 +1063,7 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       "--editorial-rank-artifact",
       editorialRankArtifactPath(reportDate)
     ]),
-    pnpmStage("build", ["run", "build"]),
+    pnpmStage("build", ["run", "build", "--", "--source-watch-report-date", reportDate]),
     pnpmStage("quality_page_check", [
       "run",
       "quality:page-check",
@@ -1490,54 +1530,64 @@ async function writeDegradedDiscoveryArtifact({
   const generatedAt = typeof context.now === "function" ? context.now() : new Date().toISOString();
   const errorCode = degradedFallbackErrorCode({ normalized, error });
   const reason = degradedFallbackReason({ normalized, error });
-  const sourceId = `${fallbackSpec.platform || fallbackSpec.auditGroup}-${slugStageId(fallbackSpec.sourceName) || "source"}`;
-  const sourceUrl = requireFallbackSourceUrl(fallbackSpec);
-  const auditSource = {
-    name: fallbackSpec.sourceName,
-    url: sourceUrl,
-    status: "blocked",
-    notes: reason
-  };
-  if (fallbackSpec.platform) {
-    auditSource.platform = fallbackSpec.platform;
-  }
-  const degradationEvent = createPublicDegradationEvent({
-    audit_group: fallbackSpec.auditGroup,
-    source: {
-      name: fallbackSpec.sourceName,
-      url: sourceUrl
+  const fallbackGroups = Array.isArray(fallbackSpec.groups) && fallbackSpec.groups.length > 0
+    ? fallbackSpec.groups
+    : [fallbackSpec];
+  const fallbackKind = fallbackSpec.fallbackKind || "degraded_discovery_artifact";
+  const sourceAudit = {};
+  const sources = [];
+  const degradationEvents = [];
+  for (const group of fallbackGroups) {
+    const sourceId = `${group.platform || group.auditGroup}-${slugStageId(group.sourceName) || "source"}`;
+    const sourceUrl = requireFallbackSourceUrl(group);
+    const auditSource = {
+      name: group.sourceName,
+      url: sourceUrl,
+      status: "blocked",
+      notes: reason
+    };
+    if (group.platform) {
+      auditSource.platform = group.platform;
     }
-  });
+    sourceAudit[group.auditGroup] = {
+      checked: true,
+      sources: [auditSource],
+      candidates_found: 0,
+      included: 0,
+      blocked_reason: errorCode,
+      notes: `Degraded fallback generated after ${stage.id} failed: ${reason}`
+    };
+    sources.push({
+      id: sourceId,
+      name: group.sourceName,
+      url: sourceUrl,
+      category: group.sourceCategory || "community",
+      status: "blocked",
+      checked_at: generatedAt,
+      notes: reason,
+      ...(group.platform ? { platform: group.platform } : {})
+    });
+    const degradationEvent = createPublicDegradationEvent({
+      audit_group: group.auditGroup,
+      source: {
+        name: group.sourceName,
+        url: sourceUrl
+      }
+    });
+    if (degradationEvent) {
+      degradationEvents.push(degradationEvent);
+    }
+  }
   const payload = {
     ok: true,
     degraded: true,
     fallback_used: true,
-    fallback_kind: "degraded_discovery_artifact",
+    fallback_kind: fallbackKind,
     report_date: context.reportDate,
     generated_at: generatedAt,
-    source_audit: {
-      [fallbackSpec.auditGroup]: {
-        checked: true,
-        sources: [auditSource],
-        candidates_found: 0,
-        included: 0,
-        blocked_reason: errorCode,
-        notes: `Degraded fallback generated after ${stage.id} failed: ${reason}`
-      }
-    },
-    sources: [
-      {
-        id: sourceId,
-        name: fallbackSpec.sourceName,
-        url: sourceUrl,
-        category: fallbackSpec.sourceCategory || "community",
-        status: "blocked",
-        checked_at: generatedAt,
-        notes: reason,
-        ...(fallbackSpec.platform ? { platform: fallbackSpec.platform } : {})
-      }
-    ],
-    degradation_events: degradationEvent ? [degradationEvent] : [],
+    source_audit: sourceAudit,
+    sources,
+    degradation_events: degradationEvents,
     candidates: []
   };
   const resolvedOutputPath = absoluteCleanPath(context.cleanRoot, outputPath);
@@ -1548,14 +1598,16 @@ async function writeDegradedDiscoveryArtifact({
       ok: true,
       degraded: true,
       fallback_used: true,
-      fallback_kind: "degraded_discovery_artifact",
+      fallback_kind: fallbackKind,
       fallback_path: stagePath(outputPath, context.cleanRoot),
-      source_audit_group: fallbackSpec.auditGroup,
+      ...(fallbackGroups.length === 1
+        ? { source_audit_group: fallbackGroups[0].auditGroup }
+        : { source_audit_groups: fallbackGroups.map((group) => group.auditGroup) }),
       candidate_count: 0,
       error_code: errorCode,
       degraded_reason: reason,
       retry_attempts_exhausted: retryAttempts.length,
-      degradation_events: degradationEvent ? [degradationEvent] : []
+      degradation_events: degradationEvents
     }
   };
 }

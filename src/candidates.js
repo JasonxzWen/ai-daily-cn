@@ -11,6 +11,7 @@ import {
   requirePlatformExemptItemContract
 } from "./platform-exempt.js";
 import { isMainRefillSelectionStage } from "./main-audit-contract.js";
+import { effectiveCandidateVerification } from "./source-verification.js";
 
 const REQUIRED_SECTIONS = {
   main_items: "main_item",
@@ -26,6 +27,7 @@ const FACT_SECTION_NAMES = new Set(["main_items", "model_releases"]);
 const NON_PRIMARY_DISCLOSURE_SECTIONS = new Set(["main_items", "hot_blogs", "projects", "builder_observations"]);
 const PRIMARY_SOURCE_LEVELS = new Set(["primary", "official", "paper", "github", "multi_source", "model_registry"]);
 const NON_PRIMARY_VERIFICATION_STATUSES = new Set(["intermediary_only", "original_social_only", "unverified"]);
+const MAIN_REFILL_HIGH_RISK_ZH_RE = /禁用|停用|停止接入|暂停接入|暂停访问|模型访问/u;
 const MAIN_REFILL_HIGH_RISK_RE = /\b(funding|raised|valuation|ipo|go public|acquisition|revenue|earnings|profit|pricing|price|benchmark|outperform|faster than|slower than|accuracy|leaderboard|safety|regulation|policy|lawsuit|ban|security|vulnerability|attack|government|minister|capability|capabilities|suspend(?:s|ed)? access|model access|access to new models|new model capabilities)\b|\b\d+(?:\.\d+)?x\s+faster\b|\$[\d,.]+\s*(?:m|b|million|billion)?|融资|估值|上市|收购|营收|财报|定价|价格|基准|跑分|安全|监管|政策|诉讼|禁令|漏洞|攻击|政府/u;
 
 export async function readCandidatePool(options = {}) {
@@ -180,13 +182,14 @@ export function collectCandidateCoverageIssues(report, candidatePool) {
           }
         }
       }
-      if (requiresPrimaryVerification(sectionName, candidate, item) && !hasPrimaryVerification(candidate)) {
+      const admission = evaluatePublicSourceAdmission({ sectionName, candidate, item });
+      if (!admission.allowed && admission.reason_code === "primary_verification_required") {
         errors.push({
           path: `${pathName}.candidate_id`,
           message: `candidate_id 未完成一手或多源核验，不能进入 ${sectionName}：${item.candidate_id}`
         });
       }
-      if (requiresNonPrimaryDisclosure(sectionName, candidate, item) && !hasNonPrimaryDisclosure(candidate, item)) {
+      if (!admission.allowed && admission.reason_code === "non_primary_disclosure_required") {
         errors.push({
           path: `${pathName}.candidate_id`,
           message: `candidate_id 使用非一手来源进入 ${sectionName} 时必须在条目中披露 source_level、verification_status 和 verification_note/risk_note：${item.candidate_id}`
@@ -196,6 +199,70 @@ export function collectCandidateCoverageIssues(report, candidatePool) {
   }
 
   return errors;
+}
+
+export function evaluatePublicSourceAdmission({ sectionName, candidate = {}, item = {} } = {}) {
+  const effectiveCandidate = effectiveCandidateVerification(candidate);
+  const verificationUpgraded =
+    effectiveCandidate.verification_status !== candidate.verification_status ||
+    effectiveCandidate.source_level !== candidate.source_level;
+  const highRisk = isHighRiskMainRefillCandidate(effectiveCandidate, item) ||
+    (sectionName === "projects" && isHighRiskFactCandidate(effectiveCandidate, item));
+  const disclosureComplete = hasNonPrimaryDisclosure(effectiveCandidate, item);
+  const primaryRequired = requiresPrimaryVerification(sectionName, effectiveCandidate, item);
+  if (primaryRequired && !hasPrimaryVerification(effectiveCandidate)) {
+    return {
+      allowed: false,
+      blocking: true,
+      verdict: "blocked_primary_required",
+      reason_code: "primary_verification_required",
+      effective_verification_status: effectiveCandidate.verification_status || "",
+      effective_source_level: effectiveCandidate.source_level || "",
+      primary_url: effectiveCandidate.primary_url || "",
+      verification_upgraded: verificationUpgraded,
+      high_risk: highRisk,
+      disclosure_complete: disclosureComplete
+    };
+  }
+
+  const disclosureRequired = requiresNonPrimaryDisclosure(sectionName, effectiveCandidate, item);
+  if (disclosureRequired && !disclosureComplete) {
+    return {
+      allowed: false,
+      blocking: true,
+      verdict: "blocked_missing_disclosure",
+      reason_code: "non_primary_disclosure_required",
+      effective_verification_status: effectiveCandidate.verification_status || "",
+      effective_source_level: effectiveCandidate.source_level || "",
+      primary_url: effectiveCandidate.primary_url || "",
+      verification_upgraded: verificationUpgraded,
+      high_risk: highRisk,
+      disclosure_complete: false
+    };
+  }
+
+  let verdict = "not_applicable";
+  if (verificationUpgraded) {
+    verdict = "trusted_primary_target_upgrade";
+  } else if (hasPrimaryVerification(effectiveCandidate)) {
+    verdict = effectiveCandidate.verification_status;
+  } else if (sectionName === "main_items" && isMainRefillSelectionStage(effectiveCandidate.main_selection_stage)) {
+    verdict = "disclosed_low_risk_refill";
+  } else if (hasNonPrimarySignal(effectiveCandidate) || hasNonPrimarySignal(item)) {
+    verdict = "disclosed_viewpoint_signal";
+  }
+  return {
+    allowed: true,
+    blocking: false,
+    verdict,
+    reason_code: "",
+    effective_verification_status: effectiveCandidate.verification_status || "",
+    effective_source_level: effectiveCandidate.source_level || "",
+    primary_url: effectiveCandidate.primary_url || "",
+    verification_upgraded: verificationUpgraded,
+    high_risk: highRisk,
+    disclosure_complete: disclosureComplete
+  };
 }
 
 function requiresPrimaryVerification(sectionName, candidate, item = {}) {
@@ -243,7 +310,7 @@ function isHighRiskMainRefillCandidate(candidate, item = {}) {
     item?.summary,
     ...(Array.isArray(item?.bullets) ? item.bullets : [])
   ].filter(Boolean).join(" ");
-  return MAIN_REFILL_HIGH_RISK_RE.test(text);
+  return MAIN_REFILL_HIGH_RISK_RE.test(text) || MAIN_REFILL_HIGH_RISK_ZH_RE.test(text);
 }
 
 function hasPrimaryVerification(candidate) {

@@ -21,12 +21,12 @@ Daily source status must not reorder this reference. Blocked, unconfigured, manu
 
 | Section | Entries | Logical mappings | Core | Optional | Manual |
 |---|---:|---:|---:|---:|---:|
-| `core_primary` 核心一手源 | 23 | 13 | 23 | 0 | 0 |
-| `china_models` 中国模型与厂商 | 36 | 5 | 26 | 10 | 0 |
+| `core_primary` 核心一手源 | 24 | 16 | 24 | 0 | 0 |
+| `china_models` 中国模型与厂商 | 36 | 7 | 26 | 10 | 0 |
 | `open_source_platforms` 开源、模型平台与代码生态 | 34 | 8 | 10 | 24 | 0 |
 | `tracking_metrics` 榜单与持续指标 | 3 | 3 | 3 | 0 | 0 |
-| `builder_community` Builder 与社区原始信号 | 54 | 2 | 10 | 43 | 1 |
-| `platform_cn_media` 中文平台与媒体线索 | 7 | 1 | 3 | 4 | 0 |
+| `builder_community` Builder 与社区原始信号 | 52 | 4 | 9 | 42 | 1 |
+| `platform_cn_media` 中文平台与媒体线索 | 8 | 3 | 3 | 5 | 0 |
 | `english_media_search` 英文媒体与搜索聚合 | 8 | 5 | 0 | 8 | 0 |
 
 ## How To Tune The Order
@@ -53,7 +53,7 @@ corepack pnpm run validate
 
 ### 核心一手源 (`core_primary`)
 
-<!-- inventory-section:core_primary count:23 -->
+<!-- inventory-section:core_primary count:24 -->
 
 | Order | Source ID | Name | Logical source | Kind | Enablement | Tier | Authority | Platform | Config status |
 |---:|---|---|---|---|---|---|---|---|---|
@@ -77,9 +77,10 @@ corepack pnpm run validate
 | 10.018 | `content-hugging-face-blog` | Hugging Face Blog | `hugging-face-blog` | `rss` | `core` | `T1` | `primary` | `-` | `configured` |
 | 10.019 | `content-xai-company-news` | xAI Company News | `xai-news` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
 | 10.020 | `content-xai-news` | xAI News | `xai-news` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.021 | `content-azure-blog` | Azure Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.022 | `content-tiktok-developers-blog` | TikTok for Developers Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 10.023 | `content-cloudflare-blog` | Cloudflare Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.021 | `content-azure-blog` | Azure Blog | `azure-ai-blog` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.022 | `content-cloudflare-blog` | Cloudflare Blog | `cloudflare-ai-platform` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.023 | `content-google-keyword` | Google Keyword Blog | `google-keyword-ai` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 10.024 | `content-tiktok-developers-blog` | TikTok for Developers Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
 
 ### 中国模型与厂商 (`china_models`)
 
@@ -102,19 +103,19 @@ corepack pnpm run validate
 | 20.013 | `content-zhipu-research` | Z.ai Research | `zhipu-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
 | 20.014 | `content-zhipu-zh-news` | Zhipu AI Chinese News | `zhipu-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
 | 20.015 | `china-ai-zhipu-news` | Zhipu AI News | `zhipu-official` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.016 | `china-ai-tencent-news-cn` | Tencent Newsroom CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.017 | `china-ai-alibaba-group-cn` | Alibaba Group News CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.018 | `china-ai-alibaba-cloud-cn-blog` | Alibaba Cloud Blog CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.019 | `china-ai-bytedance-seed-cn` | ByteDance Seed CN Blog | `unmapped` | `html_index` | `optional` | `T0` | `primary` | `-` | `configured` |
-| 20.020 | `china-ai-baidu-ai-news` | Baidu AI News | `unmapped` | `html_index` | `optional` | `T0` | `primary` | `-` | `configured` |
-| 20.021 | `content-tencent-media-center` | Tencent Media Center | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.022 | `content-bytedance-news` | ByteDance News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.023 | `content-alibaba-group-press-releases` | Alibaba Group Press Releases | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.024 | `content-baidu-press-releases` | Baidu Press Releases | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.025 | `content-bytedance-seed-blog` | ByteDance Seed Tech Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.026 | `content-tencent-corporate-ai` | Tencent AI Business | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.027 | `content-tencent-hunyuan-blog` | Tencent Hunyuan Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 20.028 | `content-alibaba-cloud-blog` | Alibaba Cloud Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.016 | `china-ai-baidu-ai-news` | Baidu AI News | `baidu-ai` | `html_index` | `optional` | `T0` | `primary` | `-` | `configured` |
+| 20.017 | `content-alibaba-cloud-blog` | Alibaba Cloud Blog | `alibaba-cloud-ai` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.018 | `china-ai-tencent-news-cn` | Tencent Newsroom CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.019 | `china-ai-alibaba-group-cn` | Alibaba Group News CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.020 | `china-ai-alibaba-cloud-cn-blog` | Alibaba Cloud Blog CN | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.021 | `china-ai-bytedance-seed-cn` | ByteDance Seed CN Blog | `unmapped` | `html_index` | `optional` | `T0` | `primary` | `-` | `configured` |
+| 20.022 | `content-tencent-media-center` | Tencent Media Center | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.023 | `content-bytedance-news` | ByteDance News | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.024 | `content-alibaba-group-press-releases` | Alibaba Group Press Releases | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.025 | `content-baidu-press-releases` | Baidu Press Releases | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.026 | `content-bytedance-seed-blog` | ByteDance Seed Tech Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.027 | `content-tencent-corporate-ai` | Tencent AI Business | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 20.028 | `content-tencent-hunyuan-blog` | Tencent Hunyuan Blog | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
 | 20.029 | `general-news-google-china-big-tech-company-watch` | Google News China Big Tech Company Watch RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
 | 20.030 | `general-news-google-official-open-source-watch` | Google News Official Open Source Watch RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
 | 20.031 | `content-huggingface-deepseek-ai` | DeepSeek Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
@@ -177,7 +178,7 @@ corepack pnpm run validate
 
 ### Builder 与社区原始信号 (`builder_community`)
 
-<!-- inventory-section:builder_community count:54 -->
+<!-- inventory-section:builder_community count:52 -->
 
 | Order | Source ID | Name | Logical source | Kind | Enablement | Tier | Authority | Platform | Config status |
 |---:|---|---|---|---|---|---|---|---|---|
@@ -185,60 +186,58 @@ corepack pnpm run validate
 | 50.002 | `community-hn-ai-newest` | Hacker News AI newest | `hacker-news` | `rss` | `optional` | `T2` | `community` | `-` | `configured` |
 | 50.003 | `community-hn-frontpage-100` | Hacker News Frontpage 100+ | `hacker-news` | `rss` | `core` | `T2` | `community` | `-` | `configured` |
 | 50.004 | `content-hacker-news-api` | Hacker News Topstories API | `hacker-news` | `search_api` | `optional` | `T2` | `community` | `-` | `configured` |
-| 50.005 | `content-google-keyword` | Google Keyword Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.006 | `content-microsoft-official-blog` | Official Microsoft Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.007 | `content-apple-newsroom` | Apple Newsroom | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.008 | `content-meta-newsroom` | Meta Newsroom | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.009 | `content-amazon-news` | Amazon News | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.010 | `content-nvidia-newsroom-rss` | NVIDIA Newsroom RSS | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.011 | `content-huawei-newsroom` | Huawei Newsroom | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
-| 50.012 | `content-xiaomi-investor-relations` | Xiaomi Investor Relations | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.013 | `content-jd-investor-news` | JD.com Investor News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.014 | `content-netease-company-news` | NetEase Company News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.015 | `content-kuaishou-company-news` | Kuaishou Company News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.016 | `content-meituan-investor-relations` | Meituan Investor Relations | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.017 | `content-builder-simon-willison` | Simon Willison's Weblog | `unmapped` | `rss` | `optional` | `T1` | `secondary` | `-` | `configured` |
-| 50.018 | `content-builder-lilian-weng` | Lil'Log (Lilian Weng) | `unmapped` | `rss` | `optional` | `T1` | `secondary` | `-` | `configured` |
-| 50.019 | `content-runway-changelog` | Runway Changelog | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.020 | `content-luma-changelog` | Luma Changelog | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.021 | `content-pika-product` | Pika Product Updates | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
-| 50.022 | `content-kling-product` | Kling Product Updates | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
-| 50.023 | `content-unity-muse` | Unity Muse | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
-| 50.024 | `content-nature-machine-learning` | Nature Machine Learning | `unmapped` | `rss` | `core` | `T0` | `secondary` | `-` | `configured` |
+| 50.005 | `content-latent-space` | Latent.Space | `latent-space` | `rss` | `optional` | `T2` | `secondary` | `-` | `configured` |
+| 50.006 | `content-nature-machine-learning` | Nature Machine Learning | `nature-machine-learning` | `rss` | `core` | `T0` | `secondary` | `-` | `configured` |
+| 50.007 | `content-microsoft-official-blog` | Official Microsoft Blog | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 50.008 | `content-apple-newsroom` | Apple Newsroom | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 50.009 | `content-meta-newsroom` | Meta Newsroom | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 50.010 | `content-amazon-news` | Amazon News | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 50.011 | `content-nvidia-newsroom-rss` | NVIDIA Newsroom RSS | `unmapped` | `rss` | `core` | `T0` | `primary` | `-` | `configured` |
+| 50.012 | `content-huawei-newsroom` | Huawei Newsroom | `unmapped` | `html_index` | `core` | `T0` | `primary` | `-` | `configured` |
+| 50.013 | `content-xiaomi-investor-relations` | Xiaomi Investor Relations | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.014 | `content-jd-investor-news` | JD.com Investor News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.015 | `content-netease-company-news` | NetEase Company News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.016 | `content-kuaishou-company-news` | Kuaishou Company News | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.017 | `content-meituan-investor-relations` | Meituan Investor Relations | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.018 | `content-builder-simon-willison` | Simon Willison's Weblog | `unmapped` | `rss` | `optional` | `T1` | `secondary` | `-` | `configured` |
+| 50.019 | `content-builder-lilian-weng` | Lil'Log (Lilian Weng) | `unmapped` | `rss` | `optional` | `T1` | `secondary` | `-` | `configured` |
+| 50.020 | `content-runway-changelog` | Runway Changelog | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.021 | `content-luma-changelog` | Luma Changelog | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.022 | `content-pika-product` | Pika Product Updates | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
+| 50.023 | `content-kling-product` | Kling Product Updates | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
+| 50.024 | `content-unity-muse` | Unity Muse | `unmapped` | `html_index` | `optional` | `T2` | `primary` | `-` | `configured` |
 | 50.025 | `content-techcrunch-enterprise` | TechCrunch Enterprise | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
-| 50.026 | `content-latent-space` | Latent.Space | `unmapped` | `rss` | `optional` | `T2` | `secondary` | `-` | `configured` |
-| 50.027 | `content-smol-ai-news` | Smol AI News | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
-| 50.028 | `content-interconnects` | Interconnects | `unmapped` | `rss` | `optional` | `T2` | `secondary` | `-` | `configured` |
-| 50.029 | `content-the-magnifier-ai` | The Magnifier AI | `unmapped` | `html_index` | `optional` | `T2` | `secondary` | `-` | `configured` |
-| 50.030 | `content-crunchbase-ai-news` | Crunchbase News AI | `unmapped` | `html_index` | `optional` | `T3` | `secondary` | `-` | `configured` |
-| 50.031 | `content-planet-ai` | Planet AI | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.032 | `general-news-google-ai` | Google News AI RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.033 | `general-news-google-ai-policy` | Google News AI Policy RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.034 | `general-news-google-aigc-content` | Google News AIGC Content Industry RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.035 | `general-news-google-aigc-video-image-game` | Google News AIGC Video Image Game RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.036 | `general-news-google-big-tech-company-watch` | Google News Big Tech Company Watch RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
-| 50.037 | `intermediary-leiphone` | Leiphone | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
-| 50.038 | `intermediary-ifanr` | iFanr | `unmapped` | `rss` | `manual` | `T3` | `intermediary` | `-` | `configured` |
-| 50.039 | `content-huggingface-openai` | OpenAI Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.040 | `content-huggingface-anthropic` | Anthropic Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.041 | `content-huggingface-zai-org` | Z.ai Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.042 | `content-huggingface-meta-llama` | Meta Llama Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.043 | `content-huggingface-paddlepaddle` | PaddlePaddle Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.044 | `content-huggingface-microsoft` | Microsoft Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.045 | `content-huggingface-nvidia` | NVIDIA Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
-| 50.046 | `wechat2rss-xinzhiyuan` | Wechat2RSS 新智元 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
-| 50.047 | `wechat2rss-paperweekly` | Wechat2RSS PaperWeekly | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
-| 50.048 | `wechat2rss-xixiaoyao` | Wechat2RSS 夕小瑶科技说 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
-| 50.049 | `wechat2rss-ml-beginner` | Wechat2RSS 机器学习初学者 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
-| 50.050 | `wechat2rss-cv-ai` | Wechat2RSS 我爱计算机视觉 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
-| 50.051 | `wechat2rss-datawhale` | Wechat2RSS Datawhale | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
-| 50.052 | `wechat2rss-swarma` | Wechat2RSS 集智俱乐部 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
-| 50.053 | `wechat2rss-aliyun-developer` | Wechat2RSS 阿里云开发者 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
-| 50.054 | `wechat2rss-ali-tech` | Wechat2RSS 阿里技术 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
+| 50.026 | `content-smol-ai-news` | Smol AI News | `unmapped` | `rss` | `optional` | `T2` | `aggregator` | `-` | `configured` |
+| 50.027 | `content-interconnects` | Interconnects | `unmapped` | `rss` | `optional` | `T2` | `secondary` | `-` | `configured` |
+| 50.028 | `content-the-magnifier-ai` | The Magnifier AI | `unmapped` | `html_index` | `optional` | `T2` | `secondary` | `-` | `configured` |
+| 50.029 | `content-crunchbase-ai-news` | Crunchbase News AI | `unmapped` | `html_index` | `optional` | `T3` | `secondary` | `-` | `configured` |
+| 50.030 | `content-planet-ai` | Planet AI | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.031 | `general-news-google-ai` | Google News AI RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.032 | `general-news-google-ai-policy` | Google News AI Policy RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.033 | `general-news-google-aigc-content` | Google News AIGC Content Industry RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.034 | `general-news-google-aigc-video-image-game` | Google News AIGC Video Image Game RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.035 | `general-news-google-big-tech-company-watch` | Google News Big Tech Company Watch RSS | `unmapped` | `rss` | `optional` | `T3` | `aggregator` | `-` | `configured` |
+| 50.036 | `intermediary-ifanr` | iFanr | `unmapped` | `rss` | `manual` | `T3` | `intermediary` | `-` | `configured` |
+| 50.037 | `content-huggingface-openai` | OpenAI Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.038 | `content-huggingface-anthropic` | Anthropic Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.039 | `content-huggingface-zai-org` | Z.ai Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.040 | `content-huggingface-meta-llama` | Meta Llama Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.041 | `content-huggingface-paddlepaddle` | PaddlePaddle Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.042 | `content-huggingface-microsoft` | Microsoft Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.043 | `content-huggingface-nvidia` | NVIDIA Hugging Face Organization | `unmapped` | `html_index` | `optional` | `T1` | `primary` | `-` | `configured` |
+| 50.044 | `wechat2rss-xinzhiyuan` | Wechat2RSS 新智元 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
+| 50.045 | `wechat2rss-paperweekly` | Wechat2RSS PaperWeekly | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
+| 50.046 | `wechat2rss-xixiaoyao` | Wechat2RSS 夕小瑶科技说 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
+| 50.047 | `wechat2rss-ml-beginner` | Wechat2RSS 机器学习初学者 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
+| 50.048 | `wechat2rss-cv-ai` | Wechat2RSS 我爱计算机视觉 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
+| 50.049 | `wechat2rss-datawhale` | Wechat2RSS Datawhale | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
+| 50.050 | `wechat2rss-swarma` | Wechat2RSS 集智俱乐部 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
+| 50.051 | `wechat2rss-aliyun-developer` | Wechat2RSS 阿里云开发者 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
+| 50.052 | `wechat2rss-ali-tech` | Wechat2RSS 阿里技术 | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
 
 ### 中文平台与媒体线索 (`platform_cn_media`)
 
-<!-- inventory-section:platform_cn_media count:7 -->
+<!-- inventory-section:platform_cn_media count:8 -->
 
 | Order | Source ID | Name | Logical source | Kind | Enablement | Tier | Authority | Platform | Config status |
 |---:|---|---|---|---|---|---|---|---|---|
@@ -248,7 +247,8 @@ corepack pnpm run validate
 | 60.004 | `intermediary-qbitai` | QbitAI | `chinese-direct-rss` | `rss` | `core` | `T3` | `intermediary` | `-` | `configured` |
 | 60.005 | `wechat2rss-jiqizhixin` | Wechat2RSS 机器之心 | `chinese-direct-rss` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
 | 60.006 | `wechat2rss-qbitai` | Wechat2RSS 量子位 | `chinese-direct-rss` | `rss` | `optional` | `T3` | `intermediary` | `wechat` | `configured` |
-| 60.007 | `intermediary-sspai` | SSPAI | `unmapped` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
+| 60.007 | `intermediary-sspai` | SSPAI | `sspai-ai` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
+| 60.008 | `intermediary-leiphone` | Leiphone | `leiphone-ai` | `rss` | `optional` | `T3` | `intermediary` | `-` | `configured` |
 
 ### 英文媒体与搜索聚合 (`english_media_search`)
 

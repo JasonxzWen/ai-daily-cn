@@ -14,6 +14,7 @@ import {
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import {
   candidatePoolRelativePaths,
+  internalCandidatePoolRelativePath,
   REPORTS_DATA_INTERNAL_DIR
 } from "./reports-data-layout.js";
 import { defaultGeneratedAt } from "./time.js";
@@ -508,15 +509,13 @@ export async function buildSite(options = {}) {
     reports
   });
   const dateIndex = buildDateIndex(feedValidation.value, reports, trendValidation.value);
-  const sourceWatchAdmittedArtifacts = await loadSourceWatchAdmittedArtifacts(rootDir, {
-    artifactPath: options.sourceWatchAdmittedArtifactPath,
-    artifactPaths: options.sourceWatchAdmittedArtifactPaths
-  });
+  const sourceWatchCandidatePoolRecords = await loadSourceWatchCandidatePools(dataInputDir, reports);
+  const sourceWatchCandidatePools = sourceWatchCandidatePoolRecords.map((record) => record.candidatePool);
   const articles = buildArticleIndex(reports, {
     siteTitle,
     siteUrl,
     updatedAt: feedValidation.value.updated_at,
-    sourceWatchAdmittedArtifacts
+    sourceWatchCandidatePools
   });
   const articleValidation = validateArticles(articles);
   if (!articleValidation.valid) {
@@ -556,6 +555,11 @@ export async function buildSite(options = {}) {
     articles: articleValidation.value
   }), writtenFiles);
 
+  const sourceWatchConsumption = buildSourceWatchConsumption(
+    sourceWatchCandidatePoolRecords,
+    articles,
+    options.sourceWatchConsumptionReportDate
+  );
   return {
     outDir,
     reports,
@@ -563,6 +567,7 @@ export async function buildSite(options = {}) {
     articles: articleValidation.value,
     trends: trendValidation.value,
     officialBlogKnowledge,
+    sourceWatchConsumption,
     dateIndex,
     writtenFiles: uniqueSorted(writtenFiles)
   };
@@ -726,7 +731,7 @@ export function buildArticleIndex(reports = [], options = {}) {
     }
   }
 
-  for (const record of sourceWatchAdmittedCandidateRecords(options)) {
+  for (const record of sourceWatchCandidateRecords(options)) {
     const article = articleFromSourceWatchCandidate(record.candidate, record.reportDate);
     if (!article) {
       continue;
@@ -745,63 +750,58 @@ export function buildArticleIndex(reports = [], options = {}) {
   );
 }
 
-async function loadSourceWatchAdmittedArtifacts(rootDir, options = {}) {
-  const artifactPaths = sourceWatchAdmittedArtifactPaths(options.artifactPaths || options.artifactPath);
-  if (artifactPaths.length === 0) {
-    return [];
-  }
-  const artifacts = [];
-  for (const artifactPath of artifactPaths) {
-    const resolved = resolveSourceWatchAdmittedArtifactPath(rootDir, artifactPath);
-    let payload;
-    try {
-      payload = JSON.parse(await fs.readFile(resolved, "utf8"));
-    } catch (error) {
-      throw new PublisherError("source_watch_admitted_artifact_read_failed", "Source Watch admitted artifact could not be read.", {
-        path: artifactPath,
-        error: error.message
-      });
+async function loadSourceWatchCandidatePools(dataInputDir, reports = []) {
+  const reportDates = [...new Set((Array.isArray(reports) ? reports : [])
+    .map((report) => normalizeSourceWatchReportDate(report?.report_date))
+    .filter(Boolean))].sort();
+  const records = [];
+  for (const reportDate of reportDates) {
+    const candidatePoolPath = path.join(
+      dataInputDir,
+      ...internalCandidatePoolRelativePath(reportDate).split(path.sep)
+    );
+    if (!await exists(candidatePoolPath)) {
+      continue;
     }
-    if (!payload || typeof payload !== "object" || payload.kind !== "source_watch_admitted_candidates") {
-      throw new PublisherError("source_watch_admitted_artifact_invalid", "Source Watch admitted artifact must have kind source_watch_admitted_candidates.", {
-        path: artifactPath
-      });
-    }
-    if (payload.public_surface === true || payload.admission_audit?.public_surface === true) {
-      throw new PublisherError("source_watch_admitted_artifact_public_surface_invalid", "Source Watch admitted artifact must remain an internal input before article publication.", {
-        path: artifactPath
-      });
-    }
-    artifacts.push(payload);
-  }
-  return artifacts;
-}
-
-function sourceWatchAdmittedArtifactPaths(value) {
-  if (!value) {
-    return [];
-  }
-  return (Array.isArray(value) ? value : [value])
-    .map((item) => String(item || "").trim())
-    .filter(Boolean);
-}
-
-function resolveSourceWatchAdmittedArtifactPath(rootDir, value) {
-  if (!String(value).toLowerCase().endsWith(".json")) {
-    throw new PublisherError("source_watch_admitted_artifact_path_invalid", "Source Watch admitted artifact path must end with .json.", {
-      path: value
+    const raw = await fs.readFile(candidatePoolPath, "utf8");
+    records.push({
+      path: candidatePoolPath,
+      sha256: createHash("sha256").update(raw).digest("hex"),
+      candidatePool: normalizeCandidatePool(JSON.parse(raw), reportDate)
     });
   }
-  const allowedRoot = path.resolve(rootDir, ".tmp", "daily-codex-pipeline");
-  const resolved = path.resolve(rootDir, value);
-  const relative = path.relative(allowedRoot, resolved);
-  if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
-    throw new PublisherError("source_watch_admitted_artifact_path_out_of_scope", "Source Watch admitted artifact path must stay under .tmp/daily-codex-pipeline.", {
-      path: value,
-      allowed_root: path.join(".tmp", "daily-codex-pipeline")
-    });
-  }
-  return resolved;
+  return records;
+}
+
+function buildSourceWatchConsumption(records, articles, requestedReportDate) {
+  const normalizedRequestedDate = normalizeSourceWatchReportDate(requestedReportDate);
+  const availableDates = records
+    .map((record) => normalizeSourceWatchReportDate(record.candidatePool?.report_date))
+    .filter(Boolean)
+    .sort();
+  const receiptDate = normalizedRequestedDate || availableDates.at(-1) || "";
+  const receiptRecords = receiptDate
+    ? records.filter((record) => normalizeSourceWatchReportDate(record.candidatePool?.report_date) === receiptDate)
+    : [];
+  const candidatePoolPaths = receiptRecords.map((record) => record.path);
+  const includedCandidates = receiptRecords.flatMap((record) => record.candidatePool.candidates.filter(
+    (candidate) => candidate?.status === "included" && candidate?.included_in === "source_watch"
+  ));
+  const publicSourceWatchKeys = new Set((Array.isArray(articles) ? articles : [])
+    .filter((article) => article?.section === "source_watch")
+    .map((article) => articleUrlKey(article.url))
+    .filter(Boolean));
+  const receiptPublicKeys = new Set(includedCandidates
+    .map((candidate) => articleFromSourceWatchCandidate(candidate, receiptDate))
+    .map((article) => articleUrlKey(article?.url))
+    .filter((key) => key && publicSourceWatchKeys.has(key)));
+  return {
+    candidate_pool_count: receiptRecords.length,
+    candidate_pool_paths: candidatePoolPaths,
+    candidate_pool_hashes: receiptRecords.map((record) => ({ path: record.path, sha256: record.sha256 })),
+    included_candidate_count: includedCandidates.length,
+    public_article_count: receiptPublicKeys.size
+  };
 }
 
 function articleFromReportItem(report, section, item, options = {}) {
@@ -862,39 +862,27 @@ function articleFromReportItem(report, section, item, options = {}) {
   };
 }
 
-function sourceWatchAdmittedCandidateRecords(options = {}) {
+function sourceWatchCandidateRecords(options = {}) {
   const records = [];
-  for (const artifact of sourceWatchAdmittedArtifactList(options.sourceWatchAdmittedArtifacts)) {
-    if (!artifact || typeof artifact !== "object" || artifact.kind !== "source_watch_admitted_candidates") {
+  for (const candidatePool of sourceWatchCandidatePoolList(options.sourceWatchCandidatePools)) {
+    if (!candidatePool || typeof candidatePool !== "object") {
       continue;
     }
-    const reportDate = normalizeSourceWatchReportDate(artifact.report_date || options.sourceWatchReportDate || options.reportDate);
-    if (!reportDate || !Array.isArray(artifact.candidates)) {
+    const reportDate = normalizeSourceWatchReportDate(candidatePool.report_date);
+    if (!reportDate || !Array.isArray(candidatePool.candidates)) {
       continue;
     }
-    for (const candidate of artifact.candidates) {
+    for (const candidate of candidatePool.candidates) {
+      if (candidate?.status !== "included" || candidate?.included_in !== "source_watch") {
+        continue;
+      }
       records.push({ candidate, reportDate });
     }
   }
-
-  const directReportDate = normalizeSourceWatchReportDate(options.sourceWatchReportDate || options.reportDate);
-  if (Array.isArray(options.sourceWatchAdmittedCandidates)) {
-    for (const candidate of options.sourceWatchAdmittedCandidates) {
-      const reportDate = normalizeSourceWatchReportDate(candidate?.report_date) || directReportDate;
-      if (!reportDate) {
-        continue;
-      }
-      records.push({
-        candidate,
-        reportDate
-      });
-    }
-  }
-
   return records;
 }
 
-function sourceWatchAdmittedArtifactList(value) {
+function sourceWatchCandidatePoolList(value) {
   if (Array.isArray(value)) {
     return value;
   }
@@ -905,25 +893,41 @@ function sourceWatchAdmittedArtifactList(value) {
 }
 
 function articleFromSourceWatchCandidate(candidate, reportDate) {
-  if (!candidate || typeof candidate !== "object" || candidate.decision !== "admitted") {
+  if (
+    !candidate
+    || typeof candidate !== "object"
+    || candidate.status !== "included"
+    || candidate.included_in !== "source_watch"
+  ) {
     return null;
   }
-  const url = firstHttpUrl(candidate.url, candidate.canonical_url);
+  const sourceWatch = candidate.source_watch && typeof candidate.source_watch === "object"
+    ? candidate.source_watch
+    : {};
+  const repoSnapshot = sourceWatch.repo_snapshot && typeof sourceWatch.repo_snapshot === "object"
+    ? sourceWatch.repo_snapshot
+    : null;
+  const repoEvent = repoSnapshot ? sourceWatchRepoArticleEvent(repoSnapshot) : null;
+  const url = firstHttpUrl(repoEvent?.url, sourceWatch.event_url, candidate.url);
   if (!isHttpUrl(url)) {
     return null;
   }
   const title = cleanArticleText(candidate.title || candidate.repo || url);
   const source = sourceWatchArticleSource(candidate, title);
-  const summary = sourceWatchArticleSummary(candidate, title);
+  const summary = sourceWatchArticleSummary(candidate, title, repoEvent);
   if (!title || !source || !summary) {
     return null;
   }
 
-  const date = normalizeArticleDate(candidate.event_date || reportDate, reportDate);
+  const date = normalizeArticleDate(
+    repoEvent?.date
+      || candidate.event_date
+      || reportDate,
+    reportDate
+  );
   if (!date) {
     return null;
   }
-  const paths = reportRelativePaths(reportDate);
   const importance = sourceWatchArticleImportance(candidate);
   const rawText = [
     "source_watch",
@@ -932,8 +936,8 @@ function articleFromSourceWatchCandidate(candidate, reportDate) {
     source,
     candidate.editorial_category,
     candidate.category,
-    candidate.signal,
-    candidate.repo,
+    sourceWatch.signal,
+    repoSnapshot?.repo,
     ...(Array.isArray(candidate.tags) ? candidate.tags : [])
   ].filter(Boolean).join(" ");
   const taxonomy = classifyArticleTaxonomy("source_watch", rawText);
@@ -948,9 +952,6 @@ function articleFromSourceWatchCandidate(candidate, reportDate) {
     month: date.slice(0, 7),
     source,
     section: "source_watch",
-    report_date: reportDate,
-    report_url: paths.htmlPath,
-    data_url: paths.dataPath,
     quality_score: sourceWatchArticleQualityScore(candidate),
     importance,
     domain: taxonomy.domain,
@@ -963,120 +964,103 @@ function articleFromSourceWatchCandidate(candidate, reportDate) {
 }
 
 function sourceWatchArticleSource(candidate, title) {
-  if (candidate.source_tier === "first_class" && title) {
+  const sourceWatch = candidate.source_watch && typeof candidate.source_watch === "object"
+    ? candidate.source_watch
+    : {};
+  if (sourceWatch.source_tier === "first_class" && title) {
     return title;
   }
   const source = cleanArticleText(candidate.source);
   if (source) {
     return source;
   }
-  const repo = cleanArticleText(candidate.repo);
+  const repo = cleanArticleText(sourceWatch.repo_snapshot?.repo);
   if (repo) {
     return `GitHub repo watch: ${repo}`;
   }
   return title || "Source Watch";
 }
 
-function sourceWatchArticleSummary(candidate, title) {
-  const template = candidate.summary_template && typeof candidate.summary_template === "object" && !Array.isArray(candidate.summary_template)
-    ? candidate.summary_template
+function sourceWatchArticleSummary(candidate, title, repoEvent = null) {
+  const sourceWatch = candidate.source_watch && typeof candidate.source_watch === "object"
+    ? candidate.source_watch
+    : {};
+  const repo = sourceWatch.repo_snapshot && typeof sourceWatch.repo_snapshot === "object"
+    ? sourceWatch.repo_snapshot
     : null;
-  const summaryFromTemplate = cleanArticleText([
-    publicSourceWatchTemplatePurpose(template?.purpose),
-    publicSourceWatchTemplateChange(template?.change),
-    publicSourceWatchTemplateEvidence(template?.evidence)
-  ].filter(Boolean).join(" "));
-  if (summaryFromTemplate) {
-    return summaryFromTemplate;
-  }
-  if (candidate.source_tier === "first_class" || candidate.source_lane === "aify") {
-    return cleanArticleText(`${title} is tracked as a first-class AI news source for the public article library.`);
-  }
-  const repo = cleanArticleText(candidate.repo || title);
-  if (candidate.signal === "github_watch" && repo) {
-    return `${repo} is tracked as a Source Watch repository signal with public project, release, and update evidence.`;
-  }
-  return `${title} is tracked as a Source Watch signal for the public article library.`;
-}
-
-function publicSourceWatchTemplatePurpose(value) {
-  return stripSourceWatchInternalTokens(value);
-}
-
-function publicSourceWatchTemplateChange(value) {
-  const text = cleanArticleText(value);
-  if (!text) {
-    return "";
-  }
-  if (/historical snapshot changed/i.test(text)) {
-    const changed = [];
-    if (/(?:commit|pushed_at)/i.test(text)) changed.push("recent repository activity");
-    if (/(?:release|tag)/i.test(text)) changed.push("release or tag metadata");
-    if (/(?:stars_delta|forks_delta|stars|forks)/i.test(text)) changed.push("community metrics");
-    return changed.length > 0
-      ? `Public repository signals changed across ${changed.join(", ")}.`
-      : "Public repository signals changed since the previous local snapshot.";
-  }
-  if (/new source watch repository/i.test(text)) {
-    return "Newly tracked source repository without prior local history.";
-  }
-  if (/unchanged|suppress/i.test(text)) {
-    return "";
-  }
-  return stripSourceWatchInternalTokens(text);
-}
-
-function publicSourceWatchTemplateEvidence(value) {
-  const fields = sourceWatchEvidenceFields(value);
-  const parts = [];
-  const stars = fields.get("stars");
-  const forks = fields.get("forks");
-  if (stars && forks) {
-    parts.push(`GitHub metadata shows ${stars} stars and ${forks} forks.`);
-  } else if (stars) {
-    parts.push(`GitHub metadata shows ${stars} stars.`);
-  } else if (forks) {
-    parts.push(`GitHub metadata shows ${forks} forks.`);
-  }
-  if (fields.get("latest_release")) {
-    parts.push(`Latest release metadata is ${cleanArticleText(fields.get("latest_release"))}.`);
-  }
-  if (fields.get("latest_tag")) {
-    parts.push(`Latest tag metadata is ${cleanArticleText(fields.get("latest_tag"))}.`);
-  }
-  if (fields.get("latest_commit")) {
-    parts.push("Recent commit activity is present.");
-  }
-  if (fields.get("pushed_at")) {
-    parts.push(`Repository push activity is dated ${cleanArticleText(String(fields.get("pushed_at")).slice(0, 10))}.`);
-  }
-  if (parts.length > 0) {
-    return parts.join(" ");
-  }
-  return stripSourceWatchInternalTokens(value);
-}
-
-function sourceWatchEvidenceFields(value) {
-  const fields = new Map();
-  for (const part of String(value || "").split(";")) {
-    const [rawKey, ...rawValue] = part.trim().split("=");
-    const key = String(rawKey || "").trim().toLowerCase();
-    const fieldValue = cleanArticleText(rawValue.join("="));
-    if (key && fieldValue) {
-      fields.set(key, fieldValue);
+  if (repo) {
+    const event = repoEvent || sourceWatchRepoArticleEvent(repo);
+    const release = event.kind === "release" && repo.latest_release && typeof repo.latest_release === "object"
+      ? repo.latest_release
+      : null;
+    if (release?.tag_name || release?.name) {
+      const releaseName = cleanArticleText(release.name || release.tag_name);
+      return `${title} 发布新版本 ${releaseName}；Source Watch 已回指 GitHub 原始发布页。`;
     }
+    const commitMessage = event.kind === "commit" ? cleanArticleText(repo.latest_commit?.message) : "";
+    if (commitMessage) {
+      return `${title} 出现新的公开提交：${commitMessage}。`;
+    }
+    const tag = event.kind === "tag" ? cleanArticleText(repo.latest_tag?.name) : "";
+    if (tag) {
+      return `${title} 出现新标签 ${tag}；Source Watch 记录了这次公开仓库变化。`;
+    }
+    return `${title} 的公开仓库快照发生实质变化，Source Watch 已保留原始来源回指。`;
   }
-  return fields;
+  const site = sourceWatch.site_snapshot && typeof sourceWatch.site_snapshot === "object"
+    ? sourceWatch.site_snapshot
+    : null;
+  if (site) {
+    const description = cleanArticleText(site.description);
+    return cleanArticleText(`Source Watch 检测到 ${title} 的公开站点或信源快照发生变化。${description}`);
+  }
+  return `Source Watch 检测到 ${title} 的公开快照发生变化。`;
 }
 
-function stripSourceWatchInternalTokens(value) {
-  return cleanArticleText(String(value || "")
-    .replace(/\b(?:latest_commit|latest_release|latest_tag|pushed_at|stars_delta|forks_delta|repo_delta|freshness|source_lane|source_tier|verification_policy|verification_status)\s*=\s*[^;,\s]+/gi, "")
-    .replace(/\b(?:latest_commit|latest_release|latest_tag|pushed_at|stars_delta|forks_delta|repo_delta|freshness|source_lane|source_tier|verification_policy|verification_status)\b/gi, "")
-    .replace(/\bHistorical snapshot changed\s*:\s*/gi, "Public repository signals changed: ")
-    .replace(/\s*;\s*/g, "; ")
-    .replace(/\s+([.;,])/g, "$1")
-    .replace(/(?:;\s*){2,}/g, "; "));
+function sourceWatchRepoArticleEvent(repo = {}) {
+  const release = repo.latest_release && typeof repo.latest_release === "object" ? repo.latest_release : null;
+  const commit = repo.latest_commit && typeof repo.latest_commit === "object" ? repo.latest_commit : null;
+  const releaseTime = sourceWatchArticleEventTime(release?.published_at);
+  const commitTime = sourceWatchArticleEventTime(commit?.author_date);
+  if (commit && (!release || commitTime > releaseTime)) {
+    return {
+      kind: "commit",
+      url: firstHttpUrl(commit.html_url, repo.repo ? `https://github.com/${repo.repo}` : ""),
+      date: commit.author_date || repo.pushed_at || ""
+    };
+  }
+  if (release) {
+    return {
+      kind: "release",
+      url: firstHttpUrl(release.html_url, repo.repo ? `https://github.com/${repo.repo}` : ""),
+      date: release.published_at || repo.pushed_at || ""
+    };
+  }
+  if (commit) {
+    return {
+      kind: "commit",
+      url: firstHttpUrl(commit.html_url, repo.repo ? `https://github.com/${repo.repo}` : ""),
+      date: commit.author_date || repo.pushed_at || ""
+    };
+  }
+  const tag = cleanArticleText(repo.latest_tag?.name);
+  if (tag && repo.repo) {
+    return {
+      kind: "tag",
+      url: `https://github.com/${repo.repo}/tree/${encodeURIComponent(tag)}`,
+      date: repo.pushed_at || ""
+    };
+  }
+  return {
+    kind: "repository",
+    url: repo.repo ? `https://github.com/${repo.repo}` : "",
+    date: repo.pushed_at || repo.updated_at || ""
+  };
+}
+
+function sourceWatchArticleEventTime(value) {
+  const timestamp = Date.parse(String(value || ""));
+  return Number.isFinite(timestamp) ? timestamp : Number.NEGATIVE_INFINITY;
 }
 
 function sourceWatchArticleImportance(candidate) {
@@ -1314,8 +1298,13 @@ function extractArticleEntities(item = {}, textValue = "") {
 }
 
 function mergeArticleRecords(existing, incoming) {
+  const primary = existing.section === "source_watch"
+    && incoming.section === "source_watch"
+    && String(incoming.date || "") > String(existing.date || "")
+    ? incoming
+    : existing;
   return {
-    ...existing,
+    ...primary,
     quality_score: Math.max(existing.quality_score, incoming.quality_score),
     importance: articleImportanceRank(incoming.importance) > articleImportanceRank(existing.importance)
       ? incoming.importance

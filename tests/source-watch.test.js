@@ -6,6 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+import Ajv from "ajv/dist/2020.js";
 import {
   collectSourceWatch,
   createSourceWatchFixtureFetch
@@ -59,6 +60,34 @@ test("collectSourceWatch replays configured sites and GitHub repos from fixtures
   assert.equal(repoCandidate.signal, "github_watch");
   assert.equal(repoCandidate.source_level, "github");
   assert.equal(repoCandidate.verification_status, "primary_confirmed");
+  assert.deepEqual(
+    Object.keys(repoCandidate.source_watch).sort(),
+    [
+      "event_url",
+      "repo_snapshot",
+      "signal",
+      "snapshot_fingerprint",
+      "source_lane",
+      "source_tier",
+      "target_id",
+      "verification_policy"
+    ]
+  );
+  assert.equal(repoCandidate.source_watch.signal, "github_watch");
+  assert.equal(repoCandidate.source_watch.target_id, "repo-ml-news-of-the-week");
+  assert.equal(repoCandidate.source_watch.source_lane, "github_watch");
+  assert.equal(repoCandidate.source_watch.source_tier, "watchlist");
+  assert.equal(repoCandidate.source_watch.verification_policy, "primary_source_required");
+  assert.equal(
+    repoCandidate.source_watch.event_url,
+    "https://github.com/SalvatoreRa/ML-news-of-the-week/commit/bbbbbbbb"
+  );
+  assert.equal(repoCandidate.event_date, "2026-07-05");
+  assert.match(repoCandidate.source_watch.snapshot_fingerprint, /^sha256:[a-f0-9]{64}$/);
+  assert.equal(repoCandidate.source_watch.repo_snapshot.repo, "SalvatoreRa/ML-news-of-the-week");
+  assert.equal(repoCandidate.source_watch.repo_snapshot.latest_release.tag_name, "2026-W27");
+  assert.equal(repoCandidate.source_watch.repo_snapshot.latest_commit.sha, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+  assert.equal(repoCandidate.source_watch.repo_snapshot.readme_status, "checked");
   assert.match(repoCandidate.notes, /stars=3210/);
   assert.equal(Object.hasOwn(repoCandidate, "readme_summary"), false);
   assert.doesNotMatch(JSON.stringify(repoCandidate), /machine learning updates/);
@@ -76,7 +105,7 @@ test("collectSourceWatch replays configured sites and GitHub repos from fixtures
   assert.equal(siteSource.source_lane, "aify");
   assert.equal(siteSource.source_tier, "first_class");
   assert.equal(siteSource.verification_policy, "no_secondary_review_required");
-  assert.equal(siteSource.verification_status, "first_class_source_confirmed");
+  assert.equal(siteSource.verification_status, "intermediary_only");
 
   const siteAudit = collected.source_audit.site_watch.sources.find((source) => source.target_id === "site-aify-news");
   assert.equal(siteAudit.source_lane, "aify");
@@ -90,8 +119,148 @@ test("collectSourceWatch replays configured sites and GitHub repos from fixtures
   assert.equal(siteCandidate.source_tier, "first_class");
   assert.equal(siteCandidate.verification_policy, "no_secondary_review_required");
   assert.equal(siteCandidate.source_level, "ai_news_aggregator");
-  assert.equal(siteCandidate.verification_status, "first_class_source_confirmed");
+  assert.equal(siteCandidate.verification_status, "intermediary_only");
   assert.match(siteCandidate.notes, /feeds=1/);
+  assert.equal(siteCandidate.source_watch.signal, "site_watch");
+  assert.equal(siteCandidate.source_watch.target_id, "site-aify-news");
+  assert.equal(siteCandidate.source_watch.source_lane, "aify");
+  assert.equal(siteCandidate.source_watch.source_tier, "first_class");
+  assert.equal(siteCandidate.source_watch.verification_policy, "no_secondary_review_required");
+  assert.equal(siteCandidate.source_watch.event_url, "https://aify-news.pages.dev/");
+  assert.match(siteCandidate.source_watch.snapshot_fingerprint, /^sha256:[a-f0-9]{64}$/);
+  assert.equal(siteCandidate.source_watch.site_snapshot.title, "Aify News");
+  assert.match(siteCandidate.source_watch.site_snapshot.content_fingerprint, /^sha256:[a-f0-9]{64}$/);
+  assert.equal(siteCandidate.source_watch.site_snapshot.feeds[0].url, "https://aify-news.pages.dev/feed.xml");
+  assert.equal(
+    siteCandidate.source_watch.site_snapshot.discovered_github_repositories[0].repo,
+    "example/aify-news"
+  );
+  assert.doesNotMatch(JSON.stringify(collected), /first_class_source_confirmed/);
+
+  const repeated = await collectSourceWatch({
+    rootDir,
+    reportDate,
+    generatedAt: "2026-07-06T09:00:00.000Z",
+    watchlistPath: fixtureWatchlistPath,
+    fetchImpl: await createSourceWatchFixtureFetch(fixtureDir),
+    fetchRetries: 0
+  });
+  const repeatedRepo = repeated.candidates.find((candidate) => candidate.source_id === "repo-ml-news-of-the-week");
+  const repeatedSite = repeated.candidates.find((candidate) => candidate.source_id === "site-aify-news");
+  assert.equal(repeatedRepo.source_watch.snapshot_fingerprint, repoCandidate.source_watch.snapshot_fingerprint);
+  assert.equal(repeatedSite.source_watch.snapshot_fingerprint, siteCandidate.source_watch.snapshot_fingerprint);
+  assert.equal(
+    repeatedSite.source_watch.site_snapshot.content_fingerprint,
+    siteCandidate.source_watch.site_snapshot.content_fingerprint
+  );
+
+  const aifyTarget = {
+    id: "site-aify-news",
+    type: "site",
+    name: "Aify News",
+    url: "https://aify-news.pages.dev/",
+    source_lane: "aify",
+    source_tier: "first_class",
+    verification_policy: "no_secondary_review_required"
+  };
+  const nonVisibleFixtureFetch = await createSourceWatchFixtureFetch(fixtureDir);
+  const nonVisibleChange = await collectSourceWatch({
+    reportDate,
+    generatedAt: "2026-07-06T09:30:00.000Z",
+    targets: [aifyTarget],
+    fetchImpl: async (url, init) => {
+      const response = await nonVisibleFixtureFetch(url, init);
+      const html = await response.text();
+      return textResponse(html.replace(
+        "</body>",
+        "<!-- ignored comment --><style>.ignored{display:none}</style><script>window.ignored=true</script></body>"
+      ));
+    },
+    fetchRetries: 0
+  });
+  const nonVisibleSite = nonVisibleChange.candidates[0];
+  assert.equal(
+    nonVisibleSite.source_watch.site_snapshot.content_fingerprint,
+    siteCandidate.source_watch.site_snapshot.content_fingerprint
+  );
+  assert.equal(nonVisibleSite.source_watch.snapshot_fingerprint, siteCandidate.source_watch.snapshot_fingerprint);
+
+  const visibleFixtureFetch = await createSourceWatchFixtureFetch(fixtureDir);
+  const visibleChange = await collectSourceWatch({
+    reportDate,
+    generatedAt: "2026-07-06T09:45:00.000Z",
+    targets: [aifyTarget],
+    fetchImpl: async (url, init) => {
+      const response = await visibleFixtureFetch(url, init);
+      const html = await response.text();
+      return textResponse(html.replace(">GitHub<", ">GitHub SOURCE_WATCH_VISIBLE_CHANGE_SENTINEL<"));
+    },
+    fetchRetries: 0
+  });
+  const visibleSite = visibleChange.candidates[0];
+  assert.notEqual(
+    visibleSite.source_watch.site_snapshot.content_fingerprint,
+    siteCandidate.source_watch.site_snapshot.content_fingerprint
+  );
+  assert.notEqual(visibleSite.source_watch.snapshot_fingerprint, siteCandidate.source_watch.snapshot_fingerprint);
+  assert.doesNotMatch(JSON.stringify(visibleSite), /SOURCE_WATCH_VISIBLE_CHANGE_SENTINEL/);
+
+  const changedMetricsFixtureFetch = await createSourceWatchFixtureFetch(fixtureDir);
+  const metricsOnlyChange = await collectSourceWatch({
+    rootDir,
+    reportDate,
+    generatedAt: "2026-07-06T10:00:00.000Z",
+    watchlistPath: fixtureWatchlistPath,
+    fetchImpl: async (url, init) => {
+      if (String(url) === "https://api.github.com/repos/SalvatoreRa/ML-news-of-the-week") {
+        const response = await changedMetricsFixtureFetch(url, init);
+        const payload = await response.json();
+        return jsonResponse({ ...payload, stargazers_count: 9999, forks_count: 999 });
+      }
+      return changedMetricsFixtureFetch(url, init);
+    },
+    fetchRetries: 0
+  });
+  const metricsOnlyRepo = metricsOnlyChange.candidates.find(
+    (candidate) => candidate.source_id === "repo-ml-news-of-the-week"
+  );
+  assert.equal(metricsOnlyRepo.source_watch.repo_snapshot.stars, 9999);
+  assert.equal(metricsOnlyRepo.source_watch.repo_snapshot.forks, 999);
+  assert.equal(metricsOnlyRepo.source_watch.snapshot_fingerprint, repoCandidate.source_watch.snapshot_fingerprint);
+});
+
+test("collectSourceWatch suppresses repository snapshots when a material GitHub endpoint is incomplete", async () => {
+  const fixtureFetch = await createSourceWatchFixtureFetch(fixtureDir);
+  const partialFetch = async (url, init) => {
+    if (String(url).includes("/SalvatoreRa/ML-news-of-the-week/commits?")) {
+      return new Response(JSON.stringify({ message: "temporary commit endpoint outage" }), {
+        status: 503,
+        headers: { "content-type": "application/json" }
+      });
+    }
+    return fixtureFetch(url, init);
+  };
+
+  const collected = await collectSourceWatch({
+    rootDir,
+    reportDate,
+    generatedAt,
+    watchlistPath: fixtureWatchlistPath,
+    fetchImpl: partialFetch,
+    fetchRetries: 0
+  });
+
+  const target = collected.targets.find((item) => item.id === "repo-ml-news-of-the-week");
+  assert.equal(target.status, "blocked");
+  assert.equal(target.endpoint_status.repo.status, "checked");
+  assert.equal(target.endpoint_status.releases.status, "checked");
+  assert.equal(target.endpoint_status.tags.status, "checked");
+  assert.equal(target.endpoint_status.commits.status, "blocked");
+  assert.equal(
+    collected.candidates.some((candidate) => candidate.source_id === "repo-ml-news-of-the-week"),
+    false,
+    "an incomplete material snapshot must not create a change fingerprint"
+  );
 });
 
 test("collectSourceWatch structures per-target failures without aborting the artifact", async () => {
@@ -124,6 +293,99 @@ test("collectSourceWatch structures per-target failures without aborting the art
   assert.equal(collected.source_audit.github_watch.sources[0].status, "blocked");
   assert.equal(collected.source_audit.site_watch.sources[0].status, "blocked");
   assert.match(collected.source_audit.github_watch.sources[0].notes, /HTTP 503/);
+});
+
+test("candidate pool schema accepts the namespaced Source Watch contract", async () => {
+  const sourceWatch = {
+    signal: "github_watch",
+    target_id: "repo-source-watch",
+    source_lane: "github_watch",
+    source_tier: "watchlist",
+    verification_policy: "primary_source_required",
+    event_url: "https://github.com/example/source-watch/releases/tag/v1",
+    snapshot_fingerprint: `sha256:${"a".repeat(64)}`,
+    repo_snapshot: {
+      repo: "example/source-watch",
+      stars: 42,
+      forks: 3,
+      open_issues: 1,
+      pushed_at: "2026-07-06T07:00:00Z",
+      updated_at: "2026-07-06T07:05:00Z",
+      default_branch: "main",
+      language: "JavaScript",
+      license: "MIT",
+      latest_release: {
+        tag_name: "v1",
+        name: "v1",
+        html_url: "https://github.com/example/source-watch/releases/tag/v1",
+        published_at: "2026-07-06T06:00:00Z",
+        prerelease: false
+      },
+      latest_tag: { name: "v1", commit_sha: "a".repeat(40) },
+      latest_commit: {
+        sha: "b".repeat(40),
+        html_url: "https://github.com/example/source-watch/commit/bbbbbbbb",
+        message: "Release v1",
+        author_date: "2026-07-06T05:00:00Z",
+        author_name: "Example"
+      },
+      readme_status: "checked"
+    }
+  };
+  const candidatePool = {
+    schema_version: 1,
+    report_date: reportDate,
+    generated_at: generatedAt,
+    sources: [{
+      id: "repo-source-watch",
+      name: "Source Watch",
+      url: "https://github.com/example/source-watch",
+      category: "repository",
+      status: "checked"
+    }],
+    candidates: [{
+      id: "repo-source-watch-v1",
+      source_id: "repo-source-watch",
+      category: "project",
+      title: "Source Watch v1",
+      url: "https://github.com/example/source-watch/releases/tag/v1",
+      source: "Source Watch",
+      event_date: reportDate,
+      status: "included",
+      included_in: "source_watch",
+      source_watch: sourceWatch
+    }]
+  };
+
+  const schema = JSON.parse(await fs.readFile(path.join(rootDir, "schemas", "candidates.schema.json"), "utf8"));
+  const ajv = new Ajv({ allErrors: true, strict: true });
+  ajv.addFormat("date", /^\d{4}-\d{2}-\d{2}$/);
+  ajv.addFormat("date-time", { type: "string", validate: (value) => Number.isFinite(Date.parse(value)) });
+  ajv.addFormat("uri", {
+    type: "string",
+    validate(value) {
+      try {
+        return ["http:", "https:"].includes(new URL(value).protocol);
+      } catch {
+        return false;
+      }
+    }
+  });
+  const validateCandidatePool = ajv.compile(schema);
+  assert.equal(validateCandidatePool(structuredClone(candidatePool)), true, JSON.stringify(validateCandidatePool.errors));
+
+  const rejected = validateCandidatePool({
+    ...candidatePool,
+    candidates: [{
+      ...candidatePool.candidates[0],
+      source_watch: { ...sourceWatch, snapshot_fingerprint: "unstable-fingerprint" }
+    }]
+  });
+  assert.equal(rejected, false);
+
+  const missingMetadata = structuredClone(candidatePool);
+  delete missingMetadata.candidates[0].source_watch;
+  assert.equal(validateCandidatePool(missingMetadata), false);
 });
 
 test("collectSourceWatch applies endpoint limit to GitHub URL and normalized arrays", async () => {
@@ -206,6 +468,11 @@ test("discover:github-watch CLI writes the source watch artifact", async () => {
   const stdoutPayload = JSON.parse(stdout);
   const filePayload = JSON.parse(await fs.readFile(outputPath, "utf8"));
   assert.equal(stdoutPayload.ok, true);
+  assert.equal(stdoutPayload.kind, "source_watch_artifact_receipt");
+  assert.equal(stdoutPayload.report_date, reportDate);
+  assert.equal(stdoutPayload.output_path, path.resolve(outputPath));
+  assert.match(stdoutPayload.artifact_sha256, /^[a-f0-9]{64}$/);
+  assert.equal(stdoutPayload.candidate_count, 4);
   assert.equal(filePayload.output_path, path.resolve(outputPath));
   assert.equal(filePayload.candidates.length, 4);
   assert.equal(filePayload.source_audit.github_watch.fetched_repos, 2);
@@ -214,7 +481,11 @@ test("discover:github-watch CLI writes the source watch artifact", async () => {
   assert.equal(aifyCandidate.source_lane, "aify");
   assert.equal(aifyCandidate.source_tier, "first_class");
   assert.equal(aifyCandidate.verification_policy, "no_secondary_review_required");
-  assert.equal(aifyCandidate.verification_status, "first_class_source_confirmed");
+  assert.equal(aifyCandidate.verification_status, "intermediary_only");
+  assert.equal(aifyCandidate.source_watch.source_lane, "aify");
+  assert.equal(aifyCandidate.source_watch.source_tier, "first_class");
+  assert.equal(aifyCandidate.source_watch.verification_policy, "no_secondary_review_required");
+  assert.match(aifyCandidate.source_watch.snapshot_fingerprint, /^sha256:[a-f0-9]{64}$/);
 });
 
 test("source watch quality fixture dedupes stale unchanged repos and keeps internal summaries", async () => {
@@ -440,6 +711,17 @@ function jsonResponse(value, status = 200) {
       return JSON.stringify(value);
     },
     async json() {
+      return value;
+    }
+  };
+}
+
+function textResponse(value, status = 200) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    headers: { get: () => null },
+    async text() {
       return value;
     }
   };

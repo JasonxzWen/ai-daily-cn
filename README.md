@@ -1,6 +1,6 @@
 # AI Daily CN
 
-Automated Chinese AI daily publisher that turns structured reports into a searchable, archived GitHub Pages site.
+Automated Chinese AI daily publisher that turns structured reports into an auditable, archived GitHub Pages site.
 
 [Live site](https://jasonxzwen.github.io/ai-daily-cn/) | [Public feed](https://jasonxzwen.github.io/ai-daily-cn/feed.json) | [Latest trends](https://jasonxzwen.github.io/ai-daily-cn/trends.json)
 

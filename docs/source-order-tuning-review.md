@@ -2,7 +2,7 @@
 
 <!-- source-order-tuning-review:v1 -->
 
-Status: `phase-15-user-review-proposal`
+Status: `phase-15-evidence-decided`
 
 Maintenance owner: `user-reviewed-fixed-source-order`
 
@@ -12,59 +12,59 @@ Inventory reference: `docs/source-inventory-order.md`
 
 ## User Review Surface
 
-This file is Codex's baseline proposal for user-tuned fixed source importance. It is intentionally a review surface, not an executable rank change. The user may tune section placement, suggested logical source ids, and ranks before a later PR updates `config/source-display-contract.json`.
+This file is the evidence-backed decision record for the 24 original logical-source proposals. `promoted` rows are now executable, `defer` rows remain collection-only pending stronger evidence, and `retire` rows retire only the promotion proposal while preserving the collection entry.
 
 Daily source status must not reorder review priorities. Blocked, skipped, unconfigured, no-update, or newly active sources stay in their fixed review position until the user approves a rank change.
 
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:78 -->
+<!-- order-tuning-total-unmapped:69 -->
 
 These counts come from the 165-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
-| `core_primary` | 3 | Phase 22 promotes the reviewed Apple, Meta Engineering, NVIDIA Developer, and xAI official sources; keep reviewing the remaining durable company/platform blogs. |
-| `china_models` | 21 | Phase 17 promotes the first five official China model sources; continue with platform/lab sources in later batches. |
+| `core_primary` | 1 | Azure, Cloudflare, and Google Keyword now have evidence-backed logical identities; one remaining entry stays collection-only. |
+| `china_models` | 19 | Baidu AI and Alibaba Cloud are promoted; zero-signal model/platform entries remain deferred until parser versus no-update status is known. |
 | `open_source_platforms` | 1 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
 | `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
-| `builder_community` | 50 | Promote named expert/community sources sparingly; keep broad aggregators and WeChat-derived clue feeds collection-only. |
-| `platform_cn_media` | 1 | Promote stable direct Chinese RSS/media clue sources only after they prove durable reader value. |
-| `english_media_search` | 2 | Keep most search/media aggregation low priority; Product Hunt can be promoted if product discovery remains useful. |
+| `builder_community` | 46 | Latent Space and Nature Machine Learning are promoted; low-yield and zero-signal entries remain collection-only. |
+| `platform_cn_media` | 0 | SSPAI is promoted as a governance identity without higher fact authority. |
+| `english_media_search` | 2 | Product Hunt promotion proposals are retired while collection continues. |
 
 ## Promotion Candidate Review
 
 <!-- promotion-candidate-review -->
 
-These candidates are proposed first-class logical sources. They are not merged into the executable display contract in this slice.
+These 24 proposals have one explicit decision based on 38 stored daily candidate artifacts from 2026-05-25 through 2026-07-09 and final-report backrefs. Promotion never changes normal story admission or source authority.
 
 | Source ID | Proposed logical source | Section | Suggested rank | Action | Rationale |
 |---|---|---|---:|---|---|
-| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 95 | `promote` | Azure platform posts can carry durable Microsoft AI infrastructure signals separate from Microsoft Research. |
-| `content-tiktok-developers-blog` | `tiktok-developer-ai` | `core_primary` | 105 | `promote` | TikTok developer posts can surface platform and applied AI developer changes. |
-| `content-cloudflare-blog` | `cloudflare-ai-platform` | `core_primary` | 115 | `promote` | Cloudflare platform posts can surface Workers AI, edge inference, and developer infrastructure signals. |
-| `content-google-keyword` | `google-keyword-ai` | `core_primary` | 125 | `promote` | Google Keyword can carry corporate and product AI announcements outside DeepMind and Research. |
-| `content-tencent-hunyuan-blog` | `tencent-hunyuan` | `china_models` | 60 | `promote` | Hunyuan is the Tencent model/platform source that should not be hidden in generic company feeds. |
-| `content-bytedance-seed-blog` | `bytedance-seed` | `china_models` | 70 | `promote` | ByteDance Seed is a distinct model/research source. |
-| `china-ai-baidu-ai-news` | `baidu-ai` | `china_models` | 80 | `promote` | Baidu AI remains a recurring Chinese model/platform signal. |
-| `content-alibaba-cloud-blog` | `alibaba-cloud-ai` | `china_models` | 90 | `promote` | Alibaba Cloud AI posts are useful platform signals next to Qwen. |
-| `content-builder-simon-willison` | `simon-willison` | `builder_community` | 30 | `promote` | Simon Willison is a high-signal builder/analyst source. |
-| `content-builder-lilian-weng` | `lilian-weng` | `builder_community` | 40 | `promote` | Lilian Weng is a high-signal technical explainer source. |
-| `content-latent-space` | `latent-space` | `builder_community` | 50 | `promote` | Latent Space is a recurring builder/research community source. |
-| `content-interconnects` | `interconnects` | `builder_community` | 60 | `promote` | Interconnects is a high-signal analysis source. |
-| `content-nature-machine-learning` | `nature-machine-learning` | `builder_community` | 70 | `promote` | Nature Machine Learning can surface durable paper and research-context signals. |
-| `content-runway-changelog` | `runway-ai-products` | `builder_community` | 80 | `promote` | Runway product changes are useful AIGC workflow signals when dated and concrete. |
-| `content-luma-changelog` | `luma-ai-products` | `builder_community` | 90 | `promote` | Luma changelog entries can carry useful image/video generation product updates. |
-| `content-smol-ai-news` | `smol-ai-news` | `builder_community` | 100 | `promote` | Smol AI News is a maintained AI news feed suitable for low-threshold discovery review. |
-| `content-the-magnifier-ai` | `the-magnifier-ai` | `builder_community` | 110 | `promote` | The Magnifier AI can remain a low-threshold analysis and discovery review candidate. |
-| `content-pika-product` | `pika-ai-products` | `builder_community` | 120 | `promote` | Pika product updates can carry concrete AIGC/video workflow signals when dated and source-backed. |
-| `content-kling-product` | `kling-ai-products` | `builder_community` | 130 | `promote` | Kling product updates can carry China-facing AIGC/video product signals when concrete. |
-| `intermediary-sspai` | `sspai-ai` | `platform_cn_media` | 60 | `promote` | SSPAI can surface China-facing product and tool signals. |
-| `intermediary-leiphone` | `leiphone-ai` | `platform_cn_media` | 80 | `promote` | Leiphone can remain a lower-priority Chinese technology clue source if it proves useful. |
-| `intermediary-ifanr` | `ifanr-ai` | `platform_cn_media` | 90 | `promote` | iFanr can remain manual/review-only for product and consumer AI signals. |
-| `content-product-hunt-trending` | `product-hunt-trending` | `english_media_search` | 60 | `promote` | Product Hunt can be useful for product discovery after major English media. |
-| `content-product-hunt-devtools` | `product-hunt-devtools` | `english_media_search` | 70 | `promote` | Product Hunt developer tools is a narrower product-discovery lane. |
+| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 95 | `promoted` | 31 observed days, 4 candidate days, and 2 final-report inclusion days support separate governance. |
+| `content-tiktok-developers-blog` | `tiktok-developer-ai` | `core_primary` | 105 | `defer` | 30 observed days produced no parsed or selected signal; parser failure and no-update are not yet distinguishable. |
+| `content-cloudflare-blog` | `cloudflare-ai-platform` | `core_primary` | 115 | `promoted` | 31 observed days, 21 candidate days, and 5 final-report inclusion days show durable platform value. |
+| `content-google-keyword` | `google-keyword-ai` | `core_primary` | 125 | `promoted` | 26 observed days, 23 candidate days, and 15 final-report inclusion days provide strong production evidence. |
+| `content-tencent-hunyuan-blog` | `tencent-hunyuan` | `china_models` | 60 | `defer` | 30 observed days produced no signal; wait for parser-versus-no-update classification. |
+| `content-bytedance-seed-blog` | `bytedance-seed` | `china_models` | 70 | `defer` | 30 observed days produced no signal; wait for parser-versus-no-update classification. |
+| `china-ai-baidu-ai-news` | `baidu-ai` | `china_models` | 80 | `promoted` | 20 observed days, 4 candidate days, and 4 final-report inclusion days justify named governance after REC-314. |
+| `content-alibaba-cloud-blog` | `alibaba-cloud-ai` | `china_models` | 90 | `promoted` | 30 observed days, 29 candidate days, and 27 final-report inclusion days provide the strongest China-platform evidence. |
+| `content-builder-simon-willison` | `simon-willison` | `builder_community` | 30 | `defer` | 13 candidate days but only 1 final-report inclusion remains entangled with REC-311 claim-level admission. |
+| `content-builder-lilian-weng` | `lilian-weng` | `builder_community` | 40 | `defer` | 13 observed days produced no parsed or selected signal. |
+| `content-latent-space` | `latent-space` | `builder_community` | 50 | `promoted` | 29 observed days, 22 candidate days, and 3 final-report inclusion days support a builder-analysis identity, not higher authority. |
+| `content-interconnects` | `interconnects` | `builder_community` | 60 | `defer` | 29 observed days, 9 candidate days, and only 1 inclusion day are insufficient for first-class governance. |
+| `content-nature-machine-learning` | `nature-machine-learning` | `builder_community` | 70 | `promoted` | 31 observed days, 30 candidate days, and 6 inclusion days show durable research-context value. |
+| `content-runway-changelog` | `runway-ai-products` | `builder_community` | 80 | `defer` | 28 observed days produced no signal; classify the changelog parser before promotion. |
+| `content-luma-changelog` | `luma-ai-products` | `builder_community` | 90 | `defer` | 28 observed days produced no signal; classify the changelog parser before promotion. |
+| `content-smol-ai-news` | `smol-ai-news` | `builder_community` | 100 | `retire` | 29 observed days and 14 candidate days produced no final-report inclusion; retain collection-only discovery. |
+| `content-the-magnifier-ai` | `the-magnifier-ai` | `builder_community` | 110 | `defer` | 29 observed days produced no candidate and included a blocked run; repair or retire the entry first. |
+| `content-pika-product` | `pika-ai-products` | `builder_community` | 120 | `defer` | 28 observed days produced no candidate and included a blocked run; repair or retire the entry first. |
+| `content-kling-product` | `kling-ai-products` | `builder_community` | 130 | `defer` | 28 observed days produced no parsed or selected signal. |
+| `intermediary-sspai` | `sspai-ai` | `platform_cn_media` | 60 | `promoted` | 20 candidate days and 13 inclusion days justify governance visibility; intermediary authority and REC-311 gates remain unchanged. |
+| `intermediary-leiphone` | `leiphone-ai` | `platform_cn_media` | 80 | `promoted` | 29 observed days, 21 candidate days, and 19 inclusion days show durable Chinese media clue value. |
+| `intermediary-ifanr` | `ifanr-ai` | `platform_cn_media` | 90 | `defer` | Manual enablement has no production observation, so promotion would be configuration-only. |
+| `content-product-hunt-trending` | `product-hunt-trending` | `english_media_search` | 60 | `retire` | 23 candidate days produced only 1 inclusion day; retain the existing product-discovery collection role. |
+| `content-product-hunt-devtools` | `product-hunt-devtools` | `english_media_search` | 70 | `retire` | 24 candidate days produced no final-report inclusion; retain collection-only discovery. |
 
 ## Collection-Only Review
 

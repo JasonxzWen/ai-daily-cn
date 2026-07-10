@@ -94,6 +94,177 @@
         "platform_exempt_unverified"
       ]
     },
+    "source_watch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signal",
+        "target_id",
+        "source_lane",
+        "source_tier",
+        "verification_policy",
+        "event_url",
+        "snapshot_fingerprint"
+      ],
+      "properties": {
+        "signal": {
+          "enum": ["github_watch", "site_watch"]
+        },
+        "target_id": {
+          "$ref": "#/$defs/id"
+        },
+        "source_lane": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_tier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "snapshot_fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "repo_snapshot": {
+          "$ref": "#/$defs/source_watch_repo_snapshot"
+        },
+        "site_snapshot": {
+          "$ref": "#/$defs/source_watch_site_snapshot"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["repo_snapshot"],
+          "properties": {
+            "signal": { "const": "github_watch" },
+            "repo_snapshot": { "$ref": "#/$defs/source_watch_repo_snapshot" },
+            "site_snapshot": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["site_snapshot"],
+          "properties": {
+            "signal": { "const": "site_watch" },
+            "repo_snapshot": false,
+            "site_snapshot": { "$ref": "#/$defs/source_watch_site_snapshot" }
+          }
+        }
+      ]
+    },
+    "source_watch_repo_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "stars",
+        "forks",
+        "open_issues",
+        "pushed_at",
+        "updated_at",
+        "default_branch",
+        "language",
+        "license",
+        "latest_release",
+        "latest_tag",
+        "latest_commit",
+        "readme_status"
+      ],
+      "properties": {
+        "repo": { "type": "string", "minLength": 3 },
+        "stars": { "type": "integer", "minimum": 0 },
+        "forks": { "type": "integer", "minimum": 0 },
+        "open_issues": { "type": "integer", "minimum": 0 },
+        "pushed_at": { "type": "string" },
+        "updated_at": { "type": "string" },
+        "default_branch": { "type": "string" },
+        "language": { "type": "string" },
+        "license": { "type": "string" },
+        "latest_release": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["tag_name", "name", "html_url", "published_at", "prerelease"],
+          "properties": {
+            "tag_name": { "type": "string" },
+            "name": { "type": "string" },
+            "html_url": { "type": "string" },
+            "published_at": { "type": "string" },
+            "prerelease": { "type": "boolean" }
+          }
+        },
+        "latest_tag": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["name", "commit_sha"],
+          "properties": {
+            "name": { "type": "string" },
+            "commit_sha": { "type": "string" }
+          }
+        },
+        "latest_commit": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["sha", "html_url", "message", "author_date", "author_name"],
+          "properties": {
+            "sha": { "type": "string" },
+            "html_url": { "type": "string" },
+            "message": { "type": "string" },
+            "author_date": { "type": "string" },
+            "author_name": { "type": "string" }
+          }
+        },
+        "readme_status": {
+          "enum": ["checked", "empty", "missing", "blocked", "not_fetched"]
+        }
+      }
+    },
+    "source_watch_site_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "canonical_url", "content_fingerprint", "feeds", "discovered_github_repositories"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "canonical_url": { "$ref": "#/$defs/absolute_url" },
+        "content_fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "feeds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "type", "url"],
+            "properties": {
+              "title": { "type": "string" },
+              "type": { "type": "string" },
+              "url": { "$ref": "#/$defs/absolute_url" }
+            }
+          }
+        },
+        "discovered_github_repositories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["repo", "url"],
+            "properties": {
+              "repo": { "type": "string", "minLength": 3 },
+              "url": { "$ref": "#/$defs/absolute_url" }
+            }
+          }
+        }
+      }
+    },
     "source": {
       "type": "object",
       "additionalProperties": false,
@@ -233,7 +404,7 @@
           "enum": ["included", "excluded"]
         },
         "included_in": {
-          "enum": ["main_items", "github_trending", "huggingface_trending", "model_releases", "hot_blogs", "projects", "builder_observations", "community_leads", "wechat_items", "zhihu_items", "reddit_items"]
+          "enum": ["main_items", "github_trending", "huggingface_trending", "model_releases", "hot_blogs", "projects", "builder_observations", "community_leads", "wechat_items", "zhihu_items", "reddit_items", "source_watch"]
         },
         "exclusion_reason": {
           "type": "string"
@@ -419,8 +590,29 @@
         },
         "published_by_gate": {
           "enum": ["deterministic_platform_gate"]
+        },
+        "source_watch": {
+          "$ref": "#/$defs/source_watch"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "required": ["included_in"],
+            "properties": {
+              "included_in": { "const": "source_watch" }
+            }
+          },
+          "then": {
+            "type": "object",
+            "required": ["source_watch"],
+            "properties": {
+              "source_watch": { "$ref": "#/$defs/source_watch" }
+            }
+          }
+        }
+      ]
     },
     "id": {
       "type": "string",

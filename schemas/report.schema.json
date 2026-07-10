@@ -1115,7 +1115,17 @@
           }
         },
         "content_type": {
-          "enum": ["blog", "interview", "podcast", "engineering_note"]
+          "enum": [
+            "blog",
+            "interview",
+            "podcast",
+            "research",
+            "engineering_note",
+            "best_practice",
+            "product_practice",
+            "safety_policy",
+            "model_release_context"
+          ]
         },
         "why_it_matters": {
           "type": "string",

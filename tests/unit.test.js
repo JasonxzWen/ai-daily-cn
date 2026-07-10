@@ -7485,6 +7485,7 @@ test("official blog context CLI writes clean internal context", async () => {
   await fs.writeFile(inputPath, `${JSON.stringify({
     entries: [
       {
+        id: "openai-custom-context-candidate",
         company: "openai",
         canonical_url: "https://openai.com/index/custom-context-record/?utm_source=test",
         title_original: "Custom context record",
@@ -7522,6 +7523,8 @@ test("official blog context CLI writes clean internal context", async () => {
     knowledgeDir,
     "--generated-at",
     "2026-07-01T08:00:00.000Z",
+    "--date",
+    "2026-07-01",
     "--limit",
     "5"
   ], {
@@ -7533,6 +7536,16 @@ test("official blog context CLI writes clean internal context", async () => {
   const raw = await fs.readFile(outputPath, "utf8");
   const parsed = JSON.parse(raw);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.kind, "official_blog_daily_context");
+  assert.equal(parsed.report_date, "2026-07-01");
+  assert.match(parsed.source_artifact_sha256, /^[a-f0-9]{64}$/);
+  assert.match(parsed.context_sha256, /^[a-f0-9]{64}$/);
+  assert.match(parsed.bindings_sha256, /^[a-f0-9]{64}$/);
+  assert.equal(parsed.bindings.length, 1);
+  assert.equal(parsed.bindings[0].record_id, "openai-custom-context-record-2026-07-01");
+  assert.equal(parsed.bindings[0].content_type, "engineering_note");
+  assert.equal(Number.isFinite(parsed.bindings[0].score), true);
+  assert.deepEqual(parsed.bindings[0].candidate_ids, ["openai-custom-context-candidate"]);
   assert.equal(parsed.context.kind, "official_blog_knowledge_context");
   assert.equal(parsed.context.visibility, "internal");
   assert.equal(parsed.context.admission_policy.version, "official-blog-admission-v1");
@@ -8473,7 +8486,7 @@ test("automation inventory recognizes daily codex pipeline publish automation", 
       'id = "ai-2"',
       'kind = "cron"',
       'name = "AI Daily publish"',
-      'prompt = "pnpm run daily:codex-pipeline -- --date 2026-07-02 --execute --publish"',
+      'prompt = "pnpm run daily:codex-pipeline -- --date 2026-07-02 --execute --publish; 不要另行运行 status:self-check"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8626,13 +8639,28 @@ test("status:self-check runs publish checks from the prepared clean worktree", a
 
 test("daily workflow contract validates repository workflow markers", async () => {
   const expectedDagContractRunCommand = "node scripts/run-daily-codex-dag.mjs --contract-run --json";
-  const expectedSourceWatchArtifactPath = ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json";
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-workflow-contract.json"), "utf8"));
   const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
   assert.equal(contract.required_package_scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
-  assert.equal(contract.daily_runner.source_watch_production_status, "not_connected");
-  assert.equal(contract.daily_runner.source_watch_consumed, false);
-  assert.equal(contract.daily_runner.source_watch_requested_artifact_path_template, expectedSourceWatchArtifactPath);
+  assert.equal(contract.daily_runner.source_watch.producer_stage, "discover_source_watch");
+  assert.equal(contract.daily_runner.source_watch.persistence_stage, "report_write");
+  assert.equal(contract.daily_runner.source_watch.consumer_stage, "build");
+  assert.equal(
+    contract.daily_runner.source_watch.candidate_pool_path_template,
+    "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
+  );
+  assert(contract.daily_runner.source_watch.connected_requires.includes("candidate_pool_sha256_matches"));
+  assert.equal(contract.daily_runner.source_watch.zero_included_candidates_still_consumed, true);
+  assert.equal(contract.daily_runner.official_blog_context.producer_stage, "official_blog_context");
+  assert.equal(contract.daily_runner.official_blog_context.consumer_stage, "report_draft");
+  assert.equal(contract.daily_runner.official_blog_context.admission_policy_version, "official-blog-admission-v1");
+  assert.equal(contract.daily_runner.official_blog_context.zero_matched_records_still_consumed, true);
+  assert.equal(contract.external_automation_inventory.require_single_project_automation, true);
+  assert.deepEqual(contract.external_automation_inventory.allowed_project_automation_ids, ["ai-2"]);
+  assert.equal(contract.external_automation_inventory.require_active_status_self_check, false);
+  assert.equal(contract.status_self_check.scheduled, false);
+  assert.equal(contract.status_self_check.mode, "manual_diagnostic_only");
+  assert.equal(contract.status_self_check.truth_source, ".tmp/run-summary-YYYY-MM-DD.json");
   assert.equal(JSON.stringify(contract.required_markers).includes("--source-watch-admitted-artifact"), false);
   assert.equal(contract.external_automation_prompt.contains.includes("--source-watch-admitted-artifact"), false);
   assert.equal(manifest.scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
@@ -8640,26 +8668,14 @@ test("daily workflow contract validates repository workflow markers", async () =
 
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-"));
   const automationsDir = path.join(tmp, "automations");
-  const promptPath = path.join(automationsDir, "ai-daily", "automation.toml");
-  await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
-  await fs.mkdir(path.join(automationsDir, "ai-daily-status-self-check"), { recursive: true });
+  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
   await fs.writeFile(
     promptPath,
     [
-      'id = "ai-daily"',
+      'id = "ai-2"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status not_connected consumed:false source_watch_requested_artifact_path"',
-      'status = "ACTIVE"',
-      'cwds = ["D:\\\\ai-daily-cn"]'
-    ].join("\n"),
-    "utf8"
-  );
-  await fs.writeFile(
-    path.join(automationsDir, "ai-daily-status-self-check", "automation.toml"),
-    [
-      'id = "ai-daily-status-self-check"',
-      'kind = "cron"',
-      'prompt = "node src/cli.js status:self-check --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8677,29 +8693,59 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
 });
 
-test("daily workflow contract accepts active publish automation without a fake Source Watch handoff", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-missing-source-watch-"));
+test("daily workflow contract rejects any extra project automation definition", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-extra-automation-"));
   const automationsDir = path.join(tmp, "automations");
-  const promptPath = path.join(automationsDir, "ai-daily", "automation.toml");
+  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
   await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
-  await fs.mkdir(path.join(automationsDir, "ai-daily-status-self-check"), { recursive: true });
   await fs.writeFile(
     promptPath,
     [
-      'id = "ai-daily"',
+      'id = "ai-2"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
     "utf8"
   );
   await fs.writeFile(
-    path.join(automationsDir, "ai-daily-status-self-check", "automation.toml"),
+    path.join(automationsDir, "ai-daily", "automation.toml"),
     [
-      'id = "ai-daily-status-self-check"',
+      'id = "ai-daily"',
       'kind = "cron"',
-      'prompt = "node src/cli.js status:self-check --date YYYY-MM-DD --output .tmp/status-self-check-YYYY-MM-DD.json"',
+      'prompt = "readonly insight"',
+      'status = "PAUSED"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await validateDailyWorkflowContract({
+    rootDir,
+    automationsDir,
+    automationPromptPath: promptPath
+  });
+
+  assert.equal(result.ok, false);
+  assert(
+    result.failures.some((failure) => failure.includes("project automation ai-daily is not allowed")),
+    result.failures.join("\n")
+  );
+});
+
+test("daily workflow contract rejects an active publish automation with stale Source Watch assertions", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-missing-source-watch-"));
+  const automationsDir = path.join(tmp, "automations");
+  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
+  await fs.writeFile(
+    promptPath,
+    [
+      'id = "ai-2"',
+      'kind = "cron"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check; source_watch.production_status must stay not_connected"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8712,7 +8758,8 @@ test("daily workflow contract accepts active publish automation without a fake S
     automationPromptPath: promptPath
   });
 
-  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("not_connected")), result.failures.join("\n"));
 });
 
 test("daily workflow contract rejects DAG contract-run package script drift", async () => {
@@ -12451,6 +12498,198 @@ test("phase 5 audit reports missing continuous source audit groups", async () =>
   assert.equal(complete.summary.primary_verified, 3);
 });
 
+test("phase 5 audits final report backrefs and reports concrete source admission outcomes", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-phase5-final-report-"));
+  const reportDate = "2026-05-27";
+  const historyDir = path.join(tmp, "reports-data");
+  const reportDir = path.join(historyDir, "2026", "05");
+  await fs.mkdir(reportDir, { recursive: true });
+  const sourceAudit = {
+    github_trending: auditGroupFixture("GitHub Trending", 1, 0),
+    builder_sources: auditGroupFixture("Builder", 1, 1),
+    content_sources: auditGroupFixture("Content", 5, 4),
+    search_sources: auditGroupFixture("Search", 1, 0),
+    sources_health: auditGroupFixture("Health", 5, 0)
+  };
+  const disclosed = {
+    verification_note: "This item remains attributed to its non-primary source.",
+    risk_note: "High-risk claims require primary or multi-source confirmation."
+  };
+  const report = {
+    report_date: reportDate,
+    source_audit: sourceAudit,
+    main_items: [
+      {
+        candidate_id: "sspai-high-risk",
+        title: "SSPAI reports Alibaba suspends access to Claude models",
+        summary: "The report claims model access was suspended.",
+        url: "https://sspai.com/post/example",
+        source_level: "intermediary",
+        verification_status: "intermediary_only",
+        ...disclosed
+      },
+      {
+        candidate_id: "builder-low-risk",
+        title: "Builder shares an agent workflow observation",
+        summary: "The author describes a personal tool workflow.",
+        url: "https://x.com/builder/status/1",
+        source_level: "original_social",
+        verification_status: "original_social_only",
+        ...disclosed
+      },
+      {
+        candidate_id: "paper-primary-target",
+        title: "A bioRxiv paper introduces an epigenetic foundation model",
+        summary: "The canonical paper page describes the model and evaluation.",
+        url: "https://www.biorxiv.org/content/10.1101/2025.07.16.665231v1",
+        source_level: "primary",
+        verification_status: "intermediary_only",
+        ...disclosed
+      },
+      {
+        candidate_id: "github-primary-target",
+        title: "TrendRadar repository documents MCP analysis",
+        summary: "The canonical repository documents the project.",
+        url: "https://github.com/sansan0/TrendRadar",
+        source_level: "github",
+        verification_status: "intermediary_only",
+        ...disclosed
+      }
+    ],
+    hot_blogs: [
+      {
+        candidate_id: "wechat-viewpoint",
+        title: "A WeChat article discusses model evaluation",
+        summary: "The article is retained as an attributed viewpoint.",
+        url: "https://mp.weixin.qq.com/s/example",
+        source_level: "intermediary",
+        verification_status: "intermediary_only",
+        ...disclosed
+      },
+      {
+        candidate_id: "missing-candidate-backref",
+        title: "A final report item lost its candidate record",
+        summary: "The report item must remain visible as a lineage violation.",
+        url: "https://example.com/missing-candidate",
+        source_level: "primary",
+        verification_status: "primary_confirmed"
+      }
+    ]
+  };
+  const candidates = [
+    {
+      id: "sspai-high-risk",
+      source_id: "intermediary-sspai",
+      category: "main_item",
+      status: "included",
+      included_in: "main_items",
+      title: report.main_items[0].title,
+      evidence: report.main_items[0].summary,
+      url: report.main_items[0].url,
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      main_selection_stage: "refill",
+      ...disclosed
+    },
+    {
+      id: "builder-low-risk",
+      source_id: "follow-builders-x",
+      category: "main_item",
+      status: "included",
+      included_in: "main_items",
+      title: report.main_items[1].title,
+      evidence: report.main_items[1].summary,
+      url: report.main_items[1].url,
+      source_level: "original_social",
+      verification_status: "original_social_only",
+      main_selection_stage: "refill",
+      ...disclosed
+    },
+    {
+      id: "paper-primary-target",
+      source_id: "content-paper-weekly",
+      category: "main_item",
+      status: "included",
+      included_in: "main_items",
+      title: report.main_items[2].title,
+      evidence: report.main_items[2].summary,
+      url: report.main_items[2].url,
+      source_level: "primary",
+      verification_status: "intermediary_only",
+      main_selection_stage: "refill",
+      ...disclosed
+    },
+    {
+      id: "github-primary-target",
+      source_id: "content-awesome-ai-news",
+      category: "main_item",
+      status: "included",
+      included_in: "main_items",
+      title: report.main_items[3].title,
+      evidence: report.main_items[3].summary,
+      url: report.main_items[3].url,
+      source_level: "github",
+      verification_status: "intermediary_only",
+      main_selection_stage: "refill",
+      ...disclosed
+    },
+    {
+      id: "wechat-viewpoint",
+      source_id: "wechat2rss-paperweekly",
+      category: "hot_blog",
+      status: "included",
+      included_in: "hot_blogs",
+      title: report.hot_blogs[0].title,
+      evidence: report.hot_blogs[0].summary,
+      url: report.hot_blogs[0].url,
+      source_level: "intermediary",
+      verification_status: "intermediary_only",
+      ...disclosed
+    },
+    {
+      id: "candidate-only-orphan",
+      source_id: "content-planet-ai",
+      category: "hot_blog",
+      status: "included",
+      included_in: "hot_blogs",
+      title: "This candidate was not published",
+      url: "https://example.com/orphan",
+      source_level: "intermediary",
+      verification_status: "intermediary_only"
+    }
+  ];
+  await fs.writeFile(path.join(reportDir, reportDate + ".json"), JSON.stringify(report, null, 2) + "\n", "utf8");
+  await fs.writeFile(
+    path.join(reportDir, reportDate + ".candidates.json"),
+    JSON.stringify({ schema_version: 1, report_date: reportDate, generated_at: reportDate + "T00:00:00Z", sources: [], candidates }, null, 2) + "\n",
+    "utf8"
+  );
+
+  const result = await auditSourceRunHistory({
+    rootDir: tmp,
+    historyDir: "reports-data",
+    reportDate,
+    days: 1
+  });
+  const day = result.days[0];
+
+  assert.equal(result.phase5_complete, false);
+  assert.equal(day.metrics.t3_fact_leak_count, 1);
+  assert.deepEqual(day.violations.map((item) => item.candidate_id), ["sspai-high-risk"]);
+  assert.equal(day.violations[0].reason_code, "primary_verification_required");
+  assert.deepEqual(day.verification_upgrades.map((item) => item.candidate_id).sort(), [
+    "github-primary-target",
+    "paper-primary-target"
+  ]);
+  assert.deepEqual(day.candidate_only_included.map((item) => item.candidate_id), ["candidate-only-orphan"]);
+  assert.deepEqual(day.missing_candidate_backrefs.map((item) => item.candidate_id), ["missing-candidate-backref"]);
+  assert.equal(day.metrics.candidate_only_included_count, 1);
+  assert.equal(day.metrics.missing_candidate_backref_count, 1);
+  assert.match(result.summary.notes, /1 source admission violation/);
+  assert.match(result.summary.notes, /1 missing candidate backref/);
+  assert.doesNotMatch(result.summary.notes, /missing days or required audit groups remain/);
+});
+
 test("statuspage discovery parses Atom incidents into light operations candidates", async () => {
   const collected = await collectStatuspageIncidents({
     reportDate: "2026-05-26",
@@ -12763,7 +13002,8 @@ test("buildSite preserves explicit report quality status in docs data and homepa
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/07/2026-07-02.json"), "utf8"));
   assert.equal(publicData.quality_status.status, "degraded");
   const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert.match(indexHtml, /data-article-index="aify-style"/);
+  assert.match(indexHtml, /data-index-style="effective-interact"/);
+  assert.doesNotMatch(indexHtml, /id="articleSearch"/);
   const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
   assert.match(opsHtml, /data-quality-status="degraded"/);
   assert.doesNotMatch(indexHtml, /Report generation is blocked by validation failure/);
@@ -13502,8 +13742,9 @@ test("buildSite writes trend index and injects scoped trend tags without mutatin
   assert(html.includes("日报导航"));
 
   const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert(indexHtml.includes('data-article-index="aify-style"'));
-  assert(indexHtml.includes("articles.json"));
+  assert(indexHtml.includes('data-index-style="effective-interact"'));
+  assert(!indexHtml.includes('id="articleSearch"'));
+  assert(!indexHtml.includes("articles.json"));
   const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
   assert(opsHtml.includes('id="topic-radar"'));
   assert(opsHtml.includes('id="signal-heat-strip"'));
@@ -14109,7 +14350,8 @@ test("buildSite writes date index homepage without exposing private report field
   assert(result.writtenFiles.includes("ops.html"));
   assert.equal(result.dateIndex.items.length, 2);
   const html = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert(html.includes('data-article-index="aify-style"'));
+  assert(html.includes('data-index-style="effective-interact"'));
+  assert(!html.includes('id="articleSearch"'));
   const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
   assert(opsHtml.includes('id="date-research-index"'));
   assert(opsHtml.includes('data-date-card="2026-05-13"'));
@@ -17541,7 +17783,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -17575,6 +17817,79 @@ test("source order tuning review is validator-backed and complete", async () => 
   }
 });
 
+test("logical source promotion proposals follow multi-day evidence decisions", async () => {
+  const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
+  const { CORE_SOURCE_CONTRACTS } = await import("../src/source-effectiveness.js");
+  const result = await validateSourceDisplayContract({ rootDir });
+  const review = await fs.readFile(path.join(rootDir, "docs/source-order-tuning-review.md"), "utf8");
+  const tick = String.fromCharCode(96);
+  const decisionRows = review
+    .split("\n")
+    .filter((line) => line.startsWith("| " + tick) && line.split("|").length >= 7);
+  const actionBySource = new Map(decisionRows.map((line) => {
+    const cells = line
+      .split("|")
+      .map((cell) => cell.trim().replaceAll(tick, ""))
+      .filter(Boolean);
+    return [cells[0], cells[4]];
+  }));
+  const promoted = [
+    ["content-azure-blog", "azure-ai-blog"],
+    ["content-cloudflare-blog", "cloudflare-ai-platform"],
+    ["content-google-keyword", "google-keyword-ai"],
+    ["china-ai-baidu-ai-news", "baidu-ai"],
+    ["content-alibaba-cloud-blog", "alibaba-cloud-ai"],
+    ["content-latent-space", "latent-space"],
+    ["content-nature-machine-learning", "nature-machine-learning"],
+    ["intermediary-sspai", "sspai-ai"],
+    ["intermediary-leiphone", "leiphone-ai"]
+  ];
+  const deferred = [
+    "content-tiktok-developers-blog",
+    "content-tencent-hunyuan-blog",
+    "content-bytedance-seed-blog",
+    "content-builder-simon-willison",
+    "content-builder-lilian-weng",
+    "content-interconnects",
+    "content-runway-changelog",
+    "content-luma-changelog",
+    "content-the-magnifier-ai",
+    "content-pika-product",
+    "content-kling-product",
+    "intermediary-ifanr"
+  ];
+  const retired = [
+    "content-smol-ai-news",
+    "content-product-hunt-trending",
+    "content-product-hunt-devtools"
+  ];
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.equal(actionBySource.size, 24);
+  for (const [sourceId] of promoted) {
+    assert.equal(actionBySource.get(sourceId), "promoted", sourceId + " must be promoted");
+  }
+  for (const sourceId of deferred) {
+    assert.equal(actionBySource.get(sourceId), "defer", sourceId + " must remain deferred");
+  }
+  for (const sourceId of retired) {
+    assert.equal(actionBySource.get(sourceId), "retire", sourceId + " must retire only its promotion proposal");
+  }
+  const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
+  for (const [, logicalId] of promoted) {
+    assert(logicalIds.has(logicalId), logicalId + " must be an executable logical source");
+  }
+  for (const sourceId of [...deferred, ...retired]) {
+    assert.equal(
+      CORE_SOURCE_CONTRACTS.some((source) => source.aliases.includes(sourceId)),
+      false,
+      sourceId + " must stay collection-only"
+    );
+  }
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
+});
+
 test("source order tuning review validator rejects drift and private fields", async () => {
   const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "source-order-tuning-review-validator-"));
@@ -17596,20 +17911,24 @@ test("source order tuning review validator rejects drift and private fields", as
   }
 
   await expectInvalid(
-    review.replace("| `core_primary` | 3 |", "| `core_primary` | 2 |"),
-    /unmapped count for core_primary must be 3/
+    review.replace("| `core_primary` | 1 |", "| `core_primary` | 0 |"),
+    /unmapped count for core_primary must be 1/
   );
   await expectInvalid(
     review.replace("`content-azure-blog`", "`unknown-source-id`"),
     /promotion candidate references unknown source id: unknown-source-id/
   );
   await expectInvalid(
-    review.replace("`content-azure-blog`", "`content-openai-news`"),
-    /promotion candidate is already mapped to logical source: content-openai-news/
+    review.replace("`content-tiktok-developers-blog`", "`content-openai-news`"),
+    /defer source content-openai-news must remain collection-only/
   );
   await expectInvalid(
-    review.replace("| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 95 | `promote` |", "| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 93 | `promote` |"),
+    review.replace("| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 95 | `promoted` |", "| `content-azure-blog` | `azure-ai-blog` | `core_primary` | 93 | `promoted` |"),
     /promotion candidate content-azure-blog suggested rank must use 5-point spacing/
+  );
+  await expectInvalid(
+    review.replace("| `content-tiktok-developers-blog` | `tiktok-developer-ai` | `core_primary` | 105 | `defer` |", "| `content-tiktok-developers-blog` | `tiktok-developer-ai` | `core_primary` | 105 | `promote` |"),
+    /action must be promoted, defer, or retire/
   );
   await expectInvalid(`${review}\nhttps://example.com/internal\n`, /order tuning review must not expose raw URLs/);
   await expectInvalid(`${review}\nAI_DAILY_RSSHUB_BASE_URL\n`, /order tuning review must not expose internal source fields/);
@@ -17625,9 +17944,9 @@ test("Anthropic Research logical source promotion is executable and review-backe
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 39);
-  assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
   assert(logical, "CORE_SOURCE_CONTRACTS should include anthropic-research-engineering");
@@ -17657,7 +17976,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
 
   assert(handbook.includes("anthropic-research-engineering"), "handbook should document the promoted logical source");
   assert(!review.includes("| `content-anthropic-research` | `anthropic-research-engineering` |"), "review should no longer list the promoted source as a future candidate");
-  assert.match(review, /order-tuning-total-unmapped:78/);
+  assert.match(review, /order-tuning-total-unmapped:69/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -17709,9 +18028,9 @@ test("core primary official logical source promotions are executable and review-
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 39);
-  assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const promotions = [
     {
@@ -17770,7 +18089,10 @@ test("core primary official logical source promotions are executable and review-
       ["aws-ml", 70],
       ["nvidia-ai-developer", 75],
       ["hugging-face-blog", 80],
-      ["xai-news", 85]
+      ["xai-news", 85],
+      ["azure-ai-blog", 95],
+      ["cloudflare-ai-platform", 115],
+      ["google-keyword-ai", 125]
     ]
   );
 
@@ -17794,7 +18116,7 @@ test("core primary official logical source promotions are executable and review-
   for (const replacementSourceId of ["content-azure-blog", "content-tiktok-developers-blog", "content-cloudflare-blog", "content-google-keyword"]) {
     assert(review.includes(`| \`${replacementSourceId}\``), `review should include replacement promotion candidate ${replacementSourceId}`);
   }
-  assert.match(review, /order-tuning-total-unmapped:78/);
+  assert.match(review, /order-tuning-total-unmapped:69/);
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -17839,9 +18161,9 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 39);
-  assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -17877,12 +18199,12 @@ test("china model logical sources are promoted into the fixed display contract",
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 39);
-  assert.equal(result.summary.display_sources, 39);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 78);
+  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
-  for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official"]) {
+  for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official", "baidu-ai", "alibaba-cloud-ai"]) {
     assert(logicalIds.has(id), `CORE_SOURCE_CONTRACTS should include ${id}`);
   }
 
@@ -17894,7 +18216,9 @@ test("china model logical sources are promoted into the fixed display contract",
       ["qwen-official", 20],
       ["kimi-official", 30],
       ["minimax-official", 40],
-      ["zhipu-official", 50]
+      ["zhipu-official", 50],
+      ["baidu-ai", 80],
+      ["alibaba-cloud-ai", 90]
     ]
   );
 
@@ -17914,7 +18238,9 @@ test("china model logical sources are promoted into the fixed display contract",
     ["content-minimax-blog", "minimax-official"],
     ["china-ai-zhipu-news", "zhipu-official"],
     ["content-zhipu-zh-news", "zhipu-official"],
-    ["content-zhipu-research", "zhipu-official"]
+    ["content-zhipu-research", "zhipu-official"],
+    ["china-ai-baidu-ai-news", "baidu-ai"],
+    ["content-alibaba-cloud-blog", "alibaba-cloud-ai"]
   ]) {
     assert.equal(inventoryById.get(sourceId)?.logical_source_id, logicalSourceId, `${sourceId} should map to ${logicalSourceId}`);
   }
@@ -17984,12 +18310,12 @@ test("source inventory order reference validator rejects drift and private field
     /duplicates source id|must list source id exactly once/
   );
   await expectInvalid(
-    reference.replace("inventory-section:core_primary count:23", "inventory-section:core_primary count:22"),
-    /section core_primary count must be 23/
+    reference.replace("inventory-section:core_primary count:24", "inventory-section:core_primary count:23"),
+    /section core_primary count must be 24/
   );
   await expectInvalid(
-    reference.replace("| `core_primary` 核心一手源 | 23 |", "| `core_primary` 核心一手源 | 22 |"),
-    /summary table section core_primary count must be 23/
+    reference.replace("| `core_primary` 核心一手源 | 24 |", "| `core_primary` 核心一手源 | 23 |"),
+    /summary table section core_primary count must be 24/
   );
   await expectInvalid(
     reference.replace("source-inventory-order:v1", "source-inventory-order:missing"),
@@ -18104,6 +18430,43 @@ test("source-first IA contract extends source effectiveness rows with stable dis
   const orderedIds = rows.map((row) => row.id);
   assert(orderedIds.indexOf("openai-news") < orderedIds.indexOf("github-trending"));
   assert(orderedIds.indexOf("github-trending") < orderedIds.indexOf("chinese-direct-rss"));
+});
+
+test("source effectiveness does not inherit parsed signal from another source in the same audit group", async () => {
+  const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
+  const report = strictPublishReportFixture();
+  report.source_audit = sourceAuditFixture();
+  report.source_audit.content_sources.candidates_found = 1;
+  report.source_audit.content_sources.included = 0;
+  report.source_audit.content_sources.sources = [
+    {
+      id: "content-openai-news-rss",
+      name: "OpenAI News RSS",
+      url: "https://openai.com/news/rss.xml",
+      source_kind: "rss",
+      status: "checked",
+      parsed_count: 1,
+      recent_48h_entries: 1
+    },
+    {
+      id: "content-google-deepmind-rss",
+      name: "Google DeepMind RSS",
+      url: "https://deepmind.google/blog/rss.xml",
+      source_kind: "rss",
+      status: "no_signal",
+      parsed_count: 0,
+      recent_48h_entries: 0
+    }
+  ];
+
+  const rows = buildSourceEffectivenessTable({ report, candidates: [] });
+  const openai = rows.find((row) => row.id === "openai-news");
+  const deepmind = rows.find((row) => row.id === "google-deepmind");
+
+  assert.equal(openai.parsed_recent, true, "the productive source keeps its own parsed signal");
+  assert.equal(deepmind.parsed_recent, false, "group candidates must not make an unproductive source look parsed");
+  assert.equal(deepmind.status_label, "no_recent_update");
+  assert.equal(deepmind.not_included_reason, "reachable_but_no_recent_parsed_signal");
 });
 
 test("internal source-first IA dashboard promotes source metrics and fixed source graph", () => {
@@ -18525,9 +18888,14 @@ test("source-first dashboard exposes full inventory runtime metrics", () => {
   const dashboard = input.sections.find((section) => section.richId === "source-first-dashboard");
   const inventoryRows = buildSourceInventoryRows({ rootDir: process.cwd() });
   const inventoryEntryCount = String(inventoryRows.length);
-  const inheritedRuntimeCount = 11;
-  const collectionOnlyCount = 78;
-  const unreportedRuntimeCount = inventoryRows.length - inheritedRuntimeCount - collectionOnlyCount;
+  const reportedLogicalSourceIds = new Set(report.source_effectiveness.map((row) => String(row.id)));
+  const inheritedRuntimeCount = inventoryRows.filter((row) =>
+    row.logical_source_id && reportedLogicalSourceIds.has(String(row.logical_source_id))
+  ).length;
+  const collectionOnlyCount = inventoryRows.filter((row) => !row.logical_source_id).length;
+  const unreportedRuntimeCount = inventoryRows.filter((row) =>
+    row.logical_source_id && !reportedLogicalSourceIds.has(String(row.logical_source_id))
+  ).length;
   const metricByTitle = new Map((dashboard?.items || []).map((item) => [item.title, item]));
   const statValue = (title, label = "数量") =>
     metricByTitle.get(title)?.stats?.find((stat) => stat.label === label)?.value;
@@ -19485,7 +19853,8 @@ test("source inventory rows expose runtime status layer", () => {
   assert.match(findInventoryLine("Anthropic News"), /运行状态：[\s\S]*updated_not_selected/);
   assert.match(findInventoryLine("QbitAI"), /运行状态：[\s\S]*not_configured_or_skipped/);
   assert.match(findInventoryLine("Hugging Face Blog"), /运行状态：[\s\S]*unreported/);
-  assert.match(findInventoryLine("Azure Blog"), /运行状态：[\s\S]*collection_only/);
+  assert.match(findInventoryLine("Azure Blog"), /运行状态：[\s\S]*unreported/);
+  assert.match(findInventoryLine("TikTok for Developers Blog"), /运行状态：[\s\S]*collection_only/);
   assert.doesNotMatch(inventoryLines.join("\n"), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
   assert.doesNotMatch(inventoryLines.join("\n"), /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
 });
@@ -21715,6 +22084,15 @@ test("report:draft rewrites evidence-backed paper refill instead of repeating En
 
   const item = drafted.report.main_items.find((entry) => entry.url === paperLead.url);
   assert(item, "evidence-backed paper lead should be eligible as sparse main stream refill");
+  const normalizedPaper = drafted.candidatePool.candidates.find((entry) => entry.url === paperLead.url);
+  assert.equal(
+    normalizedPaper?.verification_status,
+    "primary_confirmed",
+    "a canonical bioRxiv publication must explicitly upgrade stale intermediary verification"
+  );
+  assert.equal(normalizedPaper?.source_level, "paper");
+  assert.equal(normalizedPaper?.primary_url, paperLead.url);
+  assert(normalizedPaper?.verification_sources?.includes(paperLead.url));
   assert.equal(
     drafted.report.main_items.some((entry) => entry.url === arxivSearchLead.url),
     false,
@@ -21735,6 +22113,84 @@ test("report:draft rewrites evidence-backed paper refill instead of repeating En
     normalizePublicCopyForComparison(bullet) !== normalizePublicCopyForComparison(item.summary)
   ), "paper refill bullet must add detail beyond title/summary");
   assert(!/This is an intermediary|trace it to a primary source|primary_verification_required/i.test([item.summary, ...(item.bullets || [])].join("\n")));
+});
+
+test("report:draft explicitly upgrades canonical GitHub repositories discovered through intermediary lists", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-github-primary-target-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const repositoryUrl = "https://github.com/sansan0/TrendRadar";
+  const repositoryLead = {
+    ...mainStreamRepairCandidate(reportDate, {
+      id: "awesome-ai-news-trendradar-primary-target",
+      category: "community_lead",
+      source: "Awesome AI News",
+      sourceId: "content-awesome-ai-news",
+      sourceLevel: "github",
+      verificationStatus: "intermediary_only",
+      title: "TrendRadar adds MCP analysis and multi-channel AI news delivery",
+      url: repositoryUrl,
+      evidence:
+        "The repository documents MCP analysis, deduplicated AI topic monitoring, enterprise messaging channels, deployment steps, and maintenance boundaries.",
+      editorialCategory: "open_source"
+    }),
+    intermediary_url: "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README_CN.md",
+    notes:
+      "source_report_url=https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README_CN.md; primary_verification_required=true"
+  };
+  const discovery = discoveryEnvelope({
+    candidates: [
+      strategicOfficialCandidate(reportDate, {
+        id: "openai-github-primary-control",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/example-github-primary-control",
+        title: "OpenAI updates API workflow controls",
+        evidence: "OpenAI describes API workflow controls, availability, migration guidance, and developer impact."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "anthropic-github-primary-control",
+        source: "Anthropic News",
+        url: "https://www.anthropic.com/news/example-github-primary-control",
+        title: "Anthropic updates deployment controls",
+        evidence: "Anthropic describes deployment controls, availability, admin settings, and developer impact."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "google-github-primary-control",
+        source: "Google AI Blog",
+        url: "https://blog.google/technology/ai/example-github-primary-control/",
+        title: "Google updates AI developer controls",
+        evidence: "Google describes developer controls, release behavior, availability, and migration guidance."
+      }),
+      strategicOfficialCandidate(reportDate, {
+        id: "meta-github-primary-control",
+        source: "Meta AI Blog",
+        url: "https://ai.meta.com/blog/example-github-primary-control/",
+        title: "Meta updates AI release controls",
+        evidence: "Meta describes release controls, platform availability, rollout details, and developer impact."
+      }),
+      repositoryLead
+    ],
+    sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Meta AI Blog", "Awesome AI News"]
+  });
+  await fs.writeFile(discoveryPath, JSON.stringify(discovery, null, 2) + "\n", "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+  const normalized = drafted.candidatePool.candidates.find((entry) => entry.url === repositoryUrl);
+
+  assert.equal(normalized?.verification_status, "primary_confirmed");
+  assert.equal(normalized?.source_level, "github");
+  assert.equal(normalized?.primary_url, repositoryUrl);
+  assert(Array.isArray(normalized?.verification_sources));
+  assert.equal(
+    normalized.verification_sources.some((sourceUrl) => sourceUrl === repositoryUrl),
+    true
+  );
 });
 
 test("report:draft rejects refill candidates outside the 72 hour main stream window", async () => {
@@ -27961,7 +28417,19 @@ async function writePhase5Day(historyDir, reportDate, options = {}) {
     path.join(dir, `${reportDate}.json`),
     `${JSON.stringify({
       report_date: reportDate,
-      source_audit: sourceAudit
+      source_audit: sourceAudit,
+      main_items: [
+        {
+          candidate_id: "candidate-main",
+          title: "Main Item",
+          url: ["https://example.com", reportDate].join("/"),
+          event_date: reportDate,
+          source_level: "primary",
+          verification_status: options.candidateVerificationStatus || "primary_confirmed",
+          verification_note: "Fixture source attribution.",
+          risk_note: "High-risk facts require primary verification."
+        }
+      ]
     }, null, 2)}\n`,
     "utf8"
   );
@@ -27991,6 +28459,7 @@ async function writePhase5Day(historyDir, reportDate, options = {}) {
           event_date: reportDate,
           status: "included",
           included_in: "main_items",
+          source_level: "primary",
           verification_status: options.candidateVerificationStatus || "primary_confirmed",
           verification_sources: [`https://example.com/${reportDate}`]
         }

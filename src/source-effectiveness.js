@@ -92,6 +92,24 @@ export const CORE_SOURCE_CONTRACTS = [
     aliases: ["content-xai-news", "content-xai-company-news", "xai news", "x.ai/news"]
   },
   {
+    id: "azure-ai-blog",
+    name: "Azure AI Blog",
+    role: "official_platform",
+    aliases: ["content-azure-blog"]
+  },
+  {
+    id: "cloudflare-ai-platform",
+    name: "Cloudflare AI Platform",
+    role: "official_platform",
+    aliases: ["content-cloudflare-blog"]
+  },
+  {
+    id: "google-keyword-ai",
+    name: "Google Keyword AI",
+    role: "official_company_news",
+    aliases: ["content-google-keyword"]
+  },
+  {
     id: "deepseek-official",
     name: "DeepSeek Official",
     role: "china_model_official",
@@ -148,10 +166,34 @@ export const CORE_SOURCE_CONTRACTS = [
     ]
   },
   {
+    id: "baidu-ai",
+    name: "Baidu AI",
+    role: "china_model_official",
+    aliases: ["china-ai-baidu-ai-news"]
+  },
+  {
+    id: "alibaba-cloud-ai",
+    name: "Alibaba Cloud AI",
+    role: "china_model_official",
+    aliases: ["content-alibaba-cloud-blog"]
+  },
+  {
     id: "follow-builders",
     name: "follow-builders X feed",
     role: "builder_aggregator",
     aliases: ["github-watch-follow-builders-x", "follow-builders x feed", "feed-x.json"]
+  },
+  {
+    id: "latent-space",
+    name: "Latent Space",
+    role: "builder_analysis",
+    aliases: ["content-latent-space"]
+  },
+  {
+    id: "nature-machine-learning",
+    name: "Nature Machine Learning",
+    role: "research_context",
+    aliases: ["content-nature-machine-learning"]
   },
   {
     id: "github-watch-ai-news-radar",
@@ -248,6 +290,18 @@ export const CORE_SOURCE_CONTRACTS = [
     role: "chinese_media",
     notes: "Directly reachable Chinese RSS sources are retained; Jiqizhixin stays on the working articles index until its /rss endpoint returns XML.",
     aliases: ["intermediary-qbitai", "intermediary-36kr", "intermediary-infoq-cn", "intermediary-jiqizhixin", "qbitai", "36kr.com/feed", "infoq.cn/feed", "jiqizhixin"]
+  },
+  {
+    id: "sspai-ai",
+    name: "SSPAI AI",
+    role: "chinese_media",
+    aliases: ["intermediary-sspai"]
+  },
+  {
+    id: "leiphone-ai",
+    name: "Leiphone AI",
+    role: "chinese_media",
+    aliases: ["intermediary-leiphone"]
   },
   {
     id: "github-org-watch",
@@ -698,9 +752,7 @@ function collectAuditSources(sourceAudit) {
       }
       rows.push({
         ...source,
-        audit_group: groupName,
-        group_candidates_found: Number.isInteger(group?.candidates_found) ? group.candidates_found : 0,
-        group_included: Number.isInteger(group?.included) ? group.included : 0
+        audit_group: groupName
       });
     }
   }
@@ -784,8 +836,7 @@ function candidateIncludedPublicly(candidate) {
 
 function sourceHasRecentParsedSignal(source) {
   return countValue(source?.recent_48h_entries) > 0 ||
-    countValue(source?.parsed_count) > 0 ||
-    countValue(source?.group_candidates_found) > 0;
+    countValue(source?.parsed_count) > 0;
 }
 
 function sourceNotIncludedReason({ configured, reachable, parsedRecent, candidateCreated, sources }) {

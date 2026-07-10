@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
@@ -29,6 +30,10 @@ import {
   MAIN_SELECTION_STAGE,
   normalizeCandidateAuditRoles
 } from "./main-audit-contract.js";
+import {
+  applyDirectPrimaryTargetVerification,
+  isDirectPrimaryPublicationUrl
+} from "./source-verification.js";
 
 const REQUIRED_AUDIT_GROUPS = [
   "github_trending",
@@ -39,6 +44,7 @@ const REQUIRED_AUDIT_GROUPS = [
   "search_sources",
   "sources_health"
 ];
+const OPTIONAL_SOURCE_WATCH_AUDIT_GROUPS = ["github_watch", "site_watch"];
 const DEGRADED_DISCOVERY_INPUT_FALLBACKS = [
   {
     pattern: /^github-trending-\d{4}-\d{2}-\d{2}\.json$/i,
@@ -100,6 +106,14 @@ const DEGRADED_DISCOVERY_INPUT_FALLBACKS = [
 const DEGRADED_DISCOVERY_INPUT_ERROR_CODES = new Set(["ENOENT", "EACCES", "EPERM", "EBUSY", "EIO", "EMFILE", "ENFILE"]);
 const CANDIDATE_SOURCE_STATUSES = new Set(["checked", "blocked", "no_signal"]);
 const PRIMARY_STATUSES = new Set(["primary_confirmed", "multi_source_confirmed"]);
+const OFFICIAL_BLOG_DAILY_CONTENT_TYPES = new Set([
+  "research",
+  "engineering_note",
+  "best_practice",
+  "product_practice",
+  "safety_policy",
+  "model_release_context"
+]);
 const REPORT_AUDIT_GROUP_FIELDS = new Set([
   "checked",
   "sources",
@@ -228,9 +242,23 @@ export async function generateReportDraft(options = {}) {
     generatedAt,
     allowDegradedInputs: options.allowDegradedInputs === true
   });
+  const officialBlogContextState = await loadOfficialBlogDailyContext({
+    rootDir,
+    reportDate,
+    contextPath: options.officialBlogContextPath,
+    discoveryInputPaths: inputPaths,
+    allowDegraded: options.allowDegradedInputs === true
+  });
   const merged = mergeDiscoveryPayloads(loaded, { reportDate, generatedAt });
   const recentMainUrlHistory = await loadRecentMainUrlHistory(rootDir, reportDate);
-  const selection = selectReportItems(merged, { reportDate, recentMainUrlHistory });
+  const reportsDataDir = options.sourceStatusOutputDir || "reports-data";
+  const sourceWatchHistory = await loadSourceWatchSnapshotHistory(rootDir, reportsDataDir, reportDate, merged.candidates);
+  const selection = selectReportItems(merged, {
+    reportDate,
+    recentMainUrlHistory,
+    sourceWatchHistory,
+    officialBlogContext: officialBlogContextState.artifact
+  });
   const candidatePool = {
     schema_version: 1,
     report_date: reportDate,
@@ -256,11 +284,12 @@ export async function generateReportDraft(options = {}) {
     selection,
     sourceAudit,
     candidates: candidatePool.candidates,
+    officialBlogContextReceipt: officialBlogContextState.receipt,
     evidenceAssets: mergeEvidenceAssets(merged.evidence_assets, evidence.assets)
   });
   const sourceStatusUpdate = await prepareSourceStatusHistoryUpdate({
     rootDir,
-    outputDir: options.sourceStatusOutputDir || "reports-data",
+    outputDir: reportsDataDir,
     reportDate,
     generatedAt,
     sourceAudit,
@@ -285,6 +314,7 @@ export async function generateReportDraft(options = {}) {
     candidatePool,
     path: outputPath,
     candidatePoolPath: candidateOutputPath,
+    officialBlogContextReceipt: officialBlogContextState.receipt,
     sourceStatusHistoryPath,
     evidence_assets: mergeEvidenceAssets(merged.evidence_assets, evidence.assets),
     evidence_skipped: evidence.skipped,
@@ -447,12 +477,15 @@ function sanitizeGeneratedPublicCopy(value) {
 function selectReportItems(merged, options = {}) {
   const reportDate = requireReportDate(options.reportDate);
   const candidates = cloneCandidates(merged.candidates);
+  selectSourceWatchCandidates(candidates, options.sourceWatchHistory);
+  const standardCandidates = candidates.filter((candidate) => !isSourceWatchCandidate(candidate));
   const metaById = merged.metaById || new Map();
   const selectedIds = new Set();
   const recentMainUrlHistory = normalizeRecentMainUrlHistory(options.recentMainUrlHistory || options.recentMainUrls);
+  const officialBlogContentTypes = officialBlogContentTypeByCandidateId(options.officialBlogContext);
   const derived = [];
   const includedCandidates = [...candidates];
-  const githubSourceCandidates = candidates
+  const githubSourceCandidates = standardCandidates
     .map((candidate) => ({ candidate, meta: metaById.get(candidate.id) || {} }))
     .filter(({ candidate, meta }) => isGitHubTrendingCandidate(candidate, meta))
     .sort((left, right) => rankOf(left.meta, 999) - rankOf(right.meta, 999));
@@ -468,7 +501,7 @@ function selectReportItems(merged, options = {}) {
     selectedIds.add(candidate.id);
     return githubTrendingItem(trendCandidate, meta, index);
   });
-  const huggingFacePool = candidates
+  const huggingFacePool = standardCandidates
     .filter((candidate) => candidate.category === "huggingface_trending" && !selectedIds.has(candidate.id))
     .sort(compareHuggingFaceTrendingCandidates);
   const huggingFaceTrending = huggingFacePool.slice(0, HUGGINGFACE_TRENDING_TARGET).map((candidate, index) => {
@@ -477,7 +510,7 @@ function selectReportItems(merged, options = {}) {
     return huggingFaceTrendingItem(selected, index);
   });
 
-  const mainEvaluations = evaluateMainCandidates(candidates, {
+  const mainEvaluations = evaluateMainCandidates(standardCandidates, {
     reportDate,
     recentMainUrlHistory,
     metaById
@@ -541,12 +574,12 @@ function selectReportItems(merged, options = {}) {
   });
 
   const hotBlogSeenUrls = new Set(mainItems.map((item) => normalizeUrl(item.url)).filter(Boolean));
-  const hotBlogPool = candidates
+  const hotBlogPool = standardCandidates
     .filter((candidate) => !selectedIds.has(candidate.id))
     .filter((candidate) => isFreshForMainItems(candidate, recentMainUrlHistory))
     .filter((candidate) => canPromoteToHotBlog(candidate, reportDate))
     .sort((left, right) => candidateScore(right) - candidateScore(left));
-  const chinaHotBlogFallbackPool = candidates
+  const chinaHotBlogFallbackPool = standardCandidates
     .filter((candidate) => !selectedIds.has(candidate.id))
     .filter((candidate) => isFreshForMainItems(candidate, recentMainUrlHistory))
     .filter((candidate) => canFallbackToChinaAiHotBlog(candidate, reportDate))
@@ -570,20 +603,20 @@ function selectReportItems(merged, options = {}) {
   ensureChineseHotBlogSeed(hotBlogSeeds, [...hotBlogPool, ...chinaHotBlogFallbackPool], hotBlogSeenUrls);
   const hotBlogDrafts = hotBlogSeeds.map((candidate) => ({
     candidate,
-    item: hotBlogItem(candidate)
+    item: hotBlogItem(candidate, { officialBlogContentTypes })
   }));
   const hotBlogPrune = pruneHotBlogDrafts(hotBlogDrafts);
   const hotBlogs = hotBlogPrune.items.map(({ candidate }) => {
     const hotCandidate = markIncludedCandidate(candidate, "hot_blog", "hot_blogs");
     selectedIds.add(candidate.id);
-    return hotBlogItem(hotCandidate);
+    return hotBlogItem(hotCandidate, { officialBlogContentTypes });
   });
-  const chineseMediaDynamics = selectChineseMediaDynamics(candidates, {
+  const chineseMediaDynamics = selectChineseMediaDynamics(standardCandidates, {
     reportDate,
     sourceAudit: merged.sourceAudit
   });
 
-  const builderSeeds = candidates
+  const builderSeeds = standardCandidates
     .filter((candidate) => candidate.category === "builder_observation" && !selectedIds.has(candidate.id))
     .filter((candidate) => canPromoteToBuilderObservation(candidate))
     .sort((left, right) => {
@@ -597,9 +630,9 @@ function selectReportItems(merged, options = {}) {
     selectedIds.add(candidate.id);
     return builderObservationItem(builderCandidate);
   });
-  const officialOrgUpdates = selectOfficialOrgUpdates(candidates, { reportDate });
+  const officialOrgUpdates = selectOfficialOrgUpdates(standardCandidates, { reportDate });
 
-  const communityPool = candidates
+  const communityPool = standardCandidates
     .filter((candidate) => candidate.category === "community_lead" && !selectedIds.has(candidate.id))
     .filter((candidate) => canPromoteToCommunityLead(candidate, reportDate))
     .sort((left, right) => candidateScore(right) - candidateScore(left))
@@ -657,7 +690,7 @@ function selectReportItems(merged, options = {}) {
       hot_blogs: hotBlogPool.length,
       chinese_media_dynamics: chineseMediaDynamics.items.length,
       projects: projectSeeds.length,
-      builder_observations: candidates.filter((candidate) => candidate.category === "builder_observation" && canPromoteToBuilderObservation(candidate)).length,
+      builder_observations: standardCandidates.filter((candidate) => candidate.category === "builder_observation" && canPromoteToBuilderObservation(candidate)).length,
       official_org_updates: officialOrgUpdates.length
     },
     selection_snapshot: {
@@ -673,6 +706,54 @@ function selectReportItems(merged, options = {}) {
       }
     }
   };
+}
+
+function selectSourceWatchCandidates(candidates, historicalSnapshotKeys = new Set()) {
+  const persisted = historicalSnapshotKeys instanceof Set ? historicalSnapshotKeys : new Set();
+  const currentSnapshotKeys = new Set();
+  for (const candidate of candidates) {
+    if (!isSourceWatchCandidate(candidate)) {
+      continue;
+    }
+    candidate.status = "excluded";
+    delete candidate.included_in;
+    const snapshotKey = sourceWatchSnapshotKey(candidate);
+    if (!snapshotKey) {
+      candidate.exclusion_reason = "source_watch_snapshot_identity_missing";
+      continue;
+    }
+    if (persisted.has(snapshotKey)) {
+      candidate.exclusion_reason = "source_watch_unchanged_snapshot";
+      continue;
+    }
+    if (currentSnapshotKeys.has(snapshotKey)) {
+      candidate.exclusion_reason = "source_watch_duplicate_snapshot";
+      continue;
+    }
+    currentSnapshotKeys.add(snapshotKey);
+    candidate.status = "included";
+    candidate.included_in = "source_watch";
+    delete candidate.exclusion_reason;
+  }
+}
+
+function isSourceWatchCandidate(candidate) {
+  return Boolean(candidate?.source_watch && typeof candidate.source_watch === "object" && !Array.isArray(candidate.source_watch));
+}
+
+function sourceWatchSnapshotKey(candidate) {
+  if (!isSourceWatchCandidate(candidate)) {
+    return "";
+  }
+  const targetId = sourceWatchTargetId(candidate);
+  const fingerprint = String(candidate.source_watch.snapshot_fingerprint || "").trim().toLowerCase();
+  return targetId && fingerprint ? `${targetId}:${fingerprint}` : "";
+}
+
+function sourceWatchTargetId(candidate) {
+  return isSourceWatchCandidate(candidate)
+    ? String(candidate.source_watch.target_id || "").trim().toLowerCase()
+    : "";
 }
 
 function pruneHotBlogDrafts(entries) {
@@ -783,6 +864,9 @@ function applyCandidateAuditRoles(candidate) {
 
 function finalizeMainAudit(candidates) {
   for (const candidate of candidates) {
+    if (isSourceWatchCandidate(candidate)) {
+      continue;
+    }
     if (isPlatformExemptCategory(candidate.category)) {
       candidate.status = "excluded";
       delete candidate.included_in;
@@ -844,6 +928,71 @@ async function loadRecentMainUrlHistory(rootDir, reportDate, lookbackDays = 7) {
     }
   }
   return urls;
+}
+
+async function loadSourceWatchSnapshotHistory(rootDir, reportsDataDir, reportDate, currentCandidates = []) {
+  const targetIds = new Set(currentCandidates.map(sourceWatchTargetId).filter(Boolean));
+  if (targetIds.size === 0) {
+    return new Set();
+  }
+  const historyRoot = path.join(path.resolve(rootDir, reportsDataDir), "internal", "candidates");
+  const files = (await listPersistedCandidatePoolFiles(historyRoot))
+    .map((filePath) => ({
+      filePath,
+      fileDate: path.basename(filePath).match(/^(\d{4}-\d{2}-\d{2})\.candidates\.json$/)?.[1] || ""
+    }))
+    .filter(({ fileDate }) => fileDate && fileDate < reportDate)
+    .sort((left, right) => right.fileDate.localeCompare(left.fileDate) || right.filePath.localeCompare(left.filePath));
+  const snapshotKeys = new Set();
+  const resolvedTargetIds = new Set();
+  for (const { filePath } of files) {
+    let pool;
+    try {
+      pool = JSON.parse(await fs.readFile(filePath, "utf8"));
+    } catch {
+      continue;
+    }
+    for (const candidate of Array.isArray(pool?.candidates) ? pool.candidates : []) {
+      if (candidate?.status !== "included" || candidate?.included_in !== "source_watch") {
+        continue;
+      }
+      const targetId = sourceWatchTargetId(candidate);
+      if (!targetIds.has(targetId) || resolvedTargetIds.has(targetId)) {
+        continue;
+      }
+      const snapshotKey = sourceWatchSnapshotKey(candidate);
+      if (snapshotKey) {
+        snapshotKeys.add(snapshotKey);
+        resolvedTargetIds.add(targetId);
+      }
+    }
+    if (resolvedTargetIds.size === targetIds.size) {
+      break;
+    }
+  }
+  return snapshotKeys;
+}
+
+async function listPersistedCandidatePoolFiles(directory) {
+  let entries;
+  try {
+    entries = await fs.readdir(directory, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+  const files = [];
+  for (const entry of entries) {
+    const entryPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await listPersistedCandidatePoolFiles(entryPath));
+    } else if (entry.isFile() && entry.name.endsWith(".candidates.json")) {
+      files.push(entryPath);
+    }
+  }
+  return files.sort();
 }
 
 function normalizeRecentMainUrlHistory(value) {
@@ -1076,7 +1225,15 @@ function modelLaunchTopicKey(candidate) {
   return releaseLike ? `model:${namedModel[0].replace(/\s+/g, "-").toLowerCase()}` : "";
 }
 
-function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, candidates = [], evidenceAssets }) {
+function buildDraftReport({
+  reportDate,
+  generatedAt,
+  selection,
+  sourceAudit,
+  candidates = [],
+  officialBlogContextReceipt,
+  evidenceAssets
+}) {
   const aigcCount = selection.main_items.filter((item) => item.editorial_category === "content_aigc").length +
     selection.community_leads.filter((item) => item.editorial_category === "content_aigc").length;
   const report = {
@@ -1112,6 +1269,7 @@ function buildDraftReport({ reportDate, generatedAt, selection, sourceAudit, can
       main_items: selection.main_items.length,
       builder_observations: selection.builder_observations.length,
       builder_skill_used: ["candidate-pool-autodraft"],
+      ...(officialBlogContextReceipt ? { official_blog_context: officialBlogContextReceipt } : {}),
       selection_snapshot: {
         main_items: selection.selection_snapshot?.main_items || {
           eligible_candidates: selection.eligible_counts?.main_items || 0,
@@ -2132,7 +2290,7 @@ function projectItem(candidate, meta) {
   };
 }
 
-function hotBlogItem(candidate) {
+function hotBlogItem(candidate, options = {}) {
   const fields = nonPrimaryDisclosureFields(candidate);
   const summary = hotBlogSummary(candidate);
   return {
@@ -2147,7 +2305,7 @@ function hotBlogItem(candidate) {
     event_date: candidate.event_date,
     topic: topicForCandidate(candidate),
     summary,
-    content_type: "blog"
+    content_type: options.officialBlogContentTypes?.get(candidate.id) || "blog"
   };
 }
 
@@ -2867,7 +3025,11 @@ function mergeSourceAudit(target, audit) {
 
 function updateAuditIncludedCounts(sourceAudit, candidates) {
   const audit = {};
-  for (const groupName of REQUIRED_AUDIT_GROUPS) {
+  const groupNames = [
+    ...REQUIRED_AUDIT_GROUPS,
+    ...OPTIONAL_SOURCE_WATCH_AUDIT_GROUPS.filter((groupName) => sourceAudit[groupName])
+  ];
+  for (const groupName of groupNames) {
     audit[groupName] = sanitizeReportAuditGroup(sourceAudit[groupName] || emptyAuditGroup(groupName));
     const included = candidates.filter((candidate) => candidate.status === "included" && auditGroupForCandidate(candidate) === groupName).length;
     const candidatesFound = Number.isInteger(audit[groupName].candidates_found) ? audit[groupName].candidates_found : included;
@@ -3019,6 +3181,8 @@ function sanitizeDailyTrackingComponentRow(row) {
 }
 
 function auditGroupForCandidate(candidate) {
+  if (candidate?.source_watch?.signal === "github_watch") return "github_watch";
+  if (candidate?.source_watch?.signal === "site_watch") return "site_watch";
   if (isPlatformExemptCategory(candidate.category)) {
     return auditGroupForPlatform(candidate.platform || platformFromCandidateCategory(candidate.category));
   }
@@ -3160,7 +3324,10 @@ function normalizeCandidate(rawCandidate, context) {
     ...(Array.isArray(rawCandidate.matched_terms) ? { matched_terms: rawCandidate.matched_terms.map((term) => String(term || "").trim()).filter(Boolean).slice(0, 12) } : {}),
     ...(rawCandidate.exemption_policy ? { exemption_policy: rawCandidate.exemption_policy } : {}),
     ...(rawCandidate.published_by_gate ? { published_by_gate: rawCandidate.published_by_gate } : {}),
-    ...(rawCandidate.curated_first_party === true ? { curated_first_party: true } : {})
+    ...(rawCandidate.curated_first_party === true ? { curated_first_party: true } : {}),
+    ...(rawCandidate.source_watch && typeof rawCandidate.source_watch === "object" && !Array.isArray(rawCandidate.source_watch)
+      ? { source_watch: structuredClone(rawCandidate.source_watch) }
+      : {})
   };
   const editorialCategory = rawCandidate.editorial_category || inferredEditorialCategory(candidate);
   if (editorialCategory) {
@@ -3172,7 +3339,7 @@ function normalizeCandidate(rawCandidate, context) {
   if (!candidate.verification_status && candidate.source_level && TRUSTED_PRIMARY_SOURCE_LEVELS.has(candidate.source_level)) {
     candidate.verification_status = candidate.source_level === "multi_source" ? "multi_source_confirmed" : "primary_confirmed";
   }
-  return candidate;
+  return applyDirectPrimaryTargetVerification(candidate);
 }
 
 function markIncludedCandidate(candidate, category, includedIn) {
@@ -3194,7 +3361,10 @@ function derivedCandidate(candidate, options) {
 }
 
 function cloneCandidates(candidates) {
-  return candidates.map((candidate) => ({ ...candidate }));
+  return candidates.map((candidate) => ({
+    ...candidate,
+    ...(isSourceWatchCandidate(candidate) ? { source_watch: structuredClone(candidate.source_watch) } : {})
+  }));
 }
 
 function uniqueCandidatesById(candidates) {
@@ -3805,41 +3975,6 @@ function hasPrimaryStoryEvidence(candidate) {
   const primaryUrl = normalizeUrl(candidate.primary_url);
   const ownUrl = normalizeUrl(candidate.url);
   return Boolean(primaryUrl && primaryUrl !== ownUrl);
-}
-
-function isDirectPrimaryPublicationUrl(candidate) {
-  const declaredSourceLevel = String(candidate?.source_level || "").trim();
-  if (declaredSourceLevel !== "paper" && declaredSourceLevel !== "paper_api") {
-    return false;
-  }
-  let publicationUrl;
-  let pathname;
-  try {
-    publicationUrl = new URL(String(candidate?.url || ""));
-    pathname = decodeURIComponent(publicationUrl.pathname).replace(/\/+$/, "") || "/";
-  } catch {
-    return false;
-  }
-  const hostname = publicationUrl.hostname.toLowerCase().replace(/^www\./, "");
-  if (hostname === "arxiv.org") {
-    return /^\/(?:abs|pdf)\/(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z-]+)?\/\d{7})(?:v\d+)?(?:\.pdf)?$/i.test(pathname);
-  }
-  if (hostname === "openreview.net") {
-    return /^\/(?:forum|pdf)$/i.test(pathname) && Boolean(publicationUrl.searchParams.get("id")?.trim());
-  }
-  if (hostname === "biorxiv.org" || hostname === "medrxiv.org") {
-    return /^\/content\/(?:10\.\d{4,9}\/[^/]+|\d{4}\.\d{2}\.\d{2}\.\d+)(?:v\d+)?(?:\.full|\.full\.pdf)?$/i.test(pathname);
-  }
-  if (hostname === "aclanthology.org") {
-    return /^\/\d{4}\.[a-z0-9-]+\.\d+$/i.test(pathname);
-  }
-  if (hostname === "papers.nips.cc") {
-    return /^\/(?:paper_files\/paper|paper)\/\d{4}\/hash\/[a-f0-9]+-(?:Abstract-Conference|Paper-Conference)(?:\.html|\.pdf)$/i.test(pathname);
-  }
-  if (hostname === "proceedings.mlr.press") {
-    return /^\/v\d+\/[a-z0-9-]+(?:\.html|\/[a-z0-9-]+\.pdf)$/i.test(pathname);
-  }
-  return false;
 }
 
 function hasMainStreamSignal(candidate, meta = {}, reportDate = "") {
@@ -6971,6 +7106,216 @@ function normalizeInputPaths(value) {
     .split(/[,\s]+/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+async function loadOfficialBlogDailyContext({
+  rootDir,
+  reportDate,
+  contextPath,
+  discoveryInputPaths = [],
+  allowDegraded = false
+}) {
+  if (!contextPath) {
+    return {
+      artifact: null,
+      receipt: officialBlogContextReceipt({ configured: false, reason: "not_configured" })
+    };
+  }
+  const resolvedRoot = path.resolve(rootDir);
+  const resolvedContextPath = path.resolve(resolvedRoot, contextPath);
+  const portableContextPath = officialBlogContextRelativePath(resolvedRoot, resolvedContextPath);
+  if (!portableContextPath) {
+    return officialBlogContextFailure({
+      allowDegraded,
+      contextPath: String(contextPath),
+      reason: "context_path_outside_repo"
+    });
+  }
+
+  let raw;
+  let artifact;
+  try {
+    raw = await fs.readFile(resolvedContextPath, "utf8");
+    artifact = JSON.parse(raw);
+  } catch {
+    return officialBlogContextFailure({ allowDegraded, contextPath: portableContextPath, reason: "context_artifact_unreadable" });
+  }
+  if (
+    artifact?.kind !== "official_blog_daily_context"
+    || artifact?.report_date !== reportDate
+    || artifact?.context?.kind !== "official_blog_knowledge_context"
+    || artifact?.context?.visibility !== "internal"
+    || !Array.isArray(artifact?.context?.records)
+    || !Array.isArray(artifact?.bindings)
+  ) {
+    return officialBlogContextFailure({ allowDegraded, contextPath: portableContextPath, reason: "context_artifact_invalid" });
+  }
+
+  const sourceArtifactPath = officialBlogContextRelativePath(
+    resolvedRoot,
+    path.resolve(resolvedRoot, String(artifact.source_artifact_path || ""))
+  );
+  const normalizedInputs = new Set(discoveryInputPaths
+    .map((inputPath) => officialBlogContextRelativePath(resolvedRoot, path.resolve(resolvedRoot, inputPath)))
+    .filter(Boolean));
+  if (!sourceArtifactPath || !normalizedInputs.has(sourceArtifactPath)) {
+    return officialBlogContextFailure({ allowDegraded, contextPath: portableContextPath, reason: "source_artifact_not_in_draft_inputs" });
+  }
+
+  let sourceRaw;
+  let sourceArtifact;
+  try {
+    sourceRaw = await fs.readFile(path.resolve(resolvedRoot, sourceArtifactPath), "utf8");
+    sourceArtifact = JSON.parse(sourceRaw);
+  } catch {
+    return officialBlogContextFailure({ allowDegraded, contextPath: portableContextPath, reason: "source_artifact_unreadable" });
+  }
+  if (sourceArtifact?.report_date !== reportDate) {
+    return officialBlogContextFailure({
+      allowDegraded,
+      contextPath: portableContextPath,
+      reason: "source_artifact_report_date_mismatch"
+    });
+  }
+  const sourceSha256 = createHash("sha256").update(sourceRaw).digest("hex");
+  if (sourceSha256 !== String(artifact.source_artifact_sha256 || "").toLowerCase()) {
+    return officialBlogContextFailure({ allowDegraded, contextPath: portableContextPath, reason: "source_artifact_sha256_mismatch" });
+  }
+  const contextSha256 = createHash("sha256").update(JSON.stringify(artifact.context)).digest("hex");
+  if (contextSha256 !== String(artifact.context_sha256 || "").toLowerCase()) {
+    return officialBlogContextFailure({ allowDegraded, contextPath: portableContextPath, reason: "context_sha256_mismatch" });
+  }
+  const bindingsSha256 = createHash("sha256").update(JSON.stringify(artifact.bindings)).digest("hex");
+  if (bindingsSha256 !== String(artifact.bindings_sha256 || "").toLowerCase()) {
+    return officialBlogContextFailure({ allowDegraded, contextPath: portableContextPath, reason: "bindings_sha256_mismatch" });
+  }
+  if (!officialBlogDailyBindingsMatchContextAndSource(artifact, sourceArtifact)) {
+    return officialBlogContextFailure({ allowDegraded, contextPath: portableContextPath, reason: "bindings_context_source_mismatch" });
+  }
+  const contentTypes = [...new Set(artifact.bindings
+    .map((binding) => String(binding?.content_type || ""))
+    .filter((contentType) => OFFICIAL_BLOG_DAILY_CONTENT_TYPES.has(contentType)))].sort();
+  const candidateIds = [...new Set(artifact.bindings.flatMap((binding) => (
+    Array.isArray(binding?.candidate_ids) ? binding.candidate_ids : []
+  )).map((candidateId) => String(candidateId || "").trim()).filter(Boolean))].sort();
+  return {
+    artifact,
+    receipt: officialBlogContextReceipt({
+      configured: true,
+      consumed: true,
+      reason: "same_day_source_and_context_sha_verified",
+      artifactPath: portableContextPath,
+      artifactSha256: createHash("sha256").update(raw).digest("hex"),
+      sourceArtifactPath,
+      sourceArtifactSha256: sourceSha256,
+      recordCount: artifact.context.records.length,
+      bindingCount: artifact.bindings.length,
+      boundCandidateCount: candidateIds.length,
+      contentTypes
+    })
+  };
+}
+
+function officialBlogContextFailure({ allowDegraded, contextPath, reason }) {
+  if (!allowDegraded) {
+    throw new PublisherError("official_blog_context_invalid", `Official-blog daily context cannot be consumed: ${reason}.`, {
+      path: contextPath,
+      reason
+    });
+  }
+  return {
+    artifact: null,
+    receipt: officialBlogContextReceipt({ configured: true, consumed: false, artifactPath: contextPath, reason })
+  };
+}
+
+function officialBlogContextReceipt(options = {}) {
+  return {
+    configured: options.configured === true,
+    consumed: options.consumed === true,
+    reason: String(options.reason || ""),
+    ...(options.artifactPath ? { artifact_path: options.artifactPath } : {}),
+    ...(options.artifactSha256 ? { artifact_sha256: options.artifactSha256 } : {}),
+    ...(options.sourceArtifactPath ? { source_artifact_path: options.sourceArtifactPath } : {}),
+    ...(options.sourceArtifactSha256 ? { source_artifact_sha256: options.sourceArtifactSha256 } : {}),
+    record_count: Number(options.recordCount || 0),
+    binding_count: Number(options.bindingCount || 0),
+    bound_candidate_count: Number(options.boundCandidateCount || 0),
+    content_types: Array.isArray(options.contentTypes) ? options.contentTypes : []
+  };
+}
+
+function officialBlogContextRelativePath(rootDir, filePath) {
+  const relative = path.relative(path.resolve(rootDir), path.resolve(filePath));
+  if (!relative || relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    return "";
+  }
+  return relative.split(path.sep).join("/");
+}
+
+export function officialBlogContentTypeByCandidateId(artifact) {
+  const selected = new Map();
+  for (const binding of Array.isArray(artifact?.bindings) ? artifact.bindings : []) {
+    const contentType = String(binding?.content_type || "");
+    if (!OFFICIAL_BLOG_DAILY_CONTENT_TYPES.has(contentType)) continue;
+    const score = Number.isFinite(Number(binding?.score)) ? Number(binding.score) : 0;
+    for (const candidateId of Array.isArray(binding?.candidate_ids) ? binding.candidate_ids : []) {
+      const normalizedId = String(candidateId || "").trim();
+      const current = selected.get(normalizedId);
+      if (normalizedId && (!current || score > current.score)) {
+        selected.set(normalizedId, { contentType, score });
+      }
+    }
+  }
+  return new Map([...selected.entries()].map(([candidateId, value]) => [candidateId, value.contentType]));
+}
+
+function officialBlogDailyBindingsMatchContextAndSource(artifact, sourceArtifact) {
+  const records = Array.isArray(artifact?.context?.records) ? artifact.context.records : [];
+  const bindings = Array.isArray(artifact?.bindings) ? artifact.bindings : [];
+  if (records.length !== bindings.length) return false;
+  const entries = officialBlogDailySourceEntries(sourceArtifact);
+  const recordsById = new Map(records.map((record) => [String(record?.id || ""), record]));
+  const seen = new Set();
+  for (const binding of bindings) {
+    const recordId = String(binding?.record_id || "");
+    const record = recordsById.get(recordId);
+    if (!recordId || !record || seen.has(recordId)) return false;
+    seen.add(recordId);
+    const contentType = String(binding?.content_type || "");
+    if (!OFFICIAL_BLOG_DAILY_CONTENT_TYPES.has(contentType) || contentType !== String(record.content_type || "")) return false;
+    const bindingScore = Number.isFinite(Number(binding?.score)) ? Number(binding.score) : 0;
+    const recordScore = Number.isFinite(Number(record?.score)) ? Number(record.score) : 0;
+    if (bindingScore !== recordScore) return false;
+    const sourceEntryIndexes = Array.isArray(record.source_entry_indexes) ? record.source_entry_indexes : [];
+    if (sourceEntryIndexes.length === 0 || sourceEntryIndexes.some(
+      (index) => !Number.isInteger(index) || index < 0 || index >= entries.length
+    )) return false;
+    const expectedCandidateIds = [...new Set(sourceEntryIndexes
+      .map((index) => entries[index])
+      .map((entry) => String(entry?.id || entry?.candidate_id || "").trim())
+      .filter(Boolean))].sort();
+    const actualCandidateIds = [...new Set((Array.isArray(binding?.candidate_ids) ? binding.candidate_ids : [])
+      .map((candidateId) => String(candidateId || "").trim())
+      .filter(Boolean))].sort();
+    if (expectedCandidateIds.length !== actualCandidateIds.length
+      || expectedCandidateIds.some((candidateId, index) => candidateId !== actualCandidateIds[index])) return false;
+  }
+  return seen.size === recordsById.size;
+}
+
+function officialBlogDailySourceEntries(input = {}) {
+  if (Array.isArray(input)) return input;
+  if (!input || typeof input !== "object") return [];
+  const entries = [];
+  for (const key of [
+    "context_entries", "contextEntries", "entries", "reviewed_entries", "reviewedEntries",
+    "review_queue", "reviewQueue", "records", "candidates", "items", "stories", "main_items",
+    "hot_blogs", "official_org_updates"
+  ]) {
+    if (Array.isArray(input[key])) entries.push(...input[key]);
+  }
+  return entries;
 }
 
 async function loadDiscoveryInputs(rootDir, inputPaths) {

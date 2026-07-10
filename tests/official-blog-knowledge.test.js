@@ -1098,6 +1098,53 @@ test("official blog authoring brief creates human templates from accepted decisi
   assert.equal(briefPayload.includes("content_html"), false);
 });
 
+test("official blog authoring classifies accepted content types without changing admission", () => {
+  const cases = [
+    ["new-model", "new_model", "model_release_context"],
+    ["new-product", "new_product", "product_practice"],
+    ["safety", "safety_engineering", "safety_policy"],
+    ["eval", "eval_methodology", "best_practice"],
+    ["agent-workflow", "agent_workflow", "engineering_note"]
+  ];
+  const acceptedForAuthoring = cases.map(([id, criterion]) => ({
+    intake_id: `openai-${id}-2026-07-10`,
+    company: "openai",
+    company_label: "OpenAI",
+    canonical_url: `https://openai.com/index/${id}`,
+    normalized_url: `https://openai.com/index/${id}`,
+    published_at: "2026-07-10",
+    title_original: `Official blog ${id}`,
+    deterministic_triage: {
+      decision: "include",
+      reason: "Existing admission policy accepted this fixture.",
+      matched_criteria: [criterion]
+    },
+    ai_review: { decision: "include", matched_criteria: [criterion] },
+    final_decision: "include",
+    final_action: "ready_for_manual_authoring"
+  }));
+  const brief = createOfficialBlogAuthoringBrief({
+    review_decisions: {
+      kind: "official_blog_review_decisions",
+      report_date: "2026-07-10",
+      accepted_for_authoring: acceptedForAuthoring,
+      needs_manual_review: [],
+      excluded: [],
+      invalid_decisions: []
+    }
+  }, {
+    reportDate: "2026-07-10",
+    generatedAt: "2026-07-10T08:00:00.000Z"
+  });
+
+  assert.equal(brief.admission_policy.version, "official-blog-admission-v1");
+  assert.equal(brief.authoring_items.length, cases.length);
+  const contentTypeById = new Map(brief.authoring_items.map((item) => [item.intake_id, item.suggested_fields.content_type]));
+  for (const [id, _criterion, expectedContentType] of cases) {
+    assert.equal(contentTypeById.get(`openai-${id}-2026-07-10`), expectedContentType);
+  }
+});
+
 test("official blog reviewed authoring validates completed templates and keeps manual items separate", () => {
   const result = createOfficialBlogReviewedAuthoring({
     kind: "official_blog_authoring_brief",

@@ -2,7 +2,7 @@
 
 Daily resilience policy: `config/daily-resilience-policy.json` is the authoritative retry/fallback/degrade/block table for the Codex-native runner. Workflow, prompt, and automation changes must pass `corepack pnpm run resilience:validate`; safe public source/coverage failures may end as `published_degraded`; successful repository publish with delayed Pages propagation may end as `published_pending_pages_verification`; unsafe content, unrecoverable rendering/schema failures, internal leakage, fake tracking components, and exhausted publish infrastructure end as `infrastructure_blocked_after_fallback_exhausted` or another whitelisted blocker.
 
-Status self-check: the 21:30 automation must call `status:self-check` after the daily publish window. It records `.tmp/status-self-check-YYYY-MM-DD.json`, verifies `sources:phase5-audit`/`publish:dry-run:daily` still pass from the clean runner baseline, and treats `multiple_active_daily_publish_automations` as a blocking issue.
+Status self-check is no longer separately scheduled. The production `.tmp/run-summary-YYYY-MM-DD.json` is the single publish and health truth source. Keep `status:self-check` as a manual diagnostic for `sources:phase5-audit`, `publish:dry-run:daily`, Pages, source health, and automation inventory; `multiple_active_daily_publish_automations` remains blocking.
 
 定时任务和长程发布任务必须从 launcher worktree 启动，统一调用可调试的 Codex 分阶段 pipeline：
 
@@ -12,7 +12,7 @@ corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
 corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
 ```
 
-Production Source Watch is not connected. Scheduled runs do not pass a fixture artifact; they read `source_watch.production_status:"not_connected"`, `consumed:false`, and `source_watch_requested_artifact_path` from `.tmp/run-summary-YYYY-MM-DD.json`. `source_watch_admitted_artifact_path` stays empty until a real producer and consumer are wired; never scan `.tmp/daily-codex-pipeline/YYYY-MM-DD` for a newest artifact.
+Production Source Watch runs through `discover_source_watch`, `report_draft`, `report_write`, and `build`. Read `source_watch.production_status`, `source_watch.connected`, and `source_watch.consumed` from `.tmp/run-summary-YYYY-MM-DD.json`; connected/consumed requires the producer stage's exact artifact path/SHA-256 receipt, equal producer/pool snapshot sets, `reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json`, and matching `source_watch.consumption.candidate_pool_hashes`. A valid zero-inclusion run is still consumed. Missing/mismatched evidence remains false. Scheduled runs pass no artifact argument and never scan `.tmp` for a newest handoff.
 
 - 该脚本把 collect、admit、每条 summarize 和 assemble 拆成独立 `codex exec --ephemeral` 上下文；定时任务迁移到该入口后，只传日期和执行意图，不在 automation prompt 中内联信息收集、准入、逐条概括或发布流水线。
 - 默认不带 `--publish` 只生成和验证，终态为 `final_status:"generated_only"`。

@@ -117,6 +117,7 @@ export function App() {
           <a href="index.html">今日</a>
           <a href="ops.html">运行</a>
           {model.latestReport?.url ? <a href={model.latestReport.url}>日报</a> : null}
+          <a href="official-blogs/">官方博客</a>
           <a href="articles.json">数据</a>
         </nav>
       </header>
@@ -139,6 +140,10 @@ export function App() {
           </div>
         </div>
       </section>
+
+      {state.status === "ready" && model.sourceWatchArticles.length > 0 ? (
+        <SourceWatchRail articles={model.sourceWatchArticles} />
+      ) : null}
 
       <section className="adc-board">
         <div className="adc-board-header">
@@ -168,6 +173,47 @@ export function App() {
         ) : null}
       </section>
     </main>
+  );
+}
+
+function SourceWatchRail({ articles }: { articles: Article[] }) {
+  return (
+    <section className="adc-source-watch" aria-labelledby="source-watch-title" data-source-watch-rail>
+      <div className="adc-source-watch-header">
+        <div>
+          <p className="adc-kicker">持续监测</p>
+          <h2 id="source-watch-title">Source Watch</h2>
+        </div>
+        <p>只展示相对历史快照发生实质变化的仓库与站点，并直接回指原始来源。</p>
+      </div>
+      <div className="adc-source-watch-grid">
+        {articles.map((article, index) => {
+          const title = cleanText(article.title) || "未命名信号";
+          return (
+            <article key={article.id || `${article.url || title}-${index}`} className="adc-source-watch-card">
+              <div className="adc-card-topline">
+                <span>SW.{String(index + 1).padStart(2, "0")}</span>
+                <Badge variant="neutral" label={cleanText(article.source) || "Source Watch"} />
+              </div>
+              <h3>
+                {article.url ? (
+                  <a href={article.url} target="_blank" rel="noopener noreferrer">{title}</a>
+                ) : title}
+              </h3>
+              <p>{cleanText(article.summary) || "公开快照发生变化。"}</p>
+              <div className="adc-card-footer">
+                <span>{formatDateShort(dateKey(article))}</span>
+                {article.url ? (
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" aria-label={`打开 Source Watch 来源：${title}`}>
+                    <ArrowUpRight size={16} />
+                  </a>
+                ) : null}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -275,21 +321,23 @@ function buildViewModel(articles: Article[], feed: Feed | null, mode: Mode) {
     if (dateDiff !== 0) return dateDiff;
     return Number(b.quality_score || 0) - Number(a.quality_score || 0);
   });
-  const dates = Array.from(new Set(sorted.map(dateKey).filter(Boolean)));
+  const sourceWatchArticles = sorted.filter((article) => article.section === "source_watch").slice(0, 4);
+  const editorialArticles = sorted.filter((article) => article.section !== "source_watch");
+  const dates = Array.from(new Set(editorialArticles.map(dateKey).filter(Boolean)));
   const latestReport = feed?.reports?.[0] || null;
   const feedLatestDate = latestReport?.report_date || "";
-  const latestDate = feedLatestDate && sorted.some((article) => dateKey(article) === feedLatestDate)
+  const latestDate = feedLatestDate && editorialArticles.some((article) => dateKey(article) === feedLatestDate)
     ? feedLatestDate
     : dates[0] || feedLatestDate;
   const yesterdayDate = dates.find((date) => date !== latestDate) || "";
-  const todayArticles = sorted.filter((article) => dateKey(article) === latestDate);
-  const yesterdayArticles = sorted.filter((article) => dateKey(article) === yesterdayDate);
+  const todayArticles = editorialArticles.filter((article) => dateKey(article) === latestDate);
+  const yesterdayArticles = editorialArticles.filter((article) => dateKey(article) === yesterdayDate);
   const visibleArticles =
     mode === "today"
       ? todayArticles.slice(0, 18)
       : mode === "yesterday"
         ? yesterdayArticles.slice(0, 18)
-        : sorted.slice(0, 60);
+        : editorialArticles.slice(0, 60);
   const sourceCount = new Set(sorted.map((article) => cleanText(article.source)).filter(Boolean)).size;
   const heroSummary = cleanText(latestReport?.summary) ||
     "把每日 AI 资讯直接放在首页，按来源质量、时间和读者决策价值组织。";
@@ -307,6 +355,7 @@ function buildViewModel(articles: Article[], feed: Feed | null, mode: Mode) {
     sourceCount,
     heroSummary,
     resultMeta,
+    sourceWatchArticles,
     visibleArticles
   };
 }
