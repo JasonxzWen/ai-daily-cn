@@ -12,7 +12,7 @@ corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
 corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
 ```
 
-Source Watch admitted candidates are a conditional explicit handoff: when .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json exists, append --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json and expect source_watch_admitted_artifact_path in .tmp/run-summary-YYYY-MM-DD.json; do not scan .tmp for a newest artifact.
+Production Source Watch is not connected. Scheduled runs do not pass a fixture artifact; they read `source_watch.production_status:"not_connected"`, `consumed:false`, and `source_watch_requested_artifact_path` from `.tmp/run-summary-YYYY-MM-DD.json`. `source_watch_admitted_artifact_path` stays empty until a real producer and consumer are wired; never scan `.tmp/daily-codex-pipeline/YYYY-MM-DD` for a newest artifact.
 
 - 该脚本把 collect、admit、每条 summarize 和 assemble 拆成独立 `codex exec --ephemeral` 上下文；定时任务迁移到该入口后，只传日期和执行意图，不在 automation prompt 中内联信息收集、准入、逐条概括或发布流水线。
 - 默认不带 `--publish` 只生成和验证，终态为 `final_status:"generated_only"`。

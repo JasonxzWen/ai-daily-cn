@@ -1,6 +1,8 @@
 # Codex 自动化创建参数
 
-Source Watch admitted candidates are published only through an explicit scheduler handoff. When .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json exists, the daily publish automation appends --source-watch-admitted-artifact .tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json and records source_watch_admitted_artifact_path in .tmp/run-summary-YYYY-MM-DD.json; it must not scan .tmp for a newest artifact.
+Production Source Watch is not connected. The daily automation must not claim an admitted artifact was consumed: `.tmp/run-summary-YYYY-MM-DD.json` records `source_watch.production_status:"not_connected"`, `consumed:false`, and diagnostic `source_watch_requested_artifact_path`, while `source_watch_admitted_artifact_path` stays empty. Do not scan `.tmp/daily-codex-pipeline/YYYY-MM-DD` for a newest artifact or pass fixture artifacts from the scheduler.
+
+The live `ai-2` automation is intentionally thin: bootstrap latest origin/main, call one `daily:codex-pipeline` command, then read the one run summary. Nested Codex ignores user configuration, accepts an explicit model only when the command passes `--model`, returns schema-constrained UTF-8 JSON from a read-only sandbox, and has a 20-minute per-call timeout. Do not copy business stages back into the scheduler prompt.
 
 ## 21:30 状态自检自动化
 
@@ -21,7 +23,9 @@ Source Watch admitted candidates are published only through an explicit schedule
 | Reasoning effort | `xhigh` |
 | Status | `ACTIVE` |
 
-## 自动化提示词
+## 历史长提示词（已退役，仅作合同来源对照）
+
+The long block below is not the scheduler prompt and must not be copied into an automation. The authoritative operating shape is the thin `Codex-native pipeline prompt` section and the live automation record; repository code owns orchestration, repair, validation, fallback, and terminal state.
 
 ```text
 始终用中文回复。
@@ -136,7 +140,7 @@ corepack pnpm run publish:github-api -- --confirm-push --date YYYY-MM-DD
 结构化草稿必须把 `github_trending`、`builder_sources`、`content_sources`、`search_sources`、`sources_health` 都合并进最终 `source_audit`，记录 `checked:true`、检查过的来源、候选数、入选数和未入选原因；只保留命令 stdout 不算连续运行证据。GitHub trending 条目进入 `github_trending` 时应填写 `rank`、`previous_rank`、`rank_delta`、`trend`、`event_date`、`source`、`evidence`；进入 `projects` 时还应填写 `domains`、`use_case`、`signal`，并确保它会作为 GitHub Trending highlight 呈现。如果 shell 网络受限但浏览器能保存 GitHub Trending HTML 或采样 JSON，可运行 `corepack pnpm run discover:github-trending -- --browser-export <path>` 复用同一解析器。Builder 来源受阻时必须在 `source_audit.builder_sources` 填写 `blocked_reason` 与 `last_successful_feed_at`，不要只写进 notes；如果 Builder 候选存在但未入选，也必须写明过滤原因。Builder 条目进入 `builder_observations` 时必须填写 `original_text`、`translation`、`role`、`event_date`、`source`、`evidence`，并让 `content` 等于完整中文 `translation`；有 handle/头像时填写 `handle` 和 `avatar_url`，构建器会 best-effort 缓存为本地头像。合格候选足够时公开入选 5-20 条；没有合格候选时保持空数组，但必须在 `source_audit` 说明已经检查过什么。
 ## Codex-native pipeline prompt
 
-定时任务 prompt 应保持很薄：从 launcher worktree 调用 `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`，真实发布时调用 `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`。pipeline 固定写 `.tmp/run-summary-YYYY-MM-DD.json`，定时任务只读取 `final_status`、`completed_stages` 和 `next_action`；如果需要丢弃同日未完成 pipeline 状态，删除或换用 `.tmp/daily-codex-pipeline/YYYY-MM-DD` 工作目录后重新运行同一命令。调度 dry-run 由 pipeline 内部执行 `publish:dry-run:daily`，旧 `publish:dry-run -- --date YYYY-MM-DD` 只保留给人工诊断。
+定时任务 prompt 应保持很薄：从 launcher worktree 调用 `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --codex-bin codex.cmd`，真实发布时追加 `--publish`。pipeline 固定写 `.tmp/run-summary-YYYY-MM-DD.json`，定时任务只读取 `automation_pipeline_mode`、`orchestration_node_count`、`final_status`、`completed_stages`、`next_action` 和 Source Watch 的 truthful state；不得扫描 `.tmp` 猜测 handoff，也不得回退到手工 AI repair 或逐阶段命令。调度 dry-run 由 pipeline 内部执行 `publish:dry-run:daily`，旧 `publish:dry-run -- --date YYYY-MM-DD` 只保留给人工诊断。
 
 ## Daily resilience policy
 

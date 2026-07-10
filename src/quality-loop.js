@@ -1,5 +1,6 @@
 import { PublisherError } from "./errors.js";
 import { findPlainLanguageIssues } from "./plain-language.js";
+import { collectCandidateCoverageIssues } from "./candidates.js";
 
 const PUBLIC_COPY_BANNED_TERMS = [
   "披露",
@@ -1130,6 +1131,21 @@ function collectCandidatePoolIssues(report, candidatePool, issues, context = {})
         details: { candidate_id: ref.id, expected: ref.section, actual: candidate.included_in }
       });
     }
+  }
+
+  for (const coverageIssue of collectCandidateCoverageIssues(report, candidatePool)) {
+    const path = String(coverageIssue?.path || "candidate_pool");
+    const alreadyRecorded = issues.some((issue) =>
+      issue.code === "candidate_pool_reference_invalid" && issue.path === path
+    );
+    if (alreadyRecorded) continue;
+    issues.push({
+      code: "candidate_pool_reference_invalid",
+      severity: "error",
+      path,
+      message: String(coverageIssue?.message || "Candidate coverage does not satisfy the report-write contract."),
+      repairable: false
+    });
   }
 }
 

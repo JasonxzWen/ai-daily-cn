@@ -1,0 +1,44 @@
+{
+  "schema_version": "1",
+  "id": "adc-public-surfaces-20260710",
+  "title": "ADC public surfaces recovery",
+  "tool": "manual",
+  "status": "accepted",
+  "source": {
+    "tool_url": "",
+    "generated_at": "2026-07-10T00:00:00.000Z",
+    "references": [
+      "design/adc-visual-system.md",
+      "docs/adc-modernization-roadmap.md"
+    ]
+  },
+  "prompt": {
+    "path": "design/prototypes/adc-public-surfaces.prompt.md",
+    "summary": "Recover the accepted ADC language across every public surface without replacing the product architecture."
+  },
+  "evidence": {
+    "screenshots": [
+      "design/prototypes/adc-public-surfaces.png"
+    ],
+    "decision_record": "design/prototypes/adc-public-surfaces.decision.md",
+    "notes": "Accepted after 1440x900 and 390x844 browser validation across the homepage, operations page, official-blog index, and latest generated report."
+  },
+  "production_boundary": {
+    "generated_code_policy": "translated",
+    "allowed_output": [
+      "design decision",
+      "shared ADC tokens",
+      "Astryx component composition",
+      "browser evidence"
+    ],
+    "forbidden_output": [
+      "direct generated production source",
+      "new component framework",
+      "third-party illustration IP copy"
+    ]
+  },
+  "handoff": {
+    "target_surface": "apps/web plus generated public report and operations shells",
+    "translation_notes": "Keep content engines separate and converge only on a repository-owned ADC visual contract."
+  }
+}

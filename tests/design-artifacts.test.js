@@ -11,6 +11,45 @@ test("repository design toolchain artifacts satisfy the contract", async () => {
   assert.equal(result.ok, true, JSON.stringify(result.issues, null, 2));
   assert(result.required_docs.every((doc) => doc.exists));
   assert(result.artifacts_checked >= 1);
+  assert.equal(result.template_records_checked, 1);
+});
+
+test("design artifact validator does not count the template as shipped design evidence", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "adc-design-template-only-"));
+  await write(path.join(rootDir, "design", "adc-visual-system.md"), "ADC visual system\n");
+  await write(
+    path.join(rootDir, "design", "design-toolchain.md"),
+    "Stitch and v0 are used for prototype evidence. Generated code is translated into Astryx components for GitHub Pages.\n"
+  );
+  await write(path.join(rootDir, "design", "prototypes", "README.md"), "Prototype records\n");
+  await write(path.join(rootDir, "design", "prototypes", "_template.prompt.md"), "Prompt\n");
+  await write(
+    path.join(rootDir, "design", "prototypes", "_template.decision.md"),
+    "## Accepted\nTemplate\n## Rejected\nNone\n## Translation Notes\nNone\n## Risks\nNone\n"
+  );
+  await write(
+    path.join(rootDir, "design", "prototypes", "_template.design.json"),
+    `${JSON.stringify({
+      schema_version: "1",
+      id: "template",
+      title: "Template",
+      tool: "manual",
+      status: "draft",
+      prompt: { path: "design/prototypes/_template.prompt.md" },
+      evidence: { screenshots: [], decision_record: "design/prototypes/_template.decision.md" },
+      production_boundary: {
+        generated_code_policy: "reference_only",
+        forbidden_output: ["direct generated code"]
+      }
+    }, null, 2)}\n`
+  );
+
+  const result = await validateDesignArtifacts({ rootDir });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.artifacts_checked, 0);
+  assert.equal(result.template_records_checked, 1);
+  assert(result.issues.some((issue) => issue.code === "design_artifact_evidence_missing"));
 });
 
 test("design artifact validator rejects direct generated-code production policy", async () => {

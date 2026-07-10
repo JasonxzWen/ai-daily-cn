@@ -6,7 +6,9 @@
     "legacy_script": "daily:run",
     "launcher_only": true,
     "summary_path_template": ".tmp/run-summary-YYYY-MM-DD.json",
-    "source_watch_admitted_artifact_path_template": ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json",
+    "source_watch_production_status": "not_connected",
+    "source_watch_consumed": false,
+    "source_watch_requested_artifact_path_template": ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json",
     "modes": {
       "dry_run": {
         "publish_allowed": false,
@@ -50,9 +52,10 @@
         "completed_stages",
         "publish:dry-run:daily",
         ".tmp/run-summary-YYYY-MM-DD.json",
-        "--source-watch-admitted-artifact",
-        ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json",
-        "source_watch_admitted_artifact_path",
+        "source_watch.production_status",
+        "not_connected",
+        "consumed:false",
+        "source_watch_requested_artifact_path",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
@@ -79,9 +82,10 @@
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         ".tmp/run-summary-YYYY-MM-DD.json",
-        "--source-watch-admitted-artifact",
-        ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json",
-        "source_watch_admitted_artifact_path",
+        "source_watch.production_status",
+        "not_connected",
+        "consumed:false",
+        "source_watch_requested_artifact_path",
         "next_action",
         "Codex-native runner"
       ]
@@ -104,9 +108,10 @@
         "21:30",
         "multiple_active_daily_publish_automations",
         ".tmp/run-summary-YYYY-MM-DD.json",
-        "--source-watch-admitted-artifact",
-        ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json",
-        "source_watch_admitted_artifact_path",
+        "source_watch.production_status",
+        "not_connected",
+        "consumed:false",
+        "source_watch_requested_artifact_path",
         "next_action"
       ]
     },
@@ -126,9 +131,10 @@
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         ".tmp/run-summary-YYYY-MM-DD.json",
-        "--source-watch-admitted-artifact",
-        ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json",
-        "source_watch_admitted_artifact_path"
+        "source_watch.production_status",
+        "not_connected",
+        "consumed:false",
+        "source_watch_requested_artifact_path"
       ]
     }
   ],
@@ -162,9 +168,6 @@
       "--execute",
       "--publish",
       ".tmp/run-summary-YYYY-MM-DD.json",
-      "--source-watch-admitted-artifact",
-      ".tmp/daily-codex-pipeline/YYYY-MM-DD/artifacts/admitted-candidates.json",
-      "source_watch_admitted_artifact_path",
       "completed_stages",
       "automation_pipeline_mode",
       "publish:dry-run:daily"

@@ -91,10 +91,6 @@ import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 import { writeDailyPublishRetrospective } from "../src/retrospectives.js";
 import { evaluateDailyContentContract } from "../scripts/check-daily-content-contract.mjs";
-import {
-  applyPromptLayerInspiredDailyTheme,
-  promptLayerInspiredDailyThemeCss
-} from "../src/daily-theme.js";
 import { buildEditorialRankArtifact } from "../src/editorial-rank.js";
 import {
   internalCandidatePoolRelativePath,
@@ -8634,7 +8630,11 @@ test("daily workflow contract validates repository workflow markers", async () =
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-workflow-contract.json"), "utf8"));
   const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
   assert.equal(contract.required_package_scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
-  assert.equal(contract.daily_runner.source_watch_admitted_artifact_path_template, expectedSourceWatchArtifactPath);
+  assert.equal(contract.daily_runner.source_watch_production_status, "not_connected");
+  assert.equal(contract.daily_runner.source_watch_consumed, false);
+  assert.equal(contract.daily_runner.source_watch_requested_artifact_path_template, expectedSourceWatchArtifactPath);
+  assert.equal(JSON.stringify(contract.required_markers).includes("--source-watch-admitted-artifact"), false);
+  assert.equal(contract.external_automation_prompt.contains.includes("--source-watch-admitted-artifact"), false);
   assert.equal(manifest.scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
   assert(!contract.daily_runner || contract.daily_runner.script !== "daily:codex-dag:contract-run");
 
@@ -8648,7 +8648,7 @@ test("daily workflow contract validates repository workflow markers", async () =
     [
       'id = "ai-daily"',
       'kind = "cron"',
-      `prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --source-watch-admitted-artifact ${expectedSourceWatchArtifactPath}; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch_admitted_artifact_path"`,
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status not_connected consumed:false source_watch_requested_artifact_path"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8677,7 +8677,7 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
 });
 
-test("daily workflow contract rejects active publish automation missing Source Watch admitted artifact handoff", async () => {
+test("daily workflow contract accepts active publish automation without a fake Source Watch handoff", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-missing-source-watch-"));
   const automationsDir = path.join(tmp, "automations");
   const promptPath = path.join(automationsDir, "ai-daily", "automation.toml");
@@ -8712,8 +8712,7 @@ test("daily workflow contract rejects active publish automation missing Source W
     automationPromptPath: promptPath
   });
 
-  assert.equal(result.ok, false);
-  assert(result.failures.some((failure) => failure.includes("--source-watch-admitted-artifact")), result.failures.join("\n"));
+  assert.equal(result.ok, true, result.failures.join("\n"));
 });
 
 test("daily workflow contract rejects DAG contract-run package script drift", async () => {
@@ -12044,8 +12043,13 @@ test("quality review requires candidate pool and flags autodraft template prose"
       candidates: [
         {
           id: "main-auto",
+          category: "main_item",
           status: "included",
-          included_in: "main_items"
+          included_in: "main_items",
+          url: report.main_items[0].url,
+          event_date: report.main_items[0].event_date,
+          source_level: "official",
+          verification_status: "primary_confirmed"
         }
       ]
     }
@@ -12086,8 +12090,13 @@ test("quality review validates autodraft candidate backreferences", async () => 
       candidates: [
         {
           id: "main-auto",
+          category: "main_item",
           status: "excluded",
-          included_in: "hot_blogs"
+          included_in: "hot_blogs",
+          url: report.main_items[0].url,
+          event_date: report.main_items[0].event_date,
+          source_level: "official",
+          verification_status: "primary_confirmed"
         }
       ]
     }
@@ -12096,6 +12105,63 @@ test("quality review validates autodraft candidate backreferences", async () => 
   assert.equal(review.ok, false);
   assert.equal(issues.length, 2);
   assert.equal(review.checklist.find((item) => item.id === "candidate_backrefs").status, "failed");
+});
+
+test("quality review shares report-write verification and disclosure coverage", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const item = {
+    ...report.main_items[0],
+    candidate_id: "main-intermediary-product",
+    editorial_category: "product_radar",
+    source_level: "official",
+    verification_status: "intermediary_only",
+    verification_note: "第三方作者转述厂商信息，尚未回到厂商公告核验。",
+    risk_note: "价格、地区和权限细节不能视为已经确认。",
+    summary: "第三方文章转述一个云端工作区入口，并提到价格、地区限制与权限边界。",
+    bullets: [
+      "**工作区入口**：文章转述云端与桌面端的文件访问方式，价格和地区限制仍待厂商公告确认。"
+    ]
+  };
+  report.main_items = [item];
+  report.github_trending = [];
+  report.huggingface_trending = [];
+  report.model_releases = [];
+  report.hot_blogs = [];
+  report.projects = [];
+  report.builder_observations = [];
+  report.community_leads = [];
+
+  const candidatePool = {
+    schema_version: 1,
+    report_date: report.report_date,
+    candidates: [
+      {
+        id: item.candidate_id,
+        category: "main_item",
+        status: "included",
+        included_in: "main_items",
+        url: item.url,
+        event_date: item.event_date,
+        source_level: "official",
+        verification_status: "intermediary_only",
+        intermediary_url: item.url,
+        verification_note: item.verification_note,
+        main_selection_stage: "refill_hot_blog",
+        evidence: "A third-party author quotes product workflow details without a verified primary release."
+      }
+    ]
+  };
+
+  const review = reviewReportQuality(report, { candidatePool });
+  const coverageIssues = review.issues.filter((issue) => issue.code === "candidate_pool_reference_invalid");
+  assert.equal(coverageIssues.some((issue) => issue.path === "main_items[0].candidate_id"), true);
+  assert.equal(review.checklist.find((entry) => entry.id === "candidate_backrefs").status, "failed");
+
+  const malformedReview = reviewReportQuality(report, {
+    candidatePool: { ...candidatePool, candidates: null }
+  });
+  assert.equal(malformedReview.ok, false);
+  assert.equal(malformedReview.issues.some((issue) => issue.code === "candidate_pool_empty"), true);
 });
 
 test("quality repair only applies safe text and highlight fixes", async () => {
@@ -12459,8 +12525,12 @@ test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
   assert.equal(await exists(path.join(outDir, "feed.json")), true);
   assert.equal(await exists(path.join(outDir, "trends.json")), true);
   assert.equal(await exists(path.join(outDir, "assets/style.css")), true);
+  assert.equal(await exists(path.join(outDir, "assets/adc-theme.css")), true);
   const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
   assert.match(indexHtml, /<link rel="stylesheet" href="assets\/style\.css\?v=[a-f0-9]{12}">/);
+  const reportHtml = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-13.html"), "utf8");
+  assert.match(reportHtml, /<link rel="stylesheet" data-adc-public-theme href="\.\.\/\.\.\/\.\.\/assets\/adc-theme\.css\?v=[a-f0-9]{12}">/);
+  assert.doesNotMatch(reportHtml, /<style data-adc-public-theme>/);
 
   const trends = JSON.parse(await fs.readFile(path.join(outDir, "trends.json"), "utf8"));
   assert.equal(validateTrends(trends).valid, true);
@@ -12494,7 +12564,7 @@ test("buildSite skips unchanged files and avoids legacy shared scratch path", as
   assert.equal(await exists(path.join(tmp, ".tmp", "effective-interact-daily")), false);
 });
 
-test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown", async () => {
+test("结构化 JSON 输入可以直接生成可发布 HTML，不要求 Markdown", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-json-build-"));
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
@@ -12571,7 +12641,7 @@ test("结构化 JSON 输入可以直接生成自包含 HTML，不要求 Markdown
   assert(html.includes("https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-15.json"));
   assert(html.includes('rel="noopener noreferrer"'));
   assert(!html.includes('<span class="unsafe-link"'));
-  assert(!html.includes('<link rel="stylesheet"'));
+  assert.match(html, /<link rel="stylesheet" data-adc-public-theme href="\.\.\/\.\.\/\.\.\/assets\/adc-theme\.css\?v=[a-f0-9]{12}">/);
   assert(!html.includes("Markdown 原文"));
 
   const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-15.json"), "utf8"));
@@ -13303,33 +13373,16 @@ test("production daily does not enable PromptLayer-inspired theme or ticket grid
   assert.match(html, /data-render-mode="pre-rendered"/);
   assert.match(html, /id="section-track-/);
   assert.doesNotMatch(html, /id="section-story-list"|id="section-today-judgment"|id="section-trend-themes"/);
-  assert.doesNotMatch(html, /<link rel="stylesheet"/);
+  assert.match(html, /<link rel="stylesheet" data-adc-public-theme href="\.\.\/\.\.\/\.\.\/assets\/adc-theme\.css\?v=[a-f0-9]{12}">/);
+  assert.doesNotMatch(html, /<style data-adc-public-theme>/);
   assert.doesNotMatch(html, /https:\/\/www\.promptlayer\.com|_next\/static|dashboard\.promptlayer\.com/);
 
   const historicalHtml = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-15.html"), "utf8");
   assert.doesNotMatch(historicalHtml, /data-ai-daily-theme="promptlayer-inspired"/);
   assert.doesNotMatch(historicalHtml, /data-ai-daily-theme-style="promptlayer-inspired"/);
   assert.doesNotMatch(historicalHtml, /main-ticket-card-grid|github-trending-card-grid/);
-});
-
-test("promptlayer-inspired daily theme injector is idempotent and self-contained", () => {
-  const html = '<!doctype html><html lang="zh-CN"><head></head><body><main class="report-shell"></main></body></html>';
-  const once = applyPromptLayerInspiredDailyTheme(html);
-  const twice = applyPromptLayerInspiredDailyTheme(once);
-
-  assert.equal((twice.match(/<html[^>]+data-ai-daily-theme="promptlayer-inspired"/g) || []).length, 1);
-  assert.equal((twice.match(/<style data-ai-daily-theme-style="promptlayer-inspired">/g) || []).length, 1);
-  assert.match(twice, /<style data-ai-daily-theme-style="promptlayer-inspired">/);
-  assert.match(promptLayerInspiredDailyThemeCss, /--daily-theme-bg:\s*#141413/);
-  assert.match(promptLayerInspiredDailyThemeCss, /\.report-hero-daily/);
-  assert.match(promptLayerInspiredDailyThemeCss, /\.report-shell::before/);
-  assert.match(promptLayerInspiredDailyThemeCss, /\.main-ticket-card-grid/);
-  assert.match(promptLayerInspiredDailyThemeCss, /\.github-trending-card-grid/);
-  assert.match(promptLayerInspiredDailyThemeCss, /\.blog-card:first-child/);
-  assert.match(promptLayerInspiredDailyThemeCss, /animation-timeline:\s*view\(\)/);
-  assert.match(promptLayerInspiredDailyThemeCss, /\.blog-card::after/);
-  assert.match(promptLayerInspiredDailyThemeCss, /prefers-reduced-motion:\s*reduce/);
-  assert.doesNotMatch(promptLayerInspiredDailyThemeCss, /@import|https?:|promptlayer\.com|_next\/static/);
+  assert.match(historicalHtml, /<link rel="stylesheet" data-adc-public-theme href="\.\.\/\.\.\/\.\.\/assets\/adc-theme\.css\?v=[a-f0-9]{12}">/);
+  assert.doesNotMatch(historicalHtml, /<style data-adc-public-theme>/);
 });
 
 test("buildSite writes effective-interact report html for 2026-06-15 without internal leakage", async () => {
@@ -21076,6 +21129,18 @@ test("report:draft refills sparse main stream with low-risk primary-required int
       url: "https://example.com/blog/agent-evaluation-practices",
       evidence: "The article compares low-risk AI agent evaluation practices: tool traces, replayable failures, release gates, and human rollback workflows.",
       editorialCategory: "engineering_toolchain"
+    }),
+    mainStreamRepairCandidate(reportDate, {
+      id: "builder-blog-official-level-but-intermediary-verification",
+      category: "hot_blog",
+      source: "Simon Willison's Weblog",
+      sourceId: "content-builder-simon-willison",
+      sourceLevel: "official",
+      verificationStatus: "intermediary_only",
+      title: "Quoting an AI vendor product workflow announcement",
+      url: "https://simonwillison.net/2026/Jul/10/openai/#atom-everything",
+      evidence: "The author quotes a vendor announcement about a cloud workflow, local files, permissions, and desktop application behavior without linking an independently verified primary release.",
+      editorialCategory: "product_radar"
     })
   ].map((candidate) => ({
     ...candidate,
@@ -21085,6 +21150,10 @@ test("report:draft refills sparse main stream with low-risk primary-required int
     notes: `intermediary_url=${candidate.url}; primary_verification_required=true`,
     verification_note: `intermediary_url=${candidate.url}; primary_verification_required=true`
   }));
+  const pathKeywordLead = lowRiskLeads.find((candidate) => candidate.id === "builder-blog-official-level-but-intermediary-verification");
+  delete pathKeywordLead.source_level;
+  delete pathKeywordLead.notes;
+  delete pathKeywordLead.verification_note;
   const highRiskLead = {
     ...mainStreamRepairCandidate(reportDate, {
       id: "techcrunch-unverified-ai-valuation-primary-required",
@@ -21151,6 +21220,9 @@ test("report:draft refills sparse main stream with low-risk primary-required int
   const snapshot = drafted.report.self_check.selection_snapshot.main_items;
   assert.equal(snapshot.shortfall, true);
   assert(snapshot.rejection_counts.secondary_single_source_story >= lowRiskLeads.length);
+  const pathKeywordPoolEntry = drafted.candidatePool.candidates.find((candidate) => candidate.id === pathKeywordLead.id);
+  assert.notEqual(pathKeywordPoolEntry?.source_level, "official", "a vendor keyword in a third-party URL path must not make the source official");
+  assert.equal(pathKeywordPoolEntry?.main_reject_reason, "secondary_single_source_story");
 });
 
 test("report:draft rewrites main item titles summaries and bullets without generic template filler", async () => {
@@ -21577,6 +21649,24 @@ test("report:draft rewrites evidence-backed paper refill instead of repeating En
     notes: "intermediary_url=https://arxiv.org/abs/2606.01444; primary_verification_required=true",
     verification_note: "intermediary_url=https://arxiv.org/abs/2606.01444; primary_verification_required=true"
   };
+  const arxivSearchLead = {
+    ...paperLead,
+    id: "arxiv-search-page-is-not-a-primary-publication",
+    title: "Search results for self-revising discovery systems",
+    url: "https://arxiv.org/search/?query=self-revising+discovery+systems&searchtype=all",
+    intermediary_url: "https://arxiv.org/search/?query=self-revising+discovery+systems&searchtype=all",
+    notes: "intermediary_url=https://arxiv.org/search/?query=self-revising+discovery+systems&searchtype=all; primary_verification_required=true",
+    verification_note: "intermediary_url=https://arxiv.org/search/?query=self-revising+discovery+systems&searchtype=all; primary_verification_required=true"
+  };
+  const malformedArxivLead = {
+    ...paperLead,
+    id: "malformed-arxiv-percent-path-is-not-a-primary-publication",
+    title: "Malformed arXiv publication path",
+    url: "https://arxiv.org/abs/%ZZ",
+    intermediary_url: "https://arxiv.org/abs/%ZZ",
+    notes: "intermediary_url=https://arxiv.org/abs/%ZZ; primary_verification_required=true",
+    verification_note: "intermediary_url=https://arxiv.org/abs/%ZZ; primary_verification_required=true"
+  };
   const discovery = discoveryEnvelope({
     candidates: [
       strategicOfficialCandidate(reportDate, {
@@ -21607,7 +21697,9 @@ test("report:draft rewrites evidence-backed paper refill instead of repeating En
         title: "Meta updates AI developer release controls",
         evidence: "Meta describes AI developer release controls, platform availability, and rollout details."
       }),
-      paperLead
+      paperLead,
+      arxivSearchLead,
+      malformedArxivLead
     ],
     sourceNames: ["OpenAI News RSS", "Anthropic News", "Google AI Blog", "Meta AI Blog", "ML Papers of the Week"]
   });
@@ -21623,6 +21715,20 @@ test("report:draft rewrites evidence-backed paper refill instead of repeating En
 
   const item = drafted.report.main_items.find((entry) => entry.url === paperLead.url);
   assert(item, "evidence-backed paper lead should be eligible as sparse main stream refill");
+  assert.equal(
+    drafted.report.main_items.some((entry) => entry.url === arxivSearchLead.url),
+    false,
+    "an arXiv search page must not override intermediary verification as a primary publication"
+  );
+  assert.equal(
+    drafted.candidatePool.candidates.find((entry) => entry.id === arxivSearchLead.id)?.main_reject_reason,
+    "secondary_single_source_story"
+  );
+  assert.equal(
+    drafted.report.main_items.some((entry) => entry.url === malformedArxivLead.url),
+    false,
+    "a malformed percent-encoded publication path must fail closed instead of aborting draft generation"
+  );
   assert.notEqual(normalizePublicCopyForComparison(item.summary), normalizePublicCopyForComparison(item.title));
   assert((item.bullets || []).some((bullet) =>
     normalizePublicCopyForComparison(bullet) !== normalizePublicCopyForComparison(item.title) &&
@@ -28780,4 +28886,29 @@ test("report:draft keeps Hugging Face model-registry entries out of the main str
     issue.code === "public_text_untranslated" && String(issue.path || "").startsWith("huggingface_trending")
   ));
   assert.equal(inMain, false, "HF model-registry entries must not fill the main stream");
+});
+
+test("project recovery uses one tracked five-layer issue ledger", async () => {
+  const ledgerPath = "tasks/project-recovery-ledger.md";
+  const ledger = await fs.readFile(path.join(rootDir, ledgerPath), "utf8");
+  for (const marker of [
+    "discovered -> implementing -> locally_verified -> runtime_verified -> production_verified -> closed",
+    "implementation exists",
+    "production entrypoint is wired",
+    "automated tests pass",
+    "browser or real scheduled acceptance passes",
+    "docs, feature state, generated artifacts, and Handoff agree",
+    "REC-001",
+    "REC-401"
+  ]) {
+    assert(ledger.includes(marker), "recovery ledger must include " + marker);
+  }
+
+  const agents = await fs.readFile(path.join(rootDir, "AGENTS.md"), "utf8");
+  assert(agents.includes(ledgerPath));
+  const featureList = JSON.parse(await fs.readFile(path.join(rootDir, "feature_list.json"), "utf8"));
+  const feature = featureList.features.find((item) => item.id === "project-recovery-ledger");
+  assert(feature);
+  assert(feature.artifacts.includes(ledgerPath));
+  assert(feature.validation.commands.includes('node --test --test-name-pattern "project recovery uses one tracked five-layer issue ledger" tests/unit.test.js'));
 });

@@ -600,7 +600,8 @@ try {
   assert.equal(await page.locator("#report-top .hero-decision-grid").count(), 0);
   assert.equal(await page.locator("nav.report-nav").count(), 1);
   assert.match(await page.locator("#report-top").textContent(), /日报导航/);
-  assert.equal(await page.locator("link[rel='stylesheet']").count(), 0);
+  assert.equal(await page.locator("link[rel='stylesheet']").count(), 1);
+  assert.equal(await page.locator("link[rel='stylesheet'][data-adc-public-theme][href^='../../../assets/adc-theme.css?v=']").count(), 1);
   assert((await page.locator("style").count()) >= 1);
   assert.doesNotMatch(await page.locator("body").textContent(), /信源审计|自检与产物|发布质量说明|source_audit|self_check|candidate_id/);
   assert.equal(await allExternalLinksHaveRel(page), true);

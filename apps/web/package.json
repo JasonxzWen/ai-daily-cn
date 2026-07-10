@@ -4,13 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "astryx": "astryx",
     "dev": "vite --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "build": "pnpm run typecheck && vite build",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
+    "@adc/design": "workspace:*",
     "@astryxdesign/core": "0.1.4",
     "@astryxdesign/theme-neutral": "0.1.4",
     "@stylexjs/stylex": "0.18.3",
@@ -19,7 +19,6 @@
     "react-dom": "19.0.0"
   },
   "devDependencies": {
-    "@astryxdesign/cli": "0.1.4",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
