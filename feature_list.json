@@ -2,6 +2,98 @@
   "schema_version": 1,
   "features": [
     {
+      "id": "daily-production-entrypoint",
+      "status": "active",
+      "summary": "Run daily generation, bounded AI repair, validation, publication, and terminal summary ownership through one production entrypoint.",
+      "commands": [
+        "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --codex-bin codex.cmd"
+      ],
+      "artifacts": [
+        ".tmp/run-summary-YYYY-MM-DD.json",
+        ".tmp/daily-codex-pipeline/YYYY-MM-DD/pipeline-plan.json",
+        ".tmp/daily-codex-mvp/YYYY-MM-DD/artifacts/ai-repair-contract-attempt-*.json"
+      ],
+      "acceptance": [
+        "A needs_ai_repair handoff is preflighted for kind, clean-root evidence realpaths, and direct launcher .tmp destination before Codex authors a contract and the same entrypoint resumes.",
+        "Automated repair is capped at five attempts and records attempted, authored, completed, edit count, terminal reason, and explicit failure state without treating a later block as recovery.",
+        "Production repair uses read-only schema-constrained UTF-8 Codex output; the host validates and writes the contract, and a bounded timeout terminates the process tree with codex_timeout.",
+        "Claim verification overrides misleading source-level inference, quality and report_write share complete candidate coverage, and terminal summaries identify only the latest unresolved failure.",
+        "Production summaries do not claim Source Watch consumption until a non-fixture producer and build consumer have actually run."
+      ],
+      "stop_conditions": [
+        "The entrypoint returns needs_ai_repair without exhausting or disabling its declared repair budget.",
+        "Codex writes outside the bounded pipeline work directory.",
+        "A requested Source Watch path is reported as consumed by the current production runner."
+      ],
+      "behavior": "Keep the automation prompt thin while the repository-owned entrypoint closes repair/resume and terminal-state transitions.",
+      "validation": {
+        "commands": [
+          "node --test tests/daily-codex-pipeline.test.js",
+          "node --test --test-name-pattern \"report:draft.*main stream|report:write allows disclosed low-risk refill|quality review.*candidate|quality review shares\" tests/unit.test.js"
+        ]
+      },
+      "evidence": {
+          "artifacts": [
+            "scripts/run-daily-codex-pipeline.mjs",
+            "src/candidates.js",
+            "src/draft.js",
+            "src/quality-loop.js",
+            "tests/daily-codex-pipeline.test.js",
+            "tests/unit.test.js",
+            "config/daily-workflow-contract.json",
+            "docs/daily-codex-pipeline.md"
+        ],
+        "stop_conditions": [
+          "Repair loops are unbounded or silent.",
+          "Source Watch fixture coverage is presented as production connectivity."
+        ]
+      }
+    },
+    {
+      "id": "project-recovery-ledger",
+      "status": "active",
+      "summary": "Track ai-daily recovery work through one stable REC issue ledger and five-layer completion evidence.",
+      "commands": [
+        "node --test --test-name-pattern \"project recovery uses one tracked five-layer issue ledger\" tests/unit.test.js"
+      ],
+      "artifacts": [
+        "tasks/project-recovery-ledger.md",
+        "feature_list.json",
+        ".harness-hub/state/current-task.md",
+        ".harness-hub/state/progress.md",
+        ".harness-hub/state/session-handoff.md"
+      ],
+      "acceptance": [
+        "Every recovery issue has a stable REC ID, fact evidence, state, concrete action, and acceptance or explicit terminal decision; implementing issues also record validation/runtime boundaries.",
+        "Closed issues prove implementation, production wiring, automated tests, browser or real scheduled acceptance, and synchronized docs, feature state, generated artifacts, and Handoff.",
+        "The ledger preserves lost-source replacements/retirements, half-landed features, design conflicts, confirmed surviving value, and every issue/action discovered in this session.",
+        "Later recovery sessions update this ledger instead of creating another broad review or issue list."
+      ],
+      "stop_conditions": [
+        "A recovery issue is called closed while any of the five evidence layers is missing.",
+        "A second durable recovery issue list is introduced.",
+        "Chat memory, TODO text, fixtures, mocks, or uncommitted files are used as closure evidence."
+      ],
+      "behavior": "Keep recovery state durable, uniquely identified, and evidence-backed across sessions and PR slices.",
+      "validation": {
+        "commands": [
+          "node --test --test-name-pattern \"project recovery uses one tracked five-layer issue ledger\" tests/unit.test.js",
+          "node scripts/harness-validate.mjs"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "tasks/project-recovery-ledger.md",
+          "tests/unit.test.js",
+          "AGENTS.md"
+        ],
+        "stop_conditions": [
+          "Stable REC IDs or five-layer completion markers drift out of the ledger.",
+          "Feature and Harness state disagree with the ledger."
+        ]
+      }
+    },
+    {
       "id": "daily-source-discovery",
       "status": "active",
       "summary": "Collect and audit daily AI sources before writing the structured report.",
@@ -178,6 +270,7 @@
         "docs/reports/YYYY/MM/YYYY-MM-DD.html",
         "docs/data/YYYY/MM/YYYY-MM-DD.json",
         "docs/data/YYYY/MM/YYYY-MM-DD.candidates.json",
+        "docs/assets/adc-theme.css",
         "docs/feed.json",
         "docs/index.html"
       ],
@@ -202,6 +295,7 @@
           "docs/reports/YYYY/MM/YYYY-MM-DD.html",
           "docs/data/YYYY/MM/YYYY-MM-DD.json",
           "docs/data/YYYY/MM/YYYY-MM-DD.candidates.json",
+          "docs/assets/adc-theme.css",
           "docs/feed.json",
           "docs/index.html"
         ],
@@ -228,6 +322,7 @@
       "acceptance": [
         "Stitch, v0, image-generation, Figma, and manual prototype records use the same design artifact contract.",
         "Prototype records include prompt evidence, decision record, production-code boundary, and screenshot evidence when accepted.",
+        "Template records are validated as authoring aids but never count as shipped candidate or accepted evidence.",
         "`corepack pnpm run validate` runs the design artifact contract."
       ],
       "stop_conditions": [
@@ -265,6 +360,15 @@
       "artifacts": [
         "design/frontend-quality-workflow.md",
         "design/design-quality-sources.json",
+        "packages/design/src/adc-theme.css",
+        "src/adc-theme.js",
+        "docs/assets/adc-theme.css",
+        "apps/web/src/App.tsx",
+        "tests/adc-visual-contract.test.js",
+        "design/prototypes/adc-public-surfaces.design.json",
+        "design/prototypes/adc-public-surfaces.decision.md",
+        "design/prototypes/adc-public-surfaces.prompt.md",
+        "design/prototypes/adc-public-surfaces.png",
         ".codex/skills/adc-frontend-quality/SKILL.md",
         ".codex/skills/design-taste-frontend/SKILL.md",
         "scripts/validate-design-quality.mjs"
@@ -272,7 +376,8 @@
       "acceptance": [
         "Taste-skill is adopted through the local design-taste-frontend skill with its dashboard and data-table boundary preserved.",
         "Impeccable is adopted as optional external design audit evidence, not as a production runtime or CI network dependency.",
-        "Material frontend PRs record design read, visual dials, source/tool evidence, audit or skip reason, and browser acceptance."
+        "Material frontend PRs record design read, visual dials, source/tool evidence, audit or skip reason, and browser acceptance.",
+        "The React homepage, static shells, and every historical daily report consume one ADC paper/ink visual contract; reports reference the shared generated assets/adc-theme.css instead of embedding a duplicate theme overlay, and sampled desktop plus narrow viewports pass overflow and computed-color checks."
       ],
       "stop_conditions": [
         "Generated or external UI code is committed directly into production paths.",
@@ -290,6 +395,15 @@
         "artifacts": [
           "design/frontend-quality-workflow.md",
           "design/design-quality-sources.json",
+          "packages/design/src/adc-theme.css",
+        "src/adc-theme.js",
+        "docs/assets/adc-theme.css",
+        "apps/web/src/App.tsx",
+          "tests/adc-visual-contract.test.js",
+          "design/prototypes/adc-public-surfaces.design.json",
+          "design/prototypes/adc-public-surfaces.decision.md",
+          "design/prototypes/adc-public-surfaces.prompt.md",
+          "design/prototypes/adc-public-surfaces.png",
           ".codex/skills/adc-frontend-quality/SKILL.md",
           ".codex/skills/design-taste-frontend/SKILL.md",
           "scripts/validate-design-quality.mjs"
