@@ -332,7 +332,7 @@ test("daily dry-run stages source status history metadata", async () => {
   assert(plan.will_stage_files.includes("reports-data/internal/source-status-history.json"));
 });
 
-test("daily dry-run stages date-scoped editorial rank artifact", async () => {
+test("daily dry-run rejects dirty retired editorial rank artifacts", async () => {
   const repoRoot = await tempRepoWithFixture();
   const rankArtifactPath = path.join(
     repoRoot,
@@ -349,19 +349,20 @@ test("daily dry-run stages date-scoped editorial rank artifact", async () => {
     "utf8"
   );
 
-  const plan = await createDailyPublishPlan({
-    repoRoot,
-    inputDir: "reports-source",
-    dataInputDir: "reports-data",
-    outDir: "docs",
-    generatedAt: fixedGeneratedAt,
-    reportDate: "2026-05-13",
-    git: fakeGit({
-      status: " M reports-data/2026/05/internal/editorial-rank-2026-05-13.json"
-    })
-  });
-
-  assert(plan.will_stage_files.includes("reports-data/2026/05/internal/editorial-rank-2026-05-13.json"));
+  await assert.rejects(
+    () => createDailyPublishPlan({
+      repoRoot,
+      inputDir: "reports-source",
+      dataInputDir: "reports-data",
+      outDir: "docs",
+      generatedAt: fixedGeneratedAt,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: " M reports-data/2026/05/internal/editorial-rank-2026-05-13.json"
+      })
+    }),
+    (error) => error instanceof PublisherError && error.code === "publisher_dirty_outside_publish_plan"
+  );
 });
 
 test("publish dry-run stages evidence and builder avatar assets for the selected report", async () => {
@@ -506,7 +507,7 @@ test("publish dry-run stops when selected strict report was not generated from c
     source_registry_count: 68,
     source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
     rules: [
-      "main_stream_blacklist_refill_5_to_30",
+      "main_stream_blacklist_refill_5_to_12",
       "content_units_min_45_when_candidates_available",
       "model_releases_must_mirror_main_items",
       "github_api_fallback_for_git_transport",

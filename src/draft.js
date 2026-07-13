@@ -21,12 +21,19 @@ import { selectChineseMediaDynamics } from "./chinese-media.js";
 import { selectOfficialOrgUpdates } from "./official-updates.js";
 import { buildTrackingComponentSnapshot } from "./tracking-components.js";
 import { normalizeOfficialComponentSnapshot } from "./official-component-snapshot.js";
-import { normalizeStoryFirstReport } from "./story-first.js";
+import {
+  normalizeStoryFirstReport,
+  STORY_FIRST_MAX,
+  STORY_FIRST_MIN,
+  STORY_FIRST_TARGET
+} from "./story-first.js";
 import { buildSourceEffectivenessTable } from "./source-effectiveness.js";
 import { createPublicDegradationEvent } from "./degradation-events.js";
 import { normalizeGithubReadmeSummary } from "./github-readme.js";
 import {
   CANDIDATE_AUDIT_ROLE,
+  MAIN_AUDIT_CONTRACT_VERSION,
+  MAIN_REJECT_REASON,
   MAIN_SELECTION_STAGE,
   normalizeCandidateAuditRoles
 } from "./main-audit-contract.js";
@@ -193,16 +200,16 @@ const MAIN_STREAM_SOURCE_IMPACT_GROUPS = [
   "zhihu_sources",
   "sources_health"
 ];
-const STORY_TARGET_MIN = 1;
-const STORY_TARGET = 8;
-const STORY_TARGET_MAX = 12;
-const MAIN_TARGET_MIN = 5;
+const STORY_TARGET_MIN = STORY_FIRST_MIN;
+const STORY_TARGET = STORY_FIRST_TARGET;
+const STORY_TARGET_MAX = STORY_FIRST_MAX;
+const MAIN_TARGET_MIN = STORY_FIRST_MIN;
 const MAIN_TARGET = STORY_TARGET;
 const MAIN_TARGET_MAX = STORY_TARGET_MAX;
 const MAIN_REFILL_WINDOW_DAYS = 3;
 const NON_MAIN_STREAM_AUDIT_REASONS = new Set([
-  "not_evaluated_section_item",
-  "retired_platform_lane"
+  MAIN_REJECT_REASON.NOT_EVALUATED_SECTION_ITEM,
+  MAIN_REJECT_REASON.RETIRED_PLATFORM_LANE
 ]);
 const GITHUB_TRENDING_TARGET = 20;
 const GITHUB_TRENDING_LANGUAGE_SCOPES = ["python", "typescript", "rust", "go", "java"];
@@ -261,6 +268,7 @@ export async function generateReportDraft(options = {}) {
   });
   const candidatePool = {
     schema_version: 1,
+    main_audit_contract_version: MAIN_AUDIT_CONTRACT_VERSION,
     report_date: reportDate,
     generated_at: generatedAt,
     sources: merged.sources,
@@ -527,15 +535,25 @@ function selectReportItems(merged, options = {}) {
     .filter((entry) => entry.eligible)
     .map((entry) => entry.candidate)
     .sort(compareMainCandidates);
-  const storyPool = uniqueCandidatesById([...strictMainPool, ...refillMainPool]);
+  const storyPool = uniqueCandidatesById([...strictMainPool, ...refillMainPool])
+    .sort(compareMainCandidates);
+  for (const [index, candidate] of storyPool.entries()) {
+    candidate.main_rank = index + 1;
+  }
   const storyClusters = pickStoryClusters(storyPool, Math.min(STORY_TARGET, STORY_TARGET_MAX));
   const mainSeeds = storyClusters.map((cluster) => cluster.primary);
   const mainSeedIds = new Set(storyClusters.flatMap((cluster) => cluster.candidates.map((candidate) => candidate.id)));
   for (const entry of mainEvaluations) {
-    if (!entry.eligible || mainSeedIds.has(entry.candidate.id)) {
+    if (!entry.eligible) {
       continue;
     }
-    entry.candidate.main_reject_reason = entry.candidate.main_reject_reason || "not_selected_lower_priority";
+    if (mainSeedIds.has(entry.candidate.id)) {
+      entry.candidate.main_selection_stage = entry.stage;
+      delete entry.candidate.main_reject_reason;
+      continue;
+    }
+    delete entry.candidate.main_selection_stage;
+    entry.candidate.main_reject_reason = MAIN_REJECT_REASON.NOT_SELECTED_LOWER_PRIORITY;
   }
   const mainSelectionSnapshot = mainSelectionSnapshotFor(mainEvaluations, mainSeeds, {
     sourceAudit: merged.sourceAudit
@@ -551,6 +569,9 @@ function selectReportItems(merged, options = {}) {
       existing: [...includedCandidates, ...derived]
     });
     mainCandidate.id = uniqueCandidateId([...includedCandidates, ...derived], storyIdForCluster(cluster));
+    mainCandidate.main_story_id = mainCandidate.id;
+    mainCandidate.main_story_primary_id = candidate.id;
+    delete mainCandidate.main_story_role;
     markStoryClusterAudit(cluster, mainCandidate.id);
     derived.push(mainCandidate);
     for (const sourceCandidate of cluster.candidates) {
@@ -870,17 +891,36 @@ function finalizeMainAudit(candidates) {
     if (isPlatformExemptCategory(candidate.category)) {
       candidate.status = "excluded";
       delete candidate.included_in;
-      candidate.main_reject_reason = candidate.main_reject_reason || "retired_platform_lane";
+      delete candidate.main_selection_stage;
+      candidate.main_reject_reason = candidate.main_reject_reason || MAIN_REJECT_REASON.RETIRED_PLATFORM_LANE;
       applyCandidateAuditRoles(candidate);
       continue;
     }
-    if (candidate.main_selection_stage || candidate.main_reject_reason) {
+    const hasSelectionStage = Boolean(candidate.main_selection_stage);
+    const hasRejectReason = Boolean(candidate.main_reject_reason);
+    if (hasSelectionStage && hasRejectReason) {
+      throw new PublisherError(
+        "main_audit_disposition_conflict",
+        `Candidate ${candidate.id || "unknown"} cannot be both selected and rejected.`,
+        {
+          candidate_id: candidate.id || "",
+          main_selection_stage: candidate.main_selection_stage,
+          main_reject_reason: candidate.main_reject_reason
+        }
+      );
+    }
+    if (hasSelectionStage || hasRejectReason) {
       applyCandidateAuditRoles(candidate);
       continue;
     }
-    candidate.main_reject_reason = candidate.included_in === "main_items"
-      ? "selected_main_item"
-      : "not_evaluated_section_item";
+    if (candidate.included_in === "main_items" || candidate.category === "main_item") {
+      throw new PublisherError(
+        "main_audit_disposition_missing",
+        `Selected main candidate ${candidate.id || "unknown"} is missing main_selection_stage.`,
+        { candidate_id: candidate.id || "" }
+      );
+    }
+    candidate.main_reject_reason = MAIN_REJECT_REASON.NOT_EVALUATED_SECTION_ITEM;
     applyCandidateAuditRoles(candidate);
   }
   return candidates;
@@ -1266,6 +1306,7 @@ function buildDraftReport({
     evidence_assets: evidenceAssets,
     self_check: {
       report_date: reportDate,
+      main_audit_contract_version: MAIN_AUDIT_CONTRACT_VERSION,
       stories: (selection.stories || []).length,
       main_items: selection.main_items.length,
       builder_observations: selection.builder_observations.length,
@@ -1287,7 +1328,7 @@ function buildDraftReport({
           target_min: STORY_TARGET_MIN,
           target: STORY_TARGET,
           target_max: STORY_TARGET_MAX,
-          shortfall: (selection.stories || []).length < STORY_TARGET,
+          shortfall: (selection.stories || []).length < STORY_TARGET_MIN,
           rejection_counts: {}
         },
         github_trending: {
@@ -3491,8 +3532,8 @@ function storyIdForCluster(cluster) {
 function storySelectionSnapshotFor(evaluations, clusters) {
   const rejectionCounts = {};
   for (const entry of evaluations) {
-    if (!entry.eligible) {
-      incrementCount(rejectionCounts, entry.reject_reason || "rejected");
+    if (entry.candidate.main_reject_reason) {
+      incrementCount(rejectionCounts, entry.candidate.main_reject_reason);
     }
   }
   return {
@@ -3502,7 +3543,7 @@ function storySelectionSnapshotFor(evaluations, clusters) {
     target_min: STORY_TARGET_MIN,
     target: STORY_TARGET,
     target_max: STORY_TARGET_MAX,
-    shortfall: clusters.length < STORY_TARGET,
+    shortfall: clusters.length < STORY_TARGET_MIN,
     rejection_counts: rejectionCounts
   };
 }
@@ -3607,6 +3648,7 @@ function storyEventType(candidate) {
 function evaluateMainCandidates(candidates, options = {}) {
   return candidates.map((candidate) => {
     const meta = options.metaById?.get(candidate.id) || {};
+    candidate.main_rank_score = mainCandidateScore(candidate);
     const rejectReason = mainRejectReason(candidate, {
       reportDate: options.reportDate,
       recentMainUrlHistory: options.recentMainUrlHistory,
@@ -3622,7 +3664,6 @@ function evaluateMainCandidates(candidates, options = {}) {
       };
     }
     if (canPromoteToMainStrict(candidate, options.reportDate)) {
-      candidate.main_selection_stage = MAIN_SELECTION_STAGE.STRICT;
       return {
         candidate,
         meta,
@@ -3631,16 +3672,15 @@ function evaluateMainCandidates(candidates, options = {}) {
       };
     }
     if (!canPromoteToMainRefill(candidate, meta, options.reportDate)) {
-      candidate.main_reject_reason = "not_main_refill_material";
+      candidate.main_reject_reason = MAIN_REJECT_REASON.NOT_MAIN_REFILL_MATERIAL;
       return {
         candidate,
         meta,
         eligible: false,
-        reject_reason: "not_main_refill_material"
+        reject_reason: MAIN_REJECT_REASON.NOT_MAIN_REFILL_MATERIAL
       };
     }
     const stage = mainRefillStage(candidate, meta, options.reportDate);
-    candidate.main_selection_stage = stage;
     return {
       candidate,
       meta,
@@ -3653,8 +3693,8 @@ function evaluateMainCandidates(candidates, options = {}) {
 function mainSelectionSnapshotFor(evaluations, selectedCandidates, options = {}) {
   const rejectionCounts = {};
   for (const entry of evaluations) {
-    if (!entry.eligible) {
-      incrementCount(rejectionCounts, entry.reject_reason || "rejected");
+    if (entry.candidate.main_reject_reason) {
+      incrementCount(rejectionCounts, entry.candidate.main_reject_reason);
     }
   }
   const selected = selectedCandidates.length;
@@ -3883,38 +3923,38 @@ function mainRejectReason(candidate, options = {}) {
   const reportDate = options.reportDate || "";
   const recentMainUrlHistory = options.recentMainUrlHistory || new Map();
   const meta = options.meta || {};
-  if (!candidate || typeof candidate !== "object") return "invalid_candidate";
-  if (!candidate.url) return "missing_url";
-  if (!hasReaderVisibleTitle(candidate)) return "missing_reader_visible_title";
-  if (isTemplatedStoryTitleCandidate(candidate)) return "templated_story_title";
-  if (isFutureDatedCandidate(candidate, reportDate)) return "future_dated";
-  if (isOutsideMainWindowCandidate(candidate, reportDate)) return "outside_main_window";
-  if (!isFreshForMainItems(candidate, recentMainUrlHistory)) return "recent_duplicate";
-  if (isStatuspageCandidate(candidate)) return "statuspage";
-  if (isSearchShadowCandidate(candidate)) return "search_shadow";
+  if (!candidate || typeof candidate !== "object") return MAIN_REJECT_REASON.INVALID_CANDIDATE;
+  if (!candidate.url) return MAIN_REJECT_REASON.MISSING_URL;
+  if (!hasReaderVisibleTitle(candidate)) return MAIN_REJECT_REASON.MISSING_READER_VISIBLE_TITLE;
+  if (isTemplatedStoryTitleCandidate(candidate)) return MAIN_REJECT_REASON.TEMPLATED_STORY_TITLE;
+  if (isFutureDatedCandidate(candidate, reportDate)) return MAIN_REJECT_REASON.FUTURE_DATED;
+  if (isOutsideMainWindowCandidate(candidate, reportDate)) return MAIN_REJECT_REASON.OUTSIDE_MAIN_WINDOW;
+  if (!isFreshForMainItems(candidate, recentMainUrlHistory)) return MAIN_REJECT_REASON.RECENT_DUPLICATE;
+  if (isStatuspageCandidate(candidate)) return MAIN_REJECT_REASON.STATUSPAGE;
+  if (isSearchShadowCandidate(candidate)) return MAIN_REJECT_REASON.SEARCH_SHADOW;
   // Hugging Face model-registry trending entries belong only to the
   // huggingface_trending section; they are repository-popularity signals, not
   // news, and must never fill the main story stream.
-  if (candidate.category === "huggingface_trending") return "huggingface_trending_lane";
-  if (isUnresolvedAggregatorMainCandidate(candidate)) return "unverified_aggregator_lead";
-  if (isPrimaryRequiredIntermediaryMainCandidate(candidate) && !canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta)) return "primary_required_intermediary_lead";
-  if (isGenericGithubTrendingTextCandidate(candidate, meta)) return "generic_github_trending_text";
-  if (isGenericHotBlogAnnouncementCandidate(candidate)) return "generic_hot_blog_announcement";
-  if (isPublicFillerMainCandidate(candidate, meta)) return "public_filler_text";
-  if (isLowValueProductHuntMainCandidate(candidate)) return "low_value_product_hunt_project";
-  if (isLowValueVendorAvailabilityPrCandidate(candidate)) return "low_value_vendor_availability_pr";
-  if (isLowValueMainCandidate(candidate)) return "low_value";
-  if (isLowValueEventGuideCandidate(candidate)) return "low_value_event_guide";
-  if (isLowValueProfileCandidate(candidate)) return "low_value_profile";
-  if (isMinorConsumerAiFeatureCandidate(candidate)) return "minor_consumer_ai_feature";
-  if (isLowSignalVendorPartnership(candidate)) return "low_signal_vendor_partnership";
-  if (candidate.category === "builder_observation" && isLowSignalBuilderMainCandidate(candidate)) return "builder_low_signal";
-  if (isHardcoreResearchOnly(candidate)) return "hardcore_research_only";
-  if (isCommunitySingleSourceStoryCandidate(candidate)) return "community_single_source_story";
-  if (isSecondarySingleSourceStoryCandidate(candidate)) return "secondary_single_source_story";
-  if (!hasMainStreamSignal(candidate, meta, reportDate)) return "not_ai_relevant";
-  if (isThinMainStreamCandidate(candidate, meta)) return "thin_candidate_detail";
-  if (isUnverifiedHighRiskMainCandidate(candidate)) return "unverified_high_risk_claim";
+  if (candidate.category === "huggingface_trending") return MAIN_REJECT_REASON.HUGGINGFACE_TRENDING_LANE;
+  if (isUnresolvedAggregatorMainCandidate(candidate)) return MAIN_REJECT_REASON.UNVERIFIED_AGGREGATOR_LEAD;
+  if (isPrimaryRequiredIntermediaryMainCandidate(candidate) && !canUseLowRiskPrimaryRequiredIntermediaryAsMain(candidate, meta)) return MAIN_REJECT_REASON.PRIMARY_REQUIRED_INTERMEDIARY_LEAD;
+  if (isGenericGithubTrendingTextCandidate(candidate, meta)) return MAIN_REJECT_REASON.GENERIC_GITHUB_TRENDING_TEXT;
+  if (isGenericHotBlogAnnouncementCandidate(candidate)) return MAIN_REJECT_REASON.GENERIC_HOT_BLOG_ANNOUNCEMENT;
+  if (isPublicFillerMainCandidate(candidate, meta)) return MAIN_REJECT_REASON.PUBLIC_FILLER_TEXT;
+  if (isLowValueProductHuntMainCandidate(candidate)) return MAIN_REJECT_REASON.LOW_VALUE_PRODUCT_HUNT_PROJECT;
+  if (isLowValueVendorAvailabilityPrCandidate(candidate)) return MAIN_REJECT_REASON.LOW_VALUE_VENDOR_AVAILABILITY_PR;
+  if (isLowValueMainCandidate(candidate)) return MAIN_REJECT_REASON.LOW_VALUE;
+  if (isLowValueEventGuideCandidate(candidate)) return MAIN_REJECT_REASON.LOW_VALUE_EVENT_GUIDE;
+  if (isLowValueProfileCandidate(candidate)) return MAIN_REJECT_REASON.LOW_VALUE_PROFILE;
+  if (isMinorConsumerAiFeatureCandidate(candidate)) return MAIN_REJECT_REASON.MINOR_CONSUMER_AI_FEATURE;
+  if (isLowSignalVendorPartnership(candidate)) return MAIN_REJECT_REASON.LOW_SIGNAL_VENDOR_PARTNERSHIP;
+  if (candidate.category === "builder_observation" && isLowSignalBuilderMainCandidate(candidate)) return MAIN_REJECT_REASON.BUILDER_LOW_SIGNAL;
+  if (isHardcoreResearchOnly(candidate)) return MAIN_REJECT_REASON.HARDCORE_RESEARCH_ONLY;
+  if (isCommunitySingleSourceStoryCandidate(candidate)) return MAIN_REJECT_REASON.COMMUNITY_SINGLE_SOURCE_STORY;
+  if (isSecondarySingleSourceStoryCandidate(candidate)) return MAIN_REJECT_REASON.SECONDARY_SINGLE_SOURCE_STORY;
+  if (!hasMainStreamSignal(candidate, meta, reportDate)) return MAIN_REJECT_REASON.NOT_AI_RELEVANT;
+  if (isThinMainStreamCandidate(candidate, meta)) return MAIN_REJECT_REASON.THIN_CANDIDATE_DETAIL;
+  if (isUnverifiedHighRiskMainCandidate(candidate)) return MAIN_REJECT_REASON.UNVERIFIED_HIGH_RISK_CLAIM;
   return "";
 }
 
@@ -4366,11 +4406,9 @@ function candidateScore(candidate) {
 }
 
 function compareMainCandidates(left, right) {
-  const publicDiff = mainCandidateScore(right) - mainCandidateScore(left);
+  const publicDiff = persistedMainRankScore(right) - persistedMainRankScore(left);
   if (publicDiff !== 0) return publicDiff;
-  const fallbackDiff = candidateScore(right) - candidateScore(left);
-  if (fallbackDiff !== 0) return fallbackDiff;
-  return String(left.title || "").localeCompare(String(right.title || ""));
+  return String(left.id || "").localeCompare(String(right.id || ""));
 }
 
 function mainCandidateScore(candidate) {
@@ -4392,6 +4430,11 @@ function mainCandidateScore(candidate) {
     score -= 30;
   }
   return score;
+}
+
+function persistedMainRankScore(candidate) {
+  const persisted = Number(candidate?.main_rank_score);
+  return Number.isFinite(persisted) ? persisted : mainCandidateScore(candidate);
 }
 
 function isOriginalModelLaunchCandidate(candidate) {

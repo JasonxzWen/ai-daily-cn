@@ -2,7 +2,7 @@
 
 > 状态：归档/参考。当前唯一权威资产为 `prompts/ai-daily/modules/editorial-authority.md`；如与本文冲突，以该文件为准。
 
-> 2026-06-15 后续覆盖：主体目标已改为 5-30 条短新闻流；Builder/X、热门博客、GitHub、社区弱信号和白名单公众号等低风险候选可参与 sparse-day 主体补位；主体不足时生成端可扩展到 72 小时并记录短缺质量事件。本文中旧的 5-10 条、48 小时 fallback 或 Builder 永不计入 `main_items` 规则只作为历史背景，不再作为当前执行合同。
+> 2026-07-13 后续覆盖：主体合同为最少 5 条、目标 8 条、最多 12 条；Builder/X、热门博客、GitHub、社区弱信号和白名单公众号等低风险候选可参与 sparse-day 主体补位；主体不足时生成端可扩展到 72 小时并记录短缺质量事件。本文中旧的 5-10、5-30、48 小时 fallback 或 Builder 永不计入 `main_items` 规则只作为历史背景，不再作为当前执行合同。
 
 ## 目标
 
@@ -201,7 +201,7 @@ https://jasonxzwen.github.io/ai-daily-cn/feed.json
 - `report_date` 使用 `YYYY-MM-DD`。
 - `event_date` 使用 `YYYY-MM-DD`。
 - URL 必须是绝对 URL。
-- `main_items` 目标为 5-30 条；5 是低信号日最低值，5-20 是常规舒适区，21-30 是高信号日可接受区间。不能为了凑数引入低质量内容。
+- `main_items` 最少 5 条、目标 8 条、最多 12 条；不能为了凑数引入低质量内容。
 - Builder 观察优先独立展示；符合黑名单过滤、信息密度和低风险边界的 Builder/X 候选可作为 sparse-day `main_items` 补位来源。
 - 没有可靠来源时数组为空，不写猜测。
 - 没有发布错误时 `publish_error` 为空字符串。
@@ -463,7 +463,7 @@ Builder 观察结构：
 
 | 规则 | 失败处理 |
 |---|---|
-| `main_items` 默认 5-30 条 | 少于 5 条时允许 fallback，并写生成期短缺事件 |
+| `main_items` 最少 5 条、目标 8 条、最多 12 条 | 少于 5 条时允许 fallback，并写生成期短缺事件；超过 12 条时合并、去重或降级 |
 | 每条主体信息有 URL | 缺失则删除该条或降级为线索 |
 | 每条主体信息有 `event_date` | 缺失则停止结构化转换 |
 | 无禁止词 | 失败则要求重写 |

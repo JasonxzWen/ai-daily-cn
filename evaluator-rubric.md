@@ -1,29 +1,33 @@
 # Evaluator Rubric
 
-Use this rubric after implementation and before acceptance. The active Slice delivers an edition-first desktop homepage, a bounded public data projection, and one shared favicon without reopening mobile, search, scoring, or source-promotion scope.
+Use this rubric for REC-323: converge main-stream ranking, terminal disposition, snapshot, quality, Phase5, report-write, and public projection on one production fact chain.
 
-| Dimension | Question | Score 0-2 | Notes |
-| --- | --- | --- | --- |
-| Alignment | Were requirement intake, selected direction, target spec, open questions, and acceptance criteria recorded before implementation? | 2 | Harness state records the `home.json` fact projection, favicon provenance, feature-survival boundary, design dials, and explicit deferment of REC-323/Aify promotion. |
-| Correctness | Does the implemented behavior match the active task and feature state? | 2 | `report_date` and `report.stories` own edition membership/order; one lead, three secondary stories, compact continuation, and Source Watch-after-main replace client-side date/score inference. |
-| TDD discipline | Did the work follow the agreed P0/P1/P2 matrix, with RED/GREEN evidence where practical? | 2 | Missing home export, favicon, public links, and generated-file ownership first failed focused tests; the reviewer-found historical-backfill false block gained a window-outside regression before closure. |
-| Verification | Were the required checks actually run with recorded evidence? | 2 | Typecheck, focused 74/74, focused status tests, build, durable E2E, local browser acceptance, and one final `corepack pnpm run validate` all pass. |
-| Scope discipline | Did this session stay within the selected task and allowed paths? | 2 | Changes are limited to homepage projection/composition, favicon links/build/publish ownership, generated public artifacts, tests, and existing governance records; no automation, mobile, search, REC-323, or Aify source behavior changed. |
-| Runtime reliability | Can the standard startup path, health checks, or user flow run again? | 2 | Build emits a truthful 19,524-byte home artifact, publish plans include home/favicon, privacy scans both, and status self-check validates schema/bytes/feed-latest without blocking old backfills. |
-| Browser acceptance | For Web changes, did agent-run browser acceptance prove URL, viewport, console/network, and artifact behavior? | 2 | Home, Ops, official blogs, and a representative report pass at the sole supported `1280x900`; screenshots show the new hierarchy, console/page errors are empty, and durable E2E proves home-only bootstrap plus favicon HTTP/link behavior. |
-| Agentic loops | Were producer, verifier, read-only arbiter, evidence, and main-agent decision recorded for material loop work? | 2 | Main implementation, deterministic tests, one bounded read-only review, P1 correction, reviewer recheck, and browser evidence are recorded. |
-| Finish closeout | Did final review, technical-debt/drift inspection, and PR/merge-readiness handling run or have explicit skip reasons? | 2 | One independent P0/P1 review found S-78; the fix was rechecked closed, and no further P0/P1 remained before the full gate. |
-| Insight recommendations | Did the session produce or explicitly skip an insight audit for tool calling, AI infrastructure, docs/code conflicts, and skill/workflow extraction candidates? | 2 | A repeated broad insight pass was intentionally skipped; the existing recovery insight was converted into REC-328/S-77, while the new false-block lesson became S-78 plus a deterministic self-check regression. |
-| Maintainability | Are code and repo-local docs clear enough for the next session? | 2 | A dedicated schema, one same-build producer, a single README contract, the accepted design record, feature inventory, and stable REC ledger describe the reader/runtime boundary. |
-| Handoff readiness | Can a new session continue from repo-local state without guessing? | 2 | Validation, browser evidence, review/fix history, deferred boundaries, provenance hashes, and the next PR sequence are recorded in existing repo/Harness state. |
+| Dimension | Score 0-2 | Evidence |
+| --- | --- | --- |
+| Alignment | 2 | The task explicitly excludes Aify, automations, publishing, search, layout work, and every mobile/tablet/narrow/touch variant. |
+| Correctness | 2 | `draft.js` is the sole production scorer/selector; score, global rank, terminal selection/rejection, story lineage, snapshot counts, and report order are persisted and cross-checked. |
+| Contract safety | 2 | New report/pool pairs declare audit contract version 1 and fail closed on missing/mismatched receipts; historical pairs with neither marker remain readable. |
+| Dead-path removal | 2 | The post-quality synthetic editorial-rank/classification producer, schemas, CLI, runner stage, policies, scripts, fixtures, and tests are retired together. |
+| Verification | 2 | Affected unit suite 143/143 and publish suite 54/54 pass. The final aggregate gate completed with 893 total / 891 pass / 0 fail / 2 skipped, followed by green build-clean, 194-file privacy, E2E, Harness, and diff checks; one stale official-blog date fixture and one load-sensitive timeout fixture were corrected without production changes. |
+| Real-data proof | 2 | Cleaned 2026-07-09 replay: 342 audited sources, 12 selected sources, 330 rejected, 0 dual, 0 missing, 40 globally ranked, 8 public stories, monotonic score/rank, zero consistency issues, and no public internal-field leak. |
+| Browser acceptance | 2 | Existing Ops status consumption was checked once at the sole supported `1280x900`; no console warning/error or horizontal overflow, screenshot under `.tmp/rec323-real/`. |
+| Runtime reliability | 2 | Shared fail-closed checks cover quality, report-write, and Phase5; the cleaned real-date replay remains runnable without publishing. |
+| Agentic loops | 2 | Main-agent producer, deterministic verifier, and one independent read-only arbiter completed one bounded loop. |
+| Finish closeout | 2 | The independent review found four P1 groups; each was fixed and the affected suites were rerun without another generic review. |
+| Insight recommendations | 2 | The broader recovery insight already identified this fact split; its lesson is now encoded as versioned receipts, one collector, tests, and REC-323. |
+| Handoff readiness | 2 | Branch, validation, review findings, CI boundary, post-merge runtime proof, and next Aify PR are recorded in Harness state. |
+| Independent review | 2 | One bounded read-only review found 0 P0 and four P1 groups; explicit versioning, score/rank ordering, source-to-story lineage, and 5/8/12 drift were fixed and revalidated. |
+| Scope discipline | 2 | No automation definition, external prompt, Aify source behavior, public IA, favicon, or mobile artifact changed. |
+| Maintainability | 2 | Shared vocabularies and the consistency collector replace duplicated boundary logic; the stable REC ledger, feature inventory, quality record, and Harness handoff are updated. |
 
 ## Verdict
 
-- The Slice is locally delivery-ready: public homepage facts now follow the edition instead of event-date/score inference, and the supplied favicon is connected end to end.
-- No P0/P1 remains after the bounded independent review and final full validation.
+- PR #296 is ready for final CI and mergeability validation.
+- No known P0/P1 remains after the single independent review and affected-suite replay.
+- Merge is allowed only after required CI is green and the PR is conflict-free.
 
 ## Residual risk
 
-- `home.json` intentionally contains only latest, previous, four Source Watch items, and twelve archive entries; `articles.json`/`feed.json` remain the complete public data contracts.
-- Cross-browser and deeper desktop accessibility hardening remain P2; mobile, tablet, narrow-screen, and touch-only variants remain explicitly unsupported.
-- Repository-size validation retains the three pre-existing advisory warnings for duplicate docs assets, Git pack size, and source-status history.
+- Historical candidate/report pairs intentionally skip the new collector only when both version markers are absent; one-sided or malformed markers fail closed.
+- Historical editorial-rank artifacts remain immutable evidence, but no production stage generates or consumes new ones.
+- A merged-main non-publish production entrypoint remains the post-merge runtime proof; until then REC-323 is `locally_verified`, not `production_verified`.

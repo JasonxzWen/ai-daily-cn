@@ -404,7 +404,9 @@ export function buildSourceEffectivenessTable({ report = {}, candidates = [] } =
       parsed_recent: parsedRecent,
       candidate_created: candidateCreated,
       public_included: publicIncluded,
-      not_included_reason: publicIncluded ? "" : sourceNotIncludedReason({ configured, reachable, parsedRecent, candidateCreated, sources }),
+      not_included_reason: publicIncluded
+        ? ""
+        : sourceNotIncludedReason({ configured, reachable, parsedRecent, candidateCreated, sources, matchedCandidates }),
       source_ids: uniqueStrings(sources.map((source) => source.id).filter(Boolean)),
       source_kinds: uniqueStrings(sources.map((source) => source.source_kind).filter(Boolean)),
       statuses: uniqueStrings(sources.map((source) => source.status).filter(Boolean)),
@@ -839,7 +841,7 @@ function sourceHasRecentParsedSignal(source) {
     countValue(source?.parsed_count) > 0;
 }
 
-function sourceNotIncludedReason({ configured, reachable, parsedRecent, candidateCreated, sources }) {
+function sourceNotIncludedReason({ configured, reachable, parsedRecent, candidateCreated, sources, matchedCandidates = [] }) {
   if (!configured) {
     return "not_configured_or_not_checked";
   }
@@ -851,6 +853,12 @@ function sourceNotIncludedReason({ configured, reachable, parsedRecent, candidat
   }
   if (!candidateCreated) {
     return "parsed_but_no_candidate_created";
+  }
+  const rejectionReasons = uniqueStrings(
+    matchedCandidates.map((candidate) => candidate?.main_reject_reason).filter(Boolean)
+  );
+  if (rejectionReasons.length > 0) {
+    return `candidate_rejected:${rejectionReasons.slice(0, 3).join(",")}`;
   }
   return "candidate_not_selected_for_public_page";
 }

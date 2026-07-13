@@ -4,6 +4,7 @@ import { candidatePoolRelativePaths } from "./reports-data-layout.js";
 import { isValidDateString } from "./time.js";
 import { evaluatePublicSourceAdmission } from "./candidates.js";
 import { effectiveCandidateVerification } from "./source-verification.js";
+import { collectMainAuditConsistencyIssues } from "./main-audit-consistency.js";
 
 const REQUIRED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
 const FACT_SECTION_NAMES = ["main_items", "model_releases", "hot_blogs", "projects"];
@@ -85,7 +86,7 @@ async function auditDay(record, historyDir) {
 
   const duplicateUrls = countDuplicateUrls(candidates);
   const effectiveCandidates = candidates.map(effectiveCandidateVerification);
-  const factAudit = auditFactSectionAdmissions(record.payload, candidates, record.report_date);
+  const factAudit = auditFactSectionAdmissions(record.payload, candidatePool, record.report_date);
 
   const metrics = {
     sources_checked: Object.values(groups).reduce((sum, group) => sum + group.sources_checked, 0),
@@ -127,13 +128,26 @@ async function auditDay(record, historyDir) {
   };
 }
 
-function auditFactSectionAdmissions(report, candidates, reportDate) {
+function auditFactSectionAdmissions(report, candidatePool, reportDate) {
+  const candidates = Array.isArray(candidatePool?.candidates) ? candidatePool.candidates : [];
   const byId = new Map(candidates.map((candidate) => [String(candidate?.id || ""), candidate]));
   const referencedCandidateIds = new Set();
   const violations = [];
   const verificationUpgrades = [];
   const missingCandidateBackrefs = [];
   const selectionMetadataMismatches = [];
+
+  for (const issue of collectMainAuditConsistencyIssues(report, candidatePool)) {
+    selectionMetadataMismatches.push({
+      report_date: reportDate,
+      candidate_id: String(issue.candidate_id || ""),
+      section: "main_items",
+      reason_code: issue.code,
+      path: issue.path,
+      title: "",
+      url: ""
+    });
+  }
 
   for (const sectionName of FACT_SECTION_NAMES) {
     const items = Array.isArray(report?.[sectionName]) ? report[sectionName] : [];

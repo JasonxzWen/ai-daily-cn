@@ -5,7 +5,7 @@ import { loadSourceRegistry } from "./source-registry.js";
 const PROMPT_MANIFEST = "prompts/ai-daily/manifest.json";
 
 export const AUTOMATION_REVISION_RULES = [
-  "main_stream_blacklist_refill_5_to_30",
+  "main_stream_blacklist_refill_5_to_12",
   "content_units_min_45_when_candidates_available",
   "model_releases_must_mirror_main_items",
   "github_api_fallback_for_git_transport",
@@ -13,7 +13,8 @@ export const AUTOMATION_REVISION_RULES = [
 ];
 
 export const AUTOMATION_REVISION_RULE_ALIASES = {
-  main_stream_blacklist_refill_5_to_30: [
+  main_stream_blacklist_refill_5_to_12: [
+    "main_stream_blacklist_refill_5_to_30",
     "main_items_min_8_when_candidates_available"
   ],
   content_units_min_45_when_candidates_available: [

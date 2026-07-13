@@ -205,16 +205,6 @@
       "replay_fixtures": ["quality-ai-repair-ready-contract", "quality-ai-repair-template-contract"]
     },
     {
-      "id": "editorial_rank_artifact",
-      "description": "Build the internal editorial rank artifact from the candidate pool before public report write.",
-      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
-      "fallback": { "kind": "none", "action": "block_on_internal_rank_artifact_error" },
-      "degrade": { "allowed": false, "action": "none" },
-      "block": { "allowed": true, "reasons": ["publish_plan_violation", "unrecoverable_schema", "internal_leakage"] },
-      "summary_fields": ["stage_id", "status", "attempts", "output_path", "item_count", "today_selected_count", "must_read_count", "error_code"],
-      "replay_fixtures": ["editorial-rank-artifact-internal"]
-    },
-    {
       "id": "report_write",
       "description": "Normalize and write the public report JSON.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },

@@ -25,7 +25,7 @@ import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 import { withDefaultImportance } from "./importance.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { isPublishableOfficialComponentFragment } from "./official-component-snapshot.js";
-import { normalizeStoryFirstReport } from "./story-first.js";
+import { normalizeStoryFirstReport, STORY_FIRST_MAX, STORY_FIRST_MIN } from "./story-first.js";
 import { sanitizeTrackingComponentSnapshot } from "./tracking-components.js";
 import { sanitizePublicDegradationEvent } from "./degradation-events.js";
 import { loadOfficialBlogKnowledge, toPublicOfficialBlogKnowledge } from "./official-blog-knowledge.js";
@@ -1593,8 +1593,8 @@ export function buildDateIndex(feed = {}, reports = [], trends = null) {
 
 function publicMainStreamStatus(metrics = {}) {
   const count = Number(metrics.main_items_count || 0);
-  const targetMin = 1;
-  const targetMax = 12;
+  const targetMin = STORY_FIRST_MIN;
+  const targetMax = STORY_FIRST_MAX;
   if (count >= targetMin && count <= targetMax) {
     return {
       status: "target",

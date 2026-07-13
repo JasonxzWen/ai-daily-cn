@@ -1,6 +1,7 @@
 import { withDefaultImportance } from "./importance.js";
 import { normalizeUrlIdentity } from "./url.js";
 
+export const STORY_FIRST_MIN = 5;
 export const STORY_FIRST_TARGET = 8;
 export const STORY_FIRST_MAX = 12;
 
@@ -483,10 +484,10 @@ function updateStorySelectionSnapshot(report, summary) {
       stories: {
         ...previousStories,
         selected: summary.selected,
-        target_min: 1,
+        target_min: STORY_FIRST_MIN,
         target: summary.target,
         target_max: summary.max,
-        shortfall: summary.selected < summary.target,
+        shortfall: summary.selected < STORY_FIRST_MIN,
         normalized_from: summary.source
       }
     }

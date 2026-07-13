@@ -9,6 +9,9 @@
     "schema_version": {
       "const": 1
     },
+    "main_audit_contract_version": {
+      "const": 1
+    },
     "report_date": {
       "type": "string",
       "format": "date"
@@ -410,8 +413,41 @@
           "type": "string"
         },
         "main_reject_reason": {
-          "type": "string",
-          "minLength": 1
+          "enum": [
+            "invalid_candidate",
+            "missing_url",
+            "missing_reader_visible_title",
+            "templated_story_title",
+            "future_dated",
+            "outside_main_window",
+            "recent_duplicate",
+            "statuspage",
+            "search_shadow",
+            "huggingface_trending_lane",
+            "unverified_aggregator_lead",
+            "primary_required_intermediary_lead",
+            "generic_github_trending_text",
+            "generic_hot_blog_announcement",
+            "public_filler_text",
+            "low_value_product_hunt_project",
+            "low_value_vendor_availability_pr",
+            "low_value",
+            "low_value_event_guide",
+            "low_value_profile",
+            "minor_consumer_ai_feature",
+            "low_signal_vendor_partnership",
+            "builder_low_signal",
+            "hardcore_research_only",
+            "community_single_source_story",
+            "secondary_single_source_story",
+            "not_ai_relevant",
+            "thin_candidate_detail",
+            "unverified_high_risk_claim",
+            "not_main_refill_material",
+            "not_selected_lower_priority",
+            "retired_platform_lane",
+            "not_evaluated_section_item"
+          ]
         },
         "main_selection_stage": {
           "enum": [
@@ -424,6 +460,13 @@
             "refill_window",
             "refill_weak_signal"
           ]
+        },
+        "main_rank_score": {
+          "type": "number"
+        },
+        "main_rank": {
+          "type": "integer",
+          "minimum": 1
         },
         "roles": {
           "type": "array",

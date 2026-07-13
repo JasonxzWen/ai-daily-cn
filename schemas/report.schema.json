@@ -141,12 +141,6 @@
     "candidate_pool_path": {
       "$ref": "#/$defs/relative_path"
     },
-    "editorial_selection": {
-      "$ref": "#/$defs/editorial_selection"
-    },
-    "daily_lanes": {
-      "$ref": "#/$defs/daily_lanes"
-    },
     "github_trending": {
       "type": "array",
       "items": {
@@ -285,197 +279,6 @@
       "additionalProperties": {
         "type": "integer",
         "minimum": 0
-      }
-    },
-    "editorial_selection": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["schema_version", "today_selected", "must_read"],
-      "properties": {
-        "schema_version": {
-          "const": 1
-        },
-        "today_selected": {
-          "$ref": "#/$defs/editorial_selection_target"
-        },
-        "must_read": {
-          "$ref": "#/$defs/editorial_selection_target"
-        }
-      }
-    },
-    "editorial_selection_target": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["target", "max_items", "items"],
-      "properties": {
-        "target": {
-          "enum": ["today_selected", "must_read"]
-        },
-        "max_items": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/editorial_selection_item"
-          },
-          "default": []
-        }
-      }
-    },
-    "editorial_selection_item": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["candidate_id", "title", "section"],
-      "properties": {
-        "candidate_id": {
-          "$ref": "#/$defs/candidate_id"
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "section": {
-          "enum": [
-            "stories",
-            "main_items",
-            "github_trending",
-            "huggingface_trending",
-            "model_releases",
-            "hot_blogs",
-            "chinese_media_dynamics",
-            "daily_tracking",
-            "projects",
-            "builder_observations",
-            "official_org_updates",
-            "community_leads"
-          ]
-        },
-        "url": {
-          "$ref": "#/$defs/absolute_url"
-        },
-        "source": {
-          "type": "string",
-          "minLength": 1
-        },
-        "summary": {
-          "type": "string",
-          "minLength": 1
-        },
-        "event_type": {
-          "type": "string",
-          "minLength": 1
-        },
-        "verification_status": {
-          "$ref": "#/$defs/verification_status"
-        }
-      }
-    },
-    "daily_lanes": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["schema_version", "lanes"],
-      "properties": {
-        "schema_version": {
-          "const": 1
-        },
-        "lanes": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 7,
-          "items": {
-            "$ref": "#/$defs/daily_lane"
-          }
-        }
-      }
-    },
-    "daily_lane": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["lane_id", "title", "max_items", "items"],
-      "properties": {
-        "lane_id": {
-          "enum": [
-            "must_read",
-            "major_company_strategy",
-            "watch_source_updates",
-            "open_source_github",
-            "product_industry",
-            "builder_twitter",
-            "trend_tracking"
-          ]
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "max_items": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/daily_lane_item"
-          },
-          "default": []
-        }
-      }
-    },
-    "daily_lane_item": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["candidate_id", "title", "section"],
-      "properties": {
-        "candidate_id": {
-          "$ref": "#/$defs/candidate_id"
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "section": {
-          "enum": [
-            "stories",
-            "main_items",
-            "github_trending",
-            "huggingface_trending",
-            "model_releases",
-            "hot_blogs",
-            "chinese_media_dynamics",
-            "daily_tracking",
-            "projects",
-            "builder_observations",
-            "official_org_updates",
-            "community_leads"
-          ]
-        },
-        "url": {
-          "$ref": "#/$defs/absolute_url"
-        },
-        "source": {
-          "type": "string",
-          "minLength": 1
-        },
-        "summary": {
-          "type": "string",
-          "minLength": 1
-        },
-        "badges": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "event_type": {
-          "type": "string",
-          "minLength": 1
-        },
-        "verification_status": {
-          "$ref": "#/$defs/verification_status"
-        }
       }
     },
     "importance": {
@@ -2452,6 +2255,9 @@
         "report_date": {
           "type": "string",
           "format": "date"
+        },
+        "main_audit_contract_version": {
+          "const": 1
         },
         "main_items": {
           "type": "integer",

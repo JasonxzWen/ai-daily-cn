@@ -1,6 +1,7 @@
 import { PublisherError } from "./errors.js";
 import { findPlainLanguageIssues } from "./plain-language.js";
 import { collectCandidateCoverageIssues } from "./candidates.js";
+import { collectMainAuditConsistencyIssues } from "./main-audit-consistency.js";
 
 const PUBLIC_COPY_BANNED_TERMS = [
   "披露",
@@ -1147,6 +1148,16 @@ function collectCandidatePoolIssues(report, candidatePool, issues, context = {})
       repairable: false
     });
   }
+  for (const auditIssue of collectMainAuditConsistencyIssues(report, candidatePool)) {
+    issues.push({
+      code: auditIssue.code,
+      severity: "error",
+      path: auditIssue.path,
+      message: auditIssue.message,
+      repairable: false,
+      details: auditIssue
+    });
+  }
 }
 
 function collectBuilderTranslationIssues(report, issues, aiReviewTasks) {
@@ -1274,7 +1285,7 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     "candidate_pool_empty",
     "candidate_id_missing",
     "candidate_pool_reference_invalid"
-  ].some((code) => failedCodes.has(code));
+  ].some((code) => failedCodes.has(code)) || [...failedCodes].some((code) => code.startsWith("main_audit_"));
   return [
     {
       id: "plain_language",

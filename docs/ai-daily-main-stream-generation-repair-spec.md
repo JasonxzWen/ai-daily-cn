@@ -1,5 +1,7 @@
 # AI 日报主体流生成修复规格
 
+> 2026-07-13 收敛说明：当前权威主体合同为最少 5 条、目标 8 条、最多 12 条，且只支持 `1280x900` 桌面视口。早期宽松数量与多端验收口径已被此合同取代。
+
 状态：spec-locked / implementation-validation-pending。本文是后续实现与验收的控制性规格，不表示当前代码已经稳定完成。`feedback/p1-main-stream-blacklist-refill` 是 confirmed durable requirement：需求、范围和测试绑定已经固定，但不是生成修复已稳定的声明。当前已经确认的事实是：2026-06-15 的生成结果只有 3 条 `main_items`，页面已经能如实显示 `主体偏少`，但生成端是否真正解决主体不足，必须等真实日期重跑、页面检查、截图验收和 `corepack pnpm run validate` 都通过后才能声称完成。
 
 当前执行门禁：本轮只落成计划、规范、测试标准和交接状态；不得继续修改 `src/**`、`tests/**`、生成报告数据、公开 HTML、发布流程或自动化配置。已有脏改动必须在后续实现阶段用红灯测试、真实日期重跑、页面检查、浏览器截图和完整验证重新证明，不能因为本规格存在就被视为正确。
@@ -20,8 +22,8 @@
 
 主体流改成短新闻流，不再是官方/一手白名单池。
 
-- 目标区间是 5-30 条：5 是低信号日最低值，5-20 是常规舒适区，21-30 是高信号日可接受区间。
-- 超过 30 条才视为过量，需要合并、去重或降级到附属栏目。
+- 主体最低 5 条、目标 8 条、最多 12 条；低于 5 条记录生成期短缺事件。
+- 超过 12 条视为过量，需要合并、去重或降级到附属栏目。
 - 官方、一手、多源确认不再是准入门票，而是排序和保留优先级。
 - 公开页仍然只展示标题、2-3 行事实摘要和来源链接，不展示生成过程、选择理由、source audit、自检、候选池、通用来源标签或模板解释。
 
@@ -55,7 +57,7 @@
 | 7. 每个候选写清楚为什么没进主体 | 每个被评估候选都要写 `main_reject_reason` 或 `main_selection_stage` | 公开页隐藏这些字段；候选池和 self_check 保留 per-candidate 与汇总统计 | `.candidates.json` 可追踪候选入选、补位、合并、拒绝原因 |
 | 8. 修复源而不是只修页面 | 页面只展示生成结果和 degraded 状态；真正修复点在 discovery、source registry、daily-runner 和候选标准化 | 不允许通过公开模板填充假内容或隐藏源失败 | source health 能解释源失败如何影响主体、附属栏目和替代路径 |
 | 9. 主体不足是生成期质量事件 | 主体不足不直接阻塞日报，但必须记录 `main_stream_shortfall` | 只有主体为 0 且无可信来源支撑时才升级为阻塞 | 真实日期不足时有 selected/refill/shortfall/rejection/source impact 事件 |
-| 10. 回归测试 | 单元、E2E、page-check、真实日期重跑和浏览器截图共同构成验收 | 不能只用 fixture 或一次页面静态检查声称稳定 | `corepack pnpm run validate`、date-specific page-check、桌面/移动截图和 runtime artifacts 同时存在 |
+| 10. 回归测试 | 单元、E2E、page-check、真实日期重跑和浏览器截图共同构成验收 | 不能只用 fixture 或一次页面静态检查声称稳定 | `corepack pnpm run validate`、date-specific page-check、`1280x900` 桌面截图和 runtime artifacts 同时存在 |
 
 ## 黑名单制准入规范
 
@@ -123,7 +125,7 @@
 }
 ```
 
-主体流从统一池里选 5-30 条。附属栏目继续存在，但不再阻止优质内容进入主体。
+主体流从统一池里选最多 12 条，目标 8 条，低于 5 条记录短缺。附属栏目继续存在，但不再阻止优质内容进入主体。
 
 处理规则：
 
@@ -275,12 +277,12 @@
 - 主体不足质量事件。
 - 源健康状态。
 - 公开垃圾句过滤。
-- 20-30 条主体不被判为 oversized。
+- 5–12 条主体不被判为 oversized，13 条及以上必须标记为 oversized。
 
 红灯命令固定为：
 
 ```powershell
-node --test tests/unit.test.js --test-name-pattern "main stream candidates by blacklist|sparse main stream from unified candidate roles|generic GitHub trending text|main stream rejection reason counts|main stream shortfall|21 to 30 main items"
+node --test tests/unit.test.js --test-name-pattern "main stream candidates by blacklist|sparse main stream from unified candidate roles|generic GitHub trending text|main stream rejection reason counts|main stream shortfall|more than twelve story-first main items"
 ```
 
 红灯证据必须保存在 `.tmp/red-main-stream-output.tap` 或同等临时文件中；绿灯证据必须记录在 `tasks/current-task.md` 的 `Regression Self-Check`。
@@ -329,7 +331,7 @@ node --test tests/unit.test.js --test-name-pattern "main stream candidates by bl
 使用真实日期重跑：
 
 - 生成 `.candidates.json` 和日报 JSON。
-- 检查主体流达到 5-30。
+- 检查主体流达到 5–12 条，并以 8 条为目标。
 - 检查补位原因和拒绝原因可审计。
 - 构建 HTML。
 - 用页面检查和浏览器截图验证日报页与 index 页。
@@ -350,7 +352,7 @@ node --test tests/unit.test.js --test-name-pattern "main stream candidates by bl
 - `report:draft records main stream shortfall as generation quality event`
 - `source health records blocked unconfigured no-signal and effective candidate counts`
 - `public interaction input strips source bucket labels and generation diagnostics`
-- `date index treats 21 to 30 main items as acceptable high-signal days`
+- `date index treats more than twelve story-first main items as oversized`
 
 ### E2E / Page Checklist
 
@@ -358,8 +360,8 @@ node --test tests/unit.test.js --test-name-pattern "main stream candidates by bl
 
 - 3 条主体：页面可渲染，但显示 `主体偏少`，不阻塞。
 - 5 条主体：达标。
-- 21-30 条主体：不显示 oversized。
-- 31 条以上主体：显示过量或要求合并。
+- 5–12 条主体：不显示 oversized。
+- 13 条以上主体：显示过量或要求合并。
 - 公开 HTML 不包含内部字段和垃圾句。
 - compact main list 仍然在详细折叠块之前。
 - index 页同时显示整体质量和主体流状态。
@@ -375,8 +377,8 @@ node --test tests/unit.test.js --test-name-pattern "main stream candidates by bl
 | 候选拒绝原因完整 | 每个被评估候选都有 `main_selection_stage` 或 `main_reject_reason` | `.candidates.json` missing audit count 为 0，并能汇总 top rejection reasons | 只有 selected 项有审计，未入选候选不可追踪 |
 | 源健康与降级 | blocked、no_signal、unconfigured、degraded、effective candidate count 均有 fixture | `source_audit` / source health 记录 source group、last checked、candidate count、included count、fallback、source impact | registry 里有 URL，或公开页只写 degraded 但无法定位源 |
 | effective-interact 生产渲染 | 单测确认 `buildSite` 调用 effective-interact pre-rendered，并保留组件 affordance | 构建后的单日报 HTML 含 effective-interact generator marker、filterable cards、导航/组件能力 | 手写模板伪造 marker，或只检查 HTML 文件存在 |
-| index 影响 | E2E/page-check 覆盖 3、5、21-30、31+ 主体数量状态 | `docs/index.html` 对真实报告显示正确主体流状态，不把 21-30 判 oversized | 只看单日报页，不检查 index |
-| 完整完成声明 | 目标测试、真实日期 draft/write/build、page-check、桌面/移动截图、`corepack pnpm run validate` 全部存在 | handoff 引用具体文件、命令、截图和计数 | 只跑 `corepack pnpm run validate`，或只跑真实日期但没有截图/page-check |
+| index 影响 | E2E/page-check 覆盖 1–4、5–12、13+ 主体数量状态 | `docs/index.html` 对真实报告显示正确主体流状态，不把 13+ 判为达标 | 只看单日报页，不检查 index |
+| 完整完成声明 | 目标测试、真实日期 draft/write/build、page-check、`1280x900` 桌面截图、`corepack pnpm run validate` 全部存在 | handoff 引用具体文件、命令、截图和计数 | 只跑 `corepack pnpm run validate`，或只跑真实日期但没有截图/page-check |
 
 ### Runtime Evidence
 
@@ -388,7 +390,7 @@ node --test tests/unit.test.js --test-name-pattern "main stream candidates by bl
 - `quality_status` 或等价质量事件。
 - `docs/reports/YYYY/MM/YYYY-MM-DD.html`。
 - `docs/index.html`。
-- 桌面和移动截图。
+- `1280x900` 桌面截图。
 
 ### Claim Boundary
 
@@ -396,7 +398,7 @@ node --test tests/unit.test.js --test-name-pattern "main stream candidates by bl
 
 - ledger 项存在，且 `node scripts/validate-feedback-contract.mjs` 通过。
 - 红灯测试先失败、实现后同名测试通过。
-- 真实日期重跑后 `reports-data/YYYY/MM/YYYY-MM-DD.json` 的 `main_items` 达到 5-30，或不足时有 `main_stream_shortfall` 质量事件。
+- 真实日期重跑后 `reports-data/YYYY/MM/YYYY-MM-DD.json` 的 `main_items` 达到 5–12 条（目标 8 条），或不足时有 `main_stream_shortfall` 质量事件。
 - `docs/reports/YYYY/MM/YYYY-MM-DD.html` 与 `docs/index.html` 已由 build 更新。
 - page-check 和浏览器截图证明公开页没有内部字段、垃圾句、遮挡、溢出或 index 状态误判。
 
@@ -427,7 +429,7 @@ corepack pnpm run validate
 
 只有同时满足以下条件，才能说这轮主体偏少修复完成：
 
-- 真实生成结果主体流达到 5-30，或不足时有清楚的生成期短缺事件。
+- 真实生成结果主体流达到 5–12 条（目标 8 条），或不足时有清楚的生成期短缺事件。
 - 候选拒绝原因可审计。
 - GitHub、Builder、hot blog、社区弱信号能按规则参与补位。
 - 官方源健康表能解释失败和替代入口。

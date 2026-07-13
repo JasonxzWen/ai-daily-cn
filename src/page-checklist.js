@@ -1162,7 +1162,7 @@ export async function evaluateIndexPageChecklist(page, options = {}) {
     addCheck(
       "date_cards_main_stream_status",
       cards.length > 0 && cardsWithoutMainStreamChip.length === 0,
-      "Every date card should separately expose whether the 1-12 story-first main stream target is met.",
+      "Every date card should separately expose whether the 5-12 story-first main stream contract is met.",
       { weak_cards: cardsWithoutMainStreamChip }
     );
     addCheck(
