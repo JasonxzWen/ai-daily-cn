@@ -71,6 +71,60 @@
       }
     },
     {
+      "id": "first-pass-public-authoring",
+      "status": "ready_for_validation",
+      "summary": "Author story, hot-blog, GitHub, and Builder public prose from same-run evidence before the first formal quality review; reserve repair for exceptional residual defects.",
+      "commands": [
+        "node --test tests/story-authoring.test.js tests/daily-codex-pipeline.test.js",
+        "node --test --test-name-pattern \"daily runner\" tests/unit.test.js",
+        "corepack pnpm run resilience:validate"
+      ],
+      "artifacts": [
+        ".tmp/first-pass-authoring-plan-YYYY-MM-DD.json",
+        ".tmp/first-pass-authoring-contract-YYYY-MM-DD.json",
+        ".tmp/daily-report.authored.json",
+        ".tmp/run-summary-YYYY-MM-DD.json"
+      ],
+      "acceptance": [
+        "The single production entrypoint invokes one bounded, schema-constrained first-pass author after report_draft and before the first quality_review.",
+        "The plan proactively covers every existing story title/narrative, hot-blog summary, GitHub description, and Builder translation path, with source URLs, candidate references, or original text retained as private grounding hints.",
+        "The host requires every declared path exactly once and the existing public-text applier still rejects fact, URL, date, source, audit, missing, banned, or undeclared writes.",
+        "A complete contract becomes daily-report.authored.json for the first formal review without consuming the exceptional repair budget; Builder translation also synchronizes content through the existing applier.",
+        "An unavailable, invalid, incomplete, or partially rejected first-pass contract is recorded as fallback and the untouched deterministic draft proceeds through formal review and bounded repair.",
+        "Run summary reports first-pass enabled/status/attempted/task/edit/applied/rejected/reason/first_review_ok/exceptional_repair_task_count separately from automation_ai_repair.",
+        "translation_fidelity remains advisory and is never copied into a repair write contract unless a separate error-covered public-editorial task authorizes that exact path."
+      ],
+      "stop_conditions": [
+        "First-pass authoring happens after quality_review or consumes repair budget.",
+        "A contract can omit a declared path, add an undeclared path, or partially apply while becoming the public report input.",
+        "Fixture success is presented as proof that repair is already exceptional in production."
+      ],
+      "behavior": "Generate deterministic facts once, author all declared reader-facing prose once, judge once, and repair only exceptional error-covered residue.",
+      "validation": {
+        "commands": [
+          "node --test tests/story-authoring.test.js tests/daily-codex-pipeline.test.js",
+          "node --test --test-name-pattern \"daily runner\" tests/unit.test.js",
+          "node scripts/validate-daily-resilience-policy.mjs",
+          "corepack pnpm run validate"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          "src/quality-loop.js",
+          "src/daily-runner.js",
+          "scripts/run-daily-codex-pipeline.mjs",
+          "config/daily-resilience-policy.json",
+          "tests/story-authoring.test.js",
+          "tests/daily-codex-pipeline.test.js",
+          "tests/unit.test.js"
+        ],
+        "stop_conditions": [
+          "The first formal review still sees routine whole-lane Builder authoring tasks.",
+          "The run summary merges first-pass work into automation_ai_repair."
+        ]
+      }
+    },
+    {
       "id": "main-selection-fact-contract",
       "status": "ready_for_validation",
       "summary": "Use draft scoring and terminal candidate dispositions as the only production selection fact; reject score, rank, snapshot, report, quality, and Phase5 drift.",

@@ -67,7 +67,8 @@ const FIRST_PASS_AUTHORING_TASK_KINDS = new Set([
   "rewrite_autodraft_template",
   "main_item_editorial_rewrite",
   "hot_blog_editorial_rewrite",
-  "builder_translation_rewrite"
+  "builder_translation_rewrite",
+  "github_description_authoring"
 ]);
 export const FIRST_PASS_AUTHORING_PHASE = "first_pass_authoring";
 export const FIRST_PASS_AUTHORING_INTENT = "source_grounded_public_authoring";
@@ -278,6 +279,133 @@ export function annotateAuthoringTask(task = {}) {
     authoring_contract: FIRST_PASS_AUTHORING_CONTRACT,
     requires_source_grounding: true
   };
+}
+
+export function buildFirstPassAuthoringTasks(report = {}) {
+  const tasks = [];
+  const stories = Array.isArray(report?.stories) ? report.stories : [];
+  stories.forEach((story, index) => {
+    const evidenceUrls = uniqueHttpUrls((Array.isArray(story?.sources) ? story.sources : [])
+      .map((source) => source?.url));
+    for (const field of ["title", "what_happened", "why_it_matters"]) {
+      if (typeof story?.[field] !== "string") continue;
+      tasks.push(firstPassTask({
+        kind: "public_editorial_rewrite",
+        path: `stories[${index}].${field}`,
+        instruction: storyAuthoringInstruction(field),
+        evidenceUrls,
+        evidenceRefs: story?.source_item_refs
+      }));
+    }
+  });
+
+  const hotBlogs = Array.isArray(report?.hot_blogs) ? report.hot_blogs : [];
+  hotBlogs.forEach((item, index) => {
+    if (typeof item?.summary !== "string") return;
+    tasks.push(firstPassTask({
+      kind: "hot_blog_editorial_rewrite",
+      path: `hot_blogs[${index}].summary`,
+      instruction: "Write a concrete 100-200 Chinese-character summary of the article's argument, evidence, method, and practical boundary.",
+      evidenceUrls: [item?.url, item?.source_url],
+      evidenceRefs: [item?.candidate_id]
+    }));
+  });
+
+  const githubItems = Array.isArray(report?.github_trending) ? report.github_trending : [];
+  githubItems.forEach((item, index) => {
+    if (typeof item?.description !== "string") return;
+    tasks.push(firstPassTask({
+      kind: "github_description_authoring",
+      path: `github_trending[${index}].description`,
+      instruction: "Explain in concise Chinese what this repository does, its concrete implementation or use case, and the evidence-backed reason it matters; do not restate rank or stars.",
+      evidenceUrls: [item?.url, item?.repo_url, item?.readme_url],
+      evidenceRefs: [item?.candidate_id]
+    }));
+  });
+
+  const builders = Array.isArray(report?.builder_observations) ? report.builder_observations : [];
+  builders.forEach((item, index) => {
+    if (typeof item?.translation !== "string") return;
+    tasks.push(firstPassTask({
+      kind: "builder_translation_rewrite",
+      path: `builder_observations[${index}].translation`,
+      instruction: "Translate and condense this specific Builder post into natural Chinese while preserving its concrete claim, uncertainty, and proper names; never use a generic Builder template.",
+      evidenceUrls: [item?.url, item?.source_url],
+      evidenceRefs: [item?.candidate_id],
+      sourceExcerpt: item?.original_text
+    }));
+  });
+
+  return tasks;
+}
+
+export function validateFirstPassAuthoringContract(contract, { reportDate = "", tasks = [] } = {}) {
+  const failures = [];
+  if (!contract || typeof contract !== "object" || Array.isArray(contract)) {
+    return { ok: false, failures: ["first-pass authoring contract must be an object"] };
+  }
+  if (contract.schema_version !== 1) failures.push("schema_version must be 1");
+  if (String(contract.report_date || "") !== String(reportDate || "")) {
+    failures.push(`report_date must be ${reportDate}`);
+  }
+  if (contract.status !== "ready") failures.push("status must be ready");
+
+  const taskPaths = (Array.isArray(tasks) ? tasks : [])
+    .map((task) => String(task?.path || "").trim())
+    .filter(Boolean);
+  const expected = new Set(taskPaths);
+  if (expected.size === 0) failures.push("tasks must declare at least one authoring path");
+  if (expected.size !== taskPaths.length) failures.push("tasks must not contain duplicate authoring paths");
+
+  const edits = Array.isArray(contract.edits) ? contract.edits : [];
+  if (edits.length === 0) failures.push("edits must contain at least one edit");
+  const seen = new Set();
+  edits.forEach((edit, index) => {
+    if (!edit || typeof edit !== "object" || Array.isArray(edit)) {
+      failures.push(`edits[${index}] must be an object`);
+      return;
+    }
+    const editPath = String(edit.path || "").trim();
+    if (!expected.has(editPath)) failures.push(`edits[${index}].path is not a declared first-pass task`);
+    if (seen.has(editPath)) failures.push(`edits[${index}].path is duplicated`);
+    if (editPath) seen.add(editPath);
+    if (typeof edit.value !== "string" || !edit.value.trim()) failures.push(`edits[${index}].value is required`);
+  });
+  for (const taskPath of expected) {
+    if (!seen.has(taskPath)) failures.push(`missing edit for declared first-pass task: ${taskPath}`);
+  }
+  return { ok: failures.length === 0, failures };
+}
+
+function firstPassTask({ kind, path, instruction, evidenceUrls = [], evidenceRefs = [], sourceExcerpt = "" }) {
+  return annotateAuthoringTask({
+    kind,
+    path,
+    instruction,
+    evidence_urls: uniqueHttpUrls(evidenceUrls),
+    evidence_refs: uniqueNonEmptyStrings(evidenceRefs),
+    ...(String(sourceExcerpt || "").trim() ? { source_excerpt: String(sourceExcerpt).trim() } : {})
+  });
+}
+
+function storyAuthoringInstruction(field) {
+  if (field === "title") {
+    return "Write a concise concrete Chinese headline grounded in the declared story sources; preserve entities and the actual event.";
+  }
+  if (field === "what_happened") {
+    return "State the concrete event, mechanism, evidence, and material boundary in natural Chinese without audit or template language.";
+  }
+  return "Explain the specific reader or engineering consequence supported by the story sources, including a decision-relevant boundary when available.";
+}
+
+function uniqueHttpUrls(values) {
+  return uniqueNonEmptyStrings(values).filter((value) => /^https?:\/\//i.test(value));
+}
+
+function uniqueNonEmptyStrings(values) {
+  return [...new Set((Array.isArray(values) ? values : [])
+    .map((value) => String(value || "").trim())
+    .filter(Boolean))];
 }
 
 export function repairReportQuality(report, review = null, options = {}) {

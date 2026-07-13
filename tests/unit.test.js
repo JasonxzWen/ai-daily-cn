@@ -10753,7 +10753,11 @@ test("daily runner hands AI repair back to Codex with publish review budget", as
           ok: false,
           needsAiRepair: true,
           output: {
-            ai_review_tasks: [{ kind: "translation_fidelity", path: "builder_observations[0]" }]
+            review: {
+              ok: false,
+              ai_review_tasks: [{ kind: "public_editorial_rewrite", path: "stories[0].what_happened" }],
+              issues: [{ code: "story_template_narrative", severity: "error", path: "stories[0].what_happened" }]
+            }
           }
         };
       }
@@ -10767,9 +10771,9 @@ test("daily runner hands AI repair back to Codex with publish review budget", as
   assert.equal(result.summary.next_action.max_review_repair_loops, 5);
   assert.equal(result.summary.next_action.remaining_review_repair_loops, 4);
   assert.equal(result.summary.next_action.required_contract_status, "ready");
-  assert.equal("handoff_phase" in result.summary.next_action, false);
-  assert.equal(result.summary.next_action.ai_review_tasks[0].kind, "translation_fidelity");
-  assert.equal("phase" in result.summary.next_action.ai_review_tasks[0], false);
+  assert.equal(result.summary.next_action.handoff_phase, "first_pass_authoring");
+  assert.equal(result.summary.next_action.ai_review_tasks[0].kind, "public_editorial_rewrite");
+  assert.equal(result.summary.next_action.ai_review_tasks[0].phase, "first_pass_authoring");
   assert.match(result.summary.next_action.contract_path, /quality-ai-repair-2026-06-04\.json$/);
   assert(!result.summary.stages.some((stage) => stage.id === "publish_real"));
 });
@@ -10794,7 +10798,11 @@ test("daily runner allows one AI repair loop in default dry-run mode", async () 
           output: {
             review: {
               ok: false,
-              ai_review_tasks: [{ kind: "rewrite_autodraft_template", path: "main_items[0].bullets[0]" }]
+              ai_review_tasks: [
+                { kind: "rewrite_autodraft_template", path: "main_items[0].bullets[0]" },
+                { kind: "translation_fidelity", path: "builder_observations[0].translation" }
+              ],
+              issues: [{ code: "main_item_template_bullet", severity: "error", path: "main_items[0].bullets[0]" }]
             }
           }
         };
@@ -10810,8 +10818,159 @@ test("daily runner allows one AI repair loop in default dry-run mode", async () 
   assert.equal(result.summary.next_action.handoff_phase, "first_pass_authoring");
   assert.equal(result.summary.next_action.handoff_intent, "source_grounded_public_authoring");
   assert.equal(result.summary.next_action.authoring_contract, "public_prose_authoring_v1");
+  assert.equal(result.summary.next_action.ai_review_tasks.length, 1, "advisory translation_fidelity must not gain repair authority");
+  assert.equal(result.summary.next_action.ai_review_tasks[0].kind, "rewrite_autodraft_template");
   assert.equal(result.summary.next_action.ai_review_tasks[0].phase, "first_pass_authoring");
   assert.equal(result.summary.next_action.ai_review_tasks[0].intent, "source_grounded_public_authoring");
+});
+
+test("daily runner applies first-pass authoring before the first quality review without consuming repair budget", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-first-pass-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const reportDate = "2026-07-13";
+  const reportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const stageIds = [];
+  let authorCalls = 0;
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate,
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "6767676767676767676767676767676767676767"
+    }),
+    firstPassAuthoringContractAuthor: async ({ tasks, sourceReportPath, authoringPlanPath }) => {
+      authorCalls += 1;
+      assert.equal(stageIds.includes("quality_review"), false, "formal review must not run before first-pass authoring");
+      assert.equal(sourceReportPath, reportPath);
+      assert.match(authoringPlanPath, /first-pass-authoring-plan-2026-07-13\.json$/);
+      return {
+        schema_version: 1,
+        report_date: reportDate,
+        status: "ready",
+        edits: tasks.map((task, index) => ({
+          path: task.path,
+          value: `来源约束的首轮公开文案 ${index + 1}`,
+          reason: "first-pass source-grounded authoring",
+          evidence_path: null
+        }))
+      };
+    },
+    runStage: async (stage) => {
+      stageIds.push(stage.id);
+      if (stage.id === "report_draft") {
+        await fs.mkdir(path.dirname(reportPath), { recursive: true });
+        await fs.writeFile(reportPath, `${JSON.stringify({
+          report_date: reportDate,
+          stories: [{
+            story_id: "s1",
+            title: "OpenAI 更新推理接口",
+            what_happened: "OpenAI 发布了接口更新。",
+            why_it_matters: "开发者需要评估迁移。",
+            sources: [{ url: "https://openai.com/news/example" }]
+          }],
+          main_items: [],
+          hot_blogs: [{ title: "智能体评测", summary: "文章讨论智能体评测。", url: "https://example.com/blog" }],
+          github_trending: [{ description: "Agent toolkit", url: "https://github.com/example/agent-kit" }],
+          builder_observations: [{
+            original_text: "We shipped faster tool calling.",
+            translation: "这条 Builder 动态值得关注。",
+            content: "这条 Builder 动态值得关注。",
+            url: "https://x.com/example/status/1"
+          }]
+        }, null, 2)}\n`, "utf8");
+        await fs.writeFile(candidatePoolPath, `${JSON.stringify({ report_date: reportDate, candidates: [] })}\n`, "utf8");
+      }
+      if (stage.id === "first_pass_authoring") {
+        const contractPath = path.join(cleanRoot, stage.command.args[5]);
+        const contract = JSON.parse(await fs.readFile(contractPath, "utf8"));
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            path: path.join(cleanRoot, ".tmp", "daily-report.authored.json"),
+            contract_applied: contract.edits.map((edit) => ({ path: edit.path })),
+            contract_rejected: [],
+            review: { ok: false, ai_review_tasks: [{ kind: "translation_fidelity" }] }
+          }
+        };
+      }
+      if (stage.id === "quality_review") {
+        assert.equal(stage.command.args[2], ".tmp/daily-report.authored.json");
+        return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
+      }
+      if (stage.id === "report_write") {
+        assert(stage.command.args.includes(".tmp/daily-report.authored.json"));
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(authorCalls, 1);
+  assert(stageIds.indexOf("report_draft") < stageIds.indexOf("first_pass_authoring"));
+  assert(stageIds.indexOf("first_pass_authoring") < stageIds.indexOf("quality_review"));
+  assert.equal(result.summary.review_repair_attempts, 0);
+  assert.equal(
+    result.summary.current_report_path,
+    ".tmp/daily-report.authored.json",
+    JSON.stringify(result.summary.automation_first_pass_authoring)
+  );
+  assert.equal(result.summary.automation_first_pass_authoring.status, "completed");
+  assert.equal(result.summary.automation_first_pass_authoring.task_count, 6);
+  assert.equal(result.summary.automation_first_pass_authoring.applied_count, 6);
+  assert.equal(result.summary.automation_first_pass_authoring.first_review_ok, true);
+});
+
+test("daily runner falls back to formal review without applying an incomplete first-pass contract", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-first-pass-fallback-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const reportDate = "2026-07-13";
+  const reportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const stageIds = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate,
+    publish: false,
+    prepareCleanWorktree: async () => ({ ok: true, next_cwd: cleanRoot }),
+    firstPassAuthoringContractAuthor: async ({ tasks }) => ({
+      schema_version: 1,
+      report_date: reportDate,
+      status: "ready",
+      edits: [{ path: tasks[0].path, value: "只覆盖一个字段" }]
+    }),
+    runStage: async (stage) => {
+      stageIds.push(stage.id);
+      if (stage.id === "report_draft") {
+        await fs.mkdir(path.dirname(reportPath), { recursive: true });
+        await fs.writeFile(reportPath, `${JSON.stringify({
+          report_date: reportDate,
+          stories: [{
+            title: "OpenAI 更新接口",
+            what_happened: "OpenAI 发布更新。",
+            why_it_matters: "开发者需要评估。",
+            sources: [{ url: "https://openai.com/news/example" }]
+          }]
+        })}\n`, "utf8");
+        await fs.writeFile(candidatePoolPath, `${JSON.stringify({ report_date: reportDate, candidates: [] })}\n`, "utf8");
+      }
+      if (stage.id === "quality_review") {
+        assert.equal(stage.command.args[2], ".tmp/daily-report.json");
+        return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(stageIds.includes("first_pass_authoring"), false);
+  assert.equal(result.summary.automation_first_pass_authoring.status, "fallback");
+  assert.equal(result.summary.automation_first_pass_authoring.reason, "first_pass_authoring_contract_invalid");
+  assert.equal(result.summary.automation_first_pass_authoring.first_review_ok, true);
+  assert.equal(result.summary.current_report_path, ".tmp/daily-report.json");
 });
 
 test("daily runner degrades instead of blocking when only editorial residue remains after the loop budget", async () => {
@@ -10962,7 +11121,7 @@ test("daily runner still blocks when residual issues are not low-risk editorial"
           output: {
             review: {
               ok: false,
-              ai_review_tasks: [{ kind: "rewrite_autodraft_template", path: "main_items[0].bullets[0]" }]
+              ai_review_tasks: [{ kind: "translation_fidelity", path: "main_items[0].bullets[0]" }]
             }
           }
         };
@@ -10997,7 +11156,8 @@ test("daily runner resumes from AI repair contract and continues with optimized 
           output: {
             review: {
               ok: false,
-              ai_review_tasks: [{ kind: "translation_fidelity", path: "builder_observations[0].translation" }]
+              ai_review_tasks: [{ kind: "builder_translation_rewrite", path: "builder_observations[0].translation" }],
+              issues: [{ code: "builder_translation_too_weak", severity: "error", path: "builder_observations[0].translation" }]
             }
           }
         };
@@ -11310,7 +11470,7 @@ test("daily runner blocks non-public-editorial AI repair review failures", async
             contract_rejected: [],
             review: {
               ok: false,
-              ai_review_tasks: [{ kind: "rewrite_autodraft_template", path: "main_items[0].bullets[0]" }],
+              ai_review_tasks: [{ kind: "translation_fidelity", path: "main_items[0].bullets[0]" }],
               issues: [
                 {
                   code: "autodraft_template_phrase",

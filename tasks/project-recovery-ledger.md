@@ -316,10 +316,11 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 ### REC-324 - Make first-pass authoring real; keep repair exceptional
 
 - Type: designed but not achieved.
-- Fact evidence: real 2026-07-10 runs still emitted 11-12 translation/editorial repair tasks, so repair remains a normal authoring phase rather than a fallback.
-- State: discovered.
-- Action: move source-grounded writing to the first authoring pass and measure repair frequency; retain bounded repair only for exceptional defects.
-- Acceptance: consecutive real runs pass first review or require a small exceptional repair set, not routine full builder translation.
+- Fact evidence: real 2026-07-10 runs emitted 11-12 translation/editorial tasks; the preserved 2026-07-13 non-publish review contained four error-covered public-editorial tasks plus ten advisory `translation_fidelity` tasks, while different Builder posts still shared generic translations. Repair therefore remained the normal writing phase.
+- State: locally_verified; consecutive merged-main production observation remains.
+- Action completed: the single production entrypoint now injects one schema-constrained first-pass author after `report_draft` and before the first formal `quality_review`. A shared plan proactively declares story title/narrative, hot-blog summary, GitHub description, and Builder translation paths; the host requires exact full coverage, applies through the existing public-text allowlist, and feeds only the fully authored report to review. Invalid, unavailable, or partial contracts fall back to the untouched deterministic draft. First-pass facts are reported separately from bounded exceptional repair, and advisory translation-fidelity tasks cannot gain repair write authority.
+- Local evidence: focused story/pipeline tests pass 53/53; all 36 daily-runner affected tests pass; the bounded P0/P1 reviewer found two path/compatibility defects, both were fixed and the targeted re-review returned Ready. Final validation passes 903 total / 901 pass / 0 fail / 2 skipped with build-clean, 194-file privacy, E2E, Harness, workflow/resilience/DAG, JSON, and diff gates. Browser acceptance is skipped because no Web composition changed. PR CI remains the delivery gate.
+- Acceptance: after merge, three consecutive real non-publish or scheduled runs must show at least 2/3 first reviews passing directly; an exception day may expose at most two error-covered public-editorial tasks and one repair loop. Median error-covered repair tasks must be zero, daily maximum two, `translation_fidelity` must remain advisory on 3/3 days, and `plain_language_stock_phrase` blockers must be zero before `production_verified`.
 
 ### REC-325 - Preserve the long-term topic repository and capability map
 
