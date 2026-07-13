@@ -1,34 +1,36 @@
 # Evaluator Rubric
 
-Use this rubric for the REC-314 GitHub Trending canonical source-effectiveness closeout.
+Use this rubric for the REC-331 Aify production-evidence closeout.
 
 | Dimension | Score 0-2 | Evidence |
 | --- | --- | --- |
-| Problem match | 2 | The immutable 2026-07-09 report says 70 candidates / 30 included while the candidate pool and final sections prove 50 / 20 canonical repositories. |
-| Correctness | 2 | Candidate facts canonicalize by owner/repo; final `github_trending` plus matching `projects` own inclusion truth; stale flags cannot create public inclusion. |
-| Count semantics | 2 | `candidate_count` represents canonical collected repositories; `included_count` represents canonical final report-section union; renderer Top10 remains a presentation cap. |
-| Shared contract | 2 | Source effectiveness and draft source audit reuse one exported canonical identity/count helper instead of duplicating the definition. |
-| Compatibility | 2 | Non-GitHub logical sources retain the existing raw-candidate behavior; GitHub selection, Top20 report, Top10 render, rank, cache and language logic are unchanged. |
-| Failure behavior | 2 | Missing final report identities fail closed to not included; unknown candidate identity remains a distinct record rather than being silently collapsed. |
-| Verification | 2 | Three RED/GREEN paths cover original/derived dedupe, stale included flags and the weekly Top20 integration; affected source-effectiveness tests pass 14/14 and the full unit suite passes. |
-| Real evidence | 2 | Running the new counter against the committed 2026-07-09 report + candidate pool returns exactly 50 candidates / 20 included / public true without rewriting history. |
-| Scope discipline | 2 | Only source-effectiveness, draft audit wiring, deterministic tests and governance records change; no Web/mobile/automation/publish/backfill surface changes. |
-| Runtime reliability | 2 | The report is assembled before effectiveness is computed, so production no longer asks a candidate flag to stand in for the final public artifact. |
-| Browser acceptance | 2 | Explicitly skipped because no Web composition changed; `1280x900` remains the sole supported viewport and existing E2E remains in the final gate. |
-| Validation efficiency | 2 | Development uses three REDs, one affected suite, one full unit run and one final repository gate; no repeated generic review. |
-| Agentic loops | 2 | Main-agent Producer, deterministic Verifier and CI Arbiter form one bounded closeout loop; prior evidence work is reused. |
-| Finish closeout | 2 | Final diff, real artifact probe, full validation, PR mergeability/checks and residual lane-health gaps are checked once before delivery. |
-| Insight recommendations | 2 | The repeated false-green pattern becomes a shared deterministic contract under REC-314 rather than a new audit or memory-only warning. |
-| Handoff readiness | 2 | REC-314/S-82, feature inventory, roadmap, quality snapshot, Harness state and PR status share one closeout record. |
+| Problem match | 2 | Aify promotion existed, but the production Phase5 stage omitted the logical source and aggregate `some` semantics allowed a site-only shell to pass. |
+| Correctness | 2 | Production explicitly audits `aify-news`; `content-aify-news` and `site-aify-news` are both required per day. |
+| Evidence semantics | 2 | Each required entry reports observation, candidate count, included/excluded counts, reasons, unresolved items and completeness. |
+| Failure behavior | 2 | Missing entries/candidates fail closed; site-only evidence cannot verify; a hybrid candidate with conflicting source and watch identities satisfies neither required entry. |
+| Public truth | 2 | Included candidates still require dated `docs/articles.json` matches and all non-included candidates require persisted reasons. |
+| Shared Phase5 | 2 | A logical-source day cannot pass when the same day's shared admission/lineage Phase5 fails. |
+| Runtime reliability | 2 | The runner copies the full logical-source evidence projection into the trusted terminal run summary before stage output sanitization. |
+| Authority boundary | 2 | Original publisher, `ai_news_aggregator`, `intermediary_only` and primary-source confirmation requirements remain unchanged. |
+| Compatibility | 2 | Non-Aify logical sources retain their existing behavior; Source Watch producer, selection and publication logic are untouched. |
+| Real evidence | 2 | The current 2026-07-11..13 audit reports both required entries, 0/3 complete days, 0 matches and `production_verified=false` without rewriting history. |
+| Verification | 2 | Aify 8/8, affected Aify/Source Watch 21/21, runner Phase5 2/2, workflow/Harness/diff gates pass; final aggregate is 910 total / 908 pass / 0 fail / 2 skipped with build-clean, 194-file privacy and desktop E2E green. |
+| Scope discipline | 2 | No Web, mobile/tablet/narrow/touch, automation definition, official-blog, generated report or backfill changes. |
+| Browser acceptance | 2 | Explicitly skipped because no Web composition changed; `1280x900` remains the sole supported viewport. |
+| Validation efficiency | 2 | Development used exact RED failures, one affected batch, one runner pattern batch and one final repository gate; only the E2E tail was repeated after its terminal exit code was lost. |
+| Agentic loops | 2 | Main-agent Producer, deterministic Verifier, one bounded reviewer and final-head CI form the closeout loop. |
+| Finish closeout | 2 | One bounded P0/P1 review and one final repository gate cover the changed runner/evidence boundary without a second generic review. |
+| Insight recommendations | 2 | The durable lesson is encoded in code/tests: a first-class label requires persisted per-entry production receipts. |
+| Handoff readiness | 2 | REC-331/S-79, feature inventory, roadmap, quality snapshot, Harness state and PR status share one record. |
 
 ## Verdict
 
-- Implementation and the single final repository gate are complete; no unresolved product ambiguity remains.
+- The implementation passed the final repository gate and the bounded hybrid-fix re-review returned Ready with P0/P1=0; no product ambiguity remains.
 - Merge only when final-head required checks are green and GitHub reports the PR conflict-free.
-- Keep REC-314 `locally_verified` until a fresh merged-main production report persists canonical counts.
+- Keep Aify status `observing` / REC-331 `locally_verified` until three consecutive post-merge production days pass with at least one public match.
 
 ## Residual risk
 
-- Historical 70/30 artifacts remain unchanged as evidence.
-- Other logical source lanes still require their own per-source production evidence; this PR does not assume GitHub's derived-record pattern applies globally.
-- Final validation passes 907 total / 905 pass / 0 fail / 2 skipped; PR/CI and fresh merged-main production evidence remain.
+- The current history truthfully contains no qualifying Aify production day; this PR must not manufacture or backfill one.
+- Any unrelated shared Phase5 failure correctly invalidates that day's Aify evidence.
+- PR/CI and post-merge production evidence remain.

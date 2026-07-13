@@ -276,7 +276,8 @@ export const CORE_SOURCE_CONTRACTS = [
     name: "Aify News",
     role: "news_aggregator",
     notes: "First-class governance identity for the Aify content and site-watch entries; aggregator/intermediary authority remains unchanged and factual claims still require primary evidence.",
-    aliases: ["content-aify-news", "site-aify-news", "aify news", "aify-news.pages.dev"]
+    aliases: ["content-aify-news", "site-aify-news", "aify news", "aify-news.pages.dev"],
+    required_observation_entries: ["content-aify-news", "site-aify-news"]
   },
   {
     id: "hacker-news",
@@ -342,6 +343,16 @@ export const CORE_SOURCE_CONTRACTS = [
     aliases: ["content-swe-bench-pro-public", "swe-bench pro", "swe bench pro", "scale labs swe-bench pro", "swe_bench_pro_public_playwright"]
   }
 ];
+
+export function logicalSourceRequiredObservationEntries(logicalSourceId) {
+  const id = String(logicalSourceId || "").trim();
+  const contract = CORE_SOURCE_CONTRACTS.find((item) => item.id === id);
+  return [...new Set(
+    (Array.isArray(contract?.required_observation_entries) ? contract.required_observation_entries : [])
+      .map((entryId) => String(entryId || "").trim())
+      .filter(Boolean)
+  )];
+}
 
 const PUBLIC_REPORT_SECTIONS = [
   "stories",
