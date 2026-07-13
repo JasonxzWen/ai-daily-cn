@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import {
   applyGithubReadmeSummary,
+  githubReadmeCacheKey,
   summarizeGithubReadme
 } from "./github-readme.js";
 import { loadSourceRegistry } from "./source-registry.js";
@@ -663,7 +664,8 @@ export async function collectGitHubTrending(options = {}) {
   const enrichedCandidates = await enrichGithubTrendingReadmes(limitedCandidates, {
     fetchImpl,
     disabled: options.readmeEnrichment === false,
-    maxCandidates: options.readmeLimit
+    maxCandidates: options.readmeLimit,
+    cache: history.readmeCache
   });
   const apiEnrichedCandidates = await enrichGithubTrendingApiFields(enrichedCandidates, {
     fetchImpl,
@@ -1623,12 +1625,12 @@ async function enrichGithubTrendingReadmes(candidates, options = {}) {
       enriched.push(candidate);
       continue;
     }
-    enriched.push(await enrichGithubTrendingReadme(candidate, fetchImpl));
+    enriched.push(await enrichGithubTrendingReadme(candidate, fetchImpl, options.cache));
   }
   return enriched;
 }
 
-async function enrichGithubTrendingReadme(candidate, fetchImpl) {
+async function enrichGithubTrendingReadme(candidate, fetchImpl, cache) {
   if (candidate.readme_summary || candidate.github_readme_summary || candidate.readme_fetch_status || candidate.readme_status) {
     return candidate;
   }
@@ -1657,17 +1659,18 @@ async function enrichGithubTrendingReadme(candidate, fetchImpl) {
           lastError = "empty_readme";
           continue;
         }
-        const summary = summarizeGithubReadme({
-          repo,
-          readme,
-          maxChars: 160
-        });
+        const sha = createHash("sha256").update(String(readme)).digest("hex");
+        const cacheKey = githubReadmeCacheKey({ repo, defaultBranch: branch, sha });
+        const cached = cache instanceof Map ? cache.get(cacheKey) : null;
+        const summary = cached?.summary || summarizeGithubReadme({ repo, readme, maxChars: 160 });
         return {
           ...applyGithubReadmeSummary(candidate, {
             repo,
             summary,
             defaultBranch: branch,
-            sha: candidate.sha || candidate.commit_sha || "unknown",
+            sha,
+            cacheKey,
+            hit: Boolean(cached),
             sourceUrl
           }),
           readme_fetch_status: "ok"
@@ -1737,11 +1740,13 @@ async function enrichGithubTrendingApiField(candidate, fetchImpl, token) {
     const topics = Array.isArray(data?.topics) ? data.topics.filter(Boolean).slice(0, 12) : [];
     const license = data?.license?.spdx_id || data?.license?.key || candidate.license || null;
     const stars = Number.isFinite(data?.stargazers_count) ? data.stargazers_count : (candidate.stargazers_total ?? null);
+    const repositoryLanguage = cleanText(data?.language || candidate.repository_language || "");
     return {
       ...candidate,
       topics: topics.length > 0 ? topics : (Array.isArray(candidate.topics) ? candidate.topics : []),
       license: license && license !== "NOASSERTION" ? license : (candidate.license || null),
       stargazers_total: stars,
+      ...(repositoryLanguage ? { repository_language: repositoryLanguage } : {}),
       pushed_at: data?.pushed_at || candidate.pushed_at || null,
       api_default_branch: data?.default_branch || candidate.default_branch || null,
       api_fetch_status: "ok"
@@ -3461,6 +3466,7 @@ export function parseGitHubTrendingHtml(html, sourceInfo = {}) {
     const nextIndex = matches[index + 1]?.index || html.length;
     const block = html.slice(match.index, nextIndex);
     const description = extractFirstParagraph(block);
+    const repositoryLanguage = extractGitHubRepositoryLanguage(block);
     const stars = extractTrendingStarCount(block);
     candidates.push({
       repo,
@@ -3469,6 +3475,7 @@ export function parseGitHubTrendingHtml(html, sourceInfo = {}) {
       source_url: sourceInfo.url || "",
       signal: "trending",
       language: sourceInfo.language || "",
+      ...(repositoryLanguage ? { repository_language: repositoryLanguage } : {}),
       window: sourceInfo.window || "",
       rank: candidates.length + 1,
       description,
@@ -3480,6 +3487,13 @@ export function parseGitHubTrendingHtml(html, sourceInfo = {}) {
   }
 
   return candidates;
+}
+
+function extractGitHubRepositoryLanguage(block) {
+  const match = String(block || "").match(
+    /<[^>]+\bitemprop=["']programmingLanguage["'][^>]*>([\s\S]*?)<\/[^>]+>/i
+  );
+  return cleanText(match?.[1] || "");
 }
 
 function enrichProjectCandidate(candidate, sourceInfo, reportDate) {
@@ -3611,6 +3625,7 @@ async function loadGitHubTrendingHistory(options = {}) {
     checked: false,
     lookbackDays,
     byRepo: new Map(),
+    readmeCache: new Map(),
     dates: [],
     repoCount: 0,
     errors: []
@@ -3637,11 +3652,19 @@ async function loadGitHubTrendingHistory(options = {}) {
       errors
     );
   const byRepo = new Map();
+  const readmeCache = new Map();
   const dates = new Set();
+  const repos = new Set();
 
   for (const record of records) {
     if (!isPreviousDateWithinWindow(record.date, reportDate, lookbackDays)) {
       continue;
+    }
+    for (const cacheEntry of extractGitHubReadmeCacheEntries(record.payload)) {
+      const existing = readmeCache.get(cacheEntry.key);
+      if (!existing || record.date > existing.date) {
+        readmeCache.set(cacheEntry.key, { ...cacheEntry, date: record.date });
+      }
     }
     const entries = extractGitHubTrendingHistoryEntries(record.payload, record.date);
     if (entries.length === 0) {
@@ -3649,13 +3672,19 @@ async function loadGitHubTrendingHistory(options = {}) {
     }
     dates.add(record.date);
     for (const entry of entries) {
-      const key = entry.repo.toLowerCase();
+      if (!entry.source_scope) {
+        continue;
+      }
+      const repoKey = entry.repo.toLowerCase();
+      const key = `${repoKey}|${entry.source_scope}`;
       const existing = byRepo.get(key) || {
         repo: entry.repo,
+        source_scope: entry.source_scope,
         dates: new Set(),
         ranks: new Map(),
         sources: new Set()
       };
+      repos.add(repoKey);
       existing.dates.add(record.date);
       if (Number.isInteger(entry.rank)) {
         existing.ranks.set(record.date, entry.rank);
@@ -3671,8 +3700,9 @@ async function loadGitHubTrendingHistory(options = {}) {
     checked: true,
     lookbackDays,
     byRepo,
+    readmeCache,
     dates: [...dates].sort(),
-    repoCount: byRepo.size,
+    repoCount: repos.size,
     errors
   };
 }
@@ -3735,6 +3765,26 @@ function extractGitHubTrendingHistoryEntries(payload, fallbackDate) {
   return entries;
 }
 
+function extractGitHubReadmeCacheEntries(payload) {
+  const entries = [];
+  const items = [
+    ...(Array.isArray(payload?.github_trending) ? payload.github_trending : []),
+    ...(Array.isArray(payload?.candidates) ? payload.candidates : []),
+    ...(Array.isArray(payload?.projects) ? payload.projects : [])
+  ];
+  for (const item of items) {
+    const cache = item?.readme_cache;
+    const key = String(cache?.key || "").trim();
+    const sha = String(cache?.sha || "").trim().toLowerCase();
+    const summary = String(item?.readme_summary || item?.description || "").trim();
+    if (!key || !/^[a-f0-9]{64}$/.test(sha) || !summary || !key.endsWith(`/${sha}`)) {
+      continue;
+    }
+    entries.push({ key, sha, summary });
+  }
+  return entries;
+}
+
 function addGitHubTrendingHistoryEntry(entries, item, sourceItem, fallbackDate, options = {}) {
   const repo = repoFromHistoryItem(item);
   if (!repo) {
@@ -3755,9 +3805,48 @@ function addGitHubTrendingHistoryEntry(entries, item, sourceItem, fallbackDate, 
   entries.push({
     repo,
     date: dateOnly(item.event_date) || fallbackDate,
-    rank: Number.isInteger(item.rank) ? item.rank : null,
-    source: item.source || sourceItem?.name || ""
+    rank: Number.isInteger(item.source_rank) && item.source_rank > 0
+      ? item.source_rank
+      : null,
+    source: item.source || sourceItem?.name || "",
+    source_scope: githubTrendingHistorySourceScope(item, sourceItem)
   });
+}
+
+function githubTrendingHistorySourceScope(item = {}, sourceItem = null) {
+  const explicit = String(item.source_scope || "").trim().toLowerCase();
+  if (/^(?:daily|weekly|past_24_hours):[a-z0-9+#._-]+$/.test(explicit)) {
+    return explicit;
+  }
+
+  const text = [
+    item.source,
+    item.source_id,
+    item.source_url,
+    sourceItem?.name,
+    sourceItem?.id,
+    sourceItem?.url
+  ].filter(Boolean).join(" ").toLowerCase();
+  const isGithubTrending = /github[ _-]?trending|github\.com\/trending|ossinsight/.test(text);
+  if (!isGithubTrending) {
+    return "";
+  }
+
+  const window = /past[_ -]?24[_ -]?hours|period=past_24_hours/.test(text)
+    ? "past_24_hours"
+    : /weekly|since=weekly/.test(text)
+      ? "weekly"
+      : /daily|since=daily/.test(text)
+        ? "daily"
+        : ["daily", "weekly", "past_24_hours"].includes(String(item.window || "").toLowerCase())
+          ? String(item.window).toLowerCase()
+          : "";
+  const pathLanguage = text.match(/github\.com\/trending\/([^?\s/]+)/)?.[1] || "";
+  const namedLanguage = text.match(/github[ _-]?trending[ _-]+(python|typescript|javascript|go|rust|java|c\+\+|c#|php|ruby|swift|kotlin|scala)(?:[ _-]+|$)/)?.[1] || "";
+  const sourceIsAll = /github[ _-]?trending(?:[ _-]+(?:daily|weekly))?(?:\s|$)|github\.com\/trending(?:\?|\s|$)|ossinsight/.test(text);
+  const fallbackLanguage = String(item.language || "").trim().toLowerCase();
+  const language = pathLanguage || namedLanguage || (sourceIsAll ? "all" : fallbackLanguage);
+  return window && language ? `${window}:${language}` : "";
 }
 
 function annotateGitHubTrendingCandidates(candidates, history) {
@@ -3765,10 +3854,12 @@ function annotateGitHubTrendingCandidates(candidates, history) {
     return candidates.map((candidate) => applyGitHubTrendMovement(candidate, null));
   }
   return candidates.map((candidate) => {
-    const key = (candidate.repo || repoFromHistoryItem(candidate)).toLowerCase();
-    if (!key) {
+    const repoKey = (candidate.repo || repoFromHistoryItem(candidate)).toLowerCase();
+    const sourceScope = githubTrendingHistorySourceScope(candidate);
+    if (!repoKey || !sourceScope) {
       return applyGitHubTrendMovement(candidate, null);
     }
+    const key = `${repoKey}|${sourceScope}`;
     const repoHistory = history.byRepo.get(key);
     const dates = repoHistory ? [...repoHistory.dates].sort() : [];
     const previousRank = repoHistory ? latestRank(repoHistory.ranks) : null;
