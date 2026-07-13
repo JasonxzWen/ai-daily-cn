@@ -322,17 +322,21 @@
         "config/source-display-contract.json",
         "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
         "reports-data/YYYY-MM-DD.json",
-        "docs/articles.json"
+        "docs/articles.json",
+        ".tmp/run-summary-YYYY-MM-DD.json"
       ],
       "acceptance": [
         "The Aify content feed and site-watch entry resolve to the stable aify-news logical source.",
         "Aify candidates preserve the original publisher while retaining aggregator/intermediary authority and primary-source verification requirements.",
+        "The production runner explicitly requests aify-news Phase5 evidence and preserves the structured result in the terminal run summary.",
+        "Every observed day contains separate persisted candidates and terminal dispositions for content-aify-news and site-aify-news; a site-only window fails closed.",
         "Three consecutive persisted production days each prove collection, admission, and a closed included or excluded disposition.",
         "Every non-included candidate has a persisted reason, every included candidate matches public output, and the evidence window contains at least one public match."
       ],
       "stop_conditions": [
         "Aify is treated as primary factual authority or bypasses primary-source confirmation.",
         "Replay or fixture evidence is reported as production verification.",
+        "The production stage omits aify-news or either required observation entry can be absent while production_verified is true.",
         "A non-included candidate lacks a reason or an included URL is absent from public output."
       ],
       "behavior": "Aify News is first-class for governance and observability, while its articles remain discovery leads that require primary evidence.",
@@ -348,6 +352,7 @@
         "artifacts": [
           "config/sources/aify-news.json",
           "src/discovery.js",
+          "src/daily-runner.js",
           "src/source-effectiveness.js",
           "src/source-phase5.js",
           "tests/aify-logical-source.test.js"
@@ -355,6 +360,7 @@
         "stop_conditions": [
           "The logical identity is only a display label with no candidate or report lineage.",
           "Original publisher identity or exclusion reasons are lost between collection and public output.",
+          "Only the legacy site-watch entry is observed while the content feed remains unconsumed.",
           "The production_verified flag can pass without three complete consecutive days and a public match."
         ]
       }
