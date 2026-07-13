@@ -71,6 +71,57 @@
       }
     },
     {
+      "id": "main-selection-fact-contract",
+      "status": "ready_for_validation",
+      "summary": "Use draft scoring and terminal candidate dispositions as the only production selection fact; reject score, rank, snapshot, report, quality, and Phase5 drift.",
+      "commands": [
+        "node --test --test-name-pattern \"terminal main audit disposition|source effectiveness reports the persisted main rejection reason\" tests/unit.test.js",
+        "node scripts/validate-daily-resilience-policy.mjs",
+        "node scripts/validate-daily-workflow-contract.mjs"
+      ],
+      "artifacts": [
+        "src/main-audit-contract.js",
+        "src/main-audit-consistency.js",
+        "src/draft.js",
+        "src/quality-loop.js",
+        "src/report.js",
+        "src/source-phase5.js",
+        "schemas/candidates.schema.json"
+      ],
+      "acceptance": [
+        "Every evaluated main candidate persists one score and exactly one terminal selection stage or rejection reason; eligible ranks are contiguous.",
+        "Selection snapshot counts, shared 5/8/12 story bounds, public report order, quality review, report_write, and Phase5 agree with candidate receipts.",
+        "Source effectiveness reports persisted rejection reasons when a logical source produced candidates but none entered the public report.",
+        "Public JSON and HTML exclude internal score, rank, stage, and rejection fields.",
+        "The retired post-quality editorial-rank artifact, synthetic classifier, public editorial-selection projection, and daily-lane projection are absent from the production runner and publish plan."
+      ],
+      "stop_conditions": [
+        "A candidate has both or neither terminal dispositions after main evaluation.",
+        "A report can be written or Phase5 can pass when score/rank/snapshot/report lineage disagrees.",
+        "A second post-quality scorer or synthetic public selection lane is reintroduced."
+      ],
+      "behavior": "Score and select once during draft generation, persist private receipts, and derive all later truth from those receipts.",
+      "validation": {
+        "commands": [
+          "node --test --test-name-pattern \"report:draft|quality review|phase 5|date index|daily runner|source effectiveness\" tests/unit.test.js",
+          "node --test tests/publish.test.js",
+          "corepack pnpm run validate"
+        ]
+      },
+      "evidence": {
+        "artifacts": [
+          ".tmp/rec323-real/replayed-report.json",
+          ".tmp/rec323-real/replayed-candidates.json",
+          ".tmp/rec323-real/replayed-quality-review.json",
+          ".tmp/rec323-real/docs/reports/2026/07/2026-07-09.html"
+        ],
+        "stop_conditions": [
+          "Fixture-only evidence is presented as real-date production proof.",
+          "Historical retired rank artifacts are treated as current runtime inputs."
+        ]
+      }
+    },
+    {
       "id": "project-recovery-ledger",
       "status": "active",
       "summary": "Track ai-daily recovery work through one stable REC issue ledger and five-layer completion evidence.",

@@ -8,6 +8,7 @@ import {
 import { importanceLabel } from "./importance.js";
 import { normalizeUrlIdentity } from "./url.js";
 import { adcPublicThemeAssetName, adcPublicThemeVersion } from "./adc-theme.js";
+import { STORY_FIRST_MAX, STORY_FIRST_MIN } from "./story-first.js";
 
 export function escapeHtml(value) {
   return String(value)
@@ -890,8 +891,8 @@ function normalizeMainStream(mainStream = {}, metrics = {}) {
 }
 
 function mainStreamStatusFromCount(count) {
-  if (count >= 5 && count <= 30) return "target";
-  if (count > 30) return "oversized";
+  if (count >= STORY_FIRST_MIN && count <= STORY_FIRST_MAX) return "target";
+  if (count > STORY_FIRST_MAX) return "oversized";
   if (count > 0) return "sparse";
   return "empty";
 }

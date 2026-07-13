@@ -43,7 +43,8 @@ import { renderIndexHtml, renderOfficialBlogsHtml, renderReportHtml } from "../s
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { buildSourceInventoryRows } from "../src/source-effectiveness.js";
 import { generateReportDraft, canPromoteToBuilderObservation } from "../src/draft.js";
-import { CANDIDATE_AUDIT_ROLES, MAIN_SELECTION_STAGES } from "../src/main-audit-contract.js";
+import { CANDIDATE_AUDIT_ROLES, MAIN_REJECT_REASONS, MAIN_SELECTION_STAGES } from "../src/main-audit-contract.js";
+import { collectMainAuditConsistencyIssues } from "../src/main-audit-consistency.js";
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite, planGeneratedFiles } from "../src/site.js";
@@ -91,7 +92,6 @@ import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 import { writeDailyPublishRetrospective } from "../src/retrospectives.js";
 import { evaluateDailyContentContract } from "../scripts/check-daily-content-contract.mjs";
-import { buildEditorialRankArtifact } from "../src/editorial-rank.js";
 import {
   internalCandidatePoolRelativePath,
   internalSourceStatusHistoryRelativePath,
@@ -165,6 +165,10 @@ test("candidate pool schema accepts curated first-party builder candidates", () 
   const validation = validateCandidatePool(candidatePool);
 
   assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+
+  const invalidReason = structuredClone(candidatePool);
+  invalidReason.candidates[0].main_reject_reason = "unknown_main_reject_reason";
+  assert.equal(validateCandidatePool(invalidReason).valid, false);
 });
 
 test("candidate audit contract stays aligned with candidate schema", async () => {
@@ -172,6 +176,7 @@ test("candidate audit contract stays aligned with candidate schema", async () =>
   const candidateProperties = schema.$defs.candidate.properties;
 
   assert.deepEqual(candidateProperties.main_selection_stage.enum, MAIN_SELECTION_STAGES);
+  assert.deepEqual(candidateProperties.main_reject_reason.enum, MAIN_REJECT_REASONS);
   assert.deepEqual(candidateProperties.roles.items.enum, CANDIDATE_AUDIT_ROLES);
 });
 
@@ -8929,7 +8934,6 @@ test("daily resilience policy validates current runner stages and workflow gates
   for (const stageId of [
     "discover_github_trending",
     "discover_builders",
-    "editorial_rank_artifact",
     "report_write",
     "quality_page_check",
     "content_contract",
@@ -9665,28 +9669,10 @@ test("daily runner writes launcher summary and stops before real publish by defa
   assert.equal(result.summary.launcher_root, launcherRoot);
   assert.equal(result.summary.clean_repo_root, cleanRoot);
   assert.equal(result.summaryPath, path.join(launcherRoot, ".tmp", "run-summary-2026-06-04.json"));
-  assert.equal(
-    result.summary.editorial_rank_artifact_path,
-    "reports-data/2026/06/internal/editorial-rank-2026-06-04.json"
-  );
-  const editorialRankCall = calls.find((call) => call.id === "editorial_rank_artifact");
-  assert(editorialRankCall, "daily runner should build internal editorial rank artifact before public write");
-  assert.deepEqual(editorialRankCall.args, [
-    "scripts/build-editorial-rank-artifact.mjs",
-    "--input",
-    ".tmp/source-candidates-2026-06-04.json",
-    "--source-date",
-    "2026-06-04",
-    "--out",
-    "reports-data/2026/06/internal/editorial-rank-2026-06-04.json"
-  ]);
-  assert(
-    calls.findIndex((call) => call.id === "editorial_rank_artifact") < calls.findIndex((call) => call.id === "report_write"),
-    "internal editorial rank artifact must be built before report_write"
-  );
+  assert.equal("editorial_rank_artifact_path" in result.summary, false);
+  assert.equal(calls.some((call) => call.id === "editorial_rank_artifact"), false);
   const reportWriteCall = calls.find((call) => call.id === "report_write");
-  assert(reportWriteCall.args.includes("--editorial-rank-artifact"));
-  assert(reportWriteCall.args.includes("reports-data/2026/06/internal/editorial-rank-2026-06-04.json"));
+  assert.equal(reportWriteCall.args.includes("--editorial-rank-artifact"), false);
   assert(calls.some((call) => call.id === "sources_phase5_audit"));
   assert(calls.some((call) => call.id === "publish_dry_run_daily"));
   assert(!calls.some((call) => call.id === "publish_real"));
@@ -11056,7 +11042,6 @@ test("daily runner resumes from AI repair contract and continues with optimized 
   assert.deepEqual(calls.map((stage) => stage.id), [
     "quality_ai_repair",
     "quality_review",
-    "editorial_rank_artifact",
     "report_write",
     "build",
     "quality_page_check",
@@ -11070,14 +11055,9 @@ test("daily runner resumes from AI repair contract and continues with optimized 
   ]);
   const repairStage = calls.find((stage) => stage.id === "quality_ai_repair");
   assert(repairStage.command.args.includes(contractPath));
-  const rankStage = calls.find((stage) => stage.id === "editorial_rank_artifact");
-  assert(rankStage, "AI repair resume should build internal editorial rank artifact before report_write");
-  assert(rankStage.command.args.includes(".tmp/source-candidates-2026-06-04.json"));
-  assert(rankStage.command.args.includes("reports-data/2026/06/internal/editorial-rank-2026-06-04.json"));
   const reportWriteStage = calls.find((stage) => stage.id === "report_write");
   assert(reportWriteStage.command.args.includes(".tmp/daily-report.optimized.json"));
-  assert(reportWriteStage.command.args.includes("--editorial-rank-artifact"));
-  assert(reportWriteStage.command.args.includes("reports-data/2026/06/internal/editorial-rank-2026-06-04.json"));
+  assert.equal(reportWriteStage.command.args.includes("--editorial-rank-artifact"), false);
 });
 
 test("daily runner creates a new empty AI repair template for public editorial repair failures", async () => {
@@ -13951,9 +13931,9 @@ test("date index view model keeps chronological order and transparent signal str
   assert.equal(dateIndex.totals.strong_days, 1);
   assert.equal(dateIndex.items[0].strength.level, "quiet");
   assert.equal(dateIndex.items[1].strength.level, "strong");
-  assert.equal(dateIndex.items[0].main_stream.status, "target");
+  assert.equal(dateIndex.items[0].main_stream.status, "sparse");
   assert.equal(dateIndex.items[0].main_stream.count, 1);
-  assert.equal(dateIndex.items[0].flags.main_stream_target_met, true);
+  assert.equal(dateIndex.items[0].flags.main_stream_target_met, false);
   assert.equal(dateIndex.items[1].main_stream.status, "target");
   assert.equal(dateIndex.items[1].main_stream.count, 10);
   assert.equal(dateIndex.items[1].flags.main_stream_target_met, true);
@@ -14016,7 +13996,7 @@ test("date index treats more than twelve story-first main items as oversized", a
 
   assert.equal(dateIndex.items[0].main_stream.status, "oversized");
   assert.equal(dateIndex.items[0].main_stream.count, 25);
-  assert.equal(dateIndex.items[0].main_stream.target_min, 1);
+  assert.equal(dateIndex.items[0].main_stream.target_min, 5);
   assert.equal(dateIndex.items[0].main_stream.target_max, 12);
   assert.equal(dateIndex.items[0].flags.main_stream_target_met, false);
   assert(html.includes('data-main-stream-status="oversized"'));
@@ -14589,371 +14569,6 @@ test("buildSite copies layered internal candidate pools only when internal data 
   const copiedCandidatePool = JSON.parse(await fs.readFile(publicCandidatePath, "utf8"));
   assert.equal(copiedCandidatePool.report_date, result.report.report_date);
   assert.equal(copiedCandidatePool.candidates.some((candidate) => candidate.id === "main-report-write"), true);
-});
-
-test("report writer consumes editorial rank artifact without leaking internal fields", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-rank-admission-write-"));
-  const rankCandidates = JSON.parse(await readFixture("editorial-rank/mixed-candidates.json"));
-  const rankArtifact = buildEditorialRankArtifact({
-    rootDir,
-    candidates: rankCandidates,
-    generatedAt: fixedGeneratedAt,
-    sourceWindow: {
-      date: "2026-05-16",
-      relative_hours: 24
-    }
-  });
-  const rankArtifactPath = path.join(tmp, "editorial-rank.json");
-  await fs.writeFile(rankArtifactPath, `${JSON.stringify(rankArtifact, null, 2)}\n`, "utf8");
-
-  const result = await writeReportDraft({
-    rootDir: tmp,
-    inputPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.json"),
-    outputDir: "reports-data",
-    candidatePoolPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.candidates.json"),
-    editorialRankArtifactPath: rankArtifactPath,
-    siteUrl,
-    generatedAt: fixedGeneratedAt
-  });
-
-  assert.equal(result.editorialRankAdmission.ok, true);
-  assert.equal(result.editorialRankAdmission.artifact_path, rankArtifactPath);
-  assert.equal(result.editorialRankAdmission.policy_id, rankArtifact.policy_id);
-  assert.equal(result.editorialRankAdmission.generated_at, rankArtifact.generated_at);
-  assert.deepEqual(result.editorialRankAdmission.source_window, rankArtifact.source_window);
-  assert.equal(result.editorialRankAdmission.item_count, 5);
-  assert.equal(result.editorialRankAdmission.today_selected_count, 3);
-  assert.equal(result.editorialRankAdmission.must_read_count, 3);
-  assert.deepEqual(result.editorialRankAdmission.lane_counts, {
-    major_company_strategy: 2,
-    must_read: 3,
-    open_source_github: 2,
-    product_industry: 1
-  });
-  assert.deepEqual(
-    result.editorialRankAdmission.today_selected_items.map((item) => item.source_id),
-    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
-  );
-  assert.deepEqual(
-    result.editorialRankAdmission.must_read_items.map((item) => item.source_id),
-    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
-  );
-  assert.equal("editorial_rank" in result.editorialRankAdmission.today_selected_items[0], false);
-  assert.equal("rank_policy" in result.editorialRankAdmission.today_selected_items[0], false);
-  assert.equal("selection_reasons" in result.editorialRankAdmission.today_selected_items[0], false);
-  assert.equal("demotion_reasons" in result.editorialRankAdmission.today_selected_items[0], false);
-  assert.equal("admission" in result.editorialRankAdmission.today_selected_items[0], false);
-
-  const publicReport = JSON.parse(await fs.readFile(result.path, "utf8"));
-  const serializedPublicReport = JSON.stringify(publicReport);
-  assert(!serializedPublicReport.includes("editorial_rank"));
-  assert(!serializedPublicReport.includes("rank_policy"));
-  assert(!serializedPublicReport.includes("selection_reasons"));
-  assert(!serializedPublicReport.includes("demotion_reasons"));
-  assert(!serializedPublicReport.includes("\"admission\""));
-});
-
-test("report writer rejects editorial rank artifact date mismatch", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-rank-admission-mismatch-"));
-  const rankCandidates = JSON.parse(await readFixture("editorial-rank/mixed-candidates.json"));
-  const rankArtifact = buildEditorialRankArtifact({
-    rootDir,
-    candidates: rankCandidates,
-    generatedAt: fixedGeneratedAt,
-    sourceWindow: {
-      date: "2026-05-15",
-      relative_hours: 24
-    }
-  });
-  const rankArtifactPath = path.join(tmp, "editorial-rank.json");
-  await fs.writeFile(rankArtifactPath, `${JSON.stringify(rankArtifact, null, 2)}\n`, "utf8");
-
-  await assert.rejects(
-    () =>
-      writeReportDraft({
-        rootDir: tmp,
-        inputPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.json"),
-        outputDir: "reports-data",
-        candidatePoolPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.candidates.json"),
-        editorialRankArtifactPath: rankArtifactPath,
-        siteUrl,
-        generatedAt: fixedGeneratedAt
-      }),
-    (error) => error instanceof PublisherError && error.code === "editorial_rank_artifact_date_mismatch"
-  );
-});
-
-test("report writer rejects invalid editorial rank artifact", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-rank-admission-invalid-"));
-  const rankArtifactPath = path.join(tmp, "editorial-rank.json");
-  await fs.writeFile(rankArtifactPath, `${JSON.stringify({ schema_version: 1, items: [] })}\n`, "utf8");
-
-  await assert.rejects(
-    () =>
-      writeReportDraft({
-        rootDir: tmp,
-        inputPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.json"),
-        outputDir: "reports-data",
-        candidatePoolPath: path.join(rootDir, "tests/fixtures/reports/good/structured-draft.candidates.json"),
-        editorialRankArtifactPath: rankArtifactPath,
-        siteUrl,
-        generatedAt: fixedGeneratedAt
-      }),
-    (error) => error instanceof PublisherError && error.code === "editorial_rank_artifact_invalid"
-  );
-});
-
-test("report:write CLI emits editorial rank admission summary", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-rank-admission-cli-"));
-  const rankCandidates = JSON.parse(await readFixture("editorial-rank/mixed-candidates.json"));
-  const rankArtifact = buildEditorialRankArtifact({
-    rootDir,
-    candidates: rankCandidates,
-    generatedAt: fixedGeneratedAt,
-    sourceWindow: {
-      date: "2026-05-16",
-      relative_hours: 24
-    }
-  });
-  const rankArtifactPath = path.join(tmp, "editorial-rank.json");
-  await fs.writeFile(rankArtifactPath, `${JSON.stringify(rankArtifact, null, 2)}\n`, "utf8");
-
-  const result = await execFileAsync(process.execPath, [
-    path.join(rootDir, "src/cli.js"),
-    "report:write",
-    path.join(rootDir, "tests/fixtures/reports/good/structured-draft.json"),
-    "reports-data",
-    "2026-05-16",
-    "--repo-root",
-    tmp,
-    "--candidate-pool",
-    path.join(rootDir, "tests/fixtures/reports/good/structured-draft.candidates.json"),
-    "--editorial-rank-artifact",
-    rankArtifactPath,
-    "--site-url",
-    siteUrl,
-    "--generated-at",
-    fixedGeneratedAt
-  ], {
-    cwd: rootDir,
-    maxBuffer: 1024 * 1024
-  });
-  const parsed = JSON.parse(result.stdout);
-
-  assert.equal(parsed.ok, true);
-  assert.equal(parsed.editorial_rank_admission.item_count, 5);
-  assert.equal(parsed.editorial_rank_admission.today_selected_count, 3);
-  assert.equal(parsed.editorial_rank_admission.must_read_count, 3);
-  assert.equal(parsed.editorial_rank_admission.lane_counts.open_source_github, 2);
-  assert.deepEqual(
-    parsed.editorial_rank_admission.today_selected_items.map((item) => item.source_id),
-    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
-  );
-  assert.deepEqual(
-    parsed.editorial_rank_admission.must_read_items.map((item) => item.source_id),
-    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
-  );
-  assert.equal(parsed.editorial_rank_admission.today_selected_items.some((item) => item.source_id === "github-momentum-only-repo"), false);
-  assert.equal("editorial_rank" in parsed.editorial_rank_admission.today_selected_items[0], false);
-  assert.equal("rank_policy" in parsed.editorial_rank_admission.today_selected_items[0], false);
-  assert.equal("selection_reasons" in parsed.editorial_rank_admission.today_selected_items[0], false);
-  assert.equal("demotion_reasons" in parsed.editorial_rank_admission.today_selected_items[0], false);
-  assert.equal("admission" in parsed.editorial_rank_admission.today_selected_items[0], false);
-});
-
-test("report writer rejects rank-blocked mainline items", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-rank-admission-blocked-"));
-  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
-  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
-  const rankCandidates = JSON.parse(await readFixture("editorial-rank/mixed-candidates.json"));
-  const blocked = rankCandidates.find((candidate) => candidate.id === "github-momentum-only-repo");
-
-  draft.main_items[0] = {
-    ...draft.main_items[0],
-    candidate_id: blocked.id,
-    title: blocked.title,
-    url: blocked.url || "https://github.com/example/momentum-only",
-    source: "GitHub Trending"
-  };
-  candidatePool.candidates[0] = {
-    ...candidatePool.candidates[0],
-    id: blocked.id,
-    title: blocked.title,
-    url: draft.main_items[0].url,
-    source: "GitHub Trending"
-  };
-
-  const draftPath = path.join(tmp, "draft.json");
-  const candidatePoolPath = path.join(tmp, "candidates.json");
-  const rankArtifactPath = path.join(tmp, "editorial-rank.json");
-  const rankArtifact = buildEditorialRankArtifact({
-    rootDir,
-    candidates: rankCandidates,
-    generatedAt: fixedGeneratedAt,
-    sourceWindow: {
-      date: "2026-05-16",
-      relative_hours: 24
-    }
-  });
-  await fs.writeFile(draftPath, `${JSON.stringify(draft, null, 2)}\n`, "utf8");
-  await fs.writeFile(candidatePoolPath, `${JSON.stringify(candidatePool, null, 2)}\n`, "utf8");
-  await fs.writeFile(rankArtifactPath, `${JSON.stringify(rankArtifact, null, 2)}\n`, "utf8");
-
-  await assert.rejects(
-    () =>
-      writeReportDraft({
-        rootDir: tmp,
-        inputPath: draftPath,
-        outputDir: "reports-data",
-        candidatePoolPath,
-        editorialRankArtifactPath: rankArtifactPath,
-        siteUrl,
-        generatedAt: fixedGeneratedAt
-      }),
-    (error) => {
-      assert(error instanceof PublisherError);
-      assert.equal(error.code, "editorial_rank_admission_blocked");
-      assert.equal(error.details.issues[0].section, "stories");
-      assert.equal(error.details.issues[0].candidate_id, "github-momentum-only-repo");
-      assert(error.details.issues[0].demotion_reasons.includes("github_readme_context_insufficient"));
-      assert(error.details.issues[0].demotion_reasons.includes("momentum_only"));
-      return true;
-    }
-  );
-});
-
-test("report writer accepts rank-selected mainline items", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-rank-admission-selected-"));
-  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
-  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
-  const rankCandidates = JSON.parse(await readFixture("editorial-rank/mixed-candidates.json"));
-  const selected = rankCandidates.find((candidate) => candidate.id === "anthropic-official-agent-practice");
-
-  draft.main_items[0] = {
-    ...draft.main_items[0],
-    candidate_id: selected.id,
-    title: selected.title,
-    url: selected.url || "https://www.anthropic.com/news/agent-practice",
-    source: "Anthropic",
-    verification_status: "primary_confirmed"
-  };
-  candidatePool.candidates[0] = {
-    ...candidatePool.candidates[0],
-    id: selected.id,
-    title: selected.title,
-    url: draft.main_items[0].url,
-    source: "Anthropic",
-    verification_status: "primary_confirmed"
-  };
-
-  const draftPath = path.join(tmp, "draft.json");
-  const candidatePoolPath = path.join(tmp, "candidates.json");
-  const rankArtifactPath = path.join(tmp, "editorial-rank.json");
-  const rankArtifact = buildEditorialRankArtifact({
-    rootDir,
-    candidates: rankCandidates,
-    generatedAt: fixedGeneratedAt,
-    sourceWindow: {
-      date: "2026-05-16",
-      relative_hours: 24
-    }
-  });
-  await fs.writeFile(draftPath, `${JSON.stringify(draft, null, 2)}\n`, "utf8");
-  await fs.writeFile(candidatePoolPath, `${JSON.stringify(candidatePool, null, 2)}\n`, "utf8");
-  await fs.writeFile(rankArtifactPath, `${JSON.stringify(rankArtifact, null, 2)}\n`, "utf8");
-
-  const result = await writeReportDraft({
-    rootDir: tmp,
-    inputPath: draftPath,
-    outputDir: "reports-data",
-    candidatePoolPath,
-    editorialRankArtifactPath: rankArtifactPath,
-    siteUrl,
-    generatedAt: fixedGeneratedAt
-  });
-
-  assert.equal(result.report.main_items[0].candidate_id, "anthropic-official-agent-practice");
-  assert.equal(result.editorialRankAdmission.must_read_count, 3);
-  assert.deepEqual(
-    result.editorialRankAdmission.today_selected_items.map((item) => item.source_id),
-    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
-  );
-  assert.deepEqual(
-    result.editorialRankAdmission.must_read_items.map((item) => item.source_id),
-    ["anthropic-official-agent-practice", "google-enterprise-platform-update", "github-contextual-eval-repo"]
-  );
-  assert.equal(result.report.editorial_selection.schema_version, 1);
-  assert.equal(result.report.editorial_selection.today_selected.max_items, 20);
-  assert.equal(result.report.editorial_selection.must_read.max_items, 8);
-  assert.deepEqual(
-    result.report.editorial_selection.today_selected.items.map((item) => item.candidate_id),
-    ["anthropic-official-agent-practice"]
-  );
-  assert.deepEqual(
-    result.report.editorial_selection.must_read.items.map((item) => item.candidate_id),
-    ["anthropic-official-agent-practice"]
-  );
-  assert.equal(result.report.editorial_selection.today_selected.items[0].section, "stories");
-  assert.equal(result.report.editorial_selection.today_selected.items[0].url, draft.main_items[0].url);
-  assert.equal(result.report.editorial_selection.today_selected.items[0].source, "Anthropic");
-  assert.equal("verification_status" in result.report.editorial_selection.today_selected.items[0], false);
-  const selectionText = JSON.stringify(result.report.editorial_selection);
-  assert.equal(selectionText.includes("editorial_rank"), false);
-  assert.equal(selectionText.includes("rank_policy"), false);
-  assert.equal(selectionText.includes("selection_reasons"), false);
-  assert.equal(selectionText.includes("demotion_reasons"), false);
-  assert.equal(selectionText.includes("\"admission\""), false);
-  assert.equal(result.report.daily_lanes.schema_version, 1);
-  assert.deepEqual(
-    result.report.daily_lanes.lanes.map((lane) => lane.lane_id),
-    [
-      "must_read",
-      "major_company_strategy",
-      "watch_source_updates",
-      "open_source_github",
-      "product_industry",
-      "builder_twitter",
-      "trend_tracking"
-    ]
-  );
-  const dailyLanesById = new Map(result.report.daily_lanes.lanes.map((lane) => [lane.lane_id, lane]));
-  assert.equal(dailyLanesById.get("must_read").title, "今日必看");
-  assert.equal(dailyLanesById.get("must_read").max_items, 8);
-  assert.deepEqual(
-    dailyLanesById.get("must_read").items,
-    result.report.editorial_selection.must_read.items
-  );
-  assert.equal(dailyLanesById.get("must_read").items.length <= 8, true);
-  assert.deepEqual(
-    dailyLanesById.get("major_company_strategy").items.map((item) => item.candidate_id),
-    ["anthropic-official-agent-practice"]
-  );
-  assert.equal(dailyLanesById.get("open_source_github").items.length, 0);
-  const dailyLaneCandidateIds = result.report.daily_lanes.lanes.flatMap((lane) =>
-    lane.items.map((item) => item.candidate_id)
-  );
-  assert.deepEqual([...new Set(dailyLaneCandidateIds)], ["anthropic-official-agent-practice"]);
-  assert.equal(
-    dailyLaneCandidateIds.every((candidateId) => candidateId === "anthropic-official-agent-practice"),
-    true
-  );
-  const dailyLaneText = JSON.stringify(result.report.daily_lanes);
-  assert.equal(dailyLaneText.includes("github-momentum-only-repo"), false);
-  assert.equal(dailyLaneText.includes("editorial_rank"), false);
-  assert.equal(dailyLaneText.includes("rank_policy"), false);
-  assert.equal(dailyLaneText.includes("selection_reasons"), false);
-  assert.equal(dailyLaneText.includes("demotion_reasons"), false);
-  assert.equal(dailyLaneText.includes("\"admission\""), false);
-  const writtenReport = JSON.parse(await fs.readFile(result.path, "utf8"));
-  assert.equal(validateReport(writtenReport).valid, true, JSON.stringify(validateReport(writtenReport).errors));
-  assert.deepEqual(writtenReport.editorial_selection, result.report.editorial_selection);
-  assert.deepEqual(writtenReport.daily_lanes, result.report.daily_lanes);
-  const publicReportText = JSON.stringify(writtenReport);
-  assert.equal(publicReportText.includes("editorial_rank"), false);
-  assert.equal(publicReportText.includes("rank_policy"), false);
-  assert.equal(publicReportText.includes("selection_reasons"), false);
-  assert.equal(publicReportText.includes("demotion_reasons"), false);
-  assert.equal(publicReportText.includes("\"admission\""), false);
 });
 
 test("report:write 允许热门博客和社区线索携带公开图片字段", async () => {
@@ -17409,6 +17024,9 @@ test("2026-06-23 story-first replay normalizes legacy report into deduped storie
   const normalized = normalizeStoryFirstReport(replay, { target: 8 });
 
   assert(Array.isArray(normalized.stories), "replay must expose stories after normalization");
+  assert.equal(normalized.self_check.selection_snapshot.stories.target_min, 5);
+  assert.equal(normalized.self_check.selection_snapshot.stories.target, 8);
+  assert.equal(normalized.self_check.selection_snapshot.stories.target_max, 12);
   assert(normalized.stories.length > 0, "replay should keep qualified stories instead of becoming empty");
   assert(normalized.stories.length <= 8, "2026-06-23 replay should converge to the default 8-story list");
   assert.equal(normalized.main_items.length, normalized.stories.length, "main_items must mirror normalized stories");
@@ -18591,6 +18209,42 @@ test("source effectiveness does not inherit parsed signal from another source in
   assert.equal(deepmind.parsed_recent, false, "group candidates must not make an unproductive source look parsed");
   assert.equal(deepmind.status_label, "no_recent_update");
   assert.equal(deepmind.not_included_reason, "reachable_but_no_recent_parsed_signal");
+});
+
+test("source effectiveness reports the persisted main rejection reason", async () => {
+  const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
+  const report = strictPublishReportFixture();
+  report.source_audit = sourceAuditFixture();
+  report.source_audit.content_sources.sources = [
+    {
+      id: "content-openai-news-rss",
+      name: "OpenAI News RSS",
+      url: "https://openai.com/news/rss.xml",
+      source_kind: "rss",
+      status: "checked",
+      parsed_count: 1,
+      recent_48h_entries: 1
+    }
+  ];
+
+  const rows = buildSourceEffectivenessTable({
+    report,
+    candidates: [
+      {
+        id: "openai-not-selected",
+        source_id: "content-openai-news-rss",
+        source: "OpenAI News RSS",
+        url: "https://openai.com/news/not-selected",
+        status: "excluded",
+        main_reject_reason: "not_selected_lower_priority"
+      }
+    ]
+  });
+  const openai = rows.find((row) => row.id === "openai-news");
+
+  assert.equal(openai.candidate_created, true);
+  assert.equal(openai.public_included, false);
+  assert.equal(openai.not_included_reason, "candidate_rejected:not_selected_lower_priority");
 });
 
 test("internal source-first IA dashboard promotes source metrics and fixed source graph", () => {
@@ -22648,6 +22302,168 @@ test("report:draft records main stream rejection reason counts", async () => {
   assert.deepEqual(unaudited.map((candidate) => candidate.id), [], "every candidate should record main stream selection or rejection audit");
 });
 
+test("report:draft records one terminal main audit disposition and complete rejection counts", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-terminal-audit-"));
+  const reportDate = "2026-06-15";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const candidates = Array.from({ length: 10 }, (_unused, index) => storyContractCandidate(reportDate, index + 1));
+  const discovery = discoveryEnvelope({
+    candidates,
+    sourceNames: ["Example AI News"]
+  });
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+
+  const candidateIds = new Set(candidates.map((candidate) => candidate.id));
+  const audited = drafted.candidatePool.candidates.filter((candidate) => candidateIds.has(candidate.id));
+  assert.equal(drafted.candidatePool.main_audit_contract_version, 1);
+  assert.equal(drafted.report.self_check.main_audit_contract_version, 1);
+  assert.equal(audited.length, candidates.length);
+  for (const candidate of audited) {
+    const dispositions = [candidate.main_selection_stage, candidate.main_reject_reason].filter(Boolean);
+    assert.equal(
+      dispositions.length,
+      1,
+      `candidate must have exactly one terminal main audit disposition: ${candidate.id}`
+    );
+    assert.equal(Number.isFinite(candidate.main_rank_score), true, `candidate must persist its score: ${candidate.id}`);
+  }
+
+  const ranked = audited
+    .filter((candidate) => Number.isInteger(candidate.main_rank))
+    .map((candidate) => candidate.main_rank)
+    .sort((left, right) => left - right);
+  assert.deepEqual(ranked, Array.from({ length: candidates.length }, (_unused, index) => index + 1));
+
+  const expectedRejectionCounts = {};
+  for (const candidate of audited.filter((candidate) => candidate.main_reject_reason)) {
+    expectedRejectionCounts[candidate.main_reject_reason] = (expectedRejectionCounts[candidate.main_reject_reason] || 0) + 1;
+  }
+  assert.deepEqual(
+    drafted.report.self_check.selection_snapshot.main_items.rejection_counts,
+    expectedRejectionCounts,
+    "selection snapshot rejection counts must be exactly recoverable from final candidate audit"
+  );
+  assert.equal(expectedRejectionCounts.not_selected_lower_priority, 2);
+  assert.deepEqual(collectMainAuditConsistencyIssues(drafted.report, drafted.candidatePool), []);
+  assert.doesNotMatch(JSON.stringify(drafted.report), /"main_(?:rank|rank_score|selection_stage|reject_reason)"/u);
+
+  const scorelessPool = structuredClone(drafted.candidatePool);
+  for (const candidate of scorelessPool.candidates) {
+    delete candidate.main_rank_score;
+  }
+  assert(
+    collectMainAuditConsistencyIssues(drafted.report, scorelessPool)
+      .some((issue) => issue.code === "main_audit_score_missing"),
+    "an explicit audit contract must not disappear when every persisted score is missing"
+  );
+
+  const unversionedPool = structuredClone(drafted.candidatePool);
+  delete unversionedPool.main_audit_contract_version;
+  assert(
+    collectMainAuditConsistencyIssues(drafted.report, unversionedPool)
+      .some((issue) => issue.code === "main_audit_contract_version_mismatch")
+  );
+
+  const rankScoreDriftPool = structuredClone(drafted.candidatePool);
+  const firstRanked = rankScoreDriftPool.candidates.find((candidate) => candidateIds.has(candidate.id) && candidate.main_rank === 1);
+  firstRanked.main_rank_score = -1e9;
+  assert(
+    collectMainAuditConsistencyIssues(drafted.report, rankScoreDriftPool)
+      .some((issue) => issue.code === "main_audit_rank_score_mismatch")
+  );
+
+  const lineageDriftPool = structuredClone(drafted.candidatePool);
+  const selectedProjection = lineageDriftPool.candidates.find((candidate) =>
+    candidate.status === "included" && candidate.included_in === "main_items" && candidate.category === "main_item"
+  );
+  const selectedPrimary = lineageDriftPool.candidates.find((candidate) => candidate.id === selectedProjection.main_story_primary_id);
+  selectedPrimary.main_selection_stage = selectedPrimary.main_selection_stage === "strict" ? "refill" : "strict";
+  assert(
+    collectMainAuditConsistencyIssues(drafted.report, lineageDriftPool)
+      .some((issue) => issue.code === "main_audit_projection_lineage_mismatch")
+  );
+
+  const tamperedPool = structuredClone(drafted.candidatePool);
+  const selected = tamperedPool.candidates.find((candidate) =>
+    candidateIds.has(candidate.id) && candidate.main_selection_stage
+  );
+  selected.main_reject_reason = "not_selected_lower_priority";
+  const tamperedIssues = collectMainAuditConsistencyIssues(drafted.report, tamperedPool);
+  assert(tamperedIssues.some((issue) => issue.code === "main_audit_disposition_conflict"));
+
+  const review = reviewReportQuality(drafted.report, { candidatePool: tamperedPool });
+  assert.equal(review.ok, false);
+  assert(review.issues.some((issue) => issue.code === "main_audit_disposition_conflict"));
+  assert.equal(review.checklist.find((item) => item.id === "candidate_backrefs").status, "failed");
+
+  const phase5Dir = path.join(tmp, "phase5-data");
+  const phase5ReportPath = path.join(phase5Dir, "2026", "06", `${reportDate}.json`);
+  const phase5PoolPath = path.join(phase5Dir, internalCandidatePoolRelativePath(reportDate));
+  await fs.mkdir(path.dirname(phase5ReportPath), { recursive: true });
+  await fs.mkdir(path.dirname(phase5PoolPath), { recursive: true });
+  await fs.writeFile(phase5ReportPath, `${JSON.stringify(drafted.report, null, 2)}\n`, "utf8");
+  await fs.writeFile(phase5PoolPath, `${JSON.stringify(drafted.candidatePool, null, 2)}\n`, "utf8");
+  const cleanPhase5 = await auditSourceRunHistory({
+    rootDir: tmp,
+    historyDir: "phase5-data",
+    reportDate,
+    days: 1
+  });
+  assert.equal(
+    cleanPhase5.days[0].metrics.selection_metadata_mismatch_count,
+    0,
+    JSON.stringify(cleanPhase5.selection_metadata_mismatches)
+  );
+
+  await fs.writeFile(phase5PoolPath, `${JSON.stringify(tamperedPool, null, 2)}\n`, "utf8");
+  const tamperedPhase5 = await auditSourceRunHistory({
+    rootDir: tmp,
+    historyDir: "phase5-data",
+    reportDate,
+    days: 1
+  });
+  assert.equal(tamperedPhase5.phase5_complete, false);
+  assert(tamperedPhase5.selection_metadata_mismatches.some((issue) =>
+    issue.reason_code === "main_audit_disposition_conflict"
+  ));
+
+  const tamperedPoolPath = path.join(tmp, "tampered-candidates.json");
+  const writableDraftPath = path.join(tmp, "writable-draft.json");
+  const writableDraft = structuredClone(drafted.report);
+  const extraAuditGroup = (name, url) => ({
+    checked: true,
+    sources: [{ name, url, status: "checked", notes: "fixture" }],
+    candidates_found: 0,
+    included: 0,
+    notes: "fixture"
+  });
+  writableDraft.source_audit = {
+    ...sourceAuditFixture(),
+    huggingface_trending: extraAuditGroup("Hugging Face Trending", "https://huggingface.co/models?sort=trending"),
+    china_ai_sources: extraAuditGroup("China AI Sources", "https://example.com/china-ai")
+  };
+  await fs.writeFile(tamperedPoolPath, `${JSON.stringify(tamperedPool, null, 2)}\n`, "utf8");
+  await fs.writeFile(writableDraftPath, `${JSON.stringify(writableDraft, null, 2)}\n`, "utf8");
+  await assert.rejects(
+    () => writeReportDraft({
+      rootDir: tmp,
+      inputPath: writableDraftPath,
+      outputDir: path.join(tmp, "reports-data"),
+      candidatePoolPath: tamperedPoolPath,
+      generatedAt: fixedGeneratedAt
+    }),
+    (error) => error instanceof PublisherError && error.code === "main_audit_consistency_failed"
+  );
+});
+
 test("report:draft records main stream shortfall as generation quality event", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-main-shortfall-"));
   const reportDate = "2026-06-15";
@@ -22754,6 +22570,18 @@ test("report:draft records main stream shortfall as generation quality event", a
     impact.status === "unconfigured" &&
     impact.affects_main_stream === true
   ));
+
+  const tamperedReport = structuredClone(drafted.report);
+  Object.assign(tamperedReport.self_check.selection_snapshot.main_items.shortfall_event, {
+    target_min: 1,
+    target_max: 30,
+    eligible_candidates: 999,
+    rejection_counts: { fake: 999 }
+  });
+  assert(
+    collectMainAuditConsistencyIssues(tamperedReport, drafted.candidatePool)
+      .some((issue) => issue.code === "main_audit_shortfall_event_mismatch")
+  );
 });
 
 test("report:draft promotes official product and platform deep dives into main_items", async () => {
@@ -27627,7 +27455,7 @@ function strictAutomationRevisionFixture() {
     source_registry_count: 68,
     source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
     rules: [
-      "main_stream_blacklist_refill_5_to_30",
+      "main_stream_blacklist_refill_5_to_12",
       "content_units_min_45_when_candidates_available",
       "model_releases_must_mirror_main_items",
       "github_api_fallback_for_git_transport",

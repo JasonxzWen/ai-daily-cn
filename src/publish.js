@@ -983,7 +983,6 @@ async function plannedReportsDataFiles(repoRoot, dates) {
     const [year, month] = date.split("-");
     const filesForDate = [
       `reports-data/${year}/${month}/${date}.json`,
-      `reports-data/${year}/${month}/internal/editorial-rank-${date}.json`,
       ...candidatePoolRelativePaths(date).map((relativePath) => toRepoPath("reports-data", relativePath))
     ];
     for (const file of filesForDate) {

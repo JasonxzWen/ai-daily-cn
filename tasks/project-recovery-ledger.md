@@ -307,10 +307,11 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 ### REC-323 - Finish admission/scoring as one production Slice
 
 - Type: half-landed selection design.
-- Fact evidence: REC-311 locally verifies the admission/Phase5/quality/report_write sub-boundary with shared vocabulary, concrete violations, trusted-target upgrades, and final-report lineage. Scoring convergence, real-date draft/HTML, and production acceptance are still incomplete.
-- State: implementing; the admission-truth sub-scope is locally_verified through REC-311.
-- Action: continue the remaining scoring/rejection/public-artifact Slice and prove it on a real-date draft/HTML plus production evidence; do not reopen the shared admission predicates.
-- Acceptance: selection/rejection reasons, quality, Phase5, report_write, and public artifact agree on real dates.
+- Fact evidence: the retired post-quality rank artifact scored the real 2026-07-09 Top 100 identically, admitted zero items, and overlapped zero of eight published main stories; the same historical pool also contained 39 candidates with simultaneous selection/rejection metadata and undercounted those rejections. Draft generation was already the actual selector, while report_write silently ignored missing rank rows.
+- State: locally_verified; fresh merged-main non-publish production acceptance remains.
+- Action completed: made draft scoring the single production fact, persisted private score/rank plus one terminal disposition, centralized rejection vocabulary and 5/8/12 story bounds, and bound quality, report_write, Phase5, source effectiveness, index status, and public privacy to the same receipts. Retired the synthetic classifier/rank artifact, runner stage, policy/schema/tests, public `editorial_selection`/`daily_lanes`, and publish staging path.
+- Real-date evidence: a cleaned replay of the 2026-07-09 source candidates produced 370 final candidates and 342 evaluated source receipts: 12 selected sources (including supporting evidence), 330 exact rejections, zero dual or missing dispositions, 40 globally ranked eligible candidates, and eight public story projections. The shared collector returned zero issues, quality was `ok`, report_write/build and Phase5 completed, and public output exposed no private audit fields. Directly replaying the old final pool was intentionally blocked because it attempted to reselect historical derived items.
+- Acceptance: selection/rejection reasons, shared target bounds, quality, Phase5, report_write, source effectiveness, index status, and public artifact agree on real dates; post-merge run the single production entrypoint without publish before claiming production_verified.
 
 ### REC-324 - Make first-pass authoring real; keep repair exceptional
 
