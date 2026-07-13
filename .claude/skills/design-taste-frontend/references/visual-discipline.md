@@ -33,7 +33,7 @@ The page should make sense for the audience and brand even if all placeholder co
 - Pair display and body type only when the contrast improves hierarchy.
 - Keep line length readable; adjust measure before shrinking text.
 - Avoid using oversized hero type inside compact panels, cards, sidebars, or dashboards.
-- Check mobile wrapping for long words, CTAs, and navigation labels.
+- Check long words, CTAs, and navigation labels at the project's supported viewport; for ai-daily-cn this is `1280x900` only.
 
 ## Color
 
@@ -68,7 +68,7 @@ The page should make sense for the audience and brand even if all placeholder co
 
 - Use real or generated bitmap images when the page depends on the product, person, place, or object being inspected.
 - Avoid dark, blurred, cropped, stock-like media when users need to understand the actual subject.
-- Give media stable aspect ratios and responsive bounds.
+- Give media stable aspect ratios and bounds inside the supported desktop content area.
 - Do not use SVG hero illustrations when a real or generated image would carry the subject better.
 
 ## Motion

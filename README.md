@@ -126,7 +126,7 @@ Useful contributions include:
 - improving report readability
 - adding reliable AI information sources
 - strengthening validation or privacy checks
-- improving static site accessibility and mobile layout
+- improving desktop static-site accessibility and information density
 
 Before opening a pull request, run:
 
@@ -134,7 +134,7 @@ Before opening a pull request, run:
 corepack pnpm run validate
 ```
 
-If your change affects HTML, CSS, or browser behavior, also inspect the generated site on desktop and mobile viewports.
+If your change affects HTML, CSS, or browser behavior, inspect the generated site at the canonical `1280x900` desktop viewport. Mobile, tablet, narrow-screen, and touch-only variants are intentionally unsupported; see `docs/desktop-only-support-policy.md`.
 
 ## Security
 

@@ -16,7 +16,7 @@ The useful transfer is the pre-flight discipline, not the whole frontend framewo
 - Use one visual system per artifact: one neutral base, one accent family, one radius rule, and status colors with meaning.
 - Treat typography and spacing as scanning tools: short paragraphs, compact cards, stable table columns, clear code line height, no viewport-scaled font tricks.
 - Motion must explain state, focus, or navigation. It must have `prefers-reduced-motion` coverage and must not be decorative spectacle.
-- Run a pre-flight before handoff: palette, card purpose, section repetition, hero density, contrast, reduced motion, mobile collapse, overflow, and copy clarity.
+- Run a pre-flight before handoff at `1280x900`: palette, card purpose, section repetition, hero density, contrast, reduced motion, desktop overflow, and copy clarity.
 
 ## Boundary
 

@@ -3,7 +3,6 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Decision Matrix</title>
   <style>
     :root { color-scheme: light; --bg:#f7f8fb; --panel:#fff; --ink:#172033; --muted:#667085; --line:#d7dce5; --accent:#2563eb; --ok:#16845b; --warn:#b7791f; --shadow:0 14px 40px rgba(23,32,51,.12); }
@@ -25,7 +24,7 @@
     button { min-height:36px; border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); padding:7px 11px; font:inherit; cursor:pointer; }
     button:hover,button[aria-pressed="true"] { border-color:var(--accent); background:#eef4ff; }
     button:focus-visible,a:focus-visible { outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent); outline-offset:2px; }
-    @media (max-width:720px) { .shell{width:min(100vw - 20px,1180px); padding-top:14px;} }
+
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after{transition:none!important;animation:none!important;} .option:hover{transform:none;} }
   </style>
 </head>

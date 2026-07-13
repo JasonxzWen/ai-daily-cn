@@ -74,7 +74,7 @@
       "priority": 1,
       "status": "ready",
       "summary": "Flowchart labels must stay contained or scroll inside the diagram panel.",
-      "content": "flowchart LR\n  A[\"OpenSpec change: polish-effective-interact-runtime-quality with a deliberately long node label\"] --> B[\"Generator emits runtime-cdn HTML with grouped navigation and dependency manifest\"]\n  B --> C[\"Runtime renders Mermaid Markdown and highlighted code inside isolated section containers\"]\n  C --> D[\"Validator checks Codex-visible browser layout across narrow medium and desktop viewports\"]\n  D --> E[\"Report remains readable with source fallbacks if any library degrades\"]"
+      "content": "flowchart LR\n  A[\"OpenSpec change: polish-effective-interact-runtime-quality with a deliberately long node label\"] --> B[\"Generator emits runtime-cdn HTML with grouped navigation and dependency manifest\"]\n  B --> C[\"Runtime renders Mermaid Markdown and highlighted code inside isolated section containers\"]\n  C --> D[\"Validator checks Codex-visible browser layout at the canonical desktop viewport\"]\n  D --> E[\"Report remains readable with source fallbacks if any library degrades\"]"
     },
     {
       "type": "mermaid",
@@ -262,27 +262,11 @@
     },
     {
       "type": "markdown",
-      "title": "Verification note - browser viewport 390",
+      "title": "Verification note - browser viewport 1280x900",
       "group": "verification",
       "priority": 2,
       "status": "pending",
-      "content": "The validator should check the 390px viewport for body overflow, nav readability, and code panel containment."
-    },
-    {
-      "type": "markdown",
-      "title": "Verification note - browser viewport 768",
-      "group": "verification",
-      "priority": 3,
-      "status": "pending",
-      "content": "The validator should check the 768px viewport for tablet layout and grouped navigation behavior."
-    },
-    {
-      "type": "markdown",
-      "title": "Verification note - browser viewport 1440",
-      "group": "verification",
-      "priority": 4,
-      "status": "pending",
-      "content": "The validator should check the 1440px viewport for desktop nav rail separation and rich panel containment."
+      "content": "The validator should check the 1280x900 desktop viewport for body overflow, nav readability, desktop rail separation, and rich panel containment."
     },
     {
       "type": "actions",

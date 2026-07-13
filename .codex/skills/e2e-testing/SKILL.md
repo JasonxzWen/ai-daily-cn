@@ -125,7 +125,6 @@ export default defineConfig({
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile-chrome', use: { ...devices['Pixel 5'] } },
   ],
   webServer: {
     command: 'npm run dev',
@@ -135,6 +134,8 @@ export default defineConfig({
   },
 })
 ```
+
+For ai-daily-cn, keep durable UI suites desktop-only at `1280x900`. Do not add device emulation, narrow-screen projects, or touch-only scenarios.
 
 ## Flaky Test Patterns
 

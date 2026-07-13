@@ -49,7 +49,7 @@ node bin\skill-hub.mjs analyze D:\ai-daily-cn --profile web --agent codex --agen
 |---|---|---|---|
 | HTML work reports | `html-work-reports` | 把日报、发布报告、失败分析做成可浏览 HTML 产物；强调自包含、证据、导出、可审计 | 已选择性安装为工作汇报技能 |
 | One-off browser testing | `webapp-testing` | 用浏览器打开 `file://` 或本地站点，验证 HTML 非空、布局、交互、链接 | 作为实现阶段验收门 |
-| Durable Playwright suites | `e2e-testing` | 为首页、日报页、feed、移动视口建立稳定 E2E | 实现阶段建立 `test:e2e` |
+| Durable Playwright suites | `e2e-testing` | 为首页、日报页、feed 和规范 `1280x900` 桌面视口建立稳定 E2E | 实现阶段建立 `test:e2e` |
 | Frontend patterns | `frontend-patterns` | 如果引入 React/Vite 或交互 UI，可约束状态、表单、路由、a11y | 静态 HTML 阶段只作参考 |
 | UI/a11y audit | `web-design-guidelines` | 发布前检查可读性、对比度、键盘访问、信息密度 | 实现阶段加入人工/半自动审计 |
 | Frontend design | `frontend-design` | 适合生产级视觉 UI，不适合常规日报汇报 | 暂缓 |
@@ -69,7 +69,7 @@ node bin\skill-hub.mjs analyze D:\ai-daily-cn --profile web --agent codex --agen
 
 3. `test:e2e`
    - 用真实浏览器验证发布页面。
-   - 对本仓库应覆盖 `index.html`、日报页、移动视口、链接、搜索/筛选等交互。
+   - 对本仓库应覆盖 `index.html`、日报页、规范 `1280x900` 桌面视口、链接和仍受支持的交互。
 
 4. `validate`
    - 聚合 typecheck、test、build、E2E 或静态检查。

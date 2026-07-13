@@ -3,7 +3,6 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Visual Exploration Board</title>
   <style>
     :root{color-scheme:light;--bg:#FAF9F5;--panel:#fff;--soft:#F0EEE6;--ink:#3D3D3A;--muted:#87867F;--line:#D1CFC5;--accent:#D97757;--ok:#788C5D;--warn:#A67C52;--danger:#B04A3F;--shadow:0 14px 40px rgba(61,61,58,.12)}
@@ -17,7 +16,7 @@
     .swatches,.tags{display:flex;flex-wrap:wrap;gap:6px}.dot{width:14px;height:14px;border-radius:999px;border:1px solid var(--line);background:var(--c)}
     .token-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}.token{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--soft)}
     button{min-height:34px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px 10px;font:inherit;cursor:pointer}button:hover,button[aria-pressed=true],button:focus-visible{border-color:var(--accent);box-shadow:0 0 0 3px rgba(217,119,87,.18)}
-    @media(max-width:720px){.shell{width:min(100vw - 18px,1280px)}.board{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.direction:hover{transform:none}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.direction:hover{transform:none}}
   </style>
 </head>
 <body>

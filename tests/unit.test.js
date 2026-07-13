@@ -855,7 +855,7 @@ test("interaction input starts with expanded story-first track cells", async () 
   assert(!mainContent.includes("为什么值得看"));
 });
 
-test("interaction input uses compact same-month coverage stat for mobile hero", async () => {
+test("interaction input uses compact same-month coverage stat for the desktop hero", async () => {
   const report = reportWithThreeMinuteMustRead(JSON.parse(await readFixture("reports/good/structured-report.json")));
   report.source_window = {
     date_from: "2026-06-21",

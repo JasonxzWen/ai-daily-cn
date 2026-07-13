@@ -3,7 +3,6 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Editor Workbench</title>
   <style>
     :root{color-scheme:light;--bg:#FAF9F5;--panel:#fff;--soft:#F0EEE6;--ink:#3D3D3A;--muted:#87867F;--line:#D1CFC5;--accent:#D97757;--ok:#788C5D;--warn:#A67C52;--danger:#B04A3F;--code:#1F1E1B;--codeText:#E8E6DE}
@@ -14,7 +13,7 @@
     button{min-height:34px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:6px 10px;font:inherit;font-weight:650;cursor:pointer}button:hover,button[aria-pressed=true],button:focus-visible{border-color:var(--accent);background:#FBF1EC;box-shadow:0 0 0 3px rgba(217,119,87,.18)}
     .list{display:grid;gap:10px}.item{display:grid;gap:8px}.item[hidden]{display:none}.chip{display:inline-flex;align-items:center;min-height:24px;padding:3px 8px;border:1px solid var(--line);border-radius:999px;background:var(--soft);font-size:12px;font-weight:700}.ok{color:var(--ok)}.warn{color:var(--warn)}.danger{color:var(--danger)}
     textarea,pre{width:100%;min-height:220px;margin:0;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--code);color:var(--codeText);font:13px/1.45 "Cascadia Code","JetBrains Mono","SFMono-Regular",Consolas,monospace;white-space:pre-wrap}
-    @media(max-width:860px){.shell{width:min(100vw - 18px,1180px)}.layout{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
   </style>
 </head>
 <body>

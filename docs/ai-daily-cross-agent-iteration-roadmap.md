@@ -47,7 +47,7 @@ The main bottleneck is target mismatch: previous work often optimized schema com
 | 4 GitHub Trending enrichment | yes | Top items include stars, star growth or trend, topics/language where available, README summary status, and non-generic Chinese description. |
 | 5 Source lanes | yes per lane | Each lane has configured/reachable/parsed_recent/candidate_created/public_included/not_included_reason evidence or a documented blocked/no-signal state. |
 | 6 Automation observability | yes | Automation config is readable, status is consistent, and run summaries produce a simple published/degraded/repaired/stage-failure view. |
-| 7 Frontend IA | yes after content slices | Desktop and mobile screenshots show dense sections, no overlap, no hidden source-quality failures, and no public internal diagnostics. |
+| 7 Frontend IA | yes after content slices | `1280x900` desktop screenshots show dense sections, no overlap, no hidden source-quality failures, and no public internal diagnostics. |
 
 ## Slice Execution Policy
 
@@ -71,7 +71,7 @@ This table is the pre-development checkpoint. A slice is not "done" because a pa
 | 4 GitHub Trending enrichment | GitHub Trending Top items carry repo-specific stars, star growth/trend, topics/language, README status, failed-README metadata preservation, and non-generic Chinese explanations in public and interaction outputs. | Partial: recent PRs improved metadata, tags, and README guards, but real daily-run evidence and remaining watchlist/direct-source interactions still need verification before stable completion. |
 | 5 Source lane health repair | Each source lane records configured/reachable/parsed_recent/candidate_created/public_included/not_included_reason evidence or an explicit blocked/no-signal state, lane by lane. | Partial: source health exists as a concept, but individual lanes such as official labs, HF, builders, Chinese RSS/WeChat/Zhihu, Reddit/community, and blogs still need lane-specific repair evidence. |
 | 6 Automation observability cleanup | Automation inventory, status, and run summaries produce a consistent published/degraded/repaired/stage-failure view with enough evidence for unattended operation and recovery. | Partial: publishing can reach degraded states, but the operator-facing status view and failure classification still need cleanup and validation. |
-| 7 Frontend information architecture | After content/admission/authoring improve, desktop and mobile pages present dense scannable sections with source quality visible, no overlap, no public internal diagnostics, and browser acceptance evidence. | Deferred: do not spend major effort here until slices 1, 2, 3, and 4 produce content worth compressing into the UI. |
+| 7 Frontend information architecture | After content/admission/authoring improve, the `1280x900` desktop page presents dense scannable sections with source quality visible, no overlap, no public internal diagnostics, and browser acceptance evidence. Mobile, tablet, narrow-screen, and touch-only surfaces are not part of the slice. | Deferred: do not spend major effort here until slices 1, 2, 3, and 4 produce content worth compressing into the UI. |
 
 ## Current Path Review
 

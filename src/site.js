@@ -209,7 +209,7 @@ const PUBLIC_SOURCE_FILTER_SECTIONS = [
 ];
 const TRACKING_HISTORY_LIMIT = 7;
 const DAILY_REPORT_HTML_OVERRIDES = `<style data-ai-daily-css-overrides>
-/* Stage D: denser collapsible panels at every width. */
+/* Stage D: denser collapsible panels on the supported desktop surface. */
 .report-section-stack .collapsible-panel {
   margin: 0;
 }
@@ -323,9 +323,8 @@ a.chip:hover,
   color: #526a2d;
 }
 
-/* Reader report left rail: desktop keeps category-level anchors; mobile keeps
-   the engine's horizontal nav. */
-@media (min-width: 761px) {
+/* Reader report left rail is the only supported desktop navigation layout. */
+
   .report-layout {
     grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
     gap: 20px;
@@ -416,34 +415,9 @@ a.chip:hover,
     overflow: visible;
     white-space: normal;
   }
-}
 
-@media (max-width: 760px) {
-  .tracking-card .card-table-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
 
-  .tracking-card .card-data-table {
-    width: max-content;
-    min-width: 620px;
-    table-layout: auto;
-  }
 
-  .tracking-card .card-data-table th,
-  .tracking-card .card-data-table td {
-    white-space: nowrap;
-    overflow-wrap: normal;
-    word-break: normal;
-  }
-
-  .tracking-card .card-data-table th:nth-child(2),
-  .tracking-card .card-data-table td:nth-child(2) {
-    min-width: 160px;
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-}
 </style>`;
 
 export async function buildSite(options = {}) {

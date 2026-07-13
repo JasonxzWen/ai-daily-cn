@@ -4,6 +4,7 @@ always respond in Chinese unless the user explicitly asks for another language.
 ## Project Local Rules
 
 - Route interaction-reporting and handoff artifact work through `.codex/skills/effective-interact`.
+- Follow `docs/desktop-only-support-policy.md`: the only supported UI/report viewport is `1280x900`; do not design, implement, test, or generate mobile, tablet, narrow-screen, or touch-only variants.
 - During development, run focused tests plus the affected suite; reserve full `corepack pnpm run validate` for slice PR preparation or final material delivery.
 
 # Codex Harness

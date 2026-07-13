@@ -113,7 +113,7 @@
 - 把 Builder / X 原帖做成搬运流，只复述帖子内容，不交代争议点、边界或实际意义。
 - 为了看起来全面，保留 `模型发布`、`今日值得关注的项目`、`项目 highlights`、`国内动态` 这类空栏目或弱栏目。
 - 主体只有少数几条新闻，或把每条写成“为什么重要 / 启示 / 读者应该关注”的泛化说明，真正事实概括很短。
-- 把 OpenRouter、Artificial Analysis 或类似网页整页截图直接放进正文，导致手机端不可读。
+- 把 OpenRouter、Artificial Analysis 或类似网页整页截图直接放进正文，破坏规范 `1280x900` 桌面视口的信息密度和可读性。
 - 为了凑图展示 favicon、logo、头像、小图标、装饰图或不可读截图。
 - 把 `source_audit`、`self_check`、`candidate_id`、`quality_status`、`remediation`、`parsed_count` 或“来源 第三方报道 / 今天进入 GitHub Trending / 这条动态主要围绕 / 序号 1”这类生成痕迹写入公开页。
 - 把 `X更新agent 与开发者工具能力`、`X公布模型能力和…变化` 这类“实体+通用动词+通用 AI 名词”的模板腔 story 标题或叙事直接发布；每条 story 的 `title`/`what_happened`/`why_it_matters` 必须基于该条自身来源改写成具体、可回溯的编辑稿。命中模板族的标题/叙事会被 review 标为 `public_editorial_rewrite` 必改任务，由 cron coding agent 改写后再发布。

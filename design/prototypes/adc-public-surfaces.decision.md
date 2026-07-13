@@ -5,7 +5,7 @@
 - Keep the React/Astryx homepage and the effective-interact report renderer.
 - Establish one repository-owned ADC token and public-surface skin shared by React and static output.
 - Make status badges monochrome and communicate state with text and shape.
-- Add narrow-screen, keyboard-focus, loading, and error acceptance to the real React surface.
+- Add keyboard-focus, loading, and error acceptance to the real React surface at the canonical `1280x900` desktop viewport.
 
 ## Rejected
 
@@ -17,7 +17,7 @@
 
 - Translate the accepted visual rules into Astryx primitives and local CSS; generated prototype code is reference-only.
 - Static report content and navigation remain unchanged while the shell receives ADC tokens and rules.
-- `adc-public-surfaces.png` records the accepted React homepage; browser evidence also covers operations, official-blog, and generated-report surfaces at desktop and narrow viewports.
+- `adc-public-surfaces.png` records the accepted React homepage; current browser evidence must cover operations, official-blog, and generated-report surfaces at `1280x900` only. Earlier narrow-screen evidence is superseded by the desktop-only policy.
 
 ## Risks
 

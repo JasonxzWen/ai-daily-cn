@@ -57,7 +57,6 @@ export function renderReportHtml(report) {
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(report.title)}</title>
   <style>
 ${defaultStyleCss}
@@ -174,7 +173,6 @@ export function renderOpsIndexHtml(feed, trends = null, dateIndex = null, option
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(feed.site_title)}</title>
   <link rel="stylesheet" href="${escapeAttribute(indexStyleHref(options.styleVersion))}">
 </head>
@@ -216,7 +214,6 @@ export function renderOfficialBlogsHtml(knowledge = {}, options = {}) {
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>官方博客知识库 | AI 日报</title>
   <link rel="stylesheet" href="${escapeAttribute(styleHref)}">
 </head>
@@ -2430,232 +2427,6 @@ summary:focus-visible,
 select:focus-visible {
   outline: none;
   box-shadow: var(--focus);
-}
-
-@media (max-width: 900px) {
-  .hero-brief {
-    grid-template-columns: 1fr;
-  }
-
-  .index-dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .report-nav {
-    position: static;
-  }
-
-  .report-nav-title {
-    width: 100%;
-  }
-}
-
-@media (max-width: 640px) {
-  .site-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 14px 16px;
-  }
-
-  .page {
-    width: min(100% - 24px, 1040px);
-    padding-top: 20px;
-  }
-
-  .report-shell,
-  .index-page {
-    width: min(100vw - 18px, 1280px);
-    padding-top: 12px;
-  }
-
-  h1 {
-    font-size: 1.55rem;
-  }
-
-  .report-title {
-    flex-basis: auto;
-    font-size: 1.55rem;
-  }
-
-  .report-hero,
-  .panel {
-    padding: 12px;
-  }
-
-  .hero-summary-text {
-    min-height: auto;
-    padding: 12px;
-    font-size: 0.96rem;
-  }
-
-  .hero-stat-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .report-nav {
-    align-items: stretch;
-    padding: 8px;
-  }
-
-  .report-nav-group {
-    display: grid;
-    flex-basis: 100%;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    width: 100%;
-  }
-
-  .report-nav a {
-    min-height: 36px;
-    padding: 7px 6px;
-    text-align: center;
-  }
-
-  .report-nav a + a {
-    border-left-color: transparent;
-  }
-
-  .index-console,
-  .index-dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .index-console-copy {
-    min-height: 0;
-  }
-
-  .signal-heat-row {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-
-  .signal-day {
-    grid-template-rows: 58px auto auto;
-    padding: 6px 4px;
-  }
-
-  .topic-radar-item {
-    grid-template-columns: 1fr;
-  }
-
-  .topic-radar-metrics {
-    justify-content: flex-start;
-  }
-
-  .source-lane-table-scroll {
-    overflow-x: visible;
-    padding: 0;
-    border: 0;
-    background: transparent;
-  }
-
-  .source-lane-table {
-    display: block;
-    min-width: 0;
-    border-collapse: separate;
-    font-size: 0.86rem;
-  }
-
-  .source-lane-table thead {
-    display: none;
-  }
-
-  .source-lane-table tbody {
-    display: grid;
-    gap: 8px;
-  }
-
-  .source-lane-table tr {
-    display: grid;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #ffffff;
-  }
-
-  .source-lane-table th,
-  .source-lane-table td {
-    display: grid;
-    grid-template-columns: minmax(76px, 0.36fr) minmax(0, 1fr);
-    gap: 8px;
-    border-right: 0;
-    padding: 8px 10px;
-  }
-
-  .source-lane-table th::before,
-  .source-lane-table td::before {
-    content: attr(data-label);
-    color: var(--muted);
-    font-size: 0.74rem;
-    font-weight: 720;
-  }
-
-  .source-lane-table tbody tr:last-child th,
-  .source-lane-table tbody tr:last-child td {
-    border-bottom: 1px solid var(--line);
-  }
-
-  .source-lane-table tbody tr th:last-child,
-  .source-lane-table tbody tr td:last-child {
-    border-bottom: 0;
-  }
-
-  .source-lane-meter {
-    width: 100%;
-    margin-right: 0;
-  }
-
-  .section-heading-row,
-  .section-heading,
-  .split-row,
-  .date-card-topline,
-  .date-card-footer,
-  .date-detail-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .date-index-filters {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .date-index-filters select,
-  .date-toggle {
-    width: 100%;
-  }
-
-  .date-index-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .date-timeline {
-    grid-template-columns: 1fr;
-  }
-
-  .selected-date-panel {
-    position: static;
-  }
-
-  .date-card-button {
-    min-height: 0;
-  }
-
-  .topic-chip {
-    max-width: 100%;
-  }
-
-  .builder-card {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "builder-header"
-      "builder-meta"
-      "builder-body"
-      "builder-original";
-  }
-
-  .project-table {
-    display: block;
-    overflow-x: auto;
-  }
 }
 `;
 

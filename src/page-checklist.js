@@ -32,8 +32,8 @@ const PAGE_CHECK_SECTION_BY_ID = {
   hot_blog_cards_reader_facing: "hot_blogs"
 };
 
-// Pure classifier (importable + unit-testable): split failed page checks across
-// all viewports into blocking vs degradable.
+// Pure classifier (importable + unit-testable): split failed page checks from
+// the supported desktop result into blocking vs degradable.
 export function classifyDailyPageCheckResults(results) {
   const failed = new Set();
   for (const result of Array.isArray(results) ? results : []) {
@@ -266,7 +266,6 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
       ["#section-trend-tracking", "趋势追踪"],
       ["#section-subscribed-rss", "媒体与订阅"]
     ];
-    const desktopLeftNav = window.innerWidth >= 761;
     const navGroupIssues = requiredNavGroups
       .map(([href, label]) => {
         const anchor = document.querySelector(`.report-nav a[href="${href}"]`);
@@ -287,10 +286,10 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     });
     addCheck(
       "left_nav_group_hierarchy",
-      !desktopLeftNav || (navGroupIssues.length === 0 && navSubStyleOk),
+      navGroupIssues.length === 0 && navSubStyleOk,
       "Left navigation should visibly separate top-level report groups from subsection anchors.",
       {
-        desktop_left_nav: desktopLeftNav,
+        desktop_left_nav: true,
         group_issues: navGroupIssues,
         track_anchor_count: navTrackAnchors.length,
         visible_sub_anchor_count: navSubAnchors.length,
@@ -540,7 +539,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         const rect = snapshot.getBoundingClientRect();
         const directBroadRoot = snapshot.querySelector(":scope > main, :scope > body, :scope > html");
         const directChrome = snapshot.querySelector(":scope > nav, :scope > header, :scope > footer, :scope > aside");
-        const heightLimit = document.documentElement.clientWidth <= 760 ? 460 : 540;
+        const heightLimit = 540;
         const mediaTooTall = Array.from(snapshot.querySelectorAll("svg, img, canvas, video")).some((node) => {
           const mediaRect = node.getBoundingClientRect();
           return mediaRect.height > 180 || mediaRect.width > rect.width + 2;
@@ -594,7 +593,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         }
         const rowHeights = rows.map((row) => row.getBoundingClientRect().height).filter((height) => height > 0);
         const maxRowHeight = Math.max(...rowHeights, 0);
-        const rowHeightLimit = document.documentElement.clientWidth <= 760 ? 140 : 120;
+        const rowHeightLimit = 120;
         return maxRowHeight <= rowHeightLimit
           ? null
           : {
@@ -611,7 +610,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     addCheck(
       "daily_tracking_table_compact",
       trackingTableLayoutIssues.length === 0,
-      "Daily tracking tables should stay compact on mobile and must not stretch rows into large blank blocks.",
+      "Daily tracking tables should stay compact on the supported desktop layout and must not stretch rows into large blank blocks.",
       { issues: trackingTableLayoutIssues }
     );
     const trackingOverlapIssues = trackingCards
@@ -787,7 +786,6 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     const communityGrid = document.querySelector(".community-card-grid");
     const communityCards = Array.from(document.querySelectorAll(".community-card"));
     const communityGridColumns = communityGrid ? getComputedStyle(communityGrid).gridTemplateColumns.trim().split(/\s+/).filter(Boolean) : [];
-    const narrowViewport = window.innerWidth <= 760;
     const weakCommunityLayoutCards = communityCards
       .map((card, index) => {
         const media = card.querySelector(".card-media-grid");
@@ -799,9 +797,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
         const titleRect = card.querySelector("h3")?.getBoundingClientRect();
         const bodyRect = card.querySelector(":scope > p")?.getBoundingClientRect();
         const mediaRect = media.getBoundingClientRect();
-        const ok = narrowViewport
-          ? columns.length === 1 && Boolean(titleRect && bodyRect && Math.abs(bodyRect.left - titleRect.left) < 8 && Math.abs(mediaRect.left - titleRect.left) < 8)
-          : columns.length === 2 && Boolean(titleRect && bodyRect && mediaRect.left > bodyRect.left + 120);
+        const ok = columns.length === 2 && Boolean(titleRect && bodyRect && mediaRect.left > bodyRect.left + 120);
         return ok
           ? null
           : {
@@ -815,7 +811,7 @@ export async function evaluateDailyPageChecklist(page, options = {}) {
     addCheck(
       "community_cards_news_stream",
       communityCards.length === 0 || (communityGridColumns.length === 1 && weakCommunityLayoutCards.length === 0),
-      "Community leads should render as a single-column news stream, and cards with images should use a text-left / image-right row layout on desktop then collapse on mobile.",
+      "Community leads should render as a single-column desktop news stream, with text on the left and media on the right.",
       {
         grid_columns: communityGridColumns,
         weak_cards: weakCommunityLayoutCards

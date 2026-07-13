@@ -322,25 +322,7 @@ a:focus-visible {
   display: none !important;
 }
 
-@media (max-width: 720px) {
-  .report-shell {
-    width: min(100vw - 20px, 1180px);
-    padding-top: 14px;
-  }
 
-  .title-row,
-  .toolbar,
-  .split-row {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .chip,
-  .status-pill,
-  .file-chip {
-    white-space: normal;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   *,

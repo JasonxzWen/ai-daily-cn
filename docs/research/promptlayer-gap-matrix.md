@@ -1,5 +1,7 @@
 # PromptLayer Visual Gap Matrix
 
+> Historical evidence note: mobile rows, screenshots, and checks below preserve the 2026-06-22 fidelity-pass record. REC-330 and `docs/desktop-only-support-policy.md` supersede them for all current design and acceptance work.
+
 ## Evidence
 
 - Reference extraction: `docs/research/promptlayer/promptlayer-extraction.json`
@@ -18,7 +20,7 @@ The 2026-06-17 AI Daily sample now carries a scoped PromptLayer-inspired visual 
 - tracking cards keep local structured tables/components while using full-width editorial title rhythm;
 - blog/community rows use thin separators and editorial row spacing rather than generic cards;
 - scroll reveal, hover lift, sticky nav, and reduced-motion fallbacks are scoped to the target theme;
-- mobile keeps the same visual language stacked without horizontal overflow.
+- mobile kept the same visual language stacked without horizontal overflow in the historical capture.
 
 The remaining differences are intentional or queued rather than accidental: AI Daily does not copy PromptLayer text, scripts, customer/logo content, or scroll hijacking; the site still favors long-report scanning over a pure landing-page journey.
 
@@ -27,7 +29,7 @@ The remaining differences are intentional or queued rather than accidental: AI D
 | Area | Reference Behavior | Current Behavior | Status / Next Direction |
 |---|---|---|---|
 | Header | Fixed 64px chrome, hamburger rail, brand, uppercase link cluster, dark/light state | Scoped theme now adds sticky top chrome and separate scrollable report nav | Mostly addressed; optional next pass can add right-side nav links if useful |
-| Hero | Dark two-column editorial composition with preview panel and bottom rail | Dark two-column hero with tilted paper preview, left summary, and bottom rail cells | Addressed for sample; keep monitoring mobile density |
+| Hero | Dark two-column editorial composition with preview panel and bottom rail | Dark two-column hero with tilted paper preview, left summary, and bottom rail cells | Historically addressed; mobile density was monitored in the superseded pass, while current acceptance is desktop-only |
 | Main items | Ticket/case-study grid with notches and compact cards | Main stream renders PromptLayer-like ticket cards with source/date metadata first | Addressed |
 | Section headings | Centered or editorial serif with small uppercase eyebrow dot | Section headings are shorter, centered/editorial, and explanation copy is removed from public sections | Addressed |
 | Tracking | Feature/split component rhythm with large titles and table-like UI | Tracking cards use full-width title flow and bounded local official snapshots/tables | Addressed after fixing Artificial Analysis title wrapping |
@@ -36,7 +38,7 @@ The remaining differences are intentional or queued rather than accidental: AI D
 | Use-case arcs | Large circular outlines and centered text | Not copied; AI Daily does not currently need a pure marketing use-case overview | Deferred intentionally |
 | Testimonial rail | Active detail plus muted cells | Not copied; Builder/community observations remain report content, not customer proof | Deferred intentionally |
 | Motion | Staggered transform transitions, scroll-driven visual section | Scoped hover lift plus view-timeline reveal with reduced-motion fallback | Partially addressed; no scroll hijacking by design |
-| Mobile | Same visual grammar stacked with full-width rule cells | Verified 375/390px mobile screenshots have no horizontal overflow and readable stacked cards | Addressed |
+| Mobile | Same visual grammar stacked with full-width rule cells | Historical 375/390px screenshots had no horizontal overflow and readable stacked cards | Historical evidence only; retired by REC-330 |
 
 ## Implemented In The Fidelity Pass
 
@@ -47,7 +49,7 @@ The remaining differences are intentional or queued rather than accidental: AI D
 3. `src/github-readme.js` now avoids the old generic "README 将 / 核心能力集中 / 它的价值在于" template for future generated reports.
 4. At the time, `tests/unit.test.js` covered scoped theme selectors, GitHub card fallback text, and README summary template avoidance; current visual-contract coverage lives in `tests/adc-visual-contract.test.js` and browser acceptance evidence.
 5. `docs/reports/2026/06/2026-06-17.html` was regenerated; non-target historical HTML diffs were reverted after builds.
-6. Playwright screenshots and `scripts/check-daily-page.mjs` verified desktop/mobile no-overflow, no key overlap, tracking component containment, and GitHub reader-facing card quality.
+6. Playwright screenshots and `scripts/check-daily-page.mjs` historically verified desktop/mobile no-overflow, no key overlap, tracking component containment, and GitHub reader-facing card quality. Current acceptance is desktop-only at `1280x900`; the earlier multi-viewport evidence is preserved but superseded by `docs/desktop-only-support-policy.md`.
 
 ## Known Reference Gaps We Should Not Copy 1:1
 

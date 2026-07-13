@@ -7,6 +7,8 @@ license: Complete terms in LICENSE.txt
 
 # Web Application Testing
 
+For ai-daily-cn, one-off browser inspection is desktop-only at `1280x900`. Do not create mobile, tablet, narrow-screen, or touch-only acceptance evidence.
+
 To test local web applications, write native Python Playwright scripts.
 
 **Helper Scripts Available**:

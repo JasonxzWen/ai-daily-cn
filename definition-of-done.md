@@ -10,6 +10,7 @@ A Codex task is done only when the worktree proves it.
 - P0 validation has passed before handoff; P1 checks are run or risk-assessed; P2 hardening is run or explicitly deferred.
 - Static checks, runtime checks, and the relevant user-flow or end-to-end path have been run when relevant.
 - Web user-visible changes include agent-run browser acceptance against the local app, with URL, scenario, viewport, console/network findings, and screenshot or trace evidence when useful.
+- ai-daily-cn Web acceptance uses only the canonical `1280x900` desktop viewport and conforms to `docs/desktop-only-support-policy.md`; mobile, tablet, narrow-screen, and touch-only work is not accepted as product scope.
 - Read-only Harness Hub startup check (`harness-hub check . --json`) has been run or explicitly skipped with a reason.
 - Standard startup path still works or has an explicit, recorded blocker.
 - Validation evidence records each command's status, exit code, passed/failed counts when available, output summary or path, and related checkpoint commit.

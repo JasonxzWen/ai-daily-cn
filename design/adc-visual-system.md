@@ -7,7 +7,7 @@ ADC. is the product identity for `ai-daily-cn`. The web app should feel like a f
 - Applies to the React/Vite homepage under `apps/web`.
 - Keeps search, comparison, favorites, right rail, and topic dashboard out of scope.
 - Uses Astryx for component primitives, while local CSS tokens define the ADC. skin.
-- Targets desktop-first GitHub Pages publishing. Mobile-specific redesign is intentionally deferred.
+- Targets desktop-only GitHub Pages publishing at `1280x900`. Mobile, tablet, narrow-screen, and touch-only design is permanently outside the current product scope.
 
 ## Visual Language
 

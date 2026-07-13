@@ -32,7 +32,7 @@ This reference captures the reusable visual language for
 
 - Default report width: `min(1280px, calc(100vw - 28px))`.
 - Default desktop top padding: `20-28px`.
-- Default mobile side padding: `9-18px`.
+- Canonical desktop canvas: `1280x900`, with stable shell padding chosen for that viewport.
 - Default panel radius: `8px`; use `12px` only for visual-gallery surfaces.
 - Prefer compact tables and source panels over repeated card grids.
 

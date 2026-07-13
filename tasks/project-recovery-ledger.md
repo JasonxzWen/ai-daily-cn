@@ -43,7 +43,7 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - State: runtime_verified.
 - Implementation path: src/site.js, src/render.js, src/adc-theme.js, packages/design/src/adc-theme.css, docs/assets/style.css, generated reports, and tests/adc-visual-contract.test.js.
 - Validation commands: focused visual/unit tests; corepack pnpm run build; browser acceptance for early/latest reports and public shells; corepack pnpm run validate.
-- Runtime/production evidence: all 49 generated report pages reference the same shared ADC asset; home, ops, official blog, the earliest 2026-05-13 report, and the latest 2026-07-09 report passed desktop/narrow browser checks with no console, network, HTTP, or overflow failures.
+- Runtime/production evidence: all 49 generated report pages reference the same shared ADC asset; current REC-330 acceptance covers home, ops, official blog, and representative reports at the canonical `1280x900` desktop viewport with no console, network, HTTP, or overflow failures. Earlier narrow-screen evidence remains historical only.
 - Blocker: none known.
 - Recurrence prevention: remove date eligibility, make the shared asset a generation invariant, and cover early/latest fixtures.
 
@@ -74,7 +74,7 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 ### REC-006 - Slice delivery and observation
 
 - Type: delivery / production acceptance.
-- Fact evidence: PR #289 is merged as the current baseline. This follow-up Slice has checkpoint `83ca25d` plus a fully validated implementation diff; final full validation reports 900 tests / 898 pass / 0 fail / 2 skipped, and desktop/mobile browser acceptance covers Source Watch, official-blog discovery, no-search behavior, privacy, backrefs, and overflow. PR/CI/mergeability, post-merge real-run, and backfill preview evidence remain pending.
+- Fact evidence: PR #289 is merged as the current baseline. This follow-up Slice has checkpoint `83ca25d` plus a fully validated implementation diff; its final full validation reported 900 tests / 898 pass / 0 fail / 2 skipped. That Slice's mobile evidence is now historical and superseded by REC-330; current browser acceptance is the canonical `1280x900` desktop surface. PR/CI/mergeability, post-merge real-run, and backfill preview evidence remain pending.
 - Root cause: delivery evidence must be regenerated for each Slice; production intentionally clones remote `origin/main`, so the truthful real non-publish run cannot exercise this unmerged branch.
 - State: implementing.
 - Implementation path: create the verified checkpoint, push current branch, create the PR, perform CI/conflict/merge closeout, then run the real non-publish pipeline and backfill previews from merged `origin/main` without treating old observation evidence as a substitute.
@@ -135,7 +135,7 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - State: locally_verified with full/browser acceptance; release still requires the merged real-run proof.
 - Implementation path: `discover_source_watch` writes a dated artifact and returns a bounded stage receipt for its exact path/SHA-256; draft classifies material changes; report_write persists the normal dated candidate pool; build publishes privacy-safe source-linked records and emits one same-date fixed-size consumption receipt; the production summary proves stage receipt, exact producer/pool `target_id:snapshot_fingerprint` set equality, pool SHA-256, and build-consumed path/hash.
 - Validation commands: the current affected Source Watch/article/pipeline/official-blog batch passes 116/116; final full validation passes 900 tests / 898 pass / 0 fail / 2 skipped, including privacy/build-clean/E2E; the production-pipeline subset includes receipt/lineage negatives.
-- Runtime/production evidence: local fixtures prove valid zero-inclusion consumption, mismatch disconnection, partial material-endpoint suppression, newest commit selection, public backrefs/dedupe, and fixed-size same-date receipt. Browser acceptance proves the public rail, paper-on-ink contrast, original-source links, no-search behavior, and no desktop/mobile overflow. A real non-publish run is not yet claimed.
+- Runtime/production evidence: local fixtures prove valid zero-inclusion consumption, mismatch disconnection, partial material-endpoint suppression, newest commit selection, public backrefs/dedupe, and fixed-size same-date receipt. Current browser acceptance proves the public rail, paper-on-ink contrast, original-source links, no-search behavior, and no overflow at canonical `1280x900`. A real non-publish run is not yet claimed.
 - Blocker: production clones remote `origin/main`; run the real non-publish proof after this PR merges.
 - Recurrence prevention: never infer consumption from a requested path.
 
@@ -174,7 +174,7 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Implementation path: centralize contracts; add CI/contract tests and monitors; keep one production entrypoint.
 - Validation commands: full validate plus alert/fixture simulations.
 - Runtime/production evidence: seven days without unexpected blocked, missing, stale, Pages mismatch, or budget breach.
-- Current-Slice action: the workflow validator requires evidence-backed Source Watch fields, rejects permanent old scheduler assertions and extra project automations, and treats `status:self-check` as manual-only. Focused/full gates cover producer-stage path/hash receipt, producer/pool fingerprints, fixed-date proof, material endpoints, latest event, official-blog source date/context/bindings hashes and relationships, score precedence, public/private fields, E2E schema freshness, Source Watch contrast, and 390px layout.
+- Current-Slice action: the workflow validator requires evidence-backed Source Watch fields, rejects permanent old scheduler assertions and extra project automations, and treats `status:self-check` as manual-only. Focused/full gates cover producer-stage path/hash receipt, producer/pool fingerprints, fixed-date proof, material endpoints, latest event, official-blog source date/context/bindings hashes and relationships, score precedence, public/private fields, E2E schema freshness, Source Watch contrast, and canonical `1280x900` desktop layout.
 - Blocker: scheduler/repository compatibility plus full/browser acceptance are resolved; post-merge real runtime/previews and longer-term alerts/retention monitoring remain.
 - Recurrence prevention: this issue is the prevention program.
 
@@ -283,9 +283,9 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 
 - Type: confirmed UI regression.
 - Fact evidence: commit 79b4c3f landed a home navigation/module; React rebuild 489fc87 retained only Today/Run/Reports/Data. The knowledge page and ops link survive, but the home discovery path is gone; the official-blog plan still requires it.
-- State: runtime_verified through desktop/mobile browser acceptance.
+- State: runtime_verified through canonical `1280x900` desktop browser acceptance; earlier mobile evidence is historical only.
 - Action completed: restored a minimal ADC-aligned home navigation/card to the existing official-blog knowledge page without re-importing the superseded homepage.
-- Acceptance: desktop/narrow home discovers the official-blog knowledge page, and the final browser fixture proves six public records, OpenAI/Anthropic coverage, related links, no private-field leakage, and no horizontal overflow.
+- Acceptance: the canonical `1280x900` desktop home discovers the official-blog knowledge page, and the final browser fixture proves six public records, OpenAI/Anthropic coverage, related links, no private-field leakage, and no horizontal overflow.
 
 ### REC-321 - Connect the official-blog knowledge workflow to daily production
 
@@ -300,7 +300,7 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 
 - Type: product decision conflict.
 - Fact evidence: README still promises a searchable archive; commit 3172371 implemented search, domain/channel/source/min-score filters and full history. The modernization roadmap later declared search/comparison/favorites non-goals. Current React shows today/yesterday/history and truncates history with `slice(0, 60)`; the legacy search renderer remains unreachable because Vite overwrites the page.
-- State: retired by user decision; runtime verified through full build and desktop/mobile browser regression.
+- State: retired by user decision; runtime verified through full build and canonical `1280x900` desktop browser regression.
 - Action completed: D1 selected deliberate no-search. Removed the Vite-overwritten legacy static search/filter renderer, its CSS/helpers, and synthetic E2E path; updated README and retained the reachable React history experience. `discover:search-news` remains an internal source-discovery capability and was not removed or conflated with public search.
 - Acceptance: repository promises no public search, no unreachable search UI remains, current history navigation stays reachable, and discovery search tests/command remain intact.
 
@@ -357,6 +357,15 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - State: locally_verified.
 - Current-Slice action: dead theme, unused CLI dependency, and three empty packages were removed; ADC shared visual contract replaced duplicate dated rollout behavior.
 - Guardrail: REC-322 is now explicitly retired by D1; do not restore the deleted public-search renderer unless a new product decision reverses that terminal state.
+
+### REC-330 - Retire mobile and narrow-screen support
+
+- Type: product-scope terminal state and technical-debt removal.
+- Fact evidence: the user explicitly classified mobile support as over-design and requested removal of its workflows, logic, code, tests, and generated artifacts.
+- State: locally complete and runtime_verified at `1280x900`; final full validation and two independent reviews pass with P0=0/P1=0. PR/CI delivery remains pending.
+- Implemented action: the product now has one supported `1280x900` desktop viewport. Project-owned width breakpoints, viewport meta tags, mobile/touch layout branches, multi-viewport page checks, E2E scenarios, report-Skill templates/validators, and two unreferenced generated reports were removed; all 49 public reports were regenerated.
+- Evidence boundary: historical/news prose, raw source snapshots, and generic React/Astryx compatibility remain factual/dependency evidence only and are not mobile support, design, or acceptance claims.
+- Guardrail: `docs/desktop-only-support-policy.md`, AGENTS/DoD/feature/Skill rules, and the `desktop-only` visual-contract test prevent reintroduction. Reversal requires a new explicit product-scope decision.
 
 ## Confirmed Surviving Value
 
@@ -442,6 +451,8 @@ This table is part of the same ledger, not a second review. `fixed` means implem
 | S-68 | PR #290 CodeQL treated an untyped `.includes(repositoryUrl)` assertion as incomplete URL-substring sanitization and raised one High alert despite all three language analyses completing | made the test prove `verification_sources` is an array and then require exact URL equality, eliminating any arbitrary-host prefix/suffix interpretation without weakening production behavior | fixed locally; focused regression passes and merge remains gated on clean CodeQL re-analysis |
 | S-69 | the first merged-main non-publish run proved Source Watch end to end but `quality_page_check` blocked a legitimate news-card title containing “模型发布” because retired section labels were matched as substrings across every section heading | narrowed retired-section text detection to exact normalized labels while retaining structural selectors; added browser-backed allow/reject regressions and replayed the exact generated desktop/mobile page | fixed locally; RED/GREEN 2/2 and real generated-page gate pass, with follow-up PR and fresh merged-main run required |
 | S-70 | the 7/7 backfill preview exposed that Anthropic's Alberta case-study anchor inherited the next Fable card through the HTML-index forward window; identity-blind Fable rules then injected model-launch facts, and the same mismatch was already public in the 7/8 report while quality/backref gates stayed green | bounded HTML-index facts to the exact anchor or same-URL JSON-LD, restricted Fable topic/prose to identity fields and the original Anthropic launch, added RED/GREEN parser/draft/history regressions, corrected the 7/8 candidates/report, and rebuilt dependent public artifacts | fixed locally; focused 7/7 tests pass, full validation/PR/merged-main replay pending |
+| S-71 | mobile, tablet, narrow-screen, and touch-only support survived across runtime CSS, report generators, page checks, E2E, local Skills, design guidance, and generated public artifacts even though it was not product value | established REC-330, removed project-owned branches and artifacts, promoted the desktop rail to the unconditional baseline, added a deterministic guard, rebuilt 49 reports, and accepted home/ops/blog/report at `1280x900` with zero console/network/overflow failures | fixed and runtime_verified locally; PR/CI pending |
+| S-72 | the final full-suite load exposed a Windows race where asynchronous `taskkill` could outlive the one-second grace and let a delayed descendant write after the parent timed out | changed the exceptional Windows process-tree termination to bounded synchronous `taskkill /T /F` and started the hard timer before termination so both share one grace budget | fixed locally; real timeout probes 5/5, pipeline 40/40, and final full validation pass; synchronous 1-5 second exceptional-path wait remains accepted P2 |
 
 ## Production Acceptance
 

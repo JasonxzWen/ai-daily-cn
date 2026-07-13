@@ -456,7 +456,7 @@ await fs.writeFile(path.join(sourceWatchPoolDir, "2026-05-15.candidates.json"), 
       snapshot_fingerprint: `sha256:${"1".repeat(64)}`,
       site_snapshot: {
         title: "E2E Source Watch Signal",
-        description: "A reader-safe changed snapshot for narrow viewport acceptance.",
+        description: "A reader-safe changed snapshot for desktop acceptance.",
         canonical_url: "https://example.com/source-watch/change",
         content_fingerprint: `sha256:${"2".repeat(64)}`,
         feeds: [],
@@ -481,21 +481,20 @@ await writeTinyPng(path.join(outDir, "assets/evidence/e2e-builder-post.png"));
 await writeTinyPng(path.join(outDir, "assets/evidence/e2e-community-token-routing.png"));
 await buildWebApp({ rootDir, outDir, forwardOutput: false });
 
-const positionalPageCheckOutput = path.join(tmp, "page-check-positional-viewports.json");
+const desktopPageCheckOutput = path.join(tmp, "page-check-desktop.json");
 await execFileAsync(process.execPath, [
   path.join(rootDir, "scripts/check-daily-page.mjs"),
   "2026-05-15",
-  "1280x900 390x1200",
   "--out",
   outDir,
   "--output",
-  positionalPageCheckOutput
+  desktopPageCheckOutput
 ], { cwd: rootDir, maxBuffer: 20 * 1024 * 1024 });
-const positionalPageCheck = JSON.parse(await fs.readFile(positionalPageCheckOutput, "utf8"));
-assert.equal(positionalPageCheck.ok, true, JSON.stringify(positionalPageCheck.blocking_checks, null, 2));
+const desktopPageCheck = JSON.parse(await fs.readFile(desktopPageCheckOutput, "utf8"));
+assert.equal(desktopPageCheck.ok, true, JSON.stringify(desktopPageCheck.blocking_checks, null, 2));
 assert.deepEqual(
-  positionalPageCheck.results.map((result) => result.viewport.width),
-  [1280, 390]
+  desktopPageCheck.results.map((result) => result.viewport.width),
+  [1280]
 );
 
 const server = await startStaticServer(outDir);
@@ -521,10 +520,7 @@ try {
   await page.getByRole("radio", { name: "历史流" }).click();
   assert.equal(await page.locator("#article-results-title").textContent(), "历史流");
   assert.equal(await allExternalLinksHaveRel(page), true);
-  await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await hasHorizontalOverflow(page), false);
-  assert.equal(await page.locator(".adc-source-watch-header").evaluate((node) => node.scrollWidth <= node.clientWidth), true);
-  await page.setViewportSize({ width: 1280, height: 900 });
 
   await page.goto(`${server.url}/ops.html`);
   assert.match(await page.locator("h1").textContent(), /AI 日报/);
@@ -561,11 +557,7 @@ try {
   assert(githubFilteredDates.includes("2026-05-15"));
   assert(!githubFilteredDates.includes("2026-05-13"));
   await page.locator("#date-filter-github").uncheck();
-  await page.setViewportSize({ width: 390, height: 844 });
-  const mobileIndexChecklist = await evaluateIndexPageChecklist(page, { expectedMinReports: 4 });
-  assert.equal(mobileIndexChecklist.ok, true, JSON.stringify(mobileIndexChecklist.issues, null, 2));
   assert.equal(await hasHorizontalOverflow(page), false);
-  await page.setViewportSize({ width: 1280, height: 900 });
   assert.equal(await page.locator("[data-source-lane]").count(), 6);
 
   await page.goto(`${server.url}/official-blogs/index.html`);
@@ -583,9 +575,6 @@ try {
   assert.doesNotMatch(await page.locator("body").textContent(), /admission_policy|source_audit|self_check|candidate_id|rationale/i);
   assert.equal(await hasRemoteScripts(page), false);
   assert.equal(await hasHorizontalOverflow(page), false);
-  await page.setViewportSize({ width: 390, height: 844 });
-  assert.equal(await hasHorizontalOverflow(page), false);
-  await page.setViewportSize({ width: 1280, height: 900 });
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-13.html`);
   assert.equal((await page.locator("#report-top h1").textContent()).trim(), "2026-05-13");
@@ -750,34 +739,6 @@ try {
   assert(debugFieldChecklist.issues.some((issue) => issue.id === "public_debug_sections_absent"));
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-15.html`);
-  await page.setViewportSize({ width: 375, height: 812 });
-  const mobileChecklist = await evaluateDailyPageChecklist(page, { reportDate: "2026-05-15" });
-  assert.equal(mobileChecklist.ok, true, JSON.stringify(mobileChecklist.issues, null, 2));
-  const mobileLayoutColumns = await page.locator(".report-layout").evaluate((node) => getComputedStyle(node).gridTemplateColumns);
-  assert.equal(mobileLayoutColumns.trim().split(/\s+/).length, 1, `report-layout should collapse to one column on mobile, got: ${mobileLayoutColumns}`);
-  await assertSectionsAbsent(page, [
-    "#section-source-first-dashboard",
-    "#section-system-operating-dashboard",
-    "#section-source-status-focus",
-    "#section-source-map",
-    "#section-source-inventory",
-    "#section-source-inventory-group-core-primary",
-    "#section-source-inventory-group-platform-cn-media"
-  ]);
-  const firstTrackHeading = page.locator("[id^='section-track-'] h2").first();
-  await firstTrackHeading.evaluate((node) => {
-    node.scrollIntoView({ block: "start", behavior: "instant" });
-  });
-  await page.waitForTimeout(120);
-  const trackHeadingBox = await firstTrackHeading.boundingBox();
-  assert(
-    trackHeadingBox && trackHeadingBox.y >= -2 && trackHeadingBox.y < 240,
-    JSON.stringify(trackHeadingBox)
-  );
-  await imageLightboxOpensAndCloses(page, ".blog-card .card-media-grid img");
-  assert.equal(await hasHorizontalOverflow(page), false);
-
-  await page.setViewportSize({ width: 1280, height: 900 });
   await page.evaluate(() => {
     const section = document.createElement("section");
     section.textContent = "OpenRouter 周变化：67%，榜单变化用于说明公开排名波动。";
@@ -1018,25 +979,6 @@ async function builderCardsUseHorizontalRows(page) {
   });
 }
 
-async function builderCardsCollapseOnMobile(page) {
-  return page.evaluate(() => {
-    const cards = Array.from(document.querySelectorAll(".builder-card"));
-    if (cards.length === 0) return false;
-
-    return cards.every((card) => {
-      const styles = getComputedStyle(card);
-      const columns = styles.gridTemplateColumns.trim().split(/\s+/);
-      const areas = styles.gridTemplateAreas;
-      const titleRect = card.querySelector("h3")?.getBoundingClientRect();
-      const bodyRect = card.querySelector(":scope > p")?.getBoundingClientRect();
-      return columns.length === 1
-        && areas.includes("builder-title")
-        && areas.includes("builder-body")
-        && Boolean(titleRect && bodyRect && Math.abs(bodyRect.left - titleRect.left) < 8);
-    });
-  });
-}
-
 async function communityCardsUseNewsStreamLayout(page) {
   return page.evaluate(() => {
     const grid = document.querySelector(".community-card-grid");
@@ -1057,25 +999,6 @@ async function communityCardsUseNewsStreamLayout(page) {
 
     return columns.length === 2
       && Boolean(titleRect && bodyRect && mediaRect && mediaRect.left > bodyRect.left + 120);
-  });
-}
-
-async function communityCardsCollapseOnMobile(page) {
-  return page.evaluate(() => {
-    const cards = Array.from(document.querySelectorAll(".community-card"));
-    if (cards.length === 0) return false;
-
-    return cards.every((card) => {
-      const styles = getComputedStyle(card);
-      const columns = styles.gridTemplateColumns.trim().split(/\s+/).filter(Boolean);
-      const titleRect = card.querySelector("h3")?.getBoundingClientRect();
-      const bodyRect = card.querySelector(":scope > p")?.getBoundingClientRect();
-      const mediaRect = card.querySelector(".card-media-grid")?.getBoundingClientRect();
-      const mediaOk = !mediaRect || Boolean(titleRect && Math.abs(mediaRect.left - titleRect.left) < 8);
-      return columns.length === 1
-        && Boolean(titleRect && bodyRect && Math.abs(bodyRect.left - titleRect.left) < 8)
-        && mediaOk;
-    });
   });
 }
 
