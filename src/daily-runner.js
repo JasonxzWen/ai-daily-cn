@@ -576,6 +576,9 @@ async function runPostQualityStages({
     }
 
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
+    if (stage.id === "sources_phase5_audit") {
+      recordSourcesPhase5Audit(summary, outcome.normalized);
+    }
     const remoteAheadAction = remoteAheadRestartNextAction({
       outcome,
       stage,
@@ -1245,6 +1248,20 @@ function recordFirstReviewResult(summary, stageResult) {
   firstPass.exceptional_repair_task_count = retryablePublicEditorialTasks(review, tasks).length;
 }
 
+function recordSourcesPhase5Audit(summary, stageResult) {
+  const output = stageResult?.output || {};
+  const logicalSourceEvidence = output.logical_source_evidence;
+  if (!logicalSourceEvidence || typeof logicalSourceEvidence !== "object" || Array.isArray(logicalSourceEvidence)) {
+    return;
+  }
+  summary.sources_phase5_audit = {
+    phase5_complete: output.phase5_complete === true,
+    report_date: String(output.report_date || ""),
+    target_days: Number(output.target_days || 0),
+    logical_source_evidence: logicalSourceEvidence
+  };
+}
+
 function buildAiRepairWorkflowStages({
   reportDate,
   sourceReportPath,
@@ -1298,16 +1315,16 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       "--json"
     ], { parse_json_failure: true }),
     pnpmStage("validate", ["run", "validate"]),
-    pnpmStage("sources_phase5_audit", [
-      "run",
+    nodeCliStage("sources_phase5_audit", [
       "sources:phase5-audit",
-      "--",
       "--date",
       reportDate,
       "--history-dir",
       "reports-data",
       "--days",
       "3",
+      "--logical-source",
+      "aify-news",
       "--output",
       tmp("sources-phase5-audit")
     ]),

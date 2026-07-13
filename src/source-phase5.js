@@ -5,6 +5,7 @@ import { isValidDateString } from "./time.js";
 import { evaluatePublicSourceAdmission } from "./candidates.js";
 import { effectiveCandidateVerification } from "./source-verification.js";
 import { collectMainAuditConsistencyIssues } from "./main-audit-consistency.js";
+import { logicalSourceRequiredObservationEntries } from "./source-effectiveness.js";
 import { normalizeUrlIdentity } from "./url.js";
 
 const REQUIRED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
@@ -68,6 +69,7 @@ async function auditLogicalSourceEvidence({
   const recordsByDate = new Map(records.map((record) => [record.report_date, record]));
   const phase5DaysByDate = new Map(phase5Days.map((day) => [day.report_date, day]));
   const publicArticles = await readPublicArticles(rootDir, publicArticlesPath);
+  const requiredObservationEntries = logicalSourceRequiredObservationEntries(logicalSourceId);
   const dayResults = [];
   for (const date of expectedDates) {
     dayResults.push(await auditLogicalSourceDay({
@@ -76,6 +78,7 @@ async function auditLogicalSourceEvidence({
       reportDate: date,
       historyDir,
       logicalSourceId,
+      requiredObservationEntries,
       publicArticles
     }));
   }
@@ -100,6 +103,7 @@ async function auditLogicalSourceEvidence({
 
   return {
     logical_source_id: logicalSourceId,
+    required_observation_entries: requiredObservationEntries,
     expected_dates: expectedDates,
     days: dayResults,
     consecutive_complete_days: dayResults.filter((day) => day.complete).length,
@@ -109,18 +113,29 @@ async function auditLogicalSourceEvidence({
   };
 }
 
-async function auditLogicalSourceDay({ record, phase5Day, reportDate, historyDir, logicalSourceId, publicArticles }) {
+async function auditLogicalSourceDay({
+  record,
+  phase5Day,
+  reportDate,
+  historyDir,
+  logicalSourceId,
+  requiredObservationEntries,
+  publicArticles
+}) {
   if (!record) {
     const violation = logicalSourceViolation(reportDate, logicalSourceId, "missing_report_day", "No persisted report exists for the expected date.");
-    return emptyLogicalSourceDay(reportDate, violation);
+    return emptyLogicalSourceDay(reportDate, violation, requiredObservationEntries);
   }
 
   const row = (Array.isArray(record.payload?.source_effectiveness) ? record.payload.source_effectiveness : [])
     .find((item) => item?.id === logicalSourceId);
   const sourceIds = uniqueStrings(row?.source_ids || []);
+  const candidateSourceIds = uniqueStrings([...sourceIds, ...requiredObservationEntries]);
   const candidatePool = await readCandidatePoolForDate(historyDir, reportDate);
   const candidates = (Array.isArray(candidatePool?.candidates) ? candidatePool.candidates : [])
-    .filter((candidate) => logicalSourceCandidateMatches(candidate, sourceIds));
+    .filter((candidate) => logicalSourceCandidateMatches(candidate, candidateSourceIds));
+  const entryObservations = requiredObservationEntries.map((entryId) =>
+    buildLogicalSourceEntryObservation(entryId, sourceIds, candidates));
   const included = candidates.filter(candidateIncludedPublicly);
   const notIncluded = candidates.filter((candidate) => !candidateIncludedPublicly(candidate));
   const reasons = uniqueStrings(notIncluded.map(candidateDispositionReason).filter(Boolean));
@@ -137,6 +152,22 @@ async function auditLogicalSourceDay({ record, phase5Day, reportDate, historyDir
   const matchedUrls = expectedUrls.filter((url) => publicUrls.has(url));
   const missingUrls = expectedUrls.filter((url) => !publicUrls.has(url));
   const violations = [];
+
+  for (const candidate of candidates) {
+    const entryIdentity = logicalSourceCandidateEntryIdentity(candidate);
+    if (
+      !entryIdentity.conflict ||
+      !requiredObservationEntries.includes(entryIdentity.source_id) ||
+      !requiredObservationEntries.includes(entryIdentity.target_id)
+    ) continue;
+    violations.push(logicalSourceViolation(
+      reportDate,
+      logicalSourceId,
+      "required_observation_entry_identity_conflict",
+      `Candidate ${entryIdentity.candidate_id} has conflicting source_id=${entryIdentity.source_id} and source_watch.target_id=${entryIdentity.target_id}; it cannot satisfy either required observation entry.`,
+      entryIdentity
+    ));
+  }
 
   if (!row) {
     violations.push(logicalSourceViolation(reportDate, logicalSourceId, "logical_source_not_reported", "The report has no source_effectiveness row for the logical source."));
@@ -165,6 +196,26 @@ async function auditLogicalSourceDay({ record, phase5Day, reportDate, historyDir
   if (unresolved.length > 0) {
     violations.push(logicalSourceViolation(reportDate, logicalSourceId, "missing_disposition_reason", `Non-included candidates have no persisted reason: ${unresolved.join(", ")}.`));
   }
+  for (const entry of entryObservations) {
+    if (!entry.observed) {
+      violations.push(logicalSourceViolation(
+        reportDate,
+        logicalSourceId,
+        "required_observation_entry_missing",
+        `Required logical-source entry ${entry.id} is absent from the day's source effectiveness observations.`,
+        { entry_id: entry.id }
+      ));
+    }
+    if (entry.candidate_count === 0) {
+      violations.push(logicalSourceViolation(
+        reportDate,
+        logicalSourceId,
+        "required_observation_entry_candidate_missing",
+        `Required logical-source entry ${entry.id} produced no persisted candidate for the day.`,
+        { entry_id: entry.id }
+      ));
+    }
+  }
   if (missingUrls.length > 0) {
     violations.push(logicalSourceViolation(reportDate, logicalSourceId, "included_public_output_mismatch", `Included candidate URLs are missing from public output: ${missingUrls.join(", ")}.`));
   }
@@ -183,6 +234,7 @@ async function auditLogicalSourceDay({ record, phase5Day, reportDate, historyDir
       statuses: uniqueStrings(row?.statuses || []),
       source_ids: sourceIds
     },
+    entry_observations: entryObservations,
     admission: {
       candidate_count: candidates.length
     },
@@ -202,12 +254,13 @@ async function auditLogicalSourceDay({ record, phase5Day, reportDate, historyDir
   };
 }
 
-function emptyLogicalSourceDay(reportDate, violation) {
+function emptyLogicalSourceDay(reportDate, violation, requiredObservationEntries = []) {
   return {
     report_date: reportDate,
     report_present: false,
     phase5_day_passed: false,
     collection: { configured: false, reachable: false, parsed_recent: false, statuses: [], source_ids: [] },
+    entry_observations: requiredObservationEntries.map(emptyLogicalSourceEntryObservation),
     admission: { candidate_count: 0 },
     disposition: { included_count: 0, excluded_count: 0, reasons: [], unresolved: [] },
     public_output: { expected_urls: [], matched_urls: [], missing_urls: [] },
@@ -216,11 +269,61 @@ function emptyLogicalSourceDay(reportDate, violation) {
   };
 }
 
+function buildLogicalSourceEntryObservation(entryId, sourceIds, candidates) {
+  const entryCandidates = candidates.filter((candidate) => {
+    const identity = logicalSourceCandidateEntryIdentity(candidate);
+    return identity.conflict === false && identity.entry_id === entryId;
+  });
+  const included = entryCandidates.filter(candidateIncludedPublicly);
+  const excluded = entryCandidates.filter((candidate) => !candidateIncludedPublicly(candidate));
+  const reasons = uniqueStrings(excluded.map(candidateDispositionReason).filter(Boolean));
+  const unresolved = excluded
+    .filter((candidate) => !candidateDispositionReason(candidate))
+    .map((candidate) => String(candidate?.id || candidate?.url || "unknown"));
+  const observed = sourceIds.includes(entryId);
+  return {
+    id: entryId,
+    observed,
+    candidate_count: entryCandidates.length,
+    included_count: included.length,
+    excluded_count: excluded.length,
+    reasons,
+    unresolved,
+    complete: observed && entryCandidates.length > 0 && unresolved.length === 0
+  };
+}
+
+function emptyLogicalSourceEntryObservation(entryId) {
+  return {
+    id: entryId,
+    observed: false,
+    candidate_count: 0,
+    included_count: 0,
+    excluded_count: 0,
+    reasons: [],
+    unresolved: [],
+    complete: false
+  };
+}
+
 function logicalSourceCandidateMatches(candidate, sourceIds) {
   if (sourceIds.length === 0) return false;
   return [candidate?.source_id, candidate?.source_watch?.target_id]
     .map((value) => String(value || "").trim())
     .some((value) => value && sourceIds.includes(value));
+}
+
+function logicalSourceCandidateEntryIdentity(candidate) {
+  const sourceId = String(candidate?.source_id || "").trim();
+  const targetId = String(candidate?.source_watch?.target_id || "").trim();
+  const conflict = Boolean(sourceId && targetId && sourceId !== targetId);
+  return {
+    candidate_id: String(candidate?.id || candidate?.url || "unknown"),
+    source_id: sourceId,
+    target_id: targetId,
+    entry_id: conflict ? "" : (targetId || sourceId),
+    conflict
+  };
 }
 
 function candidateIncludedPublicly(candidate) {
@@ -237,12 +340,13 @@ function logicalSourceCandidatePublicUrl(candidate) {
   return String(candidate?.source_watch?.event_url || candidate?.url || "").trim();
 }
 
-function logicalSourceViolation(reportDate, logicalSourceId, code, message) {
+function logicalSourceViolation(reportDate, logicalSourceId, code, message, details = {}) {
   return {
     report_date: reportDate,
     logical_source_id: logicalSourceId,
     code,
-    message
+    message,
+    ...details
   };
 }
 
