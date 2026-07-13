@@ -8588,6 +8588,10 @@ test("status:self-check reports degraded published state without blocking", asyn
       blocking_issues: []
     }
   });
+  await writeSelfCheckHomeFixture(tmp, {
+    latestDate: "2026-07-09",
+    feedDates: ["2026-07-09", "2026-06-04"]
+  });
   const automationsDir = path.join(tmp, "automations");
   await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
   await fs.writeFile(
@@ -29363,8 +29367,44 @@ async function writeSelfCheckReportFixture(root, reportDate, overrides = {}) {
   await fs.writeFile(path.join(docsDataDir, `${reportDate}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
   await fs.writeFile(path.join(htmlDir, `${reportDate}.html`), `<main>${reportDate}</main>`, "utf8");
   await fs.writeFile(path.join(root, "docs", "index.html"), `<a>${reportDate}</a>`, "utf8");
-  await fs.writeFile(path.join(root, "docs", "feed.json"), JSON.stringify({ reports: [{ report_date: reportDate }] }), "utf8");
+  await writeSelfCheckHomeFixture(root, { latestDate: reportDate, feedDates: [reportDate] });
   await fs.writeFile(path.join(root, "docs", "trends.json"), JSON.stringify({ reports: [{ report_date: reportDate }] }), "utf8");
+}
+
+async function writeSelfCheckHomeFixture(root, { latestDate, feedDates }) {
+  const [year, month] = latestDate.split("-");
+  const home = {
+    schema_version: 1,
+    site_title: "AI 日报",
+    generated_at: `${latestDate}T00:00:00.000Z`,
+    latest_edition: {
+      report_date: latestDate,
+      title: `AI 日报 ${latestDate}`,
+      summary: "Fixture homepage edition.",
+      report_url: `reports/${year}/${month}/${latestDate}.html`,
+      data_url: `data/${year}/${month}/${latestDate}.json`,
+      generated_at: `${latestDate}T00:00:00.000Z`,
+      story_count: 0,
+      lead_story: null,
+      secondary_stories: [],
+      compact_stories: []
+    },
+    previous_edition: null,
+    source_watch: [],
+    archive: [],
+    byte_size: 1
+  };
+  let nextSize = Buffer.byteLength(`${JSON.stringify(home, null, 2)}\n`);
+  while (home.byte_size !== nextSize) {
+    home.byte_size = nextSize;
+    nextSize = Buffer.byteLength(`${JSON.stringify(home, null, 2)}\n`);
+  }
+  await fs.writeFile(
+    path.join(root, "docs", "feed.json"),
+    JSON.stringify({ reports: feedDates.map((reportDate) => ({ report_date: reportDate })) }),
+    "utf8"
+  );
+  await fs.writeFile(path.join(root, "docs", "home.json"), `${JSON.stringify(home, null, 2)}\n`, "utf8");
 }
 
 function textResponse(text, status = 200, finalUrl = "") {

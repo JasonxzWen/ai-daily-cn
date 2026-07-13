@@ -883,8 +883,10 @@ function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
   const keep = new Set([
     `${outPrefix}/.nojekyll`,
     `${outPrefix}/articles.json`,
+    `${outPrefix}/favicon.ico`,
     `${outPrefix}/assets/style.css`,
     `${outPrefix}/feed.json`,
+    `${outPrefix}/home.json`,
     `${outPrefix}/index.html`,
     `${outPrefix}/ops.html`,
     `${outPrefix}/trends.json`,
@@ -1204,7 +1206,9 @@ function isPublisherOwnedPath(filePath) {
   return (
     filePath === "docs/.nojekyll" ||
     filePath === "docs/articles.json" ||
+    filePath === "docs/favicon.ico" ||
     filePath === "docs/feed.json" ||
+    filePath === "docs/home.json" ||
     filePath === "docs/index.html" ||
     filePath === "docs/ops.html" ||
     filePath === "docs/trends.json" ||

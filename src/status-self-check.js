@@ -6,11 +6,12 @@ import { PublisherError } from "./errors.js";
 import { createDailyPublishPlan, prepareCleanPublishWorktree } from "./publish.js";
 import { buildSite } from "./site.js";
 import { checkSourcesHealth } from "./source-health.js";
+import { validateHome } from "./schema.js";
 import { validateSourceRegistryPath } from "./source-registry.js";
 import { isValidDateString } from "./time.js";
 import { validateDailyWorkflowContract } from "./workflow-contract.js";
 
-const REQUIRED_DOC_FILES = ["docs/index.html", "docs/feed.json", "docs/trends.json"];
+const REQUIRED_DOC_FILES = ["docs/index.html", "docs/feed.json", "docs/home.json", "docs/trends.json"];
 
 export async function runStatusSelfCheck(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
@@ -37,6 +38,7 @@ export async function runStatusSelfCheck(options = {}) {
     html: path.join(checkRoot, "docs", "reports", year, month, `${reportDate}.html`),
     index: path.join(checkRoot, "docs", "index.html"),
     feed: path.join(checkRoot, "docs", "feed.json"),
+    home: path.join(checkRoot, "docs", "home.json"),
     trends: path.join(checkRoot, "docs", "trends.json")
   };
 
@@ -287,7 +289,7 @@ async function checkRequiredFiles({ rootDir, reportDate, paths, blockingIssues, 
     { id: "reports_data_json", path: paths.report_json, mustContain: reportDate },
     { id: "docs_data_json", path: paths.docs_json, mustContain: reportDate },
     { id: "daily_html", path: paths.html, mustContain: reportDate },
-    ...REQUIRED_DOC_FILES.map((file) => ({
+    ...REQUIRED_DOC_FILES.filter((file) => file !== "docs/home.json").map((file) => ({
       id: file.replace(/[/.]/g, "_"),
       path: path.join(rootDir, file),
       mustContain: reportDate
@@ -326,6 +328,54 @@ async function checkRequiredFiles({ rootDir, reportDate, paths, blockingIssues, 
         message: error.message
       });
     }
+  }
+
+  await checkHomeArtifact({ paths, blockingIssues, checks });
+}
+
+async function checkHomeArtifact({ paths, blockingIssues, checks }) {
+  const id = "docs_home_json";
+  try {
+    const [homeText, feedText] = await Promise.all([
+      fs.readFile(paths.home, "utf8"),
+      fs.readFile(paths.feed, "utf8")
+    ]);
+    const home = JSON.parse(homeText);
+    const feed = JSON.parse(feedText);
+    const validation = validateHome(home);
+    const latestFeedDate = String(feed?.reports?.[0]?.report_date || "");
+    const latestHomeDate = String(home?.latest_edition?.report_date || "");
+    const actualBytes = Buffer.byteLength(homeText);
+    const byteSizeMatches = home?.byte_size === actualBytes;
+    const latestDateMatches = Boolean(latestFeedDate) && latestHomeDate === latestFeedDate;
+    const passed = validation.valid && byteSizeMatches && latestDateMatches;
+    checks.push({
+      id,
+      status: passed ? "passed" : "failed",
+      path: paths.home,
+      schema_valid: validation.valid,
+      byte_size_matches: byteSizeMatches,
+      latest_date_matches: latestDateMatches,
+      latest_feed_date: latestFeedDate,
+      latest_home_date: latestHomeDate
+    });
+    if (!passed) {
+      blockingIssues.push({
+        code: "home_artifact_invalid",
+        section: "artifacts",
+        path: paths.home,
+        message: "docs/home.json must satisfy its schema, byte-size receipt, and latest feed edition",
+        failures: validation.errors
+      });
+    }
+  } catch (error) {
+    checks.push({ id, status: "failed", path: paths.home, error: error.message });
+    blockingIssues.push({
+      code: error.code === "ENOENT" ? "artifact_missing" : "home_artifact_invalid",
+      section: "artifacts",
+      path: paths.home,
+      message: error.message
+    });
   }
 }
 

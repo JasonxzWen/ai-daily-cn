@@ -8,9 +8,9 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
-import { buildArticleIndex, buildSite } from "../src/site.js";
+import { buildArticleIndex, buildHomeData, buildSite } from "../src/site.js";
 import { renderIndexHtml } from "../src/render.js";
-import { validateArticles } from "../src/schema.js";
+import { validateArticles, validateHome } from "../src/schema.js";
 
 const rootDir = process.cwd();
 const trendConfigPath = path.join(rootDir, "config", "trends.json");
@@ -277,6 +277,99 @@ test("buildArticleIndex emits public Aify-style article records", () => {
   assert.equal(validation.valid, true, JSON.stringify(validation.errors, null, 2));
 });
 
+test("home data binds editions by report_date and preserves editorial story order", () => {
+  const latest = sampleReport();
+  latest.stories = Array.from({ length: 6 }, (_, index) => {
+    const story = structuredClone(latest.stories[0]);
+    story.story_id = `story-latest-${index + 1}`;
+    story.object = `本期主故事 ${index + 1}`;
+    story.title = `Latest story ${index + 1}`;
+    story.event_date = "2026-07-02";
+    story.sources[0].url = `https://example.com/latest-story-${index + 1}`;
+    return story;
+  });
+  latest.main_items = [];
+
+  const previous = structuredClone(latest);
+  previous.report_date = "2026-07-02";
+  previous.title = "AI 日报 2026-07-02";
+  previous.summary = "上一期编辑摘要。";
+  previous.generated_at = "2026-07-02T08:00:00.000Z";
+  previous.stories = previous.stories.slice(0, 2).map((story, index) => ({
+    ...story,
+    story_id: `story-previous-${index + 1}`,
+    object: `上一期主故事 ${index + 1}`,
+    title: `Previous story ${index + 1}`,
+    event_date: "2026-07-01",
+    sources: [{
+      ...story.sources[0],
+      url: `https://example.com/previous-story-${index + 1}`
+    }]
+  }));
+
+  const feed = {
+    schema_version: 1,
+    site_title: "AI 日报",
+    site_url: "https://example.com/ai-daily-cn/",
+    updated_at: "2026-07-03T08:00:00.000Z",
+    reports: [latest, previous].map((report) => ({
+      report_date: report.report_date,
+      title: report.title,
+      summary: report.summary,
+      url: `reports/2026/07/${report.report_date}.html`,
+      data_url: `data/2026/07/${report.report_date}.json`,
+      main_items: report.stories.length,
+      builder_observations: 0,
+      generated_at: report.generated_at
+    }))
+  };
+  const articles = buildArticleIndex([previous, latest], {
+    updatedAt: feed.updated_at,
+    sourceWatchCandidatePools: [sampleSourceWatchCandidatePool()]
+  });
+  const home = buildHomeData([previous, latest], { feed, articles });
+
+  assert.equal(home.latest_edition.report_date, "2026-07-03");
+  assert.equal(home.previous_edition.report_date, "2026-07-02");
+  assert.deepEqual(
+    [
+      home.latest_edition.lead_story,
+      ...home.latest_edition.secondary_stories,
+      ...home.latest_edition.compact_stories
+    ].map((story) => story.title),
+    latest.stories.map((story) => story.object),
+    "home edition must retain report.stories order even when every event happened the previous day"
+  );
+  assert.equal(home.latest_edition.lead_story.event_date, "2026-07-02");
+  assert.equal(home.latest_edition.story_count, 6);
+  assert.equal(home.previous_edition.story_count, 2);
+  assert.equal(home.source_watch.length, 2);
+  assert(home.source_watch.length <= 4);
+  assert.equal(Buffer.byteLength(`${JSON.stringify(home, null, 2)}\n`), home.byte_size);
+  assert(home.byte_size < 128 * 1024, `home.json must stay lightweight, got ${home.byte_size}`);
+
+  const serialized = JSON.stringify(home);
+  for (const forbidden of [
+    "quality_score",
+    "candidate_id",
+    "candidate_pool_path",
+    "admission",
+    "rationale",
+    "source_effectiveness",
+    "self_check"
+  ]) {
+    assert.equal(serialized.includes(forbidden), false, `home data leaked ${forbidden}`);
+  }
+
+  const validation = validateHome(home);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors, null, 2));
+  const invalid = structuredClone(home);
+  invalid.latest_edition.lead_story.quality_score = 99;
+  const invalidResult = validateHome(invalid);
+  assert.equal(invalidResult.valid, false, "home schema must reject internal score fields");
+  assert(invalidResult.errors.some((error) => error.keyword === "additionalProperties"));
+});
+
 test("buildArticleIndex consumes included Source Watch candidates from persistent candidate pools", () => {
   const articles = buildArticleIndex([], {
     updatedAt: "2026-07-03T08:00:00.000Z",
@@ -357,7 +450,13 @@ test("buildSite publishes Source Watch candidates from the persistent candidate 
   });
 
   assert(result.writtenFiles.includes("articles.json"));
+  assert(result.writtenFiles.includes("home.json"));
   assert(result.articles.some((article) => article.section === "source_watch"));
+  assert.equal(validateHome(result.home).valid, true, JSON.stringify(validateHome(result.home).errors, null, 2));
+  const home = JSON.parse(await fs.readFile(path.join(outDir, "home.json"), "utf8"));
+  assert.deepEqual(home, result.home);
+  assert.equal(home.latest_edition.report_date, "2026-05-13");
+  assert.equal(home.source_watch.length, 2);
   const articles = JSON.parse(await fs.readFile(path.join(outDir, "articles.json"), "utf8"));
   const aify = articles.find((article) => article.url === "https://aify-news.pages.dev/");
   assert.equal(aify.source, "Aify News");

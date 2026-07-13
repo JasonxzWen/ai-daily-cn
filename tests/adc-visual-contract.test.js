@@ -27,7 +27,15 @@ test("React homepage keeps badges monochrome and exposes resilient UI states", a
 
   assert.doesNotMatch(app, /variant=\{badgeVariant\(/);
   assert.doesNotMatch(app, /function badgeVariant\(/);
-  assert.match(app, /Promise\.allSettled\(/);
+  assert.match(app, /fetchJson<HomeData>\("home\.json"\)/);
+  assert.doesNotMatch(app, /fetchJson<[^>]+>\("articles\.json"\)/);
+  assert.doesNotMatch(app, /fetchJson<[^>]+>\("feed\.json"\)/);
+  assert.doesNotMatch(app, /quality_score/);
+  assert.match(app, /data-edition-surface/);
+  assert.match(app, /data-lead-story/);
+  assert.match(app, /data-secondary-story/);
+  assert.match(app, /data-compact-story/);
+  assert(app.indexOf("<EditionSurface") < app.indexOf("<SourceWatchRail"), "edition must render before Source Watch");
   assert.match(app, /role="status"/);
   assert.match(app, /aria-live="polite"/);
   assert.match(app, /role="alert"/);
@@ -41,7 +49,31 @@ test("React homepage CSS is desktop-only and keeps direct Astryx badge overrides
   assert.match(css, /\.astryx-badge/);
   assert.doesNotMatch(css, /@media\s*\([^)]*\b(?:max|min)-width\s*:/i);
   assert.match(css, /\.adc-source-watch h2\s*\{[^}]*color:\s*var\(--adc-card\)/);
+  assert.match(css, /\.adc-lead-story/);
+  assert.match(css, /\.adc-secondary-story/);
+  assert.match(css, /\.adc-compact-story/);
+  assert.doesNotMatch(css, /\.adc-metrics\b/);
   assert.match(css, /:focus-visible/);
+});
+
+test("public favicon is a multi-size ICO copied byte-for-byte into the Pages output", async () => {
+  const sourcePath = path.join(rootDir, "apps", "web", "public", "favicon.ico");
+  const outputPath = path.join(rootDir, "docs", "favicon.ico");
+  const source = await fs.readFile(sourcePath);
+  const output = await fs.readFile(outputPath);
+
+  assert.equal(source.readUInt16LE(0), 0);
+  assert.equal(source.readUInt16LE(2), 1);
+  const count = source.readUInt16LE(4);
+  const sizes = Array.from({ length: count }, (_unused, index) => {
+    const offset = 6 + (index * 16);
+    return source[offset] || 256;
+  });
+  assert.deepEqual(sizes, [16, 32, 48, 64, 128, 256]);
+  assert.deepEqual(output, source);
+
+  const appIndex = await fs.readFile(path.join(rootDir, "apps", "web", "index.html"), "utf8");
+  assert.match(appIndex, /<link rel="icon" href="\.\/favicon\.ico"/);
 });
 
 test("desktop-only contract rejects project-owned mobile support paths", async () => {
@@ -174,10 +206,13 @@ test("static public surfaces declare the shared ADC skin instead of implying sep
   assert.doesNotMatch(defaultStyleCss, /adc-public-theme:v1/);
   assert.match(ops, /<body data-adc-public-surface="ops">/);
   assert.match(official, /<body data-adc-public-surface="official-blogs">/);
+  assert.match(ops, /<link rel="icon" href="favicon\.ico">/);
+  assert.match(official, /<link rel="icon" href="\.\.\/favicon\.ico">/);
   for (const dailyReport of [report, historicalReport]) {
     assert.match(dailyReport, /<body data-adc-public-surface="report">/);
     assert.match(dailyReport, /<link[^>]+data-adc-public-theme[^>]+adc-theme\.css/);
     assert.match(dailyReport, /class="adc-report-brand"/);
+    assert.match(dailyReport, /<link rel="icon" href="\.\.\/\.\.\/\.\.\/favicon\.ico">/);
     assert.doesNotMatch(dailyReport, /<style data-adc-public-theme>|--adc-paper/);
   }
   assert.match(ops, /<span class="adc-public-brand">ADC\.<\/span>/);
@@ -193,6 +228,8 @@ test("static site generation plans the shared ADC theme asset", async () => {
   });
 
   assert.equal(plan.files.includes("assets/adc-theme.css"), true);
+  assert.equal(plan.files.includes("home.json"), true);
+  assert.equal(plan.files.includes("favicon.ico"), true);
 });
 
 test("generated historical reports share one external ADC theme asset", async () => {

@@ -1,99 +1,76 @@
-import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Badge, Button, Card, SegmentedControl, SegmentedControlItem } from "@astryxdesign/core";
-import { ArrowUpRight, CalendarDays, FileText, Newspaper, Radio, RefreshCw } from "lucide-react";
+import { ArrowUpRight, CalendarDays, FileText, Radio, RefreshCw } from "lucide-react";
 
-type Article = {
-  id?: string;
-  title?: string;
-  url?: string;
-  summary?: string;
-  date?: string;
-  report_date?: string;
+type HomeStory = {
+  id: string;
+  title: string;
+  url: string;
+  summary: string;
+  event_date: string;
+  source: string;
+  label: "本期主线" | "Source Watch";
+  tags: string[];
   report_url?: string;
-  source?: string;
-  domain?: string;
-  quality_score?: number;
-  importance?: string;
-  section?: string;
-  flavors?: string[];
-  channels_l1?: string[];
-  companies?: string[];
-  products?: string[];
 };
 
-type Report = {
-  report_date?: string;
-  title?: string;
-  summary?: string;
-  url?: string;
-  main_items?: number;
-  builder_observations?: number;
-  generated_at?: string;
+type Edition = {
+  report_date: string;
+  title: string;
+  summary: string;
+  report_url: string;
+  data_url: string;
+  generated_at: string;
+  story_count: number;
+  lead_story: HomeStory | null;
+  secondary_stories: HomeStory[];
+  compact_stories: HomeStory[];
 };
 
-type Feed = {
-  site_title?: string;
-  updated_at?: string;
-  reports?: Report[];
+type ArchiveEntry = {
+  report_date: string;
+  title: string;
+  summary: string;
+  url: string;
+};
+
+type HomeData = {
+  schema_version: 1;
+  site_title: string;
+  generated_at: string;
+  latest_edition: Edition | null;
+  previous_edition: Edition | null;
+  source_watch: HomeStory[];
+  archive: ArchiveEntry[];
+  byte_size: number;
 };
 
 type LoadState =
-  | { status: "loading"; articles: Article[]; feed: Feed | null; error: "" }
-  | { status: "ready"; articles: Article[]; feed: Feed | null; error: "" }
-  | { status: "error"; articles: Article[]; feed: Feed | null; error: string };
+  | { status: "loading"; data: null; error: "" }
+  | { status: "ready"; data: HomeData; error: "" }
+  | { status: "error"; data: null; error: string };
 
-type Mode = "today" | "yesterday" | "history";
-
-const modeTitle: Record<Mode, string> = {
-  today: "今日精选",
-  yesterday: "昨日回看",
-  history: "历史流"
-};
-
-const modeCopy: Record<Mode, string> = {
-  today: "开屏默认读取最新日报入库的重点资讯。",
-  yesterday: "保留上一期高质量信号，避免隔日漏读。",
-  history: "按时间与质量混合排序，展示最近入库的公共资讯。"
-};
+type Mode = "latest" | "previous" | "archive";
 
 export function App() {
-  const [mode, setMode] = useState<Mode>("today");
-  const [state, setState] = useState<LoadState>({
-    status: "loading",
-    articles: [],
-    feed: null,
-    error: ""
-  });
+  const [mode, setMode] = useState<Mode>("latest");
+  const [state, setState] = useState<LoadState>({ status: "loading", data: null, error: "" });
 
   useEffect(() => {
     let cancelled = false;
-    async function load() {
-      try {
-        const [articlesResult, feedResult] = await Promise.allSettled([
-          fetchJson<Article[]>("articles.json"),
-          fetchJson<Feed>("feed.json")
-        ]);
-        if (articlesResult.status === "rejected") {
-          throw articlesResult.reason;
-        }
-        const articles = articlesResult.value;
-        const feed = feedResult.status === "fulfilled" ? feedResult.value : null;
-        if (!cancelled) {
-          setState({ status: "ready", articles: Array.isArray(articles) ? articles : [], feed, error: "" });
-        }
-      } catch (error) {
+    fetchJson<HomeData>("home.json")
+      .then((data) => {
+        if (!cancelled) setState({ status: "ready", data, error: "" });
+      })
+      .catch((error: unknown) => {
         if (!cancelled) {
           setState({
             status: "error",
-            articles: [],
-            feed: null,
+            data: null,
             error: error instanceof Error ? error.message : String(error)
           });
         }
-      }
-    }
-    load();
+      });
     return () => {
       cancelled = true;
     };
@@ -103,195 +80,230 @@ export function App() {
     document.documentElement.dataset.articleIndexLoaded = state.status === "ready" ? mode : state.status;
   }, [mode, state.status]);
 
-  const model = useMemo(() => buildViewModel(state.articles, state.feed, mode), [state.articles, state.feed, mode]);
+  const home = state.status === "ready" ? state.data : null;
+  const edition = mode === "latest" ? home?.latest_edition : mode === "previous" ? home?.previous_edition : null;
 
   return (
     <main className="adc-shell" data-article-index="adc-react-astryx" data-adc-react-home>
-      <a className="adc-skip-link" href="#article-results-title">跳到资讯列表</a>
+      <a className="adc-skip-link" href="#article-results-title">跳到本期主线</a>
       <header className="adc-topbar">
         <a className="adc-brand" href="index.html" aria-label="ADC 首页">
           <span className="adc-brand-mark">ADC.</span>
           <span className="adc-brand-subtitle">AI Daily CN</span>
         </a>
         <nav className="adc-nav" aria-label="主导航">
-          <a href="index.html">今日</a>
-          <a href="ops.html">运行</a>
-          {model.latestReport?.url ? <a href={model.latestReport.url}>日报</a> : null}
+          <a href="index.html">本期</a>
+          {home?.latest_edition?.report_url ? <a href={home.latest_edition.report_url}>日报</a> : null}
           <a href="official-blogs/">官方博客</a>
           <a href="articles.json">数据</a>
+          <a className="adc-nav-secondary" href="ops.html">运行</a>
         </nav>
       </header>
 
-      <section className="adc-hero">
-        <div className="adc-hero-copy">
-          <Badge variant="neutral" label="ADC. 资讯流" icon={<Radio size={14} />} />
-          <h1>ADC. AI 资讯流</h1>
-          <p>{model.heroSummary}</p>
+      <section className="adc-intro" aria-labelledby="adc-home-title">
+        <div className="adc-intro-copy">
+          <Badge
+            variant="neutral"
+            label={home?.latest_edition ? `最新一期 · ${formatDateShort(home.latest_edition.report_date)}` : "每日 AI 编辑版"}
+            icon={<Radio size={14} />}
+          />
+          <h1 id="adc-home-title">ADC. AI 资讯流</h1>
+          <p>{home?.latest_edition?.summary || "按日报期次、编辑顺序和读者决策价值组织每日 AI 资讯。"}</p>
         </div>
-        <div className="adc-hero-panel" aria-label="资讯概览">
-          <div className="adc-character-card">
-            <img src="assets/adc-character.svg" alt="ADC. 黑白线稿角色" />
-          </div>
-          <div className="adc-metrics">
-            <Metric label="最新日期" value={formatDateShort(model.latestDate) || "--"} icon={<CalendarDays size={18} />} />
-            <Metric label="今日入库" value={String(model.todayCount)} icon={<Newspaper size={18} />} />
-            <Metric label="信源" value={String(model.sourceCount)} icon={<Radio size={18} />} />
-            <Metric label="总量" value={String(state.articles.length)} icon={<FileText size={18} />} />
-          </div>
+        <div className="adc-intro-mark" aria-hidden="true">
+          <img src="assets/adc-character.svg" alt="" />
         </div>
       </section>
 
-      {state.status === "ready" && model.sourceWatchArticles.length > 0 ? (
-        <SourceWatchRail articles={model.sourceWatchArticles} />
+      <section className="adc-edition-toolbar" aria-label="日报期次选择">
+        <div>
+          <p className="adc-kicker">Edition first</p>
+          <h2 id="article-results-title">
+            {mode === "latest" ? "最新一期" : mode === "previous" ? "上一期" : "往期日报"}
+          </h2>
+        </div>
+        <SegmentedControl value={mode} onChange={(value) => setMode(value as Mode)} label="日报期次" layout="hug">
+          <SegmentedControlItem value="latest" label="最新一期" />
+          <SegmentedControlItem value="previous" label="上一期" />
+          <SegmentedControlItem value="archive" label="往期" />
+        </SegmentedControl>
+      </section>
+
+      {state.status === "loading" ? <LoadingState /> : null}
+      {state.status === "error" ? <ErrorState error={state.error} /> : null}
+      {state.status === "ready" && mode !== "archive" && edition ? <EditionSurface edition={edition} /> : null}
+      {state.status === "ready" && mode !== "archive" && !edition ? <EmptyState title="暂无这一期" /> : null}
+      {state.status === "ready" && mode === "archive" ? <ArchiveSurface entries={state.data.archive} /> : null}
+
+      {state.status === "ready" && mode === "latest" && state.data.source_watch.length > 0 ? (
+        <SourceWatchRail stories={state.data.source_watch} />
       ) : null}
-
-      <section className="adc-board">
-        <div className="adc-board-header">
-          <div>
-            <p className="adc-kicker">首屏默认页</p>
-            <h2 id="article-results-title">{modeTitle[mode]}</h2>
-            <p id="articleResultMeta">{model.resultMeta}</p>
-          </div>
-          <SegmentedControl value={mode} onChange={(value) => setMode(value as Mode)} label="资讯范围" layout="hug">
-            <SegmentedControlItem value="today" label="今日精选" />
-            <SegmentedControlItem value="yesterday" label="昨日回看" />
-            <SegmentedControlItem value="history" label="历史流" />
-          </SegmentedControl>
-        </div>
-
-        <p className="adc-mode-copy">{modeCopy[mode]}</p>
-
-        {state.status === "loading" ? <LoadingState /> : null}
-        {state.status === "error" ? <ErrorState error={state.error} /> : null}
-        {state.status === "ready" && model.visibleArticles.length === 0 ? <EmptyState /> : null}
-        {state.status === "ready" && model.visibleArticles.length > 0 ? (
-          <div className="adc-news-grid">
-            {model.visibleArticles.map((article, index) => (
-              <ArticleCard key={article.id || `${article.url || article.title}-${index}`} article={article} index={index} />
-            ))}
-          </div>
-        ) : null}
-      </section>
     </main>
   );
 }
 
-function SourceWatchRail({ articles }: { articles: Article[] }) {
+function EditionSurface({ edition }: { edition: Edition }) {
   return (
-    <section className="adc-source-watch" aria-labelledby="source-watch-title" data-source-watch-rail>
-      <div className="adc-source-watch-header">
+    <section className="adc-edition" data-edition-surface data-report-date={edition.report_date}>
+      <header className="adc-edition-meta">
+        <p>{formatDateLong(edition.report_date)} · {edition.story_count} 条编辑主线</p>
         <div>
-          <p className="adc-kicker">持续监测</p>
-          <h2 id="source-watch-title">Source Watch</h2>
+          <a href={edition.report_url}>打开完整日报</a>
+          <a href={edition.data_url}>本期 JSON</a>
         </div>
-        <p>只展示相对历史快照发生实质变化的仓库与站点，并直接回指原始来源。</p>
-      </div>
-      <div className="adc-source-watch-grid">
-        {articles.map((article, index) => {
-          const title = cleanText(article.title) || "未命名信号";
-          return (
-            <article key={article.id || `${article.url || title}-${index}`} className="adc-source-watch-card">
-              <div className="adc-card-topline">
-                <span>SW.{String(index + 1).padStart(2, "0")}</span>
-                <Badge variant="neutral" label={cleanText(article.source) || "Source Watch"} />
-              </div>
-              <h3>
-                {article.url ? (
-                  <a href={article.url} target="_blank" rel="noopener noreferrer">{title}</a>
-                ) : title}
-              </h3>
-              <p>{cleanText(article.summary) || "公开快照发生变化。"}</p>
-              <div className="adc-card-footer">
-                <span>{formatDateShort(dateKey(article))}</span>
-                {article.url ? (
-                  <a href={article.url} target="_blank" rel="noopener noreferrer" aria-label={`打开 Source Watch 来源：${title}`}>
-                    <ArrowUpRight size={16} />
-                  </a>
-                ) : null}
-              </div>
-            </article>
-          );
-        })}
-      </div>
+      </header>
+
+      {edition.lead_story ? (
+        <div className="adc-edition-feature-grid">
+          <LeadStory story={edition.lead_story} />
+          <div className="adc-secondary-stack" aria-label="次级主线">
+            {edition.secondary_stories.map((story, index) => (
+              <SecondaryStory key={story.id} story={story} index={index + 2} />
+            ))}
+          </div>
+        </div>
+      ) : <EmptyState title="本期暂无主线故事" />}
+
+      {edition.compact_stories.length > 0 ? (
+        <div className="adc-compact-list" aria-label="更多本期主线">
+          {edition.compact_stories.map((story, index) => (
+            <CompactStory key={story.id} story={story} index={index + 5} />
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }
 
-function ArticleCard({ article, index }: { article: Article; index: number }) {
-  const score = Number(article.quality_score || 0);
-  const source = cleanText(article.source) || "未标注来源";
-  const title = cleanText(article.title) || "未命名资讯";
-  const summary = cleanText(article.summary) || "暂无摘要。";
-  const date = article.date || article.report_date || "";
-  const primaryTag = firstText(article.channels_l1) || cleanText(article.domain) || cleanText(article.section) || "AI";
-  const secondaryTags = [firstText(article.flavors), firstText(article.companies), firstText(article.products)]
-    .filter(Boolean)
-    .slice(0, 3);
-
+function LeadStory({ story }: { story: HomeStory }) {
   return (
-    <Card
-      className="adc-news-card"
-      padding={0}
-      data-article-card
-      data-article-score={score || undefined}
-      data-rank={String(index + 1).padStart(2, "0")}
-    >
+    <Card className="adc-lead-story" padding={0} data-lead-story data-article-card>
       <article>
-        <div className="adc-card-topline">
-          <span>{String(index + 1).padStart(2, "0")}</span>
-          <Badge variant="neutral" label={primaryTag} />
-        </div>
-        <h3>
-          {article.url ? (
-            <a href={article.url} target="_blank" rel="noopener noreferrer">
-              {title}
-            </a>
-          ) : (
-            title
-          )}
-        </h3>
-        <p>{summary}</p>
-        <div className="adc-card-tags">
-          <Badge variant="neutral" label={source} />
-          {date ? <Badge variant="neutral" label={formatDateShort(date) || date} /> : null}
-          {score ? <Badge variant="neutral" label={`${score} 分`} /> : null}
-          {secondaryTags.map((tag) => (
-            <Badge key={tag} variant="neutral" label={tag} />
-          ))}
-        </div>
-        <div className="adc-card-footer">
-          {article.report_url ? <a href={article.report_url}>对应日报</a> : <span />}
-          {article.url ? (
-            <a href={article.url} target="_blank" rel="noopener noreferrer" aria-label={`打开来源：${title}`}>
-              <ArrowUpRight size={16} />
-            </a>
-          ) : null}
-        </div>
+        <StoryTopline story={story} rank="01" />
+        <h2><StoryLink story={story} /></h2>
+        <p>{story.summary}</p>
+        <StoryFooter story={story} />
       </article>
     </Card>
   );
 }
 
-function Metric({ label, value, icon }: { label: string; value: string; icon: ReactNode }) {
+function SecondaryStory({ story, index }: { story: HomeStory; index: number }) {
   return (
-    <Card className="adc-metric" padding={0}>
-      <span className="adc-metric-icon">{icon}</span>
-      <span>{label}</span>
-      <strong>{value}</strong>
+    <Card className="adc-secondary-story" padding={0} data-secondary-story data-article-card>
+      <article>
+        <StoryTopline story={story} rank={String(index).padStart(2, "0")} />
+        <h3><StoryLink story={story} /></h3>
+        <p>{story.summary}</p>
+        <StoryFooter story={story} compact />
+      </article>
     </Card>
+  );
+}
+
+function CompactStory({ story, index }: { story: HomeStory; index: number }) {
+  return (
+    <article className="adc-compact-story" data-compact-story data-article-card>
+      <span className="adc-story-rank">{String(index).padStart(2, "0")}</span>
+      <div>
+        <h3><StoryLink story={story} /></h3>
+        <p>{story.summary}</p>
+      </div>
+      <span className="adc-compact-source">{story.source}</span>
+      <a className="adc-icon-link" href={story.url} target="_blank" rel="noopener noreferrer" aria-label={`打开来源：${story.title}`}>
+        <ArrowUpRight size={17} />
+      </a>
+    </article>
+  );
+}
+
+function StoryTopline({ story, rank }: { story: HomeStory; rank: string }) {
+  return (
+    <div className="adc-story-topline">
+      <span className="adc-story-rank">{rank}</span>
+      <Badge variant="neutral" label={story.tags[0] || story.label} />
+    </div>
+  );
+}
+
+function StoryLink({ story }: { story: HomeStory }) {
+  return <a href={story.url} target="_blank" rel="noopener noreferrer">{story.title}</a>;
+}
+
+function StoryFooter({ story, compact = false }: { story: HomeStory; compact?: boolean }) {
+  return (
+    <footer className="adc-story-footer">
+      <span>{story.source}</span>
+      <span>{formatDateShort(story.event_date)}</span>
+      {!compact && story.report_url ? <a href={story.report_url}>对应日报</a> : null}
+      <a className="adc-icon-link" href={story.url} target="_blank" rel="noopener noreferrer" aria-label={`打开来源：${story.title}`}>
+        <ArrowUpRight size={16} />
+      </a>
+    </footer>
+  );
+}
+
+function ArchiveSurface({ entries }: { entries: ArchiveEntry[] }) {
+  if (entries.length === 0) return <EmptyState title="暂无更多往期日报" />;
+  return (
+    <section className="adc-archive" aria-label="往期日报列表">
+      {entries.map((entry) => (
+        <article key={entry.report_date} className="adc-archive-row">
+          <CalendarDays size={18} />
+          <time dateTime={entry.report_date}>{formatDateLong(entry.report_date)}</time>
+          <div>
+            <h3><a href={entry.url}>{entry.title}</a></h3>
+            <p>{entry.summary}</p>
+          </div>
+          <a className="adc-icon-link" href={entry.url} aria-label={`打开日报：${entry.title}`}><ArrowUpRight size={17} /></a>
+        </article>
+      ))}
+      <a className="adc-archive-data-link" href="feed.json"><FileText size={16} /> 查看完整日报索引</a>
+    </section>
+  );
+}
+
+function SourceWatchRail({ stories }: { stories: HomeStory[] }) {
+  return (
+    <section className="adc-source-watch" aria-labelledby="source-watch-title" data-source-watch-rail>
+      <div className="adc-source-watch-header">
+        <div>
+          <p className="adc-kicker">主体之后 · 持续监测</p>
+          <h2 id="source-watch-title">Source Watch</h2>
+        </div>
+        <p>只展示相对历史快照发生实质变化的仓库与站点，并直接回指原始来源。</p>
+      </div>
+      <div className="adc-source-watch-grid">
+        {stories.map((story, index) => (
+          <article key={story.id} className="adc-source-watch-card">
+            <div className="adc-story-topline">
+              <span className="adc-story-rank">SW.{String(index + 1).padStart(2, "0")}</span>
+              <Badge variant="neutral" label={story.source} />
+            </div>
+            <h3><StoryLink story={story} /></h3>
+            <p>{story.summary}</p>
+            <footer className="adc-story-footer">
+              <span>{formatDateShort(story.event_date)}</span>
+              <a className="adc-icon-link" href={story.url} target="_blank" rel="noopener noreferrer" aria-label={`打开 Source Watch 来源：${story.title}`}>
+                <ArrowUpRight size={16} />
+              </a>
+            </footer>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
 function LoadingState() {
   return (
     <div className="adc-state-grid" role="status" aria-live="polite" aria-label="加载中">
-      {Array.from({ length: 6 }, (_unused, index) => (
-        <Card key={index} className="adc-skeleton" padding={0}>
-          <span />
-          <span />
-          <span />
-        </Card>
-      ))}
+      <Card className="adc-skeleton adc-skeleton-lead" padding={0}><span /><span /><span /></Card>
+      <div className="adc-skeleton-stack">
+        {Array.from({ length: 3 }, (_unused, index) => (
+          <Card key={index} className="adc-skeleton" padding={0}><span /><span /></Card>
+        ))}
+      </div>
     </div>
   );
 }
@@ -299,86 +311,26 @@ function LoadingState() {
 function ErrorState({ error }: { error: string }) {
   return (
     <Card className="adc-state-card" padding={0} role="alert">
-      <h3>数据读取失败</h3>
+      <h3>首页数据读取失败</h3>
       <p>{error}</p>
       <Button label="重新加载" variant="secondary" icon={<RefreshCw size={16} />} onClick={() => window.location.reload()} />
     </Card>
   );
 }
 
-function EmptyState() {
+function EmptyState({ title }: { title: string }) {
   return (
     <Card className="adc-state-card" padding={0}>
-      <h3>暂无可展示资讯</h3>
-      <p>当前数据源没有命中这个范围。</p>
+      <h3>{title}</h3>
+      <p>公开数据中暂时没有可展示内容。</p>
     </Card>
   );
 }
 
-function buildViewModel(articles: Article[], feed: Feed | null, mode: Mode) {
-  const sorted = [...articles].sort((a, b) => {
-    const dateDiff = dateKey(b).localeCompare(dateKey(a));
-    if (dateDiff !== 0) return dateDiff;
-    return Number(b.quality_score || 0) - Number(a.quality_score || 0);
-  });
-  const sourceWatchArticles = sorted.filter((article) => article.section === "source_watch").slice(0, 4);
-  const editorialArticles = sorted.filter((article) => article.section !== "source_watch");
-  const dates = Array.from(new Set(editorialArticles.map(dateKey).filter(Boolean)));
-  const latestReport = feed?.reports?.[0] || null;
-  const feedLatestDate = latestReport?.report_date || "";
-  const latestDate = feedLatestDate && editorialArticles.some((article) => dateKey(article) === feedLatestDate)
-    ? feedLatestDate
-    : dates[0] || feedLatestDate;
-  const yesterdayDate = dates.find((date) => date !== latestDate) || "";
-  const todayArticles = editorialArticles.filter((article) => dateKey(article) === latestDate);
-  const yesterdayArticles = editorialArticles.filter((article) => dateKey(article) === yesterdayDate);
-  const visibleArticles =
-    mode === "today"
-      ? todayArticles.slice(0, 18)
-      : mode === "yesterday"
-        ? yesterdayArticles.slice(0, 18)
-        : editorialArticles.slice(0, 60);
-  const sourceCount = new Set(sorted.map((article) => cleanText(article.source)).filter(Boolean)).size;
-  const heroSummary = cleanText(latestReport?.summary) ||
-    "把每日 AI 资讯直接放在首页，按来源质量、时间和读者决策价值组织。";
-  const resultDate = mode === "today" ? latestDate : mode === "yesterday" ? yesterdayDate : latestDate;
-  const resultMeta = [
-    `${visibleArticles.length} 条资讯`,
-    resultDate ? formatDateLong(resultDate) : "",
-    mode === "history" ? "最近 60 条" : ""
-  ].filter(Boolean).join(" · ");
-
-  return {
-    latestReport,
-    latestDate,
-    todayCount: todayArticles.length,
-    sourceCount,
-    heroSummary,
-    resultMeta,
-    sourceWatchArticles,
-    visibleArticles
-  };
-}
-
 async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(url, { cache: "no-cache" });
-  if (!response.ok) {
-    throw new Error(`${url} ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`${url} ${response.status}`);
   return response.json() as Promise<T>;
-}
-
-function dateKey(article: Article) {
-  return article.date || article.report_date || "";
-}
-
-function firstText(values?: string[]) {
-  if (!Array.isArray(values)) return "";
-  return cleanText(values.find((value) => cleanText(value)) || "");
-}
-
-function cleanText(value?: string | number | null) {
-  return String(value ?? "").trim();
 }
 
 function formatDateShort(value: string) {

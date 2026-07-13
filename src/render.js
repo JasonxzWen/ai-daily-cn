@@ -58,6 +58,7 @@ export function renderReportHtml(report) {
 <head>
   <meta charset="utf-8">
   <title>${escapeHtml(report.title)}</title>
+  <link rel="icon" href="${escapeAttribute(relativeAssetHref(report.html_path, "favicon.ico"))}">
   <style>
 ${defaultStyleCss}
   </style>
@@ -174,6 +175,7 @@ export function renderOpsIndexHtml(feed, trends = null, dateIndex = null, option
 <head>
   <meta charset="utf-8">
   <title>${escapeHtml(feed.site_title)}</title>
+  <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="${escapeAttribute(indexStyleHref(options.styleVersion))}">
 </head>
 <body data-adc-public-surface="ops">
@@ -215,6 +217,7 @@ export function renderOfficialBlogsHtml(knowledge = {}, options = {}) {
 <head>
   <meta charset="utf-8">
   <title>官方博客知识库 | AI 日报</title>
+  <link rel="icon" href="../favicon.ico">
   <link rel="stylesheet" href="${escapeAttribute(styleHref)}">
 </head>
 <body data-adc-public-surface="official-blogs">
