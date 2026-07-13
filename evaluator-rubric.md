@@ -1,33 +1,35 @@
 # Evaluator Rubric
 
-Use this rubric for REC-323: converge main-stream ranking, terminal disposition, snapshot, quality, Phase5, report-write, and public projection on one production fact chain.
+Use this rubric for the clean publish clone recovery hotfix that follows PR #296.
 
 | Dimension | Score 0-2 | Evidence |
 | --- | --- | --- |
-| Alignment | 2 | The task explicitly excludes Aify, automations, publishing, search, layout work, and every mobile/tablet/narrow/touch variant. |
-| Correctness | 2 | `draft.js` is the sole production scorer/selector; score, global rank, terminal selection/rejection, story lineage, snapshot counts, and report order are persisted and cross-checked. |
-| Contract safety | 2 | New report/pool pairs declare audit contract version 1 and fail closed on missing/mismatched receipts; historical pairs with neither marker remain readable. |
-| Dead-path removal | 2 | The post-quality synthetic editorial-rank/classification producer, schemas, CLI, runner stage, policies, scripts, fixtures, and tests are retired together. |
-| Verification | 2 | Affected unit suite 143/143 and publish suite 54/54 pass. The final aggregate gate completed with 893 total / 891 pass / 0 fail / 2 skipped, followed by green build-clean, 194-file privacy, E2E, Harness, and diff checks; one stale official-blog date fixture and one load-sensitive timeout fixture were corrected without production changes. |
-| Real-data proof | 2 | Cleaned 2026-07-09 replay: 342 audited sources, 12 selected sources, 330 rejected, 0 dual, 0 missing, 40 globally ranked, 8 public stories, monotonic score/rank, zero consistency issues, and no public internal-field leak. |
-| Browser acceptance | 2 | Existing Ops status consumption was checked once at the sole supported `1280x900`; no console warning/error or horizontal overflow, screenshot under `.tmp/rec323-real/`. |
-| Runtime reliability | 2 | Shared fail-closed checks cover quality, report-write, and Phase5; the cleaned real-date replay remains runnable without publishing. |
-| Agentic loops | 2 | Main-agent producer, deterministic verifier, and one independent read-only arbiter completed one bounded loop. |
-| Finish closeout | 2 | The independent review found four P1 groups; each was fixed and the affected suites were rerun without another generic review. |
-| Insight recommendations | 2 | The broader recovery insight already identified this fact split; its lesson is now encoded as versioned receipts, one collector, tests, and REC-323. |
-| Handoff readiness | 2 | Branch, validation, review findings, CI boundary, post-merge runtime proof, and next Aify PR are recorded in Harness state. |
-| Independent review | 2 | One bounded read-only review found 0 P0 and four P1 groups; explicit versioning, score/rank ordering, source-to-story lineage, and 5/8/12 drift were fixed and revalidated. |
-| Scope discipline | 2 | No automation definition, external prompt, Aify source behavior, public IA, favicon, or mobile artifact changed. |
-| Maintainability | 2 | Shared vocabularies and the consistency collector replace duplicated boundary logic; the stable REC ledger, feature inventory, quality record, and Harness handoff are updated. |
+| Symptom match | 2 | A real merged-main non-publish run stops at prepare_clean_worktree with the exact checkout failure recorded in the dated summary. |
+| Root cause | 2 | Fetch succeeds; the dedicated clone is 361 commits behind with tracked residue, and ordinary checkout runs before reset. Existing node_modules also predates the current pnpm lock contract. |
+| Scope safety | 2 | Force applies only to the existing dedicated clone after its path passes the current .tmp boundary check; user worktrees and external paths are unchanged. |
+| Correctness | 2 | Existing clones use checkout --force -B, retain hard reset/clean, and refresh dependencies with the frozen lockfile. |
+| Regression coverage | 2 | The two confirmed failures are RED before implementation and GREEN after it; checkout argv and dependency invocation are deterministic. |
+| Verification | 2 | Focused 2/2, affected publish 54/54, live workflow, Harness, diff, final-head CodeQL, and post-merge runtime are the acceptance chain. |
+| Affected suite | 2 | Full tests/publish.test.js passes 54/54; live workflow contract passes without failures or warnings. |
+| Data preservation | 2 | The old dirty clone is not reset or deleted before an absolute-path manifest and quarantine preserve its exact historical variants and run evidence. |
+| Non-goals | 2 | No automation, Aify, Source Watch, report content, public UI, mobile surface, backfill, or publish command changes. |
+| Scope discipline | 2 | The diff remains inside publish preparation, its tests, REC-006/quality evidence, and ignored Harness state. |
+| Runtime reliability | 2 | Failed-run residue and stale dependencies are both addressed at the dedicated-clone boundary. |
+| Browser acceptance | 2 | Explicitly skipped because no Web behavior, artifact, or 1280x900 surface changed. |
+| Agentic loops | 2 | Main-agent producer, deterministic verifier, and one independent read-only diagnosis completed one bounded loop. |
+| Finish closeout | 2 | No duplicate generic review; PR state and evidence-preserving runtime replay are the remaining closeout gates. |
+| Insight recommendations | 2 | The reusable-clean-state rule is promoted into tests and REC-006; no new skill is needed. |
+| Validation efficiency | 2 | Full validate is explicitly skipped as disproportionate immediately after PR #296's 893-test aggregate gate; focused, affected, workflow, Harness, diff, CI, and post-merge runtime evidence cover the changed boundary. |
+| Handoff readiness | 2 | REC-006, quality state, Harness state, PR status, archive evidence, and post-merge terminal result are the required closeout record. |
 
 ## Verdict
 
-- PR #296 is ready for final CI and mergeability validation.
-- No known P0/P1 remains after the single independent review and affected-suite replay.
-- Merge is allowed only after required CI is green and the PR is conflict-free.
+- Ready for the narrow PR after Harness and diff checks pass.
+- Merge only when final-head CodeQL is green and the PR is conflict-free.
+- Production acceptance requires evidence archive first, then a merged-main non-publish rerun that advances beyond prepare_clean_worktree.
 
 ## Residual risk
 
-- Historical candidate/report pairs intentionally skip the new collector only when both version markers are absent; one-sided or malformed markers fail closed.
-- Historical editorial-rank artifacts remain immutable evidence, but no production stage generates or consumes new ones.
-- A merged-main non-publish production entrypoint remains the post-merge runtime proof; until then REC-323 is `locally_verified`, not `production_verified`.
+- Git command stderr remains summarized by a generic publisher error; this is diagnostic debt, not a blocker for the confirmed recovery path.
+- Reused clean clones now pay one idempotent frozen-lockfile install per run to avoid stale dependency false confidence.
+- Downstream pipeline stages may still reveal independent failures after prepare succeeds; report their actual terminal state without attributing them to this fix.

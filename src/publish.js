@@ -212,7 +212,7 @@ export async function prepareCleanPublishWorktree(options = {}) {
       errorMessage: "Unable to fetch origin/main in the clean publish worktree.",
       timeoutMs: options.fetchTimeoutMs || 5 * 60 * 1000
     });
-    await runGitCommand(worktreeDir, ["checkout", "-B", allowedBranch, `origin/${allowedBranch}`], {
+    await runGitCommand(worktreeDir, ["checkout", "--force", "-B", allowedBranch, `origin/${allowedBranch}`], {
       run,
       errorCode: "git_not_writable",
       errorMessage: "Unable to checkout origin/main in the clean publish worktree."
@@ -280,7 +280,7 @@ export async function prepareCleanPublishWorktree(options = {}) {
   const dependencyStatus = await ensurePublishWorktreeDependencies(worktreeDir, {
     run,
     installDependencies: options.installDependencies !== false,
-    forceInstall: Boolean(options.forceInstall),
+    forceInstall: Boolean(options.forceInstall) || (targetExists && options.installDependencies !== false),
     pnpmStoreDir: options.pnpmStoreDir,
     timeoutMs: options.installTimeoutMs || 10 * 60 * 1000
   });
