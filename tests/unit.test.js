@@ -3489,6 +3489,10 @@ test("report:draft merges weekly GitHub all-language and selected language pools
   });
 
   assert.equal(drafted.report.github_trending.length, 20);
+  const githubEffectiveness = drafted.report.source_effectiveness.find((item) => item.id === "github-trending");
+  assert.equal(githubEffectiveness.candidate_count, 60);
+  assert.equal(githubEffectiveness.included_count, 20);
+  assert.equal(drafted.report.source_audit.github_trending.included, 20);
   assert.deepEqual(drafted.report.github_trending.map((item) => item.rank), Array.from({ length: 20 }, (_unused, index) => index + 1));
   assert(drafted.report.github_trending.every((item) => item.window === "weekly"));
   for (const language of ["python", "typescript", "rust", "go", "java"]) {
@@ -18509,6 +18513,78 @@ test("source effectiveness does not inherit parsed signal from another source in
   assert.equal(deepmind.parsed_recent, false, "group candidates must not make an unproductive source look parsed");
   assert.equal(deepmind.status_label, "no_recent_update");
   assert.equal(deepmind.not_included_reason, "reachable_but_no_recent_parsed_signal");
+});
+
+test("source effectiveness dedupes original and derived GitHub Trending records by repository", async () => {
+  const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
+  const report = {
+    source_audit: {
+      github_trending: {
+        checked: true,
+        candidates_found: 4,
+        included: 3,
+        sources: [{
+          id: "github-github-trending-weekly",
+          name: "GitHub Trending weekly",
+          url: "https://github.com/trending?since=weekly",
+          status: "checked",
+          parsed_count: 2
+        }]
+      }
+    },
+    github_trending: [
+      { repo: "example/alpha", url: "https://github.com/example/alpha", source: "GitHub Trending weekly" },
+      { repo: "example/beta", url: "https://github.com/example/beta", source: "GitHub Trending weekly" }
+    ],
+    projects: [
+      { name: "example/alpha", url: "https://github.com/example/alpha", source: "GitHub Trending weekly" }
+    ]
+  };
+  const candidates = [
+    { id: "project-example-alpha", repo: "example/alpha", url: "https://github.com/example/alpha", source: "GitHub Trending weekly", included_in: ["projects"] },
+    { id: "trend-project-example-alpha", repo: "example/alpha", url: "https://github.com/example/alpha", source: "GitHub Trending weekly", included_in: ["github_trending"] },
+    { id: "project-example-beta", repo: "example/beta", url: "https://github.com/example/beta", source: "GitHub Trending weekly", status: "excluded" },
+    { id: "trend-project-example-beta", repo: "example/beta", url: "https://github.com/example/beta", source: "GitHub Trending weekly", included_in: ["github_trending"] }
+  ];
+
+  const row = buildSourceEffectivenessTable({ report, candidates }).find((item) => item.id === "github-trending");
+  assert.equal(row.candidate_count, 2);
+  assert.equal(row.included_count, 2);
+  assert.equal(row.public_included, true);
+});
+
+test("source effectiveness ignores stale GitHub included flags absent from final report sections", async () => {
+  const { buildSourceEffectivenessTable } = await import("../src/source-effectiveness.js");
+  const report = {
+    source_audit: {
+      github_trending: {
+        checked: true,
+        candidates_found: 1,
+        included: 1,
+        sources: [{
+          id: "github-github-trending-weekly",
+          name: "GitHub Trending weekly",
+          url: "https://github.com/trending?since=weekly",
+          status: "checked",
+          parsed_count: 1
+        }]
+      }
+    },
+    github_trending: [],
+    projects: []
+  };
+  const candidates = [{
+    id: "trend-project-example-stale",
+    repo: "example/stale",
+    url: "https://github.com/example/stale",
+    source: "GitHub Trending weekly",
+    included_in: ["github_trending"]
+  }];
+
+  const row = buildSourceEffectivenessTable({ report, candidates }).find((item) => item.id === "github-trending");
+  assert.equal(row.candidate_count, 1);
+  assert.equal(row.included_count, 0);
+  assert.equal(row.public_included, false);
 });
 
 test("source effectiveness reports the persisted main rejection reason", async () => {

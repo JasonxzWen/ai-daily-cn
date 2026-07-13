@@ -255,12 +255,13 @@
         "HTML-index title, summary, and image facts come only from the exact anchor or same-URL structured metadata; adjacent cards cannot trigger high-specificity model-launch topics or prose through evidence text.",
         "GitHub Trending preserves source-scope language separately from repository_language, and the public report uses the repository language while source_scope continues to identify the ranked pool.",
         "GitHub Trending rank movement compares source_rank only within the same source_scope; an unknown or different historical scope fails closed to new.",
-        "GitHub README summaries use a content SHA-256 cache key; a first network fetch is a miss and only an exact historical key match may report hit=true."
+        "GitHub README summaries use a content SHA-256 cache key; a first network fetch is a miss and only an exact historical key match may report hit=true.",
+        "GitHub Trending source effectiveness counts each canonical repository once across original and derived candidates, and public inclusion comes from the final github_trending/projects union rather than stale candidate flags."
       ],
       "stop_conditions": [
         "Required source audit fields cannot be reconstructed.",
         "The draft would bypass candidate-pool or freshness gates.",
-        "GitHub source scope, repository language, rank basis, or README cache evidence is conflated or inferred across incompatible records."
+        "GitHub source scope, repository language, rank basis, README cache evidence, or canonical effectiveness identity is conflated or inferred across incompatible records."
       ],
       "behavior": "Collect and audit daily AI sources before writing the structured report.",
       "validation": {
@@ -272,7 +273,7 @@
           "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
           "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20",
           "node --test tests/source-watch.test.js tests/source-watch-runner-draft.test.js tests/official-blog-daily-context.test.js",
-          "node --test --test-name-pattern \"GitHub trending|github trending|report:draft merges weekly GitHub\" tests/unit.test.js",
+          "node --test --test-name-pattern \"GitHub trending|github trending|report:draft merges weekly GitHub|source effectiveness dedupes original|source effectiveness ignores stale\" tests/unit.test.js",
           "corepack pnpm run sources:display-contract"
         ]
       },

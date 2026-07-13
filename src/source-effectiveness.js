@@ -397,11 +397,19 @@ export function buildSourceEffectivenessTable({ report = {}, candidates = [] } =
       : Array.isArray(candidates)
       ? candidates.filter((candidate) => candidateMatchesContract(candidate, contract, candidateSources))
       : [];
-    const publicIncluded = sourceIncludedPublicly(report, contract, candidateSources, matchedCandidates);
+    const countedCandidates = contract.id === "github-trending"
+      ? dedupeGitHubTrendingItems(matchedCandidates)
+      : matchedCandidates;
+    const includedCount = contract.id === "github-trending"
+      ? countCanonicalGitHubTrendingPublicItems(report, countedCandidates)
+      : matchedCandidates.filter(candidateIncludedPublicly).length;
+    const publicIncluded = contract.id === "github-trending"
+      ? includedCount > 0
+      : sourceIncludedPublicly(report, contract, candidateSources, matchedCandidates);
     const configured = sources.length > 0 && (contract.requires_real_configuration ? activeSources.length > 0 : true);
     const reachable = configured && activeSources.some((source) => REACHABLE_STATUSES.has(String(source.status || "")));
     const parsedRecent = configured && activeSources.some(sourceHasRecentParsedSignal);
-    const candidateCreated = matchedCandidates.length > 0;
+    const candidateCreated = countedCandidates.length > 0;
     return {
       id: contract.id,
       name: contract.name,
@@ -413,16 +421,97 @@ export function buildSourceEffectivenessTable({ report = {}, candidates = [] } =
       public_included: publicIncluded,
       not_included_reason: publicIncluded
         ? ""
-        : sourceNotIncludedReason({ configured, reachable, parsedRecent, candidateCreated, sources, matchedCandidates }),
+        : sourceNotIncludedReason({ configured, reachable, parsedRecent, candidateCreated, sources, matchedCandidates: countedCandidates }),
       source_ids: uniqueStrings(sources.map((source) => source.id).filter(Boolean)),
       source_kinds: uniqueStrings(sources.map((source) => source.source_kind).filter(Boolean)),
       statuses: uniqueStrings(sources.map((source) => source.status).filter(Boolean)),
-      candidate_count: matchedCandidates.length,
-      included_count: matchedCandidates.filter(candidateIncludedPublicly).length,
+      candidate_count: countedCandidates.length,
+      included_count: includedCount,
       notes: sourceEffectivenessNotes(contract, sources)
     };
   });
   return decorateSourceEffectivenessRows(rows);
+}
+
+export function githubTrendingCanonicalIdentity(item = {}) {
+  const repo = normalizeGitHubRepository(item.repo) || normalizeGitHubRepository(item.name);
+  if (repo) {
+    return `repo:${repo}`;
+  }
+  for (const value of [item.url, item.primary_url]) {
+    const urlRepo = gitHubRepositoryFromUrl(value);
+    if (urlRepo) {
+      return `repo:${urlRepo}`;
+    }
+  }
+  const candidateId = String(item.candidate_id || item.id || "").trim().toLowerCase();
+  return candidateId ? `candidate:${candidateId}` : "";
+}
+
+export function countCanonicalGitHubTrendingPublicItems(report = {}, matchedCandidates = []) {
+  const candidateIdentities = new Set(
+    matchedCandidates.map(githubTrendingCanonicalIdentity).filter(Boolean)
+  );
+  const trendingItems = Array.isArray(report?.github_trending) ? report.github_trending : [];
+  const projectItems = (Array.isArray(report?.projects) ? report.projects : []).filter((item) => {
+    const identity = githubTrendingCanonicalIdentity(item);
+    return identity && (candidateIdentities.has(identity) || isGitHubTrendingSourcedItem(item));
+  });
+  return new Set(
+    [...trendingItems, ...projectItems]
+      .map(githubTrendingCanonicalIdentity)
+      .filter(Boolean)
+  ).size;
+}
+
+function dedupeGitHubTrendingItems(items = []) {
+  const seen = new Set();
+  return items.filter((item, index) => {
+    const identity = githubTrendingCanonicalIdentity(item) || `unknown:${index}`;
+    if (seen.has(identity)) {
+      return false;
+    }
+    seen.add(identity);
+    return true;
+  });
+}
+
+function normalizeGitHubRepository(value) {
+  const text = String(value || "").trim().replace(/\\/g, "/");
+  if (!text || /^https?:\/\//i.test(text)) {
+    return "";
+  }
+  const parts = text
+    .replace(/^github\.com\//i, "")
+    .split(/[?#]/, 1)[0]
+    .replace(/\.git$/i, "")
+    .split("/")
+    .filter(Boolean);
+  if (parts.length !== 2 || parts.some((part) => !/^[a-z0-9_.-]+$/i.test(part))) {
+    return "";
+  }
+  return `${parts[0]}/${parts[1]}`.toLowerCase();
+}
+
+function gitHubRepositoryFromUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    if (url.hostname.toLowerCase().replace(/^www\./, "") !== "github.com") {
+      return "";
+    }
+    return normalizeGitHubRepository(url.pathname);
+  } catch {
+    return "";
+  }
+}
+
+function isGitHubTrendingSourcedItem(item = {}) {
+  return /github[ _-]?trending|github\.com\/trending|ossinsight/i.test([
+    item.source,
+    item.source_id,
+    item.source_name,
+    item.source_url
+  ].filter(Boolean).join(" "));
 }
 
 export function buildSourceInventoryRows(options = {}) {

@@ -209,15 +209,15 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Action: add these accounts to the upstream follow-builders collector or add only reliable feeds; report per-handle window coverage and original X URLs.
 - Acceptance: a real builder artifact reports checked/skipped/covered state for every curated handle without claiming tag-only coverage as ingestion.
 
-### REC-314 - Remove per-source fake-positive effectiveness
+### REC-314 - Remove fake-positive source effectiveness
 
 - Type: observability correctness.
-- Fact evidence: `collectAuditSources()` copies group-level candidates_found to every source; `sourceHasRecentParsedSignal()` then treats that group count as a per-source parse signal. DeepSeek, Qwen, Kimi, MiniMax, and Zhipu can therefore show parsed_recent even when their own parsed_count is zero.
-- Root cause: group success is attributed to every source in the group.
+- Fact evidence: (1) group-level candidate totals formerly made zero-signal sibling sources look parsed; (2) the real 2026-07-09 GitHub Trending row reported 70 candidates / 30 included although its candidate pool contained 50 canonical repositories and its final `github_trending` + `projects` union contained 20 canonical repositories. The 10 project items were duplicates of the first 10 trending items.
+- Root cause: group success was attributed to every source, and GitHub effectiveness counted raw original + derived candidate records plus stale `included_in` flags instead of canonical repository identities joined to final report sections.
 - State: locally_verified.
-- Action completed: `parsed_recent` now uses only per-source `parsed_count/recent_48h_entries`; synthetic group candidate/included fields were removed from per-source rows.
-- Evidence: the two-source regression keeps the productive source true and the zero-signal sibling false; focused source-effectiveness tests pass.
-- Acceptance: in a two-source group where only one source emits candidates, the other remains parsed_recent false.
+- Action completed: `parsed_recent` uses only per-source `parsed_count/recent_48h_entries`; GitHub candidate rows canonicalize by repository; final `github_trending` plus matching `projects` own inclusion truth; draft source audit reuses the same canonical counter.
+- Evidence: the two-source regression keeps the productive source true and the zero-signal sibling false. Three GitHub RED/GREEN paths cover derived duplicates, stale included flags, and the full weekly Top20 draft; the affected source-effectiveness suite passes 14/14; the immutable 2026-07-09 artifact replays to 50 candidates / 20 included without rewriting history. Final validation passes 907 total / 905 pass / 0 fail / 2 skipped; PR/CI remains pending.
+- Acceptance: in a two-source group only the productive source is parsed; each GitHub repository counts once across original/derived records; absent final report identities cannot be public-included; source effectiveness and source audit agree with the final canonical section union.
 
 ### REC-315 - Preserve terminal decisions for 24 historical source IDs
 
@@ -486,6 +486,7 @@ This table is part of the same ledger, not a second review. `fixed` means implem
 | S-79 | Aify News carried a `first_class` intent label while only a site-watch shell existed; the content feed was not a governed collection entry and its original publisher would be lost by the generic JSON path | added a dedicated content entry and stable logical identity, preserved original publisher plus aggregator authority, and added a three-day collection-to-public Phase5 contract bound to the shared admission/lineage verdict | locally_verified; 41/41 focused/affected and 898-test final validation pass, production observation pending |
 | S-80 | the real non-publish pipeline spent minutes hashing its own fresh `.tmp` clone and quarantine during repository-guard snapshots before Codex repair | retained the truthful `needs_ai_repair` result, stopped the low-value 20-minute repair tail for this development pass, and recorded exclusion/bounded-snapshot work as a later workflow optimization | discovered; intentionally not mixed into REC-331 |
 | S-81 | GitHub Trending exposed ranking scope as repository language, compared ranks across incompatible scopes/surfaces, and labelled first network README fetches as cache hits with unknown SHA | added `repository_language` without changing scope selection, keyed history by repo + source_scope and positive source_rank only, and made README cache keys content-SHA based with fail-closed miss/hit semantics | locally_verified under REC-332; 905/903/0/2 final validation passes, PR/CI and fresh merged-main runs pending |
+| S-82 | GitHub Trending source effectiveness counted 50 canonical repositories as 70 candidates and 20 final included repositories as 30 because original/derived/project surfaces were added as raw rows | centralized canonical repo identity, deduped candidate facts, made final report sections own inclusion, and reused the counter for source audit | locally_verified under REC-314; focused 14/14, real 50/20 replay and final 907/905/0/2 validation pass; PR/CI pending |
 
 ## Production Acceptance
 
