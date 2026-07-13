@@ -21,7 +21,7 @@
       "design/prototypes/adc-public-surfaces.png"
     ],
     "decision_record": "design/prototypes/adc-public-surfaces.decision.md",
-    "notes": "The visual direction remains accepted, but its earlier multi-viewport evidence was superseded on 2026-07-13. Current acceptance covers the homepage, operations page, official-blog index, and generated report at the canonical 1280x900 desktop viewport only."
+    "notes": "The accepted 2026-07-13 evidence is edition-first: one lead, three secondary stories, compact continuation, and Source Watch after the main edition. The homepage consumes bounded home.json data and omits internal quality scores. Acceptance covers the homepage, operations page, official-blog index, and generated report at the canonical 1280x900 desktop viewport only."
   },
   "production_boundary": {
     "generated_code_policy": "translated",
@@ -39,6 +39,6 @@
   },
   "handoff": {
     "target_surface": "apps/web plus generated public report and operations shells",
-    "translation_notes": "Keep content engines separate and converge only on a repository-owned ADC visual contract."
+    "translation_notes": "Keep content engines separate, project report_date-owned editorial order into home.json, and converge only on a repository-owned ADC visual contract."
   }
 }

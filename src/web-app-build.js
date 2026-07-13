@@ -5,6 +5,7 @@ import { mergeCommandEnv, pnpmInvocationForArgs } from "./process-runner.js";
 
 export const WEB_APP_GENERATED_FILES = [
   "index.html",
+  "favicon.ico",
   "assets/adc-home.css",
   "assets/adc-home.js",
   "assets/adc-character.svg"

@@ -18,7 +18,7 @@ import {
   REPORTS_DATA_INTERNAL_DIR
 } from "./reports-data-layout.js";
 import { defaultGeneratedAt } from "./time.js";
-import { validateArticles, validateFeed, validateReport, validateTrends } from "./schema.js";
+import { validateArticles, validateFeed, validateHome, validateReport, validateTrends } from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
 import { deriveQualityStatus, normalizeQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
@@ -497,6 +497,16 @@ export async function buildSite(options = {}) {
       errors: articleValidation.errors
     });
   }
+  const home = buildHomeData(reports, {
+    feed: feedValidation.value,
+    articles: articleValidation.value
+  });
+  const homeValidation = validateHome(home);
+  if (!homeValidation.valid) {
+    throw new PublisherError("home_schema_validation_failed", "生成的 home.json 未通过 schema 校验。", {
+      errors: homeValidation.errors
+    });
+  }
   const reportNavigationByDate = buildReportNavigation(feedValidation.value.reports, dateIndex.items);
   const trackingHistoryByDate = buildDailyTrackingHistoryByReportDate(reports);
 
@@ -514,6 +524,7 @@ export async function buildSite(options = {}) {
 
   await writeJsonTracked(outDir, "feed.json", feedValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "articles.json", articleValidation.value, writtenFiles);
+  await writeJsonTracked(outDir, "home.json", homeValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "data/official-blogs.json", officialBlogKnowledge, writtenFiles);
   await writeFileTracked(outDir, "official-blogs/index.html", renderOfficialBlogsHtml(officialBlogKnowledge, {
@@ -539,6 +550,7 @@ export async function buildSite(options = {}) {
     reports,
     feed: feedValidation.value,
     articles: articleValidation.value,
+    home: homeValidation.value,
     trends: trendValidation.value,
     officialBlogKnowledge,
     sourceWatchConsumption,
@@ -601,6 +613,7 @@ export async function planGeneratedFiles(options = {}) {
     "assets/style.css",
     "feed.json",
     "articles.json",
+    "home.json",
     "index.html",
     "ops.html",
     "trends.json",
@@ -722,6 +735,116 @@ export function buildArticleIndex(reports = [], options = {}) {
     Number(b.quality_score || 0) - Number(a.quality_score || 0) ||
     String(a.title).localeCompare(String(b.title), "zh-Hans-CN")
   );
+}
+
+export function buildHomeData(reports = [], options = {}) {
+  const feed = options.feed && typeof options.feed === "object" ? options.feed : {};
+  const articles = Array.isArray(options.articles) ? options.articles : [];
+  const orderedReports = [...(Array.isArray(reports) ? reports : [])]
+    .filter((report) => report?.report_date)
+    .sort((a, b) => String(b.report_date).localeCompare(String(a.report_date)));
+  const feedByDate = new Map((Array.isArray(feed.reports) ? feed.reports : [])
+    .map((report) => [String(report?.report_date || ""), report]));
+  const home = {
+    schema_version: 1,
+    site_title: cleanArticleText(feed.site_title || DEFAULT_SITE.title),
+    generated_at: cleanArticleText(feed.updated_at || options.generatedAt || defaultGeneratedAt()),
+    latest_edition: buildHomeEdition(orderedReports[0], feedByDate),
+    previous_edition: buildHomeEdition(orderedReports[1], feedByDate),
+    source_watch: articles
+      .filter((article) => article?.section === "source_watch")
+      .slice(0, 4)
+      .map(homeSourceWatchItem),
+    archive: (Array.isArray(feed.reports) ? feed.reports : [])
+      .slice(2, 14)
+      .map(homeArchiveEntry)
+      .filter(Boolean),
+    byte_size: 1
+  };
+  let nextSize = Buffer.byteLength(`${JSON.stringify(home, null, 2)}\n`);
+  while (home.byte_size !== nextSize) {
+    home.byte_size = nextSize;
+    nextSize = Buffer.byteLength(`${JSON.stringify(home, null, 2)}\n`);
+  }
+  return home;
+}
+
+function buildHomeEdition(report, feedByDate) {
+  if (!report?.report_date) {
+    return null;
+  }
+  const seen = new Set();
+  const stories = (Array.isArray(report.stories) ? report.stories : [])
+    .map((item) => articleFromReportItem(report, "stories", item))
+    .filter(Boolean)
+    .filter((article) => {
+      const key = articleUrlKey(article.url);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 18)
+    .map(homeStoryItem);
+  const feedEntry = feedByDate.get(String(report.report_date)) || {};
+  const paths = reportRelativePaths(report.report_date);
+  return {
+    report_date: report.report_date,
+    title: cleanArticleText(feedEntry.title || report.title || `AI 日报 ${report.report_date}`),
+    summary: cleanArticleText(feedEntry.summary || report.summary || "本期暂无编辑摘要。"),
+    report_url: cleanArticleText(feedEntry.url || paths.htmlPath),
+    data_url: cleanArticleText(feedEntry.data_url || paths.dataPath),
+    generated_at: cleanArticleText(feedEntry.generated_at || report.generated_at || `${report.report_date}T00:00:00.000Z`),
+    story_count: stories.length,
+    lead_story: stories[0] || null,
+    secondary_stories: stories.slice(1, 4),
+    compact_stories: stories.slice(4)
+  };
+}
+
+function homeStoryItem(article) {
+  return {
+    id: article.id,
+    title: article.title,
+    url: article.url,
+    summary: article.summary,
+    event_date: article.date,
+    source: article.source,
+    label: "本期主线",
+    tags: homeArticleTags(article),
+    report_url: article.report_url
+  };
+}
+
+function homeSourceWatchItem(article) {
+  return {
+    id: article.id,
+    title: article.title,
+    url: article.url,
+    summary: article.summary,
+    event_date: article.date,
+    source: article.source,
+    label: "Source Watch",
+    tags: homeArticleTags(article)
+  };
+}
+
+function homeArticleTags(article) {
+  return uniqueSorted([
+    ...(Array.isArray(article.channels_l1) ? article.channels_l1.slice(0, 1) : []),
+    ...(Array.isArray(article.flavors) ? article.flavors.slice(0, 1) : []),
+    ...(Array.isArray(article.companies) ? article.companies.slice(0, 1) : [])
+  ].map(cleanArticleText).filter(Boolean)).slice(0, 3);
+}
+
+function homeArchiveEntry(report) {
+  const reportDate = cleanArticleText(report?.report_date);
+  const title = cleanArticleText(report?.title);
+  const summary = cleanArticleText(report?.summary);
+  const url = cleanArticleText(report?.url);
+  if (!reportDate || !title || !summary || !url) {
+    return null;
+  }
+  return { report_date: reportDate, title, summary, url };
 }
 
 async function loadSourceWatchCandidatePools(dataInputDir, reports = []) {
@@ -2000,6 +2123,9 @@ export function applyDailyReportHtmlOverrides(html, _reportDate) {
     );
   }
   const styleBlocks = [];
+  if (!/<link\b[^>]*\brel=["']icon["'][^>]*>/i.test(result)) {
+    styleBlocks.push('<link rel="icon" href="../../../favicon.ico">');
+  }
   if (!result.includes("data-adc-public-theme")) {
     styleBlocks.push(`<link rel="stylesheet" data-adc-public-theme href="../../../${adcPublicThemeAssetPath}?v=${adcPublicThemeVersion}">`);
   }

@@ -502,10 +502,18 @@ const browser = await chromium.launch();
 
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const homepageRequests = [];
+  page.on("request", (request) => homepageRequests.push(new URL(request.url()).pathname));
   await page.goto(`${server.url}/index.html`);
+  await page.waitForLoadState("networkidle");
   assert.match(await page.locator("h1").textContent(), /ADC\. AI 资讯流/);
   assert.equal(await hasRemoteScripts(page), false);
   assert.equal(await page.locator('[data-article-index="adc-react-astryx"]').count(), 1);
+  assert.equal(homepageRequests.includes("/home.json"), true);
+  assert.equal(homepageRequests.includes("/articles.json"), false);
+  assert.equal(homepageRequests.includes("/feed.json"), false);
+  assert.equal(await page.locator('link[rel="icon"][href="./favicon.ico"]').count(), 1);
+  assert.equal((await page.request.get(`${server.url}/favicon.ico`)).ok(), true);
   assert.equal(await page.locator('img[src="assets/adc-character.svg"]').count(), 1);
   assert.equal(await page.locator('img[src="assets/adc-character.svg"]').evaluate((image) => image.complete && image.naturalWidth > 0), true);
   assert.equal(await page.locator('a[href="ops.html"]').count() >= 1, true);
@@ -514,15 +522,24 @@ try {
   assert.equal(await page.locator("#articleSource").count(), 0);
   assert.equal(await page.locator("#articleScore").count(), 0);
   assert.equal(await page.locator("[data-article-card]").count() >= 2, true);
+  assert.equal(await page.locator("[data-lead-story]").count(), 1);
+  assert.equal(await page.locator("[data-secondary-story]").count() >= 1, true);
+  assert.equal(await page.locator("[data-edition-surface]").evaluate((edition) => {
+    const sourceWatch = document.querySelector("[data-source-watch-rail]");
+    return Boolean(sourceWatch && edition.compareDocumentPosition(sourceWatch) & Node.DOCUMENT_POSITION_FOLLOWING);
+  }), true);
+  const leadBox = await page.locator("[data-lead-story]").boundingBox();
+  assert(leadBox && leadBox.y < 900, "lead story should start inside the supported 1280x900 viewport");
   assert.equal(await page.locator("[data-source-watch-rail]").count(), 1);
-  await page.getByRole("radio", { name: "昨日回看" }).click();
-  assert.equal(await page.locator("#article-results-title").textContent(), "昨日回看");
-  await page.getByRole("radio", { name: "历史流" }).click();
-  assert.equal(await page.locator("#article-results-title").textContent(), "历史流");
+  await page.getByRole("radio", { name: "上一期" }).click();
+  assert.equal(await page.locator("#article-results-title").textContent(), "上一期");
+  await page.getByRole("radio", { name: "往期" }).click();
+  assert.equal(await page.locator("#article-results-title").textContent(), "往期日报");
   assert.equal(await allExternalLinksHaveRel(page), true);
   assert.equal(await hasHorizontalOverflow(page), false);
 
   await page.goto(`${server.url}/ops.html`);
+  assert.equal(await page.locator('link[rel="icon"][href="favicon.ico"]').count(), 1);
   assert.match(await page.locator("h1").textContent(), /AI 日报/);
   assert.equal(await hasRemoteScripts(page), false);
   assert((await page.locator("a[href='reports/2026/05/2026-05-13.html']").count()) >= 1);
@@ -561,6 +578,7 @@ try {
   assert.equal(await page.locator("[data-source-lane]").count(), 6);
 
   await page.goto(`${server.url}/official-blogs/index.html`);
+  assert.equal(await page.locator('link[rel="icon"][href="../favicon.ico"]').count(), 1);
   assert.equal(await page.locator("#official-blog-excerpts").count(), 1);
   assert.equal(await page.locator("[data-official-blog-excerpt-card]").count() >= 6, true);
   assert.equal(await page.locator('[data-official-blog-company="openai"]').count() >= 1, true);
@@ -577,6 +595,7 @@ try {
   assert.equal(await hasHorizontalOverflow(page), false);
 
   await page.goto(`${server.url}/reports/2026/05/2026-05-13.html`);
+  assert.equal(await page.locator('link[rel="icon"][href="../../../favicon.ico"]').count(), 1);
   assert.equal((await page.locator("#report-top h1").textContent()).trim(), "2026-05-13");
   assert.equal(await page.locator("html[data-html-work-report][data-render-mode='pre-rendered']").count(), 1);
   assert.equal(await page.locator('html[data-ai-daily-theme="promptlayer-inspired"]').count(), 0);

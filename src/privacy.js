@@ -6,6 +6,7 @@ export const PUBLIC_ARTIFACT_PATHS = [
   "docs/data",
   "docs/feed.json",
   "docs/articles.json",
+  "docs/home.json",
   "docs/index.html",
   "docs/trends.json",
   "reports-data"
