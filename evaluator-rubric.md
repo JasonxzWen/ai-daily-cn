@@ -12,15 +12,15 @@ Use this rubric after implementation and before acceptance. The active Slice ret
 | Runtime reliability | Can the standard startup path, health checks, or user flow run again? | 2 | The page checker has one fixed desktop viewport, the production timeout tree terminates descendants deterministically on Windows, and focused pipeline tests plus the earlier full gate passed. |
 | Browser acceptance | For Web changes, did agent-run browser acceptance prove URL, viewport, console/network, and artifact behavior? | 2 | Home, ops, official blogs, and a representative daily report passed at `1280x900` with no console, page, network, HTTP, or horizontal-overflow failures; screenshots were independently inspected. |
 | Agentic loops | Were producer, verifier, read-only arbiter, evidence, and main-agent decision recorded for material loop work? | 2 | Main implementation, deterministic checks, two independent read-only reviews, browser evidence, and main-agent fixes are recorded; reviewers found and closed false-green gaps. |
-| Finish closeout | Did final review, technical-debt/drift inspection, and PR/merge-readiness handling run or have explicit skip reasons? | 1 | Two independent read-only reviews end at P0=0/P1=0, and their two final P2 guard findings are fixed. PR creation plus CI/mergeability evidence remain. |
+| Finish closeout | Did final review, technical-debt/drift inspection, and PR/merge-readiness handling run or have explicit skip reasons? | 2 | Two independent read-only reviews end at P0=0/P1=0 and their final P2 guard findings are fixed. PR #293 is Ready, MERGEABLE/CLEAN, and all four CodeQL checks pass. |
 | Insight recommendations | Did the session produce or explicitly skip an insight audit for tool calling, AI infrastructure, docs/code conflicts, and skill/workflow extraction candidates? | 2 | The prior 15-day insight pass analyzed 5,062 events; this Slice converts its recurring docs/code drift and false-green lesson into one deterministic desktop-only contract instead of another audit artifact. |
 | Maintainability | Are code and repo-local docs clear enough for the next session? | 2 | `docs/desktop-only-support-policy.md`, REC-330, prompts, local Skills, feature inventory, and the broadened static guard define what is unsupported, what evidence must survive, and how reversal is authorized. |
-| Handoff readiness | Can a new session continue from repo-local state without guessing? | 1 | Current task and decisions are current; progress, session handoff, final validation evidence, commit, and PR status still need finalization. |
+| Handoff readiness | Can a new session continue from repo-local state without guessing? | 2 | REC-330, quality/rubric, ignored Harness state, checkpoint hashes, PR #293, final validation, review, CI, residual risk, and the explicit no-merge boundary are recorded. |
 
 ## Verdict
 
 - Product direction and implementation are locally aligned: `1280x900` desktop is the only supported viewport, while historical/source mobile facts are preserved as evidence rather than support promises.
-- Local implementation and final post-fix validation are complete. Delivery still requires checkpoint commits, PR creation, mergeability/CI evidence, and final Harness handoff updates.
+- Local implementation and final post-fix validation are complete. PR #293 is delivery-ready with clean mergeability and passing checks; merge is intentionally left for explicit user direction.
 
 ## Residual risk
 
