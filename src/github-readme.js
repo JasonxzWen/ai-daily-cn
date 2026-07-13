@@ -64,7 +64,7 @@ export function applyGithubReadmeSummary(item = {}, summaryInfo = {}) {
     readme_summary: summary,
     readme_cache: {
       key: cacheKey,
-      hit: summaryInfo.hit !== false,
+      hit: summaryInfo.hit === true,
       repo,
       sha: summaryInfo.sha || "",
       default_branch: summaryInfo.defaultBranch || summaryInfo.branch || "main",

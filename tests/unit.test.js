@@ -3180,6 +3180,7 @@ test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
   assert.equal(candidates[0].repo, "example/trending-agent");
   assert.equal(candidates[0].signal, "trending");
   assert.equal(candidates[0].language, "typescript");
+  assert.equal(candidates[0].repository_language, "TypeScript");
   assert.equal(candidates[0].rank, 1);
   assert.equal(candidates[0].description, "Agent workbench with a runnable demo.");
 
@@ -3189,7 +3190,8 @@ test("GitHub trending 发现器解析仓库候选并生成审计", async () => {
     previousTrending: [
       {
         repo: "example/trending-agent",
-        rank: 4
+        source_rank: 4,
+        source_scope: "daily:typescript"
       }
     ],
     fetchImpl: async () => ({
@@ -3219,6 +3221,131 @@ test("GitHub trending fixed sources cover weekly all-language and selected langu
     ["all", "go", "java", "python", "rust", "typescript"]
   );
   assert(weeklySources.every((source) => /since=weekly/.test(source.url)));
+});
+
+test("GitHub trending rank movement compares source ranks only within the same scope", async () => {
+  const source = {
+    name: "GitHub Trending weekly",
+    url: "https://github.com/trending?since=weekly",
+    language: "all",
+    window: "weekly"
+  };
+  const collected = await collectGitHubTrending({
+    sources: [source],
+    reportDate: "2026-05-17",
+    readmeEnrichment: false,
+    candidateHistory: [
+      {
+        date: "2026-05-16",
+        payload: {
+          report_date: "2026-05-16",
+          github_trending: [
+            {
+              repo: "example/trending-agent",
+              url: "https://github.com/example/trending-agent",
+              source: "GitHub Trending Python weekly",
+              source_scope: "weekly:python",
+              source_rank: 2,
+              rank: 1
+            },
+            {
+              repo: "example/rag-eval",
+              url: "https://github.com/example/rag-eval",
+              source: "GitHub Trending Python weekly",
+              source_scope: "weekly:python",
+              source_rank: 2,
+              rank: 2
+            }
+          ]
+        }
+      },
+      {
+        date: "2026-05-15",
+        payload: {
+          report_date: "2026-05-15",
+          github_trending: [
+            {
+              repo: "example/trending-agent",
+              url: "https://github.com/example/trending-agent",
+              source: "GitHub Trending weekly",
+              source_scope: "weekly:all",
+              source_rank: 4,
+              rank: 7
+            },
+            {
+              repo: "example/rag-eval",
+              url: "https://github.com/example/rag-eval",
+              source: "GitHub Trending weekly",
+              source_scope: "weekly:all",
+              rank: 9
+            }
+          ]
+        }
+      }
+    ],
+    fetchImpl: async () => ({
+      ok: true,
+      text: async () => githubTrendingFixture()
+    })
+  });
+
+  const repeated = collected.candidates.find((candidate) => candidate.repo === "example/trending-agent");
+  const crossScopeOnly = collected.candidates.find((candidate) => candidate.repo === "example/rag-eval");
+  assert.equal(repeated.previous_rank, 4);
+  assert.equal(repeated.rank_delta, 3);
+  assert.equal(repeated.trend, "up");
+  assert.equal(crossScopeOnly.previous_rank, null);
+  assert.equal(crossScopeOnly.rank_delta, null);
+  assert.equal(crossScopeOnly.trend, "new");
+});
+
+test("GitHub trending README cache uses content SHA and reports a hit only for matching history", async () => {
+  const source = {
+    name: "GitHub Trending weekly",
+    url: "https://github.com/trending?since=weekly",
+    language: "all",
+    window: "weekly"
+  };
+  const readme = [
+    "# Trending Agent",
+    "A local-first agent workbench with browser tools, replayable traces, evaluation fixtures, and deployment examples."
+  ].join("\n");
+  const fetchImpl = async (url) => ({
+    ok: true,
+    status: 200,
+    text: async () => url === source.url ? githubTrendingFixture() : readme
+  });
+
+  const first = await collectGitHubTrending({
+    sources: [source],
+    reportDate: "2026-05-16",
+    limit: 1,
+    history: false,
+    fetchImpl
+  });
+  const firstItem = first.candidates[0];
+  assert.equal(firstItem.readme_cache.hit, false);
+  assert.match(firstItem.readme_cache.sha, /^[a-f0-9]{64}$/);
+  assert.doesNotMatch(firstItem.readme_cache.key, /unknown/);
+
+  const second = await collectGitHubTrending({
+    sources: [source],
+    reportDate: "2026-05-17",
+    limit: 1,
+    candidateHistory: [{
+      date: "2026-05-16",
+      payload: {
+        report_date: "2026-05-16",
+        github_trending: first.candidates
+      }
+    }],
+    fetchImpl
+  });
+  const secondItem = second.candidates[0];
+  assert.equal(secondItem.readme_cache.key, firstItem.readme_cache.key);
+  assert.equal(secondItem.readme_cache.sha, firstItem.readme_cache.sha);
+  assert.equal(secondItem.readme_cache.hit, true);
+  assert.equal(secondItem.readme_summary, firstItem.readme_summary);
 });
 
 test("GitHub trending discovery limit preserves required weekly language pools", async () => {
@@ -3279,7 +3406,7 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     editorialCategory: "ai_industry"
   }));
   const readmeSummary = () => "README 将该仓库定位为AI 工程实践，核心能力集中在Agent 构建、工具调用和工作流编排，并提供README 说明和使用入口。它的价值在于把这些能力整理成可复现的工程入口，具体阅读时还应关注默认入口、运行前提、示例覆盖和工程流程衔接。";
-  const githubCandidate = ({ repo, source, language, rank, readmeFailed = false }) => ({
+  const githubCandidate = ({ repo, source, language, repositoryLanguage = language, rank, readmeFailed = false }) => ({
     id: `github-${repo.replace(/[^a-z0-9]+/gi, "-")}`,
     source_id: `github-${source.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
     category: "project",
@@ -3294,6 +3421,7 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     previous_rank: rank === 1 ? 4 : null,
     rank_delta: rank === 1 ? 3 : null,
     language,
+    repository_language: repositoryLanguage,
     window: "weekly",
     topics: ["agent", "llm", "workflow", "browser-automation"],
     license: "MIT",
@@ -3313,6 +3441,7 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     repo: `example/all-weekly-${index + 1}`,
     source: "GitHub Trending weekly",
     language: "all",
+    repositoryLanguage: index === 0 ? "Rust" : "TypeScript",
     rank: index + 1
   }));
   const languageSpecs = [
@@ -3363,13 +3492,15 @@ test("report:draft merges weekly GitHub all-language and selected language pools
   assert.deepEqual(drafted.report.github_trending.map((item) => item.rank), Array.from({ length: 20 }, (_unused, index) => index + 1));
   assert(drafted.report.github_trending.every((item) => item.window === "weekly"));
   for (const language of ["python", "typescript", "rust", "go", "java"]) {
-    assert(drafted.report.github_trending.some((item) => String(item.language).toLowerCase() === language), `missing ${language}`);
+    assert(drafted.report.github_trending.some((item) => item.source_scope === `weekly:${language}`), `missing weekly:${language}`);
   }
   const failedReadmeItem = drafted.report.github_trending.find((item) => item.repo === "example/java-weekly-1");
   assert(failedReadmeItem);
   assert.equal(failedReadmeItem.readme_fetch_status, "failed");
   assert.equal(Object.hasOwn(failedReadmeItem, "description"), false);
   const apiMetadataItem = drafted.report.github_trending.find((item) => item.repo === "example/all-weekly-1");
+  assert.equal(apiMetadataItem.language, "Rust");
+  assert.equal(apiMetadataItem.source_scope, "weekly:all");
   assert.deepEqual(apiMetadataItem.topics, ["agent", "llm", "workflow", "browser-automation"]);
   assert.equal(apiMetadataItem.license, "MIT");
   assert.equal(apiMetadataItem.stars_this_week, 999);
@@ -3377,6 +3508,12 @@ test("report:draft merges weekly GitHub all-language and selected language pools
   assert.equal(apiMetadataItem.previous_rank, 4);
   assert.equal(apiMetadataItem.rank_delta, 3);
   assert.equal(apiMetadataItem.pushed_at, "2026-06-16T10:00:00Z");
+  const normalizedApiMetadataCandidate = drafted.candidatePool.candidates.find((item) => item.id === apiMetadataItem.candidate_id);
+  assert.equal(normalizedApiMetadataCandidate.repository_language, "Rust");
+  assert.equal(normalizedApiMetadataCandidate.language, "all");
+  assert.equal(normalizedApiMetadataCandidate.window, "weekly");
+  const candidateValidation = validateCandidatePool(drafted.candidatePool);
+  assert.equal(candidateValidation.valid, true, JSON.stringify(candidateValidation.errors));
 
   const input = reportToInteractionInput(drafted.report);
   const section = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
@@ -3391,6 +3528,8 @@ test("report:draft merges weekly GitHub all-language and selected language pools
     }
     const healthyCard = section.items.find((item) => item.title === "example/all-weekly-1");
     assert(healthyCard);
+    assert(JSON.stringify(healthyCard).includes("Rust"));
+    assert(!JSON.stringify(healthyCard).includes("weekly:all"));
     assert(!String(healthyCard.body).includes("它的价值在于"));
     assert(!String(healthyCard.body).includes("优先核对 README"));
     assert(!String(healthyCard.body).includes("核心能力集中"));
@@ -25889,6 +26028,7 @@ test("GitHub Trending enriches descriptions from cached README summaries", () =>
     {
       summary,
       sha,
+      hit: true,
       defaultBranch: "main",
       cacheKey: key,
       sourceUrl: `https://raw.githubusercontent.com/${repo}/main/README.md`
@@ -28458,6 +28598,7 @@ function githubTrendingFixture() {
     </a>
   </h2>
   <p class="col-9 color-fg-muted my-1 pr-4">Agent workbench with a runnable demo.</p>
+  <span itemprop="programmingLanguage">TypeScript</span>
 </article>
 <article class="Box-row">
   <h2 class="h3 lh-condensed">
@@ -28466,6 +28607,7 @@ function githubTrendingFixture() {
     </a>
   </h2>
   <p class="col-9 color-fg-muted my-1 pr-4">RAG eval toolkit.</p>
+  <span itemprop="programmingLanguage">Python</span>
 </article>`;
 }
 
@@ -29520,8 +29662,14 @@ test("report:draft ranks curated_first_party builders ahead of stronger non-cura
   assert.equal(builders[0].candidate_id, "builder-curated-karpathy", "curated first-party builder must rank first");
 });
 
-test("github trending API enrichment attaches topics, license, stars, pushed_at", async () => {
-  const candidate = { repo: "owner/repo", name: "owner/repo", url: "https://github.com/owner/repo" };
+test("github trending API enrichment attaches repository language, topics, license, stars, pushed_at", async () => {
+  const candidate = {
+    repo: "owner/repo",
+    name: "owner/repo",
+    url: "https://github.com/owner/repo",
+    language: "all",
+    repository_language: "TypeScript"
+  };
   const fetchImpl = async (url) => {
     if (url === "https://api.github.com/repos/owner/repo") {
       return {
@@ -29532,6 +29680,7 @@ test("github trending API enrichment attaches topics, license, stars, pushed_at"
             topics: ["agent", "llm", "harness"],
             license: { spdx_id: "MIT", key: "mit" },
             stargazers_count: 12345,
+            language: "Rust",
             pushed_at: "2026-06-25T10:00:00Z",
             default_branch: "main"
           };
@@ -29544,12 +29693,14 @@ test("github trending API enrichment attaches topics, license, stars, pushed_at"
   assert.deepEqual(enriched.topics, ["agent", "llm", "harness"]);
   assert.equal(enriched.license, "MIT");
   assert.equal(enriched.stargazers_total, 12345);
+  assert.equal(enriched.language, "all");
+  assert.equal(enriched.repository_language, "Rust");
   assert.equal(enriched.pushed_at, "2026-06-25T10:00:00Z");
   assert.equal(enriched.api_fetch_status, "ok");
 });
 
 test("github trending API enrichment is opt-in and resilient", async () => {
-  const candidate = { repo: "owner/repo" };
+  const candidate = { repo: "owner/repo", repository_language: "Go" };
   // Off by default (no enabled flag / no token) -> candidate untouched.
   const [asis] = await enrichGithubTrendingApiFields([candidate], {
     fetchImpl: async () => ({ ok: true, async json() { return {}; } })
@@ -29565,6 +29716,7 @@ test("github trending API enrichment is opt-in and resilient", async () => {
   });
   assert.equal(failed.api_fetch_status, "failed");
   assert.equal(failed.repo, "owner/repo");
+  assert.equal(failed.repository_language, "Go");
 });
 
 test("report:draft keeps Hugging Face model-registry entries out of the main stream", async () => {
