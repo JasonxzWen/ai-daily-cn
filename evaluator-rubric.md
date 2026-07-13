@@ -1,35 +1,38 @@
 # Evaluator Rubric
 
-Use this rubric for the clean publish clone recovery hotfix that follows PR #296.
+Use this rubric for REC-331, the Aify News logical-source observability Slice.
 
 | Dimension | Score 0-2 | Evidence |
 | --- | --- | --- |
-| Symptom match | 2 | A real merged-main non-publish run stops at prepare_clean_worktree with the exact checkout failure recorded in the dated summary. |
-| Root cause | 2 | Fetch succeeds; the dedicated clone is 361 commits behind with tracked residue, and ordinary checkout runs before reset. Existing node_modules also predates the current pnpm lock contract. |
-| Scope safety | 2 | Force applies only to the existing dedicated clone after its path passes the current .tmp boundary check; user worktrees and external paths are unchanged. |
-| Correctness | 2 | Existing clones use checkout --force -B, retain hard reset/clean, and refresh dependencies with the frozen lockfile. |
-| Regression coverage | 2 | The two confirmed failures are RED before implementation and GREEN after it; checkout argv and dependency invocation are deterministic. |
-| Verification | 2 | Focused 2/2, affected publish 54/54, live workflow, Harness, diff, final-head CodeQL, and post-merge runtime are the acceptance chain. |
-| Affected suite | 2 | Full tests/publish.test.js passes 54/54; live workflow contract passes without failures or warnings. |
-| Data preservation | 2 | The old dirty clone is not reset or deleted before an absolute-path manifest and quarantine preserve its exact historical variants and run evidence. |
-| Non-goals | 2 | No automation, Aify, Source Watch, report content, public UI, mobile surface, backfill, or publish command changes. |
-| Scope discipline | 2 | The diff remains inside publish preparation, its tests, REC-006/quality evidence, and ignored Harness state. |
-| Runtime reliability | 2 | Failed-run residue and stale dependencies are both addressed at the dedicated-clone boundary. |
-| Browser acceptance | 2 | Explicitly skipped because no Web behavior, artifact, or 1280x900 surface changed. |
-| Agentic loops | 2 | Main-agent producer, deterministic verifier, and one independent read-only diagnosis completed one bounded loop. |
-| Finish closeout | 2 | No duplicate generic review; PR state and evidence-preserving runtime replay are the remaining closeout gates. |
-| Insight recommendations | 2 | The reusable-clean-state rule is promoted into tests and REC-006; no new skill is needed. |
-| Validation efficiency | 2 | Full validate is explicitly skipped as disproportionate immediately after PR #296's 893-test aggregate gate; focused, affected, workflow, Harness, diff, CI, and post-merge runtime evidence cover the changed boundary. |
-| Handoff readiness | 2 | REC-006, quality state, Harness state, PR status, archive evidence, and post-merge terminal result are the required closeout record. |
+| Problem match | 2 | The previous `first_class` intent had only a homepage watch, no article collection entry, stable logical identity, or multi-day production proof. |
+| Authority safety | 2 | Aify remains T3 `aggregator` / `ai_news_aggregator` with `intermediary_only` verification and primary-source confirmation requirements. |
+| Publisher truth | 2 | Generic JSON live and cache paths retain the payload's original publisher instead of attributing every item to Aify. |
+| Collection wiring | 2 | `content-aify-news` collects the real `/articles.json` endpoint and maps with `site-aify-news` to one `aify-news` logical source. |
+| Effectiveness truth | 2 | Stable audit IDs and parsed counts survive Source Watch; persisted main rejection reasons take precedence and non-main exclusion reasons remain visible. |
+| Correctness | 2 | Phase5 checks three exact consecutive dates across source effectiveness, persisted candidate pool, terminal disposition, and dated public article URLs. |
+| False-green resistance | 2 | Missing days/rows/reachability/parse/candidates/reasons, effectiveness-inclusion drift, and included/public URL mismatches all keep `production_verified=false`. |
+| Public proof threshold | 2 | A passing window requires every day complete and at least one unique public URL match; fixture or endpoint replay cannot satisfy production proof. |
+| Contract synchronization | 2 | Registry, generated inventory, handbook, display contract, feature state, REC-331, and unit counts agree on 166 entries / 49 logical sources. |
+| Regression coverage | 2 | Focused RED/GREEN covers live/cache publisher truth, authority, exclusion reason, positive three-day closure, and negative missing/mismatched evidence. |
+| Verification | 2 | Aify, Source Watch producer/draft, Phase5, effectiveness, display, and inventory checks pass 41/41; final validation passes 898 total / 896 pass / 0 fail / 2 skipped with build-clean, privacy, E2E, Harness, source, design, and diff gates. |
+| Runtime reliability | 2 | Read-only 2026-07-11/12/13 endpoint replays each return five date-correct candidates with original publishers and intermediary authority. |
+| Current-state honesty | 2 | The committed-history audit reports 0/3 complete days, zero public matches, and `production_verified=false`; the feature remains `observing`. |
+| Scope discipline | 2 | No automation prompt, schedule, publish behavior, reports-data, backfill, public UI, or unrelated source promotion is changed. |
+| Browser acceptance | 2 | Explicitly skipped because no Web composition changed; the only supported viewport remains `1280x900`, and no mobile/tablet/narrow/touch logic or artifacts are introduced. |
+| Validation efficiency | 2 | Development uses focused/affected checks and one final full validate at PR preparation, with one bounded read-only review. |
+| Agentic loops | 2 | Main-agent producer, deterministic RED/GREEN verifier, and one bounded read-only P0/P1 reviewer form a single closeout loop. |
+| Finish closeout | 2 | Final diff, project-rule drift, authority safety, CI, conflict status, and residual production-observation boundary are checked once before delivery. |
+| Insight recommendations | 2 | Record the repository-guard `.tmp` hashing cost and workflow-router wording false positive as workflow/eval follow-ups; do not widen REC-331. |
+| Handoff readiness | 2 | REC-331, feature state, quality snapshot, Harness state, PR head, CI/mergeability, and post-merge observation boundary form the closeout record. |
 
 ## Verdict
 
-- Ready for the narrow PR after Harness and diff checks pass.
-- Merge only when final-head CodeQL is green and the PR is conflict-free.
-- Production acceptance requires evidence archive first, then a merged-main non-publish rerun that advances beyond prepare_clean_worktree.
+- Ready for final full validation and PR preparation after the bounded read-only review reports no unresolved P0/P1.
+- Merge only when final-head CodeQL is green and GitHub reports the PR conflict-free.
+- Keep the feature at `observing` after merge; only three future persisted production days with at least one public match may advance it to `production_verified`.
 
 ## Residual risk
 
-- Git command stderr remains summarized by a generic publisher error; this is diagnostic debt, not a blocker for the confirmed recovery path.
-- Reused clean clones now pay one idempotent frozen-lockfile install per run to avoid stale dependency false confidence.
-- Downstream pipeline stages may still reveal independent failures after prepare succeeds; report their actual terminal state without attributing them to this fix.
+- Aify is a third-party aggregator whose payload shape and availability can change; generic parser/cache behavior is covered, but natural production observation remains necessary.
+- Preserving original publisher text improves attribution but does not prove factual authority; admission must continue to require primary evidence.
+- Historical committed reports predate this collection entry, so replay demonstrates capability only and must never be presented as scheduled-run evidence.

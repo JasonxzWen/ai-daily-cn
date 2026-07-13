@@ -21,7 +21,7 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 <!-- order-tuning-unmapped-counts -->
 <!-- order-tuning-total-unmapped:69 -->
 
-These counts come from the 165-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
+These counts come from the 166-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
@@ -65,6 +65,10 @@ These 24 proposals have one explicit decision based on 38 stored daily candidate
 | `intermediary-ifanr` | `ifanr-ai` | `platform_cn_media` | 90 | `defer` | Manual enablement has no production observation, so promotion would be configuration-only. |
 | `content-product-hunt-trending` | `product-hunt-trending` | `english_media_search` | 60 | `retire` | 23 candidate days produced only 1 inclusion day; retain the existing product-discovery collection role. |
 | `content-product-hunt-devtools` | `product-hunt-devtools` | `english_media_search` | 70 | `retire` | 24 candidate days produced no final-report inclusion; retain collection-only discovery. |
+
+### User-directed promotion after the original 24-source review
+
+`aify-news` is a separately approved promotion, not a retroactive change to the 24-source decision table above. Its `content-aify-news` JSON entry and `site-aify-news` observation entry share one logical identity at rank 60. The feature remains `observing` until three consecutive persisted production days close collection, admission, disposition reason, and public-output evidence; endpoint replay alone is not production verification.
 
 ## Collection-Only Review
 

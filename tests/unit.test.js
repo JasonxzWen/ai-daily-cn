@@ -17629,7 +17629,7 @@ test("logical source promotion proposals follow multi-day evidence decisions", a
       sourceId + " must stay collection-only"
     );
   }
-  assert.equal(result.summary.logical_sources, 48);
+  assert.equal(result.summary.logical_sources, 49);
   assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 });
 
@@ -17687,8 +17687,8 @@ test("Anthropic Research logical source promotion is executable and review-backe
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 48);
-  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.logical_sources, 49);
+  assert.equal(result.summary.display_sources, 49);
   assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
@@ -17771,8 +17771,8 @@ test("core primary official logical source promotions are executable and review-
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 48);
-  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.logical_sources, 49);
+  assert.equal(result.summary.display_sources, 49);
   assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const promotions = [
@@ -17904,8 +17904,8 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 48);
-  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.logical_sources, 49);
+  assert.equal(result.summary.display_sources, 49);
   assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
@@ -17942,8 +17942,8 @@ test("china model logical sources are promoted into the fixed display contract",
   const inventoryRows = buildSourceInventoryRows({ rootDir });
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
-  assert.equal(result.summary.logical_sources, 48);
-  assert.equal(result.summary.display_sources, 48);
+  assert.equal(result.summary.logical_sources, 49);
+  assert.equal(result.summary.display_sources, 49);
   assert.equal(result.summary.order_tuning_unmapped_sources, 69);
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));

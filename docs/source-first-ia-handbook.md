@@ -121,6 +121,7 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 | 30 | `mit-technology-review` | MIT Technology Review |
 | 40 | `ars-technica` | Ars Technica |
 | 50 | `venturebeat-ai` | VentureBeat AI |
+| 60 | `aify-news` | First-class aggregator governance; every factual claim still requires a primary-source backtrace. |
 
 ## 新增信源插入规则
 

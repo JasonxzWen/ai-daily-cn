@@ -105,6 +105,10 @@ test("report:draft preserves Source Watch audit and routes a first snapshot only
   }
   assert.equal(drafted.report.source_audit.github_watch.included, 1);
   assert.equal(drafted.report.source_audit.site_watch.included, 1);
+  assert.equal(drafted.report.source_audit.github_watch.sources[0].id, "acme-agent");
+  assert.equal(drafted.report.source_audit.github_watch.sources[0].parsed_count, 1);
+  assert.equal(drafted.report.source_audit.site_watch.sources[0].id, "example-ai");
+  assert.equal(drafted.report.source_audit.site_watch.sources[0].parsed_count, 1);
   assertCandidateAbsentFromOrdinarySections(drafted.report, candidate.id);
   assertCandidateAbsentFromOrdinarySections(drafted.report, siteCandidate.id);
   assert.equal(validateCandidatePool(drafted.candidatePool).valid, true);
@@ -217,17 +221,17 @@ function sourceWatchDiscovery(candidates) {
     generated_at: `${REPORT_DATE}T08:00:00.000Z`,
     sources: [],
     source_audit: {
-      github_watch: auditGroup("GitHub Watch", "https://github.com/acme/agent", githubCandidates.length),
-      site_watch: auditGroup("Site Watch", "https://example.com/ai", siteCandidates.length)
+      github_watch: auditGroup("acme-agent", "GitHub Watch", "https://github.com/acme/agent", githubCandidates.length),
+      site_watch: auditGroup("example-ai", "Site Watch", "https://example.com/ai", siteCandidates.length)
     },
     candidates
   };
 }
 
-function auditGroup(name, url, candidatesFound) {
+function auditGroup(id, name, url, candidatesFound) {
   return {
     checked: true,
-    sources: [{ name, url, status: "checked", notes: "source watch fixture" }],
+    sources: [{ id, target_id: id, name, url, status: "checked", parsed_count: candidatesFound > 0 ? 1 : 0, notes: "source watch fixture" }],
     candidates_found: candidatesFound,
     included: 0,
     notes: `${candidatesFound} Source Watch candidates collected.`

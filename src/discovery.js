@@ -1044,7 +1044,9 @@ async function collectSourceWatchGithubRepo(target, context) {
     source: sourceItem,
     candidate,
     auditSource: auditSource(target.name, target.url, status, notes, {
+      id: target.id,
       target_id: target.id,
+      parsed_count: candidate ? 1 : 0,
       repo: target.repo,
       ...sourceWatchContractFields(target),
       endpoint_status: endpointStatus,
@@ -1110,7 +1112,9 @@ async function collectSourceWatchSite(target, context) {
     source: sourceItem,
     candidate,
     auditSource: auditSource(target.name, target.url, status, notes, {
+      id: target.id,
       target_id: target.id,
+      parsed_count: candidate ? 1 : 0,
       ...sourceWatchContractFields(target),
       http_status: result.status,
       title: site.title || "",
@@ -2673,7 +2677,7 @@ export async function collectContentSources(options = {}) {
           category: candidateCategory,
           title: entry.title,
           url: originalUrl || entry.url,
-          source: currentSource.name,
+          source: contentCandidateSource(entry, currentSource),
           event_date: entry.event_date,
           status: "excluded",
           evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
@@ -2750,7 +2754,7 @@ export async function collectContentSources(options = {}) {
           category: candidateCategory,
           title: entry.title,
           url: originalUrl || entry.url,
-          source: currentSource.name,
+          source: contentCandidateSource(entry, currentSource),
           event_date: entry.event_date,
           status: "excluded",
           evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
@@ -3056,9 +3060,11 @@ function contentCandidateNotes(entry, sourceInfo, originalUrl) {
 
 function contentVerificationFields(entry, sourceInfo, originalUrl) {
   const status = contentVerificationStatus(sourceInfo, originalUrl);
+  const sourceLevel = String(sourceInfo.source_level || entry.source_level || "").trim();
   const fields = {
     verification_status: status,
-    verification_sources: []
+    verification_sources: [],
+    ...(sourceLevel ? { source_level: sourceLevel } : {})
   };
   if (sourceInfo.authority === "intermediary" || sourceInfo.authority === "secondary" || sourceInfo.authority === "aggregator" || sourceInfo.verification_policy === "primary_required") {
     fields.intermediary_url = entry.url;
@@ -3074,6 +3080,10 @@ function contentVerificationFields(entry, sourceInfo, originalUrl) {
     fields.verification_sources = [originalUrl];
   }
   return fields;
+}
+
+function contentCandidateSource(entry, sourceInfo) {
+  return String(entry.publisher || "").trim() || sourceInfo.name;
 }
 
 function contentVerificationStatus(sourceInfo, originalUrl) {
@@ -5813,7 +5823,7 @@ function contentSourceCachePath(rootDir, sourceInfo) {
 }
 
 function isCacheFallbackSource(sourceInfo = {}) {
-  return /arxiv|reddit/i.test(`${sourceInfo.id || ""} ${sourceInfo.name || ""} ${sourceInfo.url || ""}`);
+  return /aify|arxiv|reddit/i.test(`${sourceInfo.id || ""} ${sourceInfo.name || ""} ${sourceInfo.url || ""}`);
 }
 
 function isCacheExpired(fetchedAt, maxAgeDays) {
@@ -6002,6 +6012,7 @@ function normalizeJsonApiEntry(rawItem, sourceInfo = {}) {
     url,
     event_date: jsonDateOnly(firstString(item.published, item.published_at, item.date, item.created_at, item.createdAt, item.updated_at, item.time, item.created_utc)),
     summary,
+    publisher: cleanText(firstString(item.source, item.publisher, item.publisher_name, item.site_name)),
     links: extractHtmlLinks(summary, url),
     ...entryImageFields(imageUrl, "json_api")
   };
