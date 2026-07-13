@@ -185,6 +185,16 @@
       "replay_fixtures": ["report-draft-missing-known-input"]
     },
     {
+      "id": "first_pass_authoring",
+      "description": "Author every declared reader-facing story, hot-blog, GitHub, and Builder field before the first formal quality review.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "deterministic_draft_quality_review", "action": "continue_to_formal_review_and_bounded_exceptional_repair" },
+      "degrade": { "allowed": true, "action": "record_first_pass_fallback_and_continue_to_formal_review" },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "internal_leakage", "unrecoverable_schema"] },
+      "summary_fields": ["stage_id", "status", "attempts", "task_count", "applied_count", "reason"],
+      "replay_fixtures": ["first-pass-authoring-complete", "first-pass-authoring-contract-fallback"]
+    },
+    {
       "id": "quality_review",
       "description": "Review public text quality and request AI repair when scoped editorial fixes are needed.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },

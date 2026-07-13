@@ -15,6 +15,8 @@ import {
   FIRST_PASS_AUTHORING_INTENT,
   FIRST_PASS_AUTHORING_PHASE,
   annotateAuthoringTasks,
+  buildFirstPassAuthoringTasks,
+  validateFirstPassAuthoringContract,
   reviewReportQuality
 } from "./quality-loop.js";
 
@@ -22,6 +24,7 @@ const execFileAsync = promisify(execFile);
 const DEFAULT_PUBLISH_MAX_REVIEW_REPAIR_LOOPS = 5;
 const DEFAULT_DRY_RUN_MAX_REVIEW_REPAIR_LOOPS = 1;
 const DEFAULT_REPORT_PATH = ".tmp/daily-report.json";
+const AUTHORED_REPORT_PATH = ".tmp/daily-report.authored.json";
 const OPTIMIZED_REPORT_PATH = ".tmp/daily-report.optimized.json";
 const CONTENT_SOURCE_DISCOVERY_LIMIT = 240;
 const CONTENT_SOURCE_PER_SOURCE_LIMIT = 3;
@@ -110,6 +113,7 @@ const DISCOVERY_DEGRADE_FALLBACKS = {
 const SUMMARY_ONLY_DEGRADE_FALLBACK_KINDS = new Set(["summary_only_degraded_audit"]);
 const PUBLIC_EDITORIAL_REPAIR_TASK_KINDS = new Set([
   "public_editorial_rewrite",
+  "rewrite_autodraft_template",
   "main_item_editorial_rewrite",
   "hot_blog_editorial_rewrite",
   "builder_translation_rewrite"
@@ -141,6 +145,9 @@ export async function runDailyWorkflow(options = {}) {
   );
   const now = options.now || (() => new Date().toISOString());
   const runStage = options.runStage || defaultRunStage;
+  const firstPassAuthoringContractAuthor = typeof options.firstPassAuthoringContractAuthor === "function"
+    ? options.firstPassAuthoringContractAuthor
+    : null;
   const existingSummary = options.restart ? null : await readJsonIfExists(summaryPath);
   if (existingSummary?.final_status === "needs_ai_repair") {
     return await resumeDailyWorkflowFromAiRepair({
@@ -172,6 +179,7 @@ export async function runDailyWorkflow(options = {}) {
     candidate_pool_path: candidatePoolPath(reportDate),
     quality_review_path: qualityReviewPath(reportDate),
     quality_repair_path: qualityRepairPath(reportDate),
+    automation_first_pass_authoring: initialFirstPassAuthoringSummary(Boolean(firstPassAuthoringContractAuthor)),
     stages: [],
     started_at: now(),
     updated_at: now(),
@@ -250,7 +258,10 @@ export async function runDailyWorkflow(options = {}) {
     now
   };
 
-  for (const stage of buildInitialWorkflowStages({ reportDate })) {
+  for (const plannedStage of buildInitialWorkflowStages({ reportDate })) {
+    const stage = plannedStage.id === "quality_review"
+      ? qualityReviewStageForReport(plannedStage, summary.current_report_path || DEFAULT_REPORT_PATH)
+      : plannedStage;
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
     const remoteAheadAction = remoteAheadRestartNextAction({
       outcome,
@@ -273,16 +284,28 @@ export async function runDailyWorkflow(options = {}) {
       return { summary, summaryPath };
     }
 
+    if (stage.id === "report_draft" && outcome.normalized.ok) {
+      await runFirstPassAuthoring({
+        summary,
+        context,
+        runStage,
+        authorContract: firstPassAuthoringContractAuthor,
+        now
+      });
+    }
+
     if (stage.id === "quality_review") {
+      recordFirstReviewResult(summary, outcome.normalized);
+      const currentReportPath = summary.current_report_path || DEFAULT_REPORT_PATH;
       const repairDecision = classifyQualityReviewResult(outcome.normalized, {
         summary,
         reportDate,
         maxReviewRepairLoops,
-        reportPath: DEFAULT_REPORT_PATH
+        reportPath: currentReportPath
       });
       if (repairDecision?.degrade) {
         markStageDegraded(summary, stage.id, repairDecision);
-        await annotateReportDegraded(absoluteCleanPath(summary.clean_repo_root, DEFAULT_REPORT_PATH), repairDecision);
+        await annotateReportDegraded(absoluteCleanPath(summary.clean_repo_root, currentReportPath), repairDecision);
         await writeSummary(summaryPath, summary);
       } else if (repairDecision) {
         summary.final_status = repairDecision.final_status;
@@ -312,7 +335,7 @@ export async function runDailyWorkflow(options = {}) {
     now,
     reportDate,
     publish,
-    reportPath: DEFAULT_REPORT_PATH
+    reportPath: summary.current_report_path || DEFAULT_REPORT_PATH
   });
 }
 
@@ -859,8 +882,11 @@ async function writePublishCorrectionForBlockedRun({ summary, context, reportDat
 }
 
 export function buildDailyWorkflowStages({ reportDate, publish }) {
+  const initialStages = buildInitialWorkflowStages({ reportDate });
   return [
-    ...buildInitialWorkflowStages({ reportDate }),
+    ...initialStages.flatMap((stage) => stage.id === "report_draft"
+      ? [stage, { id: "first_pass_authoring", command: { tool: "internal", args: [] } }]
+      : [stage]),
     ...buildPostQualityWorkflowStages({ reportDate, publish, reportPath: DEFAULT_REPORT_PATH })
   ];
 }
@@ -1013,6 +1039,210 @@ function buildInitialWorkflowStages({ reportDate }) {
     ])
   ];
   return stages;
+}
+
+function initialFirstPassAuthoringSummary(enabled) {
+  return {
+    enabled,
+    status: enabled ? "pending" : "disabled",
+    attempted: 0,
+    task_count: 0,
+    edit_count: 0,
+    applied_count: 0,
+    rejected_count: 0,
+    first_review_ok: null,
+    exceptional_repair_task_count: 0,
+    reason: enabled ? "awaiting_report_draft" : "author_contract_callback_not_configured"
+  };
+}
+
+async function runFirstPassAuthoring({ summary, context, runStage, authorContract, now }) {
+  if (typeof authorContract !== "function") {
+    return;
+  }
+
+  const reportDate = context.reportDate;
+  const sourceReportPath = absoluteCleanPath(context.cleanRoot, DEFAULT_REPORT_PATH);
+  const candidatePath = absoluteCleanPath(context.cleanRoot, summary.candidate_pool_path || candidatePoolPath(reportDate));
+  const planPath = absoluteCleanPath(context.cleanRoot, firstPassAuthoringPlanPath(reportDate));
+  const contractPath = absoluteCleanPath(context.cleanRoot, firstPassAuthoringContractPath(reportDate));
+  const firstPass = summary.automation_first_pass_authoring || initialFirstPassAuthoringSummary(true);
+  summary.automation_first_pass_authoring = firstPass;
+
+  try {
+    const [report, candidatePool] = await Promise.all([
+      readJsonIfExists(sourceReportPath),
+      readJsonIfExists(candidatePath)
+    ]);
+    if (!report || typeof report !== "object") {
+      throw new PublisherError("first_pass_authoring_report_missing", "First-pass authoring requires the generated report artifact.");
+    }
+    if (!candidatePool || typeof candidatePool !== "object") {
+      throw new PublisherError("first_pass_authoring_candidate_pool_missing", "First-pass authoring requires the same-run candidate pool.");
+    }
+
+    const tasks = buildFirstPassAuthoringTasks(report);
+    firstPass.task_count = tasks.length;
+    firstPass.plan_path = firstPassAuthoringPlanPath(reportDate);
+    firstPass.source_report_path = DEFAULT_REPORT_PATH;
+    firstPass.candidate_pool_path = summary.candidate_pool_path || candidatePoolPath(reportDate);
+    await fs.mkdir(path.dirname(planPath), { recursive: true });
+    await fs.writeFile(planPath, `${JSON.stringify({
+      schema_version: 1,
+      report_date: reportDate,
+      phase: FIRST_PASS_AUTHORING_PHASE,
+      intent: FIRST_PASS_AUTHORING_INTENT,
+      authoring_contract: FIRST_PASS_AUTHORING_CONTRACT,
+      tasks
+    }, null, 2)}\n`, "utf8");
+    if (tasks.length === 0) {
+      firstPass.status = "not_needed";
+      firstPass.reason = "no_reader_facing_authoring_paths";
+      recordStage(summary, {
+        id: "first_pass_authoring",
+        status: "passed",
+        output: { attempts: 0, task_count: 0, plan_path: firstPass.plan_path, reason: firstPass.reason },
+        now
+      });
+      return;
+    }
+
+    firstPass.attempted = 1;
+    firstPass.status = "authoring";
+    firstPass.reason = "author_contract_requested";
+    const contract = await authorContract({
+      reportDate,
+      sourceReportPath,
+      candidatePoolPath: candidatePath,
+      authoringPlanPath: planPath,
+      editorialAuthorityPath: absoluteCleanPath(context.cleanRoot, "prompts/ai-daily/modules/editorial-authority.md"),
+      tasks
+    });
+    const validation = validateFirstPassAuthoringContract(contract, { reportDate, tasks });
+    if (!validation.ok) {
+      throw new PublisherError("first_pass_authoring_contract_invalid", validation.failures.join("; "));
+    }
+    firstPass.edit_count = contract.edits.length;
+    await fs.writeFile(contractPath, `${JSON.stringify(contract, null, 2)}\n`, "utf8");
+
+    const applyStage = buildFirstPassAuthoringApplyStage({
+      reportDate,
+      sourceReportPath: DEFAULT_REPORT_PATH,
+      outputReportPath: AUTHORED_REPORT_PATH,
+      contractPath: firstPassAuthoringContractPath(reportDate),
+      candidatePoolPath: summary.candidate_pool_path || candidatePoolPath(reportDate)
+    });
+    let normalized;
+    try {
+      normalized = normalizeStageResult(await runStage(applyStage, context));
+    } catch (error) {
+      recordStage(summary, {
+        id: applyStage.id,
+        status: "degraded",
+        command: applyStage.command,
+        error,
+        output: { attempts: 1, fallback_used: true, fallback_report_path: DEFAULT_REPORT_PATH },
+        now
+      });
+      throw error;
+    }
+    const appliedPaths = new Set((Array.isArray(normalized.output?.contract_applied)
+      ? normalized.output.contract_applied
+      : []).map((entry) => String(entry?.path || "").trim()).filter(Boolean));
+    const rejected = Array.isArray(normalized.output?.contract_rejected) ? normalized.output.contract_rejected : [];
+    firstPass.applied_count = appliedPaths.size;
+    firstPass.rejected_count = rejected.length;
+    const expectedPaths = new Set(tasks.map((task) => task.path));
+    const fullyApplied = rejected.length === 0 && appliedPaths.size === expectedPaths.size
+      && [...expectedPaths].every((taskPath) => appliedPaths.has(taskPath));
+    if (!fullyApplied) {
+      recordStage(summary, {
+        id: applyStage.id,
+        status: "degraded",
+        command: applyStage.command,
+        output: {
+          ...normalized.output,
+          attempts: 1,
+          fallback_used: true,
+          fallback_report_path: DEFAULT_REPORT_PATH,
+          reason: "first_pass_contract_not_fully_applied"
+        },
+        now
+      });
+      firstPass.status = "fallback";
+      firstPass.reason = "first_pass_contract_not_fully_applied";
+      return;
+    }
+
+    recordStage(summary, {
+      id: applyStage.id,
+      status: "passed",
+      command: applyStage.command,
+      output: {
+        ...normalized.output,
+        attempts: 1,
+        authoring_complete: true,
+        residual_review_ok: normalized.output?.review?.ok === true
+      },
+      now
+    });
+    summary.current_report_path = AUTHORED_REPORT_PATH;
+    firstPass.status = "completed";
+    firstPass.reason = "all_declared_paths_applied";
+    firstPass.authored_report_path = AUTHORED_REPORT_PATH;
+  } catch (error) {
+    if (!summary.stages.some((stage) => stage.id === "first_pass_authoring" && stage.status === "degraded")) {
+      recordStage(summary, {
+        id: "first_pass_authoring",
+        status: "degraded",
+        output: {
+          fallback_used: true,
+          attempts: firstPass.attempted,
+          fallback_report_path: DEFAULT_REPORT_PATH,
+          error_code: error?.code || "first_pass_authoring_failed",
+          reason: error?.message || "first-pass authoring failed"
+        },
+        now
+      });
+    }
+    firstPass.status = "fallback";
+    firstPass.reason = error?.code || "first_pass_authoring_failed";
+    firstPass.error = error?.message || String(error || "first-pass authoring failed");
+    summary.current_report_path = DEFAULT_REPORT_PATH;
+  }
+}
+
+function buildFirstPassAuthoringApplyStage({ reportDate, sourceReportPath, outputReportPath, contractPath, candidatePoolPath }) {
+  return nodeCliStage("first_pass_authoring", [
+    "quality:repair",
+    sourceReportPath,
+    outputReportPath,
+    firstPassAuthoringResultPath(reportDate),
+    contractPath,
+    candidatePoolPath
+  ]);
+}
+
+function qualityReviewStageForReport(stage, reportPath) {
+  const args = [...(stage?.command?.args || [])];
+  if (args.length > 2) args[2] = reportPath;
+  return {
+    ...stage,
+    command: {
+      ...stage.command,
+      args
+    }
+  };
+}
+
+function recordFirstReviewResult(summary, stageResult) {
+  const firstPass = summary.automation_first_pass_authoring;
+  if (!firstPass || firstPass.status === "disabled") return;
+  const review = stageResult.output?.review || stageResult.output || {};
+  const reviewOk = stageResult.ok && (review.ok === true || stageResult.output?.ok === true || !Object.prototype.hasOwnProperty.call(review, "ok"));
+  firstPass.first_review_ok = Boolean(reviewOk);
+  const tasks = annotateAuthoringTasks(Array.isArray(review.ai_review_tasks) ? review.ai_review_tasks : []);
+  firstPass.exceptional_repair_task_count = retryablePublicEditorialTasks(review, tasks).length;
 }
 
 function buildAiRepairWorkflowStages({
@@ -1789,9 +2019,10 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
     : Array.isArray(stageResult.output?.ai_review_tasks)
       ? stageResult.output.ai_review_tasks
       : []);
-  if (aiTasks.length > 0 && reviewRepairAttempt <= maxReviewRepairLoops) {
+  const retryTasks = retryablePublicEditorialTasks(review, aiTasks);
+  if (retryTasks.length > 0 && reviewRepairAttempt <= maxReviewRepairLoops) {
     const contractPath = aiRepairContractPath(summary.launcher_root, reportDate, reviewRepairAttempt);
-    const authoringHandoff = authoringHandoffMetadata(aiTasks);
+    const authoringHandoff = authoringHandoffMetadata(retryTasks);
     return {
       final_status: "needs_ai_repair",
       next_action: {
@@ -1804,7 +2035,7 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
         max_review_repair_loops: maxReviewRepairLoops,
         remaining_review_repair_loops: maxReviewRepairLoops - reviewRepairAttempt,
         ...authoringHandoff,
-        ai_review_tasks: aiTasks,
+        ai_review_tasks: retryTasks,
         required_contract_status: "ready",
         required_contract_fields: ["schema_version", "report_date", "status", "edits"],
         message: authoringHandoff.handoff_phase
@@ -2381,6 +2612,18 @@ function qualityReviewPath(reportDate) {
 
 function qualityRepairPath(reportDate) {
   return `.tmp/quality-repair-${reportDate}.json`;
+}
+
+function firstPassAuthoringPlanPath(reportDate) {
+  return `.tmp/first-pass-authoring-plan-${reportDate}.json`;
+}
+
+function firstPassAuthoringContractPath(reportDate) {
+  return `.tmp/first-pass-authoring-contract-${reportDate}.json`;
+}
+
+function firstPassAuthoringResultPath(reportDate) {
+  return `.tmp/first-pass-authoring-result-${reportDate}.json`;
 }
 
 function aiRepairContractPath(launcherRoot, reportDate, attempt) {

@@ -1143,6 +1143,79 @@ test("daily Codex production orchestrator authors a repair contract and resumes 
   assert.equal(summary.automation_ai_repair.terminal_reason, "workflow_completed");
 });
 
+test("daily Codex production orchestrator injects first-pass authoring without counting it as repair", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-first-pass-"));
+  const reportDate = "2026-07-13";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: false,
+    codexBin: "codex.cmd"
+  });
+  let firstPassAuthorCalls = 0;
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    firstPassAuthoringContractAuthor: async ({ tasks }) => {
+      firstPassAuthorCalls += 1;
+      return {
+        schema_version: 1,
+        report_date: reportDate,
+        status: "ready",
+        edits: tasks.map((task) => ({
+          path: task.path,
+          value: "来源约束的首轮文案",
+          reason: "first pass",
+          evidence_path: null
+        }))
+      };
+    },
+    workflowRunner: async ({ summaryPath, firstPassAuthoringContractAuthor }) => {
+      const contract = await firstPassAuthoringContractAuthor({
+        reportDate,
+        sourceReportPath: path.join(cleanRoot, ".tmp", "daily-report.json"),
+        candidatePoolPath: path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`),
+        authoringPlanPath: path.join(cleanRoot, ".tmp", `first-pass-authoring-plan-${reportDate}.json`),
+        editorialAuthorityPath: path.join(cleanRoot, "prompts", "ai-daily", "modules", "editorial-authority.md"),
+        tasks: [{ path: "stories[0].what_happened" }]
+      });
+      assert.equal(contract.edits.length, 1);
+      return {
+        summaryPath,
+        summary: {
+          report_date: reportDate,
+          mode: "dry-run",
+          final_status: "generated_only",
+          clean_repo_root: cleanRoot,
+          current_report_path: ".tmp/daily-report.authored.json",
+          automation_first_pass_authoring: {
+            enabled: true,
+            status: "completed",
+            attempted: 1,
+            task_count: 1,
+            edit_count: 1,
+            applied_count: 1,
+            rejected_count: 0,
+            first_review_ok: true,
+            exceptional_repair_task_count: 0,
+            reason: "all_declared_paths_applied"
+          },
+          next_action: { kind: "none" },
+          stages: [{ id: "quality_review", status: "passed" }]
+        }
+      };
+    }
+  });
+
+  assert.equal(firstPassAuthorCalls, 1);
+  assert.equal(summary.automation_first_pass_authoring.status, "completed");
+  assert.equal(summary.automation_first_pass_authoring.first_review_ok, true);
+  assert.equal(summary.automation_ai_repair.attempted, 0);
+  assert.equal(summary.automation_ai_repair.terminal_reason, "not_needed");
+});
+
 test("daily Codex production repair author returns schema-constrained UTF-8 JSON without sandbox writes", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-structured-repair-"));
   const reportDate = "2026-07-10";

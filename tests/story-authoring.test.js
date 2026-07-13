@@ -5,7 +5,12 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { reviewReportQuality, applyQualityRepairContract } from "../src/quality-loop.js";
+import {
+  applyQualityRepairContract,
+  buildFirstPassAuthoringTasks,
+  reviewReportQuality,
+  validateFirstPassAuthoringContract
+} from "../src/quality-loop.js";
 
 function templatedStoryReport() {
   return {
@@ -32,6 +37,86 @@ function assertFirstPassAuthoringTask(task) {
   assert.equal(task.authoring_contract, "public_prose_authoring_v1");
   assert.equal(task.requires_source_grounding, true);
 }
+
+test("first-pass plan proactively authors every reader-facing narrative lane before review", () => {
+  const report = {
+    report_date: "2026-07-13",
+    stories: [{
+      story_id: "story-openai",
+      title: "OpenAI 发布新推理接口",
+      what_happened: "OpenAI 发布了一项更新。",
+      why_it_matters: "开发者可以关注这项变化。",
+      source_item_refs: ["candidate-openai"],
+      sources: [{ label: "OpenAI News", url: "https://openai.com/news/example" }]
+    }],
+    main_items: [],
+    hot_blogs: [{
+      candidate_id: "candidate-blog",
+      title: "一篇关于智能体评测的文章",
+      summary: "文章讨论了智能体评测。",
+      url: "https://example.com/blog"
+    }],
+    github_trending: [{
+      candidate_id: "candidate-repo",
+      repo: "example/agent-kit",
+      description: "Agent toolkit",
+      url: "https://github.com/example/agent-kit"
+    }],
+    builder_observations: [{
+      candidate_id: "candidate-builder",
+      original_text: "We shipped a smaller model with faster tool calling.",
+      translation: "这条 Builder 动态值得关注。",
+      content: "这条 Builder 动态值得关注。",
+      url: "https://x.com/example/status/1"
+    }]
+  };
+
+  const tasks = buildFirstPassAuthoringTasks(report);
+  const byPath = new Map(tasks.map((task) => [task.path, task]));
+
+  assert.deepEqual([...byPath.keys()], [
+    "stories[0].title",
+    "stories[0].what_happened",
+    "stories[0].why_it_matters",
+    "hot_blogs[0].summary",
+    "github_trending[0].description",
+    "builder_observations[0].translation"
+  ]);
+  tasks.forEach(assertFirstPassAuthoringTask);
+  assert.equal(byPath.get("builder_observations[0].translation").kind, "builder_translation_rewrite");
+  assert.deepEqual(byPath.get("stories[0].what_happened").evidence_urls, ["https://openai.com/news/example"]);
+  assert.equal(byPath.get("github_trending[0].description").kind, "github_description_authoring");
+});
+
+test("first-pass contract requires exact full task coverage", () => {
+  const tasks = [
+    { path: "stories[0].what_happened" },
+    { path: "builder_observations[0].translation" }
+  ];
+  const base = {
+    schema_version: 1,
+    report_date: "2026-07-13",
+    status: "ready"
+  };
+
+  const missing = validateFirstPassAuthoringContract({
+    ...base,
+    edits: [{ path: tasks[0].path, value: "具体事实" }]
+  }, { reportDate: "2026-07-13", tasks });
+  assert.equal(missing.ok, false);
+  assert(missing.failures.some((failure) => failure.includes(tasks[1].path)));
+
+  const extra = validateFirstPassAuthoringContract({
+    ...base,
+    edits: [
+      { path: tasks[0].path, value: "具体事实" },
+      { path: tasks[1].path, value: "具体翻译" },
+      { path: "stories[0].sources[0].url", value: "https://evil.example" }
+    ]
+  }, { reportDate: "2026-07-13", tasks });
+  assert.equal(extra.ok, false);
+  assert(extra.failures.some((failure) => failure.includes("not a declared first-pass task")));
+});
 
 test("review routes templated story narrative to the editorial loop", () => {
   const review = reviewReportQuality(templatedStoryReport());
