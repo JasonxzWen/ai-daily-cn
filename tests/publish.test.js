@@ -821,7 +821,7 @@ test("publish prepare-clean-worktree resets only the dedicated checkout when it 
     [
       "ls-remote git@github.com:owner/repo.git",
       "fetch origin",
-      "checkout -B",
+      "checkout --force",
       "reset --hard",
       "clean -fd",
       "rev-parse --abbrev-ref",
@@ -829,13 +829,16 @@ test("publish prepare-clean-worktree resets only the dedicated checkout when it 
       "status --porcelain"
     ]
   );
+  const checkoutCall = calls.find((call) => call.args[0] === "checkout");
+  assert.deepEqual(checkoutCall?.args, ["checkout", "--force", "-B", "main", "origin/main"]);
 });
 
-test("publish prepare-clean-worktree installs dependencies with the configured pnpm store", async () => {
+test("publish prepare-clean-worktree refreshes existing dependencies with the configured pnpm store", async () => {
   const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-pnpm-store-"));
   const worktreeDir = path.join(repoRoot, ".tmp", "publish-worktrees", "main");
   const pnpmStoreDir = path.join(repoRoot, ".tmp", "pnpm-store");
   await fs.mkdir(path.join(worktreeDir, ".git"), { recursive: true });
+  await fs.mkdir(path.join(worktreeDir, "node_modules"), { recursive: true });
   await fs.writeFile(path.join(worktreeDir, "package.json"), JSON.stringify({ scripts: {} }));
   const calls = [];
 

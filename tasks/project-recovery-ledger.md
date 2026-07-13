@@ -20,7 +20,7 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Implementation path: scripts/run-daily-codex-pipeline.mjs and tests/daily-codex-pipeline.test.js.
 - Validation commands: node --test tests/daily-codex-pipeline.test.js; corepack pnpm run validate.
 - Runtime/production evidence: a real 2026-07-10 nested-Codex run produced a schema-constrained UTF-8 repair contract and passed the second quality review. The 2026-07-13 scheduled run then exposed a narrower follow-up defect: after a valid repair was applied, advisory `translation_fidelity` tasks were treated as write-authorized blockers and stopped the bounded loop after one attempt. This Slice filters the next handoff to safe public-editorial tasks that cover every error path; fresh scheduled closure remains post-merge.
-- Blocker: production_verified requires the PR to land so the clean origin/main publish worktree contains this implementation, followed by scheduled evidence.
+- Blocker: PR #294 and REC-323 are merged, but the first merged-main non-publish proof stopped before content stages because the reused clean publish clone could not overwrite tracked residue. REC-006 owns the force-checkout/dependency-refresh repair; fresh scheduled evidence follows that merge.
 - Recurrence prevention: one production entrypoint, capped attempts, exact path contracts, truthful terminal reasons, and regression tests.
 
 ### REC-002 - Source Watch truth convergence
@@ -32,7 +32,7 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Implementation path: production entrypoint, workflow contract, repository docs/prompts/tests, and C:/Users/Admin/.codex/automations/ai-2/automation.toml.
 - Validation commands: focused workflow-contract tests; node --test tests/daily-codex-pipeline.test.js; literal drift search; corepack pnpm run validate.
 - Runtime/production evidence: historical summaries remain valid for the pre-REC-301 state. The supported automation interface updated only `ai-2` prompt semantics; field-by-field reread preserved ACTIVE/schedule/cwd/project/bootstrap/model/reasoning/worktree/`--publish`. This Slice made its sole additional prompt change explicit UTF-8 reading of the dated run summary and re-proved the same field invariants. The same supported interface removed `ai-7`; evidence-backed orphan cleanup removed the stale `ai-daily` and `ai-daily-status-self-check` definitions while preserving the `ai-daily` bootstrap/cache/evidence support root. Live file inventory now contains exactly one `D:\ai-daily-cn` automation and the workflow validator passes with zero failures/warnings.
-- Blocker: real non-publish pipeline evidence must run after this PR lands because production deliberately prepares a clean checkout from remote `origin/main`.
+- Blocker: the first merged-main non-publish pipeline proof stopped in `prepare_clean_worktree`; REC-006 must land and produce a fresh terminal summary before Source Watch can advance beyond `locally_verified`.
 - Recurrence prevention: semantic contract tests and a thin scheduler prompt with no business state machine.
 
 ### REC-003 - All-history ADC shared asset
@@ -74,14 +74,14 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 ### REC-006 - Slice delivery and observation
 
 - Type: delivery / production acceptance.
-- Fact evidence: PR #289 is merged as the current baseline. This follow-up Slice has checkpoint `83ca25d` plus a fully validated implementation diff; its final full validation reported 900 tests / 898 pass / 0 fail / 2 skipped. That Slice's mobile evidence is now historical and superseded by REC-330; current browser acceptance is the canonical `1280x900` desktop surface. PR/CI/mergeability, post-merge real-run, and backfill preview evidence remain pending.
-- Root cause: delivery evidence must be regenerated for each Slice; production intentionally clones remote `origin/main`, so the truthful real non-publish run cannot exercise this unmerged branch.
+- Fact evidence: PRs #294, #295, and #296 are merged through `origin/main@d1c7ee3`. The first post-merge non-publish run wrote `.tmp/run-summary-2026-07-13.json` and truthfully stopped at `prepare_clean_worktree`: the dedicated clone was at `20e6751`, 361 commits behind, with 10 tracked modifications from the legitimate 2026-06-24 failed dry-run. Fetch succeeded; ordinary checkout failed before the promised hard reset. The same clone carried pre-pnpm-lock `node_modules`, so directory presence was also not valid dependency freshness evidence.
+- Root cause: the reusable clean-clone recovery sequence was not idempotent: ordinary checkout ran before reset, and dependency installation trusted any existing `node_modules` regardless of the current frozen lockfile.
 - State: implementing.
-- Implementation path: create the verified checkpoint, push current branch, create the PR, perform CI/conflict/merge closeout, then run the real non-publish pipeline and backfill previews from merged `origin/main` without treating old observation evidence as a substitute.
-- Validation commands: full local gates; gh PR/check/status commands; monitoring evidence after delivery.
-- Runtime/production evidence: PR URL, commit hashes, CI, mergeability, conflicts, branch protection, final real dry-run/previews, and later natural automation outcomes.
-- Blocker: local full/browser acceptance is green; remote PR checks and post-merge real-run/previews remain. Merge is explicitly authorized by the user for this Slice.
-- Recurrence prevention: PR unit per Slice and post-delivery monitoring with explicit terminal criteria.
+- Implementation path: force checkout only inside the bounded dedicated clean clone; refresh frozen-lockfile dependencies whenever that clone is reused; preserve the current dirty clone manifest/archive before recovery; then rerun the real non-publish pipeline from merged main.
+- Validation commands: focused RED/GREEN prepare-clean-worktree tests; full publish suite; workflow/Harness/diff checks; PR CodeQL/mergeability; post-merge real non-publish summary.
+- Runtime/production evidence: current failure is bounded and non-publishing. The old clone will be quarantined with path/status/hash evidence before the repaired entrypoint creates a fresh current-main clone.
+- Blocker: repair PR, evidence archive, and post-merge non-publish rerun remain. Backfill previews are still a later consolidated acceptance batch.
+- Recurrence prevention: force/reset only within the validated `.tmp` clean-clone boundary, do not use `node_modules` existence as lockfile freshness, and keep a deterministic command/dependency regression.
 
 ## Later Slice 1 - External Runtime Recovery
 
