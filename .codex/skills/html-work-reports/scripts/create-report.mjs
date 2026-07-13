@@ -561,7 +561,7 @@ async function createReport(input, options = {}) {
   const css = [
     fs.readFileSync(reportUiCssPath, "utf8"),
     mode === "runtime" ? fs.readFileSync(richRuntimeCssPath, "utf8") : "",
-    "table{width:100%;border-collapse:collapse;margin:10px 0}th,td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px}.unsafe-link{color:var(--danger);font-weight:700}.rich-status{font-size:12px;color:var(--muted)}nav.report-nav{position:sticky;top:0;z-index:5;margin:12px 0;padding:10px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px)}nav.report-nav a{display:inline-block;margin:4px 10px 4px 0;font-weight:700;text-decoration:none}.report-section-stack{display:grid;gap:12px}.panel{margin-top:12px}details{margin-top:10px}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}"
+    "table{width:100%;border-collapse:collapse;margin:10px 0}th,td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px}.unsafe-link{color:var(--danger);font-weight:700}.rich-status{font-size:12px;color:var(--muted)}nav.report-nav{position:sticky;top:0;z-index:5;margin:12px 0;padding:10px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px)}nav.report-nav a{display:inline-block;margin:4px 10px 4px 0;font-weight:700;text-decoration:none}.report-section-stack{display:grid;gap:12px}.panel{margin-top:12px}details{margin-top:10px}.tab-panel{margin-top:10px}"
   ].join("\n");
 
   const js = [
@@ -577,7 +577,6 @@ async function createReport(input, options = {}) {
 <html lang="en" data-html-work-report data-render-mode="${escapeAttr(mode)}" data-template="${escapeAttr(template)}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="html-work-reports create-report.mjs">
   <meta name="generated-at" content="${escapeAttr(generatedAt)}">
   <title>${escapeHtml(input.title)}</title>

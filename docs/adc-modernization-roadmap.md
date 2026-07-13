@@ -72,7 +72,7 @@ Wechat2RSS is treated as transport. The underlying account/source determines aut
 ## Explicit Non-Goals
 
 - No search, comparison, or favorite features in this stack.
-- No mobile-specific redesign.
+- Desktop-only at `1280x900`; mobile, tablet, narrow-screen, and touch-only work is not maintained or considered.
 - No Next.js or Vercel runtime migration.
 - No direct publication of internal source strategy fields.
 - No production use of Stitch-generated code.

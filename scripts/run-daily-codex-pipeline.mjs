@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import fsSync from "node:fs";
 import fs from "node:fs/promises";
@@ -1735,16 +1735,16 @@ export async function spawnWithPrompt(command, args, options) {
     };
     const timeout = setTimeout(() => {
       timedOut = true;
-      const terminateProcessTree = options.terminateProcessTree || terminateSpawnedProcessTree;
-      try {
-        void Promise.resolve(terminateProcessTree(child)).catch(() => directKillSpawnedChild(child));
-      } catch {
-        directKillSpawnedChild(child);
-      }
       hardTimeoutTimer = setTimeout(
         () => void settleTimedOut({ force: true }),
         terminationGraceMs
       );
+      const terminateProcessTree = options.terminateProcessTree || terminateSpawnedProcessTree;
+      try {
+        void Promise.resolve(terminateProcessTree(child, { timeoutMs: terminationGraceMs })).catch(() => directKillSpawnedChild(child));
+      } catch {
+        directKillSpawnedChild(child);
+      }
     }, timeoutMs);
     child.stdout.pipe(stdout);
     child.stderr.pipe(stderr);
@@ -1780,19 +1780,17 @@ export async function spawnWithPrompt(command, args, options) {
   });
 }
 
-function terminateSpawnedProcessTree(child) {
+function terminateSpawnedProcessTree(child, { timeoutMs = 1000 } = {}) {
   const pid = Number(child?.pid);
   if (!Number.isInteger(pid) || pid <= 0) return;
   if (process.platform === "win32") {
-    const killer = spawn("taskkill.exe", ["/PID", String(pid), "/T", "/F"], {
+    const killer = spawnSync("taskkill.exe", ["/PID", String(pid), "/T", "/F"], {
       shell: false,
       stdio: "ignore",
-      windowsHide: true
+      windowsHide: true,
+      timeout: Math.max(1, Math.min(5000, Number(timeoutMs) || 1000))
     });
-    killer.on("error", () => directKillSpawnedChild(child));
-    killer.on("close", (code) => {
-      if (code !== 0) directKillSpawnedChild(child);
-    });
+    if (killer.error || killer.status !== 0) directKillSpawnedChild(child);
     return;
   }
   try {

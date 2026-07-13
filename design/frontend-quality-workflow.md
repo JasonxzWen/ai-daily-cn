@@ -5,7 +5,7 @@
 <!-- impeccable-boundary -->
 <!-- frontend-quality-validation -->
 
-ADC frontend quality work uses external design systems as evidence and review language, not as unreviewed production source. The product remains a desktop-first AI news data product implemented with React, Astryx, and Vite.
+ADC frontend quality work uses external design systems as evidence and review language, not as unreviewed production source. The product is a desktop-only AI news data product implemented with React, Astryx, and Vite; its canonical acceptance viewport is `1280x900`.
 
 ## Adopted Sources
 
@@ -21,7 +21,7 @@ Every material ADC frontend PR must record or surface:
 - Source/tool evidence: prototype source, manual sketch, Stitch/v0/Figma record, or explicit reason no external prototype was used.
 - Implementation boundary: translate ideas into the ADC React/Astryx component system; do not commit generated code directly to production paths.
 - Interaction evidence: hover, focus, loading, empty, error, and reduced-motion behavior, including `prefers-reduced-motion` where motion is introduced.
-- Browser acceptance: Playwright or equivalent local browser run with scenario, viewport, console/network findings, and screenshot or trace when the UI changes.
+- Browser acceptance: Playwright or equivalent local browser run at `1280x900` with scenario, console/network findings, and screenshot or trace when the UI changes. Do not add mobile, tablet, narrow-screen, or touch-only evidence.
 - Audit evidence: Impeccable detector/review output when available, or an explicit skip reason when the tool is unavailable or not applicable.
 
 ## Standard Flow

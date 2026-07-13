@@ -14,7 +14,7 @@ This project uses AI design tools as prototype accelerators, not as direct produ
 - Generated code is not committed directly to production.
 - Prototype output must be translated into React, Astryx components, and ADC CSS tokens by the maintainer.
 - GitHub Pages remains the deployment target; no prototype tool may introduce a hosted runtime requirement.
-- Prototype decisions must preserve the current product scope: no search, comparison, favorites, right rail, topic dashboard, or mobile-specific redesign unless explicitly reopened.
+- Prototype decisions must preserve the current product scope: no search, comparison, favorites, right rail, topic dashboard, mobile/tablet/narrow-screen, or touch-only variants. The desktop-only boundary requires a new explicit product decision to change.
 
 ## Required Record
 

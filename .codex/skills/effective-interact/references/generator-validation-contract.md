@@ -44,7 +44,7 @@ Static validation must fail on:
 
 Browser validation must fail on:
 
-- blank or incomplete viewports;
+- blank or incomplete canonical desktop renders;
 - horizontal overflow;
 - clipped text;
 - broken hover/focus/copy interactions;

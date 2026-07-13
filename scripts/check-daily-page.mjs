@@ -8,13 +8,17 @@ import { evaluateDailyPageChecklist, classifyDailyPageCheckResults } from "../sr
 const argv = process.argv.slice(2);
 const args = parseArgs(argv);
 const positional = positionalArgs(argv);
+if (args.viewports || positional.some((value) => /^(?:\d+x\d+)(?:[,\s]+\d+x\d+)*$/i.test(String(value).trim()))) {
+  process.stderr.write("quality:page-check uses the fixed 1280x900 desktop viewport; viewport overrides are unsupported\n");
+  process.exit(1);
+}
 const inferred = inferPositionalArgs(positional);
 const reportDate = args.date || firstDate(argv);
 const rootDir = path.resolve(args["repo-root"] || process.cwd());
 const outDir = path.resolve(rootDir, args.out || inferred.outDir || "docs");
 const outputArg = args.output || inferred.outputPath;
 const outputPath = outputArg ? path.resolve(rootDir, outputArg) : "";
-const viewports = parseViewports(args.viewports || inferred.viewports || "1280x900,375x812");
+const viewport = { width: 1280, height: 900 };
 
 if (!reportDate) {
   process.stderr.write("quality:page-check requires --date YYYY-MM-DD\n");
@@ -28,14 +32,12 @@ const publicReportData = await readPublicReportData(outDir, reportDate);
 const expectedQualityStatus = String(publicReportData?.quality_status?.status || "").trim();
 
 try {
-  for (const viewport of viewports) {
-    const page = await browser.newPage({ viewport });
-    const [year, month] = reportDate.split("-");
-    await page.goto(`${server.url}/reports/${year}/${month}/${reportDate}.html`, { waitUntil: "domcontentloaded" });
-    await eagerLoadImages(page);
-    results.push(await evaluateDailyPageChecklist(page, { reportDate, expectedQualityStatus }));
-    await page.close();
-  }
+  const page = await browser.newPage({ viewport });
+  const [year, month] = reportDate.split("-");
+  await page.goto(`${server.url}/reports/${year}/${month}/${reportDate}.html`, { waitUntil: "domcontentloaded" });
+  await eagerLoadImages(page);
+  results.push(await evaluateDailyPageChecklist(page, { reportDate, expectedQualityStatus }));
+  await page.close();
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));
@@ -173,8 +175,7 @@ function positionalArgs(argv) {
 function inferPositionalArgs(positional) {
   const inferred = {
     outDir: "",
-    outputPath: "",
-    viewports: ""
+    outputPath: ""
   };
   const values = [...positional];
   const dateIndex = values.findIndex((value) => /^\d{4}-\d{2}-\d{2}$/.test(value));
@@ -183,11 +184,6 @@ function inferPositionalArgs(positional) {
   }
 
   for (const value of values) {
-    const viewportList = normalizeViewportList(value);
-    if (viewportList) {
-      inferred.viewports = [inferred.viewports, viewportList].filter(Boolean).join(",");
-      continue;
-    }
     if (!inferred.outDir && !looksLikeJsonOutputPath(value)) {
       inferred.outDir = value;
       continue;
@@ -200,34 +196,6 @@ function inferPositionalArgs(positional) {
   return inferred;
 }
 
-function normalizeViewportList(value) {
-  const parts = String(value || "")
-    .split(/[,\s]+/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-  if (!parts.length || !parts.every((part) => /^\d+x\d+$/.test(part))) {
-    return "";
-  }
-  return parts.join(",");
-}
-
 function looksLikeJsonOutputPath(value) {
   return /\.json$/i.test(String(value || ""));
-}
-
-function parseViewports(value) {
-  return String(value || "")
-    .split(/[,\s]+/)
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .map((part) => {
-      const match = /^(\d+)x(\d+)$/.exec(part);
-      if (!match) {
-        throw new Error(`Invalid viewport: ${part}`);
-      }
-      return {
-        width: Number.parseInt(match[1], 10),
-        height: Number.parseInt(match[2], 10)
-      };
-    });
 }

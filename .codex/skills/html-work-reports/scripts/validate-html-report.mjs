@@ -122,7 +122,7 @@ function validateStatic(html) {
     "filters, tabs, or copy controls missing",
     issues
   );
-  add(checks, "responsive-motion", html.includes("prefers-reduced-motion"), "missing reduced-motion CSS", issues);
+  add(checks, "reduced-motion", html.includes("prefers-reduced-motion"), "missing reduced-motion CSS", issues);
 
   if (runtime) {
     add(checks, "runtime-pins", runtimePins, "runtime mode does not declare pinned dependencies", issues);
@@ -155,7 +155,7 @@ async function validateBrowser(file, options) {
   let browser;
   try {
     browser = await chromium.launch({ channel: "chrome", headless: true });
-    const page = await browser.newPage({ viewport: { width: 390, height: 780 } });
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     await page.goto(`file://${path.resolve(file).replaceAll("\\", "/")}`);
     const title = await page.locator(".report-title, h1").first().textContent({ timeout: 3000 });
     const bodyBox = await page.locator("body").boundingBox();
@@ -165,13 +165,13 @@ async function validateBrowser(file, options) {
     if (await tab.count()) await tab.click();
     const hiddenPanels = await page.locator("[data-tab-panel-group][hidden], [data-filter-target][hidden]").count();
 
-    if (!title || !bodyBox || bodyBox.width < 300) {
-      return { status: "failed", reason: "blank or badly sized narrow viewport" };
+    if (!title || !bodyBox || bodyBox.width < 900) {
+      return { status: "failed", reason: "blank or badly sized desktop viewport" };
     }
 
     return {
       status: "passed",
-      reason: "narrow viewport loaded and basic controls were exercised",
+      reason: "desktop viewport loaded and basic controls were exercised",
       hiddenPanels
     };
   } catch (error) {

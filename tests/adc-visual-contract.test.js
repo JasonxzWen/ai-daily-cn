@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
@@ -33,15 +34,129 @@ test("React homepage keeps badges monochrome and exposes resilient UI states", a
   assert.match(app, /className="adc-skip-link"/);
 });
 
-test("React homepage CSS supports narrow viewports and direct Astryx badge overrides", async () => {
+test("React homepage CSS is desktop-only and keeps direct Astryx badge overrides", async () => {
   const css = await fs.readFile(path.join(rootDir, "apps", "web", "src", "styles.css"), "utf8");
 
   assert.doesNotMatch(css, /body\s*\{[^}]*min-width:\s*1120px/s);
   assert.match(css, /\.astryx-badge/);
-  assert.match(css, /@media\s*\(max-width:\s*720px\)/);
-  assert.match(css, /@media\s*\(max-width:\s*720px\)[\s\S]*?\.adc-source-watch-header\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+  assert.doesNotMatch(css, /@media\s*\([^)]*\b(?:max|min)-width\s*:/i);
   assert.match(css, /\.adc-source-watch h2\s*\{[^}]*color:\s*var\(--adc-card\)/);
   assert.match(css, /:focus-visible/);
+});
+
+test("desktop-only contract rejects project-owned mobile support paths", async () => {
+  const policy = await fs.readFile(path.join(rootDir, "docs", "desktop-only-support-policy.md"), "utf8");
+  assert.match(policy, /1280x900/);
+  assert.match(policy, /手机、平板、窄屏和触摸专用布局/);
+  assert.match(policy, /第三方依赖内部的通用 touch\/pointer\/响应式兼容/);
+
+  const governedFiles = [
+    "apps/web/index.html",
+    "apps/web/src/styles.css",
+    "packages/design/src/adc-theme.css",
+    "src/render.js",
+    "src/site.js",
+    "src/page-checklist.js",
+    "scripts/check-daily-page.mjs",
+    "tests/e2e/site.e2e.js",
+    "tests/skills.test.js",
+    ".codex/skills/effective-interact/assets/components/interaction-ui.css",
+    ".codex/skills/effective-interact/scripts/create-interaction.mjs",
+    ".codex/skills/effective-interact/scripts/validate-interaction.mjs",
+    ".codex/skills/html-work-reports/assets/components/report-ui.css",
+    ".codex/skills/html-work-reports/scripts/create-report.mjs",
+    ".codex/skills/html-work-reports/scripts/validate-html-report.mjs",
+    "docs/assets/adc-theme.css",
+    "docs/assets/style.css",
+    "docs/index.html",
+    "docs/ops.html",
+    "docs/official-blogs/index.html"
+  ];
+  governedFiles.push(...(await collectHtmlFiles(path.join(rootDir, ".codex", "skills", "effective-interact", "assets", "templates")))
+    .map((file) => path.relative(rootDir, file)));
+  governedFiles.push(...(await collectHtmlFiles(path.join(rootDir, ".codex", "skills", "html-work-reports", "assets", "templates")))
+    .map((file) => path.relative(rootDir, file)));
+
+  const forbiddenPatterns = [
+    ["width-based media query", /@media\s*\([^)]*(?:(?:max|min)-width\s*:|\bwidth\s*[<>=])/i],
+    ["viewport meta tag", /<meta\b[^>]*\bname\s*=\s*["']viewport["'][^>]*>/i],
+    ["touch-only momentum scrolling", /-webkit-overflow-scrolling:\s*touch/i],
+    ["touch-only event handler", /\btouch(?:start|move|end|cancel)\b/i],
+    ["coarse-pointer layout branch", /\(\s*(?:pointer\s*:\s*coarse|hover\s*:\s*none)\s*\)/i],
+    ["JavaScript viewport-width branch", /(?:window\.innerWidth|document\.documentElement\.clientWidth)\s*(?:<=|>=|<|>)\s*\d+/i]
+  ];
+
+  for (const relativePath of governedFiles) {
+    const source = await fs.readFile(path.join(rootDir, relativePath), "utf8");
+    for (const [label, pattern] of forbiddenPatterns) {
+      assert.doesNotMatch(source, pattern, `${relativePath} must not contain ${label}`);
+    }
+  }
+
+  const generatedHomeCss = await fs.readFile(path.join(rootDir, "docs", "assets", "adc-home.css"), "utf8");
+  assert.doesNotMatch(generatedHomeCss, /@media\s*\(width<=1100px\)\{\.adc-shell/i, "generated homepage must not restore the removed 1100px ADC breakpoint");
+  assert.doesNotMatch(generatedHomeCss, /@media\s*\(width<=720px\)\{\.adc-shell/i, "generated homepage must not restore the removed 720px ADC breakpoint");
+  assert.doesNotMatch(generatedHomeCss, /@media\s*\(width<=640px\)\{\.adc-report-brand/i, "generated homepage must not restore the removed ADC report-brand breakpoint");
+
+  const interactionValidator = await fs.readFile(path.join(rootDir, ".codex", "skills", "effective-interact", "scripts", "validate-interaction.mjs"), "utf8");
+  assert.match(interactionValidator, /Emulation\.setDeviceMetricsOverride[\s\S]*?mobile:\s*false/, "CDP requires an explicit desktop device-emulation flag");
+  assert.doesNotMatch(interactionValidator, /mobile:\s*(?:true|width\s*[<>=])/, "interaction validation must never enable device emulation or derive it from viewport width");
+  assert.match(interactionValidator, /const browserViewport\s*=\s*\{\s*width:\s*1280,\s*height:\s*900\s*\}/);
+
+  const pageCheckScript = await fs.readFile(path.join(rootDir, "scripts", "check-daily-page.mjs"), "utf8");
+  assert.match(pageCheckScript, /const viewport\s*=\s*\{\s*width:\s*1280,\s*height:\s*900\s*\}/);
+  assert.match(pageCheckScript, /viewport overrides are unsupported/);
+  assert.doesNotMatch(pageCheckScript, /parseViewports|normalizeViewportList|for\s*\(const viewport/);
+  for (const overrideArgs of [
+    ["--viewports", "390x844"],
+    ["1280x900 390x1200"],
+    ["1280x900,390x1200"]
+  ]) {
+    const rejected = spawnSync(process.execPath, ["scripts/check-daily-page.mjs", "--date", "2026-07-09", ...overrideArgs], {
+      cwd: rootDir,
+      encoding: "utf8"
+    });
+    assert.equal(rejected.status, 1, `page-check must reject viewport override ${overrideArgs.join(" ")}`);
+    assert.match(rejected.stderr, /fixed 1280x900 desktop viewport/);
+  }
+
+  const htmlReportValidator = await fs.readFile(path.join(rootDir, ".codex", "skills", "html-work-reports", "scripts", "validate-html-report.mjs"), "utf8");
+  assert.match(htmlReportValidator, /newPage\(\{\s*viewport:\s*\{\s*width:\s*1280,\s*height:\s*900\s*\}\s*\}\)/);
+
+  for (const relativePath of ["tests/e2e/site.e2e.js", "tests/skills.test.js"]) {
+    const source = await fs.readFile(path.join(rootDir, relativePath), "utf8");
+    const viewportSizes = [
+      ...source.matchAll(/viewport:\s*\{\s*width:\s*(\d+),\s*height:\s*(\d+)/g),
+      ...source.matchAll(/setViewportSize\(\{\s*width:\s*(\d+),\s*height:\s*(\d+)/g)
+    ].map((match) => [Number(match[1]), Number(match[2])]);
+    assert.equal(viewportSizes.length > 0, true, `${relativePath} must exercise the canonical desktop viewport`);
+    assert.deepEqual([...new Set(viewportSizes.map((size) => size.join("x")))], ["1280x900"], `${relativePath} must not exercise other viewport sizes`);
+  }
+
+  const activeInstructionFiles = [
+    "apps/web/README.md",
+    "docs/ai-daily-distribution-testing-prompt-spec.md",
+    "docs/skill-hub-frontend-html-capability-evaluation.md",
+    "prompts/ai-daily/modules/output-html.md",
+    "prompts/ai-daily/modules/structured-report-json.md",
+    "prompts/ai-daily/modules/editorial-authority.md",
+    ".codex/skills/design-taste-frontend/references/visual-discipline.md",
+    ".codex/skills/design-taste-frontend/references/redesign-and-preflight.md",
+    ".claude/skills/design-taste-frontend/references/visual-discipline.md",
+    ".claude/skills/design-taste-frontend/references/redesign-and-preflight.md",
+    "evaluator-rubric.md"
+  ];
+  const retiredInstruction = /桌面和移动端阅读|在移动视口|移动\/桌面无明显重叠|验证移动视口|移动端不能横向撑破页面|手机端不可读|移动视口建立|日报页、移动视口|Check mobile wrapping|mobile and desktop|responsive rules stay|desktop\/mobile|desktop\/narrow|375x812|390px layout/i;
+  for (const relativePath of activeInstructionFiles) {
+    const source = await fs.readFile(path.join(rootDir, relativePath), "utf8");
+    assert.match(source, /1280x900/, `${relativePath} must name the canonical desktop viewport`);
+    assert.doesNotMatch(source, retiredInstruction, `${relativePath} must not restore a retired mobile instruction`);
+  }
+
+  const ledger = await fs.readFile(path.join(rootDir, "tasks", "project-recovery-ledger.md"), "utf8");
+  const rec330 = ledger.match(/### REC-330[\s\S]*?(?=\n## |\n### REC-331|$)/)?.[0] || "";
+  assert.match(rec330, /1280x900/);
+  assert.doesNotMatch(rec330, /desktop\/mobile|desktop\/narrow|375x812|390px layout/i);
 });
 
 test("static public surfaces declare the shared ADC skin instead of implying separate themes", () => {
@@ -90,6 +205,8 @@ test("generated historical reports share one external ADC theme asset", async ()
     assert.equal(links.length, 1, path.relative(rootDir, reportPath));
     assert.match(html, /<body data-adc-public-surface="report">/);
     assert.doesNotMatch(html, /<style data-adc-public-theme>|--adc-paper/);
+    assert.doesNotMatch(html, /<meta\b[^>]*\bname\s*=\s*["']viewport["'][^>]*>/i);
+    assert.doesNotMatch(html, /@media\s*\([^)]*(?:(?:max|min)-width\s*:|\bwidth\s*[<>=])/i);
     const assetPath = path.resolve(path.dirname(reportPath), links[0][1].split("?")[0]);
     assert.equal(await fs.readFile(assetPath, "utf8"), adcPublicThemeCss + "\n");
   }

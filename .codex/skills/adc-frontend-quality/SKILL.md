@@ -14,6 +14,8 @@ metadata:
 
 Use this skill as the ADC-specific frontend quality gate. It keeps product UI work grounded in the local React/Astryx stack while allowing taste-skill and Impeccable to inform visual decisions and review evidence.
 
+ADC is desktop-only. Design and browser acceptance use `1280x900`; do not introduce mobile, tablet, narrow-screen, touch-only, or width-breakpoint variants. Generic compatibility inside React/Astryx is not product support evidence.
+
 ## Startup
 
 1. Read `design/frontend-quality-workflow.md`.
@@ -36,5 +38,5 @@ Before frontend handoff, include:
 - source/tool evidence or a skip reason;
 - component-system fit for React and Astryx;
 - interaction states and `prefers-reduced-motion` handling when relevant;
-- browser acceptance evidence with scenario, viewport, console/network result, and screenshot or trace when UI changes;
+- browser acceptance evidence at `1280x900` with scenario, console/network result, and screenshot or trace when UI changes;
 - Impeccable audit result or explicit skip reason.

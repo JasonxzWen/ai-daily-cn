@@ -428,7 +428,7 @@ Generator and validator scripts are internal `effective-interact` assets. Do not
 
 - Use a `data-table` section when the artifact has repeated fields across multiple items, because the reader can compare rows faster than scanning separate cards.
 - The component highlights the hovered or focused cell, its row, and its column. The hovered cell receives both row and column highlight classes plus a small `transform: scale(...)` emphasis; neighboring cells use color and outline only, so the table does not reflow.
-- Keep column labels short, use `align: "right"` only for numbers, and let long text wrap inside cells. On narrow screens the table must scroll inside its own wrapper rather than widening the page.
+- Keep column labels short, use `align: "right"` only for numbers, and let long text wrap inside cells. At the canonical desktop viewport, an intentionally wide table must scroll inside its own wrapper rather than widening the page.
 - Do not use the table component as decoration. A two-column key/value table is useful for status summaries; a single row of large prose is usually better as normal Markdown.
 
 ## Rich Content Contract
@@ -497,7 +497,7 @@ Runtime rules:
 - Prefer content groups such as `summary`, `main`, `changes`, `impact`, `risks`, `decision`, `verification`, `next`, and `details`.
 - Use component groups such as `diagrams`, `code`, or `evidence` only when the artifact intentionally contains those components and the group helps the reader.
 - Desktop artifacts should keep navigation visually separate from the reading column.
-- Narrow artifacts should wrap, collapse, or scroll navigation without body-level horizontal overflow.
+- Artifacts must avoid body-level horizontal overflow at the canonical `1280x900` desktop viewport.
 - Navigation, tab, and filter controls should read as joined segmented groups, not scattered buttons. Include a return-to-overview path for long artifacts.
 - Long section names need wrapping, truncation with `title`, or an equivalent accessible affordance. Navigation labels are Chinese by default and should describe the argument, not the widget inventory.
 
@@ -539,7 +539,7 @@ Run `scripts/validate-interaction.mjs` on generated or custom HTML before handof
 - Mermaid ready SVG in browser-required validation; degraded or failed Mermaid is blocking
 - code highlight markup, language classes, line wrappers, and inert file path labels
 - evidence, verification status, filter, tab, and copy controls only when the artifact contains those optional modules
-- browser checks across narrow, medium, and desktop viewports for body overflow, major overlap, Mermaid containment, code tokens, chart containment, visible focus, reduced-motion CSS, primary conclusion visibility, and control state changes
+- browser checks at the canonical `1280x900` desktop viewport for body overflow, major overlap, Mermaid containment, code tokens, chart containment, visible focus, reduced-motion CSS, primary conclusion visibility, and control state changes
 - advisory visual-structure gate for HTML reports that still read like linear prose even though the skill was loaded
 
 If Playwright/Chrome is unavailable, browser-only coverage must be reported as `degraded`; with `--require-browser`, validation must fail instead of silently claiming browser checks passed.
@@ -563,7 +563,6 @@ Use this structure unless the task clearly needs something else:
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Report title</title>
   <style>
     :root { color-scheme: light; }
@@ -572,7 +571,6 @@ Use this structure unless the task clearly needs something else:
     nav a { display: block; }
     section { margin-block: 28px; }
     .summary { border-left: 4px solid #2563eb; padding-left: 16px; }
-    @media (max-width: 720px) { main { padding: 16px; } }
   </style>
 </head>
 <body>
@@ -605,7 +603,7 @@ Use this structure unless the task clearly needs something else:
 - Engineering artifacts should be dense but calm.
 - Use color to encode severity, status, ownership, or grouping.
 - Avoid decorative backgrounds that make evidence harder to read.
-- Use responsive grids and allow tables to scroll horizontally on small screens.
+- Use stable desktop grids and allow intentionally wide tables to scroll inside their own containers.
 - Prefer inline SVG for diagrams that need precise labels or arrows.
 - Replace paragraphs longer than 3 short lines with cards, bullets, or progressive disclosure.
 - Let the page do work Markdown cannot: spatial comparison, sticky context, direct code emphasis, filters, copy/export, and rendered diagrams.

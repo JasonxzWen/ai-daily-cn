@@ -48,7 +48,7 @@ Do not use this skill for:
 
 Write one self-contained static `.html` under `reports/` unless the repo has a better convention. In chat, link the file and verification.
 
-Build with visual blocks, tables, timelines, diagrams, cards, code panels, and chips. Keep keyboard access, narrow width readability, and `prefers-reduced-motion`.
+Build with visual blocks, tables, timelines, diagrams, cards, code panels, and chips. Keep keyboard access, desktop readability, and `prefers-reduced-motion`; ai-daily-cn does not support mobile, tablet, narrow-screen, or touch-only variants.
 
 Use only inlineable HTML/CSS and vanilla JS for report components. If a visual idea needs React, Tailwind, Vite, or another build step, port the static shape or skip it.
 
@@ -93,7 +93,7 @@ Use `assets/components/report-ui.css` and `assets/components/report-ui.js` for c
 
 Before handing off:
 
-Run `scripts/validate-html-report.mjs` when possible. Otherwise inspect non-empty output, narrow viewport sanity, rendered Markdown/Mermaid/code, controls, and linked evidence.
+Run `scripts/validate-html-report.mjs` when possible. Otherwise inspect non-empty output at `1280x900`, rendered Markdown/Mermaid/code, controls, and linked evidence.
 
 ## Related Skills
 

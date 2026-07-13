@@ -2435,7 +2435,7 @@ async function createInteraction(input, options = {}) {
   const css = [
     fs.readFileSync(reportUiCssPath, "utf8"),
     isRuntimeMode(mode) ? fs.readFileSync(richRuntimeCssPath, "utf8") : "",
-    "table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}"
+    "table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}"
   ].join("\n");
 
   const js = [
@@ -2473,7 +2473,6 @@ async function createInteraction(input, options = {}) {
 <html lang="zh-CN" data-html-work-report data-render-mode="${escapeAttr(mode)}" data-artifact-kind="${escapeAttr(intent.artifactKind)}" data-status="${escapeAttr(input.status)}"${handoffAttributes} data-runtime-state="${isRuntimeMode(mode) ? "pending" : "not-runtime"}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="effective-interact create-interaction.mjs">
   <meta name="generated-at" content="${escapeAttr(generatedAt)}">
   <meta name="render-mode" content="${escapeAttr(mode)}">

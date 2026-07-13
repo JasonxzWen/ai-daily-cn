@@ -7,6 +7,6 @@ Use this checklist when a daily report item should render a source icon but fall
 - [ ] The rendered report was regenerated after changing the icon cache.
 - [ ] The affected title renders an `img.inline-site-icon` before the link text.
 - [ ] The icon `src` is a concrete image data URI or trusted favicon URL, not a generated initials SVG.
-- [ ] The icon image is loaded and has non-zero rendered dimensions on desktop and mobile viewports.
+- [ ] The icon image is loaded and has non-zero rendered dimensions at the canonical `1280x900` desktop viewport.
 - [ ] Source summary bullets are reader-facing Chinese, not untranslated English source excerpts.
 - [ ] The public page quality checklist still passes after regeneration.

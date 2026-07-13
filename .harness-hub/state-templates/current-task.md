@@ -92,7 +92,7 @@ State the concrete outcome for the active Codex goal.
 
 - P0: Must pass before handoff. Include the new or changed behavior test, nearest relevant suite, required static/runtime gates, and Web browser acceptance when this task changes Web user-visible behavior.
 - P1: Run or risk-assess affected module, integration, system, API, data-flow, or cross-boundary checks.
-- P2: Hardening checks such as broader regression, repeated runs, cross-browser/mobile viewport, accessibility, or performance. Defer only with a recorded reason.
+- P2: Hardening checks such as broader regression, repeated runs, desktop cross-browser, accessibility, or performance. Mobile, tablet, narrow-screen, and touch-only viewports are outside ai-daily-cn scope. Defer other hardening only with a recorded reason.
 - Static: lint, typecheck, format, or structural checks.
 - Runtime: tests, build, startup, smoke, or health checks.
 - User flow: end-to-end, integration, browser, CLI, or scenario checks.

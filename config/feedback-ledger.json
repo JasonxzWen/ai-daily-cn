@@ -1039,7 +1039,7 @@
       "status": "implemented",
       "title": "Reject full-page official tracking snapshots",
       "problem": "OpenRouter and Artificial Analysis official snapshot capture could fall back to `main` or `body`, causing the public daily page to render whole-page navigation, huge logos, oversized SVGs, and thousands of pixels of broken layout while previous gates still passed.",
-      "expected_behavior": "Official tracking snapshots are publishable only when they are bounded component fragments, not full-page DOM dumps. `main`, `body`, `html`, `#root`, and `#__next` snapshots are rejected; legacy broad snapshots degrade to a source-unavailable note rather than rendering local fake components or giant official page fragments. Page checks fail oversized official snapshots on desktop and mobile.",
+      "expected_behavior": "Official tracking snapshots are publishable only when they are bounded component fragments, not full-page DOM dumps. `main`, `body`, `html`, `#root`, and `#__next` snapshots are rejected; legacy broad snapshots degrade to a source-unavailable note rather than rendering local fake components or giant official page fragments. Page checks fail oversized official snapshots at the canonical 1280x900 desktop viewport.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",

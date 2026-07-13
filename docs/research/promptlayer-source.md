@@ -29,6 +29,8 @@ This repo is not a Next.js clone target, so the workflow is adapted to the exist
 
 ## Reference Screenshots
 
+> 下列移动端截图与行为仅保存 2026-06-22 的外部信源和历史取证；REC-330 后它们不构成 ai-daily-cn 的设计、维护或验收范围。
+
 - PromptLayer desktop hero: `output/playwright/promptlayer-clone/promptlayer-desktop1440-full.png`
 - PromptLayer mobile hero: `output/playwright/promptlayer-clone/promptlayer-mobile390-full.png`
 - PromptLayer scroll frames: `output/playwright/promptlayer-scroll/promptlayer-scroll-00.png` through `promptlayer-scroll-12.png`
@@ -67,7 +69,7 @@ This repo is not a Next.js clone target, so the workflow is adapted to the exist
 - The visual editor section responds to wheel progression by changing the arc label positions and paper preview state.
 - Header stays fixed and swaps dark/light treatment depending on the visible section.
 - Hover states are subtle: color/fill changes, background changes, and restrained transform transitions rather than heavy shadows.
-- Mobile keeps the same grammar but stacks the hero, logo rail, visual preview, and cards into narrow full-width rule cells.
+- Mobile kept the same grammar but stacked the hero, logo rail, visual preview, and cards into narrow full-width rule cells in the historical capture; this is evidence only, not a current support requirement.
 
 ## Copied Versus Replaced
 

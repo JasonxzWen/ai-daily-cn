@@ -1141,7 +1141,7 @@ test("effective-interact filterable cards support exclusive default filters", as
   const { chromium } = await import("@playwright/test");
   const browser = await chromium.launch({ headless: true });
   try {
-    const page = await browser.newPage({ viewport: { width: 900, height: 700 } });
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     await page.goto(pathToFileURL(payload.outputPath).href);
     await page.click('#section-exclusive-filters > .toolbar button[data-filter-value="Alpha"]');
     const clickedState = await page.evaluate(() => {

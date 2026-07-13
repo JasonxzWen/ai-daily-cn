@@ -116,4 +116,4 @@ node --test tests/unit.test.js
 corepack pnpm run quality:page-check -- --date YYYY-MM-DD
 ```
 
-涉及页面结构、icon、tag、左栏或折叠行为时，还要跑相关 unit/e2e，并保留桌面和移动 viewport 的浏览器验收记录。
+涉及页面结构、icon、tag、左栏或折叠行为时，还要跑相关 unit/e2e，并只保留 `1280x900` 桌面 viewport 的浏览器验收记录。移动、平板、窄屏和触摸专用设计不在产品范围内。

@@ -40,7 +40,7 @@ Use the closest asset and delete sections that do not apply:
 | `assets/templates/review-findings.html` | A PR/code/doc review has multiple findings, severity levels, or reviewer focus areas. | severity filters, finding cards, annotated code panel, file tour, action export |
 | `assets/templates/research-explainer.html` | Research, architecture, or module understanding needs citations, diagrams, examples, and a glossary. | TL;DR grid, rendered rich-text sections, tabbed examples, diagram panel, source rail |
 | `assets/templates/decision-matrix.html` | Multiple options, product choices, or implementation approaches need trade-off comparison. | option cards, recommendation, risk notes, confirmation questions |
-| `assets/components/report-ui.css` | A custom page needs common visual primitives. | cards, chips, source links, code blocks, diff panels, Mermaid evidence panels, focus/dim effects, responsive grids |
+| `assets/components/report-ui.css` | A custom page needs common visual primitives. | cards, chips, source links, code blocks, diff panels, Mermaid evidence panels, focus/dim effects, desktop grids |
 | `assets/components/report-ui.js` | A custom page needs simple interactions. | filters, tabs, search, copy/export buttons, evidence spotlight, selected-state focus |
 | `assets/components/rich-render-runtime.css` | A report needs runtime-rendered Markdown, Mermaid, or highlighted code. | rendered Markdown styling, Mermaid fallback styling, highlight token affordances |
 | `assets/components/rich-render-runtime.js` | A report needs runtime-rendered Markdown, Mermaid, or highlighted code. | Marked + DOMPurify bridge, Mermaid `run`, highlight.js `highlightElement`, status badges |
@@ -162,7 +162,7 @@ Run `scripts/validate-html-report.mjs` on generated or custom HTML before handof
 - Mermaid inline SVG or explicit runtime fallback
 - code highlight markup and inert file path labels
 - evidence, verification status, filter, tab, copy, focus/motion support
-- optional browser checks for narrow viewport and basic control state changes
+- optional browser checks at `1280x900` and basic control state changes
 
 If Playwright/Chrome is unavailable, browser-only coverage must be reported as `degraded`; do not silently claim browser checks passed.
 
@@ -182,7 +182,6 @@ Use this structure unless the task clearly needs something else:
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Report title</title>
   <style>
     :root { color-scheme: light; }
@@ -191,7 +190,6 @@ Use this structure unless the task clearly needs something else:
     nav a { margin-right: 12px; }
     section { margin-block: 28px; }
     .summary { border-left: 4px solid #2563eb; padding-left: 16px; }
-    @media (max-width: 720px) { main { padding: 16px; } }
   </style>
 </head>
 <body>
@@ -223,7 +221,7 @@ Use this structure unless the task clearly needs something else:
 - Engineering reports should be dense but calm.
 - Use color to encode severity, status, ownership, or grouping.
 - Avoid decorative backgrounds that make evidence harder to read.
-- Use responsive grids and allow tables to scroll horizontally on small screens.
+- Use stable desktop grids and allow intentionally wide tables to scroll inside their own containers.
 - Prefer inline SVG for diagrams that need precise labels or arrows.
 - Replace paragraphs longer than 3 short lines with cards, bullets, or progressive disclosure.
 - Let the page do work Markdown cannot: spatial comparison, sticky context, direct code emphasis, filters, copy/export, and rendered diagrams.

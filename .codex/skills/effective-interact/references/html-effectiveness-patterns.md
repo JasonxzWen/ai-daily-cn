@@ -57,7 +57,7 @@ Selective source: `Leonxlnx/taste-skill` at `3c7017d636c3a4aad378433ea6d0cfa6c92
 - Section discipline: avoid decorative split headers, redundant eyebrows, scroll cues, fake version labels, and decorative dots. Use labels only when they encode state, group, severity, or ownership.
 - Spacing and typography check: compact sections, stable grid tracks, readable line height, no viewport-scaled type, no clipped code rows, and no button or chip text overflow.
 - Motion check: motion must explain focus, state, filtering, navigation, or copy feedback. Provide `prefers-reduced-motion`; avoid spectacle-only animation.
-- Pre-flight before handoff: palette, card purpose, section repetition, hero density, contrast, reduced motion, mobile collapse, overflow, and visible copy/export path.
+- Pre-flight before handoff at `1280x900`: palette, card purpose, section repetition, hero density, contrast, reduced motion, desktop overflow, and visible copy/export path.
 
 ## Component Mapping
 

@@ -597,7 +597,7 @@ function validateStatic(html) {
   if (html.includes("data-claim-id=")) add(checks, "claims-traceable", claimIssues.length === 0, claimIssues.join("; "), issues);
   const chartIssues = collectChartIssues(documentMarkup);
   if (html.includes("data-chart-section")) add(checks, "chart-accessibility", chartIssues.length === 0, chartIssues.join("; "), issues);
-  add(checks, "responsive-motion", html.includes("prefers-reduced-motion"), "missing reduced-motion CSS", issues);
+  add(checks, "reduced-motion", html.includes("prefers-reduced-motion"), "missing reduced-motion CSS", issues);
 
   if (runtime) {
     const runtimeAuditIssues = collectRuntimeAuditIssues(documentMarkup);
@@ -611,11 +611,7 @@ function validateStatic(html) {
   return { ok: issues.length === 0, checks, issues, warnings, mode };
 }
 
-const browserViewports = [
-  { width: 390, height: 780 },
-  { width: 768, height: 900 },
-  { width: 1440, height: 1000 }
-];
+const browserViewport = { width: 1280, height: 900 };
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -840,7 +836,7 @@ async function inspectViewportCdp(client, width, height) {
     width,
     height,
     deviceScaleFactor: 1,
-    mobile: width < 600
+    mobile: false
   });
   await delay(150);
   return await evaluate(
@@ -1222,10 +1218,8 @@ async function validateBrowserWithCdp(file, mode) {
     await waitForDocument(client);
 
     const runtime = await settleRuntimeCdp(client, mode);
-    const viewports = [];
-    for (const viewport of browserViewports) {
-      viewports.push(await inspectViewportCdp(client, viewport.width, viewport.height));
-    }
+    const desktopViewport = await inspectViewportCdp(client, browserViewport.width, browserViewport.height);
+    const viewports = [desktopViewport];
     const mermaid = await inspectMermaidCdp(client);
     const code = await inspectCodeCdp(client);
     const dataTables = await inspectDataTablesCdp(client);
@@ -1233,12 +1227,10 @@ async function validateBrowserWithCdp(file, mode) {
     const accessibility = await inspectAccessibilityCdp(client);
 
     const issues = [];
-    for (const viewport of viewports) {
-      if (!viewport.title || viewport.regionCount < 3) issues.push(`blank or incomplete viewport ${viewport.width}`);
-      if (viewport.overflowX > 4) issues.push(`body horizontal overflow ${viewport.overflowX}px at ${viewport.width}`);
-      if (viewport.overlaps.length) issues.push(`overlap at ${viewport.width}: ${viewport.overlaps.slice(0, 3).join("; ")}`);
-      if (viewport.clippedText?.length) issues.push(`clipped text at ${viewport.width}: ${viewport.clippedText.join("; ")}`);
-    }
+    if (!desktopViewport.title || desktopViewport.regionCount < 3) issues.push(`blank or incomplete viewport ${desktopViewport.width}`);
+    if (desktopViewport.overflowX > 4) issues.push(`body horizontal overflow ${desktopViewport.overflowX}px at ${desktopViewport.width}`);
+    if (desktopViewport.overlaps.length) issues.push(`overlap at ${desktopViewport.width}: ${desktopViewport.overlaps.slice(0, 3).join("; ")}`);
+    if (desktopViewport.clippedText?.length) issues.push(`clipped text at ${desktopViewport.width}: ${desktopViewport.clippedText.join("; ")}`);
     for (const item of mermaid) {
       if (item.state !== "ready") issues.push(`mermaid ${item.id} did not render ready SVG; state=${item.state}`);
       if (item.svgCount === 0) issues.push(`mermaid ${item.id} rendered no SVG`);
@@ -1282,7 +1274,7 @@ async function validateBrowserWithCdp(file, mode) {
 
     return {
       status: "passed",
-      reason: `runtime state, responsive layout, rich content, and controls were validated in ${path.basename(browser.executable)}`,
+      reason: `runtime state, desktop layout, rich content, and controls were validated in ${path.basename(browser.executable)}`,
       runtime,
       viewports,
       mermaid,

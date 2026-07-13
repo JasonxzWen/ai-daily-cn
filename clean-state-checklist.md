@@ -17,6 +17,7 @@ Use this checklist before handoff.
 - P1 checks are run or risk-assessed for affected module, integration, system, API, data-flow, or cross-boundary behavior.
 - P2 hardening checks are run or explicitly deferred with a reason.
 - Web browser acceptance records local URL, scenario, viewport, console/network findings, and screenshot or trace evidence when the task touches Web user-visible behavior.
+- Web evidence uses only the canonical `1280x900` desktop viewport and no project-owned mobile, tablet, narrow-screen, or touch-only branch/artifact was introduced.
 - PR status is checked and recorded after any PR creation or update, including mergeability, CI/check-run status, conflicts, branch-protection blockers, fixes pushed, validation reruns, and any user/external blocker.
 - Agentic loop records are captured for material work: loop type, producer, verifier, read-only arbiter, evidence, main-agent decision, and follow-up or explicit skip reason.
 - Finish closeout is recorded for material changes: final independent review findings or skip reason, technical-debt/drift warnings, PR/merge readiness, conflict decisions surfaced to the user, and `insight` recommendations or skip reason.

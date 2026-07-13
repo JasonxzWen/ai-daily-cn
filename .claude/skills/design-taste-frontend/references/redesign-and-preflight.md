@@ -16,7 +16,7 @@ For existing projects, audit before touching code:
 
 1. Identify whether the user wants preservation, targeted evolution, or full overhaul.
 2. Capture the current visual system: layout, typography, colors, density, nav, cards, forms, media, and motion.
-3. Name the main failures: hierarchy, spacing, contrast, generic palette, weak content density, missing state, broken responsiveness, or brand drift.
+3. Name the main failures: hierarchy, spacing, contrast, generic palette, weak content density, missing state, broken supported-viewport layout, or brand drift.
 4. Decide what must be preserved: brand assets, product mental model, key flows, existing component API, accessibility behavior.
 5. Make the smallest visual move that solves the stated problem unless the user asked for a full redesign.
 
@@ -65,7 +65,7 @@ Before handoff, verify:
 - Dials explain the chosen variance, motion, and density.
 - The foundation is real, current, and not a fake official package.
 - The page avoids AI-purple/default-card/generic-glass defaults unless justified.
-- Typography wraps cleanly on mobile and desktop.
+- Typography wraps cleanly at the project's supported viewport; ai-daily-cn accepts only `1280x900` desktop.
 - Layout does not overlap, shift, or resize unpredictably.
 - Cards, tables, and sections use the right component for the information.
 - Images reveal the real subject or useful state.

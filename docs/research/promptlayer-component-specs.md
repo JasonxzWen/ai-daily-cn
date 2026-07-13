@@ -6,7 +6,6 @@ These specs translate the authorized PromptLayer component grammar into AI Daily
 
 - Source screenshots:
   - `output/playwright/promptlayer-clone/promptlayer-desktop1440-full.png`
-  - `output/playwright/promptlayer-clone/promptlayer-mobile390-full.png`
 - Purpose in AI Daily: replace the current dashboard-like hero toolbar/nav with a calmer fixed report chrome.
 - Layout:
   - Height around `64px` on desktop.
@@ -94,7 +93,6 @@ These specs translate the authorized PromptLayer component grammar into AI Daily
   - Daily tracking and quality/source sections can use split sections: narrative summary left, structured table/component right.
 - Layout:
   - Desktop two columns with 45/55 or 50/50 split.
-  - Mobile stacks summary above component.
   - Right panel uses inset border and section header strip.
 - Interactions:
   - Tables/components keep local interaction; hover rows remain restrained.
@@ -110,7 +108,6 @@ These specs translate the authorized PromptLayer component grammar into AI Daily
   - Good fit for topic clusters such as AI industry, product/platform, open source, China, and quality.
 - Layout:
   - Desktop: two top arcs and one lower centered arc.
-  - Mobile: stacked rounded/arc cards, preserving large circle motif without overflow.
 - AI Daily adaptation:
   - Use it sparingly for section overview, not every item.
 

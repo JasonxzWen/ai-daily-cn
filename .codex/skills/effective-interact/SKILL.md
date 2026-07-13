@@ -5,6 +5,8 @@ description: Load when agent pauses to report relatively complex information nee
 
 # Effective Interact
 
+ai-daily-cn interaction artifacts are desktop-only at `1280x900`. Templates, generated HTML, and browser validation must not add mobile, tablet, narrow-screen, touch-only, viewport-meta, or width-breakpoint behavior. Third-party runtime compatibility is not support evidence.
+
 When loaded, think in visual language first; map/table/timeline/flow/evidence shapes reduce interaction time and information loss. HTML is an escalation path, not the default goal; material repo or skill behavior changes are the default HTML handoff exception. Make activation observable: conclusion, structure, evidence/risk/validation/next action, no generic linear prose. Adapt `ThariqS/html-effectiveness` as pattern families, not templates to copy.
 
 Read `DESIGN.md` before composing an HTML artifact, then relevant split references: `references/report-ia.md`, `references/visual-language.md`, `references/component-contracts.md`, and `references/generator-validation-contract.md`. Components and information architecture come first; old template inputs are not supported.

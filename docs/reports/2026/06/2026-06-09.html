@@ -2,7 +2,6 @@
 <html lang="zh-CN" data-html-work-report data-render-mode="pre-rendered" data-artifact-kind="research" data-status="degraded" data-runtime-state="not-runtime">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="effective-interact create-interaction.mjs">
   <meta name="generated-at" content="2026-06-09T08:53:27.693Z">
   <meta name="render-mode" content="pre-rendered">
@@ -1155,12 +1154,7 @@ body.lightbox-open {
   font-weight: 820;
 }
 
-@media (max-width: 520px) {
-  .tracking-line-label {
-    stroke-width: 5px;
-    font-size: 18px;
-  }
-}
+
 
 .tracking-line-series:hover .tracking-line-path,
 .tracking-line-series:focus-within .tracking-line-path {
@@ -1488,144 +1482,7 @@ body.lightbox-open {
   background: #f8fafc;
 }
 
-@media (max-width: 760px) {
-  .blog-card {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "blog-title"
-      "blog-tags"
-      "blog-media"
-      "blog-body"
-      "blog-details";
-  }
 
-  .blog-card .card-tags {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  }
-
-  .project-card-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .builder-card-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .builder-card {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "builder-title"
-      "builder-tags"
-      "builder-media"
-      "builder-body"
-      "builder-details";
-  }
-
-  .community-card,
-  .community-card:has(.card-media-grid) {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "community-title"
-      "community-tags"
-      "community-media"
-      "community-body";
-  }
-
-  .community-card:not(:has(.card-media-grid)) {
-    grid-template-areas:
-      "community-title"
-      "community-tags"
-      "community-body";
-  }
-
-  .community-card .card-media-grid img {
-    object-fit: contain;
-  }
-
-  .tracking-card {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "tracking-title"
-      "tracking-tags"
-      "tracking-component"
-      "tracking-stats"
-      "tracking-trend"
-      "tracking-bars"
-      "tracking-table"
-      "tracking-body";
-  }
-
-  .tracking-card .tracking-component {
-    grid-area: tracking-component;
-  }
-
-  .tracking-component-header {
-    display: grid;
-  }
-
-  .tracking-bar-row {
-    grid-template-columns: 36px minmax(0, 1fr);
-    grid-template-areas:
-      "rank name"
-      "rank bar"
-      "rank value";
-  }
-
-  .tracking-rank {
-    grid-area: rank;
-  }
-
-  .tracking-name {
-    grid-area: name;
-  }
-
-  .tracking-bar-track {
-    grid-area: bar;
-  }
-
-  .tracking-value {
-    grid-area: value;
-  }
-
-  .tracking-change {
-    grid-area: value;
-    justify-self: end;
-  }
-
-  .tracking-stack-row {
-    grid-template-columns: 1fr;
-    gap: 5px;
-  }
-
-  .tracking-stack-track {
-    width: 100%;
-  }
-
-  .tracking-component[data-scale="log"] .tracking-stack-track {
-    width: 100%;
-  }
-
-  .tracking-trace div {
-    grid-template-columns: 1fr;
-  }
-
-  .project-card {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "project-title"
-      "project-tags"
-      "project-body"
-      "project-details";
-  }
-
-  .project-card .card-detail-list,
-  .card-media-grid[data-count="2"],
-  .card-media-grid[data-count="3"],
-  .card-media-grid[data-count="4"],
-  .card-media-grid[data-count="5"] {
-    grid-template-columns: 1fr;
-  }
-}
 
 .blog-card {
   grid-template-columns: 1fr;
@@ -1708,30 +1565,7 @@ body.lightbox-open {
   line-height: 1.58;
 }
 
-@media (max-width: 760px) {
-  .blog-card,
-  .blog-card:has(.card-media-grid) {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "blog-title"
-      "blog-tags"
-      "blog-media"
-      "blog-body"
-      "blog-details";
-  }
 
-  .blog-card:not(:has(.card-media-grid)) {
-    grid-template-areas:
-      "blog-title"
-      "blog-tags"
-      "blog-body"
-      "blog-details";
-  }
-
-  .blog-card .card-detail-list {
-    grid-template-columns: 1fr;
-  }
-}
 
 .interactive-card {
   transition: opacity 140ms ease, filter 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease, transform 140ms ease;
@@ -2551,91 +2385,9 @@ summary:focus-visible {
   display: none !important;
 }
 
-@media (max-width: 900px) {
-  .hero-brief,
-  .hero-decision-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
-@media (max-width: 720px) {
-  .report-shell {
-    width: min(100vw - 18px, 1280px);
-    padding-top: 12px;
-  }
 
-  .split-row,
-  .code-panel header,
-  .diff-panel header {
-    align-items: stretch;
-    flex-direction: column;
-  }
 
-  .report-hero {
-    gap: 10px;
-    padding: 12px;
-  }
-
-  .title-row {
-    align-items: flex-start;
-  }
-
-  .toolbar {
-    align-items: center;
-    justify-content: flex-start;
-  }
-
-  .report-title {
-    flex-basis: auto;
-    font-size: 24px;
-  }
-
-  .hero-summary-text {
-    min-height: auto;
-    padding: 12px;
-    font-size: 15px;
-  }
-
-  .hero-stat-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .hero-stat {
-    min-height: 58px;
-    padding: 8px;
-  }
-
-  .hero-stat strong {
-    font-size: 19px;
-  }
-
-  .hero-decision-card {
-    min-height: auto;
-    padding: 10px;
-  }
-
-  .hero-decision-card strong {
-    font-size: 13px;
-  }
-
-  .chip,
-  .status-pill,
-  .file-chip {
-    white-space: normal;
-  }
-
-  .report-data-table {
-    min-width: 560px;
-  }
-
-  .claims-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .chart-bar-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 
 .hero-link-row,
 .card-tags,
@@ -2924,10 +2676,10 @@ body.lightbox-open {
 }
 
 
-table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}@media(max-width:720px){.step{grid-template-columns:1fr}}</style>
-<link rel="stylesheet" data-adc-public-theme href="../../../assets/adc-theme.css?v=03b3d2c1a40a">
+table{width:100%;border-collapse:collapse;margin:10px 0;min-width:520px}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.rendered-markdown table{display:table}.timeline{display:grid;gap:10px}.step{display:grid;grid-template-columns:minmax(90px,140px) minmax(0,1fr);gap:10px;padding:10px;border-left:3px solid var(--accent);background:#f9fafc;border-radius:6px;min-width:0}.unsafe-link{color:var(--danger);font-weight:700}.tab-panel{margin-top:10px}</style>
+<link rel="stylesheet" data-adc-public-theme href="../../../assets/adc-theme.css?v=44ed32470699">
 <style data-ai-daily-css-overrides>
-/* Stage D: denser collapsible panels at every width. */
+/* Stage D: denser collapsible panels on the supported desktop surface. */
 .report-section-stack .collapsible-panel {
   margin: 0;
 }
@@ -3041,9 +2793,8 @@ a.chip:hover,
   color: #526a2d;
 }
 
-/* Reader report left rail: desktop keeps category-level anchors; mobile keeps
-   the engine's horizontal nav. */
-@media (min-width: 761px) {
+/* Reader report left rail is the only supported desktop navigation layout. */
+
   .report-layout {
     grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
     gap: 20px;
@@ -3134,34 +2885,9 @@ a.chip:hover,
     overflow: visible;
     white-space: normal;
   }
-}
 
-@media (max-width: 760px) {
-  .tracking-card .card-table-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
 
-  .tracking-card .card-data-table {
-    width: max-content;
-    min-width: 620px;
-    table-layout: auto;
-  }
 
-  .tracking-card .card-data-table th,
-  .tracking-card .card-data-table td {
-    white-space: nowrap;
-    overflow-wrap: normal;
-    word-break: normal;
-  }
-
-  .tracking-card .card-data-table th:nth-child(2),
-  .tracking-card .card-data-table td:nth-child(2) {
-    min-width: 160px;
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-}
 </style>
 </head>
 <body data-adc-public-surface="report">

@@ -460,9 +460,10 @@
         "Taste-skill is adopted through the local design-taste-frontend skill with its dashboard and data-table boundary preserved.",
         "Impeccable is adopted as optional external design audit evidence, not as a production runtime or CI network dependency.",
         "Material frontend PRs record design read, visual dials, source/tool evidence, audit or skip reason, and browser acceptance.",
-        "The React homepage, static shells, and every historical daily report consume one ADC paper/ink visual contract; reports reference the shared generated assets/adc-theme.css instead of embedding a duplicate theme overlay, and sampled desktop plus narrow viewports pass overflow and computed-color checks.",
+        "The React homepage, static shells, and every historical daily report consume one ADC paper/ink visual contract; reports reference the shared generated assets/adc-theme.css instead of embedding a duplicate theme overlay, and the canonical 1280x900 desktop viewport passes overflow and computed-color checks.",
         "Replacement builds preserve the official-blog home entry and Source Watch article presentation while the retired public-search UI does not return.",
-        "Source Watch headings remain visibly paper-colored on the ink panel at desktop and 390px viewports, with an automated CSS contrast contract preventing black-on-black regressions.",
+        "Source Watch headings remain visibly paper-colored on the ink panel at the canonical 1280x900 desktop viewport, with an automated CSS contrast contract preventing black-on-black regressions.",
+        "The product is desktop-only: mobile, tablet, narrow-screen, touch-only, viewport-meta, and width-breakpoint variants are excluded from implementation, generated artifacts, and acceptance; historical/source evidence and generic third-party compatibility are non-support exceptions.",
         "The page gate rejects retired model/project sections by exact section label or structural selector without blocking legitimate news-card titles that merely mention model releases."
       ],
       "stop_conditions": [
@@ -787,11 +788,18 @@
       "risk assessment when a P1 check is skipped"
     ],
     "P2": [
-      "broader regression, repeated runs, cross-browser or mobile viewport, accessibility, or performance hardening",
+      "broader regression, repeated runs, desktop cross-browser, accessibility, or performance hardening",
       "explicit defer reason when not run"
     ]
   },
   "web_acceptance_policy": {
+    "canonical_viewport": "1280x900 desktop only",
+    "unsupported_surfaces": [
+      "mobile",
+      "tablet",
+      "narrow-screen",
+      "touch-only"
+    ],
     "applies_to": [
       "Web UI",
       "routing",

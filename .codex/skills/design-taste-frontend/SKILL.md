@@ -23,7 +23,7 @@ Do not use it for dashboards, dense data tables, multi-step product UI, routine 
 4. Set three working dials: `DESIGN_VARIANCE`, `MOTION_INTENSITY`, and `VISUAL_DENSITY`. Let the brief override the default.
 5. Choose a real foundation. If the brief maps to an official design system, use the official package and tokens. If it is an aesthetic rather than a system, say so and build honestly.
 6. Design against AI tells: no AI-purple default, dark mesh hero, three equal feature cards, generic glassmorphism, or Inter/slate sameness unless the source material demands it.
-7. Verify spacing, typography, responsiveness, media strategy, hover/focus states, reduced motion, and layout stability before handoff.
+7. Verify spacing, typography, the project's supported viewport, media strategy, hover/focus states, reduced motion, and layout stability before handoff.
 
 ## References
 

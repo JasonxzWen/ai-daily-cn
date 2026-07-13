@@ -1,6 +1,6 @@
 # ADC Character v1 Prompt
 
-Create an original ADC brand character for a desktop-first AI news data product.
+Create an original ADC brand character for a desktop-only AI news data product.
 
 Style constraints:
 
