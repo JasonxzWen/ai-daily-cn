@@ -27,7 +27,10 @@ import {
   STORY_FIRST_MIN,
   STORY_FIRST_TARGET
 } from "./story-first.js";
-import { buildSourceEffectivenessTable } from "./source-effectiveness.js";
+import {
+  buildSourceEffectivenessTable,
+  countCanonicalGitHubTrendingPublicItems
+} from "./source-effectiveness.js";
 import { createPublicDegradationEvent } from "./degradation-events.js";
 import { normalizeGithubReadmeSummary } from "./github-readme.js";
 import {
@@ -285,7 +288,7 @@ export async function generateReportDraft(options = {}) {
       existingEvidenceAssets: merged.evidence_assets,
       fetchImpl: options.fetchImpl
     });
-  const sourceAudit = updateAuditIncludedCounts(merged.sourceAudit, selection.candidates);
+  const sourceAudit = updateAuditIncludedCounts(merged.sourceAudit, selection.candidates, selection);
   const report = buildDraftReport({
     reportDate,
     generatedAt,
@@ -1290,7 +1293,7 @@ function buildDraftReport({
     },
     hero_highlights: selectHeroHighlights(selection),
     source_audit: sourceAudit,
-    source_effectiveness: buildSourceEffectivenessTable({ report: { source_audit: sourceAudit }, candidates }),
+    source_effectiveness: [],
     stories: selection.stories || [],
     main_items: selection.main_items,
     github_trending: selection.github_trending,
@@ -1373,6 +1376,7 @@ function buildDraftReport({
     generated_at: generatedAt
   };
   normalizeAutodraftPublicText(report);
+  report.source_effectiveness = buildSourceEffectivenessTable({ report, candidates });
   return report;
 }
 
@@ -3065,7 +3069,7 @@ function mergeSourceAudit(target, audit) {
   }
 }
 
-function updateAuditIncludedCounts(sourceAudit, candidates) {
+function updateAuditIncludedCounts(sourceAudit, candidates, selection = {}) {
   const audit = {};
   const groupNames = [
     ...REQUIRED_AUDIT_GROUPS,
@@ -3073,7 +3077,12 @@ function updateAuditIncludedCounts(sourceAudit, candidates) {
   ];
   for (const groupName of groupNames) {
     audit[groupName] = sanitizeReportAuditGroup(sourceAudit[groupName] || emptyAuditGroup(groupName));
-    const included = candidates.filter((candidate) => candidate.status === "included" && auditGroupForCandidate(candidate) === groupName).length;
+    const included = groupName === "github_trending"
+      ? countCanonicalGitHubTrendingPublicItems(
+        { github_trending: selection.github_trending, projects: selection.projects },
+        candidates.filter((candidate) => auditGroupForCandidate(candidate) === groupName)
+      )
+      : candidates.filter((candidate) => candidate.status === "included" && auditGroupForCandidate(candidate) === groupName).length;
     const candidatesFound = Number.isInteger(audit[groupName].candidates_found) ? audit[groupName].candidates_found : included;
     audit[groupName].included = Math.min(included, candidatesFound);
   }
