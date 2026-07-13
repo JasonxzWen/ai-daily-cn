@@ -1,38 +1,38 @@
 # Evaluator Rubric
 
-Use this rubric for REC-324, first-pass public authoring before formal quality review.
+Use this rubric for REC-332, truthful GitHub Trending enrichment facts.
 
 | Dimension | Score 0-2 | Evidence |
 | --- | --- | --- |
-| Problem match | 2 | Routine public prose was produced by deterministic templates and then repaired after review; available real evidence showed repair on 2/2 observed dates and 11-12 tasks per run. |
-| Stage order | 2 | The production wrapper injects authoring after `report_draft` and before the first `quality_review`; direct runner callers remain backward compatible. |
-| Correctness | 2 | Story title/narrative, hot-blog summary, GitHub description, and Builder translation paths are enumerated up front and must each be edited exactly once. |
-| Write safety | 2 | The existing JSON Schema, path allowlist, task identity checks, and host-side applier remain the only mutation boundary; facts, links, source identity, dates, and audit data are not authorable. |
-| Fail-closed behavior | 2 | Unavailable, invalid, extra, duplicate, missing, partially applied, or rejected contracts leave the original draft as the formal-review input. |
-| Artifact truth | 2 | `.tmp/daily-report.authored.json` is consumed only after full acceptance; a partial private artifact cannot become current report state. |
-| Accounting truth | 2 | `automation_first_pass_authoring` reports attempt, task/edit/applied/rejected counts, first-review result, exceptional-repair count, and reason independently of `automation_ai_repair`. |
-| Repair authority | 2 | Initial and follow-up repair contracts contain only error-covered public-editorial tasks; `translation_fidelity` remains advisory evidence and cannot trigger writes. |
-| Compatibility | 2 | Existing exceptional repair/resume, retry budget, terminal summary, Source Watch, selection, report-write, and publish boundaries remain unchanged. |
-| Verification | 2 | RED/GREEN covers proactive four-lane planning, exact coverage, stage order, authored-state preservation, repair accounting, partial fallback, advisory exclusion, and legacy task compatibility; focused tests pass 53/53, affected daily-runner tests 36/36, and final validation 903 total / 901 pass / 0 fail / 2 skipped. |
-| Policy synchronization | 2 | `first_pass_authoring` is one shared runtime stage in the resilience contract; its plan/apply artifacts do not create parallel stage vocabulary. |
-| Current-state honesty | 2 | Repository evidence may establish local correctness only; the feature remains `locally_verified` until three future real runs satisfy the production thresholds. |
-| Runtime reliability | 2 | Over three consecutive real non-publish runs, at least two must pass first review directly; exceptional-repair tasks must have median 0 and daily maximum 2, with zero plain-language blockers. |
-| Scope discipline | 2 | No UI, mobile/tablet/narrow/touch support, source admission, scheduler definition, automation prompt, backfill, or publication is changed. |
-| Browser acceptance | 2 | Explicitly skipped because no Web composition changed; the only supported viewport remains `1280x900`. |
-| Validation efficiency | 2 | Development uses focused affected tests, one bounded P0/P1 review, and one final full validation at PR preparation. |
-| Agentic loops | 2 | Main-agent implementation, deterministic RED/GREEN verification, and one read-only P0/P1 reviewer form the single closeout loop. |
-| Finish closeout | 2 | Final diff, contract synchronization, project-rule drift, CI, mergeability, and residual real-run boundary are checked once before delivery. |
-| Insight recommendations | 2 | Existing session insight is reused; no duplicate 14-day scan or second generic audit is performed. |
-| Handoff readiness | 2 | REC-324, feature state, quality snapshot, Harness state, PR head, CI/mergeability, and post-merge observation thresholds form one closeout record. |
+| Problem match | 2 | The 2026-07-09 real Top20 proved three false facts: public `language=all`, cross-scope/public-rank trend comparison, and 19 false README cache hits with unknown SHA. |
+| Correctness | 2 | Repository language is independent from ranking scope, movement accepts only a positive same-scope `source_rank`, and cache identity is the README content SHA-256. |
+| Language semantics | 2 | Raw `language/window` remain ranking scope; `repository_language` is independently collected from Trending HTML or GitHub REST and becomes the existing public language value. |
+| Rank correctness | 2 | History keys include repo plus source scope and prefer `source_rank`; a different or unknown scope cannot create previous-rank movement. |
+| Cache truth | 2 | README content is SHA-256 keyed; first network fetch is `hit:false`, and only an exact prior key with a usable summary can become `hit:true`. |
+| Failure behavior | 2 | API failure preserves scraped language; unknown history fails closed to `new`; README failure keeps rank/star/trend/error and does not invent a description. |
+| Candidate durability | 2 | Candidate schema and normalization persist scope `language/window` plus `repository_language` instead of relying only on transient raw metadata. |
+| Public compatibility | 2 | The report continues to use its existing `language` and `source_scope` fields, so current render/interaction contracts gain the right value without a new UI shape. |
+| Selection compatibility | 2 | Weekly all-language and five language pools still merge/dedupe into Top20 using scope language; repository language never affects selection. |
+| Verification | 2 | RED/GREEN covered HTML/API language, candidate/report/interaction projection, scope-aware source-rank movement, and first/second-run README cache behavior; focused tests pass 16/16 and the affected unit suite passes 253/253. |
+| Full validation | 2 | Final validation passes 905 total / 903 pass / 0 fail / 2 skipped, including build-clean, 194-file privacy scan, desktop E2E, Harness, source/design/workflow/DAG and diff gates. |
+| Current-state honesty | 2 | REC-332 remains `locally_verified`; historical broken artifacts are evidence, not rewritten proof. Three fresh merged-main runs are required for production verification. |
+| Scope discipline | 2 | No UI layout, mobile/tablet/narrow/touch support, scheduler, automation prompt, admission, backfill, publication, or historical artifact is changed. |
+| Runtime reliability | 2 | Unknown legacy scope/rank fails closed to `new`; API failure preserves scraped language; README failure retains known rank/star/trend/error facts without inventing prose. |
+| Browser acceptance | 2 | Explicitly skipped because no Web composition changed; production report interaction and legacy render behavior are covered deterministically, and `1280x900` remains the sole supported viewport. |
+| Validation efficiency | 2 | Development used focused tests, one affected suite, one final full validation, and one bounded P0/P1 review. |
+| Agentic loops | 2 | Two bounded read-only discovery passes found the real gaps; main-agent RED/GREEN implementation plus one final read-only reviewer form the closeout loop. |
+| Finish closeout | 2 | The sole reviewer P1—falling back to public merged `rank`—was reproduced by RED, fixed to require positive `source_rank`, and revalidated without opening another generic review. |
+| Insight recommendations | 2 | Existing session insight is reused; the false cache/rank/language evidence is promoted into REC-332 and deterministic contracts instead of another generic audit. |
+| Handoff readiness | 2 | Feature inventory, roadmap, REC-332/S-81, quality snapshot, Harness state, PR head, CI/mergeability, and three-run thresholds form one closeout record. |
 
 ## Verdict
 
-- Ready for PR preparation: the one final full validation passed and the bounded re-review reports no unresolved P0/P1.
+- Ready for PR preparation: the bounded reviewer reported one P1, its regression is now GREEN, and no unresolved P0/P1 remains.
 - Merge only when final-head required checks are green and GitHub reports the PR conflict-free.
-- Keep REC-324 at `locally_verified` after merge; only three consecutive real runs meeting the stated thresholds may advance it to `production_verified`.
+- Keep REC-332 at `locally_verified` after merge; only three consecutive real runs meeting the stated thresholds may advance it to `production_verified`.
 
 ## Residual risk
 
-- A full authoring plan can be larger than the previous exceptional-repair contract; production observation must measure call duration and failure rate without weakening exact coverage.
-- Authoring quality is still model-dependent, so the deterministic formal review and bounded exceptional repair remain mandatory safety nets.
-- Historical replay can prove contract behavior but cannot establish that future scheduled runs make repair exceptional.
+- Existing reports keep their historical `all`, cross-scope trend, and `sha:unknown` values; they are not rewritten to manufacture green history.
+- REST topics/license/total stars still depend on a GitHub token, while HTML language and weekly star velocity remain credential-free fallbacks.
+- PR #299 has wired first-pass GitHub prose, but only fresh scheduled output can prove non-generic Chinese explanations in production.

@@ -380,6 +380,17 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Acceptance: Aify is first-class for observability and source governance without becoming primary factual authority; source effectiveness, candidate pool, persisted report, and public article index agree for the same dates.
 - Recurrence prevention: the feature inventory and Phase5 audit fail closed on missing days, missing logical rows, missing dispositions, or included/public mismatches.
 
+### REC-332 - Make GitHub Trending enrichment facts truthful
+
+- Type: GitHub discovery / public metadata / observability correctness.
+- Fact evidence: the 2026-07-09 Top20 had weekly stars and trend on 20/20 items, but the public Top10 came entirely from `weekly:all`, so 0/10 exposed a real repository language. At least one repository compared a current source rank against a previous public rank from another scope. Nineteen successful README entries all reported `hit:true` with `sha:unknown` even though no cache was read.
+- Root cause: one `language` field represented both ranking scope and repository language; history keyed only by repo and preferred public `rank`; README summary application defaulted to a cache hit while discovery supplied no content identity or historical lookup.
+- State: locally_verified; PR/CI and merged-main production observation remain pending.
+- Current-Slice action: preserve raw scope `language/window` plus schema-backed `repository_language`; project repository language into the public report while keeping `source_scope`; key rank history by repo + scope and compare `source_rank`; compute README content SHA-256, default to cache miss, and reuse a prior summary only for an exact historical key.
+- Local evidence: RED covered missing HTML/API language, public `all` leakage, candidate persistence, cross-scope rank drift, legacy public-rank fallback, and false cache hit/unknown SHA. GREEN passes the focused regressions and the full affected `tests/unit.test.js` dot run. The bounded reviewer found the one public-rank fallback P1; its dedicated RED/GREEN is fixed. Final validation passes 905 total / 903 pass / 0 fail / 2 skipped with build-clean, 194-file privacy, desktop E2E, Harness, source/design/workflow/DAG, and diff gates.
+- Acceptance: three consecutive merged-main runs show Top10 language on every API/HTML-supported repository, same-scope trend math only, non-unknown README SHA for every successful README, truthful miss/hit semantics, failed README items retaining rank/star/trend/error without invented descriptions, and GitHub first-pass prose passing the existing quality gates.
+- Recurrence prevention: feature inventory and deterministic fixtures bind scope, source rank, repository language, cache key/hit/SHA, candidate schema, report, render, and interaction behavior.
+
 ## Confirmed Surviving Value
 
 - Product/content: four dense Feishu-style tracks, roughly 100-character summaries, collapsible stories, and desktop navigation remain active.
@@ -474,6 +485,7 @@ This table is part of the same ledger, not a second review. `fixed` means implem
 | S-78 | the first home-artifact self-check reused the selected publish date containment rule, which would falsely block a legitimate historical backfill once that date fell outside the bounded homepage window | removed target-date containment for `home.json`; self-check now proves schema validity, truthful file byte size, and `latest_edition.report_date` equality with the latest feed entry | fixed locally; a 2026-06-04 backfill against a 2026-07-09 homepage passes the focused status regression |
 | S-79 | Aify News carried a `first_class` intent label while only a site-watch shell existed; the content feed was not a governed collection entry and its original publisher would be lost by the generic JSON path | added a dedicated content entry and stable logical identity, preserved original publisher plus aggregator authority, and added a three-day collection-to-public Phase5 contract bound to the shared admission/lineage verdict | locally_verified; 41/41 focused/affected and 898-test final validation pass, production observation pending |
 | S-80 | the real non-publish pipeline spent minutes hashing its own fresh `.tmp` clone and quarantine during repository-guard snapshots before Codex repair | retained the truthful `needs_ai_repair` result, stopped the low-value 20-minute repair tail for this development pass, and recorded exclusion/bounded-snapshot work as a later workflow optimization | discovered; intentionally not mixed into REC-331 |
+| S-81 | GitHub Trending exposed ranking scope as repository language, compared ranks across incompatible scopes/surfaces, and labelled first network README fetches as cache hits with unknown SHA | added `repository_language` without changing scope selection, keyed history by repo + source_scope and positive source_rank only, and made README cache keys content-SHA based with fail-closed miss/hit semantics | locally_verified under REC-332; 905/903/0/2 final validation passes, PR/CI and fresh merged-main runs pending |
 
 ## Production Acceptance
 
