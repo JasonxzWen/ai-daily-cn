@@ -8741,6 +8741,7 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert.equal(contract.status_self_check.truth_source, ".tmp/run-summary-YYYY-MM-DD.json");
   assert.equal(JSON.stringify(contract.required_markers).includes("--source-watch-admitted-artifact"), false);
   assert.equal(contract.external_automation_prompt.contains.includes("--source-watch-admitted-artifact"), false);
+  assert(contract.external_automation_prompt.contains.includes("Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8"));
   assert.equal(manifest.scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
   assert(!contract.daily_runner || contract.daily_runner.script !== "daily:codex-dag:contract-run");
 
@@ -8753,7 +8754,7 @@ test("daily workflow contract validates repository workflow markers", async () =
     [
       'id = "ai-2"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -8809,6 +8810,36 @@ test("daily workflow contract rejects any extra project automation definition", 
   assert.equal(result.ok, false);
   assert(
     result.failures.some((failure) => failure.includes("project automation ai-daily is not allowed")),
+    result.failures.join("\n")
+  );
+});
+
+test("daily workflow contract rejects a publish prompt that reads the run summary without explicit UTF-8", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-prompt-encoding-"));
+  const automationsDir = path.join(tmp, "automations");
+  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  await fs.mkdir(path.dirname(promptPath), { recursive: true });
+  await fs.writeFile(
+    promptPath,
+    [
+      'id = "ai-2"',
+      'kind = "cron"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content $summaryPath -Raw"',
+      'status = "ACTIVE"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await validateDailyWorkflowContract({
+    rootDir,
+    automationsDir,
+    automationPromptPath: promptPath
+  });
+
+  assert.equal(result.ok, false);
+  assert(
+    result.failures.some((failure) => failure.includes("Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8")),
     result.failures.join("\n")
   );
 });
@@ -11065,7 +11096,10 @@ test("daily runner creates a new empty AI repair template for public editorial r
           output: {
             review: {
               ok: false,
-              ai_review_tasks: [{ kind: "hot_blog_editorial_rewrite", path: "hot_blogs[1].summary" }],
+              ai_review_tasks: [
+                { kind: "hot_blog_editorial_rewrite", path: "hot_blogs[1].summary" },
+                { kind: "translation_fidelity", path: "builder_observations[0].translation" }
+              ],
               issues: [
                 {
                   code: "hot_blog_summary_template",
@@ -11121,7 +11155,10 @@ test("daily runner creates a new empty AI repair template for public editorial r
             contract_rejected: [],
             review: {
               ok: false,
-              ai_review_tasks: [{ kind: "hot_blog_editorial_rewrite", path: "hot_blogs[1].summary" }],
+              ai_review_tasks: [
+                { kind: "hot_blog_editorial_rewrite", path: "hot_blogs[1].summary" },
+                { kind: "translation_fidelity", path: "builder_observations[0].translation" }
+              ],
               issues: [
                 {
                   code: "hot_blog_summary_template",
@@ -11147,6 +11184,11 @@ test("daily runner creates a new empty AI repair template for public editorial r
   assert.equal(resumed.summary.next_action.handoff_phase, "first_pass_authoring");
   assert.equal(resumed.summary.next_action.handoff_intent, "source_grounded_public_authoring");
   assert.equal(resumed.summary.next_action.authoring_contract, "public_prose_authoring_v1");
+  assert.deepEqual(
+    resumed.summary.next_action.ai_review_tasks.map((task) => task.kind),
+    ["hot_blog_editorial_rewrite"],
+    "advisory fidelity tasks remain review evidence but must not gain repair write authority"
+  );
   assert.equal(resumed.summary.next_action.ai_review_tasks[0].phase, "first_pass_authoring");
   assert.deepEqual(calls, ["quality_ai_repair"]);
 

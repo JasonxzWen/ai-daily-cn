@@ -18,11 +18,12 @@
       "acceptance": [
         "A needs_ai_repair handoff is preflighted for kind, clean-root evidence realpaths, and direct launcher .tmp destination before Codex authors a contract and the same entrypoint resumes.",
         "Automated repair is capped at five attempts and records attempted, authored, completed, edit count, terminal reason, and explicit failure state without treating a later block as recovery.",
+        "After a repair is applied, advisory review tasks remain evidence while only safe public-editorial tasks covering every error-severity path may enter the next write contract.",
         "Production repair uses read-only schema-constrained UTF-8 Codex output; the host validates and writes the contract, and a bounded timeout terminates the process tree with codex_timeout.",
-        "Claim verification overrides misleading source-level inference, quality and report_write share complete candidate coverage, and terminal summaries identify only the latest unresolved failure.",
+        "Claim verification overrides misleading source-level inference, quality and report_write share complete candidate coverage, and terminal summaries identify only the latest unresolved failure with non-empty error code, message, failures, and blocking evidence.",
         "Production Source Watch is connected only when the producer stage returns the exact artifact path/SHA-256 receipt, the dated producer and candidate pool have identical target_id:snapshot_fingerprint sets, and build proves the exact pool path plus SHA-256; zero inclusion remains a valid consumed state.",
         "A live scheduler that still forces not_connected or consumed:false fails the workflow compatibility gate before release.",
-        "The project scheduler inventory contains exactly one automation, ai-2; its prompt delegates health truth to the dated run summary, while status:self-check remains a manual diagnostic rather than a second scheduled workflow."
+        "The project scheduler inventory contains exactly one automation, ai-2; its prompt reads the dated UTF-8 run summary with explicit PowerShell encoding and delegates health truth to it, while status:self-check remains a manual diagnostic rather than a second scheduled workflow."
       ],
       "stop_conditions": [
         "The entrypoint returns needs_ai_repair without exhausting or disabling its declared repair budget.",
@@ -145,7 +146,7 @@
         "Phase5 joins final report candidate backrefs, applies the shared source-admission decision, and reports concrete violations, trusted-target upgrades, orphan included flags, and missing backrefs.",
         "Logical-source promotion is evidence-decided per collection entry; defer and retire decisions remain collection-only and never raise source authority.",
         "Source Watch suppresses a target when any material GitHub endpoint fails, selects the newest release or commit event, persists the source snapshot fingerprint, and returns a stage-bound artifact path/hash receipt.",
-        "Official-blog daily context reuses existing reviewed knowledge, preserves official-blog-admission-v1, verifies wrapper/source dates plus source/context/bindings hashes and relationships, chooses the highest-score type binding, and never auto-writes curated knowledge.",
+        "Official-blog daily context consumes a real content-source artifact that declares report_date/generated_at, reuses existing reviewed knowledge, preserves official-blog-admission-v1, verifies wrapper/source dates plus source/context/bindings hashes and relationships, chooses the highest-score type binding, and never auto-writes curated knowledge.",
         "HTML-index title, summary, and image facts come only from the exact anchor or same-URL structured metadata; adjacent cards cannot trigger high-specificity model-launch topics or prose through evidence text."
       ],
       "stop_conditions": [
