@@ -1884,7 +1884,8 @@ async function classifyAiRepairReviewFailure(stageResult, {
 
   const review = output.review && typeof output.review === "object" ? output.review : null;
   const aiTasks = annotateAuthoringTasks(Array.isArray(review?.ai_review_tasks) ? review.ai_review_tasks : []);
-  if (!review || review.ok === true || aiTasks.length === 0 || !aiTasks.every(isPublicEditorialRepairTask)) {
+  const retryTasks = retryablePublicEditorialTasks(review, aiTasks);
+  if (!review || review.ok === true || retryTasks.length === 0) {
     return null;
   }
 
@@ -1921,10 +1922,10 @@ async function classifyAiRepairReviewFailure(stageResult, {
   await writeAiRepairContractTemplate(nextAttempt.contractPath, {
     reportDate,
     review,
-    aiTasks
+    aiTasks: retryTasks
   });
 
-  const authoringHandoff = authoringHandoffMetadata(aiTasks);
+  const authoringHandoff = authoringHandoffMetadata(retryTasks);
   return {
     final_status: "needs_ai_repair",
     next_action: {
@@ -1937,7 +1938,7 @@ async function classifyAiRepairReviewFailure(stageResult, {
       max_review_repair_loops: maxReviewRepairLoops,
       remaining_review_repair_loops: maxReviewRepairLoops - nextAttempt.attempt,
       ...authoringHandoff,
-      ai_review_tasks: aiTasks,
+      ai_review_tasks: retryTasks,
       contract_status: "template",
       required_contract_status: "ready",
       required_contract_fields: ["schema_version", "report_date", "status", "edits"],
@@ -2082,6 +2083,23 @@ function contentContractIssueToQualityIssue(issue) {
 
 function isPublicEditorialRepairTask(task) {
   return task && PUBLIC_EDITORIAL_REPAIR_TASK_KINDS.has(String(task.kind || ""));
+}
+
+function retryablePublicEditorialTasks(review, tasks) {
+  const editorialTasks = tasks.filter(isPublicEditorialRepairTask);
+  if (editorialTasks.length === 0) return [];
+
+  const blockingIssues = (Array.isArray(review?.issues) ? review.issues : [])
+    .filter((issue) => String(issue?.severity || "") === "error");
+  if (blockingIssues.length === 0) return editorialTasks;
+
+  const taskPaths = new Set(editorialTasks.map((task) => String(task?.path || "")).filter(Boolean));
+  const issuePaths = blockingIssues.map((issue) => String(issue?.path || ""));
+  if (issuePaths.some((issuePath) => !issuePath || !taskPaths.has(issuePath))) {
+    return [];
+  }
+  const blockingPaths = new Set(issuePaths);
+  return editorialTasks.filter((task) => blockingPaths.has(String(task?.path || "")));
 }
 
 // Phase 3 degrade-not-block: when the review/repair loop is exhausted and EVERY

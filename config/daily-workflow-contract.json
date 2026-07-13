@@ -222,6 +222,7 @@
       "publish:dry-run:daily",
       "bootstrap mainSha",
       "不要另行运行 status:self-check",
+      "Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8",
       "source_watch.connected",
       "source_watch.consumed",
       "candidate_pool_hashes"

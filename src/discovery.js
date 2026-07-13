@@ -2771,6 +2771,8 @@ export async function collectContentSources(options = {}) {
   const outputCandidates = limitCandidatesBySource(candidates, limit);
 
   return {
+    report_date: reportDate,
+    generated_at: generatedAt,
     source_audit: {
       [auditGroupName]: {
         checked: true,

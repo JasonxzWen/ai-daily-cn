@@ -8,6 +8,7 @@ import test from "node:test";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { buildDailyWorkflowStages } from "../src/daily-runner.js";
+import { collectContentSources } from "../src/discovery.js";
 import { generateReportDraft, officialBlogContentTypeByCandidateId } from "../src/draft.js";
 
 const reportDate = "2026-07-10";
@@ -67,6 +68,86 @@ test("official-blog context producer rejects a requested date that differs from 
       return true;
     }
   );
+});
+
+test("official-blog context producer rejects a dated request when the source artifact has no business date", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "official-blog-context-cli-missing-date-"));
+  const inputPath = path.join(tmp, ".tmp", "content-sources.json");
+  const outputPath = path.join(tmp, ".tmp", "official-blog-context.json");
+  await fs.mkdir(path.dirname(inputPath), { recursive: true });
+  await fs.writeFile(inputPath, `${JSON.stringify({ candidates: [] })}\n`, "utf8");
+
+  await assert.rejects(
+    execFileAsync(process.execPath, [
+      path.join(rootDir, "src", "cli.js"),
+      "official-blog:context",
+      "--repo-root",
+      rootDir,
+      "--input",
+      inputPath,
+      "--output",
+      outputPath,
+      "--date",
+      reportDate
+    ], { cwd: rootDir }),
+    (error) => {
+      const payload = JSON.parse(error.stdout);
+      assert.equal(payload.error, "official_blog_context_report_date_missing");
+      return true;
+    }
+  );
+});
+
+test("real content-source output carries its business date through official-blog context into the draft", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "official-blog-daily-context-producer-"));
+  const sourceRelativePath = `.tmp/content-sources-${reportDate}.json`;
+  const contextRelativePath = `.tmp/official-blog-context-${reportDate}.json`;
+  const sourcePath = path.join(tmp, sourceRelativePath);
+  const contextPath = path.join(tmp, contextRelativePath);
+  await fs.mkdir(path.dirname(sourcePath), { recursive: true });
+
+  const generatedAt = `${reportDate}T08:00:00.000Z`;
+  const collected = await collectContentSources({
+    rootDir: tmp,
+    reportDate,
+    generatedAt,
+    sources: [],
+    env: {},
+    fetchImpl: async () => {
+      throw new Error("empty source fixture must not fetch");
+    }
+  });
+  assert.equal(collected.report_date, reportDate);
+  assert.equal(collected.generated_at, generatedAt);
+  await fs.writeFile(sourcePath, `${JSON.stringify({ ok: true, ...collected }, null, 2)}\n`, "utf8");
+
+  await execFileAsync(process.execPath, [
+    path.join(rootDir, "src", "cli.js"),
+    "official-blog:context",
+    "--repo-root",
+    tmp,
+    "--input",
+    sourcePath,
+    "--output",
+    contextPath,
+    "--date",
+    reportDate,
+    "--generated-at",
+    generatedAt
+  ], { cwd: rootDir });
+
+  const result = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt,
+    inputPaths: [sourceRelativePath],
+    officialBlogContextPath: contextRelativePath,
+    allowDegradedInputs: true,
+    cacheEvidence: false
+  });
+
+  assert.equal(result.officialBlogContextReceipt.consumed, true);
+  assert.equal(result.officialBlogContextReceipt.reason, "same_day_source_and_context_sha_verified");
 });
 
 test("report draft consumes same-day official-blog context with matching source SHA", async () => {

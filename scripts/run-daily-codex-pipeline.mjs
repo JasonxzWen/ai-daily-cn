@@ -577,14 +577,41 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
   const publication = buildPublicationSummary({ legacySummary, completedStages, finalStatus });
   const pages = buildPagesSummary({ completedStages, finalStatus, publication });
   const validation = buildValidationSummary(completedStages);
-  const blockingIssues = Array.isArray(qualityStatus.blocking_issues) ? qualityStatus.blocking_issues : [];
   const degradedSections = Array.isArray(qualityStatus.degraded_sections) ? qualityStatus.degraded_sections : [];
-  const failures = collectLegacyFailures(legacySummary, completedStages);
   const successful = productionSummaryOk(finalStatus);
   const terminalFailure = latestUnresolvedFailedStage(completedStages);
   const terminalStageId = successful
     ? latestStageId(completedStages) || legacySummary.stage_id || "initialize"
     : terminalFailure?.id || legacySummary.failed_stage_id || legacySummary.stage_id || latestStageId(completedStages) || "initialize";
+  const terminalError = successful
+    ? ""
+    : stageFailureMessage(terminalFailure)
+      || String(legacySummary.error || "").trim()
+      || `Daily workflow blocked at ${terminalStageId}.`;
+  const terminalErrorCode = successful
+    ? ""
+    : stringFirst([terminalFailure?.error_code, legacySummary.error_code]) || "daily_workflow_blocked";
+  const failures = successful
+    ? []
+    : uniqueExistingStrings([
+        ...collectLegacyFailures(legacySummary, completedStages),
+        terminalError
+      ]);
+  const terminalBlockingIssues = successful
+    ? []
+    : semanticBlockingIssuesFromStage(terminalFailure).length > 0
+      ? semanticBlockingIssuesFromStage(terminalFailure)
+      : [{
+          code: terminalErrorCode,
+          severity: "error",
+          path: `stages.${terminalStageId}`,
+          message: terminalError
+        }];
+  const blockingIssues = mergeBlockingIssues([
+    ...(Array.isArray(qualityStatus.blocking_issues) ? qualityStatus.blocking_issues : []),
+    ...(!successful && Array.isArray(legacySummary.blocking_issues) ? legacySummary.blocking_issues : []),
+    ...terminalBlockingIssues
+  ]);
   const summary = {
     ...legacySummary,
     ok: successful,
@@ -622,9 +649,11 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
   };
   if (!successful) {
     summary.failed_stage_id = terminalFailure?.id || legacySummary.failed_stage_id || summary.stage_id;
-    summary.error = stageFailureMessage(terminalFailure) || legacySummary.error || failures.at(-1) || "";
+    summary.error_code = terminalErrorCode;
+    summary.error = terminalError;
   } else {
     summary.failed_stage_id = "";
+    summary.error_code = "";
     summary.error = "";
   }
   await writeJson(plan.outputs.run_summary, summary);
@@ -1314,6 +1343,13 @@ function normalizeCompletedStages(stages) {
       ...(stage.updated_at ? { updated_at: stage.updated_at } : {}),
       ...(Array.isArray(stage.failures) ? { failures: stage.failures } : {})
     };
+    if (["failed", "failure", "blocked"].includes(normalized.status)) {
+      const semanticIssue = semanticBlockingIssuesFromStage(normalized)[0];
+      if (semanticIssue) {
+        normalized.error_code ||= semanticIssue.code;
+        normalized.error ||= semanticIssue.message;
+      }
+    }
     applyStageTiming(normalized, stage, previousFinishedAt);
     previousFinishedAt = normalized.finished_at || normalized.updated_at || previousFinishedAt;
     return normalized;
@@ -1520,6 +1556,55 @@ function stageFailureMessage(stage) {
     if (String(message || "").trim()) return String(message).trim();
   }
   return "";
+}
+
+function semanticBlockingIssuesFromStage(stage) {
+  if (!stage) return [];
+  const output = stageOutput(stage);
+  const review = plainObject(output.review) ? output.review : {};
+  const qualityReview = plainObject(output.quality_review) ? output.quality_review : {};
+  return normalizeSemanticBlockingIssues([
+    ...(Array.isArray(review.issues) ? review.issues : []),
+    ...(Array.isArray(qualityReview.issues) ? qualityReview.issues : []),
+    ...(Array.isArray(output.issues) ? output.issues : [])
+  ].filter((issue) => String(issue?.severity || "") === "error"));
+}
+
+function normalizeSemanticBlockingIssues(issues) {
+  const seen = new Set();
+  const normalized = [];
+  for (const issue of issues) {
+    if (!issue || typeof issue !== "object") continue;
+    const code = String(issue.code || issue.error_code || "daily_workflow_blocked").trim() || "daily_workflow_blocked";
+    const pathName = String(issue.path || issue.section || "").trim();
+    const message = String(issue.message || issue.error || code).trim() || code;
+    const key = `${code}\u0000${pathName}\u0000${message}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    normalized.push({
+      code,
+      severity: "error",
+      ...(pathName ? { path: pathName } : {}),
+      message
+    });
+  }
+  return normalized;
+}
+
+function mergeBlockingIssues(issues) {
+  const seen = new Set();
+  const merged = [];
+  for (const issue of issues) {
+    if (!issue || typeof issue !== "object") continue;
+    const code = String(issue.code || issue.error_code || "").trim();
+    const pathName = String(issue.path || issue.section || "").trim();
+    const message = String(issue.message || issue.error || "").trim();
+    const key = `${code}\u0000${pathName}\u0000${message}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(issue);
+  }
+  return merged;
 }
 
 function latestStageId(stages) {

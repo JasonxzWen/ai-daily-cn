@@ -383,6 +383,12 @@ try {
       limit: args.limit || args["max-records"]
     });
     const inputReportDate = input?.report_date || input?.reportDate || "";
+    if (args.date && !inputReportDate) {
+      throw new PublisherError(
+        "official_blog_context_report_date_missing",
+        "official-blog:context input must declare report_date when --date is provided."
+      );
+    }
     if (args.date && inputReportDate && args.date !== inputReportDate) {
       throw new PublisherError(
         "official_blog_context_report_date_mismatch",

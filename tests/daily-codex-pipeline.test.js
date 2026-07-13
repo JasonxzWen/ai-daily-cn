@@ -601,6 +601,69 @@ test("daily Codex production summary reports the latest unresolved failed stage"
   assert.equal(summary.error, "candidate coverage failed");
 });
 
+test("daily Codex blocked summary projects semantic review failures into stable terminal evidence", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-semantic-failure-"));
+  const reportDate = "2026-07-06";
+  await writeMinimalRepoFiles(rootDir);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: false,
+    codexBin: "codex.cmd"
+  });
+  const workflowRunner = async ({ summaryPath }) => {
+    const legacySummary = {
+      report_date: reportDate,
+      mode: "dry-run",
+      final_status: "blocked",
+      next_action: { kind: "inspect_stage_failure", stage_id: "quality_ai_repair" },
+      clean_repo_root: path.join(rootDir, ".tmp", "publish-worktrees", "main"),
+      error: "",
+      error_code: null,
+      failures: [],
+      blocking_issues: [],
+      stages: [
+        {
+          id: "quality_ai_repair",
+          status: "failed",
+          output: {
+            review: {
+              ok: false,
+              issues: [
+                {
+                  code: "builder_translation_too_weak",
+                  severity: "error",
+                  path: "builder_observations[2].translation",
+                  message: "Builder translation remains too weak."
+                }
+              ]
+            }
+          }
+        }
+      ]
+    };
+    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+    return { summary: legacySummary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+
+  assert.equal(summary.stage_id, "quality_ai_repair");
+  assert.equal(summary.failed_stage_id, "quality_ai_repair");
+  assert.equal(summary.error_code, "builder_translation_too_weak");
+  assert.equal(summary.error, "Builder translation remains too weak.");
+  assert(summary.failures.includes("Builder translation remains too weak."));
+  assert.deepEqual(summary.blocking_issues, [
+    {
+      code: "builder_translation_too_weak",
+      severity: "error",
+      path: "builder_observations[2].translation",
+      message: "Builder translation remains too weak."
+    }
+  ]);
+});
+
 test("daily Codex successful fallback clears recovered failure metadata", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-recovered-publish-"));
   const reportDate = "2026-07-06";
