@@ -1243,7 +1243,7 @@ test("daily Codex production repair author times out and terminates the spawned 
     executeRequested: true,
     publishRequested: true,
     codexBin,
-    codexTimeoutMs: 75
+    codexTimeoutMs: 1000
   });
   let workflowCalls = 0;
 
@@ -1288,8 +1288,20 @@ test("daily Codex production repair author times out and terminates the spawned 
   assert.equal(summary.final_status, "blocked");
   assert.equal(summary.error_code, "codex_timeout");
   assert.equal(summary.automation_ai_repair.attempts[0].error_code, "codex_timeout");
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  await assert.rejects(fs.access(path.join(plan.work_dir, "delayed-codex-completed.txt")));
+  const childPid = Number(await fs.readFile(path.join(plan.work_dir, "hanging-codex-pid.txt"), "utf8"));
+  assert(Number.isInteger(childPid) && childPid > 0);
+  let childAlive = true;
+  const processExitDeadline = Date.now() + 1000;
+  while (childAlive && Date.now() < processExitDeadline) {
+    try {
+      process.kill(childPid, 0);
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    } catch (error) {
+      if (error?.code !== "ESRCH") throw error;
+      childAlive = false;
+    }
+  }
+  assert.equal(childAlive, false, "timed-out Codex child process must be terminated");
 });
 
 test("daily Codex production orchestrator blocks an invalid automated repair contract before resume", async () => {
@@ -2082,6 +2094,8 @@ const outputIndex = args.indexOf("--output-last-message");
 if (outputIndex === -1) process.exit(2);
 const outputPath = path.resolve(args[outputIndex + 1]);
 const workDir = path.dirname(path.dirname(outputPath));
+fs.mkdirSync(workDir, { recursive: true });
+fs.writeFileSync(path.join(workDir, "hanging-codex-pid.txt"), String(process.pid), "utf8");
 setTimeout(() => {
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   fs.writeFileSync(outputPath, JSON.stringify({
@@ -2096,6 +2110,7 @@ setTimeout(() => {
   }, null, 2), "utf8");
   fs.writeFileSync(path.join(workDir, "delayed-codex-completed.txt"), "completed", "utf8");
 }, ${Number(delayMs)});
+setInterval(() => {}, 1000);
 `, "utf8");
 
   if (process.platform === "win32") {

@@ -8,7 +8,7 @@ Use this rubric for REC-323: converge main-stream ranking, terminal disposition,
 | Correctness | 2 | `draft.js` is the sole production scorer/selector; score, global rank, terminal selection/rejection, story lineage, snapshot counts, and report order are persisted and cross-checked. |
 | Contract safety | 2 | New report/pool pairs declare audit contract version 1 and fail closed on missing/mismatched receipts; historical pairs with neither marker remain readable. |
 | Dead-path removal | 2 | The post-quality synthetic editorial-rank/classification producer, schemas, CLI, runner stage, policies, scripts, fixtures, and tests are retired together. |
-| Verification | 2 | Affected unit suite 143/143, publish suite 54/54, resilience/workflow/Harness validators, and `git diff --check` pass. The local full-validate terminal result was not recoverable and is not claimed; PR CI is the authoritative full gate. |
+| Verification | 2 | Affected unit suite 143/143 and publish suite 54/54 pass. The final aggregate gate completed with 893 total / 891 pass / 0 fail / 2 skipped, followed by green build-clean, 194-file privacy, E2E, Harness, and diff checks; one stale official-blog date fixture and one load-sensitive timeout fixture were corrected without production changes. |
 | Real-data proof | 2 | Cleaned 2026-07-09 replay: 342 audited sources, 12 selected sources, 330 rejected, 0 dual, 0 missing, 40 globally ranked, 8 public stories, monotonic score/rank, zero consistency issues, and no public internal-field leak. |
 | Browser acceptance | 2 | Existing Ops status consumption was checked once at the sole supported `1280x900`; no console warning/error or horizontal overflow, screenshot under `.tmp/rec323-real/`. |
 | Runtime reliability | 2 | Shared fail-closed checks cover quality, report-write, and Phase5; the cleaned real-date replay remains runnable without publishing. |
@@ -22,7 +22,7 @@ Use this rubric for REC-323: converge main-stream ranking, terminal disposition,
 
 ## Verdict
 
-- Ready for PR and authoritative CI validation.
+- PR #296 is ready for final CI and mergeability validation.
 - No known P0/P1 remains after the single independent review and affected-suite replay.
 - Merge is allowed only after required CI is green and the PR is conflict-free.
 

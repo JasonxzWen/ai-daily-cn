@@ -7566,6 +7566,7 @@ test("official blog context CLI writes clean internal context", async () => {
     related_report_dates: []
   }, null, 2)}\n`, "utf8");
   await fs.writeFile(inputPath, `${JSON.stringify({
+    report_date: "2026-07-01",
     entries: [
       {
         id: "openai-custom-context-candidate",
