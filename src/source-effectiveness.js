@@ -272,6 +272,13 @@ export const CORE_SOURCE_CONTRACTS = [
     aliases: ["venturebeat ai", "venturebeat.com/category/ai"]
   },
   {
+    id: "aify-news",
+    name: "Aify News",
+    role: "news_aggregator",
+    notes: "First-class governance identity for the Aify content and site-watch entries; aggregator/intermediary authority remains unchanged and factual claims still require primary evidence.",
+    aliases: ["content-aify-news", "site-aify-news", "aify news", "aify-news.pages.dev"]
+  },
+  {
     id: "hacker-news",
     name: "Hacker News",
     role: "community_api",
@@ -854,13 +861,15 @@ function sourceNotIncludedReason({ configured, reachable, parsedRecent, candidat
   if (!candidateCreated) {
     return "parsed_but_no_candidate_created";
   }
-  const rejectionReasons = uniqueStrings(
-    matchedCandidates.map((candidate) => candidate?.main_reject_reason).filter(Boolean)
-  );
+  const rejectionReasons = uniqueStrings(matchedCandidates.map(candidateRejectionReason).filter(Boolean));
   if (rejectionReasons.length > 0) {
     return `candidate_rejected:${rejectionReasons.slice(0, 3).join(",")}`;
   }
   return "candidate_not_selected_for_public_page";
+}
+
+function candidateRejectionReason(candidate) {
+  return String(candidate?.main_reject_reason || candidate?.exclusion_reason || "").trim();
 }
 
 function isInactivePlaceholderSource(source = {}) {

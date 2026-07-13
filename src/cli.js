@@ -914,7 +914,9 @@ try {
       rootDir: path.resolve(args["repo-root"] || process.cwd()),
       reportDate: args.date || firstPositionalDate(argv),
       historyDir: args["history-dir"] || firstHistoryPath(argv) || "reports-data",
-      days: Number.parseInt(args.days || positionalNumbers[0] || "3", 10)
+      days: Number.parseInt(args.days || positionalNumbers[0] || "3", 10),
+      logicalSourceId: args["logical-source"] || "",
+      publicArticlesPath: args["public-articles"] || ""
     });
     printJson(result);
   } else if (command === "sources:audit-merge") {

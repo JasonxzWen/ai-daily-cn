@@ -5,6 +5,7 @@ import { isValidDateString } from "./time.js";
 import { evaluatePublicSourceAdmission } from "./candidates.js";
 import { effectiveCandidateVerification } from "./source-verification.js";
 import { collectMainAuditConsistencyIssues } from "./main-audit-consistency.js";
+import { normalizeUrlIdentity } from "./url.js";
 
 const REQUIRED_AUDIT_GROUPS = ["github_trending", "builder_sources", "content_sources", "search_sources", "sources_health"];
 const FACT_SECTION_NAMES = ["main_items", "model_releases", "hot_blogs", "projects"];
@@ -23,6 +24,19 @@ export async function auditSourceRunHistory(options = {}) {
   }
 
   const summary = summarizeDayResults(dayResults, days);
+  const logicalSourceId = String(options.logicalSourceId || "").trim();
+  const logicalSourceEvidence = logicalSourceId
+    ? await auditLogicalSourceEvidence({
+        rootDir,
+        historyDir,
+        reportDate,
+        days,
+        records,
+        phase5Days: dayResults,
+        logicalSourceId,
+        publicArticlesPath: options.publicArticlesPath
+      })
+    : null;
   return {
     ok: true,
     phase5_complete: summary.passed,
@@ -35,8 +49,222 @@ export async function auditSourceRunHistory(options = {}) {
     candidate_only_included: dayResults.flatMap((day) => day.candidate_only_included),
     missing_candidate_backrefs: dayResults.flatMap((day) => day.missing_candidate_backrefs),
     selection_metadata_mismatches: dayResults.flatMap((day) => day.selection_metadata_mismatches),
-    days: dayResults
+    days: dayResults,
+    ...(logicalSourceEvidence ? { logical_source_evidence: logicalSourceEvidence } : {})
   };
+}
+
+async function auditLogicalSourceEvidence({
+  rootDir,
+  historyDir,
+  reportDate,
+  days,
+  records,
+  phase5Days,
+  logicalSourceId,
+  publicArticlesPath
+}) {
+  const expectedDates = consecutiveDatesEnding(reportDate, days);
+  const recordsByDate = new Map(records.map((record) => [record.report_date, record]));
+  const phase5DaysByDate = new Map(phase5Days.map((day) => [day.report_date, day]));
+  const publicArticles = await readPublicArticles(rootDir, publicArticlesPath);
+  const dayResults = [];
+  for (const date of expectedDates) {
+    dayResults.push(await auditLogicalSourceDay({
+      record: recordsByDate.get(date),
+      phase5Day: phase5DaysByDate.get(date),
+      reportDate: date,
+      historyDir,
+      logicalSourceId,
+      publicArticles
+    }));
+  }
+  const violations = dayResults.flatMap((day) => day.violations);
+  if (days < 3) {
+    violations.push({
+      report_date: reportDate,
+      logical_source_id: logicalSourceId,
+      code: "insufficient_evidence_window",
+      message: "Logical source production verification requires at least three consecutive days."
+    });
+  }
+  const totalPublicMatches = new Set(
+    dayResults.flatMap((day) => day.public_output.matched_urls)
+  ).size;
+  const productionVerified =
+    days >= 3 &&
+    dayResults.length === days &&
+    dayResults.every((day) => day.complete) &&
+    totalPublicMatches > 0 &&
+    violations.length === 0;
+
+  return {
+    logical_source_id: logicalSourceId,
+    expected_dates: expectedDates,
+    days: dayResults,
+    consecutive_complete_days: dayResults.filter((day) => day.complete).length,
+    total_public_matches: totalPublicMatches,
+    production_verified: productionVerified,
+    violations
+  };
+}
+
+async function auditLogicalSourceDay({ record, phase5Day, reportDate, historyDir, logicalSourceId, publicArticles }) {
+  if (!record) {
+    const violation = logicalSourceViolation(reportDate, logicalSourceId, "missing_report_day", "No persisted report exists for the expected date.");
+    return emptyLogicalSourceDay(reportDate, violation);
+  }
+
+  const row = (Array.isArray(record.payload?.source_effectiveness) ? record.payload.source_effectiveness : [])
+    .find((item) => item?.id === logicalSourceId);
+  const sourceIds = uniqueStrings(row?.source_ids || []);
+  const candidatePool = await readCandidatePoolForDate(historyDir, reportDate);
+  const candidates = (Array.isArray(candidatePool?.candidates) ? candidatePool.candidates : [])
+    .filter((candidate) => logicalSourceCandidateMatches(candidate, sourceIds));
+  const included = candidates.filter(candidateIncludedPublicly);
+  const notIncluded = candidates.filter((candidate) => !candidateIncludedPublicly(candidate));
+  const reasons = uniqueStrings(notIncluded.map(candidateDispositionReason).filter(Boolean));
+  const unresolved = notIncluded
+    .filter((candidate) => !candidateDispositionReason(candidate))
+    .map((candidate) => String(candidate?.id || candidate?.url || "unknown"));
+  const expectedUrls = uniqueStrings(included.map(logicalSourceCandidatePublicUrl).map(normalizeUrlIdentity).filter(Boolean));
+  const publicUrls = new Set(
+    publicArticles
+      .filter((article) => String(article?.report_date || article?.date || "") === reportDate)
+      .map((article) => normalizeUrlIdentity(article?.url))
+      .filter(Boolean)
+  );
+  const matchedUrls = expectedUrls.filter((url) => publicUrls.has(url));
+  const missingUrls = expectedUrls.filter((url) => !publicUrls.has(url));
+  const violations = [];
+
+  if (!row) {
+    violations.push(logicalSourceViolation(reportDate, logicalSourceId, "logical_source_not_reported", "The report has no source_effectiveness row for the logical source."));
+  } else {
+    if (row.configured !== true) {
+      violations.push(logicalSourceViolation(reportDate, logicalSourceId, "collection_not_configured", "The logical source was not configured."));
+    }
+    if (row.reachable !== true) {
+      violations.push(logicalSourceViolation(reportDate, logicalSourceId, "collection_unreachable", "The logical source was not reachable."));
+    }
+    if (row.parsed_recent !== true) {
+      violations.push(logicalSourceViolation(reportDate, logicalSourceId, "collection_not_parsed", "The logical source had no recent parsed signal."));
+    }
+    if (row.candidate_created !== true || candidates.length === 0) {
+      violations.push(logicalSourceViolation(reportDate, logicalSourceId, "candidate_not_created", "The persisted candidate pool has no candidate for the logical source."));
+    }
+    if ((row.public_included === true) !== (included.length > 0)) {
+      violations.push(logicalSourceViolation(
+        reportDate,
+        logicalSourceId,
+        "effectiveness_public_included_mismatch",
+        `Source effectiveness reports public_included=${row.public_included === true}, but the persisted candidate pool has ${included.length} included candidate(s).`
+      ));
+    }
+  }
+  if (unresolved.length > 0) {
+    violations.push(logicalSourceViolation(reportDate, logicalSourceId, "missing_disposition_reason", `Non-included candidates have no persisted reason: ${unresolved.join(", ")}.`));
+  }
+  if (missingUrls.length > 0) {
+    violations.push(logicalSourceViolation(reportDate, logicalSourceId, "included_public_output_mismatch", `Included candidate URLs are missing from public output: ${missingUrls.join(", ")}.`));
+  }
+  if (phase5Day?.passed !== true) {
+    violations.push(logicalSourceViolation(reportDate, logicalSourceId, "phase5_day_incomplete", "The report day's shared Phase5 admission and lineage audit did not pass."));
+  }
+
+  return {
+    report_date: reportDate,
+    report_present: true,
+    phase5_day_passed: phase5Day?.passed === true,
+    collection: {
+      configured: row?.configured === true,
+      reachable: row?.reachable === true,
+      parsed_recent: row?.parsed_recent === true,
+      statuses: uniqueStrings(row?.statuses || []),
+      source_ids: sourceIds
+    },
+    admission: {
+      candidate_count: candidates.length
+    },
+    disposition: {
+      included_count: included.length,
+      excluded_count: notIncluded.length,
+      reasons,
+      unresolved
+    },
+    public_output: {
+      expected_urls: expectedUrls,
+      matched_urls: matchedUrls,
+      missing_urls: missingUrls
+    },
+    complete: violations.length === 0,
+    violations
+  };
+}
+
+function emptyLogicalSourceDay(reportDate, violation) {
+  return {
+    report_date: reportDate,
+    report_present: false,
+    phase5_day_passed: false,
+    collection: { configured: false, reachable: false, parsed_recent: false, statuses: [], source_ids: [] },
+    admission: { candidate_count: 0 },
+    disposition: { included_count: 0, excluded_count: 0, reasons: [], unresolved: [] },
+    public_output: { expected_urls: [], matched_urls: [], missing_urls: [] },
+    complete: false,
+    violations: [violation]
+  };
+}
+
+function logicalSourceCandidateMatches(candidate, sourceIds) {
+  if (sourceIds.length === 0) return false;
+  return [candidate?.source_id, candidate?.source_watch?.target_id]
+    .map((value) => String(value || "").trim())
+    .some((value) => value && sourceIds.includes(value));
+}
+
+function candidateIncludedPublicly(candidate) {
+  if (String(candidate?.status || "") === "included") return true;
+  if (Array.isArray(candidate?.included_in)) return candidate.included_in.length > 0;
+  return Boolean(String(candidate?.included_in || "").trim());
+}
+
+function candidateDispositionReason(candidate) {
+  return String(candidate?.main_reject_reason || candidate?.exclusion_reason || "").trim();
+}
+
+function logicalSourceCandidatePublicUrl(candidate) {
+  return String(candidate?.source_watch?.event_url || candidate?.url || "").trim();
+}
+
+function logicalSourceViolation(reportDate, logicalSourceId, code, message) {
+  return {
+    report_date: reportDate,
+    logical_source_id: logicalSourceId,
+    code,
+    message
+  };
+}
+
+function consecutiveDatesEnding(reportDate, days) {
+  const end = new Date(`${reportDate}T00:00:00.000Z`);
+  const dates = [];
+  for (let offset = days - 1; offset >= 0; offset -= 1) {
+    const date = new Date(end);
+    date.setUTCDate(end.getUTCDate() - offset);
+    dates.push(date.toISOString().slice(0, 10));
+  }
+  return dates;
+}
+
+async function readPublicArticles(rootDir, publicArticlesPath) {
+  const filePath = path.resolve(rootDir, publicArticlesPath || path.join("docs", "articles.json"));
+  try {
+    const payload = JSON.parse(await fs.readFile(filePath, "utf8"));
+    return Array.isArray(payload) ? payload : (Array.isArray(payload?.articles) ? payload.articles : []);
+  } catch {
+    return [];
+  }
 }
 
 async function loadReportRecords(historyDir, reportDate) {
@@ -355,6 +583,10 @@ function phase5SummaryNotes({
 
 function plural(count, singular, pluralValue) {
   return count === 1 ? singular : pluralValue;
+}
+
+function uniqueStrings(values) {
+  return [...new Set((Array.isArray(values) ? values : []).map((value) => String(value || "").trim()).filter(Boolean))];
 }
 
 function countDuplicateUrls(candidates) {

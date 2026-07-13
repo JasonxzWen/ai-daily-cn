@@ -247,14 +247,14 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Root cause: a review proposal was later read as implementation progress without a production promotion decision.
 - State: locally_verified.
 - Decision: 38 stored daily artifacts support 9 promotions (`azure-ai-blog`, `cloudflare-ai-platform`, `google-keyword-ai`, `baidu-ai`, `alibaba-cloud-ai`, `latent-space`, `nature-machine-learning`, `sspai-ai`, `leiphone-ai`), 12 deferrals, and 3 retired promotion proposals. Retired proposals keep their collection entries.
-- Implementation: 48 logical sources now map through `CORE_SOURCE_CONTRACTS` and the display contract; 69 collection entries remain unmapped. `docs/source-order-tuning-review.md` records every per-source decision and evidence; the validator rejects invalid actions or mapped defer/retire rows.
+- Implementation: 49 logical sources now map through `CORE_SOURCE_CONTRACTS` and the display contract; 69 collection entries remain unmapped. `docs/source-order-tuning-review.md` records every per-source decision and evidence; the validator rejects invalid actions or mapped defer/retire rows. Aify News is the separately user-directed 49th identity and remains in observation under REC-331 rather than being counted as production-proven by this historical promotion review.
 - Evidence: source display validation passes; 8 focused governance/promotion/inventory tests pass.
 - Acceptance: display contract, source_effectiveness, candidate output, and public inclusion agree per logical source; promotion never raises source authority or bypasses story admission.
 
 ### REC-317 - Keep RSSHub/RSS-Bridge optional, not default
 
 - Type: replaced/retired default capability.
-- Fact evidence: the current 165-source registry contains no RSSHub/RSS-Bridge/aggregator defaults; preflight forbids the old placeholders, while external `--sources` fixtures still support private integrations.
+- Fact evidence: the current 166-source registry contains no RSSHub/RSS-Bridge defaults; preflight forbids the old placeholders, while external `--sources` fixtures still support private integrations. The Aify News aggregator entry is an explicit product decision governed by REC-331, not a restored generic aggregator default.
 - Root cause: the old integration plan was not updated after source reset.
 - State: replaced.
 - Action: update the old plan to label this a standalone private capability; do not restore placeholders. Later remove compatibility code only if no real user remains.
@@ -369,6 +369,16 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Evidence boundary: historical/news prose, raw source snapshots, and generic React/Astryx compatibility remain factual/dependency evidence only and are not mobile support, design, or acceptance claims.
 - Guardrail: `docs/desktop-only-support-policy.md`, AGENTS/DoD/feature/Skill rules, and the `desktop-only` visual-contract test prevent reintroduction. Reversal requires a new explicit product-scope decision.
 
+### REC-331 - Make Aify News first-class in governance and observable in production
+
+- Type: logical-source promotion / evidence closure.
+- Fact evidence: `site-aify-news` was already watched as a shell signal, but the public article feed had no collection entry, stable logical identity, preserved original-publisher lineage, or consecutive-day production proof. The old `first_class` wording therefore described intent rather than a closed production capability.
+- State: locally_verified; deterministic contracts, shared Phase5 fail-closed binding, and real endpoint replay are verified, while real consecutive production observation remains open.
+- Implementation path: add the Aify `/articles.json` content entry, map both `content-aify-news` and `site-aify-news` to `aify-news`, preserve the payload's original publisher, keep `ai_news_aggregator`/`intermediary_only` authority, and extend Phase5 with logical-source evidence over collection, admission, disposition, and public output.
+- Validation boundary: fixtures and date-scoped endpoint replays prove parser and contract behavior only. `production_verified` requires at least three consecutive persisted production days, every non-included candidate carrying a reason, every included URL matching public output, and at least one public match in the window.
+- Acceptance: Aify is first-class for observability and source governance without becoming primary factual authority; source effectiveness, candidate pool, persisted report, and public article index agree for the same dates.
+- Recurrence prevention: the feature inventory and Phase5 audit fail closed on missing days, missing logical rows, missing dispositions, or included/public mismatches.
+
 ## Confirmed Surviving Value
 
 - Product/content: four dense Feishu-style tracks, roughly 100-character summaries, collapsible stories, and desktop navigation remain active.
@@ -461,6 +471,8 @@ This table is part of the same ledger, not a second review. `fixed` means implem
 | S-76 | live `ai-2` used PowerShell's implicit text encoding when reading the UTF-8 run summary, allowing Windows PowerShell 5.1 to corrupt Chinese terminal evidence | used the supported updater for one prompt-only change to `Get-Content -LiteralPath ... -Encoding UTF8`, added a workflow-contract guard, and reread every non-prompt field plus the otherwise byte-equivalent prompt | fixed externally and contract-guarded; workflow validator passes 0 failures / 0 warnings |
 | S-77 | the React homepage loaded the 1,197,407-byte article archive and grouped by event date, so 23 older events in the latest 72-record edition could be detached from their report while only 2 of 8 editorial main stories appeared in the former “today” view | added a schema-validated, privacy-scanned `home.json` projection keyed by `report_date`, retained report story order, implemented lead/secondary/compact hierarchy, and made homepage requests independent of `articles.json`/`feed.json` | fixed locally; focused schema/build/publish tests and desktop E2E/browser evidence pass |
 | S-78 | the first home-artifact self-check reused the selected publish date containment rule, which would falsely block a legitimate historical backfill once that date fell outside the bounded homepage window | removed target-date containment for `home.json`; self-check now proves schema validity, truthful file byte size, and `latest_edition.report_date` equality with the latest feed entry | fixed locally; a 2026-06-04 backfill against a 2026-07-09 homepage passes the focused status regression |
+| S-79 | Aify News carried a `first_class` intent label while only a site-watch shell existed; the content feed was not a governed collection entry and its original publisher would be lost by the generic JSON path | added a dedicated content entry and stable logical identity, preserved original publisher plus aggregator authority, and added a three-day collection-to-public Phase5 contract bound to the shared admission/lineage verdict | locally_verified; 41/41 focused/affected and 898-test final validation pass, production observation pending |
+| S-80 | the real non-publish pipeline spent minutes hashing its own fresh `.tmp` clone and quarantine during repository-guard snapshots before Codex repair | retained the truthful `needs_ai_repair` result, stopped the low-value 20-minute repair tail for this development pass, and recorded exclusion/bounded-snapshot work as a later workflow optimization | discovered; intentionally not mixed into REC-331 |
 
 ## Production Acceptance
 

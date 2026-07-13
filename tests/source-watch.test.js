@@ -108,6 +108,11 @@ test("collectSourceWatch replays configured sites and GitHub repos from fixtures
   assert.equal(siteSource.verification_status, "intermediary_only");
 
   const siteAudit = collected.source_audit.site_watch.sources.find((source) => source.target_id === "site-aify-news");
+  const repoAudit = collected.source_audit.github_watch.sources.find((source) => source.target_id === "repo-ml-news-of-the-week");
+  assert.equal(repoAudit.id, "repo-ml-news-of-the-week");
+  assert.equal(repoAudit.parsed_count, 1);
+  assert.equal(siteAudit.id, "site-aify-news");
+  assert.equal(siteAudit.parsed_count, 1);
   assert.equal(siteAudit.source_lane, "aify");
   assert.equal(siteAudit.source_tier, "first_class");
   assert.equal(siteAudit.verification_policy, "no_secondary_review_required");
@@ -292,6 +297,10 @@ test("collectSourceWatch structures per-target failures without aborting the art
   assert.equal(collected.targets[1].status, "blocked");
   assert.equal(collected.source_audit.github_watch.sources[0].status, "blocked");
   assert.equal(collected.source_audit.site_watch.sources[0].status, "blocked");
+  assert.equal(collected.source_audit.github_watch.sources[0].id, "repo-failed");
+  assert.equal(collected.source_audit.github_watch.sources[0].parsed_count, 0);
+  assert.equal(collected.source_audit.site_watch.sources[0].id, "site-failed");
+  assert.equal(collected.source_audit.site_watch.sources[0].parsed_count, 0);
   assert.match(collected.source_audit.github_watch.sources[0].notes, /HTTP 503/);
 });
 
