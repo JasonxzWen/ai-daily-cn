@@ -1,12 +1,15 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
+import { isPublicNetworkHost, isSensitivePrivateNetworkHost } from "./public-url.js";
+
 export const PUBLIC_ARTIFACT_PATHS = [
   "docs/reports",
   "docs/data",
   "docs/feed.json",
   "docs/articles.json",
   "docs/home.json",
+  "docs/signals",
   "docs/index.html",
   "docs/trends.json",
   "reports-data"
@@ -21,6 +24,14 @@ const LOCAL_INFO_PATTERNS = [
   { name: "codex_automation_path", pattern: /\.codex[\\/]automations|automations[\\/]ai-daily[\\/]inputs/i },
   { name: "file_url_local_path", pattern: /file:\/\/\/?(?:[A-Za-z]:|\/(?:Users|home|tmp)\b)/i }
 ];
+
+const PUBLIC_URL_FORBIDDEN_PATTERNS = [
+  { name: "public_url_credentials", pattern: /https?:\/\/[^\s/?:#]+:[^\s/@]+@/i },
+  { name: "public_url_secret_query", pattern: /[?&](?:access[_-]?token|api[_-]?key|auth(?:orization)?|client[_-]?secret|credential|key|pass(?:word|wd)?|secret|sig(?:nature)?|token|x-amz-(?:credential|security-token|signature)|x-goog-(?:credential|signature))=/i }
+];
+const PUBLIC_URL_RE = /https?:\/\/[^\s"'<>\\]+/gi;
+const HTML_PUBLIC_URL_ATTRIBUTE_RE = /\b(?:href|src|action)\s*=\s*["'](https?:\/\/[^"'<>]+)["']/gi;
+const XML_PUBLIC_URL_ELEMENT_RE = /<(?:link|url|uri)>\s*(https?:\/\/[^<\s]+)\s*<\//gi;
 
 const PUBLIC_DOCS_FORBIDDEN_PATTERNS = [
   { name: "public_source_effectiveness", pattern: /\bsource_effectiveness\b/i },
@@ -58,8 +69,10 @@ export async function scanPublicArtifactsForLocalInfo(options = {}) {
     const text = await fs.readFile(filePath, "utf8");
     const relativeFile = path.relative(rootDir, filePath).replace(/\\/g, "/");
     const filePatterns = relativeFile.startsWith("docs/")
-      ? [...patterns, ...PUBLIC_DOCS_FORBIDDEN_PATTERNS]
-      : patterns;
+      ? [...patterns, ...PUBLIC_URL_FORBIDDEN_PATTERNS, ...PUBLIC_DOCS_FORBIDDEN_PATTERNS]
+      : relativeFile.startsWith("reports-data/occurrences/")
+        ? [...patterns, ...PUBLIC_URL_FORBIDDEN_PATTERNS]
+        : patterns;
     for (const { name, pattern } of filePatterns) {
       const match = pattern.exec(text);
       if (match) {
@@ -70,6 +83,16 @@ export async function scanPublicArtifactsForLocalInfo(options = {}) {
         });
       }
     }
+    if (relativeFile.startsWith("docs/") || relativeFile.startsWith("reports-data/occurrences/")) {
+      const privateUrlIndex = findPrivatePublicUrlIndex(text, relativeFile);
+      if (privateUrlIndex >= 0) {
+        findings.push({
+          file: relativeFile,
+          pattern: "public_url_private_host",
+          excerpt: redactExcerpt(text, privateUrlIndex)
+        });
+      }
+    }
   }
 
   return {
@@ -77,6 +100,88 @@ export async function scanPublicArtifactsForLocalInfo(options = {}) {
     files_checked: files.length,
     findings
   };
+}
+
+function findPrivatePublicUrlIndex(text, relativeFile) {
+  const extension = path.extname(relativeFile).toLowerCase();
+  if (extension === ".json") {
+    try {
+      const parsed = JSON.parse(text);
+      const privateUrl = privateUrlInJsonValue(parsed) || sensitivePrivateUrlInJsonValue(parsed);
+      return privateUrl ? text.indexOf(privateUrl) : -1;
+    } catch {
+      return -1;
+    }
+  }
+  const patterns = extension === ".xml"
+    ? [HTML_PUBLIC_URL_ATTRIBUTE_RE, XML_PUBLIC_URL_ELEMENT_RE]
+    : extension === ".html"
+      ? [HTML_PUBLIC_URL_ATTRIBUTE_RE]
+      : [];
+  for (const pattern of patterns) {
+    for (const match of text.matchAll(pattern)) {
+      const rawUrl = match[1] || match[0];
+      if (hasPrivateHost(rawUrl)) return (match.index || 0) + match[0].indexOf(rawUrl);
+    }
+  }
+  return -1;
+}
+
+function sensitivePrivateUrlInJsonValue(value) {
+  if (typeof value === "string") {
+    for (const match of value.matchAll(PUBLIC_URL_RE)) {
+      try {
+        if (isSensitivePrivateNetworkHost(new URL(match[0]).hostname)) return match[0];
+      } catch {
+        // Ignore malformed prose fragments; URL/schema validators own structured fields.
+      }
+    }
+    return "";
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = sensitivePrivateUrlInJsonValue(item);
+      if (found) return found;
+    }
+    return "";
+  }
+  if (!value || typeof value !== "object") return "";
+  for (const item of Object.values(value)) {
+    const found = sensitivePrivateUrlInJsonValue(item);
+    if (found) return found;
+  }
+  return "";
+}
+
+function privateUrlInJsonValue(value, parentKey = "") {
+  if (typeof value === "string") {
+    if (!/(?:^|_)(?:url|urls|uri|uris)$/.test(parentKey)) return "";
+    for (const match of value.matchAll(PUBLIC_URL_RE)) {
+      if (hasPrivateHost(match[0])) return match[0];
+    }
+    return "";
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = privateUrlInJsonValue(item, parentKey);
+      if (found) return found;
+    }
+    return "";
+  }
+  if (!value || typeof value !== "object") return "";
+  for (const [key, item] of Object.entries(value)) {
+    const found = privateUrlInJsonValue(item, key);
+    if (found) return found;
+  }
+  return "";
+}
+
+function hasPrivateHost(value) {
+  try {
+    return !isPublicNetworkHost(new URL(value).hostname);
+  } catch {
+    return false;
+  }
 }
 
 async function listTextFiles(target) {

@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "source_groups": [
+    { "id": "official_blogs", "label": "官网博客", "order": 1 },
+    { "id": "github_trending", "label": "GitHub 趋势", "order": 2 },
+    { "id": "community_discussions", "label": "社区讨论", "order": 3 },
+    { "id": "x_updates", "label": "X 动态", "order": 4 },
+    { "id": "news_newsletters", "label": "新闻 / Newsletter", "order": 5 },
+    { "id": "papers_models", "label": "论文 / 模型", "order": 6 },
+    { "id": "other", "label": "其他 / 待归类", "order": 7 }
+  ],
+  "credibility_tags": [
+    { "id": "primary_material", "label": "一手材料", "order": 1 },
+    { "id": "multi_source_material", "label": "多源材料", "order": 2 },
+    { "id": "single_source_relay", "label": "单源转述", "order": 3 },
+    { "id": "community_lead", "label": "社区线索", "order": 4 },
+    { "id": "monitoring_lead", "label": "监测线索", "order": 5 },
+    { "id": "pending_review", "label": "待核材料", "order": 6 }
+  ],
+  "content_tags": [
+    { "id": "model_release", "label": "模型发布", "order": 1 },
+    { "id": "product_update", "label": "产品更新", "order": 2 },
+    { "id": "open_source", "label": "开源项目", "order": 3 },
+    { "id": "research", "label": "研究论文", "order": 4 },
+    { "id": "engineering", "label": "工程技术", "order": 5 },
+    { "id": "company_business", "label": "公司动态", "order": 6 },
+    { "id": "funding", "label": "融资交易", "order": 7 },
+    { "id": "policy_infrastructure", "label": "政策与基础设施", "order": 8 },
+    { "id": "industry_news", "label": "行业动态", "order": 9 },
+    { "id": "creative_ai", "label": "AIGC / 内容", "order": 10 },
+    { "id": "analysis_opinion", "label": "观点分析", "order": 11 },
+    { "id": "podcast", "label": "播客访谈", "order": 12 },
+    { "id": "community_discussion", "label": "社区讨论", "order": 13 },
+    { "id": "other", "label": "其他", "order": 14 }
+  ],
+  "legacy_mappings": {
+    "editorial_category_to_content_tags": {
+      "headline": ["industry_news"],
+      "ai_industry": ["industry_news"],
+      "engineering_toolchain": ["engineering"],
+      "model_release": ["model_release"],
+      "company_business": ["company_business"],
+      "policy_infra": ["policy_infrastructure"],
+      "content_aigc": ["creative_ai"],
+      "product_radar": ["product_update"],
+      "funding": ["funding"],
+      "open_source": ["open_source"],
+      "viewpoint_analysis": ["analysis_opinion"],
+      "podcast": ["podcast"],
+      "x_discussion": ["community_discussion"],
+      "community_signal": ["community_discussion"]
+    },
+    "candidate_category_to_content_tags": {
+      "github_trending": ["open_source"],
+      "project": ["open_source"],
+      "huggingface_trending": ["model_release"],
+      "model_release": ["model_release"],
+      "builder_observation": ["analysis_opinion"],
+      "community_lead": ["community_discussion"]
+    },
+    "verification_status_to_credibility_tag": {
+      "primary_confirmed": "primary_material",
+      "multi_source_confirmed": "multi_source_material",
+      "intermediary_only": "single_source_relay",
+      "original_social_only": "community_lead",
+      "platform_exempt_unverified": "community_lead",
+      "unverified": "pending_review"
+    },
+    "source_level_to_credibility_tag": {
+      "primary": "primary_material",
+      "official": "primary_material",
+      "paper": "primary_material",
+      "github": "primary_material",
+      "model_registry": "primary_material",
+      "official_company_news": "primary_material",
+      "official_open_source_account": "primary_material",
+      "official_model_host_account": "primary_material",
+      "multi_source": "multi_source_material",
+      "intermediary": "single_source_relay",
+      "wechat_primary_like": "single_source_relay",
+      "wechat_industry_whitelist": "single_source_relay",
+      "wechat2rss_medium_trust": "single_source_relay",
+      "weekly_paper_aggregator": "single_source_relay",
+      "open_source_aggregator": "single_source_relay",
+      "tech_weekly_aggregator": "single_source_relay",
+      "paper_aggregator": "single_source_relay",
+      "ai_news_aggregator": "single_source_relay",
+      "aigc_content_industry": "single_source_relay",
+      "ai_funding_product_radar": "single_source_relay",
+      "weekly_ai_news_aggregator": "single_source_relay",
+      "community": "community_lead",
+      "original_social": "community_lead",
+      "platform_exempt_signal": "community_lead",
+      "paper_api": "monitoring_lead",
+      "community_api": "monitoring_lead",
+      "github_ai_news_directory": "monitoring_lead",
+      "big_tech_company_watch": "monitoring_lead",
+      "china_big_tech_company_watch": "monitoring_lead",
+      "official_open_source_watch": "monitoring_lead",
+      "unverified": "pending_review"
+    }
+  },
+  "host_groups": {
+    "x_updates": ["x.com", "twitter.com"],
+    "papers_models": ["arxiv.org", "openreview.net", "doi.org", "huggingface.co", "paperswithcode.com", "semanticscholar.org"],
+    "github_trending": ["github.com", "github.io", "githubusercontent.com"],
+    "community_discussions": ["news.ycombinator.com", "hnrss.org", "reddit.com", "zhihu.com", "weixin.qq.com", "v2ex.com", "lobste.rs"],
+    "official_blogs": ["openai.com", "anthropic.com", "deepmind.google", "blog.google", "ai.google", "developers.googleblog.com", "microsoft.com", "azure.microsoft.com", "aws.amazon.com", "nvidia.com", "meta.com", "ai.meta.com", "apple.com", "mistral.ai", "qwen.ai", "alibabacloud.com", "bytedance.com", "tencent.com", "deepseek.com", "zhipuai.cn", "minimax.io", "kimi.com"]
+  }
+}

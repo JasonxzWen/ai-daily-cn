@@ -48,7 +48,7 @@ import { collectMainAuditConsistencyIssues } from "../src/main-audit-consistency
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite, planGeneratedFiles } from "../src/site.js";
-import { schemas, validateCandidatePool, validateFeed, validateReport } from "../src/schema.js";
+import { schemas, validateCandidatePool, validateFeed, validateReport, validateSourceRegistry } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
@@ -180,22 +180,28 @@ test("candidate audit contract stays aligned with candidate schema", async () =>
   assert.deepEqual(candidateProperties.roles.items.enum, CANDIDATE_AUDIT_ROLES);
 });
 
-test("source level vocabulary stays synchronized across registry, candidate, report, and runtime fallbacks", async () => {
+test("legacy source and classification fields remain open metadata across registry, candidate, and report schemas", async () => {
   const registry = await loadSourceRegistry({ rootDir });
-  const registryLevels = schemas.sourceRegistry.$defs.source_level?.enum || [];
-  const candidateLevels = schemas.candidatePool.$defs.source_level.enum;
-  const reportLevels = schemas.report.$defs.source_level.enum;
-  const configuredLevels = new Set([
-    ...registry.sources.map((source) => source.source_level || source.sourceLevel),
-    ...DEFAULT_CONTENT_SOURCES.map((source) => source.source_level || source.sourceLevel)
-  ].filter(Boolean));
+  for (const schema of [schemas.sourceRegistry, schemas.candidatePool, schemas.report]) {
+    assert.deepEqual(schema.$defs.source_level, { type: "string", minLength: 1 });
+  }
+  for (const schema of [schemas.candidatePool, schemas.report]) {
+    assert.deepEqual(schema.$defs.verification_status, { type: "string", minLength: 1 });
+    assert.deepEqual(schema.$defs.editorial_category, { type: "string", minLength: 1 });
+  }
+  assert.equal(registry.sources.length > 0, true);
+  assert.equal(validateSourceRegistry({ schema_version: 1, sources: [{
+    ...registry.sources[0],
+    source_level: "future_unknown_source_level"
+  }] }).valid, true);
 
-  assert.deepEqual(registryLevels, candidateLevels);
-  assert.deepEqual(reportLevels, candidateLevels);
-  assert.deepEqual(
-    [...configuredLevels].filter((sourceLevel) => !candidateLevels.includes(sourceLevel)).sort(),
-    []
-  );
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  Object.assign(report.main_items[0], {
+    source_level: "future_unknown_source_level",
+    verification_status: "future_unknown_verification",
+    editorial_category: "future_unknown_editorial_category"
+  });
+  assert.equal(validateReport(report).valid, true);
 });
 
 test("real non-publish candidate artifact replay preserves provenance and accepts configured source levels", async () => {
@@ -236,10 +242,12 @@ test("real non-publish candidate artifact replay preserves provenance and accept
 
   const unknown = structuredClone(candidatePool);
   unknown.candidates[0].source_level = "future_unknown_source_level";
-  assert.equal(validateCandidatePool(unknown).valid, false);
+  unknown.candidates[0].verification_status = "future_unknown_verification";
+  unknown.candidates[0].editorial_category = "future_unknown_editorial_category";
+  assert.equal(validateCandidatePool(unknown).valid, true);
 });
 
-test("report draft rejects unknown source level before writing producer artifacts", async () => {
+test("report draft preserves unknown source level and still writes producer artifacts", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-level-contract-"));
   const reportDate = "2026-07-14";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -247,22 +255,48 @@ test("report draft rejects unknown source level before writing producer artifact
   const candidateOutputPath = path.join(tmp, ".tmp", `source-candidates-${reportDate}.json`);
   const discovery = autodraftDiscoveryFixture(reportDate);
   discovery.candidates[0].source_level = "future_unknown_source_level";
+  discovery.candidates[0].verification_status = "future_unknown_verification";
+  discovery.candidates[0].editorial_category = "future_unknown_editorial_category";
+  discovery.candidates[0].summary = "Collector-provided summary retained before editorial selection.";
+  discovery.candidates[0].publisher = "Runway";
+  discovery.candidates[0].published_at = "2026-07-14T01:00:00.000Z";
+  discovery.candidates[0].collected_at = "2026-07-14T02:00:00.000Z";
+  discovery.candidates[0].source_group = "official_blogs";
+  discovery.candidates[0].content_tags = ["model_release", "product_update"];
   await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
 
-  await assert.rejects(
-    () => generateReportDraft({
-      rootDir: tmp,
-      reportDate,
-      generatedAt: "2026-07-14T02:33:48.000Z",
-      inputPaths: [discoveryPath],
-      outputPath,
-      candidateOutputPath,
-      cacheEvidence: false
-    }),
-    (error) => error instanceof PublisherError && error.code === "candidate_pool_schema_validation_failed"
-  );
-  assert.equal(fsSync.existsSync(outputPath), false);
-  assert.equal(fsSync.existsSync(candidateOutputPath), false);
+  const result = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: "2026-07-14T02:33:48.000Z",
+    inputPaths: [discoveryPath],
+    outputPath,
+    candidateOutputPath,
+    cacheEvidence: false
+  });
+  assert.equal(fsSync.existsSync(outputPath), true);
+  assert.equal(fsSync.existsSync(candidateOutputPath), true);
+  assert.equal(fsSync.existsSync(result.occurrenceStorePath), true);
+  const candidatePool = JSON.parse(await fs.readFile(candidateOutputPath, "utf8"));
+  const producedCandidate = candidatePool.candidates.find((item) => item.url === discovery.candidates[0].url);
+  const occurrence = result.occurrenceStore.occurrences.find((item) => item.url === discovery.candidates[0].url);
+  assert.match(producedCandidate.observation_id, /^obs_[a-f0-9]{24}$/);
+  assert.equal(producedCandidate.summary, discovery.candidates[0].summary);
+  assert.equal(producedCandidate.publisher, "Runway");
+  assert.equal(producedCandidate.published_at, "2026-07-14T01:00:00.000Z");
+  assert.equal(producedCandidate.collected_at, "2026-07-14T02:00:00.000Z");
+  assert.equal(producedCandidate.source_group, "official_blogs");
+  assert.deepEqual(producedCandidate.content_tags, ["model_release", "product_update"]);
+  assert.equal(occurrence.observation_id, producedCandidate.observation_id);
+  assert.equal(occurrence.source_level, "future_unknown_source_level");
+  assert.equal(occurrence.verification_status, "future_unknown_verification");
+  assert.equal(occurrence.editorial_category, "future_unknown_editorial_category");
+  assert.equal(occurrence.summary, discovery.candidates[0].summary);
+  assert.equal(occurrence.publisher_hint, "Runway");
+  assert.equal(occurrence.published_at, "2026-07-14T01:00:00.000Z");
+  assert.equal(occurrence.collected_at, "2026-07-14T02:00:00.000Z");
+  assert.equal(occurrence.raw_source_group, "official_blogs");
+  assert.deepEqual(occurrence.raw_tags, ["model_release", "product_update"]);
 });
 
 test("candidate pool schema accepts specific main refill selection stages", () => {
@@ -5636,28 +5670,26 @@ test("source registry validates required source metadata", () => {
   );
 });
 
-test("source registry rejects unknown source level in snake-case and camel-case before discovery", () => {
+test("source registry preserves unknown source level metadata in snake-case and camel-case", () => {
   for (const property of ["source_level", "sourceLevel"]) {
-    assert.throws(
-      () => normalizeSourceRegistry({
-        schema_version: 1,
-        sources: [
-          {
-            id: `unknown-${property}`,
-            name: `Unknown ${property}`,
-            url: `https://example.com/unknown-${property}.xml`,
-            source_kind: "rss",
-            candidate_category: "hot_blog",
-            tier: "T1",
-            authority: "intermediary",
-            enablement: "optional",
-            verification_policy: "primary_required",
-            [property]: "future_unknown_source_level"
-          }
-        ]
-      }),
-      (error) => error instanceof PublisherError && error.code === "source_registry_schema_validation_failed"
-    );
+    const normalized = normalizeSourceRegistry({
+      schema_version: 1,
+      sources: [
+        {
+          id: `unknown-${property}`,
+          name: `Unknown ${property}`,
+          url: `https://example.com/unknown-${property}.xml`,
+          source_kind: "rss",
+          candidate_category: "hot_blog",
+          tier: "T1",
+          authority: "intermediary",
+          enablement: "optional",
+          verification_policy: "primary_required",
+          [property]: "future_unknown_source_level"
+        }
+      ]
+    });
+    assert.equal(normalized.sources[0][property], "future_unknown_source_level");
   }
 });
 
@@ -9387,13 +9419,13 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
   assert(quickReference.includes("feedback/p1-ai-daily-requirements-reconciliation"));
 
   const rows = reconciliation.split(/\r?\n/).filter((line) => /^\| REQ-\d{3} \|/.test(line));
-  assert.equal(rows.length, 13);
-  for (let index = 1; index <= 13; index += 1) {
-    const id = `REQ-${String(index).padStart(3, "0")}`;
+  const expectedRequirementIds = Array.from({ length: 14 }, (_, index) => `REQ-${String(index + 1).padStart(3, "0")}`);
+  assert.equal(rows.length, expectedRequirementIds.length);
+  for (const id of expectedRequirementIds) {
     const row = rows.find((line) => line.includes(`| ${id} |`));
     assert(row, `${id} must be listed`);
     assert.match(row, /feedback\/p1-/);
-    assert.match(row, /\| (implemented|partial|missing) \|$/);
+    assert.match(row, /\| (implemented|implementing|partial|missing) \|$/);
   }
 
   for (const phrase of [
@@ -9487,13 +9519,16 @@ test("story-centered daily contract is implemented with generator and rendering 
   }
 
   for (const phrase of [
-    "implemented / publish-run-validation-pending",
+    "implemented-for-optional-legacy-edited-report / publish-run-validation-pending",
+    "public-signal-stream-contract:v1",
+    "仅保留为可选遗留编辑报告合同",
+    "不治理 `docs/signals/**`",
     "默认 8 条，最多 12 条",
     "允许少于 8",
     "GitHub Trending 作为一等固定模块",
     "过去 7 期主列表出现过",
     "2026-06-23",
-    "schema、draft 生成、report 写入、public rendering、page checklist 和回归测试",
+    "schema、draft 生成、report 写入、legacy public rendering、page checklist 和回归测试",
     "不能仅凭这些本地实现证据声称某天日报发布成功"
   ]) {
     assert(storyContract.includes(phrase), `story contract must include ${phrase}`);
@@ -18426,7 +18461,7 @@ test("source insertion handbook validator rejects drift", async () => {
   assert.match(result.failures.join("\n"), /handbook missing insertion handbook phrase: Source Insertion Decision Tree/);
 });
 
-test("source-first v2 contract defines internal runtime order and public exclusion", async () => {
+test("source-first v2 contract separates internal inventory runtime from the public occurrence projection", async () => {
   const { validateSourceDisplayContract } = await import("../scripts/validate-source-display-contract.mjs");
   const result = await validateSourceDisplayContract({ rootDir });
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config/source-display-contract.json"), "utf8"));
@@ -18437,8 +18472,8 @@ test("source-first v2 contract defines internal runtime order and public exclusi
   assert.deepEqual(result.summary.required_presentation_contract, contract.presentation_contract);
   assert.equal(contract.presentation_contract.version, "source-first-v2");
   assert.equal(contract.presentation_contract.surface, "internal_source_governance");
-  assert.equal(contract.presentation_contract.public_daily_default, "story_first_without_source_runtime_sections");
-  assert.equal(contract.presentation_contract.public_runtime_sections, "excluded_by_default");
+  assert.equal(contract.presentation_contract.public_daily_default, "source_grouped_occurrence_stream");
+  assert.equal(contract.presentation_contract.public_runtime_sections, "reader_safe_projection_only");
   assert.deepEqual(contract.presentation_contract.first_viewport_order, [
     "source_signal_story",
     "source_metrics_dashboard"
@@ -18453,7 +18488,7 @@ test("source-first v2 contract defines internal runtime order and public exclusi
   assert.equal(contract.presentation_contract.reader_source_unit, "logical_source");
   assert.equal(contract.presentation_contract.inventory_unit, "collection_entry");
   assert.equal(contract.presentation_contract.full_inventory_semantics, "visible_grouped_expanded_non_hiding_search");
-  assert.equal(contract.presentation_contract.story_content_contract, "story-centered-daily-contract");
+  assert.equal(contract.presentation_contract.story_content_contract, "legacy-editorial-only");
   assert.deepEqual(contract.presentation_contract.public_excluded_section_ids, [
     "source_signal_story",
     "source_first_dashboard",
@@ -18481,11 +18516,11 @@ test("source-first v2 contract defines internal runtime order and public exclusi
   for (const phrase of [
     "Logical Source Layer",
     "Collection Entry Layer",
-    "Source-first runtime is internal governance by default",
-    "Public daily pages remain story-first and exclude source runtime audit sections",
-    "source signal story before source metrics dashboard in internal source-first runtime",
-    "153 collection entries are complete inventory rows, not public daily story content",
-    "Story-centered content remains the fact carrier",
+    "Source-first inventory runtime remains internal governance",
+    "Public pages use a reader-safe source-grouped occurrence projection and exclude internal source runtime audit sections",
+    "source signal story before source metrics dashboard in internal source-first inventory runtime",
+    "Collection entries are complete inventory rows, not public occurrence cards",
+    "Reader-safe occurrences are the public fact carrier; story-centered content is an optional legacy editorial derivative",
     "Promote a collection entry only when source governance should track it as a named source"
   ]) {
     assert(handbook.includes(phrase), `handbook should explain source-first v2 phrase: ${phrase}`);
@@ -18493,10 +18528,10 @@ test("source-first v2 contract defines internal runtime order and public exclusi
 
   for (const phrase of [
     "Source-First V2 Addendum",
-    "Public daily pages are story-first by default and exclude source-first runtime audit sections.",
+    "reader-safe source-first occurrence stream",
     "The internal source-first runtime puts `source_signal_story` before `source_metrics_dashboard`.",
-    "The current 153 collection entries are full inventory rows, not public daily story content.",
-    "`config/source-display-contract.json` is the executable authority"
+    "The current 166 collection entries are internal inventory rows, not public occurrence cards.",
+    "`config/source-display-contract.json` governs the internal inventory"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation should preserve source-first v2 decision: ${phrase}`);
   }

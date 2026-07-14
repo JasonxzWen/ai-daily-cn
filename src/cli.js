@@ -32,7 +32,7 @@ import { checkSourcesHealth } from "./source-health.js";
 import { auditSourceRunHistory } from "./source-phase5.js";
 import { mergeSourceAuditIntoReport } from "./source-audit.js";
 import { validateSourceRegistryPath } from "./source-registry.js";
-import { generateReportDraft } from "./draft.js";
+import { generateReportDraft, writeDiscoveryOccurrenceStore } from "./draft.js";
 import { cacheEvidenceImages } from "./evidence-cache.js";
 import { writeReportDraft } from "./report.js";
 import { buildSite } from "./site.js";
@@ -633,6 +633,25 @@ try {
       quality_status: result.report.quality_status || null,
       degraded_sections: result.report.quality_status?.degraded_sections || []
     });
+  } else if (command === "signals:write") {
+    const args = parseArgs(argv);
+    const reportDate = args.date || firstPositionalDate(argv);
+    const result = await writeDiscoveryOccurrenceStore({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate,
+      generatedAt: args["generated-at"] || firstPositionalDateTime(argv),
+      inputPaths: draftInputPaths(argv, args),
+      outputDir: args.out || "reports-data",
+      allowDegradedInputs: Boolean(args["allow-degraded-inputs"])
+    });
+    printJson({
+      ok: true,
+      report_date: result.store.report_date,
+      occurrence_store_path: result.occurrenceStorePath,
+      input_record_count: result.store.input_record_count,
+      occurrence_count: result.store.occurrence_count,
+      normalization_error_count: result.store.normalization_error_count
+    });
   } else if (command === "report:draft") {
     const args = parseArgs(argv);
     const reportDate = args.date || firstPositionalDate(argv);
@@ -645,6 +664,7 @@ try {
       inputPaths: draftInputPaths(argv, args, { outputPath, candidateOutputPath }),
       outputPath,
       candidateOutputPath,
+      occurrenceOutputDir: args["occurrence-output"] || "reports-data",
       allowDegradedInputs: Boolean(args["allow-degraded-inputs"]),
       officialBlogContextPath: args["official-blog-context"],
       evidenceOutDir: args["evidence-out"] || "docs",
@@ -656,6 +676,7 @@ try {
       report_date: result.report.report_date,
       path: result.path,
       candidate_pool_path: result.candidatePoolPath,
+      occurrence_store_path: result.occurrenceStorePath,
       source_status_history_path: result.sourceStatusHistoryPath,
       evidence_assets: result.evidence_assets,
       evidence_skipped: result.evidence_skipped,

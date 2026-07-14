@@ -84,8 +84,8 @@ const SOURCE_PROMOTION_DECISIONS = new Set(["promoted", "defer", "retire"]);
 const REQUIRED_PRESENTATION_CONTRACT = {
   version: "source-first-v2",
   surface: "internal_source_governance",
-  public_daily_default: "story_first_without_source_runtime_sections",
-  public_runtime_sections: "excluded_by_default",
+  public_daily_default: "source_grouped_occurrence_stream",
+  public_runtime_sections: "reader_safe_projection_only",
   first_viewport_order: [
     "source_signal_story",
     "source_metrics_dashboard"
@@ -100,7 +100,7 @@ const REQUIRED_PRESENTATION_CONTRACT = {
   reader_source_unit: "logical_source",
   inventory_unit: "collection_entry",
   full_inventory_semantics: "visible_grouped_expanded_non_hiding_search",
-  story_content_contract: "story-centered-daily-contract",
+  story_content_contract: "legacy-editorial-only",
   public_excluded_section_ids: [
     "source_signal_story",
     "source_first_dashboard",
@@ -114,11 +114,11 @@ const REQUIRED_PRESENTATION_CONTRACT = {
 const REQUIRED_SOURCE_FIRST_V2_HANDBOOK_PHRASES = [
   "Logical Source Layer",
   "Collection Entry Layer",
-  "Source-first runtime is internal governance by default",
-  "Public daily pages remain story-first and exclude source runtime audit sections",
-  "source signal story before source metrics dashboard in internal source-first runtime",
-  "153 collection entries are complete inventory rows, not public daily story content",
-  "Story-centered content remains the fact carrier",
+  "Source-first inventory runtime remains internal governance",
+  "Public pages use a reader-safe source-grouped occurrence projection and exclude internal source runtime audit sections",
+  "source signal story before source metrics dashboard in internal source-first inventory runtime",
+  "Collection entries are complete inventory rows, not public occurrence cards",
+  "Reader-safe occurrences are the public fact carrier; story-centered content is an optional legacy editorial derivative",
   "Promote a collection entry only when source governance should track it as a named source"
 ];
 

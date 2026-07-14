@@ -106,9 +106,9 @@
       "id": "feedback/p1-fixed-source-candidate-effectiveness",
       "severity": "P1",
       "status": "implemented",
-      "title": "Keep registered fixed sources effective",
+      "title": "Keep fixed sources and open metadata effective",
       "problem": "Requested RSS/API/aggregator sources could be present in registries and source_audit but fail to affect daily selection because early feeds consumed the global discovery candidate limit; configured source_level values could also pass registry validation and then fail only after the candidate artifact reached report_write.",
-      "expected_behavior": "Content discovery visits the full enabled source surface, records every source in source_audit, fairly preserves candidates from later fixed sources under global limits, and daily runner gives content discovery enough candidate budget for the fixed source surface. Registry, candidate, and report schemas keep one synchronized source_level vocabulary, fallback metadata survives collection, and the draft producer rejects invalid pools before writing or authoring.",
+      "expected_behavior": "Content discovery visits the full enabled source surface, records every source in source_audit, and fairly preserves later fixed-source results under transport limits. Source-level and classification fields are open metadata: new non-empty values survive registry, candidate, report, and occurrence boundaries, while canonical public labels use an explicit fallback. The draft producer persists the lossless occurrence store before editorial selection and separately validates the legacy editorial pool before writing or authoring.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -122,8 +122,8 @@
         "tests/unit.test.js"
       ],
       "validation": {
-        "command": "node --test tests/unit.test.js",
-        "test_name": "source level vocabulary stays synchronized across registry, candidate, report, and runtime fallbacks",
+        "command": "corepack pnpm run test",
+        "test_name": "legacy source and classification fields remain open metadata across registry, candidate, and report schemas",
         "gate": "pnpm run validate"
       }
     },
@@ -207,18 +207,19 @@
       "id": "feedback/p1-domestic-dynamics-public-visibility",
       "severity": "P1",
       "status": "implemented",
-      "title": "Surface domestic dynamics without weakening source gates",
+      "title": "Keep domestic observations visible across public monitoring",
       "problem": "Domestic Chinese AI dynamics could be present in the candidate pool but remain buried in source audit or mixed community leads, making the public report look dominated by overseas vendor updates.",
-      "expected_behavior": "When qualified Chinese or domestic candidates exist, public content preserves domestic visibility inside existing main groups, hot blogs, Chinese media/RSS, GitHub Trending, or story sections. `community_leads` is not a public card surface; unresolved high-risk intermediary facts keep verification/risk disclosure and are not promoted to factual main items or a separate `国内动态` navigation item.",
+      "expected_behavior": "Every safely normalized Chinese or domestic observation enters the public signal stream under its source group, including community clues, with content and credibility labels instead of qualification gates. Inside the optional legacy edited report only, unresolved high-risk intermediary claims are not promoted to factual main stories and the old `community_leads` section remains non-public.",
       "scope": [
         "config/feedback-ledger.json",
         "src/interaction-report.js",
         "prompts/ai-daily/modules/selection-rules.md",
+        "tests/public-signals.test.js",
         "tests/unit.test.js"
       ],
       "validation": {
-        "command": "node --test tests/unit.test.js",
-        "test_name": "domestic community leads are omitted from public interaction sections",
+        "command": "corepack pnpm run test",
+        "test_name": "repository contract keeps public signal membership lossless and labels non-gating",
         "gate": "pnpm run validate"
       }
     },
@@ -228,7 +229,7 @@
       "status": "implemented",
       "title": "Run AI-ready quality review before publish",
       "problem": "Daily drafts could pass structural gates while still retaining AI-flavored wording, automatic draft template prose, noisy highlights, thin bullets, Builder translation drift, or unchecked candidate-pool back-references.",
-      "expected_behavior": "Daily publish reviews draft JSON against the candidate pool before report:write, exposes the current matching issue.details to bounded repair, permits contracts only for current unresolved paths, continues only after strict blocking-signal reduction, rolls back the first stalled attempt, and suppresses content-contract re-entry before the targeted page checklist.",
+      "expected_behavior": "The optional legacy edited-report pipeline reviews draft JSON against its candidate pool before report:write, exposes current matching issue.details to bounded repair, permits contracts only for unresolved legacy paths, continues only after strict blocking-signal reduction, rolls back the first stalled attempt, and suppresses content-contract re-entry before its targeted page checklist. These quality gates never control occurrence persistence, docs/signals membership, chronology, or publication.",
       "scope": [
         "config/feedback-ledger.json",
         "package.json",
@@ -254,7 +255,7 @@
       "status": "implemented",
       "title": "Public daily content is compact news, not explanations",
       "problem": "The public daily report could render too few real main stories while spending visible space on selection rationale, watch-next advice, source-type grids, and other AI-flavored filler instead of concise source-backed news.",
-      "expected_behavior": "The public daily main stream is an edited story-first list, not raw source items: default 8 stories, maximum 12, and fewer are allowed when fewer qualify. Each story has a concrete title, `what_happened`, compact `why_it_matters`, public source links, and an evidence level. Public pages do not require a `今日必看`, `完整列表`, PromptLayer ticket grid, or first-screen optimized landing layout. Internal metadata such as `reader_relevance`, selection criteria, candidate counts, and watch-next filler stays out of the public page.",
+      "expected_behavior": "This contract remains applicable to the legacy edited-report artifact only. The controlling public product direction changed on 2026-07-14: the site is a source-first signal listener, not an 8-12-story admission surface. Public signal cards expose concise reader-safe summaries, links, publisher/collector separation, source group, content tags, and credibility tags; editorial rationale, candidate scores, rejection reasons, and internal audit fields remain private.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -287,7 +288,7 @@
       "status": "confirmed",
       "title": "Refill sparse main stream from a blacklist-filtered unified pool",
       "problem": "The daily generator treated `main_items` as an official/primary whitelist pool, so days with many usable GitHub, Builder, blog, community, and weak-signal candidates could still publish only a few main stories; later patches then tried to compensate with hard post-generation gates and public filler.",
-      "expected_behavior": "`main_items` admission is blacklist-based: source authority affects ranking and dedupe priority, not basic eligibility. When strict main candidates are fewer than 5, the generator refills from qualified GitHub/project, Builder/X, hot blog, official update, community, 72-hour window-fill, and low-risk weak-signal candidates up to the 5-item minimum, while rejecting generic trending text, missing-source items, recent duplicates, non-AI items, public filler, low-value vendor model availability PRs, and unverified high-risk facts. Every evaluated candidate records a `main_selection_stage` or `main_reject_reason`, plus duplicate/merge/window-fill details where applicable; vendor channel availability PRs for another provider's model use `main_reject_reason:\"low_value_vendor_availability_pr\"`. The generator records selected/refill counts, target boundaries, shortfall events, source-health impacts, and rejection reason counts before rendering; post-generation gates only catch accidents.",
+      "expected_behavior": "This confirmed requirement is now scoped only to the optional legacy edited-report summary. Its blacklist, qualification, refill, 5-item minimum, ranking, dedupe, and rejection audit may choose summary stories, but none of those values or decisions may remove, demote, or reorder records in the public source signal stream governed by feedback/p1-lossless-public-signal-stream.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -375,9 +376,9 @@
       "id": "feedback/p1-china-ai-hard-gate",
       "severity": "P1",
       "status": "implemented",
-      "title": "Run China AI source lane before publish",
+      "title": "Run the China AI source lane and disclose collection outages",
       "problem": "Domestic Chinese AI sources could be absent because daily discovery did not have an explicit China AI lane and successful publish quality did not distinguish an executed-but-empty China lane from a lane that never ran.",
-      "expected_behavior": "For reports dated 2026-06-11 or later, strict publish requires `source_audit.china_ai_sources` with checked source proof from the configured China AI official source lane. Missing lane execution is blocking; an executed lane with no recent qualified signal is degraded and publicly disclosed.",
+      "expected_behavior": "For the optional legacy edited report dated 2026-06-11 or later, strict report publication requires `source_audit.china_ai_sources` with checked source proof. The public listener records lane failure as source-health/access metadata and still publishes every occurrence collected from healthy lanes; missing execution or no qualified legacy story must never delete, delay, or reorder those observations.",
       "scope": [
         "config/feedback-ledger.json",
         "config/search-queries.json",
@@ -423,9 +424,9 @@
       "id": "feedback/p1-chinese-hot-blog-slot",
       "severity": "P1",
       "status": "implemented",
-      "title": "Reserve a Chinese AI hot-blog lane",
+      "title": "Preserve Chinese AI blogs in monitoring and legacy summaries",
       "problem": "The `hot_blogs` section could be entirely overseas and English even when qualified Chinese or China AI technical blog candidates were available.",
-      "expected_behavior": "When qualified Chinese or China AI blog candidates exist, report selection reserves visible `hot_blogs` coverage for at least one such candidate or records an explicit exclusion/degradation reason. This does not weaken factual gates for main news.",
+      "expected_behavior": "Every safely normalized Chinese or China AI blog observation enters the public signal stream without qualification or slot limits. Inside the optional legacy edited report only, selection reserves visible `hot_blogs` coverage for at least one qualified candidate or records an explicit reason; those factual gates cannot affect public membership or chronology.",
       "scope": [
         "config/feedback-ledger.json",
         "config/sources/china-ai-sources.json",
@@ -444,9 +445,9 @@
       "id": "feedback/p1-huggingface-trending-section",
       "severity": "P1",
       "status": "implemented",
-      "title": "Add Hugging Face Trending discovery and public section",
+      "title": "Add Hugging Face Trending discovery and public monitoring",
       "problem": "The report had GitHub Trending but no equivalent Hugging Face Trending lane, so model, dataset, and Space trend signals were not independently discovered or displayed.",
-      "expected_behavior": "Daily discovery runs Hugging Face Trending, stores an auditable `source_audit.huggingface_trending` group, drafts a `huggingface_trending` Top 10 section, validates the schema, and renders it as a public section separate from ordinary Hugging Face organization pages.",
+      "expected_behavior": "Daily discovery runs Hugging Face Trending and stores auditable source metadata. Every safe model, dataset, and Space observation enters the public `papers_models` signal group; the old `huggingface_trending` Top 10 is only a legacy edited-report projection and cannot cap or qualify the public stream.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -474,16 +475,19 @@
       "status": "implemented",
       "title": "Keep X/Twitter discussion cards compact",
       "problem": "Builder and X/Twitter discussion cards could leave excessive whitespace, translate or paraphrase original posts into generic commentary, or expose internal source-bucket labels.",
-      "expected_behavior": "Public Builder/X cards show author, handle, date, source link, and the original X/Twitter post text as the card body. Do not translate, tag, or replace the original with generic summaries; truncate only for layout, and keep internal fields out of public content.",
+      "expected_behavior": "Public Builder/X signal cards keep author, handle, date, source link, and original post text when available; a concise reader-safe summary and source/content/credibility tags may accompany it. Do not replace the post with generic filler or expose internal fields. The old no-tag compact-card rule applies only to the legacy edited report until PR3 removes that surface.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
-        "src/interaction-report.js",
-        "tests/unit.test.js"
+        "schemas/occurrence-store.schema.json",
+        "schemas/public-signals.schema.json",
+        "src/occurrence-store.js",
+        "src/public-signals.js",
+        "tests/public-signals.test.js"
       ],
       "validation": {
-        "command": "node --test tests/unit.test.js",
-        "test_name": "public daily IA reset enforces stories original X compact tracking hover and source effectiveness",
+        "command": "corepack pnpm run test",
+        "test_name": "public X signals preserve author handle and original post text",
         "gate": "pnpm run validate"
       }
     },
@@ -535,7 +539,7 @@
       "status": "implemented",
       "title": "Keep public daily from becoming a machine audit log",
       "problem": "The public daily can regress from a reader-facing story report into dense machine audit output: source health logs, fetch/retry notes, candidate pool diagnostics, parsed counters, ledger notes, or regression self-check text appearing as public content.",
-      "expected_behavior": "Public daily sections stay story-first and reader-facing. Source coverage may show concise reader status tags and source links, but raw source_audit, sources_health, candidate_pool, fetch/retry logs, parsed_count, notes fields, ledger review, regression self-check, and machine execution details remain internal-only.",
+      "expected_behavior": "Public pages stay source-first and reader-facing. Reader-safe publisher/collector attribution, source/content/credibility labels, health/access state, summaries, and links may be visible; raw source_audit, sources_health, candidate_pool, fetch/retry logs, parsed_count, notes fields, ledger review, regression self-check, and machine execution details remain internal-only.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -553,9 +557,9 @@
       "id": "feedback/p1-public-importance-selection",
       "severity": "P1",
       "status": "implemented",
-      "title": "Rank by public AI importance, not personal relevance",
+      "title": "Rank the optional edited report by public AI importance",
       "problem": "Selection rules could suppress broad AI news, official product updates, big-company moves, and general AI热点 because they were not directly tied to the user's immediate work.",
-      "expected_behavior": "Candidate scoring gives explicit weight to public AI importance: AI news volume, major company/lab authority, official product/platform changes, model/API/pricing/benchmark/regulatory/capital signals, and broad AI热点. The LLM may draft summaries but must not decide section structure, item count, media policy, or blocking strategy.",
+      "expected_behavior": "Inside the optional legacy edited report only, candidate scoring gives explicit weight to broad public AI importance rather than personal relevance. The public signal stream ignores that score for membership and default order; the LLM may draft summaries but cannot create a hidden admission, count, media, or blocking policy.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -703,9 +707,9 @@
       "id": "feedback/p1-public-signal-layering",
       "severity": "P1",
       "status": "implemented",
-      "title": "Publish qualified signals without generic source-label clutter",
+      "title": "Publish the broad signal stream with uncertainty labels, not qualification gates",
       "problem": "Daily report safety gates could be too strict, then the attempted fix made qualified third-party reports, builder posts, blogs, and community leads readable only through repetitive generic labels such as 来源/第三方报道/社区线索.",
-      "expected_behavior": "The factual main stream stays strict, but qualified non-primary content is published in hot blogs, builder observations, GitHub trends, and a capped community/media signal section. Community leads must pass reader-facing qualification gates and stay small enough to support, not dilute, the story-first page. Keep source_level and verification_status in structured data for audit, but the public interaction page must not render generic source buckets or implementation labels as repeated chips or detail cells.",
+      "expected_behavior": "Superseded for the public product on 2026-07-14 by feedback/p1-lossless-public-signal-stream. All safely normalizable official, third-party, builder, GitHub, media, and community occurrences enter the public source stream without qualification gates or section caps. Source level and verification metadata remain labels only. The old strict/capped behavior is retained solely for the legacy editorial report artifact and must never control public signal membership or default chronology.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -715,11 +719,12 @@
         "prompts/ai-daily/modules/effective-interact-output.md",
         "src/draft.js",
         "src/interaction-report.js",
+        "tests/public-signals.test.js",
         "tests/unit.test.js"
       ],
       "validation": {
-        "command": "node --test tests/unit.test.js",
-        "test_name": "report:draft caps public signal coverage beyond strict factual sections",
+        "command": "corepack pnpm run test",
+        "test_name": "repository contract keeps public signal membership lossless and labels non-gating",
         "gate": "pnpm run validate"
       }
     },
@@ -727,9 +732,9 @@
       "id": "feedback/p1-editorial-importance-density-source-visibility",
       "severity": "P1",
       "status": "implemented",
-      "title": "Preserve editorial importance, blog density, and source gap visibility",
+      "title": "Preserve legacy editorial importance without narrowing public monitoring",
       "problem": "Daily reports could miss the original model launch, split channel availability into separate main stories, render one-line hot blog summaries, recycle low-utility vendor PR, and lose source-gap evidence entirely.",
-      "expected_behavior": "Original model/provider launches outrank duplicate channel availability; channel availability is folded into the original story. Hot blogs expose concrete public summaries. Recent duplicate or low-utility vendor PRs are excluded or downgraded. Source gaps stay in internal diagnostics and public pages show only reader-relevant content, not source coverage or old platform gap sections.",
+      "expected_behavior": "Inside the optional legacy edited report, original model/provider launches outrank duplicate channel availability, duplicate story context may be folded together, and hot blogs use concrete summaries. The public signal stream still retains every safe duplicate observation and low-utility vendor item in chronology with visible labels. Raw source-gap diagnostics stay internal; compact reader-safe source health may never become admission or rank.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -800,7 +805,7 @@
       "status": "implemented",
       "title": "Publish Chinese media dynamics",
       "problem": "Machine Heart, QbitAI, and SSPAI updates could be absent or reduced to a tiny slot, even when users wanted all in-window Chinese media dynamics summarized.",
-      "expected_behavior": "QbitAI and SSPAI use direct RSS, Machine Heart uses a non-RSS HTML/API-style entry, and every in-window entry from those sources is summarized around 200 Chinese characters in an independent public section with source status disclosure.",
+      "expected_behavior": "QbitAI and SSPAI use direct RSS and Machine Heart uses a non-RSS HTML/API-style entry; every safe in-window observation enters the source-grouped public signal stream with source status labels. The independent Chinese-media section and roughly 200-character summaries apply only to the optional legacy rendered report and are scheduled for removal with that renderer in PR3.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -824,7 +829,7 @@
       "status": "implemented",
       "title": "Separate official organization updates",
       "problem": "Official lab/company/product updates could be mixed into Builder/X discussion, making official organization signals hard to scan.",
-      "expected_behavior": "Official organization updates from official company/news/account sources render in a dedicated public section and are not mixed into personal Builder/X observation cards.",
+      "expected_behavior": "Official organization observations enter the public official_blogs source group and remain distinct from personal X observations through source metadata. The old dedicated official-updates section applies only to the optional legacy rendered report and is scheduled for removal with that renderer in PR3.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -894,7 +899,7 @@
       "status": "closed",
       "title": "Superseded must-read hero requirement",
       "problem": "The former three-card must-read contract is no longer the public daily target and would now force an obsolete first-screen layout.",
-      "expected_behavior": "Superseded on 2026-06-23: `hero_highlights` may remain optional compatibility data, but public single-report pages must not require a `今日必看` section, exactly three hero cards, hidden navigation, first-screen stats sinking, or a duplicate `完整列表`; the current reader contract starts with story-first `今日判断`, `趋势主题`, and `今日主线` sections.",
+      "expected_behavior": "Historical and closed: the 2026-06-23 hero contract was superseded again on 2026-07-14. PR3 deletes the obsolete single-report public surface and its hero/story compatibility shape; the replacement is the complete source-grouped scheme-C signal page.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -918,7 +923,7 @@
       "status": "implemented",
       "title": "Keep public reader sections concrete and dense",
       "problem": "Public AI daily pages could duplicate the main stream with a `完整列表`, leave main details collapsed, show GitHub Trending rows with generic ranking/README boilerplate, render blank or broken X/Twitter cards when optional fields were missing, and reduce community leads to one-line blurbs.",
-      "expected_behavior": "Public interaction input removes `完整列表`, renders story-first `今日判断`, `趋势主题`, and `今日主线` sections without PromptLayer ticket grids, filters GitHub Trending boilerplate in favor of README/project/source-grounded context, renders Builder/X cards with safe title/body fallbacks, and keeps community lead bodies dense without internal review notes.",
+      "expected_behavior": "This remains a legacy edited-report rendering contract until PR3 deletes that surface. The replacement public IA is source-first: GitHub, X, community, official, news/newsletter, paper/model, and fallback occurrence cards use safe title/body fallbacks and concrete source-grounded summaries without internal review notes or machine audit fields.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -942,7 +947,7 @@
       "status": "implemented",
       "title": "Reset public daily IA and source effectiveness gates",
       "problem": "The public daily could still be technically generated while showing low-density sections, generic explanatory filler, translated X/Twitter commentary, table-like daily tracking regressions, hover-dim interactions, and no clear answer for whether each core source was configured, reachable, parsed, selected as candidate, and publicly included.",
-      "expected_behavior": "Public daily reports use edited stories as the main list, GitHub Trending as an independent Top10 module, parsed compact daily tracking components, original X/Twitter text, bottom community hotspots only when whitelisted, no public source coverage block, no generic public filler copy, no hover dim/blur of sibling cards, and clean-build reproducibility. Internal source-effectiveness diagnostics still record `configured`, `reachable`, `parsed_recent`, `candidate_created`, `public_included`, and `not_included_reason` for core official, aggregator, media, HN/community hotspots, GitHub watchlist, and Chinese direct RSS sources, but public docs/data and reports do not expose `source_effectiveness` or source-level diagnostics. README/API aggregators use source-specific health contracts and are not blocked by RSS/feed-like rules.",
+      "expected_behavior": "Superseded for the public IA on 2026-07-14 by the source-first signal stream. Public pages group all safely normalizable occurrences by source attributes, keep GitHub, X, community, media/newsletter, official-blog, and paper/model groups independently browsable, and use credibility/content/source metadata only as visible filters. Raw source-effectiveness diagnostics, internal audit fields, scores, and rejection reasons remain private; source health may appear only as a compact record label and never as admission or default ranking input.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -969,7 +974,7 @@
       "status": "implemented",
       "title": "Keep production daily HTML on effective-interact",
       "problem": "A remediation attempted to remove public-page garbage by replacing the production daily report renderer with a bespoke public template that carried fake `data-html-work-report` and `data-render-mode` markers, losing effective-interact components and historical validation requirements.",
-      "expected_behavior": "Production single-report HTML is generated through `.codex/skills/effective-interact/scripts/create-interaction.mjs` in `pre-rendered` mode. Public cleanup happens in generation and interaction-input shaping, not by bypassing effective-interact. The built HTML includes the effective-interact generator marker and component affordances such as filterable cards, tracking components, grouped navigation, and lightbox support.",
+      "expected_behavior": "Until PR3 deletes the old rendered daily pages, the optional legacy single-report HTML is generated through `.codex/skills/effective-interact/scripts/create-interaction.mjs` in `pre-rendered` mode and retains its historical renderer checks. This is a legacy compatibility contract, not the public signal-stream renderer or a constraint on the scheme-C React application.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1019,7 +1024,7 @@
       "status": "implemented",
       "title": "Gate daily content quality before publish",
       "problem": "The 2026-06-17 run exposed weak generated content that structural checks did not reject: one-bullet main details, filler-heavy hot blog text, shallow GitHub Trending descriptions, zero Builder/X selections despite enough eligible X feed candidates, and fake simplified tracking components.",
-      "expected_behavior": "A deterministic content-contract checker blocks REQ-001, REQ-006, REQ-007, and REQ-008 failures before publish; REQ-010 may degrade when an official snapshot is unavailable, but fake OpenRouter or Artificial Analysis components are blocking. The contract records GitHub Trending weekly all-language plus Python, TypeScript, Rust, Go, and Java Top10 merged to Top20, README-failure fallback behavior, Builder/X eligible threshold, hot-blog 100-200 character public summaries without rendered key_points, and official tracking snapshot requirements. `pnpm run validate` runs the checker against recent real `reports-data` artifacts, not only the synthetic self-test fixture, and a provenance-bound historical production candidate replay guards source-level artifact drift without claiming production verification.",
+      "expected_behavior": "The deterministic content-contract checker remains a gate for the legacy edited-report artifact and reconstructed tracking components. It cannot gate public occurrence membership: unknown source or classification metadata falls back visibly, Builder/X and community occurrence counts are not qualification quotas, and a blocked editorial report must not erase an already persisted occurrence store. `pnpm run validate` still checks recent real report artifacts and the provenance-bound historical replay without claiming production verification.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1074,7 +1079,7 @@
       "status": "implemented",
       "title": "Prune duplicate or templated public items before repair",
       "problem": "Daily generation could pass structurally and publish, or enter AI repair, while retaining repeated hot blog titles, templated summaries, and low-information public copy. This makes repair look like the main quality strategy instead of a fallback.",
-      "expected_behavior": "Autodraft generation should convert hot blog evidence into concrete Chinese public copy, automatically prune duplicate-title or templated hot blog entries before quality review, record prune counts and reasons in `self_check.selection_snapshot.hot_blogs`, and let quality review hard-block any duplicate/template hot blog that slips through without making AI repair the normal path.",
+      "expected_behavior": "For the optional legacy edited report only, autodraft converts hot blog evidence into concrete Chinese copy, prunes duplicate-title or templated entries before quality review, records prune counts and reasons in `self_check.selection_snapshot.hot_blogs`, and lets legacy quality review hard-block residue. Pruning and hard blocks never remove occurrences from docs/signals or delay its publication.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1094,7 +1099,7 @@
       "status": "implemented",
       "title": "Generate the daily main list as deduped edited stories",
       "problem": "The public daily can become a long source-type report with duplicated URLs, repeated templated summaries, and generic main items such as `OpenAI更新AI 产品、平台或工程实践`, which fails the 3-minute reader goal even when publish succeeds.",
-      "expected_behavior": "The generator builds a main list of edited merged stories: default 8, maximum 12, fewer allowed when fewer qualify; no templated story is used to fill the quota; strong primary single-source stories may enter, secondary/community single-source items default to signal sections; same-day URL/factual duplicates merge into one story with sources; previous-7-report duplicates stay out unless materially updated; GitHub Trending remains a first-class visible Top10 module; summary and trend claims derive from visible stories or signals; quality gates degrade by demoting bad story candidates and block only unusable artifacts, unverifiable main stories, or publish safety failures.",
+      "expected_behavior": "This remains implemented for the legacy edited-report artifact, where the generator builds a deduped story list and GitHub module. It was superseded as the controlling public product contract on 2026-07-14 by feedback/p1-lossless-public-signal-stream: story merging, qualification, quotas, seven-report dedupe, demotion, and editorial quality gates must not remove or reorder occurrences in the public source stream.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1167,7 +1172,7 @@
       "status": "implemented",
       "title": "Keep daily publish recovery policy executable",
       "problem": "Recent scheduled daily runs failed for different causes because retry, fallback, degradation, and blocking behavior were scattered across runner code, prompts, runbooks, and automation expectations instead of being checked as one workflow contract.",
-      "expected_behavior": "The repository keeps `config/daily-resilience-policy.json` as the authoritative retry/fallback/degrade/block table for current daily runner stages. Validation must prove required runner stages are covered, terminal status and blocking taxonomies exist, docs/package workflow gates include `pnpm run resilience:validate`, safe public source or coverage failures can end as degraded publish states, and unsafe content, unrecoverable schema/rendering, internal leakage, fake tracking components, or exhausted publish infrastructure remain blocking.",
+      "expected_behavior": "The repository keeps `config/daily-resilience-policy.json` as the authoritative retry/fallback/degrade/block table for the current legacy edited-report runner stages. Validation proves those stages and terminal taxonomies are covered. This policy may block unsafe legacy content or rendering but must not make a failed edited report block the independent docs/signals publication path introduced by PR2.",
       "scope": [
         "config/daily-resilience-policy.json",
         "config/daily-workflow-contract.json",
@@ -1218,7 +1223,7 @@
       "status": "implemented",
       "title": "Keep the public daily slim and bind the new source reset",
       "problem": "The user repeatedly requested that public pages stop showing machine-audit/log wording and that new source requirements land durably, but prior iterations left old platform lanes, public source coverage, weak GitHub watch wiring, and AI-flavored public copy able to recur.",
-      "expected_behavior": "New public daily pages do not render source coverage/gaps, source_audit, source_effectiveness/source effectiveness wording, verification sections, source-first runtime dashboards, candidate pools, access-gate wording, or banned terms such as `披露`. GitHub Trending renders as Top10. Default discovery no longer runs WeChat/Zhihu/old Reddit platform lanes. Registered sources include the requested GitHub watchlist, Chinese direct RSS, and bottom community hotspots; Reddit/HNRSS blockages remain internal diagnostics unless selected content itself affects reader judgment.",
+      "expected_behavior": "Public pages remain reader-facing and must not expose raw source_audit, source_effectiveness tables, candidate pools, repair state, scores, or machine logs. The 2026-07-14 direction reset intentionally restores source-first information architecture through safe occurrence cards, publisher/collector attribution, tags, and source-group navigation rather than an operational dashboard. GitHub watchlist, direct Chinese RSS, community hotspots, and future public/legal collectors may all contribute occurrences without a whitelist or qualification gate.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1249,7 +1254,7 @@
       "status": "implemented",
       "title": "Keep daily generation split into debuggable MVP stages",
       "problem": "The generated daily report can pass structure while publishing source-first machine logs as reader copy, mixing admission rationale into summaries, default-folding each story into an overdesigned detail panel, flattening left-rail hierarchy, and regressing icon/tag/type scale.",
-      "expected_behavior": "Daily generation separates information collection, admission, per-item reader summary, and assembly into independently debuggable stages. Admission reasons, candidate scores, source audit, and watch-next stay internal. Public story sections render as expanded track cells with concrete reader-facing bullets and source links, no visible `发生了什么：` / `为什么值得看：` labels, no per-story default collapse, compact icons, styled tags with hover states, and left-rail hierarchy that distinguishes categories from sections.",
+      "expected_behavior": "Legacy edited-report generation keeps collection, optional story selection, per-item summary, and assembly independently debuggable. The public source stream branches immediately after collection, before that optional selection stage. Candidate scores, source audit, rejection reasons, and watch-next remain internal; reader-safe occurrence cards expose only concise summaries, links, attribution, source group, content tags, credibility tag, health, access, and time metadata.",
       "scope": [
         "DESIGN.md",
         "config/feedback-ledger.json",
@@ -1293,6 +1298,31 @@
       "validation": {
         "command": "node --test tests/unit.test.js",
         "test_name": "automation inventory uses explicit readonly insight role",
+        "gate": "pnpm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-lossless-public-signal-stream",
+      "severity": "P1",
+      "status": "implemented",
+      "title": "Keep the public source signal stream lossless and non-gating",
+      "problem": "The project repeatedly treated editorial selection, source authority, verification, qualification, quotas, dedupe, and quality review as public admission policy. That made the repository a small fact-summary page instead of the broad AI source listener the user requested, and old contracts could silently restore those gates even after the schema was relaxed.",
+      "expected_behavior": "Every safely normalizable discovery occurrence is persisted before editorial selection and remains publicly discoverable. No content-admission gate exists. Credibility, content, source, health, access, authority, verification, selection, quality, and rejection metadata are labels or internal diagnostics only; they never change membership or default chronology. New observed records use a persistent observation_id that is independent from candidate IDs and display metadata. Duplicate URLs from distinct collectors or observations remain distinct; repeated raw rows for one observation are transparently coalesced and counted. Unknown classification falls back to other/pending_review. Public artifacts expose only reader-safe attribution, summary, labels, time, health, and access fields and use pagination solely as transport, never as an item cap.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "feature_list.json",
+        "schemas/occurrence-store.schema.json",
+        "schemas/public-signals.schema.json",
+        "src/occurrence-store.js",
+        "src/public-signals.js",
+        "src/draft.js",
+        "src/site.js",
+        "tests/public-signals.test.js"
+      ],
+      "validation": {
+        "command": "corepack pnpm run test",
+        "test_name": "repository contract keeps public signal membership lossless and labels non-gating",
         "gate": "pnpm run validate"
       }
     }

@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/occurrence-store.schema.json",
+  "title": "AI Daily Source Occurrence Store",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "report_date",
+    "generated_at",
+    "input_record_count",
+    "occurrence_count",
+    "coalesced_record_count",
+    "normalization_error_count",
+    "normalization_errors",
+    "occurrences"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "occurrence_store" },
+    "report_date": { "type": "string", "format": "date" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "input_record_count": { "type": "integer", "minimum": 0 },
+    "occurrence_count": { "type": "integer", "minimum": 0 },
+    "coalesced_record_count": { "type": "integer", "minimum": 0 },
+    "normalization_error_count": { "type": "integer", "minimum": 0 },
+    "normalization_errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["index", "code"],
+        "properties": {
+          "index": { "type": "integer", "minimum": 0 },
+          "code": { "enum": ["record_invalid", "url_unsafe", "date_invalid", "observation_id_missing"] }
+        }
+      }
+    },
+    "occurrences": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/occurrence" }
+    }
+  },
+  "$defs": {
+    "nullable_text": { "type": ["string", "null"] },
+    "nullable_uri": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_datetime": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "collector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url", "health", "category"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" },
+        "health": { "enum": ["available", "degraded", "unknown"] },
+        "category": { "$ref": "#/$defs/nullable_text" }
+      }
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "observation_id",
+        "raw_record_count",
+        "cluster_id",
+        "title",
+        "url",
+        "summary",
+        "publisher_hint",
+        "collector",
+        "candidate_category",
+        "source_level",
+        "verification_status",
+        "editorial_category",
+        "raw_source_group",
+        "raw_tags",
+        "author",
+        "handle",
+        "original_text",
+        "event_date",
+        "published_at",
+        "collected_at",
+        "date_anomaly",
+        "image_url",
+        "access_state"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^occ_[a-f0-9]{24}$" },
+        "observation_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+        "raw_record_count": { "type": "integer", "minimum": 1 },
+        "cluster_id": { "type": "string", "pattern": "^cluster_[a-f0-9]{24}$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "url": { "type": "string", "format": "uri" },
+        "summary": { "$ref": "#/$defs/nullable_text" },
+        "publisher_hint": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "collector": { "$ref": "#/$defs/collector" },
+        "candidate_category": { "type": "string", "minLength": 1 },
+        "source_level": { "$ref": "#/$defs/nullable_text" },
+        "verification_status": { "$ref": "#/$defs/nullable_text" },
+        "editorial_category": { "$ref": "#/$defs/nullable_text" },
+        "raw_source_group": { "$ref": "#/$defs/nullable_text" },
+        "raw_tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "author": { "$ref": "#/$defs/nullable_text" },
+        "handle": { "$ref": "#/$defs/nullable_text" },
+        "original_text": { "$ref": "#/$defs/nullable_text" },
+        "event_date": { "type": "string", "format": "date" },
+        "published_at": { "$ref": "#/$defs/nullable_datetime" },
+        "collected_at": { "type": "string", "format": "date-time" },
+        "date_anomaly": {
+          "oneOf": [
+            { "const": "future_relative_to_collection" },
+            { "type": "null" }
+          ]
+        },
+        "image_url": { "$ref": "#/$defs/nullable_uri" },
+        "access_state": { "enum": ["direct", "indirect", "unknown"] }
+      }
+    }
+  }
+}

@@ -9,6 +9,7 @@ import {
   writeSourceStatusHistory
 } from "./source-status-history.js";
 import { normalizeUrlIdentity } from "./url.js";
+import { canonicalPublicUrlIdentity, sanitizePublicHttpUrl } from "./public-url.js";
 import {
   auditGroupForPlatform,
   isPlatformExemptCategory,
@@ -41,6 +42,8 @@ import {
   normalizeCandidateAuditRoles
 } from "./main-audit-contract.js";
 import { normalizeCandidatePool } from "./candidates.js";
+import { buildOccurrenceStore, writeOccurrenceStore } from "./occurrence-store.js";
+import { isValidDateTimeString } from "./time.js";
 import {
   applyDirectPrimaryTargetVerification,
   isDirectPrimaryPublicationUrl
@@ -277,6 +280,17 @@ export async function generateReportDraft(options = {}) {
     allowDegraded: options.allowDegradedInputs === true
   });
   const merged = mergeDiscoveryPayloads(loaded, { reportDate, generatedAt });
+  const occurrenceStore = buildOccurrenceStore({
+    reportDate,
+    generatedAt,
+    sources: merged.sources,
+    candidates: merged.occurrenceCandidates
+  });
+  const occurrenceStorePath = await writeOccurrenceStore({
+    rootDir,
+    outputDir: options.occurrenceOutputDir || "reports-data",
+    store: occurrenceStore
+  });
   const recentMainUrlHistory = await loadRecentMainUrlHistory(rootDir, reportDate);
   const reportsDataDir = options.sourceStatusOutputDir || "reports-data";
   const sourceWatchHistory = await loadSourceWatchSnapshotHistory(rootDir, reportsDataDir, reportDate, merged.candidates);
@@ -342,12 +356,15 @@ export async function generateReportDraft(options = {}) {
     candidatePool,
     path: outputPath,
     candidatePoolPath: candidateOutputPath,
+    occurrenceStore,
+    occurrenceStorePath,
     officialBlogContextReceipt: officialBlogContextState.receipt,
     sourceStatusHistoryPath,
     evidence_assets: mergeEvidenceAssets(merged.evidence_assets, evidence.assets),
     evidence_skipped: evidence.skipped,
     counts: {
       candidates: candidatePool.candidates.length,
+      occurrences: occurrenceStore.occurrence_count,
       main_items: reportWithSourceSuggestions.main_items.length,
       github_trending: reportWithSourceSuggestions.github_trending.length,
       huggingface_trending: reportWithSourceSuggestions.huggingface_trending.length,
@@ -361,12 +378,38 @@ export async function generateReportDraft(options = {}) {
   };
 }
 
+export async function writeDiscoveryOccurrenceStore(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const reportDate = requireReportDate(options.reportDate);
+  const generatedAt = options.generatedAt || new Date().toISOString();
+  const inputPaths = normalizeInputPaths(options.inputPaths || options.inputs || options.input);
+  const loaded = await loadDiscoveryInputsWithDegraded(rootDir, inputPaths, {
+    reportDate,
+    generatedAt,
+    allowDegradedInputs: options.allowDegradedInputs === true
+  });
+  const merged = mergeDiscoveryPayloads(loaded, { reportDate, generatedAt });
+  const store = buildOccurrenceStore({
+    reportDate,
+    generatedAt,
+    sources: merged.sources,
+    candidates: merged.occurrenceCandidates
+  });
+  const occurrenceStorePath = await writeOccurrenceStore({
+    rootDir,
+    outputDir: options.outputDir || "reports-data",
+    store
+  });
+  return { store, occurrenceStorePath };
+}
+
 export function mergeDiscoveryPayloads(payloads, options = {}) {
   const reportDate = requireReportDate(options.reportDate);
   const generatedAt = options.generatedAt || new Date().toISOString();
   const sourceAudit = {};
   const sourceMap = new Map();
   const candidates = [];
+  const occurrenceCandidates = [];
   const metaById = new Map();
   const evidenceAssets = [];
 
@@ -380,13 +423,24 @@ export function mergeDiscoveryPayloads(payloads, options = {}) {
     }
     addSourcesFromAudit(sourceMap, payload?.source_audit, generatedAt);
     for (const rawCandidate of Array.isArray(payload?.candidates) ? payload.candidates : []) {
-      const candidate = normalizeCandidate(rawCandidate, {
-        reportDate,
-        existing: candidates,
-        sourceMap,
-        generatedAt
-      });
+      if (!rawCandidate || typeof rawCandidate !== "object" || Array.isArray(rawCandidate)) {
+        occurrenceCandidates.push(rawCandidate);
+        continue;
+      }
+      let candidate;
+      try {
+        candidate = normalizeCandidate(rawCandidate, {
+          reportDate,
+          existing: candidates,
+          sourceMap,
+          generatedAt
+        });
+      } catch {
+        occurrenceCandidates.push(rawCandidate);
+        continue;
+      }
       candidates.push(candidate);
+      occurrenceCandidates.push(occurrenceCandidateFromRaw(rawCandidate, candidate));
       metaById.set(candidate.id, rawCandidate);
     }
   }
@@ -410,6 +464,7 @@ export function mergeDiscoveryPayloads(payloads, options = {}) {
     sourceAudit,
     sources: [...sourceMap.values()].sort((left, right) => left.id.localeCompare(right.id)),
     candidates,
+    occurrenceCandidates,
     metaById,
     evidence_assets: mergeEvidenceAssets(evidenceAssets)
   };
@@ -3284,13 +3339,13 @@ function addSourcesFromAudit(sourceMap, audit, generatedAt) {
     for (const source of Array.isArray(group?.sources) ? group.sources : []) {
       addCandidateSource(sourceMap, {
         id: sourceIdFromAuditSource(groupName, source),
-        name: source.name || groupName,
-        url: source.url || "https://example.com/",
+        name: primitiveText(source.name) || groupName,
+        url: source.url,
         category,
         status: source.status,
         checked_at: generatedAt,
-        notes: source.notes || "",
-        platform: source.platform || platformForAuditGroup(groupName),
+        notes: primitiveText(source.notes),
+        platform: primitiveText(source.platform) || platformForAuditGroup(groupName),
         source_level: source.source_level,
         verification_status: source.verification_status
       }, generatedAt);
@@ -3300,8 +3355,12 @@ function addSourcesFromAudit(sourceMap, audit, generatedAt) {
 
 function sourceIdFromAuditSource(groupName, source) {
   const platform = platformForAuditGroup(groupName);
-  const prefix = platform || (groupName === "github_trending" ? "github" : groupName === "huggingface_trending" ? "huggingface" : groupName === "china_ai_sources" ? "china-ai" : groupName === "builder_sources" ? "builder" : groupName === "search_sources" ? "search" : "content");
-  return `${prefix}-${slugId(source?.name || source?.url || groupName) || "source"}`;
+  const explicit = normalizedSourceIdentifier(source?.id, "");
+  if (explicit) return explicit;
+  const sourceUrl = canonicalPublicUrlIdentity(source?.url);
+  if (sourceUrl) return sourceIdFromUrl(sourceUrl);
+  const seed = ["audit", groupName, platform].join("|");
+  return `source_${createHash("sha256").update(seed).digest("hex").slice(0, 24)}`;
 }
 
 function platformForAuditGroup(groupName) {
@@ -3309,20 +3368,22 @@ function platformForAuditGroup(groupName) {
 }
 
 function addCandidateSource(sourceMap, source, generatedAt) {
-  const id = source?.id || slugId(source?.name || source?.url || "source");
-  if (!id) return;
+  if (!source || typeof source !== "object" || Array.isArray(source)) return;
+  const url = sanitizePublicHttpUrl(source.url);
+  if (!url) return;
+  const id = normalizedSourceIdentifier(source.id, sourceIdFromUrl(url));
   const status = CANDIDATE_SOURCE_STATUSES.has(source.status) ? source.status : source.status === "skipped_manual_review_required" || String(source.status || "").startsWith("skipped") ? "blocked" : "no_signal";
   const normalized = {
     id,
-    name: source.name || id,
-    url: isHttpUrl(source.url) ? source.url : "https://example.com/",
+    name: primitiveText(source.name) || id,
+    url,
     category: candidateSourceCategory(source.category),
     status,
-    checked_at: source.checked_at || generatedAt,
-    notes: source.notes || "",
-    ...(source.platform ? { platform: source.platform } : {}),
-    ...(source.source_level ? { source_level: source.source_level } : {}),
-    ...(source.verification_status ? { verification_status: source.verification_status } : {})
+    checked_at: isValidDateTimeString(source.checked_at) ? String(source.checked_at) : generatedAt,
+    notes: primitiveText(source.notes),
+    ...(primitiveText(source.platform) ? { platform: primitiveText(source.platform) } : {}),
+    ...(primitiveText(source.source_level) ? { source_level: primitiveText(source.source_level) } : {}),
+    ...(primitiveText(source.verification_status) ? { verification_status: primitiveText(source.verification_status) } : {})
   };
   if (!sourceMap.has(id)) {
     sourceMap.set(id, normalized);
@@ -3331,13 +3392,15 @@ function addCandidateSource(sourceMap, source, generatedAt) {
 
 function normalizeCandidate(rawCandidate, context) {
   const id = uniqueCandidateId(context.existing, rawCandidate.id || `${rawCandidate.source_id || rawCandidate.source}-${rawCandidate.title || rawCandidate.url}`);
-  const sourceId = rawCandidate.source_id || sourceIdFromCandidate(rawCandidate);
+  const sourceId = normalizedSourceIdentifier(rawCandidate.source_id, sourceIdFromCandidate(rawCandidate));
+  const eventDate = dateOnly(rawCandidate.event_date) || context.reportDate;
+  const observationId = observationIdForCandidate(rawCandidate, { sourceId, eventDate });
   const roles = normalizeCandidateAuditRoles(rawCandidate.roles);
   if (!context.sourceMap.has(sourceId)) {
     addCandidateSource(context.sourceMap, {
       id: sourceId,
-      name: rawCandidate.source || sourceId,
-      url: rawCandidate.source_url || rawCandidate.url || "https://example.com/",
+      name: primitiveText(rawCandidate.source) || sourceId,
+      url: rawCandidate.source_url || rawCandidate.url,
       category: sourceCategoryForCandidate(rawCandidate),
       status: "checked",
       checked_at: context.generatedAt,
@@ -3347,18 +3410,28 @@ function normalizeCandidate(rawCandidate, context) {
 
   const candidate = {
     id,
+    observation_id: observationId,
     source_id: sourceId,
     category: normalizedCandidateCategory(rawCandidate.category),
     title: trimText(rawCandidate.title || rawCandidate.name || rawCandidate.repo || rawCandidate.url, 180),
     url: rawCandidate.url,
-    source: rawCandidate.source || sourceNameForSourceId(context.sourceMap, sourceId),
-    event_date: dateOnly(rawCandidate.event_date) || context.reportDate,
+    source: primitiveText(rawCandidate.source) || sourceNameForSourceId(context.sourceMap, sourceId),
+    event_date: eventDate,
     status: rawCandidate.status === "included" ? "included" : "excluded",
     ...(rawCandidate.included_in ? { included_in: rawCandidate.included_in } : {}),
     ...(rawCandidate.evidence ? { evidence: trimText(rawCandidate.evidence, 320) } : {}),
+    ...(rawCandidate.summary ? { summary: trimText(rawCandidate.summary, 360) } : {}),
+    ...(rawCandidate.description ? { description: trimText(rawCandidate.description, 360) } : {}),
+    ...(rawCandidate.publisher ? { publisher: trimText(rawCandidate.publisher, 200) } : {}),
+    ...(isValidDateTimeString(rawCandidate.published_at) ? { published_at: String(rawCandidate.published_at) } : {}),
+    ...(isValidDateTimeString(rawCandidate.collected_at) ? { collected_at: String(rawCandidate.collected_at) } : {}),
+    ...(rawCandidate.source_group ? { source_group: trimText(rawCandidate.source_group, 120) } : {}),
+    ...(Array.isArray(rawCandidate.content_tags)
+      ? { content_tags: [...new Set(rawCandidate.content_tags.map((tag) => trimText(tag, 100)).filter(Boolean))].slice(0, 32) }
+      : {}),
     ...(rawCandidate.author ? { author: rawCandidate.author } : {}),
     ...(rawCandidate.handle ? { handle: rawCandidate.handle } : {}),
-    ...(rawCandidate.original_text ? { original_text: trimText(rawCandidate.original_text, 500) } : {}),
+    ...(rawCandidate.original_text ? { original_text: trimText(rawCandidate.original_text, 5000) } : {}),
     ...(rawCandidate.avatar_url ? { avatar_url: rawCandidate.avatar_url } : {}),
     ...(rawCandidate.avatar_local_path ? { avatar_local_path: rawCandidate.avatar_local_path } : {}),
     ...(rawCandidate.image_url ? { image_url: rawCandidate.image_url } : {}),
@@ -3414,6 +3487,22 @@ function normalizeCandidate(rawCandidate, context) {
     candidate.verification_status = candidate.source_level === "multi_source" ? "multi_source_confirmed" : "primary_confirmed";
   }
   return applyDirectPrimaryTargetVerification(candidate);
+}
+
+function occurrenceCandidateFromRaw(rawCandidate, normalizedCandidate) {
+  const occurrenceCandidate = {
+    ...normalizedCandidate,
+    category: primitiveText(rawCandidate.category) || "other"
+  };
+  for (const field of ["source_level", "verification_status", "editorial_category", "source_group"]) {
+    const value = primitiveText(rawCandidate[field]);
+    if (value) {
+      occurrenceCandidate[field] = value;
+    } else {
+      delete occurrenceCandidate[field];
+    }
+  }
+  return occurrenceCandidate;
 }
 
 function markIncludedCandidate(candidate, category, includedIn) {
@@ -7191,11 +7280,44 @@ function sourceCategoryForCandidate(candidate) {
   if (candidate.category === "builder_observation") return "builder";
   if (candidate.category === "project" || isGitHubTrendingCandidate(candidate, candidate)) return "project";
   if (candidate.category === "hot_blog") return "blog";
-  return "community";
+  if (candidate.category === "community_lead") return "community";
+  if (candidate.category === "model_release" || candidate.category === "huggingface_trending") return "model_registry";
+  return "other";
 }
 
 function sourceIdFromCandidate(candidate) {
-  return `${sourceCategoryForCandidate(candidate)}-${slugId(candidate.source || candidate.source_url || candidate.url || "source") || "source"}`;
+  const sourceUrl = canonicalPublicUrlIdentity(candidate?.source_url);
+  if (sourceUrl) return sourceIdFromUrl(sourceUrl);
+  const materialUrl = canonicalPublicUrlIdentity(
+    candidate?.primary_url || candidate?.original_url || candidate?.url || candidate?.intermediary_url
+  );
+  const seed = [
+    sourceCategoryForCandidate(candidate),
+    primitiveText(candidate?.platform),
+    materialUrl || "unknown-material"
+  ].join("|");
+  return `source_${createHash("sha256").update(seed).digest("hex").slice(0, 24)}`;
+}
+
+function sourceIdFromUrl(value) {
+  const canonical = canonicalPublicUrlIdentity(value);
+  const seed = canonical || String(value || "").trim() || "unknown-source";
+  return `source_${createHash("sha256").update(seed).digest("hex").slice(0, 24)}`;
+}
+
+function normalizedSourceIdentifier(value, fallback) {
+  const text = primitiveText(value).trim();
+  if (text.length <= 500 && /^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(text)) return text;
+  if (text) {
+    return `source_${createHash("sha256").update(text).digest("hex").slice(0, 24)}`;
+  }
+  return fallback;
+}
+
+function primitiveText(value) {
+  return typeof value === "string" || typeof value === "number" || typeof value === "bigint"
+    ? String(value).trim()
+    : "";
 }
 
 function sourceNameForSourceId(sourceMap, sourceId) {
@@ -7616,6 +7738,44 @@ function uniqueCandidateId(existingCandidates, rawValue) {
   let suffix = 2;
   while (used.has(`${base}-${suffix}`)) suffix += 1;
   return `${base}-${suffix}`;
+}
+
+function observationIdForCandidate(rawCandidate, context) {
+  const explicit = primitiveText(rawCandidate?.observation_id);
+  if (explicit) return normalizedObservationId(explicit);
+  const nativeIdentity = [
+    ["native_id", rawCandidate?.native_id],
+    ["guid", rawCandidate?.guid],
+    ["external_id", rawCandidate?.external_id],
+    ["post_id", rawCandidate?.post_id],
+    ["item_id", rawCandidate?.item_id],
+    ["tweet_id", rawCandidate?.tweet_id],
+    ["paper_id", rawCandidate?.paper_id],
+    ["entry_id", rawCandidate?.entry_id],
+    ["record_id", rawCandidate?.record_id],
+    ["source_watch.snapshot_fingerprint", rawCandidate?.source_watch?.snapshot_fingerprint]
+  ].map(([kind, value]) => [kind, primitiveText(value)])
+    .find(([, value]) => value);
+  if (nativeIdentity) {
+    const identity = [context.sourceId, nativeIdentity[0], nativeIdentity[1]].join("|");
+    return `obs_${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
+  }
+  const materialUrl = canonicalPublicUrlIdentity(
+    rawCandidate?.primary_url || rawCandidate?.original_url || rawCandidate?.url || rawCandidate?.intermediary_url
+  );
+  const identity = [
+    context.sourceId,
+    materialUrl,
+    context.eventDate
+  ].join("|");
+  return `obs_${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
+}
+
+function normalizedObservationId(value) {
+  const text = primitiveText(value);
+  return text.length <= 500 && /^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(text)
+    ? text
+    : `obs_${createHash("sha256").update(text).digest("hex").slice(0, 24)}`;
 }
 
 function slugId(value) {
