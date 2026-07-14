@@ -56,7 +56,7 @@ function buildDailyPublishRecord({ id, reportDate, status, summary }) {
     summary: `Daily publish ${summary.mode || "run"} completed for ${reportDate} with status ${status}.`,
     evidence: {
       report_json: `reports-data/${year}/${month}/${reportDate}.json`,
-      html: `docs/reports/${year}/${month}/${reportDate}.html`,
+      docs_data_json: `docs/data/${year}/${month}/${reportDate}.json`,
       validation_commands: [
         "node scripts/validate-retrospectives.mjs",
         "corepack pnpm run validate"
@@ -123,7 +123,7 @@ function buildDailyPublishCorrectionRecord({ id, reportDate, status, summary }) 
     summary: `Correction record for daily publish ${reportDate} after final publish status became ${status}.`,
     evidence: {
       report_json: `reports-data/${year}/${month}/${reportDate}.json`,
-      html: `docs/reports/${year}/${month}/${reportDate}.html`,
+      docs_data_json: `docs/data/${year}/${month}/${reportDate}.json`,
       validation_commands: [
         "node scripts/validate-retrospectives.mjs",
         "corepack pnpm run validate"

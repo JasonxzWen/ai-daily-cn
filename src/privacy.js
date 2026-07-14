@@ -5,7 +5,6 @@ import path from "node:path";
 import { isPublicNetworkHost, isSensitivePrivateNetworkHost } from "./public-url.js";
 
 export const PUBLIC_ARTIFACT_PATHS = [
-  "docs/reports",
   "docs/data",
   "docs/feed.json",
   "docs/articles.json",

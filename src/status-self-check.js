@@ -35,7 +35,6 @@ export async function runStatusSelfCheck(options = {}) {
   const paths = {
     report_json: path.join(checkRoot, "reports-data", year, month, `${reportDate}.json`),
     docs_json: path.join(checkRoot, "docs", "data", year, month, `${reportDate}.json`),
-    html: path.join(checkRoot, "docs", "reports", year, month, `${reportDate}.html`),
     index: path.join(checkRoot, "docs", "index.html"),
     feed: path.join(checkRoot, "docs", "feed.json"),
     home: path.join(checkRoot, "docs", "home.json"),
@@ -287,7 +286,6 @@ async function checkRequiredFiles({ rootDir, reportDate, paths, blockingIssues, 
   const files = [
     { id: "reports_data_json", path: paths.report_json, mustContain: reportDate },
     { id: "docs_data_json", path: paths.docs_json, mustContain: reportDate },
-    { id: "daily_html", path: paths.html, mustContain: reportDate },
     ...REQUIRED_DOC_FILES.filter((file) => file !== "docs/home.json").map((file) => ({
       id: file.replace(/[/.]/g, "_"),
       path: path.join(rootDir, file),

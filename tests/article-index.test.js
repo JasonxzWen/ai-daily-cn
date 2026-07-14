@@ -9,7 +9,6 @@ import path from "node:path";
 import test from "node:test";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildArticleIndex, buildHomeData, buildSite, collectJsonFiles } from "../src/site.js";
-import { renderIndexHtml } from "../src/render.js";
 import { validateArticles, validateHome } from "../src/schema.js";
 
 const rootDir = process.cwd();
@@ -273,7 +272,7 @@ test("buildArticleIndex emits public Aify-style article records", () => {
     assert.ok(article.title, "article requires title");
     assert.ok(article.summary, "article requires summary");
     assert.ok(article.source, "article requires source");
-    assert.ok(article.report_url.endsWith("2026-07-03.html"));
+    assert.ok(article.report_url.endsWith("2026-07-03.json"));
     assert.ok(article.data_url.endsWith("2026-07-03.json"));
     assert.ok(Number.isInteger(article.quality_score), "quality_score must be integer");
     assert.ok(article.quality_score >= 0 && article.quality_score <= 100);
@@ -717,54 +716,4 @@ test("public artifact scan includes docs/articles.json internal fields", async (
     ),
     JSON.stringify(result.findings, null, 2)
   );
-});
-
-test("server-rendered homepage stays on the ops fallback even when articles are available", () => {
-  const articles = buildArticleIndex([sampleReport()], {
-    updatedAt: "2026-07-03T08:00:00.000Z"
-  });
-  articles.push({
-    ...articles[0],
-    id: "article-old-history-only",
-    title: "Very Old History Only Article",
-    url: "https://example.com/old-history-only",
-    date: "2026-01-01",
-    month: "2026-01",
-    report_date: "2026-01-01",
-    report_url: "reports/2026/01/2026-01-01.html",
-    data_url: "data/2026/01/2026-01-01.json"
-  });
-  const html = renderIndexHtml({
-    schema_version: 1,
-    site_title: "AI 日报",
-    site_url: "https://example.com/ai-daily-cn/",
-    updated_at: "2026-07-03T08:00:00.000Z",
-    reports: [
-      {
-        report_date: "2026-07-03",
-        title: "AI 日报 2026-07-03",
-        summary: "今日主线转向企业 AI 治理、模型基础设施和 Agent 工程实践。",
-        url: "reports/2026/07/2026-07-03.html",
-        data_url: "data/2026/07/2026-07-03.json",
-        main_items: 1,
-        builder_observations: 1,
-        generated_at: "2026-07-03T08:00:00.000Z"
-      }
-    ]
-  }, null, null, {
-    articles,
-    styleVersion: "test"
-  });
-
-  assert.match(html, /data-index-style="effective-interact"/);
-  assert.match(html, /id="index-console"/);
-  assert.match(html, /href="#source-lane-board"/);
-  assert.doesNotMatch(html, /data-article-index="aify-style"/);
-  assert.doesNotMatch(html, /id="articleSearch"/);
-  assert.doesNotMatch(html, /id="articleSource"/);
-  assert.doesNotMatch(html, /id="articleScore"/);
-  assert.doesNotMatch(html, /window\.__ARTICLE_INDEX_INLINE__/);
-  assert.doesNotMatch(html, /window\.__ARTICLE_INDEX_URL__/);
-  assert.doesNotMatch(html, /fetch\(url/);
-  assert.doesNotMatch(html, /Very Old History Only Article/);
 });

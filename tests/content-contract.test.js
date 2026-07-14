@@ -286,21 +286,17 @@ test("public copy gate blocks source effectiveness spaced wording", () => {
   assert(issue.examples.some((example) => example.term === "source effectiveness"));
 });
 
-test("real artifact content contract scans report directory and surfaces blocking issues", async () => {
+test("real artifact content contract scans report JSON and surfaces blocking issues", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-content-contract-"));
   const dataDir = path.join(tmp, "reports-data", "2026", "06");
-  const htmlDir = path.join(tmp, "docs", "reports", "2026", "06");
   fs.mkdirSync(dataDir, { recursive: true });
-  fs.mkdirSync(htmlDir, { recursive: true });
   const realTemplatedReport = JSON.parse(fs.readFileSync(path.join(REPORTS_DIR, "2026", "06", "2026-06-24.json"), "utf8"));
   realTemplatedReport.github_trending = [];
   fs.writeFileSync(path.join(dataDir, "2026-06-26.json"), JSON.stringify(realTemplatedReport), "utf8");
-  fs.writeFileSync(path.join(htmlDir, "2026-06-26.html"), "<html><body><section id=\"story-list\"></section></body></html>", "utf8");
 
   const result = await evaluateRealArtifactContentContract({
     rootDir: tmp,
     dataInput: "reports-data",
-    htmlInput: path.join("docs", "reports"),
     latest: 1
   });
 
@@ -311,40 +307,7 @@ test("real artifact content contract scans report directory and surfaces blockin
   assert(result.degraded.some((issue) => issue.code === "story_template_narrative"));
 });
 
-test("real artifact content contract ignores dated occurrence stores outside the legacy report layout", async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-content-contract-occurrences-"));
-  const reportDate = "2026-07-09";
-  const dataDir = path.join(tmp, "reports-data", "2026", "07");
-  const htmlDir = path.join(tmp, "docs", "reports", "2026", "07");
-  const occurrenceDir = path.join(tmp, "reports-data", "occurrences", "2026", "07");
-  fs.mkdirSync(dataDir, { recursive: true });
-  fs.mkdirSync(htmlDir, { recursive: true });
-  fs.mkdirSync(occurrenceDir, { recursive: true });
-  fs.copyFileSync(path.join(REPORTS_DIR, "2026", "07", `${reportDate}.json`), path.join(dataDir, `${reportDate}.json`));
-  fs.copyFileSync(
-    path.join(__dirname, "..", "docs", "reports", "2026", "07", `${reportDate}.html`),
-    path.join(htmlDir, `${reportDate}.html`)
-  );
-  fs.writeFileSync(
-    path.join(occurrenceDir, "2026-07-15.json"),
-    JSON.stringify({ schema_version: 1, report_date: "2026-07-15", occurrences: [] }),
-    "utf8"
-  );
-
-  const result = await evaluateRealArtifactContentContract({
-    rootDir: tmp,
-    dataInput: "reports-data",
-    htmlInput: path.join("docs", "reports"),
-    latest: 1
-  });
-
-  assert.equal(result.ok, true, JSON.stringify(result.issues));
-  assert.equal(result.summary.artifacts_checked, 1);
-  assert.equal(result.reports[0].report_date, reportDate);
-  assert.equal(result.reports[0].report_path, `reports-data/2026/07/${reportDate}.json`);
-});
-
-test("real artifact content contract blocks missing matching public HTML", async () => {
+test("real artifact content contract does not require retired public HTML", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-content-contract-missing-html-"));
   const dataDir = path.join(tmp, "reports-data", "2026", "06");
   fs.mkdirSync(dataDir, { recursive: true });
@@ -354,24 +317,18 @@ test("real artifact content contract blocks missing matching public HTML", async
   const result = await evaluateRealArtifactContentContract({
     rootDir: tmp,
     dataInput: "reports-data",
-    htmlInput: path.join("docs", "reports"),
     latest: 1
   });
-  const issue = result.issues.find((item) => item.code === "real_artifact_html_missing");
 
-  assert.equal(result.ok, false);
-  assert.equal(result.reports[0].html_path, "docs/reports/2026/06/2026-06-27.html");
-  assert(issue, "missing public HTML must block real artifact validation");
-  assert.equal(issue.requirement, "REQ-003");
-  assert.equal(issue.details.expected_html_path, "docs/reports/2026/06/2026-06-27.html");
+  assert.equal(result.summary.artifacts_checked, 1);
+  assert.equal(Object.hasOwn(result.reports[0], "html_path"), false);
+  assert.equal(result.issues.some((item) => item.code === "real_artifact_html_missing"), false);
 });
 
 test("real artifact content contract enforces public copy gate by default", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-public-copy-real-"));
   const dataDir = path.join(tmp, "reports-data", "2026", "07");
-  const htmlDir = path.join(tmp, "docs", "reports", "2026", "07");
   fs.mkdirSync(dataDir, { recursive: true });
-  fs.mkdirSync(htmlDir, { recursive: true });
 
   const report = {
     ...storyFixture("OpenAI 发布模型能力更新，说明评测设置和使用范围。"),
@@ -379,12 +336,10 @@ test("real artifact content contract enforces public copy gate by default", asyn
     summary: "今天的候选池显示，OpenAI 披露模型能力和评估方法更新。"
   };
   fs.writeFileSync(path.join(dataDir, "2026-07-01.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
-  fs.writeFileSync(path.join(htmlDir, "2026-07-01.html"), "<main>候选池</main>", "utf8");
 
   const result = await evaluateRealArtifactContentContract({
     rootDir: tmp,
     dataInput: "reports-data",
-    htmlInput: path.join("docs", "reports"),
     latest: 1
   });
 

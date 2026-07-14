@@ -6,7 +6,6 @@ import { canonicalStoryUrl, isTemplatedStoryTitle, STORY_FIRST_MAX } from "../sr
 
 const REQUIRED_GITHUB_LANGUAGES = ["all", "Python", "TypeScript", "Rust", "Go", "Java"];
 const DEFAULT_DATA_INPUT = "reports-data";
-const DEFAULT_HTML_INPUT = path.join("docs", "reports");
 const DEFAULT_LATEST_COUNT = 3;
 const MAIN_FILLER_PATTERN = /材料覆盖|边界落在|后续观察|读者可核对|可继续关注|本轮材料|信息较为有限|公开描述提到|需要结合|已披露事实集中在|已披露细节覆盖|公开材料仍需要回到原文核对|更新agent\s*工作流和开发工具能力|更新AI\s*产品、平台或工程实践|当前公开的是代码接口|当前公开的是实验设置|这会影响研发团队是否|这会影响产品团队判断|这会改变模型和平台团队/i;
 const HOT_BLOG_FILLER_PATTERN = /原文说明|读者可核对|继续留意|本文可作为|信息较为有限|后续观察|可继续关注|材料覆盖|\u66f4\u6709\u4ef7\u503c\u7684\u4fe1\u606f\u662f|\u5224\u65ad\u8fd9\u7c7b\u65b9\u6848\u65f6\u8fd8\u8981\u770b|\u6587\u7ae0\u68b3\u7406\u4e00\u4e2a AI \u4ea7\u54c1|\u6587\u7ae0\u62c6\u89e3 agent/i;
@@ -142,9 +141,8 @@ export function evaluateDailyContentContract(report, options = {}) {
 export async function evaluateRealArtifactContentContract(options = {}) {
   const rootDir = options.rootDir || process.cwd();
   const dataInput = options.dataInput || DEFAULT_DATA_INPUT;
-  const htmlInput = options.htmlInput || DEFAULT_HTML_INPUT;
   const latest = normalizeLatestCount(options.latest);
-  const artifacts = await discoverReportArtifacts({ rootDir, dataInput, htmlInput, latest });
+  const artifacts = await discoverReportArtifacts({ rootDir, dataInput, latest });
 
   if (artifacts.length === 0) {
     const issue = blockingIssue({
@@ -162,7 +160,6 @@ export async function evaluateRealArtifactContentContract(options = {}) {
       summary: {
         mode: "real-artifacts",
         data_input: dataInput,
-        html_input: htmlInput,
         latest,
         artifacts_checked: 0,
         blocking_reports: 0,
@@ -178,27 +175,13 @@ export async function evaluateRealArtifactContentContract(options = {}) {
   for (const artifact of artifacts) {
     const report = JSON.parse(await fs.readFile(artifact.reportPath, "utf8"));
     const reportPath = normalizePath(path.relative(rootDir, artifact.reportPath));
-    const htmlPath = artifact.htmlPath ? normalizePath(path.relative(rootDir, artifact.htmlPath)) : null;
-    const htmlExists = artifact.htmlPath ? await fileExists(artifact.htmlPath) : false;
-    const html = htmlExists ? await fs.readFile(artifact.htmlPath, "utf8") : "";
     const result = evaluateDailyContentContract(report, {
-      html,
       enforcePublicCopyGate: options.enforcePublicCopyGate
     });
     const reportIssues = [...result.issues];
-    if (artifact.htmlPath && !htmlExists) {
-      reportIssues.unshift(blockingIssue({
-        code: "real_artifact_html_missing",
-        requirement: "REQ-003",
-        section: "public_html",
-        message: `Real report artifact ${reportPath} must have matching public HTML at ${htmlPath}.`,
-        details: { expected_html_path: htmlPath }
-      }));
-    }
     const reportEntry = {
       report_date: artifact.reportDate,
       report_path: reportPath,
-      html_path: htmlPath,
       ok: reportIssues.length === 0,
       blocking: reportIssues.length > 0,
       issue_count: reportIssues.length,
@@ -225,7 +208,6 @@ export async function evaluateRealArtifactContentContract(options = {}) {
     summary: {
       mode: "real-artifacts",
       data_input: dataInput,
-      html_input: htmlInput,
       latest,
       artifacts_checked: reports.length,
       blocking_reports: reports.filter((report) => report.issue_count > 0).length,
@@ -237,14 +219,10 @@ export async function evaluateRealArtifactContentContract(options = {}) {
 async function discoverReportArtifacts(options) {
   const rootDir = options.rootDir || process.cwd();
   const dataRoot = path.resolve(rootDir, options.dataInput || DEFAULT_DATA_INPUT);
-  const htmlRoot = path.resolve(rootDir, options.htmlInput || DEFAULT_HTML_INPUT);
   const files = [];
   await collectReportJsonFiles(dataRoot, dataRoot, files);
   files.sort((a, b) => a.reportDate.localeCompare(b.reportDate) || a.reportPath.localeCompare(b.reportPath));
-  return files.slice(-normalizeLatestCount(options.latest)).map((artifact) => ({
-    ...artifact,
-    htmlPath: matchingHtmlPath(htmlRoot, artifact.reportDate)
-  }));
+  return files.slice(-normalizeLatestCount(options.latest));
 }
 
 async function collectReportJsonFiles(dir, dataRoot, files) {
@@ -271,11 +249,6 @@ async function collectReportJsonFiles(dir, dataRoot, files) {
     }
     files.push({ reportDate, reportPath: absolutePath });
   }
-}
-
-function matchingHtmlPath(htmlRoot, reportDate) {
-  const [year, month] = reportDate.split("-");
-  return path.join(htmlRoot, year, month, `${reportDate}.html`);
 }
 
 async function fileExists(filePath) {
@@ -1055,7 +1028,6 @@ async function runCli(argv) {
   if (!args.selfTest && !args.report) {
     const result = await evaluateRealArtifactContentContract({
       dataInput: args.dataInput,
-      htmlInput: args.htmlInput,
       latest: args.latest
     });
     if (args.json) {
@@ -1100,8 +1072,6 @@ function parseArgs(argv) {
       args.html = argv[++index];
     } else if (arg === "--data-input") {
       args.dataInput = argv[++index];
-    } else if (arg === "--html-input") {
-      args.htmlInput = argv[++index];
     } else if (arg === "--latest") {
       args.latest = argv[++index];
     } else if (arg === "--json") {
@@ -1120,7 +1090,7 @@ function parseArgs(argv) {
 function printUsage() {
   console.log([
     "Usage:",
-    "  node scripts/check-daily-content-contract.mjs [--data-input reports-data] [--html-input docs/reports] [--latest 3] [--json]",
+    "  node scripts/check-daily-content-contract.mjs [--data-input reports-data] [--latest 3] [--json]",
     "  node scripts/check-daily-content-contract.mjs --report <report.json> [--html <report.html>] [--json]",
     "  node scripts/check-daily-content-contract.mjs --self-test [--json]"
   ].join("\n"));
