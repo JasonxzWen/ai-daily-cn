@@ -40,6 +40,7 @@ import {
   MAIN_SELECTION_STAGE,
   normalizeCandidateAuditRoles
 } from "./main-audit-contract.js";
+import { normalizeCandidatePool } from "./candidates.js";
 import {
   applyDirectPrimaryTargetVerification,
   isDirectPrimaryPublicationUrl
@@ -116,6 +117,16 @@ const DEGRADED_DISCOVERY_INPUT_FALLBACKS = [
 const DEGRADED_DISCOVERY_INPUT_ERROR_CODES = new Set(["ENOENT", "EACCES", "EPERM", "EBUSY", "EIO", "EMFILE", "ENFILE"]);
 const CANDIDATE_SOURCE_STATUSES = new Set(["checked", "blocked", "no_signal"]);
 const PRIMARY_STATUSES = new Set(["primary_confirmed", "multi_source_confirmed"]);
+const EDITORIAL_CATEGORY_ALIASES = new Map([
+  ["research_product", "ai_industry"],
+  ["research", "ai_industry"],
+  ["model_infrastructure", "ai_industry"],
+  ["model_benchmark", "ai_industry"],
+  ["developer_tools", "engineering_toolchain"],
+  ["engineering_deep_dive", "engineering_toolchain"],
+  ["policy_society", "policy_infra"],
+  ["policy", "policy_infra"]
+]);
 const OFFICIAL_BLOG_DAILY_CONTENT_TYPES = new Set([
   "research",
   "engineering_note",
@@ -239,7 +250,13 @@ const PUBLIC_THIRD_PARTY_SOURCE_LEVELS = new Set([
   "ai_news_aggregator",
   "aigc_content_industry",
   "ai_funding_product_radar",
-  "community_api"
+  "community_api",
+  "github_ai_news_directory",
+  "weekly_ai_news_aggregator",
+  "big_tech_company_watch",
+  "china_big_tech_company_watch",
+  "official_open_source_watch",
+  "wechat2rss_medium_trust"
 ]);
 
 export async function generateReportDraft(options = {}) {
@@ -269,14 +286,14 @@ export async function generateReportDraft(options = {}) {
     sourceWatchHistory,
     officialBlogContext: officialBlogContextState.artifact
   });
-  const candidatePool = {
+  const candidatePool = normalizeCandidatePool({
     schema_version: 1,
     main_audit_contract_version: MAIN_AUDIT_CONTRACT_VERSION,
     report_date: reportDate,
     generated_at: generatedAt,
     sources: merged.sources,
     candidates: selection.candidates
-  };
+  }, reportDate);
   const evidence = options.cacheEvidence === false
     ? { assets: [], skipped: [] }
     : await cacheEvidenceImages({
@@ -3383,7 +3400,10 @@ function normalizeCandidate(rawCandidate, context) {
       ? { source_watch: structuredClone(rawCandidate.source_watch) }
       : {})
   };
-  const editorialCategory = rawCandidate.editorial_category || inferredEditorialCategory(candidate);
+  const declaredEditorialCategory = String(rawCandidate.editorial_category || "").trim();
+  const editorialCategory = EDITORIAL_CATEGORY_ALIASES.get(declaredEditorialCategory) ||
+    declaredEditorialCategory ||
+    inferredEditorialCategory(candidate);
   if (editorialCategory) {
     candidate.editorial_category = editorialCategory;
   }

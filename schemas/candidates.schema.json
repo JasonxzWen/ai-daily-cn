@@ -84,6 +84,12 @@
         "official_open_source_account",
         "official_model_host_account",
         "model_registry",
+        "github_ai_news_directory",
+        "weekly_ai_news_aggregator",
+        "big_tech_company_watch",
+        "china_big_tech_company_watch",
+        "official_open_source_watch",
+        "wechat2rss_medium_trust",
         "platform_exempt_signal"
       ]
     },
@@ -484,6 +490,17 @@
           "default": []
         },
         "window_fill": {
+          "type": "boolean"
+        },
+        "story_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claim_fingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "material_update": {
           "type": "boolean"
         },
         "main_story_id": {
