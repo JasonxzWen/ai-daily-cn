@@ -1,36 +1,31 @@
 # Evaluator Rubric
 
-Use this rubric for the REC-331 Aify production-evidence closeout.
+Use this rubric for the S-73 exhausted-repair advisory-isolation slice.
 
 | Dimension | Score 0-2 | Evidence |
 | --- | --- | --- |
-| Problem match | 2 | Aify promotion existed, but the production Phase5 stage omitted the logical source and aggregate `some` semantics allowed a site-only shell to pass. |
-| Correctness | 2 | Production explicitly audits `aify-news`; `content-aify-news` and `site-aify-news` are both required per day. |
-| Evidence semantics | 2 | Each required entry reports observation, candidate count, included/excluded counts, reasons, unresolved items and completeness. |
-| Failure behavior | 2 | Missing entries/candidates fail closed; site-only evidence cannot verify; a hybrid candidate with conflicting source and watch identities satisfies neither required entry. |
-| Public truth | 2 | Included candidates still require dated `docs/articles.json` matches and all non-included candidates require persisted reasons. |
-| Shared Phase5 | 2 | A logical-source day cannot pass when the same day's shared admission/lineage Phase5 fails. |
-| Runtime reliability | 2 | The runner copies the full logical-source evidence projection into the trusted terminal run summary before stage output sanitization. |
-| Authority boundary | 2 | Original publisher, `ai_news_aggregator`, `intermediary_only` and primary-source confirmation requirements remain unchanged. |
-| Compatibility | 2 | Non-Aify logical sources retain their existing behavior; Source Watch producer, selection and publication logic are untouched. |
-| Real evidence | 2 | The current 2026-07-11..13 audit reports both required entries, 0/3 complete days, 0 matches and `production_verified=false` without rewriting history. |
-| Verification | 2 | Aify 8/8, affected Aify/Source Watch 21/21, runner Phase5 2/2, workflow/Harness/diff gates pass; final aggregate is 910 total / 908 pass / 0 fail / 2 skipped with build-clean, 194-file privacy and desktop E2E green. |
-| Scope discipline | 2 | No Web, mobile/tablet/narrow/touch, automation definition, official-blog, generated report or backfill changes. |
+| Problem match | 2 | The real failure mixed four error-covered public-editorial blockers with ten advisory fidelity tasks; the sibling retry classifier was already fixed, but the terminal degradation classifier still treated every task as a veto. |
+| Correctness | 2 | Safe degradation now requires at least one authorized editorial task and full coverage of every error-severity path; unrelated blockers remain fail-closed. |
+| Authority boundary | 2 | Advisory tasks stay in the review artifact but cannot authorize writes, veto degradation, inflate residual counts, or create affected sections. |
+| Failure behavior | 2 | Empty editorial sets and any non-covered or explicitly non-degradable blocking issue still return the existing hard block. |
+| Compatibility | 2 | Publish commands, scheduler configuration, review schemas, retry budget, and report generation are unchanged. |
+| Runtime reliability | 2 | The fix is inside the repository-owned terminal classifier, so every production invocation uses the same authority rule without scheduler prompt logic. |
+| Verification | 2 | The mixed-task regression (including an unmatched stale editorial task), related runner cases, isolated unit suite (540/540), and full repository gate (911 total / 909 pass / 0 fail / 2 skipped) pass. |
+| Scope discipline | 2 | The slice changes one classifier, one regression, and the existing recovery/evidence records; no Web or generated public artifact changed. |
 | Browser acceptance | 2 | Explicitly skipped because no Web composition changed; `1280x900` remains the sole supported viewport. |
-| Validation efficiency | 2 | Development used exact RED failures, one affected batch, one runner pattern batch and one final repository gate; only the E2E tail was repeated after its terminal exit code was lost. |
-| Agentic loops | 2 | Main-agent Producer, deterministic Verifier, one bounded reviewer and final-head CI form the closeout loop. |
-| Finish closeout | 2 | One bounded P0/P1 review and one final repository gate cover the changed runner/evidence boundary without a second generic review. |
-| Insight recommendations | 2 | The durable lesson is encoded in code/tests: a first-class label requires persisted per-entry production receipts. |
-| Handoff readiness | 2 | REC-331/S-79, feature inventory, roadmap, quality snapshot, Harness state and PR status share one record. |
+| Validation efficiency | 2 | Development used one exact RED, one GREEN, one related-pattern batch, one affected suite, and reserves a single full validation for PR preparation. |
+| Agentic loops | 2 | Main-agent Producer, deterministic focused tests, one bounded independent reviewer, and final-head CI form the closeout loop. |
+| Finish closeout | 2 | The bounded independent re-review is Ready with P0/P1=0 after closing stale-task scope and evidence-count findings. |
+| Insight recommendations | 2 | Retry and terminal degradation now reuse one error-covered task helper; the next slices address monotonic progress and real-artifact contract drift. |
+| Handoff readiness | 1 | Local implementation and closeout evidence are complete; PR/CI and fresh scheduled proof remain. |
 
 ## Verdict
 
-- The implementation passed the final repository gate and the bounded hybrid-fix re-review returned Ready with P0/P1=0; no product ambiguity remains.
-- Merge only when final-head required checks are green and GitHub reports the PR conflict-free.
-- Keep Aify status `observing` / REC-331 `locally_verified` until three consecutive post-merge production days pass with at least one public match.
+- The behavior fix passed final repository validation and bounded independent review.
+- Do not call the issue production-verified until a merged-main scheduled run reaches the expected terminal state.
+- Merge only with explicit user authorization after required checks are green and GitHub reports the PR conflict-free.
 
 ## Residual risk
 
-- The current history truthfully contains no qualifying Aify production day; this PR must not manufacture or backfill one.
-- Any unrelated shared Phase5 failure correctly invalidates that day's Aify evidence.
-- PR/CI and post-merge production evidence remain.
+- This slice does not solve stale feedback, non-monotonic repair, or artifact-schema drift; those remain the next two stacked PRs.
+- A later `report_write` contract failure can still block an otherwise degradable run until the production artifact replay slice lands.
