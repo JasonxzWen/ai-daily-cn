@@ -1,11 +1,21 @@
 ## 结构化数据
 
+> 范围声明：本模块仅适用于公共信号流完成后的可选遗留编辑报告（legacy report）。它不治理 `docs/signals/**`，不得改变公共信号流的成员集合、默认时序或发布结果；这里的 report schema、候选回指和编辑字段不构成公共信号准入条件。
+
 先用候选池自动生成结构化日报 JSON 草稿，再用仓库命令标准化写入：
 
 ```powershell
-corepack pnpm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
-corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
+$reportDate = "YYYY-MM-DD"
+$generatedAt = (Get-Date).ToUniversalTime().ToString("o")
+$workflow = Get-Content config/daily-workflow-contract.json -Raw -Encoding utf8 | ConvertFrom-Json
+$signalInputs = ($workflow.daily_runner.public_signals.discovery_lanes | ForEach-Object { $_.artifact_path_template.Replace("YYYY-MM-DD", $reportDate) }) -join ","
+$legacyInputs = "$signalInputs,.tmp/sources-health-$reportDate.json"
+corepack pnpm run signals:write -- --date $reportDate --generated-at $generatedAt --input $signalInputs --allow-degraded-inputs
+corepack pnpm run report:draft -- --date $reportDate --generated-at $generatedAt --input $legacyInputs --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
+corepack pnpm run report:write -- .tmp/daily-report.json reports-data $reportDate
 ```
+
+`signals:write` 是 occurrence store 的唯一 writer；canonical discovery lane 只从 `daily_runner.public_signals.discovery_lanes` 读取。单路失败时用 `--allow-degraded-inputs` 先保留其余成功观察，再从 checkpoint 续跑缺失通道并补充同日 store。任何 fallback 都不能缩减已有 occurrence，也不能把 `sources-health` 诊断混入 signal 成员。`report:draft` 只验证并消费同日 store，并可额外读取第九个健康审计输入，不得覆盖 occurrence。
 
 命令会校验 `schemas/report.schema.json`，补齐稳定的发布路径、`canonical_url`、`publish_status` 和 `generated_at`，并写入 `reports-data/YYYY/MM/YYYY-MM-DD.json`。
 
@@ -55,8 +65,8 @@ corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - AI 核心动态：高信号模型类重大变化必须作为主体新闻写入 `stories`，讲清楚能力、限制、可用性、成本或迁移影响；`model_releases` 仅作历史兼容字段，新草稿默认空数组，不生成公开栏目。平台、工程、算力、监管、企业采用和重大产品变化也写入 `stories`。
 - AIGC 与内容产业动态：覆盖图片生成、视频生成、创作者工具、AI 游戏资产/关卡/角色生成、Runway/Pika/Luma/Kling/Unity 等公司产品动作；事实已回源时写入 `stories` 并使用 `editorial_category:"content_aigc"`，只有中介线索或待验证时写入 `community_leads`。
 - 产品与融资雷达：产品写入 `projects` 或 `community_leads`；融资、估值、ARR、并购和 IPO 只有官方公告、投资方公告、监管文件或两个独立可信来源确认时，才可写入 `stories`。
-- 精选博客与播客：长摘要写入 `hot_blogs`；只有一个 builder 原始观点时写入 `builder_observations`；无 transcript 或无原始单集页时写入 `community_leads` 或丢弃。
-- X / 社区热点讨论：builder 原始帖写入 `builder_observations`；泛讨论写入 `community_leads`，并必须保留原始 X status URL。Builder 观点必须保留原文和完整中文翻译，不得写成概括。
+- 遗留报告中的精选博客与播客：长摘要写入 `hot_blogs`；只有一个 builder 原始观点时写入 `builder_observations`；无 transcript 或无原始单集页时可写入 legacy `community_leads` 或不进入遗留报告，但不得删除对应的安全公共信号。
+- 遗留报告中的 X / 社区热点讨论：builder 原始帖写入 `builder_observations`；泛讨论写入 `community_leads`，进入 legacy 正文时必须保留原始 X status URL。Builder 观点必须保留原文和完整中文翻译，不得写成概括；公共信号缺原始 status URL 时保留并打标签。
 - 参考用户给定的飞书日报板块结构做覆盖校验：`内容赛道动态` 映射 AIGC/内容产业，`AI行业动态` 映射大厂动作、平台政策、监管、算力和商业化，`观点与分析` 映射博客、播客、Builder/X 原始观点，`今天值得关注的产品` 映射 GitHub Trending、Product Hunt、融资和产品雷达，`今日热点的 Twitter 讨论` 映射 `builder_observations` 与 `community_leads`。这只是栏目契约，不代表直接复用该文档正文。
 
 内容密度目标：
@@ -167,22 +177,22 @@ corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
 - `builder_sources.blocked_reason`：当 Builder 来源被阻塞或为空时填写机器可读原因，例如 `fetch_failed`、`auth_required`、`empty_feed`、`rate_limited`、`no_recent_signal`
 - `builder_sources.last_successful_feed_at`：记录上次成功获取中心 feed 的 ISO 时间；没有历史记录时用 `null`
 - `builder_sources.notes`
-- `content_sources.checked: true`：记录热门博客、访谈、播客、Product Hunt developer-tools/trending、广义科技媒体、大厂 newsroom、行业趋势源、X 热点 feed、微信公众号/自媒体中介线索或聚合站检查结果，结构与其他审计组一致。中介源必须在 notes 中保留 `primary_verification_required=true` 或等价说明；白名单公众号必须保留 `source_level`、公众号名和待核验点；X 热点必须保留原始 X status URL。
+- Legacy `content_sources.checked: true`：记录热门博客、访谈、播客、Product Hunt developer-tools/trending、广义科技媒体、大厂 newsroom、行业趋势源、X 热点 feed、微信公众号/自媒体中介线索或聚合站检查结果，结构与其他遗留审计组一致。中介源在 legacy notes 中保留 `primary_verification_required=true` 或等价说明；白名单公众号保留 `source_level`、公众号名和待核验点；X 热点进入遗留报告时保留原始 X status URL。缺 status URL 的安全公共信号仍保留并标记缺口。
 - `search_sources.checked: true`：记录 `discover:search-news` 的影子运行结果，必须包含 `shadow:true`，缺 key provider 记录为 `skipped_missing_token` 或在 notes 中说明。
 - `sources_health.checked: true`：记录 `sources:health` 的健康检查结果；未配置自托管 RSSHub/RSS-Bridge base URL 时记录 `skipped_missing_base_url`，不是日报失败。
 - 可选但推荐的审计指标：`pricing_quota_cost_items`、`model_availability_ops`、`wechat_whitelist_items`、`provider_cost_units`。这些字段只记录数量、请求数或 credit 估算，不记录 token、密钥或鉴权 header。
 
-`source_audit.*.sources[].status` 允许 `checked`、`no_signal`、`blocked`、`skipped_missing_token`、`skipped_missing_base_url`、`skipped_manual_source`、`skipped_manual_review_required`。如果某组没有候选，也必须说明检查过哪些源以及为什么未入选。
+legacy `source_audit.*.sources[].status` 为历史兼容仍可读取 `checked`、`no_signal`、`blocked`、`skipped_missing_token`、`skipped_missing_base_url`、`skipped_manual_source`、`skipped_manual_review_required`；新监听运行不得生成 manual skip，来源无法访问时记录具体凭据、地址、网络或解析原因。如果某组没有遗留编辑候选，也必须说明检查过哪些源以及为什么未入选；该结果不改变公共 occurrence。
 
 `stories` 通过 `source_item_refs` 回指候选；`main_items`、`github_trending`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 的每个入选条目必须填写 `candidate_id`，并且该 ID 必须存在于 `.tmp/source-candidates-YYYY-MM-DD.json`。
 
 `projects` 必须尽量填写 `domains` 和 `use_case`：`domains` 说明领域，例如 `coding_agent`、`agent_memory`、`RAG`、`eval_harness`、`inference_serving`；`use_case` 说明作用，例如“给 coding agent 提供跨会话持久记忆”。`description` 控制在 100 个中文字符以内，避免堆叠审计来源、长背景或重复 use_case。公开 HTML 只会把匹配 GitHub Trending Top20 的项目作为对应条目的行内领域、用途和信号说明，不生成单独项目卡片区、“项目 highlight / 项目 highlights”标签、子标题或额外项目列表；未匹配 Top20 的 `projects` 只保留在结构化 JSON 中。项目也可额外填写 `event_date`、`source`、`signal`、`evidence`；GitHub trending 和 Product Hunt 发现的项目应优先填写这些字段。
 
-`builder_observations` 必须填写 `author`、`content`、`url`，新草稿还必须填写 `original_text` 和 `translation`。`original_text` 放原帖或原始连续摘录的完整英文/原文；`translation` 是完整、精确、忠于原意的中文翻译，不能压缩为观点摘要，不能添加原文没有的判断；`content` 为兼容字段，必须与 `translation` 保持同义，推荐直接填同一段完整翻译。可额外填写 `handle`、`role`、`event_date`、`source`、`evidence`、`avatar_url`、`avatar_local_path` 或 `avatar_data_uri`。如果有 X handle，应填写 `handle`；如果能取得头像 URL，填写 `avatar_url`，构建器会 best-effort 缓存到 `docs/assets/avatars/**` 并写入公开数据。没有原始 URL、没有原文或无法完整翻译的 builder 内容不得写入。
+Legacy `builder_observations` 必须填写 `author`、`content`、`url`，新草稿还必须填写 `original_text` 和 `translation`。`original_text` 放原帖或原始连续摘录的完整英文/原文；`translation` 是完整、精确、忠于原意的中文翻译，不能压缩为观点摘要，不能添加原文没有的判断；`content` 为兼容字段，必须与 `translation` 保持同义，推荐直接填同一段完整翻译。可额外填写 `handle`、`role`、`event_date`、`source`、`evidence`、`avatar_url`、`avatar_local_path` 或 `avatar_data_uri`。如果有 X handle，应填写 `handle`；如果能取得头像 URL，填写 `avatar_url`，构建器会 best-effort 缓存到 `docs/assets/avatars/**` 并写入公开数据。没有原始 URL、没有原文或无法完整翻译的 builder 内容不得写入 legacy `builder_observations`，但安全公共信号仍保留并标记缺口。
 
 当 `source_audit.builder_sources.candidates_found >= 5` 或候选池中存在至少 5 条合格 `builder_observation` 候选时，`builder_observations` 目标为 5-20 条；少于 5 条必须把过滤口径写入 `source_audit.builder_sources.notes` 或 `self_check.notes`，并在内部 `quality_status.degraded_sections` 记录 Builder 覆盖不足；公开页只允许显示短缺口说明。对于 follow-builders X feed，`self_check.selection_snapshot.builder_observations.eligible_after_filter >= 3` 时，`selected` 不得为 0。
 
-Product Hunt 项目只有在官网、GitHub、README、文档或原始发布页完成交叉确认后才能写入 `projects`；否则写入 `community_leads` 或丢弃。融资类产品即使来自 Crunchbase、TechCrunch、36Kr 等来源，也必须满足 `primary_confirmed` 或 `multi_source_confirmed` 后才进入事实栏目。
+Product Hunt 项目只有在官网、GitHub、README、文档或原始发布页完成交叉确认后才能写入 legacy `projects`；否则写入 legacy `community_leads` 或不进入遗留报告。对应安全记录仍保留在公共信号流。融资类产品即使来自 Crunchbase、TechCrunch、36Kr 等来源，也必须满足 `primary_confirmed` 或 `multi_source_confirmed` 后才进入遗留事实栏目。
 
 AI 开发工具计费、配额、成本归因、usage dashboard、Service Quotas、seat/usage-based billing 和 credit 变化必须作为常规候选被记录；影响开发者工作流、团队预算、上线容量或采购口径时可写入 `main_items`，否则写入 `community_leads`。
 

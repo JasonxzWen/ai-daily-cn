@@ -19,17 +19,17 @@ Daily source status must not reorder review priorities. Blocked, skipped, unconf
 ## Unmapped Source Counts
 
 <!-- order-tuning-unmapped-counts -->
-<!-- order-tuning-total-unmapped:69 -->
+<!-- order-tuning-total-unmapped:98 -->
 
-These counts come from the 166-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources.
+These counts come from the current 186-entry safe inventory. They show how many collection entries are visible but not yet represented as first-class logical sources. A collection-only entry still participates in the public listener; logical-source promotion is internal inventory governance, never a publishing gate.
 
 | Section | Unmapped entries | Review stance |
 |---|---:|---|
-| `core_primary` | 1 | Azure, Cloudflare, and Google Keyword now have evidence-backed logical identities; one remaining entry stays collection-only. |
+| `core_primary` | 8 | Existing promoted identities stay mapped; eight collection entries, including new official release channels, remain collection-only without losing listener coverage. |
 | `china_models` | 19 | Baidu AI and Alibaba Cloud are promoted; zero-signal model/platform entries remain deferred until parser versus no-update status is known. |
-| `open_source_platforms` | 1 | Promote durable paper, model, and code ecosystem sources; keep org mirrors collection-only. |
+| `open_source_platforms` | 16 | Existing promoted identities stay mapped; repository releases and trend endpoints remain collection-only without losing listener coverage. |
 | `tracking_metrics` | 0 | Completed in Phase 16; the three structured benchmark/ranking sources are now first-class logical sources. |
-| `builder_community` | 46 | Latent Space and Nature Machine Learning are promoted; low-yield and zero-signal entries remain collection-only. |
+| `builder_community` | 53 | Latent Space and Nature Machine Learning are promoted; newsletters, media, and community channels remain collection-only without losing listener coverage. |
 | `platform_cn_media` | 0 | SSPAI is promoted as a governance identity without higher fact authority. |
 | `english_media_search` | 2 | Product Hunt promotion proposals are retired while collection continues. |
 

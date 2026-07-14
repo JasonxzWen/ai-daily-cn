@@ -24,7 +24,7 @@
         "After the bounded repair budget is exhausted, advisory-only tasks cannot veto a safe editorial degradation; degraded sections and residual counts are derived only from error-covered public-editorial tasks.",
         "Production repair uses read-only schema-constrained UTF-8 Codex output; the host validates and writes the contract, and a bounded timeout terminates the process tree with codex_timeout.",
         "Claim verification overrides misleading source-level inference, quality and report_write share complete candidate coverage, and terminal summaries identify only the latest unresolved failure with non-empty error code, message, failures, and blocking evidence.",
-        "Source registry, candidate pool, and report schemas accept non-empty source_level metadata without a closed vocabulary; unknown values survive collection and fall back only when projected into canonical public labels.",
+        "Source registry uses only source_group, content_tags, and credibility_tag for public classification. Legacy candidate/report source_level metadata remains open historical input and falls back only when projected into canonical public labels.",
         "Report draft persists the merged discovery occurrence store before editorial selection, evidence caching, authoring, quality review, or report artifact writes; structural candidate errors may still block the legacy editorial artifact, but classification metadata never blocks the public occurrence stream.",
         "Production Source Watch is connected only when the producer stage returns the exact artifact path/SHA-256 receipt, the dated producer and candidate pool have identical target_id:snapshot_fingerprint sets, and build proves the exact pool path plus SHA-256; zero inclusion remains a valid consumed state.",
         "A live scheduler that still forces not_connected or consumed:false fails the workflow compatibility gate before release.",
@@ -34,7 +34,7 @@
         "The entrypoint returns needs_ai_repair without exhausting or disabling its declared repair budget.",
         "A repair prompt reads an initial or stale review after a newer post-attempt review exists, or a stalled loop authors another contract.",
         "A repair attempt changes a cleared path, fails to strictly reduce blocking signals, or degrades the accepted checkpoint without rollback.",
-        "A non-empty source_level or classification value is rejected only because it is new, or editorial selection runs before the occurrence store is persisted.",
+        "A legacy candidate/report classification value is rejected only because it is new, or editorial selection runs before the occurrence store is persisted.",
         "Codex writes outside the bounded pipeline work directory.",
         "A requested Source Watch path is reported as consumed without producer, fingerprint-lineage, persisted-pool, and build evidence.",
         "The live automation prompt contradicts evidence-backed Source Watch summary semantics.",
@@ -46,7 +46,7 @@
           "node --test tests/daily-codex-pipeline.test.js",
           "node --test tests/source-watch.test.js tests/source-watch-runner-draft.test.js tests/article-index.test.js tests/official-blog-daily-context.test.js",
           "node --test --test-name-pattern \"report:draft.*main stream|report:write allows disclosed low-risk refill|quality review.*candidate|quality review shares\" tests/unit.test.js",
-          "node --test --test-name-pattern \"legacy source and classification fields remain open metadata|real non-publish candidate artifact replay|report draft preserves unknown source level|source registry preserves unknown source level|preserves snake case\" tests/unit.test.js",
+          "node --test --test-name-pattern \"legacy source and classification fields remain open metadata|real non-publish candidate artifact replay|report draft preserves unknown source level|source registry taxonomy\" tests/unit.test.js",
           "node --test tests/public-signals.test.js",
           "corepack pnpm run sources:validate",
           "corepack pnpm run workflow:validate",
@@ -107,7 +107,7 @@
         "Persisted and public URLs are canonical HTTP(S) values without credentials, fragments, tracking keys, or secret query parameters, and the same safety rule is enforced again when stores are loaded.",
         "Future-dated source records remain visible with date_anomaly=future_relative_to_collection and use collected_at for default chronology instead of occupying the top of the stream.",
         "Public projection exposes publisher and collected_via separately and omits candidate IDs, selection state, rejection reasons, scores, internal notes, and private paths.",
-        "Historical candidate pools and reports remain discoverable through explicitly marked legacy_candidate_pool and legacy_editorial projections; their already-persisted candidate IDs are legacy discriminators only and are not presented as exact raw observation identity.",
+        "The pre-PR2 public signal history is preserved once as immutable compressed occurrence stores with an exact SHA-256 manifest; production build and publish fail closed on any missing, extra, or changed shard and never read legacy candidate/report artifacts at runtime.",
         "The index renders only non-empty source groups, and every occurrence appears exactly once across the page union for its group.",
         "The complete signals tree is cross-file validated and swapped from a staged directory as one generation, so readers never receive mixed index/page generations."
       ],
@@ -307,11 +307,14 @@
       "summary": "Collect and audit daily AI sources before writing the structured report.",
       "commands": [
         "corepack pnpm run prompt:build -- YYYY-MM-DD",
-        "corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
+        "corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --history-root reports-data",
         "corepack pnpm run discover:github-watch -- --date YYYY-MM-DD --config config/source-watchlist.json",
-        "corepack pnpm run discover:builders -- --date YYYY-MM-DD --limit 20",
-        "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
-        "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20"
+        "corepack pnpm run discover:huggingface-trending -- --date YYYY-MM-DD",
+        "corepack pnpm run discover:builders -- --date YYYY-MM-DD",
+        "corepack pnpm run discover:china-ai -- --date YYYY-MM-DD",
+        "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --source-concurrency 12",
+        "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD",
+        "corepack pnpm run discover:search-news -- --date YYYY-MM-DD"
       ],
       "artifacts": [
         ".tmp/source-candidates-YYYY-MM-DD.json",
@@ -328,34 +331,37 @@
         "Per-source parsed_recent uses only that source's parsed_count or recent_48h_entries; group candidate totals never create per-source success.",
         "Phase5 joins final legacy report candidate backrefs, applies the shared edited-report admission decision, and reports concrete violations, trusted-target upgrades, orphan included flags, and missing backrefs without governing public occurrence membership.",
         "Logical-source promotion is evidence-decided per collection entry; defer and retire decisions remain collection-only and never raise source authority.",
-        "Source Watch suppresses a target when any material GitHub endpoint fails, selects the newest release or commit event, persists the source snapshot fingerprint, and returns a stage-bound artifact path/hash receipt.",
+        "Source Watch persists the repository snapshot plus every successfully fetched release, tag, commit, and same-origin paginated Link event with stable observation identity. A failed endpoint records only local health/access degradation and cannot suppress successful events from that target or another target.",
         "Official-blog daily context consumes a real content-source artifact that declares report_date/generated_at, reuses existing reviewed knowledge, preserves official-blog-admission-v1, verifies wrapper/source dates plus source/context/bindings hashes and relationships, chooses the highest-score type binding, and never auto-writes curated knowledge.",
         "HTML-index title, summary, and image facts come only from the exact anchor or same-URL structured metadata; adjacent cards cannot trigger high-specificity model-launch topics or prose through evidence text.",
         "GitHub Trending preserves source-scope language separately from repository_language, and the public report uses the repository language while source_scope continues to identify the ranked pool.",
         "GitHub Trending rank movement compares source_rank only within the same source_scope; an unknown or different historical scope fails closed to new.",
         "GitHub README summaries use a content SHA-256 cache key; a first network fetch is a miss and only an exact historical key match may report hit=true.",
         "GitHub Trending source effectiveness counts each canonical repository once across original and derived candidates; the final github_trending/projects union governs only optional legacy edited-report inclusion and source-effectiveness metrics, never docs/signals occurrence membership, which comes exclusively from the pre-selection occurrence store.",
-        "Every non-empty registered and runtime-fallback source_level is preserved as open metadata in both snake_case and legacy camelCase paths; canonical public labels use an explicit unknown fallback rather than rejecting new values.",
+        "Every registered source declares source_group, content_tags, and credibility_tag directly. Non-empty source_level values survive only as legacy candidate/report raw metadata; canonical public labels use an explicit unknown fallback rather than rejecting new values.",
         "The merged discovery occurrence store is persisted before selection; the legacy editorial candidate pool is still schema- and reference-validated before report or candidate artifacts are written."
       ],
       "stop_conditions": [
         "Required source audit fields cannot be reconstructed.",
         "The draft would bypass candidate-pool or freshness gates.",
-        "A configured source_level is rejected downstream only because it is absent from a closed vocabulary, an occurrence is lost before selection, or a producer writes an invalid legacy editorial pool for later stages to discover.",
+        "A legacy candidate/report source_level is rejected only because it is absent from a closed vocabulary, an occurrence is lost before selection, or a producer writes an invalid legacy editorial pool for later stages to discover.",
         "GitHub source scope, repository language, rank basis, README cache evidence, or canonical effectiveness identity is conflated or inferred across incompatible records."
       ],
       "behavior": "Collect and audit daily AI sources before writing the structured report.",
       "validation": {
         "commands": [
           "corepack pnpm run prompt:build -- YYYY-MM-DD",
-          "corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --limit 50 --history-root reports-data",
+          "corepack pnpm run discover:github-trending -- --date YYYY-MM-DD --history-root reports-data",
           "corepack pnpm run discover:github-watch -- --date YYYY-MM-DD --config config/source-watchlist.json",
-          "corepack pnpm run discover:builders -- --date YYYY-MM-DD --limit 20",
-          "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3",
-          "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20",
+          "corepack pnpm run discover:huggingface-trending -- --date YYYY-MM-DD",
+          "corepack pnpm run discover:builders -- --date YYYY-MM-DD",
+          "corepack pnpm run discover:china-ai -- --date YYYY-MM-DD",
+          "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --source-concurrency 12",
+          "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD",
+          "corepack pnpm run discover:search-news -- --date YYYY-MM-DD",
           "node --test tests/source-watch.test.js tests/source-watch-runner-draft.test.js tests/official-blog-daily-context.test.js",
           "node --test --test-name-pattern \"GitHub trending|github trending|report:draft merges weekly GitHub|source effectiveness dedupes original|source effectiveness ignores stale\" tests/unit.test.js",
-          "node --test --test-name-pattern \"legacy source and classification fields remain open metadata|real non-publish candidate artifact replay|report draft preserves unknown source level|source registry preserves unknown source level|preserves snake case\" tests/unit.test.js",
+          "node --test --test-name-pattern \"legacy source and classification fields remain open metadata|real non-publish candidate artifact replay|report draft preserves unknown source level|source registry taxonomy\" tests/unit.test.js",
           "node --test tests/public-signals.test.js",
           "corepack pnpm run sources:validate",
           "corepack pnpm run sources:display-contract"
@@ -459,16 +465,16 @@
       "commands": [
         "corepack pnpm run sources:validate",
         "corepack pnpm exec node --test tests/source-coverage.test.js",
-        "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --limit 60 --per-source-limit 3"
+        "corepack pnpm run discover:content-sources -- --date YYYY-MM-DD --source-concurrency 12"
       ],
       "artifacts": [
         "config/sources/wechat2rss-sources.json",
         ".tmp/source-candidates-YYYY-MM-DD.json"
       ],
       "acceptance": [
-        "Twelve Wechat2RSS public feeds are registered as optional T3 intermediary RSS sources.",
+        "Twelve Wechat2RSS public feeds are registered as intermediary RSS sources with explicit source-group and credibility metadata.",
         "Every safely normalizable Wechat2RSS observation enters the public signal stream; primary-source confirmation is required only before the optional legacy edited report restates an intermediary claim as a factual story.",
-        "The sources remain in the default content discovery enablement set without replacing direct Chinese RSS sources."
+        "Every registered feed is listened to by default without replacing direct Chinese RSS sources."
       ],
       "stop_conditions": [
         "Wechat2RSS public feed URLs stop resolving as RSS/XML.",

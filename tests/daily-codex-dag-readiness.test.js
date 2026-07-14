@@ -17,13 +17,13 @@ test("daily DAG readiness report classifies current manifest without counting pl
   });
 
   assert.equal(report.schema_version, 1);
-  assert.equal(report.node_count, 16);
-  assert.equal(report.nodes.length, 16);
+  assert.equal(report.node_count, 22);
+  assert.equal(report.nodes.length, 22);
   assert.equal(report.counts.planned, 9);
-  assert.equal(report.counts.mapped, 7);
+  assert.equal(report.counts.mapped, 13);
   assert.equal(report.counts.real, 0);
   assert.equal(report.counts.fixture, 0);
-  assert.equal(report.counts.production_ready, 7);
+  assert.equal(report.counts.production_ready, 13);
 
   const score = report.nodes.find((node) => node.id === "score");
   assert(score);

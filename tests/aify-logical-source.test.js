@@ -19,18 +19,14 @@ const AIFY_SOURCE = {
   url: "https://aify-news.pages.dev/articles.json",
   source_kind: "search_api",
   candidate_category: "community_lead",
-  tier: "T3",
-  authority: "aggregator",
-  enablement: "core",
-  verification_policy: "primary_required",
+  source_group: "news_newsletters",
+  credibility_tag: "single_source_relay",
+  content_tags: ["industry_news", "analysis_opinion"],
   requires_original_url: false,
-  lookback_days: 0,
-  max_items_per_run: 5,
-  timeout_ms: 15000,
-  source_level: "ai_news_aggregator"
+  timeout_ms: 15000
 };
 
-test("Aify collection is a core logical source without publisher or authority escalation", async (t) => {
+test("Aify collection is a logical source with explicit public taxonomy tags", async (t) => {
   const config = JSON.parse(await fs.readFile(path.join(rootDir, "config", "sources", "aify-news.json"), "utf8"));
   assert.deepEqual(config.sources, [AIFY_SOURCE]);
 
@@ -373,7 +369,9 @@ function assertAifyCandidate(candidate) {
   assert(candidate);
   assert.equal(candidate.source_id, "content-aify-news");
   assert.equal(candidate.source, "LangChain Docs");
-  assert.equal(candidate.source_level, "ai_news_aggregator");
+  assert.equal(candidate.source_group, "news_newsletters");
+  assert.equal(candidate.credibility_tag, "single_source_relay");
+  assert.deepEqual(candidate.content_tags, ["industry_news", "analysis_opinion"]);
   assert.equal(candidate.verification_status, "intermediary_only");
   assert.equal(candidate.url, "https://docs.langchain.com/agent-runtime-guide");
 }

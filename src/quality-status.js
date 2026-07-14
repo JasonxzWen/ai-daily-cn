@@ -1273,8 +1273,11 @@ function automationRevisionMismatches(revision, currentRevision) {
   if (Number(revision.source_registry_count || 0) !== Number(currentRevision.source_registry_count || 0)) {
     mismatches.push("source_registry_count");
   }
-  if (!objectsEqual(revision.source_registry_enablement_counts, currentRevision.source_registry_enablement_counts)) {
-    mismatches.push("source_registry_enablement_counts");
+  if (!objectsEqual(revision.source_registry_source_group_counts, currentRevision.source_registry_source_group_counts)) {
+    mismatches.push("source_registry_source_group_counts");
+  }
+  if (!objectsEqual(revision.source_registry_credibility_tag_counts, currentRevision.source_registry_credibility_tag_counts)) {
+    mismatches.push("source_registry_credibility_tag_counts");
   }
 
   return unique(mismatches);

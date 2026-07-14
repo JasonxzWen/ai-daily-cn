@@ -44,7 +44,6 @@
       "required": [
         "id",
         "cluster_id",
-        "record_origin",
         "title",
         "url",
         "summary",
@@ -67,7 +66,6 @@
       "properties": {
         "id": { "type": "string", "pattern": "^occ_[a-f0-9]{24}$" },
         "cluster_id": { "type": "string", "pattern": "^cluster_[a-f0-9]{24}$" },
-        "record_origin": { "enum": ["observed", "legacy_candidate_pool", "legacy_editorial"] },
         "title": { "type": "string", "minLength": 1 },
         "url": { "type": "string", "format": "uri" },
         "summary": { "$ref": "#/$defs/nullable_text" },
@@ -101,11 +99,11 @@
     "coverage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["observed_count", "legacy_candidate_count", "legacy_editorial_count", "normalization_error_count"],
+      "required": ["input_record_count", "occurrence_count", "coalesced_record_count", "normalization_error_count"],
       "properties": {
-        "observed_count": { "type": "integer", "minimum": 0 },
-        "legacy_candidate_count": { "type": "integer", "minimum": 0 },
-        "legacy_editorial_count": { "type": "integer", "minimum": 0 },
+        "input_record_count": { "type": "integer", "minimum": 0 },
+        "occurrence_count": { "type": "integer", "minimum": 0 },
+        "coalesced_record_count": { "type": "integer", "minimum": 0 },
         "normalization_error_count": { "type": "integer", "minimum": 0 }
       }
     },

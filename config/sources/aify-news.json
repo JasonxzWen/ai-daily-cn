@@ -7,15 +7,14 @@
       "url": "https://aify-news.pages.dev/articles.json",
       "source_kind": "search_api",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "aggregator",
-      "enablement": "core",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "lookback_days": 0,
-      "max_items_per_run": 5,
-      "timeout_ms": 15000,
-      "source_level": "ai_news_aggregator"
+      "timeout_ms": 15000
     }
   ]
 }

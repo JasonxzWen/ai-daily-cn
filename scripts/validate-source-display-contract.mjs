@@ -2,6 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { containsInternalSourceField } from "../src/privacy.js";
 import { buildSourceInventoryRows, CORE_SOURCE_CONTRACTS } from "../src/source-effectiveness.js";
 
 const REQUIRED_STATUS_LABELS = [
@@ -453,10 +454,6 @@ function validateInventoryOrderReference(reference, inventoryRows, maintenance, 
       message: "inventory order reference must not expose raw URLs"
     },
     {
-      pattern: /(?:\bAI_DAILY_[A-Z0-9_]+\b|\b[A-Z][A-Z0-9_]*(?:_API_KEY|_TOKEN|_COOKIE|_SECRET|_BASE_URL|_FEED_URL|_URL)\b|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|\bkeywords\b|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug)/i,
-      message: "inventory order reference must not expose internal source fields"
-    },
-    {
       pattern: /(?:[A-Za-z]:[\\/]|\\Users\\|\.codex[\\/]|\/Users\/[^/\s]+\/|\/home\/[^/\s]+\/)/i,
       message: "inventory order reference must not expose local paths"
     },
@@ -469,6 +466,9 @@ function validateInventoryOrderReference(reference, inventoryRows, maintenance, 
     if (check.pattern.test(reference)) {
       failures.push(check.message);
     }
+  }
+  if (containsInternalSourceField(reference)) {
+    failures.push("inventory order reference must not expose internal source fields");
   }
 }
 
@@ -574,10 +574,6 @@ function validateOrderTuningReview(review, inventoryRows, contract, maintenance,
       message: "order tuning review must not expose raw URLs"
     },
     {
-      pattern: /(?:\bAI_DAILY_[A-Z0-9_]+\b|\b[A-Z][A-Z0-9_]*(?:_API_KEY|_TOKEN|_COOKIE|_SECRET|_BASE_URL|_FEED_URL|_URL)\b|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|\bkeywords\b|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug)/i,
-      message: "order tuning review must not expose internal source fields"
-    },
-    {
       pattern: /(?:[A-Za-z]:[\\/]|\\Users\\|\.codex[\\/]|\/Users\/[^/\s]+\/|\/home\/[^/\s]+\/)/i,
       message: "order tuning review must not expose local paths"
     },
@@ -590,6 +586,9 @@ function validateOrderTuningReview(review, inventoryRows, contract, maintenance,
     if (check.pattern.test(review)) {
       failures.push(check.message);
     }
+  }
+  if (containsInternalSourceField(review)) {
+    failures.push("order tuning review must not expose internal source fields");
   }
 }
 

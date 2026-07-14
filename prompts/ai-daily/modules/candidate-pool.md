@@ -1,12 +1,22 @@
-## 候选池硬门槛
+## 遗留编辑报告候选池（legacy-only）
 
-日报正文只能从候选池中选条目。默认流程是先运行固定发现命令，再运行：
+> 范围声明：本模块仅适用于公共信号流完成后的可选遗留编辑报告（legacy report）。它不治理 `docs/signals/**`，不得改变公共信号流的成员集合、默认时序或发布结果；候选池不是公共信号的准入门槛。
+
+可选遗留编辑报告的正文只能从候选池中选条目。`signals:write` 是 occurrence store 的唯一 writer；独立运行 legacy fallback 时，先用同一批 discovery inputs 和同一个 `generated-at` 写 signal store，再让 `report:draft` 只验证并消费它：
 
 ```powershell
-corepack pnpm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
+$reportDate = "YYYY-MM-DD"
+$generatedAt = (Get-Date).ToUniversalTime().ToString("o")
+$workflow = Get-Content config/daily-workflow-contract.json -Raw -Encoding utf8 | ConvertFrom-Json
+$signalInputs = ($workflow.daily_runner.public_signals.discovery_lanes | ForEach-Object { $_.artifact_path_template.Replace("YYYY-MM-DD", $reportDate) }) -join ","
+$legacyInputs = "$signalInputs,.tmp/sources-health-$reportDate.json"
+corepack pnpm run signals:write -- --date $reportDate --generated-at $generatedAt --input $signalInputs --allow-degraded-inputs
+corepack pnpm run report:draft -- --date $reportDate --generated-at $generatedAt --input $legacyInputs --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
 ```
 
-`report:draft` 会从发现输出合并 `source_audit`、写入 `.tmp/source-candidates-YYYY-MM-DD.json`、为入选候选标记 `status:"included"` / `included_in`，并生成 `.tmp/daily-report.json`。不要再用临时手工脚本绕过这个步骤。
+`signals:write` 的 canonical 输入由 `daily_runner.public_signals.discovery_lanes` 唯一声明，且不得包含只作诊断的 `sources-health`。单路暂时缺失时使用 `--allow-degraded-inputs` 留下局部降级并继续写入已成功观察；随后从该路 checkpoint 续跑并以同日全量输入补充 store。写入器不得缩减或改写已有 occurrence。`report:draft` 可以额外消费第九个 `sources-health` 审计输入，但它无权重写 occurrence store。
+
+`report:draft` 不写 occurrence store。它会验证 store 与发现输入一致，再合并 legacy `source_audit`、写入 `.tmp/source-candidates-YYYY-MM-DD.json`、为入选候选标记 `status:"included"` / `included_in`，并生成 `.tmp/daily-report.json`。不要再用临时手工脚本绕过这个步骤。
 
 候选池必须记录：
 
@@ -16,7 +26,7 @@ corepack pnpm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending
 - 证据图片：候选带 `image_url` 时，`report:draft` 会 best-effort 缓存到 `docs/assets/evidence/**` 并写入 `evidence_assets`；缓存失败不得伪造图片。
 - 历史比较：记录已和 `reports-data` 最近至少 7 个日报日的正文与候选池比较；重复候选保留 `status:"excluded"`、`exclusion_reason` 和对应历史日期或历史 URL。
 
-硬规则：
+遗留编辑报告规则：
 
 - `main_items`、`github_trending`、`model_releases`、`hot_blogs`、`projects`、`builder_observations` 中的每个入选条目都必须填写 `candidate_id`。
 - `candidate_id` 必须指向候选池中 `status:"included"` 的候选。
@@ -28,6 +38,7 @@ corepack pnpm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending
 执行顺序：
 
 1. 运行发现命令并写出 `.tmp/*-YYYY-MM-DD.json`。
-2. 运行 `corepack pnpm run report:draft ...` 生成 `.tmp/source-candidates-YYYY-MM-DD.json` 和 `.tmp/daily-report.json`。
-3. 运行 `corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`。
-4. 如果返回 `candidate_pool_missing`、`candidate_pool_reference_invalid` 或 schema 错误，修正候选池或正文回指，不要绕过门禁。
+2. 运行 `signals:write` 写入唯一 occurrence store。
+3. 运行 `corepack pnpm run report:draft ...` 生成 `.tmp/source-candidates-YYYY-MM-DD.json` 和 `.tmp/daily-report.json`。
+4. 运行 `corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD`。
+5. 如果返回 `candidate_pool_missing`、`candidate_pool_reference_invalid` 或 schema 错误，修正候选池或正文回指，不要绕过遗留报告的编辑门禁；该错误不得阻止已经验证的公共信号发布。

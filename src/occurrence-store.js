@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { isDeepStrictEqual } from "node:util";
 
 import { PublisherError } from "./errors.js";
 import { canonicalPublicUrlIdentity, isPublicNetworkHost, sanitizePublicHttpUrl } from "./public-url.js";
@@ -89,16 +90,121 @@ export async function writeOccurrenceStore(options = {}) {
     });
   }
   const target = path.join(outputDir, ...occurrenceStoreRelativePath(validation.value.report_date).split(path.sep));
+  const existing = await readExistingOccurrenceStore(target);
+  const persisted = existing && options.mergeExisting === true
+    ? mergeOccurrenceStoreSnapshots(existing, validation.value)
+    : validation.value;
+  if (existing) assertMonotonicOccurrenceRewrite(existing, persisted, target);
   await fs.mkdir(path.dirname(target), { recursive: true });
   const temporary = `${target}.${process.pid}.${randomUUID()}.tmp`;
   try {
-    await fs.writeFile(temporary, `${JSON.stringify(validation.value, null, 2)}\n`, "utf8");
+    await fs.writeFile(temporary, `${JSON.stringify(persisted, null, 2)}\n`, "utf8");
     await fs.rename(temporary, target);
   } catch (error) {
     await fs.rm(temporary, { force: true }).catch(() => {});
     throw error;
   }
   return target;
+}
+
+async function readExistingOccurrenceStore(target) {
+  let payload;
+  try {
+    payload = JSON.parse(await fs.readFile(target, "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw new PublisherError(
+      "occurrence_store_existing_invalid",
+      "Existing occurrence store is unreadable; refusing to replace persisted signal history.",
+      { path: target, cause: error.message }
+    );
+  }
+  const validation = validateOccurrenceStore(payload);
+  if (!validation.valid) {
+    throw new PublisherError(
+      "occurrence_store_existing_invalid",
+      "Existing occurrence store is invalid; refusing to replace persisted signal history.",
+      { path: target, errors: validation.errors }
+    );
+  }
+  return validation.value;
+}
+
+function mergeOccurrenceStoreSnapshots(existing, incoming) {
+  if (existing.report_date !== incoming.report_date) {
+    throw new PublisherError(
+      "occurrence_store_date_mismatch",
+      "Cannot merge occurrence stores from different report dates.",
+      { existing_report_date: existing.report_date, incoming_report_date: incoming.report_date }
+    );
+  }
+
+  const existingIds = new Set(existing.occurrences.map((item) => item.id));
+  const addedOccurrences = incoming.occurrences.filter((item) => !existingIds.has(item.id));
+  const occurrences = [...existing.occurrences, ...addedOccurrences].sort(compareOccurrenceChronology);
+  const existingErrorKeys = new Set(existing.normalization_errors.map((item) => JSON.stringify(item)));
+  const addedErrorCodes = incoming.normalization_errors
+    .filter((item) => !existingErrorKeys.has(JSON.stringify(item)))
+    .map((item) => item.code);
+  const addedRepresentedRecordCount = addedOccurrences
+    .reduce((sum, item) => sum + item.raw_record_count, 0);
+  const addedErrorIndexBase = existing.input_record_count + addedRepresentedRecordCount;
+  const normalizationErrors = [
+    ...existing.normalization_errors,
+    ...addedErrorCodes.map((code, index) => ({ index: addedErrorIndexBase + index, code }))
+  ];
+  const representedRecordCount = occurrences.reduce((sum, item) => sum + item.raw_record_count, 0);
+  const coalescedRecordCount = occurrences.reduce((sum, item) => sum + item.raw_record_count - 1, 0);
+  const hasNewEvidence = addedOccurrences.length > 0 || addedErrorCodes.length > 0;
+  const merged = {
+    ...existing,
+    generated_at: hasNewEvidence && Date.parse(incoming.generated_at) > Date.parse(existing.generated_at)
+      ? incoming.generated_at
+      : existing.generated_at,
+    input_record_count: representedRecordCount + normalizationErrors.length,
+    occurrence_count: occurrences.length,
+    coalesced_record_count: coalescedRecordCount,
+    normalization_error_count: normalizationErrors.length,
+    normalization_errors: normalizationErrors,
+    occurrences
+  };
+  const validation = validateOccurrenceStore(merged);
+  if (!validation.valid) {
+    throw new PublisherError("occurrence_store_merge_invalid", "Merged occurrence store failed schema validation.", {
+      errors: validation.errors
+    });
+  }
+  return validation.value;
+}
+
+function assertMonotonicOccurrenceRewrite(existing, next, target) {
+  const nextById = new Map(next.occurrences.map((item) => [item.id, item]));
+  const missingOccurrenceIds = [];
+  const changedOccurrenceIds = [];
+  for (const item of existing.occurrences) {
+    const replacement = nextById.get(item.id);
+    if (!replacement) {
+      missingOccurrenceIds.push(item.id);
+    } else if (!isDeepStrictEqual(replacement, item)) {
+      changedOccurrenceIds.push(item.id);
+    }
+  }
+  const nextErrors = new Set(next.normalization_errors.map((item) => JSON.stringify(item)));
+  const missingNormalizationErrors = existing.normalization_errors
+    .filter((item) => !nextErrors.has(JSON.stringify(item)));
+  if (missingOccurrenceIds.length === 0 && changedOccurrenceIds.length === 0 && missingNormalizationErrors.length === 0) {
+    return;
+  }
+  throw new PublisherError(
+    "occurrence_store_non_monotonic_rewrite",
+    "Refusing a same-day occurrence-store rewrite that would remove or mutate persisted listener evidence.",
+    {
+      path: target,
+      missing_occurrence_ids: missingOccurrenceIds,
+      changed_occurrence_ids: changedOccurrenceIds,
+      missing_normalization_errors: missingNormalizationErrors
+    }
+  );
 }
 
 function normalizeOccurrence(candidate, context) {
@@ -156,10 +262,11 @@ function normalizeOccurrence(candidate, context) {
         health: collectorHealth(source.status),
         category: nullableText(source.category, 120)
       },
-      candidate_category: cleanText(candidate.category, 100) || "other",
-      source_level: nullableText(candidate.source_level, 120),
-      verification_status: nullableText(candidate.verification_status, 120),
-      editorial_category: nullableText(candidate.editorial_category, 120),
+      raw_content_kind: cleanText(candidate.category, 100) || "other",
+      raw_source_level: nullableText(candidate.source_level, 120),
+      raw_verification_status: nullableText(candidate.verification_status, 120),
+      raw_credibility_tag: nullableText(candidate.credibility_tag, 120),
+      raw_content_category: nullableText(candidate.editorial_category, 120),
       raw_source_group: nullableText(inferSourceGroupHint(candidate, source, selectedUrl.url), 120),
       raw_tags: uniqueTextValues([
         ...(Array.isArray(candidate.content_tags) ? candidate.content_tags : []),
@@ -196,10 +303,11 @@ function mergeOccurrenceValues(identity, values) {
     summary: preferredText(records.map((item) => item.summary)) || null,
     publisher_hint: preferredText(records.map((item) => item.publisher_hint)) || first.publisher_hint,
     collector: preferredObject(records.map((item) => item.collector)) || first.collector,
-    candidate_category: preferredMetadata(records.map((item) => item.candidate_category), "other") || "other",
-    source_level: preferredMetadata(records.map((item) => item.source_level)),
-    verification_status: preferredMetadata(records.map((item) => item.verification_status)),
-    editorial_category: preferredMetadata(records.map((item) => item.editorial_category)),
+    raw_content_kind: preferredMetadata(records.map((item) => item.raw_content_kind), "other") || "other",
+    raw_source_level: preferredMetadata(records.map((item) => item.raw_source_level)),
+    raw_verification_status: preferredMetadata(records.map((item) => item.raw_verification_status)),
+    raw_credibility_tag: preferredMetadata(records.map((item) => item.raw_credibility_tag)),
+    raw_content_category: preferredMetadata(records.map((item) => item.raw_content_category)),
     raw_source_group: preferredMetadata(records.map((item) => item.raw_source_group)),
     raw_tags: uniqueTextValues(records.flatMap((item) => item.raw_tags), 32, 100).sort((left, right) => left.localeCompare(right)),
     author: preferredText(records.map((item) => item.author)) || null,
@@ -215,15 +323,22 @@ function mergeOccurrenceValues(identity, values) {
 }
 
 function selectMaterialUrl(candidate) {
-  for (const [value, accessState] of [
-    [candidate.primary_url, "direct"],
-    [candidate.original_url, "direct"],
-    [candidate.url, "direct"],
-    [candidate.intermediary_url, "indirect"]
-  ]) {
-    const url = sanitizePublicHttpUrl(value);
-    if (url) return { url, accessState };
+  const primaryUrl = sanitizePublicHttpUrl(candidate.primary_url);
+  if (primaryUrl) return { url: primaryUrl, accessState: "direct" };
+  const originalUrl = sanitizePublicHttpUrl(candidate.original_url);
+  if (originalUrl) return { url: originalUrl, accessState: "direct" };
+
+  const materialUrl = sanitizePublicHttpUrl(candidate.url);
+  const intermediaryUrl = sanitizePublicHttpUrl(candidate.intermediary_url);
+  const materialIsRelay = materialUrl && intermediaryUrl &&
+    canonicalPublicUrlIdentity(materialUrl) === canonicalPublicUrlIdentity(intermediaryUrl);
+  if (materialUrl) {
+    return {
+      url: materialUrl,
+      accessState: materialIsRelay || candidate.access_state === "indirect" ? "indirect" : "direct"
+    };
   }
+  if (intermediaryUrl) return { url: intermediaryUrl, accessState: "indirect" };
   return { url: "", accessState: "unknown" };
 }
 
@@ -373,14 +488,25 @@ function fallbackTitle(value) {
 function inferSourceGroupHint(candidate, source, materialUrl) {
   const explicit = cleanText(candidate.source_group || source.source_group || source.public_source_group, 120);
   if (explicit) return explicit;
-  const category = `${cleanText(source.category, 120)} ${cleanText(candidate.category, 120)}`.toLowerCase();
-  const host = hostnameLabel(materialUrl).toLowerCase();
-  if (/^(?:x|twitter)\.com$/.test(host) || /\b(?:builder|social|twitter|x_updates)\b/.test(category)) return "x_updates";
-  if (/github/.test(host) || /\b(?:github|project|open[_ -]?source)\b/.test(category)) return "github_trending";
-  if (/arxiv|openreview|huggingface|paperswithcode/.test(host) || /\b(?:paper|research|model|huggingface)\b/.test(category)) return "papers_models";
-  if (/hacker|hnrss|reddit|zhihu|weixin|v2ex|lobste/.test(host) || /\bcommunity\b/.test(category)) return "community_discussions";
-  if (/\b(?:official|core_primary|china_models|official_blog)\b/.test(category)) return "official_blogs";
+  const collector = `${cleanText(source.category, 120)} ${cleanText(source.name, 120)} ${cleanText(source.url, 240)}`.toLowerCase();
+  if (/\b(?:builder|social|twitter|x_updates)\b|(?:^|\W)x(?:\W|$)/.test(collector)) return "x_updates";
+  if (/github/.test(collector)) return "github_trending";
+  if (/arxiv|openreview|hugging\s*face|paper|research|model registry/.test(collector)) return "papers_models";
+  if (/hacker|hnrss|reddit|zhihu|weixin|wechat|v2ex|lobste|community/.test(collector)) return "community_discussions";
+  if (/news|newsletter|media|rss|feed|aggregator|search/.test(collector)) return "news_newsletters";
+  if (/official|primary/.test(collector)) return "official_blogs";
+  const category = cleanText(candidate.category, 120).toLowerCase();
+  if (/\b(?:builder|social|twitter|x_updates)\b/.test(category)) return "x_updates";
+  if (/\b(?:github|project|open[_ -]?source)\b/.test(category)) return "github_trending";
+  if (/\b(?:paper|research|model|huggingface)\b/.test(category)) return "papers_models";
+  if (/\bcommunity\b/.test(category)) return "community_discussions";
   if (/\b(?:news|newsletter|media|rss|feed|aggregator|search|hot_blog)\b/.test(category)) return "news_newsletters";
+  if (/\b(?:official|core_primary|china_models|official_blog)\b/.test(category)) return "official_blogs";
+  const host = hostnameLabel(materialUrl).toLowerCase();
+  if (/^(?:x|twitter)\.com$/.test(host)) return "x_updates";
+  if (/github/.test(host)) return "github_trending";
+  if (/arxiv|openreview|huggingface|paperswithcode/.test(host)) return "papers_models";
+  if (/hacker|hnrss|reddit|zhihu|weixin|v2ex|lobste/.test(host)) return "community_discussions";
   return null;
 }
 

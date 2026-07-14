@@ -7,19 +7,20 @@ import {
   summarizeGithubReadme
 } from "./github-readme.js";
 import { loadSourceRegistry } from "./source-registry.js";
+import { sanitizePublicHttpUrl } from "./public-url.js";
 import { loadWeChatArticleInput, WECHAT_ARTICLE_INPUT_SOURCE } from "./wechat-input.js";
 import {
   auditGroupForPlatform,
   isPlatformExemptCategory,
   PLATFORM_EXEMPT_PLATFORMS,
-  PLATFORM_EXEMPT_POLICY,
   platformEntryToCandidate,
   platformFromCandidateCategory,
-  platformSourceRejectReason,
+  platformSourceRejectReason as legacyPlatformSourceAnnotation,
   sectionForPlatformCategory
 } from "./platform-exempt.js";
 import { createOfficialComponentSnapshot } from "./official-component-snapshot.js";
 import { candidatePoolRelativePaths } from "./reports-data-layout.js";
+import { transportCompletenessTags } from "./public-signal-lanes.js";
 
 const GITHUB_BASE_URL = "https://github.com";
 const FETCH_RETRY_NOTES = new WeakMap();
@@ -36,12 +37,15 @@ const DEFAULT_FOLLOW_BUILDERS_FEEDS = {
 };
 const X_SNOWFLAKE_EPOCH_MS = 1288834974657n;
 const TAVILY_SEARCH_URL = "https://api.tavily.com/search";
+const TAVILY_MAX_RESULTS_PER_REQUEST = 20;
 const DEFAULT_SOURCE_CACHE_TTL_DAYS = 7;
 const OPENROUTER_RANKINGS_SOURCE_KIND = "openrouter_rankings_public_playwright";
 const ARTIFICIAL_ANALYSIS_INDEX_SOURCE_KIND = "artificial_analysis_index_public_playwright";
 const SWE_BENCH_PRO_PUBLIC_SOURCE_KIND = "swe_bench_pro_public_playwright";
 const GITHUB_REPORT_MARKDOWN_SOURCE_KIND = "github_report_markdown";
 const HUGGINGFACE_DAILY_PAPERS_API_SOURCE_KIND = "huggingface_daily_papers_api";
+const HUGGINGFACE_HUB_TRENDING_API_SOURCE_KIND = "huggingface_hub_trending_api";
+const DATED_CHANGELOG_SOURCE_KIND = "dated_changelog";
 const DEFAULT_X_BUILDER_SEARCH_TERMS = [
   "Claude Code",
   "coding agents",
@@ -53,6 +57,8 @@ const DEFAULT_X_BUILDER_SEARCH_TERMS = [
 const DEFAULT_SOURCE_WATCHLIST_PATH = path.join("config", "source-watchlist.json");
 const SOURCE_WATCH_USER_AGENT = "ai-daily-cn-static-publisher";
 const DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT = 5;
+const DEFAULT_TRANSPORT_REQUEST_BUDGET = 120;
+const DEFAULT_TRANSPORT_RUNTIME_MS = 180000;
 
 export const DEFAULT_GITHUB_TRENDING_SOURCES = [
   source("GitHub Trending daily", "https://github.com/trending?since=daily", "all", "daily"),
@@ -170,15 +176,13 @@ export const DEFAULT_CONTENT_SOURCES = [
     id: "intermediary-qbitai",
     name: "QbitAI",
     url: "https://www.qbitai.com/feed",
-    category: "intermediary",
-    max_items_per_run: 20
+    category: "intermediary"
   },
   {
     id: "intermediary-sspai",
     name: "SSPAI",
     url: "https://sspai.com/feed",
-    category: "intermediary",
-    max_items_per_run: 20
+    category: "intermediary"
   },
   {
     id: "intermediary-36kr",
@@ -199,8 +203,6 @@ export const DEFAULT_CONTENT_SOURCES = [
     category: "intermediary",
     source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
     latest_report_link_pattern: "years/\\d{4}\\.md#",
-    lookback_days: 14,
-    maxItemsPerRun: 8,
     sourceLevel: "weekly_paper_aggregator"
   },
   {
@@ -209,8 +211,6 @@ export const DEFAULT_CONTENT_SOURCES = [
     url: "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md",
     category: "project",
     source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
-    lookback_days: 30,
-    maxItemsPerRun: 5,
     timeoutMs: 15000,
     sourceLevel: "github_ai_news_directory"
   },
@@ -221,8 +221,6 @@ export const DEFAULT_CONTENT_SOURCES = [
     category: "intermediary",
     source_kind: GITHUB_REPORT_MARKDOWN_SOURCE_KIND,
     latest_report_link_pattern: "#ML-news-Week",
-    lookback_days: 14,
-    maxItemsPerRun: 8,
     timeoutMs: 20000,
     sourceLevel: "weekly_ai_news_aggregator"
   },
@@ -417,8 +415,7 @@ export const DEFAULT_CONTENT_SOURCES = [
     name: "Smol AI News",
     url: "https://news.smol.ai/rss.xml",
     category: "intermediary",
-    sourceLevel: "ai_news_aggregator",
-    lookback_days: 7
+    sourceLevel: "ai_news_aggregator"
   },
   {
     id: "content-interconnects",
@@ -601,9 +598,9 @@ export async function collectGitHubTrending(options = {}) {
   }
 
   const sources = options.sources || DEFAULT_GITHUB_TRENDING_SOURCES;
-  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 50;
   const sourceResults = [];
   const byRepo = new Map();
+  const observations = [];
 
   for (const currentSource of sources) {
     try {
@@ -634,6 +631,7 @@ export async function collectGitHubTrending(options = {}) {
 
       for (const candidate of parsed) {
         const enriched = enrichProjectCandidate(candidate, currentSource, options.reportDate);
+        observations.push(enriched);
         const existing = byRepo.get(candidate.repo);
         if (!existing || shouldPreferGithubTrendingCandidate(enriched, existing)) {
           byRepo.set(candidate.repo, enriched);
@@ -654,14 +652,13 @@ export async function collectGitHubTrending(options = {}) {
       byRepo,
       sourceResults,
       fetchImpl,
-      limit,
       reportDate: options.reportDate
     });
   }
 
   const history = await loadGitHubTrendingHistory(options);
-  const limitedCandidates = prioritizeGithubTrendingCandidatesForLimit([...byRepo.values()], limit);
-  const enrichedCandidates = await enrichGithubTrendingReadmes(limitedCandidates, {
+  const collectedCandidates = observations.length > 0 ? observations : [...byRepo.values()];
+  const enrichedCandidates = await enrichGithubTrendingReadmes(collectedCandidates, {
     fetchImpl,
     disabled: options.readmeEnrichment === false,
     maxCandidates: options.readmeLimit,
@@ -701,6 +698,7 @@ export async function collectSourceWatch(options = {}) {
   }
 
   const watchlist = await loadSourceWatchlist(options, rootDir);
+  const transportRuntime = await createContentTransportRuntime({ ...options, rootDir });
   const targets = [];
   const sources = [];
   const candidates = [];
@@ -714,13 +712,12 @@ export async function collectSourceWatch(options = {}) {
         generatedAt,
         reportDate,
         candidates,
-        options
+        options,
+        transportRuntime
       });
       targets.push(result.target);
       sources.push(result.source);
-      if (result.candidate) {
-        candidates.push(result.candidate);
-      }
+      candidates.push(...(result.candidates || (result.candidate ? [result.candidate] : [])));
       githubAuditSources.push(result.auditSource);
       continue;
     }
@@ -741,6 +738,7 @@ export async function collectSourceWatch(options = {}) {
 
   const fetchedRepos = githubAuditSources.filter((sourceResult) => sourceResult.status === "checked").length;
   const fetchedSites = siteAuditSources.filter((sourceResult) => sourceResult.status === "checked").length;
+  await persistContentTransportRuntime(transportRuntime, generatedAt);
   return {
     schema_version: 1,
     kind: "source_watch_candidates",
@@ -951,9 +949,10 @@ async function collectSourceWatchGithubRepo(target, context) {
   };
   const endpointStatus = {};
   const rateLimit = {};
+  const githubHeaders = sourceWatchGithubHeaders(context.options);
   const repoResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.repo, {
-    headers: sourceWatchGithubHeaders(context.options)
-  });
+    headers: githubHeaders
+  }, context.transportRuntime?.budget);
   endpointStatus.repo = sourceWatchEndpointStatus(repoResult);
   sourceWatchMergeRateLimit(rateLimit, repoResult.rate_limit);
 
@@ -962,34 +961,61 @@ async function collectSourceWatchGithubRepo(target, context) {
   let commits = [];
   let readme = { status: "not_fetched", excerpt: "" };
   const incompleteMaterialEndpoints = [];
+  const transportLimitations = new Set();
+  const continuationUrls = new Set();
+  let transportPagesFetched = 0;
   if (repoResult.ok) {
-    const releaseResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.releases, {
-      headers: sourceWatchGithubHeaders(context.options)
+    const releaseResult = await sourceWatchFetchGithubPages({
+      fetchImpl: context.fetchImpl,
+      url: endpointUrls.releases,
+      init: { headers: githubHeaders },
+      runtime: context.transportRuntime,
+      laneKey: `source-watch:github:${target.id}:releases`,
+      generatedAt: context.generatedAt
     });
     endpointStatus.releases = sourceWatchEndpointStatus(releaseResult);
     sourceWatchMergeRateLimit(rateLimit, releaseResult.rate_limit);
-    releases = sourceWatchReleases(releaseResult.payload, endpointLimit);
-    if (!releaseResult.ok) incompleteMaterialEndpoints.push("releases");
+    releases = sourceWatchReleases(releaseResult.payload);
+    transportPagesFetched += releaseResult.pages_fetched || 0;
+    if (releaseResult.transport_limitation) transportLimitations.add(releaseResult.transport_limitation);
+    if (releaseResult.continuation_url) continuationUrls.add(releaseResult.continuation_url);
+    if (!releaseResult.ok || releaseResult.transport_status === "degraded") incompleteMaterialEndpoints.push("releases");
 
-    const tagResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.tags, {
-      headers: sourceWatchGithubHeaders(context.options)
+    const tagResult = await sourceWatchFetchGithubPages({
+      fetchImpl: context.fetchImpl,
+      url: endpointUrls.tags,
+      init: { headers: githubHeaders },
+      runtime: context.transportRuntime,
+      laneKey: `source-watch:github:${target.id}:tags`,
+      generatedAt: context.generatedAt
     });
     endpointStatus.tags = sourceWatchEndpointStatus(tagResult);
     sourceWatchMergeRateLimit(rateLimit, tagResult.rate_limit);
-    tags = sourceWatchTags(tagResult.payload, endpointLimit);
-    if (!tagResult.ok) incompleteMaterialEndpoints.push("tags");
+    tags = sourceWatchTags(tagResult.payload);
+    transportPagesFetched += tagResult.pages_fetched || 0;
+    if (tagResult.transport_limitation) transportLimitations.add(tagResult.transport_limitation);
+    if (tagResult.continuation_url) continuationUrls.add(tagResult.continuation_url);
+    if (!tagResult.ok || tagResult.transport_status === "degraded") incompleteMaterialEndpoints.push("tags");
 
-    const commitResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.commits, {
-      headers: sourceWatchGithubHeaders(context.options)
+    const commitResult = await sourceWatchFetchGithubPages({
+      fetchImpl: context.fetchImpl,
+      url: endpointUrls.commits,
+      init: { headers: githubHeaders },
+      runtime: context.transportRuntime,
+      laneKey: `source-watch:github:${target.id}:commits`,
+      generatedAt: context.generatedAt
     });
     endpointStatus.commits = sourceWatchEndpointStatus(commitResult);
     sourceWatchMergeRateLimit(rateLimit, commitResult.rate_limit);
-    commits = sourceWatchCommits(commitResult.payload, endpointLimit);
-    if (!commitResult.ok) incompleteMaterialEndpoints.push("commits");
+    commits = sourceWatchCommits(commitResult.payload);
+    transportPagesFetched += commitResult.pages_fetched || 0;
+    if (commitResult.transport_limitation) transportLimitations.add(commitResult.transport_limitation);
+    if (commitResult.continuation_url) continuationUrls.add(commitResult.continuation_url);
+    if (!commitResult.ok || commitResult.transport_status === "degraded") incompleteMaterialEndpoints.push("commits");
 
     const readmeResult = await sourceWatchFetchJson(context.fetchImpl, endpointUrls.readme, {
-      headers: sourceWatchGithubHeaders(context.options)
-    });
+      headers: githubHeaders
+    }, context.transportRuntime?.budget);
     endpointStatus.readme = sourceWatchEndpointStatus(readmeResult);
     sourceWatchMergeRateLimit(rateLimit, readmeResult.rate_limit);
     readme = sourceWatchReadme(readmeResult);
@@ -1033,22 +1059,34 @@ async function collectSourceWatchGithubRepo(target, context) {
     ...sourceWatchContractFields(target),
     verification_status: materialSnapshotComplete ? "primary_confirmed" : "unverified"
   };
-  const candidate = materialSnapshotComplete ? sourceWatchGithubCandidate(target, metadata, {
+  const snapshotCandidate = repoResult.ok ? sourceWatchGithubCandidate(target, metadata, {
     reportDate: context.reportDate,
     candidates: context.candidates,
     releases,
     tags,
     commits,
-    readme
+    readme,
+    materialSnapshotComplete
   }) : null;
+  const eventCandidates = repoResult.ok ? sourceWatchGithubEventCandidates(target, metadata, {
+    reportDate: context.reportDate,
+    candidates: [...context.candidates, ...(snapshotCandidate ? [snapshotCandidate] : [])],
+    releases,
+    tags,
+    commits,
+    readme,
+    materialSnapshotComplete
+  }) : [];
+  const githubCandidates = [...(snapshotCandidate ? [snapshotCandidate] : []), ...eventCandidates];
   return {
     target: targetResult,
     source: sourceItem,
-    candidate,
+    candidate: snapshotCandidate,
+    candidates: githubCandidates,
     auditSource: auditSource(target.name, target.url, status, notes, {
       id: target.id,
       target_id: target.id,
-      parsed_count: candidate ? 1 : 0,
+      parsed_count: githubCandidates.length,
       repo: target.repo,
       ...sourceWatchContractFields(target),
       endpoint_status: endpointStatus,
@@ -1059,7 +1097,11 @@ async function collectSourceWatchGithubRepo(target, context) {
       releases_count: releases.length,
       tags_count: tags.length,
       recent_commits_count: commits.length,
-      readme_fetch_status: readme.status
+      readme_fetch_status: readme.status,
+      transport_status: transportLimitations.size > 0 ? "degraded" : "complete",
+      pages_fetched: transportPagesFetched,
+      ...(transportLimitations.size ? { transport_limitation: [...transportLimitations].join(",") } : {}),
+      ...(continuationUrls.size ? { continuation_urls: [...continuationUrls] } : {})
     })
   };
 }
@@ -1135,6 +1177,7 @@ function sourceWatchGithubCandidate(target, metadata, details) {
   const sourceWatch = sourceWatchGithubMetadata(target, metadata, details, event);
   return {
     id: uniqueCandidateId(details.candidates, `github-watch-${target.repo}`),
+    observation_id: stableRowFingerprint("github-watch-repository", [target.id, target.repo, details.reportDate]),
     source_id: target.id,
     category: "project",
     title: metadata.full_name || target.repo,
@@ -1159,13 +1202,89 @@ function sourceWatchGithubCandidate(target, metadata, details) {
       `readme=${details.readme.status}`
     ].filter(Boolean).join("; "),
     tags: metadata.topics || [],
-    verification_status: "primary_confirmed",
+    verification_status: details.materialSnapshotComplete === false ? "unverified" : "primary_confirmed",
     source_level: "github",
     primary_url: metadata.html_url || target.url,
     verification_sources: [metadata.html_url || target.url],
     editorial_category: "open_source",
     trend: "same"
   };
+}
+
+function sourceWatchGithubEventCandidates(target, metadata, details) {
+  const repoUrl = metadata.html_url || target.url;
+  const usedCandidates = [...details.candidates];
+  const candidates = [];
+  const add = (kind, item, fields) => {
+    const url = sanitizePublicHttpUrl(fields.url) || repoUrl;
+    const observationId = sourceWatchGithubEventObservationId(target, kind, item);
+    const candidate = {
+      id: uniqueCandidateId([...usedCandidates, ...candidates], `github-watch-${target.repo}-${kind}-${item.native_id || item.sha || item.tag_name || item.name || observationId}`),
+      observation_id: observationId,
+      source_id: target.id,
+      category: "project",
+      title: fields.title,
+      name: metadata.full_name || target.repo,
+      repo: target.repo,
+      url,
+      source: target.name,
+      event_date: dateOnly(fields.date) || details.reportDate,
+      status: "excluded",
+      signal: "github_watch",
+      ...sourceWatchContractFields(target),
+      source_watch: {
+        ...sourceWatchGithubMetadata(target, metadata, details, { url, date: fields.date }),
+        event_url: url,
+        snapshot_fingerprint: sourceWatchFingerprint({ repo: target.repo.toLowerCase(), kind, observation_id: observationId })
+      },
+      description: fields.description || metadata.description || "",
+      evidence: fields.evidence,
+      notes: `event_kind=${kind}; listener_event=true`,
+      verification_status: details.materialSnapshotComplete === false ? "unverified" : "primary_confirmed",
+      source_level: "github",
+      primary_url: url,
+      verification_sources: [url],
+      editorial_category: "open_source",
+      trend: "same"
+    };
+    candidates.push(candidate);
+  };
+
+  for (const release of details.releases) {
+    add("release", release, {
+      title: `${metadata.full_name || target.repo} release ${release.name || release.tag_name || "(untitled)"}`,
+      url: release.html_url || `${repoUrl.replace(/\/$/, "")}/releases`,
+      date: release.published_at,
+      evidence: `${target.repo} published release ${release.tag_name || release.name || "(untitled)"}${release.published_at ? ` at ${release.published_at}` : ""}.`,
+      description: release.name || release.tag_name || ""
+    });
+  }
+  for (const tag of details.tags) {
+    add("tag", tag, {
+      title: `${metadata.full_name || target.repo} tag ${tag.name || "(untitled)"}`,
+      url: `${repoUrl.replace(/\/$/, "")}/tree/${encodeURIComponent(tag.name || tag.commit_sha || "")}`,
+      date: "",
+      evidence: `${target.repo} exposed tag ${tag.name || "(untitled)"}${tag.commit_sha ? ` at ${tag.commit_sha.slice(0, 12)}` : ""}.`,
+      description: tag.name || ""
+    });
+  }
+  for (const commit of details.commits) {
+    add("commit", commit, {
+      title: `${metadata.full_name || target.repo} commit ${commit.message || commit.sha.slice(0, 12) || "(untitled)"}`,
+      url: commit.html_url || `${repoUrl.replace(/\/$/, "")}/commit/${commit.sha}`,
+      date: commit.author_date,
+      evidence: `${target.repo} commit ${commit.sha.slice(0, 12) || "unknown"}${commit.author_date ? ` was authored at ${commit.author_date}` : ""}.`,
+      description: commit.message || ""
+    });
+  }
+  return candidates;
+}
+
+function sourceWatchGithubEventObservationId(target, kind, item) {
+  const nativeId = firstString(item?.native_id, item?.sha, item?.tag_name, item?.name, item?.html_url);
+  return nativeId
+    ? stableRowFingerprint("github-watch-event", [target.id, target.repo, kind, "native", nativeId])
+    : stableRowFingerprint("github-watch-event-row", [target.id, target.repo, kind, JSON.stringify(item)]);
 }
 
 function sourceWatchSiteCandidate(target, site, details) {
@@ -1327,22 +1446,126 @@ function sourceWatchSiteMetadata(target, site, eventUrl) {
   };
 }
 
-async function sourceWatchFetchJson(fetchImpl, url, init) {
+async function sourceWatchFetchJson(fetchImpl, url, init, budget) {
+  if (budget && !budget.reserve()) {
+    const limitation = budget.exhaustionReason() || "runtime_request_budget_exhausted";
+    return { ok: false, status: 0, error: limitation, transport_status: "degraded", transport_limitation: limitation };
+  }
   try {
     const response = await fetchImpl(url, init);
     const rateLimit = sourceWatchRateLimit(response);
     if (!response.ok) {
-      return { ok: false, status: response.status || 0, rate_limit: rateLimit, error: withRetryNote(`HTTP ${response.status || 0}`, response) };
+      return { ok: false, status: response.status || 0, response, rate_limit: rateLimit, error: withRetryNote(`HTTP ${response.status || 0}`, response) };
     }
     return {
       ok: true,
       status: response.status || 200,
+      response,
       rate_limit: rateLimit,
       payload: await readJsonResponse(response)
     };
   } catch (error) {
     return { ok: false, status: 0, error: withRetryNote(formatDiscoveryErrorNote(error), error) };
   }
+}
+
+async function sourceWatchFetchGithubPages({ fetchImpl, url, init, runtime, laneKey, generatedAt }) {
+  const rows = [];
+  const rateLimit = {};
+  const seenRequests = new Set();
+  let pagesFetched = 0;
+  let status = 0;
+  let limitation = "";
+  let error = "";
+
+  const first = await sourceWatchFetchJson(fetchImpl, url, init, runtime?.budget);
+  status = first.status || 0;
+  sourceWatchMergeRateLimit(rateLimit, first.rate_limit);
+  if (!first.ok) {
+    return {
+      ...first,
+      payload: [],
+      pages_fetched: 0,
+      transport_status: "degraded",
+      transport_limitation: first.transport_limitation || first.error || "first_page_fetch_failed"
+    };
+  }
+  rows.push(...(Array.isArray(first.payload) ? first.payload : []));
+  pagesFetched += 1;
+  seenRequests.add(sourceWatchPaginationRequestKey(url));
+
+  const currentNext = nextLinkUrl(first.response, url, "https://api.github.com");
+  if (currentNext.error) limitation = currentNext.error;
+  const savedState = sanitizeSharedPaginationState(runtime?.checkpoint?.lanes?.[laneKey]?.state);
+  let nextUrl = savedState?.nextUrl || currentNext.url;
+  let replayCurrent = Boolean(savedState?.nextUrl && currentNext.url && savedState.nextUrl !== currentNext.url);
+
+  while (nextUrl && runtime?.budget?.canReserve()) {
+    const requestFingerprint = sourceWatchPaginationRequestKey(nextUrl);
+    if (!requestFingerprint || seenRequests.has(requestFingerprint)) {
+      limitation = "pagination_request_repeated";
+      nextUrl = "";
+      break;
+    }
+    seenRequests.add(requestFingerprint);
+    const page = await sourceWatchFetchJson(fetchImpl, nextUrl, init, runtime.budget);
+    status = page.status || status;
+    sourceWatchMergeRateLimit(rateLimit, page.rate_limit);
+    if (!page.ok) {
+      limitation = page.transport_limitation || "pagination_fetch_failed";
+      error = page.error || limitation;
+      break;
+    }
+    rows.push(...(Array.isArray(page.payload) ? page.payload : []));
+    pagesFetched += 1;
+    const following = nextLinkUrl(page.response, nextUrl, "https://api.github.com");
+    if (following.error) {
+      limitation = following.error;
+      nextUrl = "";
+    } else if (following.url) {
+      nextUrl = following.url;
+    } else if (replayCurrent) {
+      nextUrl = currentNext.url;
+      replayCurrent = false;
+    } else {
+      nextUrl = "";
+    }
+    if (nextUrl) {
+      runtime.checkpoint.lanes[laneKey] = {
+        provider: "github_source_watch",
+        state: { nextUrl },
+        updated_at: generatedAt
+      };
+      await persistContentTransportRuntime(runtime, generatedAt);
+    }
+  }
+
+  if (nextUrl) {
+    limitation ||= runtime?.budget?.exhaustionReason() || "checkpoint_backlog_pending";
+    runtime.checkpoint.lanes[laneKey] = {
+      provider: "github_source_watch",
+      state: { nextUrl },
+      updated_at: generatedAt
+    };
+  } else {
+    delete runtime.checkpoint.lanes[laneKey];
+  }
+  return {
+    ok: true,
+    status,
+    payload: rows,
+    rate_limit: rateLimit,
+    pages_fetched: pagesFetched,
+    transport_status: limitation ? "degraded" : "complete",
+    ...(limitation ? { transport_limitation: limitation } : {}),
+    ...(nextUrl ? { continuation_url: nextUrl } : {}),
+    ...(error ? { error } : {})
+  };
+}
+
+function sourceWatchPaginationRequestKey(value) {
+  const safe = sanitizePublicHttpUrl(value);
+  return safe ? createHash("sha256").update(safe).digest("hex") : "";
 }
 
 async function sourceWatchFetchText(fetchImpl, url, init) {
@@ -1372,7 +1595,7 @@ function sourceWatchGithubHeaders(options = {}) {
 
 function sourceWatchEndpointLimit(options = {}) {
   const value = Number.parseInt(options.endpointLimit || options["endpoint-limit"] || DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT, 10);
-  return Number.isInteger(value) && value > 0 ? Math.min(value, 20) : DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT;
+  return Number.isInteger(value) && value > 0 ? Math.min(value, 100) : DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT;
 }
 
 function sourceWatchEndpointStatus(result = {}) {
@@ -1431,8 +1654,9 @@ function sourceWatchRepoMetadata(payload = {}, target = {}) {
   };
 }
 
-function sourceWatchReleases(payload, limit = DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT) {
-  return Array.isArray(payload) ? payload.slice(0, limit).map((release) => ({
+function sourceWatchReleases(payload) {
+  return Array.isArray(payload) ? payload.map((release) => ({
+    native_id: firstString(release.id, release.node_id, release.tag_name),
     tag_name: release.tag_name || "",
     name: release.name || release.tag_name || "",
     html_url: release.html_url || "",
@@ -1441,15 +1665,17 @@ function sourceWatchReleases(payload, limit = DEFAULT_SOURCE_WATCH_ENDPOINT_LIMI
   })) : [];
 }
 
-function sourceWatchTags(payload, limit = DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT) {
-  return Array.isArray(payload) ? payload.slice(0, limit).map((tag) => ({
+function sourceWatchTags(payload) {
+  return Array.isArray(payload) ? payload.map((tag) => ({
+    native_id: firstString(tag.node_id, tag.name, tag.commit?.sha),
     name: tag.name || "",
     commit_sha: tag.commit?.sha || ""
   })) : [];
 }
 
-function sourceWatchCommits(payload, limit = DEFAULT_SOURCE_WATCH_ENDPOINT_LIMIT) {
-  return Array.isArray(payload) ? payload.slice(0, limit).map((commit) => ({
+function sourceWatchCommits(payload) {
+  return Array.isArray(payload) ? payload.map((commit) => ({
+    native_id: firstString(commit.node_id, commit.sha),
     sha: commit.sha || "",
     html_url: commit.html_url || "",
     message: firstLine(commit.commit?.message || ""),
@@ -1774,33 +2000,39 @@ export async function collectHuggingFaceTrending(options = {}) {
   const reportDate = requireReportDate(options.reportDate);
   const generatedAt = options.generatedAt || new Date().toISOString();
   const sourceItem = normalizeGenericSource(options.source || DEFAULT_HUGGINGFACE_TRENDING_SOURCE, "huggingface-trending");
-  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
   const sourceResults = [];
   const candidateSources = [toCandidateSource(sourceItem, "project", generatedAt, "blocked", "")];
   const candidates = [];
+  const requestUrl = withTransportPageSize(sourceItem.url, options.transportPageSize);
 
   try {
-    const response = await fetchImpl(sourceItem.url, {
+    const transport = await fetchHuggingFacePages({
+      fetchImpl,
+      url: requestUrl,
+      pageSize: options.transportPageSize,
+      requestBudget: options.transportRequestBudget,
+      init: {
       headers: {
         accept: "application/json,text/html,*/*",
         "user-agent": "ai-daily-cn-static-publisher"
       },
       ...timeoutInit(sourceItem.timeoutMs || sourceItem.timeout_ms || 15000)
+      }
     });
-    if (!response.ok) {
-      const notes = withRetryNote(`HTTP ${response.status}`, response);
+    const response = transport.response;
+    if (!transport.ok) {
+      const notes = withRetryNote(`HTTP ${response?.status || 0}`, response);
       markSource(candidateSources[0], "blocked", notes);
-      sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", notes));
+      sourceResults.push(auditSource(sourceItem.name, sourceItem.url, "blocked", notes, huggingFaceTransportAudit(transport)));
       return huggingFaceTrendingResult(sourceResults, candidateSources, candidates);
     }
 
-    const text = await response.text();
-    const entries = parseHuggingFaceTrendingEntries(text, sourceItem)
-      .filter((entry) => entry.repo && entry.url)
-      .slice(0, limit);
+    const entries = parseHuggingFaceTrendingEntries(transport.text, sourceItem)
+      .filter((entry) => entry.repo && entry.url);
     for (const [index, entry] of entries.entries()) {
       candidates.push({
         id: uniqueCandidateId(candidates, `${sourceItem.id}-${entry.repo}`),
+        observation_id: `huggingface:model:${entry.repo}`,
         source_id: sourceItem.id,
         category: "huggingface_trending",
         title: entry.repo,
@@ -1821,9 +2053,15 @@ export async function collectHuggingFaceTrending(options = {}) {
       });
     }
     const status = entries.length > 0 ? "checked" : "no_signal";
-    const notes = withRetryNote(`${entries.length} ranked models parsed`, response);
+    const notes = withRetryNote(
+      `${entries.length} ranked models parsed; transport_status=${transport.transport_status}; pages_fetched=${transport.pages_fetched}${transport.transport_limitation ? `; transport_limitation=${transport.transport_limitation}` : ""}${transport.continuation_url ? `; continuation_url=${sanitizeNoteValue(transport.continuation_url)}` : ""}`,
+      response
+    );
     markSource(candidateSources[0], status, notes);
-    sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes, { parsed_count: entries.length }));
+    sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes, {
+      parsed_count: entries.length,
+      ...huggingFaceTransportAudit(transport)
+    }));
   } catch (error) {
     const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
     markSource(candidateSources[0], "blocked", notes);
@@ -1831,6 +2069,449 @@ export async function collectHuggingFaceTrending(options = {}) {
   }
 
   return huggingFaceTrendingResult(sourceResults, candidateSources, candidates);
+}
+
+function withTransportPageSize(value, pageSize) {
+  const size = Number.parseInt(pageSize, 10);
+  if (!Number.isInteger(size) || size <= 0) return value;
+  try {
+    const url = new URL(value);
+    url.searchParams.set("limit", String(size));
+    return url.toString();
+  } catch {
+    return value;
+  }
+}
+
+async function fetchHuggingFacePages({ fetchImpl, url, init, pageSize, requestBudget }) {
+  let nextUrl = String(url || "");
+  let response = null;
+  let pagesFetched = 0;
+  const rows = [];
+  const seenUrls = new Set();
+  const seenPages = new Set();
+  const allowedOrigin = safeUrlOrigin(nextUrl);
+  const maxRequests = positiveInteger(requestBudget, 1000);
+
+  while (nextUrl) {
+    if (pagesFetched >= maxRequests) {
+      return huggingFacePageResult({
+        response,
+        rows,
+        pagesFetched,
+        transportLimitation: "runtime_request_budget_exhausted",
+        continuationUrl: nextUrl
+      });
+    }
+    if (seenUrls.has(nextUrl)) {
+      return huggingFacePageResult({ response, rows, pagesFetched, transportLimitation: "pagination_url_repeated" });
+    }
+    seenUrls.add(nextUrl);
+    response = await fetchImpl(nextUrl, init);
+    if (!response.ok) {
+      if (pagesFetched === 0) {
+        return {
+          ok: false,
+          response,
+          text: "",
+          pages_fetched: 0,
+          transport_status: "degraded",
+          transport_limitation: `http_${response.status}`
+        };
+      }
+      return huggingFacePageResult({ response, rows, pagesFetched, transportLimitation: `pagination_http_${response.status}` });
+    }
+
+    const text = await response.text();
+    const payload = parseJsonOrNull(text);
+    if (payload === null) {
+      return {
+        ok: true,
+        response,
+        text,
+        pages_fetched: 1,
+        transport_status: "degraded",
+        transport_limitation: "html_surface_has_no_reliable_pagination"
+      };
+    }
+    const pageRows = Array.isArray(payload)
+      ? payload
+      : arrayFromPossibleKeys(payload, ["models", "spaces", "datasets", "items", "data", "results"]);
+    const pageFingerprint = createHash("sha256").update(JSON.stringify(pageRows)).digest("hex");
+    if (seenPages.has(pageFingerprint)) {
+      return huggingFacePageResult({ response, rows, pagesFetched, transportLimitation: "pagination_page_repeated" });
+    }
+    seenPages.add(pageFingerprint);
+    rows.push(...pageRows);
+    pagesFetched += 1;
+
+    const nextFromHeader = nextLinkUrl(response, nextUrl, allowedOrigin);
+    if (nextFromHeader.error) {
+      return huggingFacePageResult({ response, rows, pagesFetched, transportLimitation: nextFromHeader.error });
+    }
+    if (nextFromHeader.url) {
+      nextUrl = nextFromHeader.url;
+      continue;
+    }
+
+    const requestPageSize = positiveInteger(pageSize, transportPageSizeFromUrl(nextUrl));
+    if (pageRows.length < requestPageSize) {
+      return huggingFacePageResult({ response, rows, pagesFetched });
+    }
+    return huggingFacePageResult({
+      response,
+      rows,
+      pagesFetched,
+      transportLimitation: "upstream_pagination_link_missing_on_full_page"
+    });
+  }
+
+  return huggingFacePageResult({ response, rows, pagesFetched });
+}
+
+function huggingFacePageResult({ response, rows, pagesFetched, transportLimitation = "", continuationUrl = "" }) {
+  return {
+    ok: true,
+    response,
+    text: JSON.stringify(rows),
+    pages_fetched: pagesFetched,
+    transport_status: transportLimitation ? "degraded" : "complete",
+    ...(transportLimitation ? { transport_limitation: transportLimitation } : {}),
+    ...(continuationUrl ? { continuation_url: continuationUrl } : {})
+  };
+}
+
+function huggingFaceTransportAudit(transport = {}) {
+  return {
+    transport_status: transport.transport_status || "degraded",
+    pages_fetched: Number(transport.pages_fetched || 0),
+    ...(transport.transport_limitation ? { transport_limitation: transport.transport_limitation } : {}),
+    ...(transport.continuation_url ? { continuation_url: transport.continuation_url } : {})
+  };
+}
+
+function transportPageSizeFromUrl(value) {
+  try {
+    return positiveInteger(new URL(value).searchParams.get("limit"), 1);
+  } catch {
+    return 1;
+  }
+}
+
+function nextLinkUrl(response, baseUrl, allowedOrigin) {
+  const link = response?.headers?.get?.("link") || "";
+  for (const part of String(link).split(",")) {
+    const match = part.match(/<([^>]+)>\s*;\s*rel=(?:"next"|next)/i);
+    if (!match) continue;
+    try {
+      const next = new URL(match[1], baseUrl).toString();
+      const sanitized = sanitizePublicHttpUrl(next);
+      if (!sanitized || new URL(sanitized).origin !== allowedOrigin) {
+        return { url: "", error: "pagination_next_url_rejected" };
+      }
+      return { url: sanitized, error: "" };
+    } catch {
+      return { url: "", error: "pagination_next_url_invalid" };
+    }
+  }
+  return { url: "", error: "" };
+}
+
+function isArxivApiSourceUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.hostname.toLowerCase() === "export.arxiv.org" && url.pathname === "/api/query";
+  } catch {
+    return false;
+  }
+}
+
+async function createContentTransportRuntime(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const statePath = options.transportStatePath ? path.resolve(rootDir, options.transportStatePath) : "";
+  return {
+    statePath,
+    checkpoint: await loadSharedTransportCheckpoint(statePath),
+    budget: createContentTransportBudget(options.transportRequestBudget, options.transportRuntimeMs),
+    arxivQueue: Promise.resolve(),
+    arxivLastRequestAt: 0,
+    arxivThrottleMs: Number.isFinite(Number(options.providerThrottleMs)) ? Math.max(0, Number(options.providerThrottleMs)) : 3000
+  };
+}
+
+async function persistContentTransportRuntime(runtime, generatedAt) {
+  if (!runtime?.statePath) return;
+  await writeSharedTransportCheckpoint(runtime.statePath, runtime.checkpoint, generatedAt);
+}
+
+async function fetchArxivContentPages({ fetchImpl, sourceInfo, url, init, runtime }) {
+  const laneKey = `content:arxiv:${String(sourceInfo.id || sourceInfo.name || url).replace(/[^A-Za-z0-9._:-]+/g, "_")}`;
+  const firstState = arxivStateFromUrl(url);
+  const pageSize = positiveInteger(firstState.pageSize, 20);
+  const blocks = [];
+  const seenRequests = new Set();
+  const seenPages = new Set();
+  let response = null;
+  let pagesFetched = 0;
+  let limitation = "";
+
+  const firstPage = await fetchArxivContentPage({ fetchImpl, url: arxivUrlForState(url, firstState.start, pageSize), init, runtime });
+  response = firstPage.response;
+  if (!firstPage.ok) {
+    return {
+      ok: false,
+      response: response || transportResponseStub(false, 0),
+      text: "",
+      pages_fetched: 0,
+      transport_status: "degraded",
+      transport_limitation: firstPage.limitation || "first_page_fetch_failed"
+    };
+  }
+  const firstParsed = parseArxivTransportPage(firstPage.text, firstState.start, pageSize);
+  blocks.push(...firstParsed.blocks);
+  pagesFetched += 1;
+  seenRequests.add(arxivRequestFingerprint(firstPage.requestUrl));
+  if (firstParsed.blocks.length > 0) seenPages.add(firstParsed.fingerprint);
+
+  const savedState = sanitizeContentPaginationState(runtime.checkpoint.lanes?.[laneKey]?.state);
+  let state = savedState || firstParsed.nextState;
+  const currentNextState = firstParsed.nextState;
+  let usedCheckpoint = Boolean(savedState && currentNextState && Number(savedState.start) !== Number(currentNextState.start));
+
+  while (state && runtime.budget.canReserve()) {
+    const requestUrl = arxivUrlForState(url, state.start, pageSize);
+    const requestFingerprint = arxivRequestFingerprint(requestUrl);
+    if (seenRequests.has(requestFingerprint)) {
+      limitation = "pagination_request_repeated";
+      state = null;
+      break;
+    }
+    seenRequests.add(requestFingerprint);
+    const page = await fetchArxivContentPage({ fetchImpl, url: requestUrl, init, runtime });
+    response = page.response || response;
+    if (!page.ok) {
+      limitation = page.limitation || "pagination_fetch_failed";
+      break;
+    }
+    const parsed = parseArxivTransportPage(page.text, state.start, pageSize);
+    if (parsed.blocks.length > 0 && seenPages.has(parsed.fingerprint)) {
+      limitation = "pagination_page_repeated";
+      state = null;
+      break;
+    }
+    if (parsed.blocks.length > 0) seenPages.add(parsed.fingerprint);
+    blocks.push(...parsed.blocks);
+    pagesFetched += 1;
+    if (parsed.nextState) {
+      state = parsed.nextState;
+      runtime.checkpoint.lanes[laneKey] = contentCheckpointLane(sourceInfo, state);
+      continue;
+    }
+    if (usedCheckpoint && currentNextState && Number(currentNextState.start) !== Number(state.start)) {
+      state = currentNextState;
+      usedCheckpoint = false;
+      runtime.checkpoint.lanes[laneKey] = contentCheckpointLane(sourceInfo, state);
+      continue;
+    }
+    state = null;
+  }
+
+  if (state) {
+    limitation ||= runtime.budget.exhaustionReason() || "checkpoint_backlog_pending";
+    runtime.checkpoint.lanes[laneKey] = contentCheckpointLane(sourceInfo, state);
+  } else {
+    delete runtime.checkpoint.lanes[laneKey];
+  }
+  const continuationUrl = state ? arxivUrlForState(url, state.start, pageSize) : "";
+  return {
+    ok: true,
+    response: response || transportResponseStub(true, 200),
+    text: `<?xml version="1.0"?><feed>${blocks.join("")}</feed>`,
+    pages_fetched: pagesFetched,
+    transport_status: limitation ? "degraded" : "complete",
+    ...(limitation ? { transport_limitation: limitation } : {}),
+    ...(continuationUrl ? { continuation_url: continuationUrl } : {})
+  };
+}
+
+async function fetchArxivContentPage({ fetchImpl, url, init, runtime }) {
+  const task = runtime.arxivQueue.then(async () => {
+    const remaining = runtime.arxivThrottleMs - (Date.now() - runtime.arxivLastRequestAt);
+    if (runtime.arxivLastRequestAt && remaining > 0) await sleep(remaining);
+    if (!runtime.budget.reserve()) {
+      return { ok: false, response: transportResponseStub(false, 0), text: "", limitation: runtime.budget.exhaustionReason(), requestUrl: url };
+    }
+    runtime.arxivLastRequestAt = Date.now();
+    try {
+      const response = await fetchImpl(url, init);
+      return {
+        ok: Boolean(response?.ok),
+        response,
+        text: response?.ok ? await response.text() : "",
+        limitation: response?.ok ? "" : `http_${response?.status || 0}`,
+        requestUrl: url
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        response: transportResponseStub(false, 0),
+        text: "",
+        limitation: `fetch_failed:${sanitizeNoteValue(formatDiscoveryErrorNote(error))}`,
+        requestUrl: url
+      };
+    }
+  });
+  runtime.arxivQueue = task.then(() => undefined, () => undefined);
+  return task;
+}
+
+function parseArxivTransportPage(text, start, pageSize) {
+  const blocks = matchXmlBlocks(text, "entry");
+  const totalRaw = xmlText(text, "totalResults");
+  const total = totalRaw ? Number(totalRaw) : Number.NaN;
+  const nextStart = Number(start || 0) + blocks.length;
+  const exhausted = blocks.length === 0 || (Number.isFinite(total) && nextStart >= total) || (!Number.isFinite(total) && blocks.length < pageSize);
+  return {
+    blocks,
+    fingerprint: createHash("sha256").update(blocks.join("\n")).digest("hex"),
+    nextState: exhausted ? null : { start: nextStart }
+  };
+}
+
+function arxivStateFromUrl(value) {
+  try {
+    const url = new URL(value);
+    return {
+      start: Math.max(0, Number.parseInt(url.searchParams.get("start") || "0", 10) || 0),
+      pageSize: positiveInteger(url.searchParams.get("max_results"), 20)
+    };
+  } catch {
+    return { start: 0, pageSize: 20 };
+  }
+}
+
+function arxivUrlForState(value, start, pageSize) {
+  const url = new URL(value);
+  url.protocol = "https:";
+  url.searchParams.set("start", String(Math.max(0, Number(start || 0))));
+  url.searchParams.set("max_results", String(pageSize));
+  return url.toString();
+}
+
+function arxivRequestFingerprint(value) {
+  return createHash("sha256").update(String(value || "")).digest("hex");
+}
+
+function contentCheckpointLane(sourceInfo, state) {
+  return {
+    provider: "arxiv_content",
+    source_id: String(sourceInfo.id || ""),
+    state: sanitizeContentPaginationState(state),
+    updated_at: new Date().toISOString()
+  };
+}
+
+function sanitizeContentPaginationState(state) {
+  if (!state || !Number.isInteger(Number(state.start)) || Number(state.start) < 0) return null;
+  return { start: Number(state.start) };
+}
+
+function createContentTransportBudget(requestBudget, runtimeMs) {
+  const maxRequests = positiveInteger(requestBudget, DEFAULT_TRANSPORT_REQUEST_BUDGET);
+  const maxRuntimeMs = positiveInteger(runtimeMs, DEFAULT_TRANSPORT_RUNTIME_MS);
+  const startedAt = Date.now();
+  let used = 0;
+  return {
+    canReserve: () => used < maxRequests && Date.now() - startedAt < maxRuntimeMs,
+    reserve() {
+      if (!this.canReserve()) return false;
+      used += 1;
+      return true;
+    },
+    exhaustionReason() {
+      if (used >= maxRequests) return "runtime_request_budget_exhausted";
+      if (Date.now() - startedAt >= maxRuntimeMs) return "runtime_time_budget_exhausted";
+      return "";
+    }
+  };
+}
+
+export async function loadSharedTransportCheckpoint(filePath) {
+  if (!filePath) return { schema_version: 1, lanes: {} };
+  try {
+    const payload = JSON.parse(await fs.readFile(filePath, "utf8"));
+    return { schema_version: 1, lanes: payload?.lanes && typeof payload.lanes === "object" ? payload.lanes : {} };
+  } catch {
+    return { schema_version: 1, lanes: {} };
+  }
+}
+
+export async function writeSharedTransportCheckpoint(filePath, checkpoint, generatedAt) {
+  const lanes = {};
+  for (const [key, lane] of Object.entries(checkpoint?.lanes || {})) {
+    const state = sanitizeSharedPaginationState(lane?.state);
+    if (!state) continue;
+    lanes[key] = {
+      provider: String(lane.provider || ""),
+      ...(lane.query_id ? { query_id: String(lane.query_id) } : {}),
+      ...(lane.source_id ? { source_id: String(lane.source_id) } : {}),
+      state,
+      ...(lane.request_fingerprint ? { request_fingerprint: String(lane.request_fingerprint) } : {}),
+      updated_at: String(lane.updated_at || generatedAt)
+    };
+  }
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  const temporary = `${filePath}.${process.pid}.tmp`;
+  await fs.writeFile(temporary, `${JSON.stringify({ schema_version: 1, updated_at: generatedAt, lanes }, null, 2)}\n`, "utf8");
+  await replaceCheckpointFile(temporary, filePath);
+}
+
+async function replaceCheckpointFile(temporary, destination) {
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    try {
+      await fs.rename(temporary, destination);
+      return;
+    } catch (error) {
+      if (!["EPERM", "EACCES", "EEXIST"].includes(error?.code) || attempt === 5) throw error;
+      await sleep((attempt + 1) * 10);
+    }
+  }
+}
+
+export function sanitizeSharedPaginationState(state) {
+  if (!state || typeof state !== "object" || Array.isArray(state)) return null;
+  const clean = {};
+  if (state.cursor !== undefined && String(state.cursor).length <= 2000) clean.cursor = String(state.cursor);
+  if (Number.isInteger(Number(state.start)) && Number(state.start) >= 0) clean.start = Number(state.start);
+  if (Number.isInteger(Number(state.offset)) && Number(state.offset) >= 0) clean.offset = Number(state.offset);
+  if (Number.isInteger(Number(state.laneIndex)) && Number(state.laneIndex) >= 0) clean.laneIndex = Number(state.laneIndex);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(String(state.reportDate || ""))) clean.reportDate = String(state.reportDate);
+  if (/^[A-Za-z0-9:_-]{1,160}$/.test(String(state.laneFingerprint || ""))) clean.laneFingerprint = String(state.laneFingerprint);
+  if (/^\d{14}$/.test(String(state.windowStart || ""))) clean.windowStart = String(state.windowStart);
+  if (/^\d{14}$/.test(String(state.windowEnd || ""))) clean.windowEnd = String(state.windowEnd);
+  if (Array.isArray(state.pendingWindows)) {
+    clean.pendingWindows = state.pendingWindows.map((window) => ({
+      start: /^\d{14}$/.test(String(window?.start || "")) ? String(window.start) : "",
+      end: /^\d{14}$/.test(String(window?.end || "")) ? String(window.end) : ""
+    })).filter((window) => window.start && window.end);
+  }
+  if (state.nextUrl) {
+    const safe = sanitizePublicHttpUrl(String(state.nextUrl).replace(/([?&](?:api[_-]?key|token|secret|credential)=)[^&]*/gi, "$1[REDACTED]"));
+    if (safe) clean.nextUrl = safe;
+  }
+  return Object.keys(clean).length ? clean : null;
+}
+
+function transportResponseStub(ok, status) {
+  return { ok, status, headers: { get: () => null } };
+}
+
+function safeUrlOrigin(value) {
+  try {
+    return new URL(sanitizePublicHttpUrl(value)).origin;
+  } catch {
+    return "";
+  }
 }
 
 function huggingFaceTrendingResult(sourceResults, candidateSources, candidates) {
@@ -1936,9 +2617,9 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
     language: options.browserExportLanguage || DEFAULT_GITHUB_TRENDING_SOURCES[0].language,
     window: options.browserExportWindow || DEFAULT_GITHUB_TRENDING_SOURCES[0].window
   });
-  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 50;
   const sourceResults = [];
   const byRepo = new Map();
+  const observations = [];
 
   for (const exportSource of sources) {
     const parsed = parseGitHubTrendingHtml(exportSource.html, exportSource);
@@ -1952,6 +2633,7 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
 
     for (const candidate of parsed) {
       const enriched = enrichProjectCandidate(candidate, exportSource, options.reportDate);
+      observations.push(enriched);
       const existing = byRepo.get(candidate.repo);
       if (!existing || shouldPreferGithubTrendingCandidate(enriched, existing)) {
         byRepo.set(candidate.repo, enriched);
@@ -1960,7 +2642,7 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
   }
 
   const history = await loadGitHubTrendingHistory(options);
-  const candidates = annotateGitHubTrendingCandidates(prioritizeGithubTrendingCandidatesForLimit([...byRepo.values()], limit), history);
+  const candidates = annotateGitHubTrendingCandidates(observations, history);
   return {
     source_audit: {
       github_trending: {
@@ -1978,7 +2660,7 @@ async function collectGitHubTrendingFromBrowserExport(options = {}) {
   };
 }
 
-async function collectOssInsightTrendingFallback({ byRepo, sourceResults, fetchImpl, limit, reportDate }) {
+async function collectOssInsightTrendingFallback({ byRepo, sourceResults, fetchImpl, reportDate }) {
   try {
     const response = await fetchImpl(OSSINSIGHT_TRENDING_SOURCE.url, {
       headers: {
@@ -1998,8 +2680,7 @@ async function collectOssInsightTrendingFallback({ byRepo, sourceResults, fetchI
 
     const payload = await readJsonResponse(response);
     const parsed = parseOssInsightTrendingPayload(payload, OSSINSIGHT_TRENDING_SOURCE)
-      .map((candidate) => enrichProjectCandidate(candidate, OSSINSIGHT_TRENDING_SOURCE, reportDate))
-      .slice(0, limit);
+      .map((candidate) => enrichProjectCandidate(candidate, OSSINSIGHT_TRENDING_SOURCE, reportDate));
     sourceResults.push({
       name: OSSINSIGHT_TRENDING_SOURCE.name,
       url: OSSINSIGHT_TRENDING_SOURCE.url,
@@ -2065,13 +2746,11 @@ export async function collectBuilderFallbacks(options = {}) {
 
   const reportDate = requireReportDate(options.reportDate);
   const generatedAt = options.generatedAt || new Date().toISOString();
+  const transportRuntime = await createContentTransportRuntime(options);
   const sources = await loadSources(options.sources, options.sourcesPath, DEFAULT_BUILDER_FALLBACK_SOURCES);
   const sourceResults = [];
   const candidateSources = [];
   const candidates = [];
-  const evidenceAssets = [];
-  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
-  const lookbackDays = Number.isInteger(options.lookbackDays) ? options.lookbackDays : 2;
   const followBuildersFeeds = options.followBuildersFeeds === false
     ? null
     : normalizeFollowBuildersFeeds(options.followBuildersFeeds || DEFAULT_FOLLOW_BUILDERS_FEEDS);
@@ -2081,28 +2760,26 @@ export async function collectBuilderFallbacks(options = {}) {
       feeds: followBuildersFeeds,
       fetchImpl,
       reportDate,
-      lookbackDays,
       generatedAt,
       sourceResults,
       candidateSources,
-      candidates,
-      limit
+      candidates
     });
   }
 
-  if (followBuildersFeeds && options.xSearchFallback !== false && !hasXStatusCandidate(candidates)) {
+  if (followBuildersFeeds && options.xSearchFallback !== false) {
     await collectXBuilderSearchFallback({
       fetchImpl,
       reportDate,
-      lookbackDays,
       generatedAt,
       sourceResults,
       candidateSources,
       candidates,
-      limit,
       apiKey: Object.hasOwn(options, "xSearchApiKey") ? options.xSearchApiKey : process.env.TAVILY_API_KEY,
       queries: options.xSearchQueries,
-      perQueryLimit: Number.parseInt(options.xSearchPerQueryLimit || "8", 10)
+      accounts: options.xSearchAccounts,
+      lookbackDays: options.xSearchLookbackDays,
+      transportRuntime
     });
   }
 
@@ -2125,8 +2802,9 @@ export async function collectBuilderFallbacks(options = {}) {
       }
 
       const entries = parseFeedEntries(await response.text())
-        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays))
-        .slice(0, limit);
+        .map((entry) => withObservedEntryDate(entry, reportDate))
+        .map(retainEntryWithSafeUrl)
+        .filter(Boolean);
       const status = entries.length > 0 ? "checked" : "no_signal";
       const notes = withRetryNote(`${entries.length} recent original entries parsed`, response);
       markSource(candidateSources.at(-1), status, notes);
@@ -2134,10 +2812,11 @@ export async function collectBuilderFallbacks(options = {}) {
 
       for (const entry of entries) {
         candidates.push({
-          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
+          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title || entry.url}`),
+          ...observationIdentityFields(entry),
           source_id: currentSource.id,
           category: "builder_observation",
-          title: `${currentSource.author || currentSource.name}: ${entry.title}`,
+          title: entry.title ? `${currentSource.author || currentSource.name}: ${entry.title}` : "",
           url: entry.url,
           source: currentSource.name,
           event_date: entry.event_date,
@@ -2154,6 +2833,7 @@ export async function collectBuilderFallbacks(options = {}) {
 
   const curatedXHandleSet = await loadCuratedXHandles(options);
   const taggedCandidates = markCuratedXHandles(candidates, curatedXHandleSet);
+  await persistContentTransportRuntime(transportRuntime, generatedAt);
 
   return {
     source_audit: {
@@ -2165,16 +2845,16 @@ export async function collectBuilderFallbacks(options = {}) {
         blocked_reason: inferBuilderBlockedReason(sourceResults, candidates),
         last_successful_feed_at: candidates.length > 0 ? generatedAt : null,
         notes: followBuildersFeeds
-          ? "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations must keep an original status URL."
+          ? "follow-builders central feed is checked before X search fallback and fixed RSS/Atom fallback; X observations without an original status URL retain a safe relay/provider URL and explicit uncertainty tags."
           : "Fixed original-source fallback; each candidate comes from a directly fetched RSS/Atom feed."
       }
     },
     sources: candidateSources,
-    candidates: taggedCandidates.slice(0, limit)
+    candidates: taggedCandidates
   };
 }
 
-async function collectXBuilderSearchFallback({ fetchImpl, reportDate, lookbackDays, generatedAt, sourceResults, candidateSources, candidates, limit, apiKey, queries, perQueryLimit }) {
+async function collectXBuilderSearchFallback({ fetchImpl, reportDate, generatedAt, sourceResults, candidateSources, candidates, apiKey, queries, accounts, lookbackDays, transportRuntime }) {
   const sourceItem = {
     id: "x-builder-search-tavily",
     name: "Tavily X builder search fallback",
@@ -2189,15 +2869,24 @@ async function collectXBuilderSearchFallback({ fetchImpl, reportDate, lookbackDa
     return;
   }
 
-  const seenUrls = new Set(candidates.map((candidate) => candidate.url));
   let hitCount = 0;
   let blockedNote = "";
   const searchQueries = Array.isArray(queries) && queries.length > 0
     ? queries
-    : buildXBuilderSearchQueries(reportDate);
+    : buildXBuilderSearchQueries();
+  const lanes = buildXBuilderSearchLanes(searchQueries, { reportDate, accounts, lookbackDays });
+  const laneKey = "builder:tavily:x";
+  const laneFingerprint = stableRowFingerprint("x-builder-lanes", lanes.map((lane) => lane.id));
+  const savedState = sanitizeSharedPaginationState(transportRuntime.checkpoint.lanes?.[laneKey]?.state);
+  let laneIndex = savedState?.reportDate === reportDate && savedState?.laneFingerprint === laneFingerprint
+    ? Math.min(savedState.laneIndex || 0, lanes.length)
+    : 0;
+  let completedLanes = 0;
 
-  for (const query of searchQueries) {
-    if (candidates.length >= limit) {
+  for (; laneIndex < lanes.length; laneIndex += 1) {
+    const lane = lanes[laneIndex];
+    if (!transportRuntime.budget.reserve()) {
+      blockedNote = transportRuntime.budget.exhaustionReason() || "runtime_request_budget_exhausted";
       break;
     }
     try {
@@ -2206,88 +2895,150 @@ async function collectXBuilderSearchFallback({ fetchImpl, reportDate, lookbackDa
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           api_key: apiKey,
-          query,
-          max_results: Math.max(1, perQueryLimit || 8),
+          query: lane.query,
+          max_results: TAVILY_MAX_RESULTS_PER_REQUEST,
           include_answer: false,
           include_raw_content: false,
           search_depth: "advanced",
-          include_domains: ["x.com"]
+          include_domains: ["x.com"],
+          start_date: lane.start_date,
+          end_date: lane.end_date
         })
       });
       if (!response.ok) {
         blockedNote = withRetryNote(`HTTP ${response.status}`, response);
-        continue;
+        break;
       }
 
       const payload = await readJsonResponse(response);
       const parsed = parseXBuilderSearchResults(payload, {
         sourceItem,
         reportDate,
-        lookbackDays,
-        query
+        query: `${lane.query}; lane=${lane.id}`
       });
       for (const entry of parsed) {
-        if (candidates.length >= limit || seenUrls.has(entry.url)) {
-          continue;
-        }
-        seenUrls.add(entry.url);
         hitCount += 1;
         candidates.push({
           ...entry,
           id: uniqueCandidateId(candidates, entry.id || `${sourceItem.id}-${entry.url}`)
         });
       }
+      completedLanes += 1;
+      const nextIndex = laneIndex + 1;
+      if (nextIndex < lanes.length) {
+        transportRuntime.checkpoint.lanes[laneKey] = {
+          provider: "tavily_x_search",
+          state: { laneIndex: nextIndex, reportDate, laneFingerprint },
+          updated_at: generatedAt
+        };
+        await persistContentTransportRuntime(transportRuntime, generatedAt);
+      }
     } catch (error) {
       blockedNote = withRetryNote(formatDiscoveryErrorNote(error), error);
+      break;
     }
   }
 
+  const hasContinuation = laneIndex < lanes.length;
+  if (hasContinuation) {
+    transportRuntime.checkpoint.lanes[laneKey] = {
+      provider: "tavily_x_search",
+      state: { laneIndex, reportDate, laneFingerprint },
+      updated_at: generatedAt
+    };
+  } else {
+    delete transportRuntime.checkpoint.lanes[laneKey];
+  }
+
   const status = hitCount > 0 ? "checked" : blockedNote ? "blocked" : "no_signal";
+  const limitations = ["provider_has_no_pagination", ...(hasContinuation ? [transportRuntime.budget.exhaustionReason() || "lane_backlog_pending"] : [])];
   const notes = hitCount > 0
-    ? `${hitCount} recent original X status entries parsed`
-    : blockedNote || "0 recent original X status entries parsed";
+    ? `${hitCount} X listener observations parsed across ${completedLanes}/${lanes.length} query/account/day lanes; transport_status=degraded; transport_limitation=${limitations.join(",")}; provider_max_results=${TAVILY_MAX_RESULTS_PER_REQUEST}`
+    : `${blockedNote || "0 X listener observations parsed"}; lanes_completed=${completedLanes}/${lanes.length}; transport_status=degraded; transport_limitation=${limitations.join(",")}; provider_max_results=${TAVILY_MAX_RESULTS_PER_REQUEST}`;
   markSource(candidateSources.at(-1), status, notes);
-  sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes));
+  sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes, {
+    transport_status: "degraded",
+    transport_limitation: limitations.join(","),
+    provider_max_results: TAVILY_MAX_RESULTS_PER_REQUEST,
+    lane_count: lanes.length,
+    lanes_completed: completedLanes,
+    ...(hasContinuation ? { continuation_lane: laneIndex } : {})
+  }));
 }
 
-function buildXBuilderSearchQueries(reportDate) {
-  const dates = [reportDate, ...previousDateStrings(reportDate, 1)]
-    .map((date) => formatSearchDate(date))
-    .filter(Boolean);
-  return dates.flatMap((dateText) =>
-    DEFAULT_X_BUILDER_SEARCH_TERMS.map((term) => `site:x.com/*/status "${dateText}" "${term}"`)
-  );
+function buildXBuilderSearchQueries() {
+  return DEFAULT_X_BUILDER_SEARCH_TERMS.map((term) => `site:x.com/*/status "${term}"`);
 }
 
-function parseXBuilderSearchResults(payload, { sourceItem, reportDate, lookbackDays, query }) {
+function buildXBuilderSearchLanes(queries, { reportDate, accounts, lookbackDays }) {
+  const globalAccounts = Array.isArray(accounts) ? accounts.map(normalizeXHandle).filter(Boolean) : [];
+  const days = positiveInteger(lookbackDays, 1);
+  const lanes = [];
+  for (const rawQuery of queries) {
+    const baseQuery = cleanText(typeof rawQuery === "string" ? rawQuery : rawQuery?.query || rawQuery?.term);
+    if (!baseQuery) continue;
+    const queryAccounts = Array.isArray(rawQuery?.accounts)
+      ? rawQuery.accounts.map(normalizeXHandle).filter(Boolean)
+      : globalAccounts;
+    const accountLanes = queryAccounts.length > 0 ? queryAccounts : [""];
+    for (const account of accountLanes) {
+      const accountQuery = account
+        ? (/site:x\.com\/\*\/status/i.test(baseQuery)
+            ? baseQuery.replace(/site:x\.com\/\*\/status/i, `site:x.com/${account}/status`)
+            : `site:x.com/${account}/status ${baseQuery}`)
+        : baseQuery;
+      for (let offset = 0; offset < days; offset += 1) {
+        const startDate = shiftDate(reportDate, -offset);
+        const endDate = shiftDate(startDate, 1);
+        lanes.push({
+          id: stableRowFingerprint("x-builder-lane", [accountQuery, startDate, endDate]),
+          query: accountQuery,
+          account,
+          start_date: startDate,
+          end_date: endDate
+        });
+      }
+    }
+  }
+  return lanes;
+}
+
+function shiftDate(date, days) {
+  const value = new Date(`${date}T00:00:00.000Z`);
+  value.setUTCDate(value.getUTCDate() + days);
+  return value.toISOString().slice(0, 10);
+}
+
+function parseXBuilderSearchResults(payload, { sourceItem, reportDate, query }) {
   return arrayFromPossibleKeys(payload, ["results"])
     .map((item) => {
-      const url = normalizeXStatusUrl(item.url);
-      const eventDate = xStatusDate(url);
+      const links = xObservationLinks(item.url, sourceItem.url);
+      const eventDate = xStatusDate(links.original_url) || reportDate;
       const content = cleanText(item.content || item.raw_content || item.title);
-      if (!url || !content || !isWithinReportWindow(eventDate, reportDate, lookbackDays)) {
-        return null;
-      }
-      const handle = xStatusHandle(url);
+      const handle = xStatusHandle(links.original_url);
       const author = handle ? `@${handle}` : "X builder";
       const avatarUrl = xAvatarUrl(handle);
       return {
+        observation_id: xObservationId(sourceItem.id, links, eventDate, content),
         source_id: sourceItem.id,
         category: "builder_observation",
-        title: `${author}: ${shortenCandidateTitle(item.title || content)}`,
-        url,
+        title: content ? `${author}: ${shortenCandidateTitle(item.title || content)}` : "",
+        ...links,
+        ...(!content ? { tags: unique([...(links.tags || []), "content_pending"]) } : {}),
         source: sourceItem.name,
         event_date: eventDate,
         status: "excluded",
         author,
-        original_text: content,
+        ...(content ? { original_text: content } : {}),
         ...(handle ? { handle } : {}),
         ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
-        evidence: summarizeEvidence(content, `${author} posted this original X status.`),
-        original_url: url,
-        verification_status: "original_social_only",
-        verification_sources: [url],
-        notes: `x_search_query=${sanitizeNoteValue(query)}`
+        evidence: summarizeEvidence(
+          content,
+          links.original_url
+            ? `${author} posted this original X status.`
+            : `${sourceItem.name} relayed an X observation whose original status URL was unavailable.`
+        ),
+        notes: appendSentence(links.notes, `x_search_query=${sanitizeNoteValue(query)}`)
       };
     })
     .filter(Boolean);
@@ -2329,7 +3080,7 @@ async function collectFollowBuildersCentralFeeds(context) {
   });
 }
 
-async function collectSingleFollowBuildersFeed({ sourceItem, parser, fetchImpl, reportDate, lookbackDays, generatedAt, sourceResults, candidateSources, candidates, limit }) {
+async function collectSingleFollowBuildersFeed({ sourceItem, parser, fetchImpl, reportDate, generatedAt, sourceResults, candidateSources, candidates }) {
   if (!sourceItem.url) {
     return;
   }
@@ -2352,25 +3103,23 @@ async function collectSingleFollowBuildersFeed({ sourceItem, parser, fetchImpl, 
     const payload = await readJsonResponse(response);
     const allParsed = parser(payload, {
       sourceItem,
-      reportDate,
-      lookbackDays
+      reportDate
     });
-    const parsed = allParsed.slice(0, Math.max(limit - candidates.length, 0));
     const upstreamErrors = followBuildersPayloadErrors(payload);
     const status = allParsed.length > 0 ? "checked" : upstreamErrors ? "blocked" : "no_signal";
     const notes = withRetryNote(
       upstreamErrors
-        ? `${allParsed.length} recent original entries parsed; upstream_error=${upstreamErrors}`
-        : `${allParsed.length} recent original entries parsed`,
+        ? `${allParsed.length} listener entries parsed; upstream_error=${upstreamErrors}`
+        : `${allParsed.length} listener entries parsed`,
       response
     );
     markSource(candidateSources.at(-1), status, notes);
     sourceResults.push(auditSource(sourceItem.name, sourceItem.url, status, notes));
 
-    for (const entry of parsed) {
+    for (const entry of allParsed) {
       candidates.push({
         ...entry,
-        id: uniqueCandidateId(candidates, entry.id || `${sourceItem.id}-${entry.title}`)
+        id: uniqueCandidateId(candidates, entry.id || `${sourceItem.id}-${entry.title || entry.url}`)
       });
     }
   } catch (error) {
@@ -2389,54 +3138,59 @@ function followBuildersPayloadErrors(payload) {
     .slice(0, 240);
 }
 
-function parseFollowBuildersXFeed(payload, { sourceItem, reportDate, lookbackDays }) {
+function parseFollowBuildersXFeed(payload, { sourceItem, reportDate }) {
   const builders = Array.isArray(payload?.x) ? payload.x : Array.isArray(payload?.builders) ? payload.builders : [];
   const entries = [];
   for (const builder of builders) {
     const tweets = Array.isArray(builder?.tweets) ? builder.tweets : [];
     for (const tweet of tweets) {
-      const eventDate = dateOnly(tweet.createdAt || tweet.created_at || tweet.date);
-      if (!tweet.url || !tweet.text || !isWithinReportWindow(eventDate, reportDate, lookbackDays)) {
-        continue;
-      }
-      const handle = normalizeXHandle(builder.handle || xStatusHandle(tweet.url));
+      const eventDate = dateOnly(tweet.createdAt || tweet.created_at || tweet.date) || reportDate;
+      const links = xObservationLinks(tweet.url, sourceItem.url);
+      const handle = normalizeXHandle(builder.handle || xStatusHandle(links.original_url));
       const author = builder.name || (handle ? `@${handle}` : "") || "Builder";
       const avatarUrl = builderAvatarUrl(builder, handle);
       entries.push({
+        observation_id: xObservationId(sourceItem.id, links, eventDate, tweet.text, handle),
         source_id: sourceItem.id,
         category: "builder_observation",
-        title: `${author}: ${shortenCandidateTitle(tweet.text)}`,
-        url: tweet.url,
+        title: tweet.text ? `${author}: ${shortenCandidateTitle(tweet.text)}` : "",
+        ...links,
+        ...(!tweet.text ? { tags: unique([...(links.tags || []), "content_pending"]) } : {}),
         source: sourceItem.name,
         event_date: eventDate,
         status: "excluded",
         author,
-        original_text: tweet.text,
+        ...(tweet.text ? { original_text: tweet.text } : {}),
         ...(handle ? { handle } : {}),
         ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
-        original_url: tweet.url,
-        verification_status: "original_social_only",
-        verification_sources: [tweet.url],
-        evidence: summarizeEvidence(tweet.text, `${author} posted this original X update.`)
+        evidence: summarizeEvidence(
+          tweet.text,
+          links.original_url
+            ? `${author} posted this original X update.`
+            : `${sourceItem.name} relayed an X observation whose original status URL was unavailable.`
+        )
       });
     }
   }
   return entries;
 }
 
-function parseFollowBuildersPodcastFeed(payload, { sourceItem, reportDate, lookbackDays }) {
+function parseFollowBuildersPodcastFeed(payload, { sourceItem, reportDate }) {
   const episodes = arrayFromPossibleKeys(payload, ["podcasts", "episodes"]);
   return episodes
     .map((episode) => {
-      const eventDate = dateOnly(episode.publishedAt || episode.published_at || episode.pubDate || episode.date);
-      if (!episode.url || !episode.title || !isWithinReportWindow(eventDate, reportDate, lookbackDays)) {
+      const eventDate = dateOnly(episode.publishedAt || episode.published_at || episode.pubDate || episode.date) || reportDate;
+      const url = sanitizePublicHttpUrl(episode.url);
+      if (!url) {
         return null;
       }
+      const title = cleanText(episode.title);
       return {
+        observation_id: followBuildersRowObservationId(sourceItem, "podcast", episode),
         source_id: sourceItem.id,
         category: "builder_observation",
-        title: episode.name ? `${episode.name}: ${episode.title}` : episode.title,
-        url: episode.url,
+        title: title ? (episode.name ? `${episode.name}: ${title}` : title) : "",
+        url,
         source: sourceItem.name,
         event_date: eventDate,
         status: "excluded",
@@ -2446,19 +3200,21 @@ function parseFollowBuildersPodcastFeed(payload, { sourceItem, reportDate, lookb
     .filter(Boolean);
 }
 
-function parseFollowBuildersBlogFeed(payload, { sourceItem, reportDate, lookbackDays }) {
+function parseFollowBuildersBlogFeed(payload, { sourceItem, reportDate }) {
   const posts = arrayFromPossibleKeys(payload, ["blogs", "posts", "articles"]);
   return posts
     .map((post) => {
-      const eventDate = dateOnly(post.publishedAt || post.published_at || post.pubDate || post.date || post.event_date);
-      if (!post.url || !post.title || !isWithinReportWindow(eventDate, reportDate, lookbackDays)) {
+      const eventDate = dateOnly(post.publishedAt || post.published_at || post.pubDate || post.date || post.event_date) || reportDate;
+      const url = sanitizePublicHttpUrl(post.url);
+      if (!url) {
         return null;
       }
       return {
+        observation_id: followBuildersRowObservationId(sourceItem, "blog", post),
         source_id: sourceItem.id,
         category: "hot_blog",
-        title: post.title,
-        url: post.url,
+        title: cleanText(post.title),
+        url,
         source: post.source || post.publisher || sourceItem.name,
         event_date: eventDate,
         status: "excluded",
@@ -2466,6 +3222,13 @@ function parseFollowBuildersBlogFeed(payload, { sourceItem, reportDate, lookback
       };
     })
     .filter(Boolean);
+}
+
+function followBuildersRowObservationId(sourceItem, kind, item) {
+  const nativeId = firstString(item?.id, item?.guid, item?.uuid, item?.episode_id, item?.post_id);
+  return nativeId
+    ? `${sourceItem.id || "follow-builders"}:${kind}:${cleanText(nativeId)}`
+    : stableRowFingerprint(`follow-builders-${kind}-row`, [sourceItem.id || sourceItem.url, JSON.stringify(item)]);
 }
 
 export async function collectContentSources(options = {}) {
@@ -2478,15 +3241,13 @@ export async function collectContentSources(options = {}) {
   const generatedAt = options.generatedAt || new Date().toISOString();
   const platformExempt = normalizePlatformExemptOption(options.platformExempt);
   const sources = filterPlatformExemptSources(await loadContentSources(options), platformExempt);
+  const ownsTransportRuntime = !options._contentTransportRuntime;
+  const contentTransportRuntime = options._contentTransportRuntime || await createContentTransportRuntime(options);
   const sourceResults = [];
   const candidateSources = [];
   const candidates = [];
   const evidenceAssets = [];
-  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
-  const perSourceLimit = Number.isInteger(options.perSourceLimit) && options.perSourceLimit > 0 ? options.perSourceLimit : 3;
-  const lookbackDays = Number.isInteger(options.lookbackDays) ? options.lookbackDays : 2;
-  const startedAt = Date.now();
-  const budgetMs = Number.isInteger(options.budgetMs) && options.budgetMs > 0 ? options.budgetMs : 300000;
+  let sourcesToCollect = sources;
 
   if (!platformExempt && shouldCheckWeChatArticleInput(options)) {
     const wechatInput = await loadWeChatArticleInput({
@@ -2504,30 +3265,36 @@ export async function collectContentSources(options = {}) {
     }
   }
 
-  for (const rawSource of sources) {
+  if (sources.length > 1 && options._singleContentSource !== true) {
+    const collected = await mapWithConcurrency(
+      sources,
+      positiveInteger(options.sourceConcurrency || options["source-concurrency"], 12),
+      (rawSource) => collectContentSources({
+        ...options,
+        sources: [rawSource],
+        includeWeChatInput: false,
+        _singleContentSource: true,
+        _contentTransportRuntime: contentTransportRuntime
+      })
+    );
+    for (const result of collected) {
+      const audit = Object.values(result.source_audit || {})[0] || {};
+      sourceResults.push(...(Array.isArray(audit.sources) ? audit.sources : []));
+      candidateSources.push(...(Array.isArray(result.sources) ? result.sources : []));
+      candidates.push(...(Array.isArray(result.candidates) ? result.candidates : []));
+      evidenceAssets.push(...(Array.isArray(result.evidence_assets) ? result.evidence_assets : []));
+    }
+    sourcesToCollect = [];
+  }
+
+  for (const rawSource of sourcesToCollect) {
     const currentSource = normalizeGenericSource(rawSource, "content");
     const { sourceCategory, candidateCategory, entryLabel } = contentSourceKinds(currentSource);
     candidateSources.push(toCandidateSource(currentSource, sourceCategory, generatedAt, "blocked", ""));
-    if (isPlatformExemptCategory(candidateCategory) && currentSource.kill_switch === true) {
-      const notes = "kill_switch_enabled";
-      markSource(candidateSources.at(-1), "no_signal", notes);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, "no_signal", notes, platformAuditSourceExtra(currentSource, { parsed_count: 0 })));
-      continue;
-    }
-    if (currentSource.source_kind === "manual") {
-      markSource(candidateSources.at(-1), "skipped_manual_review_required", "manual whitelist source");
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, "skipped_manual_review_required", "manual whitelist source; add reviewed items to the candidate pool with source_level metadata", platformAuditSourceExtra(currentSource)));
-      continue;
-    }
     const skipped = contentSourceSkipReason(currentSource, options.env || process.env);
     if (skipped) {
       markSource(candidateSources.at(-1), "blocked", skipped);
       sourceResults.push(auditSource(currentSource.name, currentSource.url, skipped, skipped, platformAuditSourceExtra(currentSource)));
-      continue;
-    }
-    if (Date.now() - startedAt > budgetMs) {
-      markSource(candidateSources.at(-1), "blocked", "budget_exceeded");
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, "blocked", "budget_exceeded", platformAuditSourceExtra(currentSource)));
       continue;
     }
     if (currentSource.source_kind === OPENROUTER_RANKINGS_SOURCE_KIND) {
@@ -2541,6 +3308,7 @@ export async function collectContentSources(options = {}) {
       sourceResults.push(auditSource(currentSource.name, currentSource.url, result.status, result.notes, {
         snapshot: result.snapshot
       }));
+      candidates.push(...rankingSnapshotCandidates(result.snapshot, currentSource, reportDate, generatedAt, candidates));
       continue;
     }
     if (currentSource.source_kind === ARTIFICIAL_ANALYSIS_INDEX_SOURCE_KIND) {
@@ -2554,6 +3322,7 @@ export async function collectContentSources(options = {}) {
       sourceResults.push(auditSource(currentSource.name, currentSource.url, result.status, result.notes, {
         snapshot: result.snapshot
       }));
+      candidates.push(...rankingSnapshotCandidates(result.snapshot, currentSource, reportDate, generatedAt, candidates));
       continue;
     }
     if (currentSource.source_kind === SWE_BENCH_PRO_PUBLIC_SOURCE_KIND) {
@@ -2567,6 +3336,7 @@ export async function collectContentSources(options = {}) {
       sourceResults.push(auditSource(currentSource.name, currentSource.url, result.status, result.notes, {
         snapshot: result.snapshot
       }));
+      candidates.push(...rankingSnapshotCandidates(result.snapshot, currentSource, reportDate, generatedAt, candidates));
       continue;
     }
     if (currentSource.source_kind === GITHUB_REPORT_MARKDOWN_SOURCE_KIND) {
@@ -2578,15 +3348,16 @@ export async function collectContentSources(options = {}) {
           generatedAt,
           options
         });
-        const sourceLookbackDays = Number.isInteger(currentSource.lookback_days) ? currentSource.lookback_days : lookbackDays;
         const datedEntries = result.entries
-          .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, sourceLookbackDays));
-        const rejected = {};
-        const entries = filterPlatformEntries(datedEntries, currentSource, candidateCategory, rejected);
-        const sourceLimit = sourceMaxItemsPerRun(currentSource, perSourceLimit);
-        for (const entry of entries.slice(0, sourceLimit)) {
+          .map((entry) => withObservedEntryDate(entry, reportDate))
+          .map(retainEntryWithSafeUrl)
+          .filter(Boolean);
+        const platformAnnotations = {};
+        const entries = annotatePlatformEntries(datedEntries, currentSource, candidateCategory, platformAnnotations);
+        for (const entry of entries) {
           candidates.push(platformCandidateOrContentCandidate({
-            id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
+            id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title || entry.url}`),
+            ...observationIdentityFields(entry),
             source_id: currentSource.id,
             category: candidateCategory,
             title: entry.title,
@@ -2597,11 +3368,14 @@ export async function collectContentSources(options = {}) {
             evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
             notes: [contentCandidateNotes(entry, currentSource, ""), `source_report_url=${sanitizeNoteValue(entry.source_report_url || currentSource.url)}`].filter(Boolean).join("; "),
             ...contentVerificationFields({ ...entry, url: entry.source_report_url || entry.url }, currentSource, ""),
+            ...(Array.isArray(entry.tags) ? { tags: entry.tags } : {}),
+            ...contentCandidateTagFields(entry, currentSource),
+            ...(entry.publisher ? { publisher: entry.publisher } : {}),
             ...(candidateCategory === "project" ? { signal: currentSource.signal || "github_report" } : {})
           }, entry, currentSource, candidates));
         }
         const status = entries.length > 0 ? result.status : "no_signal";
-        const notes = appendPlatformRejectedNotes(`${result.notes}; ${entries.length} within ${sourceLookbackDays}d source window`, rejected);
+        const notes = appendPlatformAnnotations(`${result.notes}; ${entries.length} listener entries retained`, platformAnnotations);
         markSource(candidateSources.at(-1), status, notes);
         sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes, platformAuditSourceExtra(currentSource, { parsed_count: entries.length })));
       } catch (error) {
@@ -2613,17 +3387,38 @@ export async function collectContentSources(options = {}) {
     }
 
     try {
-      const response = await fetchImpl(contentSourceRequestUrl(currentSource, options.env || process.env, reportDate), {
+      const requestUrl = contentSourceRequestUrl(currentSource, options.env || process.env, reportDate);
+      const requestInit = {
         headers: {
           accept: "application/json, application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
           "user-agent": "ai-daily-cn-static-publisher"
         },
         ...timeoutInit(currentSource.timeoutMs || currentSource.timeout_ms || 15000)
-      });
-      let responseText = "";
+      };
+      const huggingFaceTransport = currentSource.source_kind === HUGGINGFACE_HUB_TRENDING_API_SOURCE_KIND
+        ? await fetchHuggingFacePages({
+            fetchImpl,
+            url: requestUrl,
+            init: requestInit,
+            pageSize: transportPageSizeFromUrl(requestUrl),
+            requestBudget: options.transportRequestBudget
+          })
+        : null;
+      const arxivTransport = !huggingFaceTransport && isArxivApiSourceUrl(requestUrl)
+        ? await fetchArxivContentPages({
+            fetchImpl,
+            sourceInfo: currentSource,
+            url: requestUrl,
+            init: requestInit,
+            runtime: contentTransportRuntime
+          })
+        : null;
+      const paginationTransport = huggingFaceTransport || arxivTransport;
+      const response = paginationTransport?.response || await fetchImpl(requestUrl, requestInit);
+      let responseText = paginationTransport?.text || "";
       let responseForRetryNote = response;
       let cacheFallbackNote = "";
-      if (!response.ok) {
+      if (!(paginationTransport ? paginationTransport.ok : response.ok)) {
         const notes = withRetryNote(`HTTP ${response.status}`, response);
         const cached = await readContentSourceCache({
           rootDir: options.rootDir || process.cwd(),
@@ -2639,8 +3434,16 @@ export async function collectContentSources(options = {}) {
         responseText = cached.content;
         responseForRetryNote = null;
         cacheFallbackNote = `cache_fallback_used; original_error=${sanitizeNoteValue(notes)}; cached_at=${sanitizeNoteValue(cached.fetched_at)}`;
-      } else {
+      } else if (!paginationTransport) {
         responseText = await response.text();
+        await writeContentSourceCache({
+          rootDir: options.rootDir || process.cwd(),
+          sourceInfo: currentSource,
+          content: responseText,
+          fetchedAt: generatedAt,
+          enabled: options.cacheFallback !== false
+        });
+      } else {
         await writeContentSourceCache({
           rootDir: options.rootDir || process.cwd(),
           sourceInfo: currentSource,
@@ -2655,29 +3458,36 @@ export async function collectContentSources(options = {}) {
         currentSource,
         fetchImpl
       );
-      const sourceLookbackDays = Number.isInteger(currentSource.lookback_days) ? currentSource.lookback_days : lookbackDays;
+      const hydrationFailureCount = parsedEntries.filter((entry) => entry.transport_degraded === "item_hydration_failed").length;
       const datedEntries = parsedEntries
-        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, sourceLookbackDays));
-      const rejected = {};
-      const entries = filterPlatformEntries(datedEntries, currentSource, candidateCategory, rejected);
+        .map((entry) => withObservedEntryDate(entry, reportDate))
+        .map(retainEntryWithSafeUrl)
+        .filter(Boolean);
+      const platformAnnotations = {};
+      const entries = annotatePlatformEntries(datedEntries, currentSource, candidateCategory, platformAnnotations);
       const status = entries.length > 0 ? "checked" : "no_signal";
       let notes = cacheFallbackNote
         ? `${entries.length} recent ${entryLabel} entries parsed; ${cacheFallbackNote}`
         : withRetryNote(`${entries.length} recent ${entryLabel} entries parsed`, responseForRetryNote);
-      notes = appendPlatformRejectedNotes(notes, rejected);
+      notes = appendPlatformAnnotations(notes, platformAnnotations);
+      if (paginationTransport) {
+        notes = appendSentence(notes, `transport_status=${paginationTransport.transport_status}; pages_fetched=${paginationTransport.pages_fetched}${paginationTransport.transport_limitation ? `; transport_limitation=${paginationTransport.transport_limitation}` : ""}${paginationTransport.continuation_url ? `; continuation_url=${sanitizeNoteValue(paginationTransport.continuation_url)}` : ""}`);
+      }
+      if (hydrationFailureCount > 0) {
+        notes = appendSentence(notes, `transport_status=degraded; item_hydration_failed=${hydrationFailureCount}; all list observations retained as placeholders`);
+      }
       let confirmedProductCrossChecks = 0;
       let unresolvedProductCrossChecks = 0;
-      let skippedOriginalUrlChecks = 0;
+      let missingOriginalUrlCount = 0;
 
-      const sourceLimit = sourceMaxItemsPerRun(currentSource, perSourceLimit);
-      for (const entry of entries.slice(0, sourceLimit)) {
+      for (const entry of entries) {
         const originalUrl = originalRequiredUrlForEntry(entry, currentSource);
         if (requiresOriginalUrl(currentSource) && !originalUrl) {
-          skippedOriginalUrlChecks += 1;
-          continue;
+          missingOriginalUrlCount += 1;
         }
         let candidate = platformCandidateOrContentCandidate({
-          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
+          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title || entry.url}`),
+          ...observationIdentityFields(entry),
           source_id: currentSource.id,
           category: candidateCategory,
           title: entry.title,
@@ -2689,6 +3499,9 @@ export async function collectContentSources(options = {}) {
           notes: contentCandidateNotes(entry, currentSource, originalUrl),
           ...contentVerificationFields(entry, currentSource, originalUrl),
           ...contentCandidateImageFields(entry),
+          ...(Array.isArray(entry.tags) ? { tags: entry.tags } : {}),
+          ...contentCandidateTagFields(entry, currentSource),
+          ...(entry.publisher ? { publisher: entry.publisher } : {}),
           ...(candidateCategory === "project" ? { signal: currentSource.signal || "product_hunt" } : {})
         }, entry, currentSource, candidates);
 
@@ -2717,10 +3530,20 @@ export async function collectContentSources(options = {}) {
         }
       }
       if (requiresOriginalUrl(currentSource)) {
-        notes = `${notes}; ${skippedOriginalUrlChecks} skipped without original URL`;
+        notes = `${notes}; ${missingOriginalUrlCount} retained without original URL`;
       }
       markSource(candidateSources.at(-1), status, notes);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes, platformAuditSourceExtra(currentSource, { parsed_count: entries.length })));
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, notes, platformAuditSourceExtra(currentSource, {
+        parsed_count: entries.length,
+        transport_status: hydrationFailureCount > 0 || paginationTransport?.transport_status === "degraded" ? "degraded" : "complete",
+        ...(paginationTransport ? { pages_fetched: paginationTransport.pages_fetched } : {}),
+        ...(paginationTransport?.transport_limitation ? { transport_limitation: paginationTransport.transport_limitation } : {}),
+        ...(paginationTransport?.continuation_url ? { continuation_url: paginationTransport.continuation_url } : {}),
+        ...(hydrationFailureCount > 0 ? {
+          transport_limitation: "item_hydration_failed",
+          hydration_failure_count: hydrationFailureCount
+        } : {})
+      })));
     } catch (error) {
       const notes = withRetryNote(formatDiscoveryErrorNote(error), error);
       const cached = await readContentSourceCache({
@@ -2739,22 +3562,23 @@ export async function collectContentSources(options = {}) {
         currentSource,
         fetchImpl
       );
-      const sourceLookbackDays = Number.isInteger(currentSource.lookback_days) ? currentSource.lookback_days : lookbackDays;
+      const hydrationFailureCount = parsedEntries.filter((entry) => entry.transport_degraded === "item_hydration_failed").length;
       const datedEntries = parsedEntries
-        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, sourceLookbackDays));
-      const rejected = {};
-      const entries = filterPlatformEntries(datedEntries, currentSource, contentSourceKinds(currentSource).candidateCategory, rejected);
+        .map((entry) => withObservedEntryDate(entry, reportDate))
+        .map(retainEntryWithSafeUrl)
+        .filter(Boolean);
+      const platformAnnotations = {};
+      const entries = annotatePlatformEntries(datedEntries, currentSource, contentSourceKinds(currentSource).candidateCategory, platformAnnotations);
       const status = entries.length > 0 ? "checked" : "no_signal";
-      const sourceLimit = sourceMaxItemsPerRun(currentSource, perSourceLimit);
-      let skippedOriginalUrlChecks = 0;
-      for (const entry of entries.slice(0, sourceLimit)) {
+      let missingOriginalUrlCount = 0;
+      for (const entry of entries) {
         const originalUrl = originalRequiredUrlForEntry(entry, currentSource);
         if (requiresOriginalUrl(currentSource) && !originalUrl) {
-          skippedOriginalUrlChecks += 1;
-          continue;
+          missingOriginalUrlCount += 1;
         }
         candidates.push(platformCandidateOrContentCandidate({
-          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
+          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title || entry.url}`),
+          ...observationIdentityFields(entry),
           source_id: currentSource.id,
           category: candidateCategory,
           title: entry.title,
@@ -2765,19 +3589,32 @@ export async function collectContentSources(options = {}) {
           evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
           notes: contentCandidateNotes(entry, currentSource, originalUrl),
           ...contentVerificationFields(entry, currentSource, originalUrl),
-          ...contentCandidateImageFields(entry)
+          ...contentCandidateImageFields(entry),
+          ...(Array.isArray(entry.tags) ? { tags: entry.tags } : {}),
+          ...contentCandidateTagFields(entry, currentSource),
+          ...(entry.publisher ? { publisher: entry.publisher } : {})
         }, entry, currentSource, candidates));
       }
-      const cacheNotes = appendPlatformRejectedNotes(`${entries.length} recent ${entryLabel} entries parsed; cache_fallback_used; original_error=${sanitizeNoteValue(notes)}; cached_at=${sanitizeNoteValue(cached.fetched_at)}${skippedOriginalUrlChecks > 0 ? `; ${skippedOriginalUrlChecks} skipped without original URL` : ""}`, rejected);
+      let cacheNotes = appendPlatformAnnotations(`${entries.length} recent ${entryLabel} entries parsed; cache_fallback_used; original_error=${sanitizeNoteValue(notes)}; cached_at=${sanitizeNoteValue(cached.fetched_at)}${missingOriginalUrlCount > 0 ? `; ${missingOriginalUrlCount} retained without original URL` : ""}`, platformAnnotations);
+      if (hydrationFailureCount > 0) {
+        cacheNotes = appendSentence(cacheNotes, `transport_status=degraded; item_hydration_failed=${hydrationFailureCount}; all list observations retained as placeholders`);
+      }
       markSource(candidateSources.at(-1), status, cacheNotes);
-      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, cacheNotes, platformAuditSourceExtra(currentSource, { parsed_count: entries.length })));
+      sourceResults.push(auditSource(currentSource.name, currentSource.url, status, cacheNotes, platformAuditSourceExtra(currentSource, {
+        parsed_count: entries.length,
+        transport_status: "degraded",
+        transport_limitation: hydrationFailureCount > 0 ? "cache_fallback_and_item_hydration_failed" : "cache_fallback",
+        ...(hydrationFailureCount > 0 ? { hydration_failure_count: hydrationFailureCount } : {})
+      })));
     }
   }
   const auditGroupName = platformExempt
     ? auditGroupForPlatform(platformExempt)
     : String(options.auditGroupName || "content_sources").trim() || "content_sources";
 
-  const outputCandidates = limitCandidatesBySource(candidates, limit);
+  if (ownsTransportRuntime) {
+    await persistContentTransportRuntime(contentTransportRuntime, generatedAt);
+  }
 
   return {
     report_date: reportDate,
@@ -2789,58 +3626,52 @@ export async function collectContentSources(options = {}) {
         candidates_found: candidates.length,
         included: 0,
         sources_checked: sourceResults.length,
-        enablement_counts: countBy(sources, "enablement"),
-        tier_counts: countBy(sources, "tier"),
+        credibility_tag_counts: countBy(sources, "credibility_tag"),
+        source_group_counts: countBy(sources, "source_group"),
         source_kind_counts: countBy(sources, "source_kind"),
         blocked_reason: candidates.length > 0 ? "" : inferBuilderBlockedReason(sourceResults),
         last_successful_feed_at: candidates.length > 0 ? generatedAt : null,
         notes: platformExempt
-          ? `${platformExempt} platform exempt sources are gated by versioned host, keyword, exclude-keyword, date-window, max-item, and kill-switch rules. Items remain outside factual sections and disclose that no primary-source backtrace was performed.`
-          : "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media leads are discovery-only until traced to primary sources. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs before they become easier project candidates. X-hotspot feeds must preserve original x.com/twitter.com URLs."
+          ? `${platformExempt} platform listener sources retain every parsed entry. Legacy host and keyword contract results are recorded as annotations only; they never suppress listener observations.`
+          : "Official labs, broad tech/big-tech newsrooms, engineering blogs, high-quality newsletters, interviews, aggregators, podcast platforms, intermediary/self-media leads, X-hotspot feeds, and product feeds are checked as content/project/community candidates. Intermediary and self-media observations remain visible with credibility metadata. Product Hunt project candidates are cross-checked against product homepages, GitHub, README, or docs when available. X observations without original status URLs retain safe relay/provider URLs and explicit uncertainty tags."
       }
     },
     sources: candidateSources,
-    candidates: outputCandidates,
+    candidates,
     evidence_assets: evidenceAssets
   };
 }
 
-function limitCandidatesBySource(candidates, limit) {
-  if (!Number.isInteger(limit) || limit <= 0 || candidates.length <= limit) {
-    return candidates;
-  }
-
-  const sourceOrder = [];
-  const bySource = new Map();
-  for (const candidate of candidates) {
-    const key = candidate.source_id || candidate.source || candidate.url || "";
-    if (!bySource.has(key)) {
-      bySource.set(key, []);
-      sourceOrder.push(key);
-    }
-    bySource.get(key).push(candidate);
-  }
-
-  const selected = [];
-  for (let round = 0; selected.length < limit; round += 1) {
-    let added = false;
-    for (const key of sourceOrder) {
-      const candidate = bySource.get(key)?.[round];
-      if (!candidate) {
-        continue;
-      }
-      selected.push(candidate);
-      added = true;
-      if (selected.length >= limit) {
-        break;
-      }
-    }
-    if (!added) {
-      break;
-    }
-  }
-
-  return selected;
+function rankingSnapshotCandidates(snapshot, sourceInfo, reportDate, generatedAt, existingCandidates) {
+  const rows = Array.isArray(snapshot?.top_entries) ? snapshot.top_entries : [];
+  return rows.map((row, index) => {
+    const rank = Number(row.rank) || index + 1;
+    const model = cleanText(row.model || row.name || `rank-${rank}`);
+    const provider = cleanText(row.provider || "");
+    const metric = cleanText(row.tokens || row.score || row.value || "");
+    const idSeed = `${sourceInfo.id}-${reportDate}-${rank}-${model}`;
+    return {
+      id: uniqueCandidateId(existingCandidates, idSeed),
+      observation_id: `ranking:${slugId(sourceInfo.id)}:${reportDate}:${rank}:${slugId(model)}`,
+      source_id: sourceInfo.id,
+      category: sourceInfo.candidate_category || "model_release",
+      title: `${sourceInfo.name} #${rank}: ${model}`,
+      url: sourceInfo.url,
+      source: sourceInfo.name,
+      publisher: provider || sourceInfo.name,
+      source_group: sourceInfo.source_group || "papers_models",
+      rank,
+      event_date: reportDate,
+      collected_at: generatedAt,
+      status: "excluded",
+      summary: [provider, metric].filter(Boolean).join(" · ") || `${model} appeared in the public ranking snapshot.`,
+      evidence: `${model} appeared at rank ${rank} in ${sourceInfo.name}${metric ? ` with ${metric}` : ""}.`,
+      source_level: "community_api",
+      ...(sourceInfo.credibility_tag ? { credibility_tag: sourceInfo.credibility_tag } : {}),
+      verification_status: "unverified",
+      content_tags: unique([...(Array.isArray(sourceInfo.content_tags) ? sourceInfo.content_tags : []), "model_release"])
+    };
+  });
 }
 
 function shouldCheckWeChatArticleInput(options = {}) {
@@ -2895,8 +3726,7 @@ async function loadContentSources(options = {}) {
   try {
     const registry = await loadSourceRegistry({
       rootDir: options.rootDir || process.cwd(),
-      sourcesPath: options.registryPath || path.join("config", "sources"),
-      includeEnablement: options.enablement || "core,optional"
+      sourcesPath: options.registryPath || path.join("config", "sources")
     });
     return registry.sources;
   } catch (error) {
@@ -2919,8 +3749,7 @@ function filterPlatformExemptSources(sources, platform) {
   return sources.filter((source) => {
     const candidateCategory = source.candidate_category || source.candidateCategory;
     const candidatePlatform = source.platform || platformFromCandidateCategory(candidateCategory);
-    return source.verification_policy === PLATFORM_EXEMPT_POLICY &&
-      candidatePlatform === platform &&
+    return candidatePlatform === platform &&
       platformFromCandidateCategory(candidateCategory) === platform;
   });
 }
@@ -2950,45 +3779,42 @@ function platformCandidateOrContentCandidate(candidate, entry, sourceInfo, exist
     ...candidate,
     status: "included",
     included_in: sectionForPlatformCategory(candidate.category),
-    evidence: summarizeEvidence(entry.summary || entry.description || entry.content || "", `${sourceInfo.name} platform entry passed deterministic rules.`),
-    notes: appendSentence(candidate.notes, `platform_exempt=true; rule_id=${sanitizeNoteValue(platformFields.rule_id)}; primary_verification_required=false`),
+    evidence: summarizeEvidence(entry.summary || entry.description || entry.content || "", `${sourceInfo.name} platform entry was retained as a listener observation.`),
+    notes: appendSentence(candidate.notes, `platform_contract_annotation=true; listener_retained=true; rule_id=${sanitizeNoteValue(platformFields.rule_id)}; primary_verification_required=false`),
     ...platformFields,
     verification_sources: []
   };
 }
 
-function filterPlatformEntries(entries, sourceInfo, candidateCategory, rejected) {
+function annotatePlatformEntries(entries, sourceInfo, candidateCategory, annotations) {
   if (!isPlatformExemptCategory(candidateCategory)) {
     return entries;
   }
-  return entries.filter((entry) => {
-    const reason = platformSourceRejectReason(entry, sourceInfo);
-    if (!reason) {
-      return true;
+  for (const entry of entries) {
+    const annotation = legacyPlatformSourceAnnotation(entry, sourceInfo);
+    if (annotation) {
+      annotations[annotation] = (annotations[annotation] || 0) + 1;
     }
-    rejected[reason] = (rejected[reason] || 0) + 1;
-    return false;
-  });
+  }
+  return entries;
 }
 
-function appendPlatformRejectedNotes(notes, rejected = {}) {
-  const parts = Object.entries(rejected)
+function appendPlatformAnnotations(notes, annotations = {}) {
+  const parts = Object.entries(annotations)
     .filter(([, count]) => count > 0)
     .map(([reason, count]) => `${reason}=${count}`);
   if (parts.length === 0) {
     return notes;
   }
-  return appendSentence(notes, `platform_rejections: ${parts.join(", ")}`);
+  return appendSentence(notes, `legacy_platform_contract_annotations: ${parts.join(", ")}; listener_retained=true`);
 }
 
 function platformAuditSourceExtra(sourceInfo, extra = {}) {
   const generic = {
     id: sourceInfo.id,
     source_kind: sourceInfo.source_kind,
-    tier: sourceInfo.tier,
-    authority: sourceInfo.authority,
-    enablement: sourceInfo.enablement,
-    verification_policy: sourceInfo.verification_policy,
+    source_group: sourceInfo.source_group,
+    credibility_tag: sourceInfo.credibility_tag,
     ...(typeof sourceInfo.requires_original_url === "boolean" ? { requires_original_url: sourceInfo.requires_original_url } : {})
   };
   if (!isPlatformExemptCategory(sourceInfo.candidate_category)) {
@@ -3002,18 +3828,6 @@ function platformAuditSourceExtra(sourceInfo, extra = {}) {
     platform: sourceInfo.platform || platformFromCandidateCategory(sourceInfo.candidate_category),
     ...extra
   };
-}
-
-function sourceMaxItemsPerRun(sourceInfo, fallback) {
-  const camel = Number(sourceInfo.maxItemsPerRun);
-  if (Number.isInteger(camel) && camel > 0) {
-    return camel;
-  }
-  const snake = Number(sourceInfo.max_items_per_run);
-  if (Number.isInteger(snake) && snake > 0) {
-    return snake;
-  }
-  return fallback;
 }
 
 function requiresOriginalUrl(sourceInfo) {
@@ -3040,7 +3854,7 @@ function isOriginalXUrl(value) {
 function contentCandidateEvidence(entry, sourceInfo, candidateCategory, entryLabel) {
   const fallback = `${sourceInfo.name} published this ${entryLabel} entry.`;
   const evidence = summarizeEvidence(entry.summary, fallback);
-  if (sourceInfo.category === "intermediary" || sourceInfo.authority === "intermediary" || sourceInfo.verification_policy === "primary_required") {
+  if (sourceInfo.category === "intermediary" || isIntermediaryCredibilityTag(sourceInfo.credibility_tag)) {
     return appendSentence(evidence, "This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.");
   }
   if (sourceInfo.category === "x_hotspot") {
@@ -3054,7 +3868,7 @@ function contentCandidateEvidence(entry, sourceInfo, candidateCategory, entryLab
 
 function contentCandidateNotes(entry, sourceInfo, originalUrl) {
   const parts = [];
-  if (sourceInfo.category === "intermediary" || sourceInfo.authority === "intermediary" || sourceInfo.verification_policy === "primary_required") {
+  if (sourceInfo.category === "intermediary" || isIntermediaryCredibilityTag(sourceInfo.credibility_tag)) {
     parts.push(`intermediary_url=${entry.url}`, "primary_verification_required=true");
   }
   if (sourceInfo.category === "x_hotspot") {
@@ -3065,13 +3879,13 @@ function contentCandidateNotes(entry, sourceInfo, originalUrl) {
 
 function contentVerificationFields(entry, sourceInfo, originalUrl) {
   const status = contentVerificationStatus(sourceInfo, originalUrl);
-  const sourceLevel = String(sourceInfo.source_level || sourceInfo.sourceLevel || entry.source_level || entry.sourceLevel || "").trim();
   const fields = {
     verification_status: status,
     verification_sources: [],
-    ...(sourceLevel ? { source_level: sourceLevel } : {})
+    ...(sourceInfo.source_group ? { source_group: String(sourceInfo.source_group).trim() } : {}),
+    ...(sourceInfo.credibility_tag ? { credibility_tag: String(sourceInfo.credibility_tag).trim() } : {})
   };
-  if (sourceInfo.authority === "intermediary" || sourceInfo.authority === "secondary" || sourceInfo.authority === "aggregator" || sourceInfo.verification_policy === "primary_required") {
+  if (isIntermediaryCredibilityTag(sourceInfo.credibility_tag)) {
     fields.intermediary_url = entry.url;
   }
   if (originalUrl) {
@@ -3087,6 +3901,14 @@ function contentVerificationFields(entry, sourceInfo, originalUrl) {
   return fields;
 }
 
+function contentCandidateTagFields(entry, sourceInfo) {
+  const tags = unique([
+    ...(Array.isArray(sourceInfo.content_tags) ? sourceInfo.content_tags : []),
+    ...(Array.isArray(entry.content_tags) ? entry.content_tags : [])
+  ].map((tag) => String(tag || "").trim()).filter(Boolean));
+  return tags.length > 0 ? { content_tags: tags } : {};
+}
+
 function contentCandidateSource(entry, sourceInfo) {
   return String(entry.publisher || "").trim() || sourceInfo.name;
 }
@@ -3095,16 +3917,18 @@ function contentVerificationStatus(sourceInfo, originalUrl) {
   if (sourceInfo.category === "x_hotspot") {
     return originalUrl ? "original_social_only" : "unverified";
   }
-  if (sourceInfo.authority === "primary" && sourceInfo.verification_policy !== "primary_required") {
-    return "primary_confirmed";
-  }
-  if (sourceInfo.verification_policy === "community_only") {
-    return "original_social_only";
-  }
-  if (sourceInfo.verification_policy === "multi_source_required") {
-    return "unverified";
-  }
-  return "intermediary_only";
+  return {
+    primary_material: "primary_confirmed",
+    multi_source_material: "multi_source_confirmed",
+    single_source_relay: "intermediary_only",
+    community_lead: "original_social_only",
+    monitoring_lead: "unverified",
+    pending_review: "unverified"
+  }[String(sourceInfo.credibility_tag || "")] || "unverified";
+}
+
+function isIntermediaryCredibilityTag(value) {
+  return ["single_source_relay", "monitoring_lead", "pending_review"].includes(String(value || ""));
 }
 
 function shouldCrossCheckProductCandidate(sourceInfo, options = {}) {
@@ -3355,8 +4179,6 @@ export async function collectStatuspageIncidents(options = {}) {
   const sources = await loadSources(options.sources, options.sourcesPath, DEFAULT_STATUSPAGE_SOURCES);
   const candidateSources = [];
   const candidates = [];
-  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 20;
-  const lookbackDays = Number.isInteger(options.lookbackDays) ? options.lookbackDays : 2;
 
   for (const rawSource of sources) {
     const currentSource = normalizeGenericSource(rawSource, "status");
@@ -3375,16 +4197,18 @@ export async function collectStatuspageIncidents(options = {}) {
       }
 
       const entries = parseFeedEntries(await response.text())
-        .filter((entry) => entry.url && entry.title && isWithinReportWindow(entry.event_date, reportDate, lookbackDays))
-        .slice(0, limit);
+        .map((entry) => withObservedEntryDate(entry, reportDate))
+        .map(retainEntryWithSafeUrl)
+        .filter(Boolean);
       markSource(candidateSources.at(-1), entries.length > 0 ? "checked" : "no_signal", withRetryNote(`${entries.length} recent incidents parsed`, response));
 
       for (const entry of entries) {
         candidates.push({
-          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title}`),
+          id: uniqueCandidateId(candidates, `${currentSource.id}-${entry.title || entry.url}`),
+          ...observationIdentityFields(entry),
           source_id: currentSource.id,
           category: "community_lead",
-          title: `${currentSource.name}: ${entry.title}`,
+          title: entry.title ? `${currentSource.name}: ${entry.title}` : "",
           url: entry.url,
           source: currentSource.name,
           event_date: entry.event_date,
@@ -3399,7 +4223,7 @@ export async function collectStatuspageIncidents(options = {}) {
 
   return {
     sources: candidateSources,
-    candidates: candidates.slice(0, limit)
+    candidates
   };
 }
 
@@ -3449,6 +4273,26 @@ async function loadSources(inlineSources, sourcesPath, fallbackSources) {
   const raw = await fs.readFile(path.resolve(sourcesPath), "utf8");
   const payload = JSON.parse(raw);
   return Array.isArray(payload) ? payload : payload.sources || fallbackSources;
+}
+
+async function mapWithConcurrency(values, concurrency, worker) {
+  const items = Array.isArray(values) ? values : [];
+  const results = new Array(items.length);
+  let cursor = 0;
+  const workerCount = Math.min(positiveInteger(concurrency, 1), Math.max(items.length, 1));
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (cursor < items.length) {
+      const index = cursor;
+      cursor += 1;
+      results[index] = await worker(items[index], index);
+    }
+  }));
+  return results;
+}
+
+function positiveInteger(value, fallback) {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 }
 
 export function parseGitHubTrendingHtml(html, sourceInfo = {}) {
@@ -3507,54 +4351,6 @@ function enrichProjectCandidate(candidate, sourceInfo, reportDate) {
     name: candidate.name || candidate.repo,
     trend: candidate.trend || "new"
   };
-}
-
-function prioritizeGithubTrendingCandidatesForLimit(candidates, limit) {
-  if (!Number.isInteger(limit) || limit <= 0 || candidates.length <= limit) {
-    return candidates;
-  }
-
-  const selected = [];
-  const seenRepos = new Set();
-  const addCandidate = (candidate) => {
-    const key = githubCandidateRepoKey(candidate);
-    if (key && seenRepos.has(key)) {
-      return false;
-    }
-    if (key) {
-      seenRepos.add(key);
-    }
-    selected.push(candidate);
-    return selected.length >= limit;
-  };
-
-  const weeklyAll = candidates
-    .filter((candidate) => isGithubTrendingWeeklyAllCandidate(candidate))
-    .sort(compareGithubTrendingCandidateRank)
-    .slice(0, 10);
-  for (const candidate of weeklyAll) {
-    if (addCandidate(candidate)) return selected;
-  }
-
-  const languagePools = REQUIRED_GITHUB_TRENDING_WEEKLY_LANGUAGES.map((language) => candidates
-    .filter((candidate) => isGithubTrendingWeeklyLanguageCandidate(candidate, language))
-    .sort(compareGithubTrendingCandidateRank)
-    .slice(0, 10));
-  const maxPoolLength = Math.max(0, ...languagePools.map((pool) => pool.length));
-  for (let index = 0; index < maxPoolLength; index += 1) {
-    for (const pool of languagePools) {
-      if (pool[index] && addCandidate(pool[index])) {
-        return selected;
-      }
-    }
-  }
-
-  for (const candidate of candidates) {
-    if (addCandidate(candidate)) {
-      return selected;
-    }
-  }
-  return selected;
 }
 
 function shouldPreferGithubTrendingCandidate(candidate, existing) {
@@ -4055,7 +4851,7 @@ function normalizeGenericSource(sourceItem, prefix) {
 }
 
 function toCandidateSource(sourceItem, category, checkedAt, status, notes) {
-  const sourceLevel = String(sourceItem.source_level || sourceItem.sourceLevel || "").trim();
+  const sourceGroup = String(sourceItem.source_group || sourceItem.public_source_group || "").trim();
   return {
     id: sourceItem.id,
     name: sourceItem.name,
@@ -4064,7 +4860,9 @@ function toCandidateSource(sourceItem, category, checkedAt, status, notes) {
     status,
     checked_at: checkedAt,
     notes,
-    ...(sourceLevel ? { source_level: sourceLevel } : {}),
+    ...(sourceGroup ? { source_group: sourceGroup } : {}),
+    ...(sourceItem.credibility_tag ? { credibility_tag: String(sourceItem.credibility_tag).trim() } : {}),
+    ...(Array.isArray(sourceItem.content_tags) ? { content_tags: unique(sourceItem.content_tags.map((tag) => String(tag || "").trim()).filter(Boolean)) } : {}),
     ...(sourceItem.platform ? { platform: sourceItem.platform } : {}),
     ...(sourceItem.rule_id || sourceItem.id ? { rule_id: sourceItem.rule_id || sourceItem.id } : {}),
     ...(isPlatformExemptCategory(sourceItem.candidate_category) ? {
@@ -4080,7 +4878,8 @@ function markSource(sourceItem, status, notes) {
 }
 
 function auditSource(name, url, status, notes, extra = {}) {
-  return { name, url, status, notes, ...extra };
+  const source = { name, url, status, notes, ...extra };
+  return { ...source, ...transportCompletenessTags(source) };
 }
 
 function inferBuilderBlockedReason(sourceResults, candidates = []) {
@@ -4104,7 +4903,48 @@ function isFollowBuildersXSource(sourceResult) {
 }
 
 function hasXStatusCandidate(candidates) {
-  return candidates.some((candidate) => isXStatusUrl(candidate.url) || isXStatusUrl(candidate.original_url));
+  return candidates.some((candidate) => {
+    if (isXStatusUrl(candidate.url) || isXStatusUrl(candidate.original_url)) {
+      return true;
+    }
+    const tags = Array.isArray(candidate.tags) ? candidate.tags : [];
+    return candidate.category === "builder_observation" &&
+      tags.includes("original_url_missing") &&
+      (candidate.source_id === "follow-builders-x" || candidate.source_id === "x-builder-search-tavily");
+  });
+}
+
+function xObservationLinks(rawUrl, providerUrl) {
+  const originalUrl = normalizeXStatusUrl(rawUrl);
+  if (originalUrl) {
+    return {
+      url: originalUrl,
+      original_url: originalUrl,
+      verification_status: "original_social_only",
+      verification_sources: [originalUrl],
+      notes: ""
+    };
+  }
+
+  const intermediaryUrl = sanitizePublicHttpUrl(rawUrl) || sanitizePublicHttpUrl(providerUrl);
+  return {
+    url: intermediaryUrl,
+    ...(intermediaryUrl ? { intermediary_url: intermediaryUrl } : {}),
+    verification_status: "unverified",
+    verification_sources: [],
+    tags: ["original_url_missing", "unverified", "indirect"],
+    notes: `original_url_missing=true; verification=unverified; access=indirect; safe_public_url=${intermediaryUrl ? "retained" : "missing"}`
+  };
+}
+
+function xObservationId(sourceId, links, eventDate, ...identityParts) {
+  const identity = [
+    sourceId,
+    links.original_url || links.intermediary_url || links.url || "no_safe_public_url",
+    eventDate,
+    ...identityParts
+  ].join("|");
+  return `x_observation:${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
 }
 
 function normalizeXStatusUrl(value) {
@@ -4244,14 +5084,6 @@ function xStatusDate(value) {
   }
 }
 
-function formatSearchDate(value) {
-  const date = new Date(`${value}T00:00:00Z`);
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-  return `${date.toLocaleString("en-US", { month: "long", timeZone: "UTC" })} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
-}
-
 function parseFeedEntries(xml) {
   const entryBlocks = matchXmlBlocks(xml, "entry");
   if (entryBlocks.length > 0) {
@@ -4261,6 +5093,9 @@ function parseFeedEntries(xml) {
 }
 
 function parseContentSourceEntries(content, sourceInfo) {
+  if (sourceInfo.source_kind === DATED_CHANGELOG_SOURCE_KIND) {
+    return parseDatedChangelogEntries(content, sourceInfo);
+  }
   if (sourceInfo.format === "html_index") {
     return parseHtmlIndexEntries(content, sourceInfo);
   }
@@ -4270,10 +5105,123 @@ function parseContentSourceEntries(content, sourceInfo) {
   if (sourceInfo.source_kind === HUGGINGFACE_DAILY_PAPERS_API_SOURCE_KIND && looksLikeJson(content)) {
     return parseHuggingFaceDailyPapersEntries(content, sourceInfo);
   }
+  if (sourceInfo.source_kind === HUGGINGFACE_HUB_TRENDING_API_SOURCE_KIND && looksLikeJson(content)) {
+    return parseHuggingFaceHubTrendingEntries(content, sourceInfo);
+  }
   if (sourceInfo.source_kind === "search_api" && looksLikeJson(content)) {
     return parseJsonSearchApiEntries(content, sourceInfo);
   }
   return parseFeedEntries(content);
+}
+
+function parseDatedChangelogEntries(content, sourceInfo = {}) {
+  const value = String(content || "");
+  const entries = /<\/?[a-z][\s\S]*>/i.test(value)
+    ? parseHtmlDatedChangelogEntries(value, sourceInfo)
+    : parseMarkdownDatedChangelogEntries(value, sourceInfo);
+  if (entries.length > 0) {
+    return entries;
+  }
+  const summary = cleanText(value).slice(0, 240);
+  return summary ? [{
+    title: `${sourceInfo.name || "Changelog"} update`,
+    url: sourceInfo.url,
+    event_date: "",
+    summary
+  }] : [];
+}
+
+function parseMarkdownDatedChangelogEntries(markdown, sourceInfo = {}) {
+  const headings = [...String(markdown || "").matchAll(/^(#{2,4})\s+(.+?)\s*$/gm)].map((match) => ({
+    index: match.index,
+    end: match.index + match[0].length,
+    level: match[1].length,
+    text: cleanText(match[2])
+  }));
+  const dated = headings.filter((heading) => dateOnly(heading.text));
+  return dated.map((heading, index) => {
+    const next = dated[index + 1];
+    const section = String(markdown || "").slice(heading.end, next?.index ?? String(markdown || "").length);
+    const innerHeading = headings.find((candidate) => candidate.index >= heading.end && candidate.index < (next?.index ?? Infinity));
+    const link = markdownLinks(section).find((item) => !item.image)?.url || markdownLinks(section).find((item) => !item.image)?.href || "";
+    const title = innerHeading?.text || `${sourceInfo.name || "Changelog"} · ${heading.text}`;
+    return {
+      title,
+      url: absoluteUrl(link, sourceInfo.url) || `${String(sourceInfo.url || "").replace(/#.*$/, "")}#${slugId(title)}`,
+      event_date: dateOnly(heading.text),
+      summary: cleanText(section.replace(/^#{2,4}\s+.+$/gm, " ")).slice(0, 240)
+    };
+  }).filter((entry) => entry.title && entry.url && entry.event_date);
+}
+
+function parseHtmlDatedChangelogEntries(html, sourceInfo = {}) {
+  const headings = [...String(html || "").matchAll(/<h([2-4])\b([^>]*)>([\s\S]*?)<\/h\1>/gi)].map((match) => ({
+    index: match.index,
+    end: match.index + match[0].length,
+    level: Number(match[1]),
+    id: extractAttribute(match[2], "id"),
+    text: cleanText(match[3])
+  }));
+  const dated = headings.filter((heading) => dateOnly(heading.text));
+  return dated.map((heading, index) => {
+    const next = dated[index + 1];
+    const section = String(html || "").slice(heading.end, next?.index ?? String(html || "").length);
+    const innerHeading = headings.find((candidate) => candidate.index >= heading.end && candidate.index < (next?.index ?? Infinity));
+    const sectionLink = extractHtmlLinks(section, sourceInfo.url)[0] || "";
+    const title = innerHeading?.text || `${sourceInfo.name || "Changelog"} · ${heading.text}`;
+    return {
+      title,
+      url: sectionLink || `${String(sourceInfo.url || "").replace(/#.*$/, "")}#${heading.id || slugId(title)}`,
+      event_date: dateOnly(heading.text),
+      summary: cleanText(section).slice(0, 240)
+    };
+  }).filter((entry) => entry.title && entry.url && entry.event_date);
+}
+
+function parseHuggingFaceHubTrendingEntries(content, sourceInfo = {}) {
+  let payload;
+  try {
+    payload = JSON.parse(content);
+  } catch {
+    return [];
+  }
+  const rows = Array.isArray(payload) ? payload : arrayFromPossibleKeys(payload, ["results", "data", "items", "models", "spaces", "datasets"]);
+  const artifactType = huggingFaceArtifactType(sourceInfo.url);
+  return rows.map((item) => {
+    const id = cleanText(firstString(item?.id, item?.modelId, item?.name));
+    if (!id) return null;
+    const tags = Array.isArray(item.tags) ? item.tags.map(cleanText).filter(Boolean) : [];
+    const score = Number.isFinite(Number(item.trendingScore)) ? Number(item.trendingScore) : null;
+    const likes = Number.isFinite(Number(item.likes)) ? Number(item.likes) : null;
+    const downloads = Number.isFinite(Number(item.downloads)) ? Number(item.downloads) : null;
+    const metrics = [
+      score === null ? "" : `trending score ${score}`,
+      likes === null ? "" : `${likes} likes`,
+      downloads === null ? "" : `${downloads} downloads`
+    ].filter(Boolean);
+    return {
+      observation_id: `huggingface:${artifactType}:${id}`,
+      title: id,
+      url: huggingFaceArtifactUrl(id, artifactType),
+      event_date: jsonDateOnly(firstString(item.createdAt, item.created_at, item.lastModified, item.last_modified)),
+      summary: `${id} appeared in Hugging Face ${artifactType} trending${metrics.length ? ` with ${metrics.join(", ")}` : ""}.`,
+      publisher: id.split("/")[0] || "Hugging Face",
+      tags,
+      content_tags: artifactType === "models" ? ["model_release"] : artifactType === "datasets" ? ["research"] : ["product_update"]
+    };
+  }).filter(Boolean);
+}
+
+function huggingFaceArtifactType(value) {
+  const match = String(value || "").match(/\/api\/(models|spaces|datasets)\b/i);
+  return match?.[1]?.toLowerCase() || "models";
+}
+
+function huggingFaceArtifactUrl(id, artifactType) {
+  const encodedPath = String(id || "").split("/").map(encodeURIComponent).join("/");
+  if (artifactType === "spaces") return `https://huggingface.co/spaces/${encodedPath}`;
+  if (artifactType === "datasets") return `https://huggingface.co/datasets/${encodedPath}`;
+  return `https://huggingface.co/${encodedPath}`;
 }
 
 async function collectGitHubReportMarkdownSource({ sourceInfo, fetchImpl, reportDate, generatedAt, options = {} }) {
@@ -4395,7 +5343,7 @@ function urlWithoutHash(value) {
 
 function markdownLinks(markdown) {
   const links = [];
-  const pattern = /(!)?\[([^\]]{1,220})\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
+  const pattern = /(!)?\[([^\]]{0,220})\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
   for (const match of String(markdown || "").matchAll(pattern)) {
     links.push({
       image: Boolean(match[1]),
@@ -4411,7 +5359,7 @@ export function parseGitHubReportMarkdownEntries(markdown, sourceInfo = {}) {
   const reportUrl = sourceInfo.report_url || sourceInfo.url || "";
   const eventDate = sourceInfo.fallback_event_date || dateOnly(sourceInfo.generated_at) || "";
   const entries = [];
-  const seen = new Set();
+  const seenParserPositions = new Set();
   const text = String(markdown || "");
 
   const tableRowPattern = /(?:^|\n)\s*\|\s*\d+\)\s+\*\*([^*]{2,180})\*\*\s*[-:：]?\s*([\s\S]*?)\|\s*([\s\S]*?)\s*\|/g;
@@ -4420,7 +5368,7 @@ export function parseGitHubReportMarkdownEntries(markdown, sourceInfo = {}) {
     if (!link) {
       continue;
     }
-    addMarkdownReportEntry(entries, seen, {
+    addMarkdownReportEntry(entries, seenParserPositions, {
       title: match[1],
       href: link.href,
       summary: match[2],
@@ -4434,7 +5382,7 @@ export function parseGitHubReportMarkdownEntries(markdown, sourceInfo = {}) {
 
   const numberedPattern = /(?:^|\n)\s*\d+[、.)]\s*\[([^\]]{2,160})\]\(([^)\s]+)(?:\s+"[^"]*")?\)\s*[：:，,-]?\s*([^\n]{0,360})/g;
   for (const match of text.matchAll(numberedPattern)) {
-    addMarkdownReportEntry(entries, seen, {
+    addMarkdownReportEntry(entries, seenParserPositions, {
       title: match[1],
       href: match[2],
       summary: match[3],
@@ -4448,7 +5396,7 @@ export function parseGitHubReportMarkdownEntries(markdown, sourceInfo = {}) {
 
   const bulletPattern = /(?:^|\n)\s*[-*]\s+\[([^\]]{2,180})\]\(([^)\s]+)(?:\s+"[^"]*")?\)\s*[：:，,-]?\s*([^\n]{0,360})/g;
   for (const match of text.matchAll(bulletPattern)) {
-    addMarkdownReportEntry(entries, seen, {
+    addMarkdownReportEntry(entries, seenParserPositions, {
       title: match[1],
       href: match[2],
       summary: match[3],
@@ -4461,10 +5409,7 @@ export function parseGitHubReportMarkdownEntries(markdown, sourceInfo = {}) {
   }
 
   for (const link of markdownLinks(text)) {
-    if (entries.length >= 30) {
-      break;
-    }
-    addMarkdownReportEntry(entries, seen, {
+    addMarkdownReportEntry(entries, seenParserPositions, {
       title: link.title,
       href: link.href,
       summary: markdownLineAround(text, link.index),
@@ -4477,25 +5422,31 @@ export function parseGitHubReportMarkdownEntries(markdown, sourceInfo = {}) {
     });
   }
 
-  return entries.slice(0, 30);
+  return entries;
 }
 
-function addMarkdownReportEntry(entries, seen, { title, href, summary, markdown, index, sourceInfo, reportUrl, eventDate, image }) {
+function addMarkdownReportEntry(entries, seenParserPositions, { title, href, summary, markdown, index, sourceInfo, reportUrl, eventDate, image }) {
   const url = resolveGitHubReportEntryUrl(href, reportUrl || sourceInfo.url);
   if (!isUsefulReportEntryUrl(url, sourceInfo) || image) {
     return;
   }
-  const key = url.replace(/#.*$/, "");
-  if (seen.has(key)) {
-    return;
-  }
   const cleanedTitle = cleanText(title);
-  if (!cleanedTitle || isBoilerplateReportTitle(cleanedTitle)) {
+  const rowText = markdownLineAround(markdown, index);
+  const parserPosition = `${markdownLineStart(markdown, index)}|${url}`;
+  if (seenParserPositions.has(parserPosition)) {
     return;
   }
-  seen.add(key);
-  const localSummary = cleanText(summary) || markdownLineAround(markdown, index);
+  seenParserPositions.add(parserPosition);
+  const localSummary = cleanText(summary) || rowText;
+  const rowFingerprint = stableRowFingerprint("github-report-row", [
+    sourceInfo.id || sourceInfo.url,
+    reportUrl || sourceInfo.url,
+    url,
+    cleanedTitle,
+    localSummary
+  ]);
   entries.push({
+    observation_id: rowFingerprint,
     title: cleanedTitle,
     url,
     event_date: eventDate,
@@ -4535,38 +5486,21 @@ function rawGitHubRootRelativeUrl(href, base) {
 }
 
 function isUsefulReportEntryUrl(url, sourceInfo = {}) {
-  if (!isHttpUrl(url) || looksLikeImageUrl(url)) {
-    return false;
-  }
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase();
-    const pathName = parsed.pathname.toLowerCase();
-    if (/^(?:cdn\.|raw\.githubusercontent\.com$)/i.test(host) && looksLikeImageUrl(url)) {
-      return false;
-    }
-    if (host === "github.com" && /\/(?:issues|pull|discussions)\/\d+$/i.test(pathName)) {
-      return false;
-    }
-    const sourceHost = sourceInfo.url ? new URL(sourceInfo.url).hostname.toLowerCase() : "";
-    if (sourceHost && host === sourceHost && /(?:readme|contributors|license|commits)/i.test(pathName)) {
-      return false;
-    }
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function isBoilerplateReportTitle(title) {
-  return /^(官网|更新发布|贡献者|推荐或自荐|subscribe|newsletter|readme|english|中文|日本語|paper|papers|tweet|tweets?|post|website|code|github|pdf|demo)$/i.test(title);
+  return Boolean(sanitizePublicHttpUrl(url)) && !looksLikeImageUrl(url);
 }
 
 function markdownLineAround(markdown, index) {
   const text = String(markdown || "");
-  const start = text.lastIndexOf("\n", Math.max(0, index - 1)) + 1;
+  const start = markdownLineStart(text, index);
   const end = text.indexOf("\n", index);
   return cleanText(text.slice(start, end >= 0 ? end : text.length)).slice(0, 360);
+}
+
+function markdownLineStart(markdown, index) {
+  const text = String(markdown || "");
+  const offset = Math.max(0, Number(index || 0));
+  if (text[offset] === "\n") return offset + 1;
+  return text.lastIndexOf("\n", Math.max(0, offset - 1)) + 1;
 }
 
 function markdownSectionForGitHubAnchor(markdown, hash) {
@@ -4827,7 +5761,7 @@ function parseOpenRouterHistoryEntries(text, topEntries = []) {
 }
 
 function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt, extras = {}) {
-  const topEntries = entries.slice(0, 10).map((entry) => ({
+  const topEntries = entries.map((entry) => ({
     rank: entry.rank,
     model: entry.model,
     provider: entry.provider,
@@ -4862,10 +5796,10 @@ function openRouterRankingsSnapshot(entries, sourceInfo, generatedAt, extras = {
 }
 
 function hasCompleteTop10(entries) {
-  if (!Array.isArray(entries) || entries.length !== 10) {
+  if (!Array.isArray(entries) || entries.length < 10) {
     return false;
   }
-  return entries.every((entry, index) =>
+  return entries.slice(0, 10).every((entry, index) =>
     entry.rank === index + 1 &&
     entry.model &&
     entry.provider &&
@@ -5125,7 +6059,7 @@ export function parseSweBenchProText(text) {
     .filter(Boolean);
   const entries = [];
   const seen = new Set();
-  for (let index = 0; index < lines.length && entries.length < 10; index += 1) {
+  for (let index = 0; index < lines.length; index += 1) {
     const score = sweBenchProScoreLine(lines[index]);
     if (!score) {
       continue;
@@ -5160,7 +6094,7 @@ function sweBenchProStaticFallbackSource(sourceInfo, options = {}, reason = "") 
 }
 
 function sweBenchProSnapshot(entries, sourceInfo, generatedAt, extras = {}) {
-  const topEntries = entries.slice(0, 10).map((entry, index) => ({
+  const topEntries = entries.map((entry, index) => ({
     rank: Number(entry.rank) || index + 1,
     model: String(entry.model || "").trim(),
     provider: String(entry.provider || sweBenchProProviderForModel(entry.model)).trim(),
@@ -5270,8 +6204,8 @@ const SWE_BENCH_PRO_STATIC_ROWS = [
 
 function hasCompleteSweBenchProTop10(entries) {
   return Array.isArray(entries) &&
-    entries.length === 10 &&
-    entries.every((entry, index) =>
+    entries.length >= 10 &&
+    entries.slice(0, 10).every((entry, index) =>
       Number(entry.rank) === index + 1 &&
       entry.model &&
       entry.provider &&
@@ -5421,7 +6355,6 @@ export function parseArtificialAnalysisIndexText(text) {
         return value >= 0 && value <= 100;
       });
     return models
-      .slice(0, 10)
       .map((model, index) => ({
         rank: index + 1,
         model,
@@ -5435,7 +6368,7 @@ export function parseArtificialAnalysisIndexText(text) {
   const entries = [];
   const seen = new Set();
 
-  for (let index = 0; index < scanLines.length && entries.length < 10; index += 1) {
+  for (let index = 0; index < scanLines.length; index += 1) {
     const model = scanLines[index];
     const provider = artificialAnalysisProviderForModel(model);
     if (!provider || seen.has(model.toLowerCase())) {
@@ -5491,7 +6424,7 @@ function artificialAnalysisProviderForModel(model) {
 }
 
 function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt, componentTabs = {}, extras = {}) {
-  const topEntries = entries.slice(0, 10).map((entry) => ({
+  const topEntries = entries.map((entry) => ({
     rank: entry.rank,
     model: entry.model,
     provider: entry.provider,
@@ -5500,11 +6433,11 @@ function artificialAnalysisIndexSnapshot(entries, sourceInfo, generatedAt, compo
   }));
   const tabs = normalizeArtificialAnalysisComponentTabs(componentTabs, topEntries);
   const officialComponentSnapshot = extras.officialComponentSnapshot ||
-    (topEntries.length === 10 ? artificialAnalysisOfficialComponentSnapshot(topEntries, sourceInfo, generatedAt) : null);
+    (topEntries.length >= 10 ? artificialAnalysisOfficialComponentSnapshot(topEntries, sourceInfo, generatedAt) : null);
   return {
     type: "artificial_analysis_intelligence_index_public_page",
     collection_method: "public_page_playwright",
-    snapshot_status: topEntries.length === 10 ? "complete" : topEntries.length > 0 ? "partial" : "blocked",
+    snapshot_status: topEntries.length >= 10 ? "complete" : topEntries.length > 0 ? "partial" : "blocked",
     snapshot_as_of: generatedAt || new Date().toISOString(),
     source_url: sourceInfo.url,
     top_entries: topEntries,
@@ -5937,15 +6870,13 @@ function looksLikeJson(content) {
 }
 
 async function hydrateSearchApiEntries(entries, sourceInfo, fetchImpl) {
-  if (!isHackerNewsTopstoriesSource(sourceInfo)) {
+  if (!isHackerNewsStoriesSource(sourceInfo)) {
     return entries;
   }
 
-  const hydrated = [];
-  for (const entry of entries.slice(0, Math.max(15, Number(sourceInfo.maxItemsPerRun) || 0))) {
+  return mapWithConcurrency(entries, positiveInteger(sourceInfo.hydration_concurrency, 8), async (entry) => {
     if (!entry.item_api_url) {
-      hydrated.push(entry);
-      continue;
+      return entry;
     }
     try {
       const response = await fetchImpl(entry.item_api_url, {
@@ -5956,18 +6887,15 @@ async function hydrateSearchApiEntries(entries, sourceInfo, fetchImpl) {
         ...timeoutInit(sourceInfo.timeoutMs || sourceInfo.timeout_ms || 15000)
       });
       if (!response.ok) {
-        continue;
+        return hackerNewsPlaceholderEntry(entry);
       }
       const item = JSON.parse(await response.text());
       const normalized = normalizeJsonApiEntry(item, sourceInfo);
-      if (normalized.title && normalized.url && normalized.event_date) {
-        hydrated.push(normalized);
-      }
+      return normalized.url ? normalized : hackerNewsPlaceholderEntry(entry);
     } catch {
-      continue;
+      return hackerNewsPlaceholderEntry(entry);
     }
-  }
-  return hydrated;
+  });
 }
 
 function parseJsonSearchApiEntries(content, sourceInfo) {
@@ -5978,11 +6906,12 @@ function parseJsonSearchApiEntries(content, sourceInfo) {
     return [];
   }
 
-  if (isHackerNewsTopstoriesSource(sourceInfo) && Array.isArray(payload)) {
+  if (isHackerNewsStoriesSource(sourceInfo) && Array.isArray(payload)) {
     return payload
       .filter((id) => Number.isInteger(Number(id)))
-      .slice(0, 30)
       .map((id) => ({
+        observation_id: `hacker-news:${Number(id)}`,
+        item_id: Number(id),
         item_api_url: `https://hacker-news.firebaseio.com/v0/item/${id}.json`
       }));
   }
@@ -5991,7 +6920,7 @@ function parseJsonSearchApiEntries(content, sourceInfo) {
     ? ((payload?.data?.children || []).map((child) => child?.data || child))
     : arrayFromPossibleKeys(payload, ["results", "data", "items", "papers", "posts", "children"]);
 
-  return items.map((item) => normalizeJsonApiEntry(item, sourceInfo)).filter((entry) => entry.title && entry.url);
+  return items.map((item) => normalizeJsonApiEntry(item, sourceInfo)).filter((entry) => entry.url);
 }
 
 function parseHuggingFaceDailyPapersEntries(content, sourceInfo) {
@@ -6004,7 +6933,7 @@ function parseHuggingFaceDailyPapersEntries(content, sourceInfo) {
 
   return arrayFromPossibleKeys(payload, ["results", "data", "items", "papers", "dailyPapers", "daily_papers"])
     .map((item) => normalizeHuggingFaceDailyPaperEntry(item, sourceInfo))
-    .filter((entry) => entry.title && entry.url);
+    .filter((entry) => entry.url);
 }
 
 function normalizeHuggingFaceDailyPaperEntry(rawItem, sourceInfo = {}) {
@@ -6030,6 +6959,9 @@ function normalizeHuggingFaceDailyPaperEntry(rawItem, sourceInfo = {}) {
   );
 
   return {
+    observation_id: paperId
+      ? `huggingface:paper:${paperId}`
+      : stableRowFingerprint("huggingface-paper-row", [JSON.stringify(item)]),
     title: cleanText(firstString(item.title, paper.title, item.name, paper.name)),
     url,
     event_date: jsonDateOnly(firstString(item.publishedAt, item.published_at, item.date, paper.publishedAt, paper.published_at)),
@@ -6074,7 +7006,7 @@ function normalizeJsonApiEntry(rawItem, sourceInfo = {}) {
     return {};
   }
 
-  const idUrl = sourceInfo.id === "content-hacker-news-api" && item.id
+  const idUrl = isHackerNewsStoriesSource(sourceInfo) && item.id
     ? `https://news.ycombinator.com/item?id=${item.id}`
     : "";
   const permalink = absoluteUrl(firstString(item.permalink, item.comments_url), sourceInfo.url);
@@ -6099,8 +7031,12 @@ function normalizeJsonApiEntry(rawItem, sourceInfo = {}) {
     ),
     sourceInfo.url
   );
+  const nativeObservationId = firstString(item.id, item.guid, item.uuid);
 
   return {
+    observation_id: nativeObservationId
+      ? `${sourceInfo.id || "json-api"}:${cleanText(nativeObservationId)}`
+      : stableRowFingerprint("json-api-row", [sourceInfo.id || sourceInfo.url, JSON.stringify(item)]),
     title: cleanText(firstString(item.title, item.name, item.paper_title)),
     url,
     event_date: jsonDateOnly(firstString(item.published, item.published_at, item.date, item.created_at, item.createdAt, item.updated_at, item.time, item.created_utc)),
@@ -6121,8 +7057,21 @@ function jsonDateOnly(value) {
   return dateOnly(value);
 }
 
-function isHackerNewsTopstoriesSource(sourceInfo = {}) {
-  return sourceInfo.id === "content-hacker-news-api" || /hacker-news\.firebaseio\.com\/v0\/topstories\.json/i.test(sourceInfo.url || "");
+function isHackerNewsStoriesSource(sourceInfo = {}) {
+  return sourceInfo.id === "content-hacker-news-api" || /hacker-news\.firebaseio\.com\/v0\/(?:top|best|new|show|ask)stories\.json/i.test(sourceInfo.url || "");
+}
+
+function hackerNewsPlaceholderEntry(entry = {}) {
+  const id = Number(entry.item_id || String(entry.item_api_url || "").match(/\/item\/(\d+)\.json/)?.[1]);
+  if (!Number.isInteger(id)) return entry;
+  return {
+    observation_id: entry.observation_id || `hacker-news:${id}`,
+    title: `Hacker News item ${id}`,
+    url: `https://news.ycombinator.com/item?id=${id}`,
+    event_date: "",
+    summary: "Hacker News item hydration was temporarily unavailable; the discussion URL was retained as a monitoring clue.",
+    transport_degraded: "item_hydration_failed"
+  };
 }
 
 function isRedditSource(sourceInfo = {}) {
@@ -6131,14 +7080,13 @@ function isRedditSource(sourceInfo = {}) {
 
 function parseHtmlIndexEntries(html, sourceInfo = {}) {
   const entries = [];
-  const seenUrls = new Set();
   const structuredMetadata = htmlIndexStructuredMetadata(html, sourceInfo.url);
   const anchorPattern = /<a\b[^>]*href=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>([\s\S]*?)<\/a>/gi;
 
   for (const match of html.matchAll(anchorPattern)) {
     const rawHref = decodeXml(match[1] || match[2] || match[3] || "");
     const url = absoluteUrl(rawHref, sourceInfo.url);
-    if (!url || seenUrls.has(url) || !matchesSourceLink(rawHref, url, sourceInfo)) {
+    if (!url || !matchesSourceLink(rawHref, url, sourceInfo)) {
       continue;
     }
 
@@ -6151,17 +7099,20 @@ function parseHtmlIndexEntries(html, sourceInfo = {}) {
       : anchorTitle || metadata?.title || "";
     const anchorEventDate = extractHtmlDate(anchorBlock);
     const eventDate = anchorEventDate || metadata?.event_date || extractHtmlDate(containerBlock);
-    if (!title || !eventDate) {
-      continue;
-    }
-
     // Treat the exact anchor (or same-URL structured metadata) as the fact boundary.
     // Reading past its closing tag can attach the next card's title, image, or facts
     // to the current candidate. An exact article/list-item container may supply only
     // an external date; arbitrary surrounding markup is never used as evidence.
     const imageUrl = extractHtmlImageUrl(anchorBlock, url) || metadata?.image_url || "";
-    seenUrls.add(url);
+    const rowFingerprint = stableRowFingerprint("html-index", [
+      sourceInfo.id || sourceInfo.url,
+      url,
+      title,
+      eventDate,
+      cleanText(containerBlock || anchorBlock)
+    ]);
     entries.push({
+      observation_id: rowFingerprint,
       title,
       url,
       event_date: eventDate,
@@ -6277,7 +7228,9 @@ function structuredImageUrl(value, baseUrl) {
 function parseAtomEntry(block) {
   const url = atomLink(block) || xmlText(block, "link");
   const summary = xmlText(block, "summary") || xmlText(block, "content");
+  const nativeId = xmlText(block, "id");
   return normalizeFeedEntry({
+    observation_id: nativeId || feedRowObservationId(block),
     title: xmlText(block, "title"),
     url,
     date: xmlText(block, "updated") || xmlText(block, "published"),
@@ -6290,7 +7243,9 @@ function parseAtomEntry(block) {
 function parseRssItem(block) {
   const url = xmlText(block, "link") || atomLink(block);
   const summary = xmlText(block, "description") || xmlText(block, "encoded") || xmlText(block, "summary");
+  const nativeId = xmlText(block, "guid") || xmlText(block, "id");
   return normalizeFeedEntry({
+    observation_id: nativeId || feedRowObservationId(block),
     title: xmlText(block, "title"),
     url,
     date: xmlText(block, "pubDate") || xmlText(block, "date") || xmlText(block, "updated"),
@@ -6305,6 +7260,7 @@ function normalizeFeedEntry(entry) {
   const rawSummary = entry.summary || "";
   const imageUrl = normalizeImageUrl(entry.image_url, url);
   return {
+    observation_id: cleanText(entry.observation_id),
     title: cleanText(entry.title),
     url,
     event_date: dateOnly(entry.date),
@@ -6312,6 +7268,21 @@ function normalizeFeedEntry(entry) {
     links: extractHtmlLinks(rawSummary, url),
     ...(imageUrl ? { image_url: imageUrl, image_source: entry.image_source || "feed" } : {})
   };
+}
+
+function feedRowObservationId(block) {
+  const row = String(block || "").replace(/\s+/g, " ").trim();
+  return stableRowFingerprint("feed-row", [row]);
+}
+
+function stableRowFingerprint(prefix, parts) {
+  const row = (Array.isArray(parts) ? parts : [parts]).map((part) => String(part || "").trim()).join("\n");
+  return `${prefix}:${createHash("sha256").update(row).digest("hex").slice(0, 32)}`;
+}
+
+function observationIdentityFields(entry = {}) {
+  const observationId = cleanText(entry.observation_id);
+  return observationId ? { observation_id: observationId } : {};
 }
 
 function contentCandidateImageFields(entry = {}) {
@@ -6499,17 +7470,20 @@ function monthNumber(value) {
   return months[month] || "";
 }
 
-function isWithinReportWindow(eventDate, reportDate, lookbackDays) {
-  if (!eventDate) {
-    return false;
+function withObservedEntryDate(entry, reportDate) {
+  if (dateOnly(entry?.event_date)) {
+    return entry;
   }
-  const eventTime = Date.parse(`${eventDate}T00:00:00Z`);
-  const reportTime = Date.parse(`${reportDate}T00:00:00Z`);
-  if (Number.isNaN(eventTime) || Number.isNaN(reportTime)) {
-    return false;
-  }
-  const diffDays = Math.floor((reportTime - eventTime) / 86400000);
-  return diffDays >= 0 && diffDays <= lookbackDays;
+  return {
+    ...entry,
+    event_date: reportDate,
+    date_basis: "observed"
+  };
+}
+
+function retainEntryWithSafeUrl(entry) {
+  const url = sanitizePublicHttpUrl(entry?.url);
+  return url ? { ...entry, url } : null;
 }
 
 function summarizeEvidence(summary, fallback) {

@@ -44,6 +44,19 @@ const PUBLIC_DOCS_FORBIDDEN_PATTERNS = [
   { name: "public_source_blocked_code", pattern: /\b[a-z0-9_]+_sources_blocked\b/i }
 ];
 
+const INTERNAL_SOURCE_TOKEN_PATTERN = /(?:\bAI_DAILY_[A-Z0-9_]+\b|\b[A-Z][A-Z0-9_]*(?:_API_KEY|_TOKEN|_COOKIE|_SECRET|_BASE_URL|_FEED_URL|_URL)\b|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|\bkeywords\b|source_audit|candidate_pool|selection_snapshot|self_check|score|debug)/i;
+const INTERNAL_NOTES_FIELD_PATTERNS = [
+  /["'`]notes["'`]\s*:/i,
+  /(?:^|\r?\n)\s*(?:[-*]\s*)?`?notes`?\s*(?=$|[:=|])/im,
+  /\|\s*`?notes`?\s*\|/i
+];
+
+export function containsInternalSourceField(value) {
+  const text = String(value || "");
+  return INTERNAL_SOURCE_TOKEN_PATTERN.test(text)
+    || INTERNAL_NOTES_FIELD_PATTERNS.some((pattern) => pattern.test(text));
+}
+
 export async function scanPublicArtifactsForLocalInfo(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const targets = options.targets || PUBLIC_ARTIFACT_PATHS;

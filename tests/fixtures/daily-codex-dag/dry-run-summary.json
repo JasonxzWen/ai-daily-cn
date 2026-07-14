@@ -6,7 +6,7 @@
     "ok": true,
     "failures": [],
     "warnings": [],
-    "node_ids": ["fetch-source-health"],
+    "node_ids": ["fetch-source-inputs"],
     "checked_files": ["config/daily-codex-dag.json"]
   },
   "mode": "daily_codex_dag_dry_run",
@@ -20,12 +20,12 @@
     "levels": [
       {
         "level": 0,
-        "node_ids": ["fetch-source-health"]
+        "node_ids": ["fetch-source-inputs"]
       }
     ],
     "nodes": [
       {
-        "id": "fetch-source-health",
+        "id": "fetch-source-inputs",
         "title": "Fetch source health and raw candidate lanes",
         "kind": "command",
         "execution_status": "planned",
@@ -39,7 +39,7 @@
         "inputs": [],
         "outputs": [
           {
-            "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json",
+            "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-inputs.json",
             "required": true
           }
         ],
@@ -55,10 +55,10 @@
     "levels": [
       {
         "level": 0,
-        "node_ids": ["fetch-source-health"]
+        "node_ids": ["fetch-source-inputs"]
       }
     ],
-    "planned_nodes": ["fetch-source-health"],
+    "planned_nodes": ["fetch-source-inputs"],
     "completed_nodes": [],
     "blocked_nodes": []
   },

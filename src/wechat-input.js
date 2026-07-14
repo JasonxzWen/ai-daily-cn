@@ -8,11 +8,9 @@ export const WECHAT_ARTICLE_INPUT_SOURCE = {
   url: "https://mp.weixin.qq.com/",
   source_kind: "manual",
   candidate_category: "community_lead",
-  tier: "T3",
-  authority: "intermediary",
-  enablement: "manual",
-  verification_policy: "primary_required",
-  source_level: "wechat_industry_whitelist"
+  source_group: "community_discussions",
+  content_tags: ["community_discussion", "analysis_opinion"],
+  credibility_tag: "single_source_relay"
 };
 
 const DEFAULT_ALLOWED_SECTIONS = ["community_leads"];

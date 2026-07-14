@@ -42,13 +42,13 @@ import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-regis
 import { renderIndexHtml, renderOfficialBlogsHtml, renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { buildSourceInventoryRows } from "../src/source-effectiveness.js";
-import { generateReportDraft, canPromoteToBuilderObservation } from "../src/draft.js";
+import { generateReportDraft, writeDiscoveryOccurrenceStore, canPromoteToBuilderObservation } from "../src/draft.js";
 import { CANDIDATE_AUDIT_ROLES, MAIN_REJECT_REASONS, MAIN_SELECTION_STAGES } from "../src/main-audit-contract.js";
 import { collectMainAuditConsistencyIssues } from "../src/main-audit-consistency.js";
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite, planGeneratedFiles } from "../src/site.js";
-import { schemas, validateCandidatePool, validateFeed, validateReport, validateSourceRegistry } from "../src/schema.js";
+import { publicSignalTaxonomy, schemas, validateCandidatePool, validateFeed, validateReport, validateSourceRegistry } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
@@ -87,8 +87,7 @@ import { pnpmInvocationForArgs } from "../src/process-runner.js";
 import { normalizeUrlIdentity } from "../src/url.js";
 import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { checkWorktreePreflight } from "../src/worktree-preflight.js";
-import { checkSourceResetPreflight } from "../src/source-reset-preflight.js";
-import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
+import { containsInternalSourceField, scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 import { writeDailyPublishRetrospective } from "../src/retrospectives.js";
 import { evaluateDailyContentContract } from "../scripts/check-daily-content-contract.mjs";
@@ -104,6 +103,10 @@ const trendConfigPath = path.join(rootDir, "config/trends.json");
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
 const siteUrl = "https://jasonxzwen.github.io/ai-daily-cn/";
 const execFileAsync = promisify(execFile);
+
+function currentUnmappedInventoryCount() {
+  return buildSourceInventoryRows({ rootDir }).filter((row) => !row.logical_source_id).length;
+}
 
 test("schema allows OpenRouter snapshot on a source audit source", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
@@ -180,12 +183,24 @@ test("candidate audit contract stays aligned with candidate schema", async () =>
   assert.deepEqual(candidateProperties.roles.items.enum, CANDIDATE_AUDIT_ROLES);
 });
 
-test("legacy source and classification fields remain open metadata across registry, candidate, and report schemas", async () => {
+test("registry rejects retired source classification while candidate and report schemas keep legacy read compatibility", async () => {
   const registry = await loadSourceRegistry({ rootDir });
-  for (const schema of [schemas.sourceRegistry, schemas.candidatePool, schemas.report]) {
-    assert.deepEqual(schema.$defs.source_level, { type: "string", minLength: 1 });
+  assert.deepEqual(schemas.sourceRegistry.$defs.source.required, [
+    "id",
+    "name",
+    "url",
+    "source_kind",
+    "candidate_category",
+    "source_group",
+    "credibility_tag",
+    "content_tags"
+  ]);
+  assert.equal(schemas.sourceRegistry.$defs.source.additionalProperties, true);
+  for (const field of ["tier", "authority", "enablement", "verification_policy", "source_level", "sourceLevel"]) {
+    assert.equal(Object.hasOwn(schemas.sourceRegistry.$defs.source.properties, field), false);
   }
   for (const schema of [schemas.candidatePool, schemas.report]) {
+    assert.deepEqual(schema.$defs.source_level, { type: "string", minLength: 1 });
     assert.deepEqual(schema.$defs.verification_status, { type: "string", minLength: 1 });
     assert.deepEqual(schema.$defs.editorial_category, { type: "string", minLength: 1 });
   }
@@ -193,7 +208,7 @@ test("legacy source and classification fields remain open metadata across regist
   assert.equal(validateSourceRegistry({ schema_version: 1, sources: [{
     ...registry.sources[0],
     source_level: "future_unknown_source_level"
-  }] }).valid, true);
+  }] }).valid, false);
 
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   Object.assign(report.main_items[0], {
@@ -247,7 +262,7 @@ test("real non-publish candidate artifact replay preserves provenance and accept
   assert.equal(validateCandidatePool(unknown).valid, true);
 });
 
-test("report draft preserves unknown source level and still writes producer artifacts", async () => {
+test("report draft preserves unknown source level without becoming a second occurrence writer", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-level-contract-"));
   const reportDate = "2026-07-14";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -276,7 +291,37 @@ test("report draft preserves unknown source level and still writes producer arti
   });
   assert.equal(fsSync.existsSync(outputPath), true);
   assert.equal(fsSync.existsSync(candidateOutputPath), true);
-  assert.equal(fsSync.existsSync(result.occurrenceStorePath), true);
+  assert.equal(result.occurrenceStorePath, "");
+  await assert.rejects(
+    generateReportDraft({
+      rootDir: tmp,
+      reportDate,
+      generatedAt: "2026-07-14T02:33:48.000Z",
+      inputPaths: [discoveryPath],
+      outputPath,
+      candidateOutputPath,
+      requireOccurrenceStore: true,
+      cacheEvidence: false
+    }),
+    (error) => error?.code === "occurrence_store_missing"
+  );
+  const signalWrite = await writeDiscoveryOccurrenceStore({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: "2026-07-14T02:33:48.000Z",
+    inputPaths: [discoveryPath]
+  });
+  const consumingDraft = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: "2026-07-14T02:33:48.000Z",
+    inputPaths: [discoveryPath],
+    outputPath,
+    candidateOutputPath,
+    requireOccurrenceStore: true,
+    cacheEvidence: false
+  });
+  assert.equal(consumingDraft.occurrenceStorePath, signalWrite.occurrenceStorePath);
   const candidatePool = JSON.parse(await fs.readFile(candidateOutputPath, "utf8"));
   const producedCandidate = candidatePool.candidates.find((item) => item.url === discovery.candidates[0].url);
   const occurrence = result.occurrenceStore.occurrences.find((item) => item.url === discovery.candidates[0].url);
@@ -288,9 +333,9 @@ test("report draft preserves unknown source level and still writes producer arti
   assert.equal(producedCandidate.source_group, "official_blogs");
   assert.deepEqual(producedCandidate.content_tags, ["model_release", "product_update"]);
   assert.equal(occurrence.observation_id, producedCandidate.observation_id);
-  assert.equal(occurrence.source_level, "future_unknown_source_level");
-  assert.equal(occurrence.verification_status, "future_unknown_verification");
-  assert.equal(occurrence.editorial_category, "future_unknown_editorial_category");
+  assert.equal(occurrence.raw_source_level, "future_unknown_source_level");
+  assert.equal(occurrence.raw_verification_status, "future_unknown_verification");
+  assert.equal(occurrence.raw_content_category, "future_unknown_editorial_category");
   assert.equal(occurrence.summary, discovery.candidates[0].summary);
   assert.equal(occurrence.publisher_hint, "Runway");
   assert.equal(occurrence.published_at, "2026-07-14T01:00:00.000Z");
@@ -3467,7 +3512,7 @@ test("GitHub trending README cache uses content SHA and reports a hit only for m
   assert.equal(secondItem.readme_summary, firstItem.readme_summary);
 });
 
-test("GitHub trending discovery limit preserves required weekly language pools", async () => {
+test("GitHub trending listener retains every ranking observation even when a legacy limit is supplied", async () => {
   const sources = DEFAULT_GITHUB_TRENDING_SOURCES;
   const htmlForSource = (source) => Array.from({ length: 12 }, (_unused, index) => {
     const language = source.language || "all";
@@ -3496,7 +3541,7 @@ test("GitHub trending discovery limit preserves required weekly language pools",
     }
   });
 
-  assert(collected.candidates.length <= 50);
+  assert.equal(collected.candidates.length, sources.length * 12);
   const weeklyLanguages = new Set(
     collected.candidates
       .filter((candidate) => candidate.window === "weekly")
@@ -3511,7 +3556,7 @@ test("GitHub trending discovery limit preserves required weekly language pools",
   }
 });
 
-test("report:draft merges weekly GitHub all-language and selected language pools to Top20", async () => {
+test("legacy report:draft keeps GitHub Top20 presentation without truncating the occurrence store", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-github-weekly-top20-"));
   const reportDate = "2026-06-17";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -3608,6 +3653,12 @@ test("report:draft merges weekly GitHub all-language and selected language pools
   });
 
   assert.equal(drafted.report.github_trending.length, 20);
+  assert.equal(drafted.occurrenceStore.input_record_count, 67);
+  assert.equal(drafted.occurrenceStore.occurrence_count, 67);
+  assert.equal(
+    drafted.occurrenceStore.occurrences.filter((item) => item.raw_content_kind === "project").length,
+    60
+  );
   const githubEffectiveness = drafted.report.source_effectiveness.find((item) => item.id === "github-trending");
   assert.equal(githubEffectiveness.candidate_count, 60);
   assert.equal(githubEffectiveness.included_count, 20);
@@ -4222,7 +4273,7 @@ test("builder discovery falls back to Tavily X status search when central X feed
   assert.equal(collected.candidates[0].avatar_url, "https://unavatar.io/x/examplebuilder");
 });
 
-test("builder discovery retries transient fetch failures and records retry notes", async () => {
+test("builder discovery retries transient feed failures while leaving other listener lanes independent", async () => {
   let calls = 0;
   const collected = await collectBuilderFallbacks({
     reportDate: "2026-05-26",
@@ -4233,6 +4284,7 @@ test("builder discovery retries transient fetch failures and records retry notes
       podcasts: "",
       blogs: ""
     },
+    xSearchFallback: false,
     retryDelayMs: 0,
     fetchImpl: async () => {
       calls += 1;
@@ -4276,7 +4328,7 @@ test("content source discovery parses hot blog and interview feeds", async () =>
   assert.match(collected.candidates[0].evidence, /OpenAI engineer interview/i);
 });
 
-test("content source discovery keeps late fixed sources effective under global candidate limit", async () => {
+test("content source discovery ignores legacy output quotas and retains every source observation", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-06-12",
     generatedAt: fixedGeneratedAt,
@@ -4289,7 +4341,6 @@ test("content source discovery keeps late fixed sources effective under global c
         url: "https://example.com/early.xml",
         source_kind: "rss",
         candidate_category: "hot_blog",
-        max_items_per_run: 3
       },
       {
         id: "content-middle-official",
@@ -4332,12 +4383,22 @@ test("content source discovery keeps late fixed sources effective under global c
     `)
   });
 
-  assert.equal(collected.candidates.length, 3);
+  assert.equal(collected.candidates.length, 9);
   assert.deepEqual(
     collected.candidates.map((candidate) => candidate.source_id),
-    ["content-early-official", "content-middle-official", "content-late-fixed-source"]
+    [
+      "content-early-official",
+      "content-early-official",
+      "content-early-official",
+      "content-middle-official",
+      "content-middle-official",
+      "content-middle-official",
+      "content-late-fixed-source",
+      "content-late-fixed-source",
+      "content-late-fixed-source"
+    ]
   );
-  assert.equal(collected.source_audit.content_sources.candidates_found, 5);
+  assert.equal(collected.source_audit.content_sources.candidates_found, 9);
   assert(
     collected.source_audit.content_sources.sources.some(
       (source) => source.name === "Late Fixed Source" && source.status === "checked" && source.parsed_count === 3
@@ -4345,7 +4406,7 @@ test("content source discovery keeps late fixed sources effective under global c
   );
 });
 
-test("GitHub report markdown parser extracts report links as discovery leads", () => {
+test("GitHub report markdown parser retains every safe link observation", () => {
   const entries = parseGitHubReportMarkdownEntries(`
 ## Top AI Papers of the Week (May 24 - May 31) - 2026
 | **Paper** | **Links** |
@@ -4359,12 +4420,15 @@ test("GitHub report markdown parser extracts report links as discovery leads", (
     fallback_event_date: "2026-05-31"
   });
 
-  assert.equal(entries.length, 2);
-  assert.equal(entries[0].title, "SkillOpt");
-  assert.equal(entries[0].url, "https://arxiv.org/abs/2605.23904");
-  assert.equal(entries[0].event_date, "2026-05-31");
-  assert.equal(entries[1].title, "codex-provider-sync");
-  assert.equal(entries[1].url, "https://github.com/Dailin521/codex-provider-sync");
+  assert.equal(entries.length, 4);
+  assert.deepEqual(entries.map((entry) => [entry.title, entry.url]), [
+    ["SkillOpt", "https://arxiv.org/abs/2605.23904"],
+    ["codex-provider-sync", "https://github.com/Dailin521/codex-provider-sync"],
+    ["Tweet", "https://x.com/omarsar0/status/2058936160291004483"],
+    ["codex-provider-sync", "https://github.com/Dailin521/codex-provider-sync"]
+  ]);
+  assert(entries.every((entry) => entry.event_date === "2026-05-31"));
+  assert.equal(new Set(entries.map((entry) => entry.observation_id)).size, 4);
 });
 
 test("content source discovery reads latest GitHub markdown report instead of commit feed", async () => {
@@ -4380,11 +4444,10 @@ test("content source discovery reads latest GitHub markdown report instead of co
         url: "https://raw.githubusercontent.com/example/ai-weekly/main/README.md",
         source_kind: "github_report_markdown",
         candidate_category: "community_lead",
-        authority: "aggregator",
-        verification_policy: "primary_required",
-        latest_report_link_pattern: "reports/issue-\\d+\\.md",
-        lookback_days: 14,
-        maxItemsPerRun: 2
+        source_group: "news_newsletters",
+        credibility_tag: "single_source_relay",
+        content_tags: ["analysis_opinion"],
+        latest_report_link_pattern: "reports/issue-\\d+\\.md"
       }
     ],
     fetchImpl: async (url) => {
@@ -4424,11 +4487,10 @@ test("content source discovery follows same-file GitHub markdown report anchors"
         url: "https://raw.githubusercontent.com/example/weekly/main/README.md",
         source_kind: "github_report_markdown",
         candidate_category: "community_lead",
-        authority: "aggregator",
-        verification_policy: "primary_required",
-        latest_report_link_pattern: "#ML-news-Week",
-        lookback_days: 14,
-        maxItemsPerRun: 3
+        source_group: "news_newsletters",
+        credibility_tag: "single_source_relay",
+        content_tags: ["industry_news"],
+        latest_report_link_pattern: "#ML-news-Week"
       }
     ],
     fetchImpl: async (url) => {
@@ -4467,8 +4529,6 @@ test("source cleanup and Hugging Face Papers API", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-06-30",
     generatedAt: fixedGeneratedAt,
-    limit: 5,
-    perSourceLimit: 3,
     sources: [
       {
         id: "content-huggingface-daily-papers",
@@ -4476,12 +4536,9 @@ test("source cleanup and Hugging Face Papers API", async () => {
         url: "https://huggingface.co/api/daily_papers?date={YYYY-MM-DD}",
         source_kind: "huggingface_daily_papers_api",
         candidate_category: "community_lead",
-        tier: "T2",
-        authority: "aggregator",
-        enablement: "optional",
-        verification_policy: "primary_required",
-        max_items_per_run: 3,
-        source_level: "paper_aggregator"
+        source_group: "papers_models",
+        credibility_tag: "single_source_relay",
+        content_tags: ["research"]
       }
     ],
     fetchImpl: async (url) => {
@@ -4529,10 +4586,9 @@ test("source cleanup and Hugging Face Papers API", async () => {
           url: "https://openrouter.ai/rankings",
           source_kind: "openrouter_rankings_public_playwright",
           candidate_category: "community_lead",
-          tier: "T0",
-          authority: "primary",
-          enablement: "core",
-          verification_policy: "primary_allowed"
+          source_group: "papers_models",
+          credibility_tag: "primary_material",
+          content_tags: ["model_release"]
         },
         {
           id: "content-artificial-analysis-intelligence-index",
@@ -4540,10 +4596,9 @@ test("source cleanup and Hugging Face Papers API", async () => {
           url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
           source_kind: "artificial_analysis_index_public_playwright",
           candidate_category: "community_lead",
-          tier: "T0",
-          authority: "primary",
-          enablement: "core",
-          verification_policy: "primary_allowed"
+          source_group: "papers_models",
+          credibility_tag: "primary_material",
+          content_tags: ["model_release"]
         },
         {
           id: "content-swe-bench-pro-public",
@@ -4551,10 +4606,9 @@ test("source cleanup and Hugging Face Papers API", async () => {
           url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
           source_kind: "swe_bench_pro_public_playwright",
           candidate_category: "community_lead",
-          tier: "T0",
-          authority: "primary",
-          enablement: "core",
-          verification_policy: "primary_allowed"
+          source_group: "papers_models",
+          credibility_tag: "primary_material",
+          content_tags: ["research"]
         }
       ]
     }),
@@ -4569,33 +4623,11 @@ test("source cleanup and Hugging Face Papers API", async () => {
 
   assert.deepEqual(health.results.map((result) => result.status), ["checked", "checked", "checked"]);
   assert(health.results.every((result) => /source-specific tracking health/.test(result.notes)));
-
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional,manual"
-  });
-  const removedIds = new Set([
-    "content-hellogithub",
-    "content-ruanyf-weekly",
-    "content-papers-with-code-api",
-    "content-reddit-machinelearning",
-    "content-ai-news-buttondown",
-    "content-adobe-ai-blog",
-    "content-fastcompany-creator-economy",
-    "platform-reddit-local-llama-feed",
-    "platform-jike-rsshub-ai-topic",
-    "platform-zhihu-rsshub-hotlist",
-    "wechat-rsshub-newrank-template",
-    "wechat-wechat2rss-feed"
-  ]);
-  const registeredIds = new Set(registry.sources.map((source) => source.id));
-  for (const id of removedIds) {
-    assert(!registeredIds.has(id), `removed source should not be registered: ${id}`);
-  }
 });
 
-test("default content sources cover broader tech, big-tech, and Product Hunt trending", () => {
-  const names = DEFAULT_CONTENT_SOURCES.map((source) => source.name);
+test("registered listener sources cover broader tech, official changelogs, and community feeds", async () => {
+  const registry = await loadSourceRegistry({ rootDir });
+  const names = registry.sources.map((source) => source.name);
 
   assert(names.includes("TechCrunch Enterprise"));
   assert(names.includes("The Verge"));
@@ -4623,47 +4655,30 @@ test("default content sources cover broader tech, big-tech, and Product Hunt tre
   assert(names.includes("Hacker News Topstories API"));
   assert(names.includes("Hugging Face Daily Papers"));
   assert(names.includes("Smol AI News"));
-  assert(!names.includes("Ben's Bites"));
-  assert(!names.includes("Fast Company Creator Economy"));
-  assert(!names.includes("HelloGitHub"));
-  assert(!names.includes("RuanYF Weekly"));
-  assert(!names.includes("Papers with Code API"));
-  assert(!names.includes("Reddit r/MachineLearning"));
-  assert(!names.includes("AI News Archive"));
+  assert(names.includes("Anthropic Platform Release Notes"));
+  assert(names.includes("Import AI Newsletter"));
+  assert(names.includes("WIRED AI Feed"));
+  assert(names.includes("Hacker News Show Stories API"));
 });
 
-test("source registry excludes rejected low threshold aggregators", async () => {
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional,manual"
-  });
-  const haystack = registry.sources
-    .map((source) => [
-      source.id,
-      source.name,
-      source.url
-    ].filter(Boolean).join(" "))
-    .join("\n")
-    .toLowerCase();
-
-  for (const forbidden of [
-    "content-bens-bites",
-    "ben's bites",
-    "bensbites.com",
-    "the rundown",
-    "therundown.ai",
-    "buttondown.com/ainews",
-    "a16z.com/ai"
+test("source registry keeps aggregators, newsletters, and community feeds as tagged monitoring inputs", async () => {
+  const registry = await loadSourceRegistry({ rootDir });
+  const byId = new Map(registry.sources.map((source) => [source.id, source]));
+  for (const [id, sourceGroup] of [
+    ["public-import-ai-newsletter", "news_newsletters"],
+    ["public-wired-ai-feed", "news_newsletters"],
+    ["public-hacker-news-showstories", "community_discussions"]
   ]) {
-    assert(!haystack.includes(forbidden), `rejected source should not be registered: ${forbidden}`);
+    const source = byId.get(id);
+    assert(source, `monitoring source must stay registered: ${id}`);
+    assert.equal(source.source_group, sourceGroup);
+    assert(["single_source_relay", "community_lead", "monitoring_lead"].includes(source.credibility_tag));
+    assert(source.content_tags.length > 0);
   }
 });
 
 test("registered discovery sources include requested GitHub weekly repositories", async () => {
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional,manual"
-  });
+  const registry = await loadSourceRegistry({ rootDir });
   const registryById = new Map(registry.sources.map((source) => [source.id, source]));
   const runtimeById = new Map(DEFAULT_CONTENT_SOURCES.map((source) => [source.id, source]));
 
@@ -4691,10 +4706,7 @@ test("registered discovery sources include requested GitHub weekly repositories"
 });
 
 test("registered discovery sources cover the user requested AI source list", async () => {
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional,manual"
-  });
+  const registry = await loadSourceRegistry({ rootDir });
   const fixedSources = [
     ...registry.sources,
     ...DEFAULT_CONTENT_SOURCES,
@@ -4789,8 +4801,9 @@ test("registered content sources cover frontier AI company official sources", as
     const source = sourcesById.get(id);
     assert(source, `missing source ${id}`);
     assert.equal(new URL(source.url).hostname, hostname);
-    assert.equal(source.authority, "primary");
-    assert.equal(source.verification_policy, "primary_allowed");
+    assert.equal(source.source_group, "official_blogs");
+    assert.equal(source.credibility_tag, "primary_material");
+    assert(source.content_tags.length > 0);
   }
 });
 
@@ -4813,10 +4826,10 @@ test("registered content sources include fixed daily tracking leaderboards", asy
       ["content-swe-bench-pro-public", "swe_bench_pro_public_playwright"]
     ]);
     assert.equal(source.source_kind, expectedSourceKind.get(id) || "html_index");
-    assert.equal(source.candidate_category, "community_lead");
-    assert.equal(source.authority, "primary");
-    assert.equal(source.enablement, "core");
-    assert.equal(source.verification_policy, "primary_allowed");
+    assert(["hot_blog", "community_lead"].includes(source.candidate_category));
+    assert.equal(source.source_group, "papers_models");
+    assert.equal(source.credibility_tag, "primary_material");
+    assert(source.content_tags.length > 0);
   }
 });
 
@@ -4835,7 +4848,7 @@ test("parseOpenRouterRankingsText extracts public Top 10 rows", () => {
   assert.deepEqual(rows.map((row) => row.rank), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 });
 
-test("collectContentSources stores OpenRouter public page snapshot without candidate pollution", async () => {
+test("collectContentSources exposes every OpenRouter ranking row as a tagged monitoring signal", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-06-05",
     generatedAt: fixedGeneratedAt,
@@ -4846,10 +4859,9 @@ test("collectContentSources stores OpenRouter public page snapshot without candi
         url: "https://openrouter.ai/rankings",
         source_kind: "openrouter_rankings_public_playwright",
         candidate_category: "community_lead",
-        tier: "T0",
-        authority: "primary",
-        enablement: "core",
-        verification_policy: "primary_allowed"
+        source_group: "papers_models",
+        credibility_tag: "primary_material",
+        content_tags: ["model_release"]
       }
     ],
     openrouterRankingsText: openRouterRankingsSampleText()
@@ -4864,7 +4876,9 @@ test("collectContentSources stores OpenRouter public page snapshot without candi
   assert.equal(source.snapshot.top_entries[0].model, "DeepSeek V4 Flash");
   assert.equal(source.snapshot.official_component_snapshot.component_kind, "openrouter_rankings");
   assert.match(source.snapshot.official_component_snapshot.sanitized_html, /data-openrouter-rankings/);
-  assert.equal(collected.candidates.length, 0);
+  assert.equal(collected.candidates.length, 10);
+  assert(collected.candidates.every((candidate) => candidate.source_id === "content-openrouter-rankings"));
+  assert(collected.candidates.every((candidate) => candidate.verification_status === "unverified"));
 });
 
 test("collectContentSources stores sanitized OpenRouter official DOM/CSS component snapshots", async () => {
@@ -4878,10 +4892,9 @@ test("collectContentSources stores sanitized OpenRouter official DOM/CSS compone
         url: "https://openrouter.ai/rankings",
         source_kind: "openrouter_rankings_public_playwright",
         candidate_category: "community_lead",
-        tier: "T0",
-        authority: "primary",
-        enablement: "core",
-        verification_policy: "primary_allowed"
+        source_group: "papers_models",
+        credibility_tag: "primary_material",
+        content_tags: ["model_release"]
       }
     ],
     openrouterRankingsText: openRouterRankingsSampleText(),
@@ -4958,10 +4971,9 @@ test("collectContentSources degrades OpenRouter snapshot when Top 10 is incomple
         url: "https://openrouter.ai/rankings",
         source_kind: "openrouter_rankings_public_playwright",
         candidate_category: "community_lead",
-        tier: "T0",
-        authority: "primary",
-        enablement: "core",
-        verification_policy: "primary_allowed"
+        source_group: "papers_models",
+        credibility_tag: "primary_material",
+        content_tags: ["model_release"]
       }
     ],
     openrouterRankingsText: openRouterRankingsSampleText(8)
@@ -4985,10 +4997,9 @@ test("collectContentSources stores OpenRouter weekly history for local tracking 
         url: "https://openrouter.ai/rankings",
         source_kind: "openrouter_rankings_public_playwright",
         candidate_category: "community_lead",
-        tier: "T0",
-        authority: "primary",
-        enablement: "core",
-        verification_policy: "primary_allowed"
+        source_group: "papers_models",
+        credibility_tag: "primary_material",
+        content_tags: ["model_release"]
       }
     ],
     openrouterRankingsText: openRouterRankingsHistorySampleText()
@@ -5056,7 +5067,7 @@ test("parseSweBenchProText extracts public Resolve Rate Top 10 rows", () => {
   assert.equal(rows[9].model, "gpt-5.2-codex");
 });
 
-test("collectContentSources stores Artificial Analysis public page snapshot without candidate pollution", async () => {
+test("collectContentSources exposes every Artificial Analysis row as a tagged monitoring signal", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-06-05",
     generatedAt: fixedGeneratedAt,
@@ -5067,10 +5078,9 @@ test("collectContentSources stores Artificial Analysis public page snapshot with
         url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         source_kind: "artificial_analysis_index_public_playwright",
         candidate_category: "community_lead",
-        tier: "T0",
-        authority: "primary",
-        enablement: "core",
-        verification_policy: "primary_allowed"
+        source_group: "papers_models",
+        credibility_tag: "primary_material",
+        content_tags: ["model_release"]
       }
     ],
     artificialAnalysisIndexText: artificialAnalysisIndexSampleText()
@@ -5085,7 +5095,8 @@ test("collectContentSources stores Artificial Analysis public page snapshot with
   assert.equal(source.snapshot.top_entries[0].model, "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)");
   assert.equal(source.snapshot.official_component_snapshot.component_kind, "artificial_analysis_index");
   assert.match(source.snapshot.official_component_snapshot.sanitized_html, /data-artificial-analysis-index/);
-  assert.equal(collected.candidates.length, 0);
+  assert.equal(collected.candidates.length, 10);
+  assert(collected.candidates.every((candidate) => candidate.source_id === "content-artificial-analysis-intelligence-index"));
 });
 
 test("collectContentSources stores Artificial Analysis token cost and scatter tabs", async () => {
@@ -5099,10 +5110,9 @@ test("collectContentSources stores Artificial Analysis token cost and scatter ta
         url: "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
         source_kind: "artificial_analysis_index_public_playwright",
         candidate_category: "community_lead",
-        tier: "T0",
-        authority: "primary",
-        enablement: "core",
-        verification_policy: "primary_allowed"
+        source_group: "papers_models",
+        credibility_tag: "primary_material",
+        content_tags: ["model_release"]
       }
     ],
     artificialAnalysisIndexText: artificialAnalysisComponentSampleText(),
@@ -5154,10 +5164,9 @@ test("collectContentSources recovers SWE-bench Pro with official snapshot fallba
         url: "https://labs.scale.com/leaderboard/swe_bench_pro_public",
         source_kind: "swe_bench_pro_public_playwright",
         candidate_category: "community_lead",
-        tier: "T0",
-        authority: "primary",
-        enablement: "core",
-        verification_policy: "primary_allowed"
+        source_group: "papers_models",
+        credibility_tag: "primary_material",
+        content_tags: ["model_release"]
       }
     ],
     fetchImpl: async () => ({ ok: false, status: 403, text: async () => "" })
@@ -5172,7 +5181,8 @@ test("collectContentSources recovers SWE-bench Pro with official snapshot fallba
   assert.equal(source.snapshot.top_entries[0].model, "gpt-5.4 (xHigh)*");
   assert.equal(source.snapshot.official_component_snapshot.component_kind, "swe_bench_pro");
   assert.match(source.snapshot.official_component_snapshot.sanitized_html, /SWE-Bench Pro/);
-  assert.equal(collected.candidates.length, 0);
+  assert.equal(collected.candidates.length, 10);
+  assert(collected.candidates.every((candidate) => candidate.source_id === "content-swe-bench-pro-public"));
 });
 
 test("collectContentSources keeps live SWE-bench Pro partial rows instead of static fallback", async () => {
@@ -5186,10 +5196,9 @@ test("collectContentSources keeps live SWE-bench Pro partial rows instead of sta
         url: "https://scaleapi.github.io/SWE-bench_Pro-os/",
         source_kind: "swe_bench_pro_public_playwright",
         candidate_category: "community_lead",
-        tier: "T0",
-        authority: "primary",
-        enablement: "core",
-        verification_policy: "primary_allowed"
+        source_group: "papers_models",
+        credibility_tag: "primary_material",
+        content_tags: ["model_release"]
       }
     ],
     sweBenchProText: sweBenchProSampleText(7)
@@ -5203,7 +5212,8 @@ test("collectContentSources keeps live SWE-bench Pro partial rows instead of sta
   assert.equal(source.snapshot.top_entries.length, 7);
   assert.equal(source.snapshot.top_entries[0].model, "gpt-5.4 (xHigh)*");
   assert(!/official_page_snapshot_static_fallback/.test(source.notes));
-  assert.equal(collected.candidates.length, 0);
+  assert.equal(collected.candidates.length, 7);
+  assert(collected.candidates.every((candidate) => candidate.source_id === "content-swe-bench-pro-public"));
 });
 
 test("report:draft publishes OpenRouter snapshot as reader-facing daily tracking card", async () => {
@@ -5468,11 +5478,10 @@ test("report:write accepts source-unavailable daily tracking as degraded", async
 });
 
 test("registered source registry covers official company news lanes", async () => {
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional"
-  });
+  const registry = await loadSourceRegistry({ rootDir });
   const sourcesById = new Map(registry.sources.map((source) => [source.id, source]));
+  const sourceByIdOrAlias = (id) => sourcesById.get(id)
+    || registry.sources.find((source) => Array.isArray(source.aliases) && source.aliases.includes(id));
   const expected = [
     ["content-google-keyword", "https://blog.google/rss/"],
     ["content-microsoft-official-blog", "https://blogs.microsoft.com/feed/"],
@@ -5499,21 +5508,18 @@ test("registered source registry covers official company news lanes", async () =
   ];
 
   for (const [id, url] of expected) {
-    const source = sourcesById.get(id);
+    const source = sourceByIdOrAlias(id);
     assert(source, `missing company news source ${id}`);
     assert.equal(source.url, url);
-    assert.equal(source.candidate_category, "community_lead");
-    assert.equal(source.authority, "primary");
-    assert.equal(source.verification_policy, "primary_allowed");
-    assert.equal(source.source_level, "official_company_news");
+    assert(["hot_blog", "community_lead"].includes(source.candidate_category));
+    assert.equal(source.source_group, "official_blogs");
+    assert.equal(source.credibility_tag, "primary_material");
+    assert(source.content_tags.length > 0);
   }
 });
 
 test("registered source registry covers official open-source account lanes", async () => {
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional"
-  });
+  const registry = await loadSourceRegistry({ rootDir });
   const sourcesById = new Map(registry.sources.map((source) => [source.id, source]));
   const expected = [
     ["content-github-openai-org", "https://github.com/openai.atom", "official_open_source_account"],
@@ -5547,22 +5553,19 @@ test("registered source registry covers official open-source account lanes", asy
     ["content-huggingface-nvidia", "https://huggingface.co/nvidia", "official_model_host_account"]
   ];
 
-  for (const [id, url, sourceLevel] of expected) {
+  for (const [id, url, sourceClass] of expected) {
     const source = sourcesById.get(id);
     assert(source, `missing official open-source source ${id}`);
     assert.equal(source.url, url);
     assert.equal(source.candidate_category, "community_lead");
-    assert.equal(source.authority, "primary");
-    assert.equal(source.verification_policy, "primary_allowed");
-    assert.equal(source.source_level, sourceLevel);
+    assert.equal(source.source_group, sourceClass === "official_model_host_account" ? "papers_models" : "github_trending");
+    assert.equal(source.credibility_tag, "primary_material");
+    assert(source.content_tags.includes(sourceClass === "official_model_host_account" ? "model_release" : "open_source"));
   }
 });
 
 test("general news registry includes company and open-source discovery lanes", async () => {
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional"
-  });
+  const registry = await loadSourceRegistry({ rootDir });
   const sourcesById = new Map(registry.sources.map((source) => [source.id, source]));
   const expected = [
     ["general-news-google-big-tech-company-watch", ["layoffs", "reorganization", "earnings", "GitHub"]],
@@ -5574,8 +5577,9 @@ test("general news registry includes company and open-source discovery lanes", a
     const source = sourcesById.get(id);
     assert(source, `missing general news lane ${id}`);
     assert.equal(source.candidate_category, "community_lead");
-    assert.equal(source.authority, "aggregator");
-    assert.equal(source.verification_policy, "primary_required");
+    assert.equal(source.source_group, "news_newsletters");
+    assert.equal(source.credibility_tag, "single_source_relay");
+    assert(source.content_tags.length > 0);
     for (const fragment of fragments) {
       assert(source.url.includes(fragment), `${id} url missing ${fragment}`);
     }
@@ -5626,28 +5630,28 @@ test("search shadow queries allow primary domains for China frontier AI labs", a
 });
 
 test("source registry validates required source metadata", () => {
+  const source = {
+    id: "content-apple-machine-learning",
+    name: "Apple Machine Learning Research",
+    url: "https://machinelearning.apple.com/rss.xml",
+    source_kind: "rss",
+    candidate_category: "hot_blog",
+    source_group: "official_blogs",
+    credibility_tag: "primary_material",
+    content_tags: ["research"],
+    requires_original_url: false,
+    timeout_ms: 15000
+  };
   const valid = normalizeSourceRegistry({
     schema_version: 1,
-    sources: [
-      {
-        id: "content-apple-machine-learning",
-        name: "Apple Machine Learning Research",
-        url: "https://machinelearning.apple.com/rss.xml",
-        source_kind: "rss",
-        candidate_category: "hot_blog",
-        tier: "T0",
-        authority: "primary",
-        enablement: "core",
-        verification_policy: "primary_allowed",
-        requires_original_url: false,
-        max_items_per_run: 3,
-        timeout_ms: 15000
-      }
-    ]
+    sources: [source]
   });
 
   assert.equal(valid.sources[0].source_kind, "rss");
   assert.equal(valid.sources[0].candidate_category, "hot_blog");
+  assert.equal(valid.sources[0].source_group, "official_blogs");
+  assert.equal(valid.sources[0].credibility_tag, "primary_material");
+  assert.deepEqual(valid.sources[0].content_tags, ["research"]);
 
   assert.throws(
     () =>
@@ -5655,14 +5659,11 @@ test("source registry validates required source metadata", () => {
         schema_version: 1,
         sources: [
           {
-            id: "missing-tier",
-            name: "Missing Tier",
+            ...source,
+            id: "missing-content-tags",
+            name: "Missing Content Tags",
             url: "https://example.com/rss.xml",
-            source_kind: "rss",
-            candidate_category: "hot_blog",
-            authority: "primary",
-            enablement: "core",
-            verification_policy: "primary_allowed"
+            content_tags: undefined
           }
         ]
       }),
@@ -5670,95 +5671,112 @@ test("source registry validates required source metadata", () => {
   );
 });
 
-test("source registry preserves unknown source level metadata in snake-case and camel-case", () => {
-  for (const property of ["source_level", "sourceLevel"]) {
-    const normalized = normalizeSourceRegistry({
-      schema_version: 1,
-      sources: [
-        {
-          id: `unknown-${property}`,
-          name: `Unknown ${property}`,
-          url: `https://example.com/unknown-${property}.xml`,
-          source_kind: "rss",
-          candidate_category: "hot_blog",
-          tier: "T1",
-          authority: "intermediary",
-          enablement: "optional",
-          verification_policy: "primary_required",
-          [property]: "future_unknown_source_level"
-        }
-      ]
-    });
-    assert.equal(normalized.sources[0][property], "future_unknown_source_level");
+test("source registry rejects retired admission and source-level vocabulary", () => {
+  const source = {
+    id: "registry-source",
+    name: "Registry Source",
+    url: "https://example.com/source.xml",
+    source_kind: "rss",
+    candidate_category: "hot_blog",
+    source_group: "news_newsletters",
+    credibility_tag: "single_source_relay",
+    content_tags: ["industry_news"]
+  };
+  for (const property of ["tier", "authority", "enablement", "verification_policy", "source_level", "sourceLevel"]) {
+    assert.throws(
+      () => normalizeSourceRegistry({
+        schema_version: 1,
+        sources: [{ ...source, [property]: "retired" }]
+      }),
+      (error) => error instanceof PublisherError && error.code === "source_registry_schema_validation_failed",
+      property
+    );
   }
 });
 
-test("content source discovery defaults to core and optional sources while keeping manual sources opt-in", async () => {
+test("source registry schema taxonomy enums stay synchronized with the public taxonomy", () => {
+  const sourceProperties = schemas.sourceRegistry.$defs.source.properties;
+  assert.deepEqual(sourceProperties.source_group.enum, publicSignalTaxonomy.source_groups.map((item) => item.id));
+  assert.deepEqual(sourceProperties.credibility_tag.enum, publicSignalTaxonomy.credibility_tags.map((item) => item.id));
+  assert.deepEqual(sourceProperties.content_tags.items.enum, publicSignalTaxonomy.content_tags.map((item) => item.id));
+  assert.deepEqual(
+    schemas.report.$defs.source_audit_source.properties.source_group.enum,
+    publicSignalTaxonomy.source_groups.map((item) => item.id)
+  );
+  assert.deepEqual(
+    schemas.report.$defs.source_audit_source.properties.credibility_tag.enum,
+    publicSignalTaxonomy.credibility_tags.map((item) => item.id)
+  );
+  assert.deepEqual(
+    schemas.report.$defs.source_audit_source.properties.content_tags.items.enum,
+    publicSignalTaxonomy.content_tags.map((item) => item.id)
+  );
+});
+
+test("content source discovery listens to every public registry source without admission selectors", async () => {
   const checkedUrls = [];
   const collectedDefault = await collectContentSources({
     rootDir,
     reportDate: "2026-05-26",
     generatedAt: fixedGeneratedAt,
-    limit: 200,
     fetchImpl: async (url) => {
       checkedUrls.push(String(url));
       return textResponse(emptyRssFixture());
     }
   });
 
-  assert(collectedDefault.source_audit.content_sources.enablement_counts.core > 0);
-  assert(collectedDefault.source_audit.content_sources.enablement_counts.optional > 0);
+  assert(collectedDefault.source_audit.content_sources.source_group_counts.official_blogs > 0);
+  assert(collectedDefault.source_audit.content_sources.credibility_tag_counts.primary_material > 0);
   assert(checkedUrls.some((url) => url.includes("machinelearning.apple.com")));
   assert(checkedUrls.some((url) => url.includes("producthunt.com/feed")));
-  assert(!checkedUrls.some((url) => url.includes("mp.weixin.qq.com")));
-
-  const manualUrls = [];
-  const collectedManual = await collectContentSources({
-    rootDir,
-    reportDate: "2026-05-26",
-    generatedAt: fixedGeneratedAt,
-    enablement: "core,optional,manual",
-    limit: 200,
-    fetchImpl: async (url) => {
-      manualUrls.push(String(url));
-      return textResponse(emptyRssFixture());
-    }
-  });
-
-  assert(collectedManual.source_audit.content_sources.enablement_counts.manual > 0);
-  assert(!manualUrls.some((url) => url.includes("mp.weixin.qq.com")));
-  assert(manualUrls.some((url) => url.includes("ifanr.com/feed")));
-  assert(!collectedManual.source_audit.content_sources.sources.some((source) => /WeChat Industry Whitelist/i.test(source.name)));
+  assert(checkedUrls.some((url) => url.includes("ifanr.com/feed")));
 });
 
-test("content source discovery preserves snake case and legacy camel case source levels", async () => {
+test("manual source kind is a collection channel and is not skipped", () => {
+  assert.equal(contentSourceSkipReason({
+    source_kind: "manual",
+    url: "https://mp.weixin.qq.com/"
+  }, {}), "");
+});
+
+test("content source discovery preserves public source, credibility, and content tags", async () => {
   const sources = [
     {
-      id: "snake-source-level",
-      name: "Snake Source Level",
-      url: "https://example.com/snake-source-level.xml",
-      category: "intermediary",
-      source_level: "big_tech_company_watch"
+      id: "official-source-tags",
+      name: "Official Source Tags",
+      url: "https://example.com/official-source-tags.xml",
+      source_kind: "rss",
+      candidate_category: "hot_blog",
+      source_group: "official_blogs",
+      credibility_tag: "primary_material",
+      content_tags: ["product_update"]
     },
     {
-      id: "camel-source-level",
-      name: "Camel Source Level",
-      url: "https://example.com/camel-source-level.xml",
-      category: "intermediary",
-      sourceLevel: "weekly_ai_news_aggregator"
+      id: "relay-source-tags",
+      name: "Relay Source Tags",
+      url: "https://example.com/relay-source-tags.xml",
+      source_kind: "rss",
+      candidate_category: "community_lead",
+      source_group: "news_newsletters",
+      credibility_tag: "single_source_relay",
+      content_tags: ["analysis_opinion", "industry_news"]
     }
   ];
   const collected = await collectContentSources({
     reportDate: "2026-05-26",
     generatedAt: fixedGeneratedAt,
     sources,
-    perSourceLimit: 1,
     fetchImpl: async () => textResponse(contentSourceRssFixture())
   });
-  const sourceLevels = new Map(collected.candidates.map((candidate) => [candidate.source_id, candidate.source_level]));
-
-  assert.equal(sourceLevels.get("snake-source-level"), "big_tech_company_watch");
-  assert.equal(sourceLevels.get("camel-source-level"), "weekly_ai_news_aggregator");
+  const candidates = new Map(collected.candidates.map((candidate) => [candidate.source_id, candidate]));
+  assert.equal(candidates.get("official-source-tags").source_group, "official_blogs");
+  assert.equal(candidates.get("official-source-tags").credibility_tag, "primary_material");
+  assert.deepEqual(candidates.get("official-source-tags").content_tags, ["product_update"]);
+  assert.equal(candidates.get("official-source-tags").verification_status, "primary_confirmed");
+  assert.equal(candidates.get("relay-source-tags").source_group, "news_newsletters");
+  assert.equal(candidates.get("relay-source-tags").credibility_tag, "single_source_relay");
+  assert.deepEqual(candidates.get("relay-source-tags").content_tags, ["analysis_opinion", "industry_news"]);
+  assert.equal(candidates.get("relay-source-tags").verification_status, "intermediary_only");
 });
 
 test("content source discovery keeps self-media as intermediary leads requiring primary verification", async () => {
@@ -5866,7 +5884,7 @@ test("content source discovery rejects WeChat article input containing local mac
   );
 });
 
-test("content source discovery accepts X hotspot feeds only when original post URL is preserved", async () => {
+test("content source discovery retains X hotspot relays and tags missing original URLs", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-05-26",
     generatedAt: fixedGeneratedAt,
@@ -5896,12 +5914,13 @@ test("content source discovery accepts X hotspot feeds only when original post U
     `)
   });
 
-  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates.length, 2);
   assert.equal(collected.sources[0].category, "community");
   assert.equal(collected.candidates[0].category, "community_lead");
   assert.equal(collected.candidates[0].url, "https://x.com/example/status/1234567890");
   assert.match(collected.candidates[0].notes, /original_url=https:\/\/x\.com\/example\/status\/1234567890/);
-  assert.match(collected.source_audit.content_sources.sources[0].notes, /1 skipped without original URL/);
+  assert.equal(Object.hasOwn(collected.candidates[1], "original_url"), false);
+  assert.match(collected.source_audit.content_sources.sources[0].notes, /1 retained without original URL/);
 });
 
 test("content source discovery parses official HTML pages and Product Hunt project feeds", async () => {
@@ -5960,11 +5979,11 @@ test("content source discovery parses company news HTML with dotted dates before
         url: "https://kuaishou.example.com/news-events/company-news",
         source_kind: "html_index",
         candidate_category: "community_lead",
-        authority: "primary",
-        verification_policy: "primary_allowed",
+        source_group: "official_blogs",
+        credibility_tag: "primary_material",
+        content_tags: ["company_business"],
         format: "html_index",
-        linkPattern: "/news-releases/news-release-details/",
-        source_level: "official_company_news"
+        linkPattern: "/news-releases/news-release-details/"
       }
     ],
     fetchImpl: async () => textResponse(`
@@ -6002,11 +6021,11 @@ test("handoff source plan parses html_index entries with JSON-LD metadata fallba
         url: "https://www.anthropic.com/news",
         source_kind: "html_index",
         candidate_category: "hot_blog",
-        authority: "primary",
-        verification_policy: "primary_allowed",
+        source_group: "official_blogs",
+        credibility_tag: "primary_material",
+        content_tags: ["research"],
         format: "html_index",
-        linkPattern: "/news/",
-        source_level: "official_company_news"
+        linkPattern: "/news/"
       }
     ],
     fetchImpl: async () => textResponse(`
@@ -6058,11 +6077,11 @@ test("content source discovery keeps dated HTML index anchor cards isolated", as
         url: "https://www.anthropic.com/news",
         source_kind: "html_index",
         candidate_category: "hot_blog",
-        authority: "primary",
-        verification_policy: "primary_allowed",
+        source_group: "official_blogs",
+        credibility_tag: "primary_material",
+        content_tags: ["industry_news"],
         format: "html_index",
-        linkPattern: "/news/",
-        source_level: "official_company_news"
+        linkPattern: "/news/"
       }
     ],
     fetchImpl: async () => textResponse(`
@@ -6104,11 +6123,11 @@ test("content source discovery keeps external dates inside each HTML index card"
         url: "https://example.com/news",
         source_kind: "html_index",
         candidate_category: "hot_blog",
-        authority: "primary",
-        verification_policy: "primary_allowed",
+        source_group: "official_blogs",
+        credibility_tag: "primary_material",
+        content_tags: ["industry_news"],
         format: "html_index",
-        linkPattern: "/news/",
-        source_level: "official_company_news"
+        linkPattern: "/news/"
       }
     ],
     fetchImpl: async () => textResponse(`
@@ -6153,8 +6172,10 @@ test("content source discovery parses JSON API sources", async () => {
         name: "Hacker News Topstories API",
         url: "https://hacker-news.firebaseio.com/v0/topstories.json",
         source_kind: "search_api",
-        category: "intermediary",
-        source_level: "community_api"
+        candidate_category: "community_lead",
+        source_group: "community_discussions",
+        credibility_tag: "monitoring_lead",
+        content_tags: ["community_discussion"]
       }
     ],
     fetchImpl: async (url) => {
@@ -6383,7 +6404,7 @@ test("search news discovery skips keyed providers without exposing tokens", asyn
   assert.equal(collected.candidates.length, 0);
 });
 
-test("search news discovery preserves provider-level partial results and timing", async () => {
+test("search news discovery distinguishes blocked providers from providers with no routed query", async () => {
   const collected = await collectSearchNews({
     reportDate: "2026-05-26",
     generatedAt: fixedGeneratedAt,
@@ -6420,9 +6441,8 @@ test("search news discovery preserves provider-level partial results and timing"
 
   const audit = collected.source_audit.search_sources;
   assert.equal(audit.sources.find((source) => source.name === "GDELT").status, "blocked");
-  assert.equal(audit.sources.find((source) => source.name === "OpenAlex").status, "checked");
-  assert.equal(collected.candidates.length, 1);
-  assert.equal(collected.candidates[0].source, "OpenAlex");
+  assert.equal(audit.sources.find((source) => source.name === "OpenAlex").status, "no_signal");
+  assert.equal(collected.candidates.length, 0);
   assert(Number.isInteger(audit.provider_runtime_ms.gdelt));
   assert(Number.isInteger(audit.provider_runtime_ms.openalex));
   assert.equal(audit.provider_error_counts.gdelt, 1);
@@ -6443,10 +6463,9 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
           url: "https://example.com/feed.xml",
           source_kind: "rss",
           candidate_category: "hot_blog",
-          tier: "T0",
-          authority: "primary",
-          enablement: "core",
-          verification_policy: "primary_allowed"
+          source_group: "official_blogs",
+          credibility_tag: "primary_material",
+          content_tags: ["industry_news"]
         },
         {
           id: "health-rsshub",
@@ -6454,24 +6473,23 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
           url: "https://rsshub.example.com/twitter/list/ai",
           source_kind: "rsshub",
           candidate_category: "community_lead",
-          tier: "T2",
-          authority: "community",
-          enablement: "optional",
-          verification_policy: "primary_required",
+          source_group: "x_updates",
+          credibility_tag: "community_lead",
+          content_tags: ["community_discussion"],
           requires_original_url: true,
           base_url_env: "AI_DAILY_TEST_RSSHUB_BASE_URL"
         },
         {
-          id: "health-manual-wechat",
-          name: "Health Manual WeChat",
-          url: "https://mp.weixin.qq.com/",
-          source_kind: "manual",
+          id: "health-tagged-wechat",
+          name: "Health Tagged WeChat Relay",
+          url: "https://example.com/wechat-relay.xml",
+          source_kind: "rss",
           candidate_category: "community_lead",
-          tier: "T3",
-          authority: "intermediary",
-          enablement: "manual",
-          verification_policy: "community_only",
-          requires_original_url: false
+          source_group: "community_discussions",
+          credibility_tag: "single_source_relay",
+          content_tags: ["community_discussion"],
+          requires_original_url: false,
+          tags: ["manual"]
         },
         {
           id: "health-wechat2rss",
@@ -6479,10 +6497,9 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
           url: "https://wechat2rss.example.invalid/feed.xml",
           source_kind: "aggregator",
           candidate_category: "community_lead",
-          tier: "T3",
-          authority: "aggregator",
-          enablement: "manual",
-          verification_policy: "primary_required",
+          source_group: "community_discussions",
+          credibility_tag: "single_source_relay",
+          content_tags: ["community_discussion"],
           url_env: "AI_DAILY_TEST_WECHAT2RSS_FEED_URL"
         }
       ]
@@ -6494,7 +6511,6 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
     rootDir: tmp,
     sourcesPath,
     reportDate: "2026-05-26",
-    enablement: "core,optional,manual",
     fetchImpl: async () => textResponse(contentSourceRssFixture())
   });
 
@@ -6503,11 +6519,42 @@ test("sources health checks feed shape and self-hosted base URL requirements", a
   assert.equal(health.results[0].feed_like, true);
   assert.equal(health.results[0].recent_48h_entries, 1);
   assert.equal(health.results[1].status, "skipped_missing_base_url");
-  assert.equal(health.results[2].status, "skipped_manual_source");
+  assert.equal(health.results[2].status, "checked");
   assert.equal(health.results[3].status, "skipped_missing_base_url");
 });
 
-test("source health filters by source id, kind, tier, category, and tag", async () => {
+test("source health checks use bounded concurrency while preserving registry order", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-sources-health-concurrency-"));
+  const sourcesPath = path.join(tmp, "sources.json");
+  const sources = ["one", "two", "three"].map((id) => sourceHealthFixtureSource({
+    id: `health-${id}`,
+    name: `Health ${id}`,
+    url: `https://example.com/${id}.xml`,
+    source_kind: "rss",
+    candidate_category: "hot_blog"
+  }));
+  await fs.writeFile(sourcesPath, JSON.stringify({ schema_version: 1, sources }), "utf8");
+  let active = 0;
+  let maximumActive = 0;
+  const health = await checkSourcesHealth({
+    rootDir: tmp,
+    sourcesPath,
+    reportDate: "2026-05-26",
+    sourceConcurrency: 2,
+    fetchImpl: async () => {
+      active += 1;
+      maximumActive = Math.max(maximumActive, active);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      active -= 1;
+      return textResponse(contentSourceRssFixture());
+    }
+  });
+
+  assert.equal(maximumActive, 2);
+  assert.deepEqual(health.results.map((result) => result.id), sources.map((source) => source.id));
+});
+
+test("source health filters by source id, kind, source group, credibility, category, and content tag", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-health-filters-"));
   const sourcesPath = path.join(tmp, "sources.json");
   await fs.writeFile(
@@ -6521,8 +6568,9 @@ test("source health filters by source id, kind, tier, category, and tag", async 
           url: "https://example.com/core.xml",
           source_kind: "rss",
           candidate_category: "hot_blog",
-          tier: "T0",
-          enablement: "core"
+          source_group: "official_blogs",
+          credibility_tag: "primary_material",
+          content_tags: ["industry_news"]
         }),
         sourceHealthFixtureSource({
           id: "health-hf-papers",
@@ -6530,9 +6578,9 @@ test("source health filters by source id, kind, tier, category, and tag", async 
           url: "https://example.com/hf.json",
           source_kind: "huggingface_daily_papers_api",
           candidate_category: "community_lead",
-          tier: "T2",
-          enablement: "optional",
-          source_level: "paper_api"
+          source_group: "papers_models",
+          credibility_tag: "monitoring_lead",
+          content_tags: ["research"]
         }),
         sourceHealthFixtureSource({
           id: "health-product-hunt",
@@ -6540,19 +6588,21 @@ test("source health filters by source id, kind, tier, category, and tag", async 
           url: "https://example.com/product-hunt.xml",
           source_kind: "rss",
           candidate_category: "project",
-          tier: "T2",
-          enablement: "optional",
+          source_group: "community_discussions",
+          credibility_tag: "monitoring_lead",
+          content_tags: ["product_update"],
           signal: "product_hunt"
         }),
         sourceHealthFixtureSource({
-          id: "health-manual",
-          name: "Health Manual",
-          url: "https://example.com/manual",
-          source_kind: "manual",
+          id: "health-tagged",
+          name: "Health Tagged Source",
+          url: "https://example.com/tagged.xml",
+          source_kind: "rss",
           candidate_category: "community_lead",
-          tier: "T3",
-          enablement: "manual",
-          verification_policy: "community_only"
+          source_group: "community_discussions",
+          credibility_tag: "community_lead",
+          content_tags: ["community_discussion"],
+          tags: ["manual"]
         })
       ]
     }),
@@ -6569,36 +6619,41 @@ test("source health filters by source id, kind, tier, category, and tag", async 
     rootDir: tmp,
     sourcesPath,
     reportDate: "2026-05-26",
-    enablement: "core,optional,manual",
-    sourceIds: ["health-manual"],
+    sourceIds: ["health-tagged"],
     fetchImpl
   });
-  assert.deepEqual(byId.results.map((source) => source.id), ["health-manual"]);
+  assert.deepEqual(byId.results.map((source) => source.id), ["health-tagged"]);
   assert.equal(byId.source_audit.sources_health.total_sources, 1);
 
   const byKind = await checkSourcesHealth({
     rootDir: tmp,
     sourcesPath,
     reportDate: "2026-05-26",
-    enablement: "core,optional,manual",
     sourceKinds: ["huggingface_daily_papers_api"],
     fetchImpl
   });
   assert.deepEqual(byKind.results.map((source) => source.id), ["health-hf-papers"]);
   assert.equal(byKind.results[0].status, "checked");
 
-  const byTierCategoryTag = await checkSourcesHealth({
+  const byGroupCredibilityCategoryTag = await checkSourcesHealth({
     rootDir: tmp,
     sourcesPath,
     reportDate: "2026-05-26",
-    enablement: "core,optional,manual",
-    tiers: ["T2"],
+    sourceGroups: ["community_discussions"],
+    credibilityTags: ["monitoring_lead"],
     categories: ["project"],
-    tags: ["product_hunt"],
+    tags: ["product_update"],
     fetchImpl
   });
-  assert.deepEqual(byTierCategoryTag.results.map((source) => source.id), ["health-product-hunt"]);
-  assert.equal(byTierCategoryTag.source_audit.sources_health.filter_summary.tags[0], "product_hunt");
+  assert.deepEqual(byGroupCredibilityCategoryTag.results.map((source) => source.id), ["health-product-hunt"]);
+  assert.deepEqual(byGroupCredibilityCategoryTag.source_audit.sources_health.filter_summary.source_groups, ["community_discussions"]);
+  assert.deepEqual(byGroupCredibilityCategoryTag.source_audit.sources_health.filter_summary.credibility_tags, ["monitoring_lead"]);
+  assert.deepEqual(byGroupCredibilityCategoryTag.source_audit.sources_health.filter_summary.tags, ["product_update"]);
+
+  await assert.rejects(
+    () => checkSourcesHealth({ rootDir: tmp, sourcesPath, reportDate: "2026-05-26", tiers: ["T2"], fetchImpl }),
+    (error) => error instanceof PublisherError && error.code === "source_health_filter_retired"
+  );
 });
 
 test("source health rejects unmatched explicit filters", async () => {
@@ -6610,14 +6665,15 @@ test("source health rejects unmatched explicit filters", async () => {
       schema_version: 1,
       sources: [
         sourceHealthFixtureSource({
-          id: "health-manual",
-          name: "Health Manual",
-          url: "https://example.com/manual",
-          source_kind: "manual",
+          id: "health-tagged",
+          name: "Health Tagged Source",
+          url: "https://example.com/tagged.xml",
+          source_kind: "rss",
           candidate_category: "community_lead",
-          tier: "T3",
-          enablement: "manual",
-          verification_policy: "community_only"
+          source_group: "community_discussions",
+          credibility_tag: "community_lead",
+          content_tags: ["community_discussion"],
+          tags: ["manual"]
         })
       ]
     }),
@@ -6629,7 +6685,6 @@ test("source health rejects unmatched explicit filters", async () => {
       rootDir: tmp,
       sourcesPath,
       reportDate: "2026-05-26",
-      enablement: "manual",
       sourceIds: ["does-not-exist"],
       fetchImpl: async () => textResponse(contentSourceRssFixture())
     }),
@@ -8968,7 +9023,23 @@ test("status:self-check runs publish checks from the prepared clean worktree", a
     prompt_manifest: "prompts/ai-daily/manifest.json",
     prompt_modules: ["fixed-source-checklist.md"],
     source_registry_count: 132,
-    source_registry_enablement_counts: { core: 54, optional: 73, manual: 5 },
+    source_registry_source_group_counts: {
+      official_blogs: 40,
+      github_trending: 20,
+      community_discussions: 20,
+      x_updates: 12,
+      news_newsletters: 20,
+      papers_models: 18,
+      other: 2
+    },
+    source_registry_credibility_tag_counts: {
+      primary_material: 54,
+      multi_source_material: 8,
+      single_source_relay: 30,
+      community_lead: 15,
+      monitoring_lead: 20,
+      pending_review: 5
+    },
     rules: ["fixed_source_checklist"]
   };
   await writeSelfCheckReportFixture(cleanRoot, "2026-06-04", {
@@ -9045,19 +9116,39 @@ test("daily workflow contract validates repository workflow markers", async () =
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-workflow-contract.json"), "utf8"));
   const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
   assert.equal(contract.required_package_scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
-  assert.equal(contract.daily_runner.source_watch.producer_stage, "discover_source_watch");
-  assert.equal(contract.daily_runner.source_watch.persistence_stage, "report_write");
-  assert.equal(contract.daily_runner.source_watch.consumer_stage, "build");
+  assert.equal(contract.daily_runner.public_signals.content_admission_gate, false);
+  assert.equal(contract.daily_runner.public_signals.membership_policy, "all_safe_normalized_observations");
+  assert.equal(contract.daily_runner.public_signals.publishes_before_legacy_report, true);
+  assert.deepEqual(contract.daily_runner.public_signals.labels_are_non_gating, [
+    "source_group",
+    "content_tags",
+    "credibility_tag",
+    "source_health",
+    "access_state"
+  ]);
+  const sourceWatch = contract.daily_runner.public_signals.source_watch;
+  assert.equal(sourceWatch.producer_stage, "discover_source_watch");
+  assert.equal(sourceWatch.persistence_stage, "signals_write");
+  assert.equal(sourceWatch.consumer_stage, "signals_build");
+  assert.equal(sourceWatch.validation_stage, "signals_validate");
   assert.equal(
-    contract.daily_runner.source_watch.candidate_pool_path_template,
-    "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
+    sourceWatch.occurrence_store_path_template,
+    "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json"
   );
-  assert(contract.daily_runner.source_watch.connected_requires.includes("candidate_pool_sha256_matches"));
-  assert.equal(contract.daily_runner.source_watch.zero_included_candidates_still_consumed, true);
-  assert.equal(contract.daily_runner.official_blog_context.producer_stage, "official_blog_context");
-  assert.equal(contract.daily_runner.official_blog_context.consumer_stage, "report_draft");
-  assert.equal(contract.daily_runner.official_blog_context.admission_policy_version, "official-blog-admission-v1");
-  assert.equal(contract.daily_runner.official_blog_context.zero_matched_records_still_consumed, true);
+  assert.equal(sourceWatch.public_index_path, "docs/signals/index.json");
+  assert(sourceWatch.connected_requires.includes("signals_write_passed"));
+  assert(sourceWatch.connected_requires.includes("public_signal_index_schema_valid"));
+  assert.equal(sourceWatch.zero_observations_still_consumed, true);
+  assert.equal(contract.daily_runner.legacy_report.optional_derivative, true);
+  assert.equal(contract.daily_runner.legacy_report.cannot_change_signal_membership, true);
+  assert.equal(contract.daily_runner.legacy_report.runs_after_public_signal_publish, true);
+  assert.equal(contract.daily_runner.legacy_report.official_blog_context.scope, "legacy_report_only");
+  assert.equal(contract.daily_runner.legacy_report.official_blog_context.producer_stage, "official_blog_context");
+  assert.equal(contract.daily_runner.legacy_report.official_blog_context.consumer_stage, "report_draft");
+  assert.equal(contract.daily_runner.legacy_report.official_blog_context.admission_policy_version, "official-blog-admission-v1");
+  assert.equal(contract.daily_runner.legacy_report.official_blog_context.zero_matched_records_still_consumed, true);
+  assert(contract.daily_runner.modes.dry_run.allowed_terminal_statuses.includes("generated_signals_only"));
+  assert(contract.daily_runner.modes.publish.allowed_terminal_statuses.includes("published_signals_only"));
   assert.equal(contract.external_automation_inventory.require_single_project_automation, true);
   assert.deepEqual(contract.external_automation_inventory.allowed_project_automation_ids, ["ai-2"]);
   assert.equal(contract.external_automation_inventory.require_active_status_self_check, false);
@@ -9065,7 +9156,13 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert.equal(contract.status_self_check.mode, "manual_diagnostic_only");
   assert.equal(contract.status_self_check.truth_source, ".tmp/run-summary-YYYY-MM-DD.json");
   assert.equal(JSON.stringify(contract.required_markers).includes("--source-watch-admitted-artifact"), false);
+  assert.equal(JSON.stringify(contract.required_markers).includes("candidate_pool_hashes"), false);
   assert.equal(contract.external_automation_prompt.contains.includes("--source-watch-admitted-artifact"), false);
+  assert.equal(contract.external_automation_prompt.contains.includes("candidate_pool_hashes"), false);
+  assert(contract.external_automation_prompt.contains.includes("occurrence_store_path"));
+  assert(contract.external_automation_prompt.contains.includes("signal_index_path"));
+  assert(contract.external_automation_prompt.contains.includes("signals.status"));
+  assert(contract.external_automation_prompt.contains.includes("legacy_report.status"));
   assert(contract.external_automation_prompt.contains.includes("Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8"));
   assert.equal(manifest.scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
   assert(!contract.daily_runner || contract.daily_runner.script !== "daily:codex-dag:contract-run");
@@ -9079,7 +9176,7 @@ test("daily workflow contract validates repository workflow markers", async () =
     [
       'id = "ai-2"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -9108,7 +9205,7 @@ test("daily workflow contract rejects any extra project automation definition", 
     [
       'id = "ai-2"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -9139,6 +9236,45 @@ test("daily workflow contract rejects any extra project automation definition", 
   );
 });
 
+test("daily workflow contract rejects admission gates or legacy lineage in the public signal lane", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-public-signal-semantics-"));
+  const contractPath = path.join(tmp, "daily-workflow-contract.json");
+  const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-workflow-contract.json"), "utf8"));
+  contract.daily_runner.public_signals.content_admission_gate = true;
+  contract.daily_runner.public_signals.source_watch.persistence_stage = "report_write";
+  contract.daily_runner.public_signals.history_baseline.production_reads_legacy_artifacts = true;
+  contract.daily_runner.legacy_report.optional_derivative = false;
+  await fs.writeFile(contractPath, `${JSON.stringify(contract, null, 2)}\n`, "utf8");
+
+  const automationsDir = path.join(tmp, "automations");
+  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  await fs.mkdir(path.dirname(promptPath), { recursive: true });
+  await fs.writeFile(
+    promptPath,
+    [
+      'id = "ai-2"',
+      'kind = "cron"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8"',
+      'status = "ACTIVE"',
+      'cwds = ["D:\\\\ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await validateDailyWorkflowContract({
+    rootDir,
+    contractPath,
+    automationsDir,
+    automationPromptPath: promptPath
+  });
+
+  assert.equal(result.ok, false);
+  assert(result.failures.some((failure) => failure.includes("content_admission_gate must be false")), result.failures.join("\n"));
+  assert(result.failures.some((failure) => failure.includes("persistence_stage must be \"signals_write\"")), result.failures.join("\n"));
+  assert(result.failures.some((failure) => failure.includes("history_baseline.production_reads_legacy_artifacts must be false")), result.failures.join("\n"));
+  assert(result.failures.some((failure) => failure.includes("optional_derivative must be true")), result.failures.join("\n"));
+});
+
 test("daily workflow contract rejects a publish prompt that reads the run summary without explicit UTF-8", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-prompt-encoding-"));
   const automationsDir = path.join(tmp, "automations");
@@ -9149,7 +9285,7 @@ test("daily workflow contract rejects a publish prompt that reads the run summar
     [
       'id = "ai-2"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content $summaryPath -Raw"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content $summaryPath -Raw"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -9179,7 +9315,7 @@ test("daily workflow contract rejects an active publish automation with stale So
     [
       'id = "ai-2"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed candidate_pool_hashes; bootstrap mainSha; 不要另行运行 status:self-check; source_watch.production_status must stay not_connected"',
+      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check; source_watch.production_status must stay not_connected"',
       'status = "ACTIVE"',
       'cwds = ["D:\\\\ai-daily-cn"]'
     ].join("\n"),
@@ -9258,6 +9394,19 @@ test("daily resilience policy validates current runner stages and workflow gates
   ]) {
     assert(result.stage_ids.includes(stageId), `missing resilience policy for ${stageId}`);
   }
+  for (const stageId of [
+    "discover_github_trending",
+    "discover_source_watch",
+    "discover_huggingface_trending",
+    "discover_builders",
+    "discover_china_ai",
+    "discover_content_sources",
+    "discover_statuspage_incidents",
+    "discover_search_news"
+  ]) {
+    const stage = result.policy.stages.find((item) => item.id === stageId);
+    assert(!stage.block.reasons.includes("high_risk_unverified_fact"), `${stageId} must label unverified content instead of blocking signals`);
+  }
   const reportWrite = result.policy.stages.find((stage) => stage.id === "report_write");
   assert.equal(reportWrite.fallback.kind, "schema_aware_normalizer");
   assert.equal(reportWrite.degrade.action, "normalize_public_degraded_fields");
@@ -9288,26 +9437,18 @@ test("daily resilience policy rejects missing required stages", async () => {
   assert(result.failures.some((failure) => failure.includes("missing required stage")));
 });
 
-test("daily resilience policy rejects retired platform discovery stages", async () => {
+test("daily resilience policy rejects credibility gates in public signal discovery", async () => {
   const { validateDailyResiliencePolicy } = await import("../src/resilience-policy.js");
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-retired-stage-policy-"));
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-signal-credibility-gate-policy-"));
   const policy = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-resilience-policy.json"), "utf8"));
-  policy.stages.push({
-    id: "discover_wechat_platform",
-    description: "Retired platform discovery stage must stay out of the default daily pipeline.",
-    retry: { max_attempts: 1, backoff_ms: [0], on: [] },
-    fallback: { kind: "none", action: "none" },
-    degrade: { allowed: false, action: "none" },
-    block: { allowed: true, reasons: ["unsafe_public_content"] },
-    summary_fields: ["stage_id", "status", "attempts"]
-  });
+  policy.stages.find((stage) => stage.id === "discover_builders").block.reasons.push("high_risk_unverified_fact");
   const policyPath = path.join(tmp, "daily-resilience-policy.json");
   await fs.writeFile(policyPath, `${JSON.stringify(policy, null, 2)}\n`, "utf8");
 
   const result = await validateDailyResiliencePolicy({ rootDir, policyPath });
 
   assert.equal(result.ok, false);
-  assert(result.failures.some((failure) => failure.includes("retired platform discovery stage discover_wechat_platform")));
+  assert(result.failures.some((failure) => failure.includes("discover_builders must label high-risk unverified observations")));
 });
 
 test("harness init recreates ignored harness state files before validation", async () => {
@@ -9435,10 +9576,10 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
     "post-generation gates only catch regressions",
     "OpenAI, Anthropic, Google/DeepMind, Meta, Microsoft, Hugging Face",
     "GitHub Trending",
-    "README-level Chinese explanation",
+    "public signal defaults use bounded transport pages only, never an item cap",
     "Builder/X observations",
     "Hot blogs include Chinese and English sources",
-    "requested GitHub watchlist, direct Chinese RSS, and bottom community-hotspot feeds",
+    "GitHub watchlist, direct Chinese RSS, and community hotspot leads",
     "OpenRouter and Artificial Analysis",
     "semantic assets",
     "Cross-Agent Iteration Roadmap Addendum",
@@ -9996,6 +10137,11 @@ test("daily runner writes launcher summary and stops before real publish by defa
   assert(calls.some((call) => call.id === "publish_dry_run_daily"));
   assert(!calls.some((call) => call.id === "publish_real"));
   assert(calls.every((call) => call.cwd === cleanRoot));
+  const stageIds = calls.map((call) => call.id);
+  assert(stageIds.indexOf("signals_write") < stageIds.indexOf("prompt_build"));
+  assert(stageIds.indexOf("signals_validate") < stageIds.indexOf("report_draft"));
+  const buildCall = calls.find((call) => call.id === "build");
+  assert(buildCall.args.includes("--skip-signals"));
 
   const saved = JSON.parse(await fs.readFile(result.summaryPath, "utf8"));
   assert.equal(saved.final_status, "generated_only");
@@ -10034,7 +10180,9 @@ test("daily runner turns remote ahead publish dry-run into restart latest main a
     }
   });
 
-  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.final_status, "generated_signals_only");
+  assert.equal(result.summary.signals.status, "generated");
+  assert.equal(result.summary.legacy_report.status, "blocked");
   assert.equal(result.summary.next_action.kind, "restart_latest_main");
   assert.equal(result.summary.next_action.stage_id, "publish_dry_run_daily");
   assert.equal(result.summary.next_action.report_date, reportDate);
@@ -10109,7 +10257,8 @@ test("daily runner ignores incidental remote ahead text from failed stage stdout
     }
   });
 
-  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.final_status, "generated_signals_only");
+  assert.equal(result.summary.legacy_report.status, "blocked");
   assert.notEqual(result.summary.next_action.kind, "restart_latest_main");
   assert.equal(result.summary.next_action.kind, "inspect_stage_failure");
   assert.equal(result.summary.next_action.stage_id, "validate");
@@ -10416,7 +10565,8 @@ test("daily runner blocks sources phase5 audit publish plan violations", async (
     }
   });
 
-  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.final_status, "generated_signals_only");
+  assert.equal(result.summary.legacy_report.status, "blocked");
   assert.equal(result.summary.next_action.kind, "inspect_stage_failure");
   assert.equal(result.summary.next_action.stage_id, "sources_phase5_audit");
   const recorded = result.summary.stages.find((stage) => stage.id === "sources_phase5_audit");
@@ -10826,7 +10976,11 @@ test("daily runner writes infrastructure-exhausted correction rollup when publis
     }
   });
 
-  assert.equal(result.summary.final_status, "infrastructure_blocked_after_fallback_exhausted");
+  assert.equal(result.summary.final_status, "published_signals_only");
+  assert.equal(result.summary.signals.status, "published");
+  assert.equal(result.summary.legacy_report.status, "infrastructure_blocked_after_fallback_exhausted");
+  const stageIds = result.summary.stages.map((stage) => stage.id);
+  assert(stageIds.indexOf("signals_publish_real") < stageIds.indexOf("prompt_build"));
   assert.equal(result.summary.next_action.kind, "recover_infrastructure_publish");
   assert.equal(result.summary.next_action.stage_id, "publish_github_api_fallback");
   assert.equal(result.summary.retrospective_correction.ok, true);
@@ -10878,7 +11032,7 @@ test("daily runner omits retired platform discovery outputs from report draft", 
       .filter((id) => id.includes("platform")),
     []
   );
-  assert.equal(calls[0].id, "source_reset_preflight");
+  assert.equal(calls[0].id, "sources_validate");
   const reportDraft = calls.find((stage) => stage.id === "report_draft");
   const inputIndex = reportDraft.command.args.indexOf("--input");
   const inputPaths = reportDraft.command.args[inputIndex + 1].split(",");
@@ -10890,7 +11044,7 @@ test("daily runner omits retired platform discovery outputs from report draft", 
   assert(reportDraft.command.args.includes("--allow-degraded-inputs"));
 });
 
-test("daily runner gives content source discovery enough candidate budget for the fixed source surface", async () => {
+test("daily runner bounds source concurrency without imposing candidate quotas", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-content-budget-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
   const calls = [];
@@ -10911,34 +11065,24 @@ test("daily runner gives content source discovery enough candidate budget for th
   });
 
   const contentDiscovery = calls.find((stage) => stage.id === "discover_content_sources");
-  const limitIndex = contentDiscovery.command.args.indexOf("--limit");
-  const perSourceIndex = contentDiscovery.command.args.indexOf("--per-source-limit");
-  const limit = Number(contentDiscovery.command.args[limitIndex + 1]);
-  const perSourceLimit = Number(contentDiscovery.command.args[perSourceIndex + 1]);
-
-  assert.equal(perSourceLimit, 3);
-  assert(limit >= 150, `content source limit ${limit} is below fixed source surface budget`);
+  const concurrencyIndex = contentDiscovery.command.args.indexOf("--source-concurrency");
+  assert.equal(Number(contentDiscovery.command.args[concurrencyIndex + 1]), 12);
+  assert.equal(contentDiscovery.command.args.includes("--limit"), false);
+  assert.equal(contentDiscovery.command.args.includes("--per-source-limit"), false);
 });
 
-test("retired platform discovery scripts and source configs stay out of default discovery", async () => {
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional,manual"
-  });
-  const ids = new Set(registry.sources.map((source) => source.id));
-  assert(!ids.has("platform-reddit-local-llama-feed"));
+test("legacy platform-specific scripts stay removed while public listeners use the common registry", async () => {
+  const registry = await loadSourceRegistry({ rootDir });
   const scripts = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8")).scripts;
   assert(!Object.hasOwn(scripts, "discover:reddit-platform"));
   assert(!Object.hasOwn(scripts, "discover:wechat-platform"));
   assert(!Object.hasOwn(scripts, "discover:zhihu-platform"));
   assert.equal(fsSync.existsSync(path.join(rootDir, "config", "sources", "wechat-whitelist.json")), false);
+  assert(registry.sources.every((source) => typeof source.source_group === "string" && source.source_group.length > 0));
 });
 
-test("configured source reset includes GitHub watchlist, Chinese direct RSS, and community hotspots", async () => {
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional,manual"
-  });
+test("broad public registry includes GitHub, Chinese RSS, community, newsletter, and model listeners", async () => {
+  const registry = await loadSourceRegistry({ rootDir });
   const byId = new Map(registry.sources.map((source) => [source.id, source]));
   const githubWatchlist = JSON.parse(await fs.readFile(path.join(rootDir, "config", "sources", "github-watchlist.json"), "utf8"));
   const communityHotspots = JSON.parse(await fs.readFile(path.join(rootDir, "config", "sources", "community-hotspots.json"), "utf8"));
@@ -10948,107 +11092,37 @@ test("configured source reset includes GitHub watchlist, Chinese direct RSS, and
     "github-watch-follow-builders-commits",
     "github-watch-follow-builders-x",
     "github-watch-ai-news-agent-commits",
-    "github-watch-ml-news-of-the-week-readme",
+    "content-salvatorera-ml-news-week",
     "community-hn-frontpage-100",
     "intermediary-qbitai",
     "intermediary-36kr",
-    "intermediary-infoq-cn"
+    "intermediary-infoq-cn",
+    "public-import-ai-newsletter",
+    "public-huggingface-trending-models"
   ]) {
-    assert(byId.has(id), `source reset should register ${id}`);
+    assert(byId.has(id), `public listener registry should include ${id}`);
   }
 
   assert.equal(byId.get("github-watch-ai-news-radar-commits").url, "https://github.com/LearnPrompt/ai-news-radar/commits/master.atom");
   assert.equal(byId.get("community-hn-frontpage-100").url, "https://hnrss.org/frontpage?points=100");
   assert.equal(byId.get("intermediary-infoq-cn").url, "https://www.infoq.cn/feed");
-  assert.equal(byId.get("intermediary-qbitai").enablement, "core");
-  assert.equal(byId.get("intermediary-36kr").enablement, "core");
-  assert.equal(byId.get("intermediary-infoq-cn").enablement, "core");
   assert(communityHotspots.sources.every((source) => source.public_degraded_on_blocked === false));
-  assert(!communityHotspots.sources.some((source) => /reddit/i.test(`${source.id} ${source.name} ${source.url}`)));
   assert(githubWatchlist.sources.some((source) => source.repository === "zarazhangrui/follow-builders"));
-  const legacyPlatformIds = [...byId.keys()].filter((id) =>
-    /zhihu|rsshub/i.test(id) || (/wechat/i.test(id) && !/^wechat2rss-/i.test(id))
-  );
-  assert.deepEqual(legacyPlatformIds, []);
+  assert(new Set(registry.sources.map((source) => source.source_group)).size >= 6);
 });
 
-test("configured source reset excludes ineffective Reddit community hotspot feeds", async () => {
-  const registry = await loadSourceRegistry({
-    rootDir,
-    includeEnablement: "core,optional,manual"
-  });
+test("community listener configuration has no categorical platform kill switch, lookback, or item quota", async () => {
+  const registry = await loadSourceRegistry({ rootDir });
   const byId = new Set(registry.sources.map((source) => source.id));
   const communityHotspots = JSON.parse(await fs.readFile(path.join(rootDir, "config", "sources", "community-hotspots.json"), "utf8"));
 
   assert(byId.has("community-hn-frontpage-100"));
   assert(byId.has("community-hn-ai-newest"));
-  assert(![...byId].some((id) => /^community-reddit-/i.test(id)));
-  assert(!communityHotspots.sources.some((source) => /reddit/i.test(`${source.id} ${source.name} ${source.url}`)));
-});
-
-test("source reset preflight passes only when the durable source reset surface is present", async () => {
-  const result = await checkSourceResetPreflight({ rootDir });
-
-  assert.equal(result.ok, true, JSON.stringify(result.failures));
-  assert(result.checked_files.includes("src/public-surface-policy.js"));
-  assert(result.checked_files.includes("config/sources/github-watchlist.json"));
-  assert(result.checked_files.includes("config/sources/community-hotspots.json"));
-  assert.equal(result.forbidden_package_scripts_present.length, 0);
-  assert.equal(result.missing_source_ids.length, 0);
-});
-
-test("source reset preflight blocks stale daily automation code", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-reset-preflight-"));
-  await fs.mkdir(path.join(tmp, "config", "sources"), { recursive: true });
-  await fs.mkdir(path.join(tmp, "src"), { recursive: true });
-  await fs.writeFile(
-    path.join(tmp, "package.json"),
-    JSON.stringify({
-      scripts: {
-        "discover:wechat-platform": "node src/cli.js discover:wechat-platform"
-      }
-    }, null, 2),
-    "utf8"
-  );
-  await fs.writeFile(
-    path.join(tmp, "config", "sources", "wechat-whitelist.json"),
-    JSON.stringify({ schema_version: 1, sources: [] }, null, 2),
-    "utf8"
-  );
-  await fs.writeFile(
-    path.join(tmp, "config", "sources", "github-watchlist.json"),
-    JSON.stringify({ schema_version: 1, sources: [] }, null, 2),
-    "utf8"
-  );
-  await fs.writeFile(
-    path.join(tmp, "config", "sources", "community-hotspots.json"),
-    JSON.stringify({
-      schema_version: 1,
-      sources: [
-        {
-          id: "community-hn-frontpage-100",
-          url: "https://hnrss.org/frontpage?points=100",
-          public_degraded_on_blocked: true
-        }
-      ]
-    }, null, 2),
-    "utf8"
-  );
-  await fs.writeFile(
-    path.join(tmp, "config", "sources", "intermediary-sources.json"),
-    JSON.stringify({ schema_version: 1, sources: [] }, null, 2),
-    "utf8"
-  );
-
-  const result = await checkSourceResetPreflight({ rootDir: tmp });
-  const failureCodes = result.failures.map((failure) => failure.code);
-
-  assert.equal(result.ok, false);
-  assert(failureCodes.includes("missing_required_file"));
-  assert(failureCodes.includes("retired_source_config_present"));
-  assert(failureCodes.includes("retired_platform_script_present"));
-  assert(failureCodes.includes("missing_required_source_id"));
-  assert(failureCodes.includes("community_hotspot_public_degradation_enabled"));
+  for (const source of communityHotspots.sources) {
+    assert.equal(Object.hasOwn(source, "kill_switch"), false);
+    assert.equal(Object.hasOwn(source, "lookback_days"), false);
+    assert.equal(Object.hasOwn(source, "max_items_per_run"), false);
+  }
 });
 
 test("daily runner hands AI repair back to Codex with publish review budget", async () => {
@@ -11378,7 +11452,8 @@ test("daily runner keeps the hard block when a non-editorial blocking issue has 
     }
   });
 
-  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.final_status, "generated_signals_only");
+  assert.equal(result.summary.legacy_report.status, "blocked");
 });
 
 test("daily runner degrades and re-renders (not block) on editorial-weak page-check failures", async () => {
@@ -11448,7 +11523,8 @@ test("daily runner still blocks when residual issues are not low-risk editorial"
     }
   });
 
-  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.final_status, "generated_signals_only");
+  assert.equal(result.summary.legacy_report.status, "blocked");
 });
 
 test("daily runner resumes from AI repair contract and continues with optimized report", async () => {
@@ -12423,6 +12499,43 @@ test("daily runner verifies Pages after successful real publish", async () => {
   assert.equal(recorded.output.http_status, 200);
 });
 
+test("daily runner publishes signals through API fallback and stops before a stale legacy checkout can run", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-signal-api-fallback-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const calls = [];
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-14",
+    publish: true,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "1111111111111111111111111111111111111111"
+    }),
+    runStage: async (stage) => {
+      calls.push(stage.id);
+      if (stage.id === "signals_publish_real") {
+        return { ok: false, output: { ok: false, error_code: "git_push_failed" } };
+      }
+      if (stage.id === "signals_publish_github_api_fallback") {
+        return { ok: true, output: { publish_mode: "github-api-fallback", commit_sha: "signal-api-sha" } };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "published_signals_only");
+  assert.equal(result.summary.signals.status, "published");
+  assert.equal(result.summary.signals.publish_mode, "github-api-fallback");
+  assert.equal(result.summary.legacy_report.status, "not_started_after_signal_transport_fallback");
+  assert.equal(result.summary.next_action.kind, "restart_latest_main_for_legacy_report");
+  assert(calls.includes("signals_publish_github_api_fallback"));
+  assert.equal(calls.includes("prompt_build"), false);
+  assert.equal(calls.includes("report_draft"), false);
+});
+
 test("daily runner verifies Pages after GitHub API fallback publish", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pages-fallback-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
@@ -12601,7 +12714,8 @@ test("daily runner records stdout and stderr from failed publish stages", async 
     }
   });
 
-  assert.equal(result.summary.final_status, "infrastructure_blocked_after_fallback_exhausted");
+  assert.equal(result.summary.final_status, "published_signals_only");
+  assert.equal(result.summary.legacy_report.status, "infrastructure_blocked_after_fallback_exhausted");
   const publishStage = result.summary.stages.find((stage) => stage.id === "publish_real");
   const fallbackStage = result.summary.stages.find((stage) => stage.id === "publish_github_api_fallback");
   assert.equal(publishStage.error_code, "ETIMEDOUT");
@@ -17115,7 +17229,7 @@ test("report:draft limits paper and GitHub overflow in community leads while kee
   assert(drafted.report.community_leads.filter((item) => item.source_level === "github").length <= 3);
 });
 
-test("report:draft caps public signal coverage beyond strict factual sections", async () => {
+test("legacy report:draft caps edited-report sections without limiting the public signal stream", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-expanded-signals-"));
   const reportDate = "2026-06-08";
   const discoveryPath = path.join(tmp, "discovery.json");
@@ -18235,12 +18349,10 @@ test("public daily IA reset enforces stories original X compact tracking hover a
         url: "https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/README.md",
         source_kind: "github_report_markdown",
         candidate_category: "community_lead",
-        tier: "T2",
-        authority: "aggregator",
-        enablement: "optional",
-        verification_policy: "primary_required",
-        requires_original_url: false,
-        max_items_per_run: 8
+        source_group: "papers_models",
+        credibility_tag: "single_source_relay",
+        content_tags: ["research"],
+        requires_original_url: false
       },
       {
         id: "hn-topstories-api",
@@ -18248,13 +18360,11 @@ test("public daily IA reset enforces stories original X compact tracking hover a
         url: "https://hacker-news.firebaseio.com/v0/topstories.json",
         source_kind: "search_api",
         candidate_category: "community_lead",
-        tier: "T2",
-        authority: "community",
-        enablement: "optional",
-        verification_policy: "community_only",
+        source_group: "community_discussions",
+        credibility_tag: "monitoring_lead",
+        content_tags: ["community_discussion"],
         requires_original_url: false,
-        max_items_per_run: 8,
-        source_level: "community_api"
+        signal: "hacker_news"
       }
     ]
   }, null, 2)}\n`, "utf8");
@@ -18263,7 +18373,6 @@ test("public daily IA reset enforces stories original X compact tracking hover a
     rootDir: tmp,
     sourcesPath,
     reportDate: "2026-06-23",
-    enablement: "optional",
     fetchImpl: async (url) => {
       if (String(url).includes("topstories")) {
         return new Response("[1,2,3]", { status: 200 });
@@ -18530,7 +18639,7 @@ test("source-first v2 contract separates internal inventory runtime from the pub
     "Source-First V2 Addendum",
     "reader-safe source-first occurrence stream",
     "The internal source-first runtime puts `source_signal_story` before `source_metrics_dashboard`.",
-    "The current 166 collection entries are internal inventory rows, not public occurrence cards.",
+    "All currently registered collection entries are internal inventory rows, not public occurrence cards",
     "`config/source-display-contract.json` governs the internal inventory"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation should preserve source-first v2 decision: ${phrase}`);
@@ -18567,7 +18676,7 @@ test("source order tuning review is validator-backed and complete", async () => 
 
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.order_tuning_review_path, "docs/source-order-tuning-review.md");
-  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
+  assert.equal(result.summary.order_tuning_unmapped_sources, currentUnmappedInventoryCount());
   assert(result.summary.required_order_tuning_markers.includes("source-order-tuning-review:v1"));
   assert(result.summary.required_order_tuning_markers.includes("promotion-candidate-review"));
 
@@ -18671,7 +18780,7 @@ test("logical source promotion proposals follow multi-day evidence decisions", a
     );
   }
   assert.equal(result.summary.logical_sources, 49);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
+  assert.equal(result.summary.order_tuning_unmapped_sources, currentUnmappedInventoryCount());
 });
 
 test("source order tuning review validator rejects drift and private fields", async () => {
@@ -18686,6 +18795,8 @@ test("source order tuning review validator rejects drift and private fields", as
 
   const reviewPath = path.join(tmp, "docs/source-order-tuning-review.md");
   const review = await fs.readFile(reviewPath, "utf8");
+  const coreUnmappedCount = buildSourceInventoryRows({ rootDir })
+    .filter((row) => row.display_section === "core_primary" && !row.logical_source_id).length;
 
   async function expectInvalid(mutatedReview, expectedPattern, label = "mutated source order tuning review") {
     await fs.writeFile(reviewPath, mutatedReview, "utf8");
@@ -18695,8 +18806,8 @@ test("source order tuning review validator rejects drift and private fields", as
   }
 
   await expectInvalid(
-    review.replace("| `core_primary` | 1 |", "| `core_primary` | 0 |"),
-    /unmapped count for core_primary must be 1/
+    review.replace(`| \`core_primary\` | ${coreUnmappedCount} |`, `| \`core_primary\` | ${coreUnmappedCount - 1} |`),
+    new RegExp(`unmapped count for core_primary must be ${coreUnmappedCount}`)
   );
   await expectInvalid(
     review.replace("`content-azure-blog`", "`unknown-source-id`"),
@@ -18730,7 +18841,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 49);
   assert.equal(result.summary.display_sources, 49);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
+  assert.equal(result.summary.order_tuning_unmapped_sources, currentUnmappedInventoryCount());
 
   const logical = CORE_SOURCE_CONTRACTS.find((source) => source.id === "anthropic-research-engineering");
   assert(logical, "CORE_SOURCE_CONTRACTS should include anthropic-research-engineering");
@@ -18760,7 +18871,7 @@ test("Anthropic Research logical source promotion is executable and review-backe
 
   assert(handbook.includes("anthropic-research-engineering"), "handbook should document the promoted logical source");
   assert(!review.includes("| `content-anthropic-research` | `anthropic-research-engineering` |"), "review should no longer list the promoted source as a future candidate");
-  assert.match(review, /order-tuning-total-unmapped:69/);
+  assert.match(review, new RegExp(`order-tuning-total-unmapped:${currentUnmappedInventoryCount()}`));
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -18814,7 +18925,7 @@ test("core primary official logical source promotions are executable and review-
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 49);
   assert.equal(result.summary.display_sources, 49);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
+  assert.equal(result.summary.order_tuning_unmapped_sources, currentUnmappedInventoryCount());
 
   const promotions = [
     {
@@ -18842,7 +18953,8 @@ test("core primary official logical source promotions are executable and review-
       id: "xai-news",
       name: "xAI News",
       rank: 85,
-      sourceIds: ["content-xai-news", "content-xai-company-news"],
+      sourceIds: ["content-xai-news"],
+      legacyAliases: ["content-xai-company-news"],
       candidateSourceId: "content-xai-news"
     }
   ];
@@ -18852,7 +18964,7 @@ test("core primary official logical source promotions are executable and review-
     const logical = logicalById.get(promotion.id);
     assert(logical, `CORE_SOURCE_CONTRACTS should include ${promotion.id}`);
     assert.equal(logical.name, promotion.name);
-    for (const sourceId of promotion.sourceIds) {
+    for (const sourceId of [...promotion.sourceIds, ...(promotion.legacyAliases || [])]) {
       assert(logical.aliases.includes(sourceId), `${promotion.id} aliases should include ${sourceId}`);
     }
   }
@@ -18900,7 +19012,7 @@ test("core primary official logical source promotions are executable and review-
   for (const replacementSourceId of ["content-azure-blog", "content-tiktok-developers-blog", "content-cloudflare-blog", "content-google-keyword"]) {
     assert(review.includes(`| \`${replacementSourceId}\``), `review should include replacement promotion candidate ${replacementSourceId}`);
   }
-  assert.match(review, /order-tuning-total-unmapped:69/);
+  assert.match(review, new RegExp(`order-tuning-total-unmapped:${currentUnmappedInventoryCount()}`));
 
   const report = strictPublishReportFixture();
   report.source_audit = sourceAuditFixture();
@@ -18947,7 +19059,7 @@ test("tracking metrics logical sources are promoted into the fixed display contr
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 49);
   assert.equal(result.summary.display_sources, 49);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
+  assert.equal(result.summary.order_tuning_unmapped_sources, currentUnmappedInventoryCount());
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["openrouter-rankings", "artificial-analysis-index", "swe-bench-pro"]) {
@@ -18985,7 +19097,7 @@ test("china model logical sources are promoted into the fixed display contract",
   assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
   assert.equal(result.summary.logical_sources, 49);
   assert.equal(result.summary.display_sources, 49);
-  assert.equal(result.summary.order_tuning_unmapped_sources, 69);
+  assert.equal(result.summary.order_tuning_unmapped_sources, currentUnmappedInventoryCount());
 
   const logicalIds = new Set(CORE_SOURCE_CONTRACTS.map((source) => source.id));
   for (const id of ["deepseek-official", "qwen-official", "kimi-official", "minimax-official", "zhipu-official", "baidu-ai", "alibaba-cloud-ai"]) {
@@ -19009,19 +19121,12 @@ test("china model logical sources are promoted into the fixed display contract",
   const inventoryById = new Map(inventoryRows.map((row) => [row.id, row]));
   for (const [sourceId, logicalSourceId] of [
     ["china-ai-deepseek-news", "deepseek-official"],
-    ["china-ai-qwen-blog", "qwen-official"],
     ["content-qwen-blog", "qwen-official"],
-    ["china-ai-kimi-blog", "kimi-official"],
-    ["content-moonshot-kimi-company-news", "kimi-official"],
-    ["content-kimi-official-blog-company-news", "kimi-official"],
     ["content-kimi-platform-blog", "kimi-official"],
     ["content-kimi-technical-blog", "kimi-official"],
-    ["china-ai-minimax-blog", "minimax-official"],
-    ["content-minimax-company-news", "minimax-official"],
     ["content-minimax-news", "minimax-official"],
     ["content-minimax-blog", "minimax-official"],
     ["china-ai-zhipu-news", "zhipu-official"],
-    ["content-zhipu-zh-news", "zhipu-official"],
     ["content-zhipu-research", "zhipu-official"],
     ["china-ai-baidu-ai-news", "baidu-ai"],
     ["content-alibaba-cloud-blog", "alibaba-cloud-ai"]
@@ -19069,6 +19174,7 @@ test("source inventory order reference validator rejects drift and private field
   await fs.mkdir(path.join(tmp, "docs"), { recursive: true });
   await fs.copyFile(path.join(rootDir, "docs/source-first-ia-handbook.md"), path.join(tmp, "docs/source-first-ia-handbook.md"));
   await fs.copyFile(path.join(rootDir, "docs/source-inventory-order.md"), path.join(tmp, "docs/source-inventory-order.md"));
+  await fs.copyFile(path.join(rootDir, "docs/source-order-tuning-review.md"), path.join(tmp, "docs/source-order-tuning-review.md"));
   await fs.copyFile(path.join(rootDir, "package.json"), path.join(tmp, "package.json"));
 
   const referencePath = path.join(tmp, "docs/source-inventory-order.md");
@@ -19076,7 +19182,10 @@ test("source inventory order reference validator rejects drift and private field
   const firstSourceId = buildSourceInventoryRows({ rootDir })[0].id;
   const firstSourceLinePattern = new RegExp(`^\\|[^\\n]*\`${escapeRegExp(firstSourceId)}\`[^\\n]*\\n`, "m");
   const firstSourceLine = reference.match(firstSourceLinePattern)?.[0] || "";
+  const coreCount = buildSourceInventoryRows({ rootDir }).filter((row) => row.display_section === "core_primary").length;
+  const coreSummaryLine = reference.split("\n").find((line) => line.startsWith("| `core_primary` ")) || "";
   assert(firstSourceLine, "test fixture should find the first generated source row");
+  assert(coreSummaryLine, "test fixture should find the core summary row");
 
   async function expectInvalid(mutatedReference, expectedPattern, label = "mutated inventory reference") {
     await fs.writeFile(referencePath, mutatedReference, "utf8");
@@ -19094,12 +19203,12 @@ test("source inventory order reference validator rejects drift and private field
     /duplicates source id|must list source id exactly once/
   );
   await expectInvalid(
-    reference.replace("inventory-section:core_primary count:24", "inventory-section:core_primary count:23"),
-    /section core_primary count must be 24/
+    reference.replace(`inventory-section:core_primary count:${coreCount}`, `inventory-section:core_primary count:${coreCount - 1}`),
+    new RegExp(`section core_primary count must be ${coreCount}`)
   );
   await expectInvalid(
-    reference.replace("| `core_primary` 核心一手源 | 24 |", "| `core_primary` 核心一手源 | 23 |"),
-    /summary table section core_primary count must be 24/
+    reference.replace(coreSummaryLine, coreSummaryLine.replace(`| ${coreCount} |`, `| ${coreCount - 1} |`)),
+    new RegExp(`summary table section core_primary count must be ${coreCount}`)
   );
   await expectInvalid(
     reference.replace("source-inventory-order:v1", "source-inventory-order:missing"),
@@ -19962,7 +20071,7 @@ test("source inventory overview renders fixed section cards", () => {
   assert.equal((JSON.stringify(inventory).match(/- \*\*/g) || []).length, 0, "overview must not duplicate all detail rows");
   assert.equal(inventoryGroupRowCount, inventoryRows.length, "detail groups must keep every collection entry");
   assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+  assert.equal(containsInternalSourceField(serializedInventory), false);
 });
 
 test("source status focus renders attention cards", () => {
@@ -20329,7 +20438,7 @@ test("source signal story renders first-screen cards before metrics", () => {
   assert.equal(dashboard.type, "filterable-cards");
   assert.equal(dashboard.cardClass, "source-metric-card");
   assert.doesNotMatch(serializedStory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(serializedStory, /RSSHUB_BASE_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+  assert.equal(containsInternalSourceField(serializedStory), false);
 });
 
 test("internal source signal story rollup summarizes source signals before metrics", () => {
@@ -20496,7 +20605,7 @@ test("internal source signal story rollup summarizes source signals before metri
   assert.match(story.content, /信源运行概况/);
   assert.match(story.content, /全量信源清单/);
   assert.doesNotMatch(serializedStory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(serializedStory, /RSSHUB_BASE_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+  assert.equal(containsInternalSourceField(serializedStory), false);
 });
 
 test("internal source-first hero synopsis promotes source signals into the diagnostic summary", () => {
@@ -20654,7 +20763,7 @@ test("internal source-first hero synopsis promotes source signals into the diagn
     ["阻塞信源", "1"]
   ]);
   assert.doesNotMatch(serializedHero, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(serializedHero, /RSSHUB_BASE_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+  assert.equal(containsInternalSourceField(serializedHero), false);
 });
 
 test("internal source inventory panel lists all registered source entries before stories", () => {
@@ -20719,9 +20828,10 @@ test("internal source inventory panel lists all registered source entries before
   assert.match(inventoryGroupContent, /QbitAI/);
   assert.match(inventoryCardsText, /html_index/);
   assert.match(inventoryCardsText, /openrouter_rankings_public_playwright/);
-  assert.match(inventoryCardsText, /manual/);
+  assert.match(inventoryCardsText, /official_blogs/);
+  assert.match(inventoryCardsText, /primary_material/);
   assert.doesNotMatch(serializedSections, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(`${inventoryCardsText}\n${inventoryGroupContent}`, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes|score|debug/i);
+  assert.equal(containsInternalSourceField(`${inventoryCardsText}\n${inventoryGroupContent}`), false);
 });
 
 test("source inventory rows expose runtime status layer", () => {
@@ -20748,7 +20858,7 @@ test("source inventory rows expose runtime status layer", () => {
   assert.match(findInventoryLine("Azure Blog"), /运行状态：[\s\S]*unreported/);
   assert.match(findInventoryLine("TikTok for Developers Blog"), /运行状态：[\s\S]*collection_only/);
   assert.doesNotMatch(inventoryLines.join("\n"), /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(inventoryLines.join("\n"), /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+  assert.equal(containsInternalSourceField(inventoryLines.join("\n")), false);
 });
 
 test("source inventory navigation splits overview from fixed-section detail groups", () => {
@@ -20814,7 +20924,7 @@ test("source inventory navigation splits overview from fixed-section detail grou
   assert(lastGroupIndex > inventoryIndex, JSON.stringify(publicSectionOrder));
   assert(firstStoryIndex > lastGroupIndex, JSON.stringify(publicSectionOrder));
   assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+  assert.equal(containsInternalSourceField(serializedInventory), false);
 });
 
 test("source inventory density controls keep all rows visible with fixed section cards", () => {
@@ -20853,7 +20963,6 @@ test("source inventory density controls keep all rows visible with fixed section
   const serializedInventory = JSON.stringify([inventory, ...groupSections]);
   const cards = inventory?.items || [];
   const serializedCards = JSON.stringify(cards);
-  const countByField = (field, value) => inventoryRows.filter((row) => row[field] === value).length;
   const cardStatTotal = (label) => cards.reduce((sum, card) =>
     sum + Number(card.stats?.find((stat) => stat.label === label)?.value || 0), 0);
 
@@ -20861,20 +20970,24 @@ test("source inventory density controls keep all rows visible with fixed section
   assert.equal(inventory.type, "filterable-cards");
   assert.equal(inventory.cardClass, "source-inventory-section-card");
   assert.match(inventory.summary, /搜索只高亮不隐藏/);
-  assert.equal(cardStatTotal("core"), countByField("enablement", "core"));
-  assert.equal(cardStatTotal("manual"), countByField("enablement", "manual"));
+  assert(cards.every((card) => card.stats?.some((stat) => stat.label === "信源板块")));
+  assert(cards.every((card) => card.stats?.some((stat) => stat.label === "可信标签")));
+  assert.equal(
+    cardStatTotal("待核材料"),
+    inventoryRows.filter((row) => row.credibility_tag === "pending_review").length
+  );
   assert.match(serializedCards, /rss/);
   assert.match(serializedCards, /html_index/);
   assert.match(serializedCards, /openrouter_rankings_public_playwright/);
   assert.equal(groupRowCount, inventoryRows.length);
   for (const section of groupSections) {
     assert.match(section.content || "", /\[回到全量信源清单\]\(#section-source-inventory\)/);
-    assert.match(section.content || "", /类型分布/);
-    assert.match(section.content || "", /保留规则/);
-    assert.match(section.content || "", /阻塞、未配置、跳过、手动或无更新/);
+    assert.match(section.content || "", /信源板块/);
+    assert.match(section.content || "", /可信标签/);
+    assert.match(section.content || "", /阻塞、未配置、跳过、待核或无更新/);
   }
   assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+  assert.equal(containsInternalSourceField(serializedInventory), false);
 });
 
 test("source inventory section cards expose important slices without filtering rows", () => {
@@ -20922,13 +21035,13 @@ test("source inventory section cards expose important slices without filtering r
   assert.match(cardsText, /中文平台与媒体线索/);
   assert.match(cardsText, /platform_cn_media/);
   assert.match(cardsText, /WeChat Industry Whitelist Manual Intake|QbitAI/);
-  assert.match(cardsText, /手动或无更新/);
+  assert.match(cardsText, /待核或无更新/);
   assert.equal(platformCard?.href, "#section-source-inventory-group-platform-cn-media");
   assert.equal(platformCard?.stats?.[0]?.value, String(platformSectionCount));
   assert.equal((cardsText.match(/^- \*\*/gm) || []).length, 0, "focus overview must not duplicate all rows");
   assert.equal(groupRowCount, inventoryRows.length, "focus lanes must not remove canonical detail rows");
   assert.doesNotMatch(serializedInventory, /source_audit|candidate_pool|selection_snapshot|self_check|score|debug/i);
-  assert.doesNotMatch(serializedInventory, /AI_DAILY_RSSHUB_BASE_URL|AI_DAILY_WECHAT2RSS_FEED_URL|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|notes/i);
+  assert.equal(containsInternalSourceField(serializedInventory), false);
 });
 
 test("source-first IA status focus surfaces actionable source states before the full graph", () => {
@@ -24409,8 +24522,7 @@ test("content source discovery uses cache fallback for blocked arXiv or Reddit s
     url: "https://www.reddit.com/r/MachineLearning/.json",
     source_kind: "search_api",
     category: "intermediary",
-    source_level: "community_api",
-    maxItemsPerRun: 3
+    source_level: "community_api"
   };
   const redditPayload = {
     data: {
@@ -24800,7 +24912,23 @@ test("report:write records automation revision fingerprint in self_check", async
     prompt_manifest: "prompts/ai-daily/manifest.json",
     prompt_modules: ["fixed-source-checklist.md"],
     source_registry_count: 68,
-    source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
+    source_registry_source_group_counts: {
+      official_blogs: 20,
+      github_trending: 10,
+      community_discussions: 10,
+      x_updates: 5,
+      news_newsletters: 13,
+      papers_models: 8,
+      other: 2
+    },
+    source_registry_credibility_tag_counts: {
+      primary_material: 28,
+      multi_source_material: 4,
+      single_source_relay: 15,
+      community_lead: 8,
+      monitoring_lead: 8,
+      pending_review: 5
+    },
     origin_main_sha: "abcdef1234567890abcdef1234567890abcdef12",
     origin_main_short: "abcdef123456",
     rules: ["fixed_source_checklist"]
@@ -24824,6 +24952,14 @@ test("automation revision reads git, prompt manifest, and source registry state"
   assert.equal(revision.prompt_manifest, "prompts/ai-daily/manifest.json");
   assert(revision.prompt_modules.includes("fixed-source-checklist.md"));
   assert(revision.source_registry_count >= 63);
+  assert.equal(
+    Object.values(revision.source_registry_source_group_counts).reduce((sum, count) => sum + count, 0),
+    revision.source_registry_count
+  );
+  assert.equal(
+    Object.values(revision.source_registry_credibility_tag_counts).reduce((sum, count) => sum + count, 0),
+    revision.source_registry_count
+  );
   assert(revision.rules.includes("fixed_source_checklist"));
   assert.match(revision.origin_main_sha, /^(unknown|[0-9a-f]{40})$/);
 });
@@ -27267,7 +27403,7 @@ test("platform exempt report rejects fact-style claims and wrong section placeme
   );
 });
 
-test("platform exempt discovery applies deterministic source rules", async () => {
+test("platform source rules annotate observations without excluding them", async () => {
   const collected = await collectContentSources({
     reportDate: "2026-05-16",
     generatedAt: fixedGeneratedAt,
@@ -27280,10 +27416,9 @@ test("platform exempt discovery applies deterministic source rules", async () =>
         url: "https://example.com/wechat.xml",
         source_kind: "rss",
         candidate_category: "wechat_item",
-        tier: "T3",
-        authority: "community",
-        enablement: "optional",
-        verification_policy: "platform_signal_exempt",
+        source_group: "community_discussions",
+        credibility_tag: "community_lead",
+        content_tags: ["community_discussion"],
         platform: "wechat",
         allowed_hosts: ["mp.weixin.qq.com"],
         allowed_url_patterns: ["^https://mp\\.weixin\\.qq\\.com/"],
@@ -27301,13 +27436,14 @@ test("platform exempt discovery applies deterministic source rules", async () =>
     ].join(""))
   });
 
-  assert.equal(collected.candidates.length, 1);
+  assert.equal(collected.candidates.length, 2);
   assert.equal(collected.candidates[0].category, "wechat_item");
   assert.equal(collected.candidates[0].included_in, "wechat_items");
   assert.equal(collected.candidates[0].platform, "wechat");
   assert.equal(collected.candidates[0].rule_id, "wechat-ai-feed");
-  assert.equal(collected.source_audit.wechat_sources.candidates_found, 1);
+  assert.equal(collected.source_audit.wechat_sources.candidates_found, 2);
   assert.equal(collected.source_audit.wechat_sources.included, 0);
+  assert.match(collected.source_audit.wechat_sources.sources[0].notes, /exclude_keywords_matched=1/);
 });
 
 test("report:draft ignores retired platform exempt candidates in default daily sections", async () => {
@@ -27754,7 +27890,11 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(!prompt.includes("public_daily_v2"));
   assert(!prompt.includes("src/public-daily-renderer.js"));
   assert(prompt.includes("pre-rendered"));
-  assert(prompt.includes("定时任务和长程发布任务必须从 launcher worktree 启动"));
+  assert(prompt.includes("public-signal-stream-contract:v1"));
+  assert(prompt.includes("公共信号通道必须先运行"));
+  assert(prompt.includes("signals_write"));
+  assert(prompt.includes("generated_signals_only"));
+  assert(prompt.includes("不治理 `docs/signals"));
   assert(prompt.includes("pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish"));
   assert(prompt.includes(".tmp/run-summary-YYYY-MM-DD.json"));
   assert(prompt.includes("publish:dry-run:daily"));
@@ -28111,10 +28251,9 @@ function platformAuditGroupFixture(name, url, candidatesFound, included) {
         url,
         status: "checked",
         source_kind: "rss",
-        tier: "T3",
-        authority: "community",
-        enablement: "optional",
-        verification_policy: "platform_signal_exempt",
+        source_group: "community_discussions",
+        credibility_tag: "community_lead",
+        content_tags: ["community_discussion"],
         platform: platformFromUrl(url),
         parsed_count: candidatesFound,
         recent_48h_entries: candidatesFound,
@@ -28544,7 +28683,8 @@ function strictPublishReportFixture() {
         candidates_found: 60,
         included: 12,
         sources_checked: contentSourceNames.length,
-        enablement_counts: { core: 28, optional: 35 },
+        source_group_counts: { official_blogs: 28, news_newsletters: 35 },
+        credibility_tag_counts: { primary_material: 28, single_source_relay: 35 },
         notes: "fixture"
       }
     },
@@ -28568,7 +28708,23 @@ function strictAutomationRevisionFixture() {
     prompt_manifest: "prompts/ai-daily/manifest.json",
     prompt_modules: ["fixed-source-checklist.md"],
     source_registry_count: 68,
-    source_registry_enablement_counts: { core: 28, optional: 35, manual: 5 },
+    source_registry_source_group_counts: {
+      official_blogs: 20,
+      github_trending: 10,
+      community_discussions: 10,
+      x_updates: 5,
+      news_newsletters: 13,
+      papers_models: 8,
+      other: 2
+    },
+    source_registry_credibility_tag_counts: {
+      primary_material: 28,
+      multi_source_material: 4,
+      single_source_relay: 15,
+      community_lead: 8,
+      monitoring_lead: 8,
+      pending_review: 5
+    },
     rules: [
       "main_stream_blacklist_refill_5_to_12",
       "content_units_min_45_when_candidates_available",
@@ -29369,10 +29525,9 @@ function sourceHealthFixtureSource(overrides = {}) {
     url: "https://example.com/feed.xml",
     source_kind: "rss",
     candidate_category: "community_lead",
-    tier: "T2",
-    authority: "aggregator",
-    enablement: "optional",
-    verification_policy: "primary_required",
+    source_group: "news_newsletters",
+    credibility_tag: "single_source_relay",
+    content_tags: ["industry_news"],
     requires_original_url: false,
     ...overrides
   };

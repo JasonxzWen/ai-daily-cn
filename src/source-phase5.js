@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { candidatePoolRelativePaths } from "./reports-data-layout.js";
 import { isValidDateString } from "./time.js";
-import { evaluatePublicSourceAdmission } from "./candidates.js";
+import { evaluateLegacyReportEligibility } from "./candidates.js";
 import { effectiveCandidateVerification } from "./source-verification.js";
 import { collectMainAuditConsistencyIssues } from "./main-audit-consistency.js";
 import { logicalSourceRequiredObservationEntries } from "./source-effectiveness.js";
@@ -525,22 +525,22 @@ function auditFactSectionAdmissions(report, candidatePool, reportDate) {
         });
       }
 
-      const admission = evaluatePublicSourceAdmission({ sectionName, candidate, item });
-      if (admission.verification_upgraded) {
+      const eligibility = evaluateLegacyReportEligibility({ sectionName, candidate, item });
+      if (eligibility.verification_upgraded) {
         verificationUpgrades.push({
           report_date: reportDate,
           candidate_id: candidateId,
           source_id: String(candidate.source_id || ""),
           section: sectionName,
-          verdict: admission.verdict,
-          effective_verification_status: admission.effective_verification_status,
-          effective_source_level: admission.effective_source_level,
-          primary_url: admission.primary_url,
+          verdict: eligibility.verdict,
+          effective_verification_status: eligibility.effective_verification_status,
+          effective_source_level: eligibility.effective_source_level,
+          primary_url: eligibility.primary_url,
           title: String(item?.title || candidate.title || ""),
           url: String(item?.url || candidate.url || "")
         });
       }
-      if (!admission.allowed) {
+      if (!eligibility.allowed) {
         violations.push({
           report_date: reportDate,
           candidate_id: candidateId,
@@ -548,10 +548,10 @@ function auditFactSectionAdmissions(report, candidatePool, reportDate) {
           section: sectionName,
           verification_status: String(candidate.verification_status || ""),
           source_level: String(candidate.source_level || ""),
-          reason_code: admission.reason_code,
-          verdict: admission.verdict,
-          high_risk: admission.high_risk,
-          disclosure_complete: admission.disclosure_complete,
+          reason_code: eligibility.reason_code,
+          verdict: eligibility.verdict,
+          high_risk: eligibility.high_risk,
+          disclosure_complete: eligibility.disclosure_complete,
           title: String(item?.title || candidate.title || ""),
           url: String(item?.url || candidate.url || "")
         });

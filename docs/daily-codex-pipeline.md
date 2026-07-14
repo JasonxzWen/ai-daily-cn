@@ -1,107 +1,123 @@
 # Daily Codex Pipeline
 
-`daily:codex-pipeline` is the production-facing entrypoint for the Codex-driven daily generation flow. In local fixture mode it can still run the coarse DAG-lite MVP flow:
+`daily:codex-pipeline` 是每日公开信号与可选 legacy 编辑报告的唯一生产入口。调度器只调用这个脚本，仓库负责阶段顺序、恢复、发布范围和终态。
+
+## 运行模式
+
+本地 fixture 模式保留轻量 DAG，用于验证 Codex 生成与一次修复：
 
 ```text
 prepare -> collect/context -> codex-generate -> validate -> repair-once -> summarize -> publish
 ```
 
-In production mode (`--execute --publish` without a fixture), the script runs as a single-script DAG orchestrator. It writes `.tmp/daily-codex-pipeline/YYYY-MM-DD/pipeline-plan.json`, calls the existing daily workflow implementation, and normalizes `.tmp/run-summary-YYYY-MM-DD.json` with:
+生产模式使用同一入口：
+
+```powershell
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --codex-bin codex.cmd
+```
+
+`--execute` 表示真实生产编排；`--publish` 必须由明确的发布授权触发。生产计划写入 `.tmp/daily-codex-pipeline/YYYY-MM-DD/pipeline-plan.json`，唯一事实源写入 `.tmp/run-summary-YYYY-MM-DD.json`。
+
+runner 不继承 `npm_config_model` 或用户 Codex 模型配置。只有确需兼容模型时才传 `--model`。每次 Codex 调用默认最多 20 分钟，可用 `--codex-timeout-ms` 在 1..3600000 毫秒内调整；超时会终止整个子进程树并记录 `codex_timeout`。
+
+自定义 fixture 工作目录必须位于 `.tmp/daily-codex-mvp/` 的子目录，runner 拒绝清理或写入任意仓库路径。
+
+## 生产双通道
+
+共享发现和规范化后，DAG 分成两条支路：
+
+```text
+normalize
+  ├─ signals_write
+  │    -> signals_build
+  │    -> signals_validate
+  │    -> signals_publish_dry_run
+  │    -> signals_publish_real
+  └─ legacy admit / summarize / quality / report / page
+```
+
+公共信号通道先完成，且没有内容准入门：每条安全、可公开的规范化观察都写入 occurrence store。信源、内容、可信度、健康与访问状态只作为标签和筛选维度，不改变成员集合或默认时序。
+
+legacy 支路是可选派生。选题、去重、新鲜度、事实复核、正文质量、候选回指和数量目标仅约束 legacy 报告；任何 legacy 节点都不得成为 `signals_publish_real` 的祖先，也不得回滚有效 signal。
+
+PR2 的一次性迁移把既有 10,966 条公开信号无损写入 `reports-data/occurrences/baseline-v1/YYYY-MM.json.gz`，并在 `reports-data/occurrence-baseline-manifest.json` 记录来源 hash、分片和数量。每日生产只读取 immutable baseline 与每日 occurrence store；它不再读取候选池、编辑报告或旧 public signal 文件，因此保留历史不等于恢复 legacy 回流。
+
+## Source Watch
+
+Source Watch 使用公共信号 lineage：
+
+```text
+discover_source_watch
+  -> signals_write
+  -> signals_build
+  -> signals_validate
+```
+
+`discover_source_watch` 写 `.tmp/source-watch-YYYY-MM-DD.json` 并返回精确 path/SHA receipt。`signals_write` 将观察按持久 `observation_id` 写到 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json`；`signals_build` 生成 `docs/signals/index.json` 与分页；`signals_validate` 验证 schema、跨文件 lineage、隐私和公开路径。
+
+summary 只有在同一次运行证明 producer receipt、occurrence store、observation lineage、build、validate 与 signal index 全部一致时，才报告：
+
+- `source_watch.production_status:"connected"`
+- `source_watch.connected:true`
+- `source_watch.consumed:true`
+
+零条观察也可以是有效 consumed。缺失或不匹配时保持 false 并给出 `reason`，不得从文件存在性推断消费，也不得使用 legacy 报告产物作为连接证据。
+
+## Official Blog Context
+
+`.tmp/official-blog-context-YYYY-MM-DD.json` 只服务于可选 legacy 编辑报告。`official-blog-admission-v1` 继续验证日期、source/context/bindings SHA、记录关系、最高分绑定和 internal visibility；无匹配可以是合法空状态，失效时只降级 legacy，不影响公共信号 membership 或发布。
+
+## Summary 合同
+
+生产 summary 至少包含：
 
 - `automation_pipeline_mode:"single_script_dag_orchestrator"`
-- `orchestration.node_count`
-- `source_watch.production_status`, `connected`, `consumed`, and same-run producer/persistence/build evidence
-- report JSON, docs data JSON, and HTML paths
-- validation, publish, Pages, blocking, and degraded summaries
+- `orchestration.node_count` 与 plan path
+- `completed_stages`
+- `signals.status`
+- `legacy_report.status`
+- Source Watch producer/occurrence/index 证据
+- validation、publish、fallback 与 Pages 状态
+- `blocking_issues`、`degraded_sections` 与 `next_action`
 
-## Command
+外层终态包括：
 
-Run the local DAG-lite pipeline:
+- `generated_only`
+- `generated_degraded`
+- `generated_signals_only`
+- `published`
+- `published_signals_only`
+- `published_pending_pages_verification`
 
-```powershell
-corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD
-```
+`published_degraded` 是可能的 legacy 状态，外层按真实公共发布结果归一化。signal-only 状态表示公共信号已成功，不得被 legacy 失败覆盖。后续基础设施恢复耗尽时使用 `infrastructure_blocked_after_fallback_exhausted`。
 
-Use a specific Codex model or work directory:
+## Codex 修复
 
-```powershell
-corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --model gpt-5 --work-dir .tmp/daily-codex-mvp/YYYY-MM-DD
-```
+生产 quality 返回 `needs_ai_repair` 时仍由同一入口恢复。Codex 使用 `--ignore-user-config`、只读 sandbox 和 JSON Schema 输出；host 校验日期、任务路径、证据根、输出路径、状态与 edits 后才写文件。模型不直接写报告或仓库文件。dry run 最多一次自动修复，publish 最多五次。
 
-The runner does not inherit `npm_config_model` or user Codex model configuration. Pass `--model` only when an explicit compatible model is required. Every Codex invocation is bounded to 20 minutes by default; diagnosis or tests may override it with `--codex-timeout-ms 600000` (1..3600000 ms). A timeout requests complete process-tree termination and permits only a bounded grace (one second on Windows) before recording `codex_timeout`, even if the tree-kill command hangs or fails. Windows non-zero/error paths fall back to direct child termination; tests cover successful tree cleanup and a non-resolving terminator.
+这套修复只治理 legacy 编辑报告，不能修改 occurrence store 或 `docs/signals/**` 的成员与时序。
 
-Custom work directories must stay under `.tmp/daily-codex-mvp/` and must name a child run directory. The runner refuses to clean or write arbitrary repository paths.
+## Fixture Artifact
 
-Run the deterministic fixture path for local validation:
+fixture 运行示例：
 
 ```powershell
 corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --fixture success
 ```
 
-Production execution and publishing use the same entrypoint:
+模式：
 
-```powershell
-corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish --codex-bin codex.cmd
-```
+- `success`：首次生成即通过。
+- `repair-success`：首次失败，单次修复成功。
+- `failure`：生成和单次修复均失败。
 
-`--execute` records the production intent and configures the Codex command. `codex.cmd` and arguments after `--` are command configuration, not fixture modes. In a full repository checkout this command runs the single-script production orchestrator and may publish.
+fixture artifact 位于 `.tmp/daily-codex-mvp/YYYY-MM-DD/`，包括 context、generated、validation、repair、final、stage summary 与 run summary。MVP final artifact 必须含 `report_date`、`headline`、`summary` 和至少一条带 `title`、`url`、`note` 的 item。
 
-When production quality returns `needs_ai_repair`, the same entrypoint owns the continuation. Codex runs with `--ignore-user-config` in a read-only sandbox and returns a JSON-Schema-constrained final object; the CLI writes that object as UTF-8, and the host validates report date, declared task paths, evidence roots, output path, status, and edits before copying the contract and resuming. The model never writes report or repository files directly. Dry-run permits one automated repair attempt; publish permits at most five.
+## 替换与自动化边界
 
-Source Watch now uses the normal production candidate path: `discover_source_watch` writes `.tmp/source-watch-YYYY-MM-DD.json` and returns a bounded stage receipt containing that exact path and SHA-256; `report:draft` classifies material snapshot changes; `report:write` persists them to `reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json`; and `build` projects `included_in:"source_watch"` records into the public article index. There is no production sidecar flag. A summary reports `connected:true` and `consumed:true` only when the same run proves the producer stage receipt, successful draft/write stages, exact equality of the producer and persisted `target_id:snapshot_fingerprint` sets, the dated persistent pool, build consumption of that exact path, and a matching SHA-256. The consumption receipt contains only the requested report date (or the latest date for an undated manual build), so proof size and counts do not grow with history; the public article index still remains all-history. A valid zero-change day may still be consumed with zero included/public items. Missing or mismatched evidence remains disconnected with a concrete reason. The local DAG-lite fixture chain remains an internal contract test and is not a production handoff.
+生产入口必须保持为 `corepack pnpm run daily:codex-pipeline`。旧 daily workflow 只允许藏在这个入口之后，调度器不得展开旧手工阶段。
 
-The daily runner also creates `.tmp/official-blog-context-YYYY-MM-DD.json` after `discover_content_sources` and passes it explicitly to `report:draft`. The content-source producer writes its business `report_date` and `generated_at` at the artifact root. This reuses only already reviewed official-blog knowledge and keeps `official-blog-admission-v1` unchanged. The context producer rejects a dated request when the source artifact omits `report_date` or declares another day; draft consumption rechecks both dates, source-artifact SHA-256, context SHA-256, bindings SHA-256, and each binding's record/type/score/source-entry relationship. When one candidate matches several reviewed records, the highest-score binding owns its content type instead of a later weak topical match overwriting an exact match. The receipt remains under internal `self_check` data and is removed from public site data. Zero matched records is a valid consumed empty state. Missing, stale, or malformed context degrades to `consumed:false` without promoting a candidate or blocking the rest of the daily.
+生产始终在最新 `origin/main` 的干净工作树运行。因此未合并分支可以通过测试和 artifact replay 证明实现，但只有合并后的自动化运行才是生产验收。
 
-Fixture modes:
-
-- `success`: generation validates without repair.
-- `repair-success`: the first generation fails validation, then the single repair pass succeeds.
-- `failure`: generation and the one repair pass both fail, and the command exits non-zero.
-
-## Artifact Contract
-
-The DAG-lite fixture runner writes MVP artifacts under `.tmp/daily-codex-mvp/YYYY-MM-DD/`.
-
-The production orchestrator writes its plan under `.tmp/daily-codex-pipeline/YYYY-MM-DD/` and the authoritative run summary at `.tmp/run-summary-YYYY-MM-DD.json`.
-
-- `pipeline-plan.json`: sanitized production orchestration plan; fixture mode still uses the six DAG-lite stages.
-- `context.json`: deterministic repository context used by the generation prompt.
-- `generated.json`: first Codex generation output.
-- `validation.json`: validation result for `generated.json`.
-- `generated.repaired.json`: single repair output when validation fails.
-- `repair-validation.json`: validation result for the repair output.
-- `final.json`: final artifact selected by the runner.
-- `stage-summary.json`: compact final-stage summary.
-- `publish-summary.json`: publish-stage metadata when `--publish` is requested.
-- `run-summary.json`: authoritative machine-readable run summary.
-
-Fixture `run-summary.json` reports `mode:"daily_codex_dag_lite"`, `final_status`, `next_action`, `completed_stages`, validation state, repair state, the final artifact path, `publish_requested`, `execute_requested`, and `publication`.
-
-Production `run-summary.json` reports `mode:"single_script_dag_orchestrator"`, `automation_pipeline_mode:"single_script_dag_orchestrator"`, `orchestration.node_count`, `completed_stages`, validation and publish summaries, Pages status, `blocking_issues`, `degraded_sections`, `structured_json_path`, `docs_data_json_path`, `html_path`, automated repair attempts, and evidence-derived Source Watch status. The connected record includes the producer path, persistent candidate-pool path and hash, plus normalized `source_watch_consumption`; incomplete evidence remains false instead of inferring consumption from path presence. `stage_id`, `failed_stage_id`, and `error` describe the latest unresolved failure; a later successful retry/fallback clears stale failure metadata.
-
-## Validation Contract
-
-MVP validation is deliberately narrow. The final artifact must be a JSON object with:
-
-```json
-{
-  "report_date": "YYYY-MM-DD",
-  "headline": "string",
-  "summary": "string",
-  "items": [
-    { "title": "string", "url": "string", "note": "string" }
-  ]
-}
-```
-
-In fixture mode, validation failure invokes exactly one repair pass. In production, the mode budget above applies. Candidate coverage is one shared contract used by quality review and report_write, so a quality pass cannot later become a candidate-category/URL/date/verification/disclosure failure at write time.
-
-## Replacement Boundary
-
-The production entrypoint must remain `corepack pnpm run daily:codex-pipeline`. The legacy daily workflow is invoked only behind that single script so scheduled automation does not expand old manual stage commands.
-
-Production generation intentionally runs in a clean latest-origin/main worktree. Therefore an unmerged branch can prove its fix with tests and real-artifact replay, but it cannot claim scheduled production acceptance from that clean worktree until the PR lands. Post-merge automation observation is the production verification boundary.
-
-External automation may validate the evidence-backed `source_watch.connected`, `source_watch.consumed`, and `source_watch.consumption.candidate_pool_hashes` fields, but it must not hard-code `not_connected` or `consumed:false` as permanent expectations. The workflow contract treats a publish prompt that does not understand these evidence fields as stale. A Source Watch producer/consumer change must not be released to that scheduler until the prompt compatibility gate passes.
-
-The next accepted infrastructure slice migrates repository commands to `corepack pnpm`. After that migration lands, scheduled automation must call `corepack pnpm run daily:codex-pipeline` and old `npm run` scheduler instructions are intentionally unsupported.
+外部自动化显式用 UTF-8 读取 summary，检查 `source_watch.connected`、`source_watch.consumed`、occurrence/index hashes、`signals.status` 与 `legacy_report.status`。它不能硬编码 disconnected，也不能把 legacy gate 重新引入 signal 发布路径。

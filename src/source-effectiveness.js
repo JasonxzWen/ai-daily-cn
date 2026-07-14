@@ -275,7 +275,7 @@ export const CORE_SOURCE_CONTRACTS = [
     id: "aify-news",
     name: "Aify News",
     role: "news_aggregator",
-    notes: "First-class governance identity for the Aify content and site-watch entries; aggregator/intermediary authority remains unchanged and factual claims still require primary evidence.",
+    notes: "First-class governance identity for the Aify content and site-watch entries; its single-source relay credibility stays visible without excluding observations.",
     aliases: ["content-aify-news", "site-aify-news", "aify news", "aify-news.pages.dev"],
     required_observation_entries: ["content-aify-news", "site-aify-news"]
   },
@@ -529,8 +529,7 @@ export function buildSourceInventoryRows(options = {}) {
   const rootDir = resolveSourceInventoryRootDir(options);
   const registry = loadSourceRegistrySync({
     rootDir,
-    sourcesPath: options.sourcesPath || "config/sources",
-    includeEnablement: options.includeEnablement || "core,optional,manual"
+    sourcesPath: options.sourcesPath || "config/sources"
   });
   return registry.sources
     .map((source, index) => sourceInventoryRow(source, index))
@@ -709,9 +708,9 @@ function sourceInventoryRow(source, sourceIndex) {
     id: String(source?.id || ""),
     name: String(source?.name || source?.id || "Unnamed source"),
     source_kind: String(source?.source_kind || "unknown"),
-    enablement: String(source?.enablement || "unknown"),
-    tier: String(source?.tier || ""),
-    authority: String(source?.authority || ""),
+    source_group: String(source?.source_group || "other"),
+    credibility_tag: String(source?.credibility_tag || "pending_review"),
+    content_tags: Array.isArray(source?.content_tags) ? [...source.content_tags] : [],
     platform: String(source?.platform || ""),
     config_status: publicSourceConfigStatus(source),
     logical_source_id: contract?.id || "",
@@ -746,7 +745,8 @@ function inferSourceInventorySectionId(source = {}) {
     source.candidate_category,
     source.category,
     source.platform,
-    source.authority
+    source.source_group,
+    source.credibility_tag
   ]);
   if (/china-ai|deepseek|qwen|kimi|minimax|zhipu|moonshot|baidu|tencent|alibaba|bytedance|doubao|siliconflow/.test(text)) {
     return "china_models";
@@ -757,16 +757,16 @@ function inferSourceInventorySectionId(source = {}) {
   if (/qbitai|machine heart|jiqizhixin|sspai|36kr|infoq cn/.test(text)) {
     return "platform_cn_media";
   }
-  if (/follow-builders|hacker news|hnrss|reddit|x\/twitter|twitter|builder|community/.test(text)) {
+  if (source.source_group === "community_discussions" || source.source_group === "x_updates" || /follow-builders|hacker news|hnrss|reddit|x\/twitter|twitter|builder|community/.test(text)) {
     return "builder_community";
   }
-  if (/github|github-watch|ai-news-radar|ai-news-agent|ml-news-of-the-week|huggingface|hugging face|arxiv|papers|open source|opensource|model card/.test(text)) {
+  if (source.source_group === "github_trending" || source.source_group === "papers_models" || /github|github-watch|ai-news-radar|ai-news-agent|ml-news-of-the-week|huggingface|hugging face|arxiv|papers|open source|opensource|model card/.test(text)) {
     return "open_source_platforms";
   }
-  if (/search_api|techcrunch|verge|technologyreview|ars technica|venturebeat|media|intermediary|aggregator/.test(text)) {
+  if (source.source_group === "news_newsletters" || /search_api|techcrunch|verge|technologyreview|ars technica|venturebeat|media|newsletter/.test(text)) {
     return "english_media_search";
   }
-  if (/primary|official|company|research|blog|news/.test(text)) {
+  if (source.source_group === "official_blogs" || /official|company|research|blog|news/.test(text)) {
     return "core_primary";
   }
   return DEFAULT_DISPLAY_SECTION.id;
@@ -774,9 +774,6 @@ function inferSourceInventorySectionId(source = {}) {
 
 function publicSourceConfigStatus(source = {}) {
   const statuses = [];
-  if (source.kill_switch === true) {
-    statuses.push("disabled");
-  }
   if (source.source_kind === "manual") {
     statuses.push("manual_review");
   }

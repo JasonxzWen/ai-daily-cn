@@ -21,9 +21,9 @@ const SYNTHETIC_EXECUTABLE_NODE_ID = "synthetic-command-node";
 const SYNTHETIC_EXECUTABLE_SCRIPT = "scripts/run-daily-codex-dag.mjs";
 const SYNTHETIC_EXECUTABLE_INPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/input.json";
 const SYNTHETIC_EXECUTABLE_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/executable-node-mvp/{report_date}/dry-run-summary.json";
-const SOURCE_WATCH_COLLECT_NODE_ID = "fetch-source-health";
+const SOURCE_WATCH_COLLECT_NODE_ID = "fetch-source-inputs";
 const SOURCE_WATCH_COLLECT_SCRIPT = "scripts/run-source-watch-collect-fixture.mjs";
-const SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json";
+const SOURCE_WATCH_COLLECT_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-inputs.json";
 const SOURCE_WATCH_DOWNSTREAM_NODE_ID = "parse-extract";
 const SOURCE_WATCH_DOWNSTREAM_SCRIPT = "scripts/run-source-watch-downstream-fixture.mjs";
 const SOURCE_WATCH_DOWNSTREAM_OUTPUT_ARTIFACT = ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json";
@@ -61,9 +61,15 @@ const REAL_NODE_ADAPTER_OWNER_PATH_SCOPE = "internal_workdir";
 const REAL_NODE_ADAPTER_PUBLIC_ARTIFACT = false;
 
 const REQUIRED_NODE_IDS = [
-  "fetch-source-health",
+  "fetch-source-inputs",
   "parse-extract",
   "normalize-canonicalize",
+  "persist-signal-occurrences",
+  "build-public-signals",
+  "validate-public-signals",
+  "plan-signal-publish",
+  "publish-public-signals",
+  "observe-source-health",
   "classify-tag-entity",
   "score",
   "dedupe-cross-language",
@@ -924,7 +930,7 @@ export async function createDailyCodexDagSourceWatchCollectMvp(options = {}) {
     codex_invocations: [],
     next_action: {
       kind: "wire_parse_extract_source_watch_candidates",
-      message: "Source Watch collect/context fixture executed fetch-source-health and wrote source-health.json; next wire parse/extract to consume these candidates."
+      message: "Source Watch collect/context fixture executed fetch-source-inputs and wrote source-inputs.json; next wire parse/extract to consume these candidates."
     }
   };
   const summaryValidation = validateDailyCodexDagRunSummary(summary);
@@ -1162,7 +1168,7 @@ export async function createDailyCodexDagSourceWatchDownstreamMvp(options = {}) 
     codex_invocations: [],
     next_action: {
       kind: "wire_normalize_canonicalize_source_watch_candidates",
-      message: "Source Watch downstream fixture consumed source-health.json and emitted extracted-candidates.json; next wire normalize/canonicalize to consume these candidates."
+      message: "Source Watch downstream fixture consumed source-inputs.json and emitted extracted-candidates.json; next wire normalize/canonicalize to consume these candidates."
     }
   };
   const summaryValidation = validateDailyCodexDagRunSummary(summary);
@@ -2456,7 +2462,53 @@ async function validateDagSemantics({ rootDir, manifest, resiliencePolicy, ajv, 
 
   validateAcyclicGraph({ nodes, nodeById, failures });
   validateInputLineage({ nodes, nodeById, failures });
+  validatePublicSignalPublishBoundary({ nodeById, failures });
+  validatePublicSignalDiagnosticBoundary({ nodes, nodeById, failures });
   validatePublishCleanupGate({ nodeById, failures });
+}
+
+function validatePublicSignalDiagnosticBoundary({ nodes, nodeById, failures }) {
+  const signalNodeIds = [
+    "persist-signal-occurrences",
+    "build-public-signals",
+    "validate-public-signals",
+    "plan-signal-publish",
+    "publish-public-signals"
+  ];
+  const forbiddenAncestors = new Set(
+    nodes
+      .filter((node) => node?.runner_stage_ref === "sources_health" || node?.resilience_policy_ref === "sources_health")
+      .map((node) => node.id)
+  );
+  const visitAncestors = (nodeId, visited = new Set()) => {
+    const node = nodeById.get(nodeId);
+    for (const dependencyId of node?.dependencies || []) {
+      if (visited.has(dependencyId)) continue;
+      visited.add(dependencyId);
+      visitAncestors(dependencyId, visited);
+    }
+    return visited;
+  };
+  for (const signalNodeId of signalNodeIds) {
+    for (const ancestorId of visitAncestors(signalNodeId)) {
+      if (forbiddenAncestors.has(ancestorId)) {
+        failures.push(`config/daily-codex-dag.json: source health diagnostic ${ancestorId} cannot be an ancestor of ${signalNodeId}.`);
+      }
+    }
+  }
+
+  const healthNode = nodeById.get("observe-source-health");
+  if (!healthNode) {
+    failures.push("config/daily-codex-dag.json: missing post-signal observe-source-health diagnostic node.");
+    return;
+  }
+  if (JSON.stringify(healthNode.dependencies || []) !== JSON.stringify(["publish-public-signals"])) {
+    failures.push("config/daily-codex-dag.json: observe-source-health must depend only on publish-public-signals.");
+  }
+  const healthDependents = nodes.filter((node) => (node?.dependencies || []).includes("observe-source-health"));
+  if (healthDependents.length > 0) {
+    failures.push("config/daily-codex-dag.json: observe-source-health must remain a diagnostic leaf node.");
+  }
 }
 
 function projectDailyCodexDagPlan(manifest) {
@@ -2488,7 +2540,7 @@ function projectDailyCodexDagPlan(manifest) {
 
   const projectedNodes = nodes
     .map((node) => projectPlanNode({ node, level: levelById.get(node.id) ?? 0 }))
-    .sort(comparePlanNodeOrder);
+    .sort((left, right) => left.level - right.level || comparePlanNodeOrder(left, right));
   const maxLevel = Math.max(...projectedNodes.map((node) => node.level));
   const levels = [];
   for (let level = 0; level <= maxLevel; level += 1) {
@@ -4131,10 +4183,10 @@ function validateSourceWatchDownstreamMvpNodeResultAgainstExpected({
 
   if (expectedNode.id === SOURCE_WATCH_COLLECT_NODE_ID) {
     if (!["success", "failure"].includes(result.status)) {
-      failures.push(`${label}.fetch-source-health status must be success or failure.`);
+      failures.push(`${label}.fetch-source-inputs status must be success or failure.`);
     }
     if (Array.isArray(result.dependency_results) && result.dependency_results.length !== 0) {
-      failures.push(`${label}.fetch-source-health dependency_results must be empty.`);
+      failures.push(`${label}.fetch-source-inputs dependency_results must be empty.`);
     }
     return;
   }
@@ -4144,10 +4196,10 @@ function validateSourceWatchDownstreamMvpNodeResultAgainstExpected({
   }
   const collectResult = resultByNodeId.get(SOURCE_WATCH_COLLECT_NODE_ID);
   if (!collectResult) {
-    failures.push(`${label}.parse-extract requires fetch-source-health node result evidence.`);
+    failures.push(`${label}.parse-extract requires fetch-source-inputs node result evidence.`);
   }
   if (!Array.isArray(result.dependency_results) || result.dependency_results.length !== 1) {
-    failures.push(`${label}.parse-extract dependency_results must contain fetch-source-health evidence.`);
+    failures.push(`${label}.parse-extract dependency_results must contain fetch-source-inputs evidence.`);
     return;
   }
   const dependency = result.dependency_results[0];
@@ -4155,20 +4207,20 @@ function validateSourceWatchDownstreamMvpNodeResultAgainstExpected({
     failures.push(`${label}.parse-extract dependency_results[0].node_id must be ${SOURCE_WATCH_COLLECT_NODE_ID}.`);
   }
   if (collectResult && dependency.execution_id !== collectResult.execution_id) {
-    failures.push(`${label}.parse-extract dependency_results[0].execution_id must match fetch-source-health result.`);
+    failures.push(`${label}.parse-extract dependency_results[0].execution_id must match fetch-source-inputs result.`);
   }
   if (collectResult && dependency.status !== collectResult.status) {
-    failures.push(`${label}.parse-extract dependency_results[0].status must match fetch-source-health result.`);
+    failures.push(`${label}.parse-extract dependency_results[0].status must match fetch-source-inputs result.`);
   }
   if (collectResult && dependency.downstream_disposition !== collectResult.downstream_disposition) {
-    failures.push(`${label}.parse-extract dependency_results[0].downstream_disposition must match fetch-source-health result.`);
+    failures.push(`${label}.parse-extract dependency_results[0].downstream_disposition must match fetch-source-inputs result.`);
   }
   if (dependency.required !== true) failures.push(`${label}.parse-extract dependency_results[0].required must be true.`);
   if (collectResult?.status !== "success" && result.status !== "blocked") {
-    failures.push(`${label}.parse-extract must be blocked when fetch-source-health does not succeed.`);
+    failures.push(`${label}.parse-extract must be blocked when fetch-source-inputs does not succeed.`);
   }
   if (collectResult?.status === "success" && result.status === "blocked") {
-    failures.push(`${label}.parse-extract must not be blocked when fetch-source-health succeeds.`);
+    failures.push(`${label}.parse-extract must not be blocked when fetch-source-inputs succeeds.`);
   }
 }
 
@@ -4329,10 +4381,10 @@ function validateSourceWatchNormalizeMvpNodeResultAgainstExpected({
 
   if (expectedNode.id === SOURCE_WATCH_COLLECT_NODE_ID) {
     if (!["success", "failure"].includes(result.status)) {
-      failures.push(`${label}.fetch-source-health status must be success or failure.`);
+      failures.push(`${label}.fetch-source-inputs status must be success or failure.`);
     }
     if (Array.isArray(result.dependency_results) && result.dependency_results.length !== 0) {
-      failures.push(`${label}.fetch-source-health dependency_results must be empty.`);
+      failures.push(`${label}.fetch-source-inputs dependency_results must be empty.`);
     }
     return;
   }
@@ -4389,13 +4441,13 @@ function validateSourceWatchCollectMvpPlanNodeAgainstExpected({ planNode, expect
     failures.push(`${label}.public_artifact must be ${expectedSourceNode.public_artifact}.`);
   }
   if (!sameOrderedStringArray(planNode.dependencies, expectedSourceNode.dependencies)) {
-    failures.push(`${label}.dependencies must match the fetch-source-health production contract.`);
+    failures.push(`${label}.dependencies must match the fetch-source-inputs production contract.`);
   }
   if (!sameArtifactArray(planNode.inputs, expectedSourceNode.inputs)) {
-    failures.push(`${label}.inputs must match the fetch-source-health production contract.`);
+    failures.push(`${label}.inputs must match the fetch-source-inputs production contract.`);
   }
   if (!sameArtifactArray(planNode.outputs, expectedSourceNode.outputs)) {
-    failures.push(`${label}.outputs must match the fetch-source-health production contract.`);
+    failures.push(`${label}.outputs must match the fetch-source-inputs production contract.`);
   }
 }
 
@@ -5422,7 +5474,7 @@ function validateSourceWatchCollectMvpSummary(summary, failures) {
   if (!planLevels) failures.push("daily codex DAG source-watch collect MVP summary plan.levels must be an array.");
   if (!planNodes || !planLevels) return;
   if (plan.node_count !== 1 || planNodes.length !== 1 || planNodes[0]?.id !== SOURCE_WATCH_COLLECT_NODE_ID) {
-    failures.push("daily codex DAG source-watch collect MVP summary plan must contain only the fetch-source-health node.");
+    failures.push("daily codex DAG source-watch collect MVP summary plan must contain only the fetch-source-inputs node.");
   }
 
   const expectedSourceNode = expectedSourceWatchCollectSourceNode();
@@ -5547,7 +5599,7 @@ function validateSourceWatchDownstreamMvpSummary(summary, failures) {
   if (!planLevels) failures.push("daily codex DAG source-watch downstream MVP summary plan.levels must be an array.");
   if (!planNodes || !planLevels) return;
   if (plan.node_count !== 2 || planNodes.length !== 2) {
-    failures.push("daily codex DAG source-watch downstream MVP summary plan must contain exactly fetch-source-health and parse-extract.");
+    failures.push("daily codex DAG source-watch downstream MVP summary plan must contain exactly fetch-source-inputs and parse-extract.");
   }
 
   const expectedNodes = expectedSourceWatchDownstreamSourceNodes();
@@ -5676,7 +5728,7 @@ function validateSourceWatchNormalizeMvpSummary(summary, failures) {
   if (!planLevels) failures.push("daily codex DAG source-watch normalize MVP summary plan.levels must be an array.");
   if (!planNodes || !planLevels) return;
   if (plan.node_count !== 3 || planNodes.length !== 3) {
-    failures.push("daily codex DAG source-watch normalize MVP summary plan must contain exactly fetch-source-health, parse-extract, and normalize-canonicalize.");
+    failures.push("daily codex DAG source-watch normalize MVP summary plan must contain exactly fetch-source-inputs, parse-extract, and normalize-canonicalize.");
   }
 
   const expectedNodes = expectedSourceWatchNormalizeSourceNodes();
@@ -5807,7 +5859,7 @@ function validateSourceWatchQualityMvpSummary(summary, failures) {
   if (!planLevels) failures.push("daily codex DAG source-watch quality MVP summary plan.levels must be an array.");
   if (!planNodes || !planLevels) return;
   if (plan.node_count !== 4 || planNodes.length !== 4) {
-    failures.push("daily codex DAG source-watch quality MVP summary plan must contain exactly fetch-source-health, parse-extract, normalize-canonicalize, and freshness-history-check.");
+    failures.push("daily codex DAG source-watch quality MVP summary plan must contain exactly fetch-source-inputs, parse-extract, normalize-canonicalize, and freshness-history-check.");
   }
 
   const expectedNodes = expectedSourceWatchQualitySourceNodes();
@@ -5940,7 +5992,7 @@ function validateSourceWatchAdmitMvpSummary(summary, failures) {
   if (!planLevels) failures.push("daily codex DAG source-watch admit MVP summary plan.levels must be an array.");
   if (!planNodes || !planLevels) return;
   if (plan.node_count !== 5 || planNodes.length !== 5) {
-    failures.push("daily codex DAG source-watch admit MVP summary plan must contain exactly fetch-source-health, parse-extract, normalize-canonicalize, freshness-history-check, and admit-reject.");
+    failures.push("daily codex DAG source-watch admit MVP summary plan must contain exactly fetch-source-inputs, parse-extract, normalize-canonicalize, freshness-history-check, and admit-reject.");
   }
 
   const expectedNodes = expectedSourceWatchAdmitSourceNodes();
@@ -6075,7 +6127,7 @@ function validateSourceWatchArticleIndexMvpSummary(summary, failures) {
   if (!planLevels) failures.push("daily codex DAG source-watch article-index MVP summary plan.levels must be an array.");
   if (!planNodes || !planLevels) return;
   if (plan.node_count !== 6 || planNodes.length !== 6) {
-    failures.push("daily codex DAG source-watch article-index MVP summary plan must contain exactly fetch-source-health, parse-extract, normalize-canonicalize, freshness-history-check, admit-reject, and persist-article-db.");
+    failures.push("daily codex DAG source-watch article-index MVP summary plan must contain exactly fetch-source-inputs, parse-extract, normalize-canonicalize, freshness-history-check, admit-reject, and persist-article-db.");
   }
 
   const expectedNodes = expectedSourceWatchArticleIndexSourceNodes();
@@ -7282,7 +7334,7 @@ function validateSourceWatchDownstreamMvpRunSemantics({ summary, run, planLevels
     failures.push("daily codex DAG source-watch downstream MVP summary run.blocked_nodes must match node execution status.");
   }
   if (summary.ok === true && !sameOrderedStringArray(expectedCompleted, [SOURCE_WATCH_COLLECT_NODE_ID, SOURCE_WATCH_DOWNSTREAM_NODE_ID])) {
-    failures.push("daily codex DAG source-watch downstream MVP summary success requires fetch-source-health and parse-extract to complete.");
+    failures.push("daily codex DAG source-watch downstream MVP summary success requires fetch-source-inputs and parse-extract to complete.");
   }
   if (summary.ok === false && expectedBlocked.length === 0) {
     failures.push("daily codex DAG source-watch downstream MVP summary failure requires at least one blocked node.");
@@ -7314,7 +7366,7 @@ function validateSourceWatchNormalizeMvpRunSemantics({ summary, run, planLevels,
     failures.push("daily codex DAG source-watch normalize MVP summary run.blocked_nodes must match node execution status.");
   }
   if (summary.ok === true && !sameOrderedStringArray(expectedCompleted, [SOURCE_WATCH_COLLECT_NODE_ID, SOURCE_WATCH_DOWNSTREAM_NODE_ID, SOURCE_WATCH_NORMALIZE_NODE_ID])) {
-    failures.push("daily codex DAG source-watch normalize MVP summary success requires fetch-source-health, parse-extract, and normalize-canonicalize to complete.");
+    failures.push("daily codex DAG source-watch normalize MVP summary success requires fetch-source-inputs, parse-extract, and normalize-canonicalize to complete.");
   }
   if (summary.ok === false && expectedBlocked.length === 0) {
     failures.push("daily codex DAG source-watch normalize MVP summary failure requires at least one blocked node.");
@@ -8671,6 +8723,46 @@ function validateAcyclicGraph({ nodes, nodeById, failures }) {
 
   for (const node of nodes) {
     if (node?.id) visit(node.id);
+  }
+}
+
+function validatePublicSignalPublishBoundary({ nodeById, failures }) {
+  const publishNodeId = "publish-public-signals";
+  const publish = nodeById.get(publishNodeId);
+  if (!publish) return;
+
+  const ancestors = transitiveDependencies(publishNodeId, nodeById);
+  const requiredAncestors = new Map([
+    ["persist-signal-occurrences", "signals_write"],
+    ["build-public-signals", "signals_build"],
+    ["validate-public-signals", "signals_validate"],
+    ["plan-signal-publish", "signals_publish_dry_run"]
+  ]);
+  for (const [required, expectedRunnerStage] of requiredAncestors) {
+    if (!ancestors.has(required)) {
+      failures.push(`config/daily-codex-dag.json: ${publishNodeId} must transitively depend on ${required}.`);
+    } else if (nodeById.get(required)?.runner_stage_ref !== expectedRunnerStage) {
+      failures.push(`config/daily-codex-dag.json: ${required}.runner_stage_ref must be ${expectedRunnerStage}.`);
+    }
+  }
+  if (publish.runner_stage_ref !== "signals_publish_real") {
+    failures.push(`config/daily-codex-dag.json: ${publishNodeId}.runner_stage_ref must be signals_publish_real.`);
+  }
+
+  const allowedRunnerStages = new Set([
+    "collect",
+    "signals_write",
+    "signals_build",
+    "signals_validate",
+    "signals_publish_dry_run"
+  ]);
+  for (const ancestorId of ancestors) {
+    const runnerStage = String(nodeById.get(ancestorId)?.runner_stage_ref || "");
+    if (!allowedRunnerStages.has(runnerStage)) {
+      failures.push(
+        `config/daily-codex-dag.json: ${publishNodeId} ancestor ${ancestorId} uses non-signal runner stage ${runnerStage || "<empty>"}.`
+      );
+    }
   }
 }
 

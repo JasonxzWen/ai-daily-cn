@@ -38,7 +38,7 @@ test("collectSourceWatch replays configured sites and GitHub repos from fixtures
   assert.equal(collected.report_date, reportDate);
   assert.equal(collected.targets.length, 4);
   assert.equal(collected.sources.length, 4);
-  assert.equal(collected.candidates.length, 4);
+  assert.equal(collected.candidates.length, 9);
   assert.equal(collected.source_audit.github_watch.watched_repos, 2);
   assert.equal(collected.source_audit.github_watch.fetched_repos, 2);
   assert.equal(collected.source_audit.site_watch.watched_sites, 2);
@@ -110,7 +110,7 @@ test("collectSourceWatch replays configured sites and GitHub repos from fixtures
   const siteAudit = collected.source_audit.site_watch.sources.find((source) => source.target_id === "site-aify-news");
   const repoAudit = collected.source_audit.github_watch.sources.find((source) => source.target_id === "repo-ml-news-of-the-week");
   assert.equal(repoAudit.id, "repo-ml-news-of-the-week");
-  assert.equal(repoAudit.parsed_count, 1);
+  assert.equal(repoAudit.parsed_count, 4);
   assert.equal(siteAudit.id, "site-aify-news");
   assert.equal(siteAudit.parsed_count, 1);
   assert.equal(siteAudit.source_lane, "aify");
@@ -234,7 +234,7 @@ test("collectSourceWatch replays configured sites and GitHub repos from fixtures
   assert.equal(metricsOnlyRepo.source_watch.snapshot_fingerprint, repoCandidate.source_watch.snapshot_fingerprint);
 });
 
-test("collectSourceWatch suppresses repository snapshots when a material GitHub endpoint is incomplete", async () => {
+test("collectSourceWatch retains a degraded repository snapshot when a material GitHub endpoint is incomplete", async () => {
   const fixtureFetch = await createSourceWatchFixtureFetch(fixtureDir);
   const partialFetch = async (url, init) => {
     if (String(url).includes("/SalvatoreRa/ML-news-of-the-week/commits?")) {
@@ -261,11 +261,10 @@ test("collectSourceWatch suppresses repository snapshots when a material GitHub 
   assert.equal(target.endpoint_status.releases.status, "checked");
   assert.equal(target.endpoint_status.tags.status, "checked");
   assert.equal(target.endpoint_status.commits.status, "blocked");
-  assert.equal(
-    collected.candidates.some((candidate) => candidate.source_id === "repo-ml-news-of-the-week"),
-    false,
-    "an incomplete material snapshot must not create a change fingerprint"
-  );
+  const candidate = collected.candidates.find((item) => item.source_id === "repo-ml-news-of-the-week");
+  assert(candidate, "an incomplete endpoint must annotate rather than suppress the repository observation");
+  assert.equal(candidate.verification_status, "unverified");
+  assert.equal(candidate.source_watch.repo_snapshot.latest_commit, null);
 });
 
 test("collectSourceWatch structures per-target failures without aborting the artifact", async () => {
@@ -397,7 +396,7 @@ test("candidate pool schema accepts the namespaced Source Watch contract", async
   assert.equal(validateCandidatePool(missingMetadata), false);
 });
 
-test("collectSourceWatch applies endpoint limit to GitHub URL and normalized arrays", async () => {
+test("collectSourceWatch uses endpoint limit only as the GitHub transport page size", async () => {
   const requestedUrls = [];
   const fetchImpl = async (url) => {
     requestedUrls.push(String(url));
@@ -447,9 +446,9 @@ test("collectSourceWatch applies endpoint limit to GitHub URL and normalized arr
   assert(requestedUrls.includes("https://api.github.com/repos/example/limited-repo/releases?per_page=1"));
   assert(requestedUrls.includes("https://api.github.com/repos/example/limited-repo/tags?per_page=1"));
   assert(requestedUrls.includes("https://api.github.com/repos/example/limited-repo/commits?per_page=1"));
-  assert.equal(collected.targets[0].releases.length, 1);
-  assert.equal(collected.targets[0].tags.length, 1);
-  assert.equal(collected.targets[0].recent_commits.length, 1);
+  assert.equal(collected.targets[0].releases.length, 2);
+  assert.equal(collected.targets[0].tags.length, 2);
+  assert.equal(collected.targets[0].recent_commits.length, 2);
   assert.equal(collected.targets[0].releases[0].tag_name, "v2");
   assert.equal(collected.targets[0].tags[0].name, "v2");
   assert.equal(collected.targets[0].recent_commits[0].message, "Second");
@@ -481,9 +480,9 @@ test("discover:github-watch CLI writes the source watch artifact", async () => {
   assert.equal(stdoutPayload.report_date, reportDate);
   assert.equal(stdoutPayload.output_path, path.resolve(outputPath));
   assert.match(stdoutPayload.artifact_sha256, /^[a-f0-9]{64}$/);
-  assert.equal(stdoutPayload.candidate_count, 4);
+  assert.equal(stdoutPayload.candidate_count, 9);
   assert.equal(filePayload.output_path, path.resolve(outputPath));
-  assert.equal(filePayload.candidates.length, 4);
+  assert.equal(filePayload.candidates.length, 9);
   assert.equal(filePayload.source_audit.github_watch.fetched_repos, 2);
   assert.equal(filePayload.source_audit.site_watch.fetched_sites, 2);
   const aifyCandidate = filePayload.candidates.find((candidate) => candidate.source_id === "site-aify-news");

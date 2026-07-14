@@ -7,6 +7,7 @@ import { PublisherError } from "./errors.js";
 import { prepareCleanPublishWorktree } from "./publish.js";
 import { mergeCommandEnv, pnpmInvocationForArgs } from "./process-runner.js";
 import { createPublicDegradationEvent } from "./degradation-events.js";
+import { publicSignalDiscoveryInputPaths } from "./public-signal-lanes.js";
 import {
   writeDailyPublishCorrectionRetrospective,
   writeDailyPublishRetrospective
@@ -27,8 +28,6 @@ const DEFAULT_DRY_RUN_MAX_REVIEW_REPAIR_LOOPS = 1;
 const DEFAULT_REPORT_PATH = ".tmp/daily-report.json";
 const AUTHORED_REPORT_PATH = ".tmp/daily-report.authored.json";
 const OPTIMIZED_REPORT_PATH = ".tmp/daily-report.optimized.json";
-const CONTENT_SOURCE_DISCOVERY_LIMIT = 240;
-const CONTENT_SOURCE_PER_SOURCE_LIMIT = 3;
 const RESILIENCE_POLICY_PATH = path.join("config", "daily-resilience-policy.json");
 const DISCOVERY_DEGRADE_FALLBACKS = {
   discover_github_trending: {
@@ -89,20 +88,6 @@ const DISCOVERY_DEGRADE_FALLBACKS = {
     sourceName: "Search/news discovery",
     sourceUrl: "https://www.google.com/search?q=AI",
     sourceCategory: "community"
-  },
-  discover_wechat_platform: {
-    auditGroup: "wechat_sources",
-    sourceName: "WeChat platform discovery",
-    sourceUrl: "https://weixin.qq.com/",
-    sourceCategory: "community",
-    platform: "wechat"
-  },
-  discover_zhihu_platform: {
-    auditGroup: "zhihu_sources",
-    sourceName: "Zhihu platform discovery",
-    sourceUrl: "https://www.zhihu.com/",
-    sourceCategory: "community",
-    platform: "zhihu"
   },
   sources_health: {
     auditGroup: "sources_health",
@@ -188,6 +173,12 @@ export async function runDailyWorkflow(options = {}) {
     quality_review_path: qualityReviewPath(reportDate),
     quality_repair_path: qualityRepairPath(reportDate),
     automation_first_pass_authoring: initialFirstPassAuthoringSummary(Boolean(firstPassAuthoringContractAuthor)),
+    signals: initialSignalSummary(),
+    legacy_report: {
+      status: "running",
+      failed_stage_id: "",
+      error_code: ""
+    },
     stages: [],
     started_at: now(),
     updated_at: now(),
@@ -266,11 +257,16 @@ export async function runDailyWorkflow(options = {}) {
     now
   };
 
-  for (const plannedStage of buildInitialWorkflowStages({ reportDate })) {
+  for (const plannedStage of buildInitialWorkflowStages({
+    reportDate,
+    publish,
+    generatedAt: summary.started_at
+  })) {
     const stage = plannedStage.id === "quality_review"
       ? qualityReviewStageForReport(plannedStage, summary.current_report_path || DEFAULT_REPORT_PATH)
       : plannedStage;
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
+    recordSignalStageResult(summary, stage, outcome);
     const remoteAheadAction = remoteAheadRestartNextAction({
       outcome,
       stage,
@@ -283,13 +279,44 @@ export async function runDailyWorkflow(options = {}) {
       summary.final_status = "blocked";
       summary.next_action = remoteAheadAction;
       await writeSummary(summaryPath, summary);
+      return finalizeSignalFallback({ summary, summaryPath, context });
+    }
+    if (publish && stage.id === "signals_publish_real" && (outcome.blocked || !outcome.normalized.ok)) {
+      const fallbackStage = buildSignalPublishFallbackStage(reportDate);
+      const fallbackOutcome = await runAndRecordStage({ stage: fallbackStage, context, summary, runStage, now });
+      recordSignalStageResult(summary, fallbackStage, fallbackOutcome);
+      if (fallbackOutcome.blocked || !fallbackOutcome.normalized.ok) {
+        summary.signals.status = "blocked";
+        summary.final_status = "infrastructure_blocked_after_fallback_exhausted";
+        summary.next_action = infrastructurePublishRecoveryNextAction({
+          outcome: fallbackOutcome,
+          stageId: fallbackStage.id,
+          previousStageId: stage.id,
+          summaryPath
+        });
+        await writeSummary(summaryPath, summary);
+        return { summary, summaryPath };
+      }
+      summary.final_status = "published_signals_only";
+      summary.legacy_report = {
+        status: "not_started_after_signal_transport_fallback",
+        failed_stage_id: stage.id,
+        error_code: String(outcome.error?.code || outcome.normalized.output?.error_code || "git_signal_publish_failed")
+      };
+      summary.next_action = {
+        kind: "restart_latest_main_for_legacy_report",
+        report_date: reportDate,
+        summary_path: summaryPath,
+        message: "Signals were published through the GitHub API fallback. Restart from the updated remote branch before generating the optional legacy report."
+      };
+      await writeSummary(summaryPath, summary);
       return { summary, summaryPath };
     }
     if (outcome.blocked) {
       summary.final_status = "blocked";
       summary.next_action = blockedNextAction(outcome.error);
       await writeSummary(summaryPath, summary);
-      return { summary, summaryPath };
+      return finalizeSignalFallback({ summary, summaryPath, context });
     }
 
     if (stage.id === "report_draft" && outcome.normalized.ok) {
@@ -319,7 +346,7 @@ export async function runDailyWorkflow(options = {}) {
         summary.final_status = repairDecision.final_status;
         summary.next_action = repairDecision.next_action;
         await writeSummary(summaryPath, summary);
-        return { summary, summaryPath };
+        return finalizeSignalFallback({ summary, summaryPath, context });
       }
     } else if (!outcome.normalized.ok) {
       summary.final_status = "blocked";
@@ -329,13 +356,13 @@ export async function runDailyWorkflow(options = {}) {
         summary_path: summaryPath
       };
       await writeSummary(summaryPath, summary);
-      return { summary, summaryPath };
+      return finalizeSignalFallback({ summary, summaryPath, context });
     }
 
     await writeSummary(summaryPath, summary);
   }
 
-  return await runPostQualityStages({
+  const result = await runPostQualityStages({
     summary,
     summaryPath,
     context,
@@ -345,6 +372,7 @@ export async function runDailyWorkflow(options = {}) {
     publish,
     reportPath: summary.current_report_path || DEFAULT_REPORT_PATH
   });
+  return finalizeSignalFallback({ ...result, context });
 }
 
 async function resumeDailyWorkflowFromAiRepair({
@@ -579,7 +607,7 @@ async function resumeDailyWorkflowFromAiRepair({
     await writeSummary(summaryPath, summary);
   }
 
-  return await runPostQualityStages({
+  const result = await runPostQualityStages({
     summary,
     summaryPath,
     context,
@@ -589,6 +617,7 @@ async function resumeDailyWorkflowFromAiRepair({
     publish,
     reportPath: OPTIMIZED_REPORT_PATH
   });
+  return finalizeSignalFallback({ ...result, context });
 }
 
 async function runPostQualityStages({
@@ -638,6 +667,7 @@ async function runPostQualityStages({
     }
 
     const outcome = await runAndRecordStage({ stage, context, summary, runStage, now });
+    recordSignalStageResult(summary, stage, outcome);
     if (stage.id === "sources_phase5_audit") {
       recordSourcesPhase5Audit(summary, outcome.normalized);
     }
@@ -679,7 +709,13 @@ async function runPostQualityStages({
         absoluteCleanPath(summary.clean_repo_root, `reports-data/${year}/${month}/${reportDate}.json`),
         decision
       );
-      const rerender = await runAndRecordStage({ stage: pnpmStage("build_disclosure", ["run", "build"]), context, summary, runStage, now });
+      const rerender = await runAndRecordStage({
+        stage: pnpmStage("build_disclosure", ["run", "build", "--", "--skip-signals"]),
+        context,
+        summary,
+        runStage,
+        now
+      });
       if (rerender.blocked || !rerender.normalized.ok) {
         summary.final_status = "blocked";
         summary.next_action = { kind: "inspect_stage_failure", stage_id: "build_disclosure", summary_path: summaryPath };
@@ -721,6 +757,7 @@ async function runPostQualityStages({
     if (publish && stage.id === "publish_real" && (outcome.blocked || !outcome.normalized.ok)) {
       const fallbackStage = buildPublishFallbackStage(reportDate);
       const fallbackOutcome = await runAndRecordStage({ stage: fallbackStage, context, summary, runStage, now });
+      recordSignalStageResult(summary, fallbackStage, fallbackOutcome);
       if (fallbackOutcome.blocked) {
         summary.final_status = "infrastructure_blocked_after_fallback_exhausted";
         summary.next_action = infrastructurePublishRecoveryNextAction({
@@ -793,6 +830,120 @@ async function runPostQualityStages({
   summary.updated_at = now();
   await writeSummary(summaryPath, summary);
   return { summary, summaryPath };
+}
+
+function recordSignalStageResult(summary, stage, outcome) {
+  if (!outcome?.normalized?.ok) return;
+  summary.signals = { ...initialSignalSummary(), ...(summary.signals || {}) };
+  const output = outcome.normalized.output || {};
+  const payload = output.result || output.plan || output;
+  if (stage.id === "signals_write") {
+    summary.signals.status = "generated";
+    summary.signals.coverage_status = Number(output.normalization_error_count || 0) > 0 ? "partial" : "complete";
+    summary.signals.occurrence_store_path = String(output.occurrence_store_path || "");
+    summary.signals.occurrence_count = Number(output.occurrence_count || 0);
+    summary.signals.normalization_error_count = Number(output.normalization_error_count || 0);
+  } else if (stage.id === "signals_build") {
+    summary.signals.status = "generated";
+    summary.signals.public_occurrence_count = Number(output.total_count || 0);
+    summary.signals.page_count = Number(output.page_count || 0);
+  } else if (stage.id === "signals_validate") {
+    summary.signals.status = "generated";
+    summary.signals.public_occurrence_count = Number(output.total_count || summary.signals.public_occurrence_count || 0);
+    summary.signals.page_count = Number(output.page_count || summary.signals.page_count || 0);
+  } else if (["signals_publish_real", "signals_publish_github_api_fallback"].includes(stage.id)) {
+    summary.signals.status = "published";
+    summary.signals.publish_mode = String(payload.publish_mode || payload.mode || (stage.id.includes("github_api") ? "github-api-fallback" : "git"));
+    summary.signals.commit = String(payload.commit_sha || payload.commit || "");
+  }
+}
+
+async function finalizeSignalFallback({ summary, summaryPath, context }) {
+  if (!summary || !summaryPath || !context) return { summary, summaryPath };
+  summary.signals = { ...initialSignalSummary(), ...(summary.signals || {}) };
+  summary.legacy_report = summary.legacy_report || {
+    status: "running",
+    failed_stage_id: "",
+    error_code: ""
+  };
+  const legacyStatus = summary.final_status;
+  const signalReady = summary.stages.some((stage) => stage.id === "signals_validate" && stage.status === "passed");
+  const terminalSuccess = [
+    "generated_only",
+    "generated_degraded",
+    "published",
+    "published_degraded",
+    "published_pending_pages_verification"
+  ].includes(legacyStatus);
+  if (terminalSuccess) {
+    if (signalReady && context.publish && ["published", "published_degraded", "published_pending_pages_verification"].includes(legacyStatus)) {
+      summary.signals.status = "published";
+    }
+    summary.legacy_report = { status: legacyStatus, failed_stage_id: "", error_code: "" };
+    await writeSummary(summaryPath, summary);
+    return { summary, summaryPath };
+  }
+
+  if (!signalReady) return { summary, summaryPath };
+  const failedStage = [...summary.stages].reverse().find((stage) => stage.status === "failed");
+  summary.legacy_report = {
+    status: legacyStatus,
+    failed_stage_id: failedStage?.id || "",
+    error_code: String(failedStage?.error_code || failedStage?.output?.error_code || failedStage?.output?.error || ""),
+    next_action: summary.next_action
+  };
+
+  if (!context.publish) {
+    summary.signals.status = "generated";
+    if (legacyStatus !== "needs_ai_repair") summary.final_status = "generated_signals_only";
+    await writeSummary(summaryPath, summary);
+    return { summary, summaryPath };
+  }
+  if (summary.signals.status === "published") {
+    if (legacyStatus !== "needs_ai_repair") summary.final_status = "published_signals_only";
+    await writeSummary(summaryPath, summary);
+    return { summary, summaryPath };
+  }
+
+  summary.signals.status = "blocked";
+  summary.final_status = "infrastructure_blocked_after_fallback_exhausted";
+  summary.next_action = {
+    kind: "inspect_stage_failure",
+    stage_id: "signals_publish_real",
+    summary_path: summaryPath,
+    message: "Signal artifacts validated but were not independently published before the legacy report started."
+  };
+  await writeSummary(summaryPath, summary);
+  return { summary, summaryPath };
+}
+
+function initialSignalSummary() {
+  return {
+    status: "pending",
+    coverage_status: "pending",
+    occurrence_store_path: "",
+    occurrence_count: 0,
+    normalization_error_count: 0,
+    index_path: "docs/signals/index.json",
+    public_occurrence_count: 0,
+    page_count: 0,
+    publish_mode: "",
+    commit: ""
+  };
+}
+
+function buildSignalPublishFallbackStage(reportDate) {
+  return pnpmStage("signals_publish_github_api_fallback", [
+    "run",
+    "publish:github-api",
+    "--",
+    "--confirm-push",
+    "--date",
+    reportDate,
+    "--scope",
+    "signals",
+    "--skip-pages-verify"
+  ]);
 }
 
 async function finalizeRetrospectiveBeforePublish({
@@ -946,8 +1097,8 @@ async function writePublishCorrectionForBlockedRun({ summary, context, reportDat
   }
 }
 
-export function buildDailyWorkflowStages({ reportDate, publish }) {
-  const initialStages = buildInitialWorkflowStages({ reportDate });
+export function buildDailyWorkflowStages({ reportDate, publish, generatedAt = `${reportDate}T00:00:00.000Z` }) {
+  const initialStages = buildInitialWorkflowStages({ reportDate, publish, generatedAt });
   return [
     ...initialStages.flatMap((stage) => stage.id === "report_draft"
       ? [stage, { id: "first_pass_authoring", command: { tool: "internal", args: [] } }]
@@ -956,31 +1107,16 @@ export function buildDailyWorkflowStages({ reportDate, publish }) {
   ];
 }
 
-function buildInitialWorkflowStages({ reportDate }) {
+function buildInitialWorkflowStages({ reportDate, publish = false, generatedAt = `${reportDate}T00:00:00.000Z` }) {
   const tmp = (name) => `.tmp/${name}-${reportDate}.json`;
-  const discoveryInputs = [
-    tmp("github-trending"),
-    tmp("source-watch"),
-    tmp("huggingface-trending"),
-    tmp("builders"),
-    tmp("china-ai"),
-    tmp("content-sources"),
-    tmp("statuspage-incidents"),
-    tmp("search-news"),
-    tmp("sources-health")
-  ].join(",");
+  const signalDiscoveryInputs = publicSignalDiscoveryInputPaths(reportDate).join(",");
+  const discoveryInputs = [signalDiscoveryInputs, tmp("sources-health")].join(",");
   const stages = [
-    nodeCliStage("source_reset_preflight", [
-      "source-reset:preflight"
-    ]),
-    pnpmStage("prompt_build", ["run", "prompt:build", "--", reportDate]),
     pnpmStage("sources_validate", ["run", "sources:validate"]),
     nodeCliStage("discover_github_trending", [
       "discover:github-trending",
       "--date",
       reportDate,
-      "--limit",
-      "50",
       "--history-root",
       "reports-data",
       "--output",
@@ -992,6 +1128,14 @@ function buildInitialWorkflowStages({ reportDate }) {
       reportDate,
       "--config",
       "config/source-watchlist.json",
+      "--endpoint-limit",
+      "5",
+      "--transport-state",
+      ".tmp/search-pagination-state.json",
+      "--transport-request-budget",
+      "120",
+      "--transport-runtime-ms",
+      "180000",
       "--output",
       tmp("source-watch")
     ]),
@@ -999,7 +1143,7 @@ function buildInitialWorkflowStages({ reportDate }) {
       "discover:huggingface-trending",
       "--date",
       reportDate,
-      "--limit",
+      "--transport-page-size",
       "20",
       "--output",
       tmp("huggingface-trending")
@@ -1008,8 +1152,14 @@ function buildInitialWorkflowStages({ reportDate }) {
       "discover:builders",
       "--date",
       reportDate,
-      "--limit",
-      "20",
+      "--transport-state",
+      ".tmp/search-pagination-state.json",
+      "--transport-request-budget",
+      "120",
+      "--transport-runtime-ms",
+      "180000",
+      "--x-search-lookback-days",
+      "7",
       "--output",
       tmp("builders")
     ]),
@@ -1017,10 +1167,8 @@ function buildInitialWorkflowStages({ reportDate }) {
       "discover:china-ai",
       "--date",
       reportDate,
-      "--limit",
-      "30",
-      "--per-source-limit",
-      "3",
+      "--source-concurrency",
+      "12",
       "--output",
       tmp("china-ai")
     ]),
@@ -1028,30 +1176,23 @@ function buildInitialWorkflowStages({ reportDate }) {
       "discover:content-sources",
       "--date",
       reportDate,
-      "--limit",
-      String(CONTENT_SOURCE_DISCOVERY_LIMIT),
-      "--per-source-limit",
-      String(CONTENT_SOURCE_PER_SOURCE_LIMIT),
+      "--source-concurrency",
+      "12",
+      "--transport-state",
+      ".tmp/search-pagination-state.json",
+      "--transport-request-budget",
+      "120",
+      "--transport-runtime-ms",
+      "180000",
+      "--provider-throttle-ms",
+      "3000",
       "--output",
       tmp("content-sources")
-    ]),
-    nodeCliStage("official_blog_context", [
-      "official-blog:context",
-      "--input",
-      tmp("content-sources"),
-      "--output",
-      tmp("official-blog-context"),
-      "--date",
-      reportDate,
-      "--limit",
-      "8"
     ]),
     nodeCliStage("discover_statuspage_incidents", [
       "discover:statuspage-incidents",
       "--date",
       reportDate,
-      "--limit",
-      "20",
       "--output",
       tmp("statuspage-incidents")
     ]),
@@ -1063,24 +1204,76 @@ function buildInitialWorkflowStages({ reportDate }) {
       "gdelt,openalex,arxiv",
       "--queries",
       "config/search-queries.json",
-      "--limit",
-      "40",
-      "--provider-timeout-ms",
-      "45000",
+      "--transport-page-size",
+      "20",
+      "--query-concurrency",
+      "4",
+      "--transport-state",
+      ".tmp/search-pagination-state.json",
+      "--transport-request-budget",
+      "120",
+      "--transport-runtime-ms",
+      "180000",
+      "--provider-throttle-ms",
+      "3000",
       "--shadow",
       "--output",
       tmp("search-news")
     ]),
+    nodeCliStage("signals_write", [
+      "signals:write",
+      "--date",
+      reportDate,
+      "--generated-at",
+      generatedAt,
+      "--input",
+      signalDiscoveryInputs,
+      "--out",
+      "reports-data",
+      "--allow-degraded-inputs"
+    ]),
+    pnpmStage("signals_build", [
+      "run",
+      "signals:build",
+      "--",
+      "--generated-at",
+      generatedAt
+    ]),
+    pnpmStage("signals_validate", ["run", "signals:validate"]),
+    ...(publish ? [
+      pnpmStage("signals_publish_dry_run", ["run", "publish:dry-run:signals", "--", "--date", reportDate]),
+      pnpmStage("signals_publish_real", [
+        "run",
+        "publish",
+        "--",
+        "--confirm-push",
+        "--date",
+        reportDate,
+        "--scope",
+        "signals",
+        "--skip-pages-verify"
+      ])
+    ] : []),
     nodeCliStage("sources_health", [
       "sources:health",
       "--date",
       reportDate,
       "--sources",
       "config/sources",
-      "--enablement",
-      "core,optional,manual",
       "--output",
       tmp("sources-health")
+    ]),
+    pnpmStage("prompt_build", ["run", "prompt:build", "--", reportDate]),
+    nodeCliStage("official_blog_context", [
+      "official-blog:context",
+      "--input",
+      tmp("content-sources"),
+      "--output",
+      tmp("official-blog-context"),
+      "--date",
+      reportDate,
+      "--limit",
+      "8"
     ]),
     nodeCliStage("report_draft", [
       "report:draft",
@@ -1089,6 +1282,8 @@ function buildInitialWorkflowStages({ reportDate }) {
       "--input",
       discoveryInputs,
       "--allow-degraded-inputs",
+      "--generated-at",
+      generatedAt,
       "--official-blog-context",
       tmp("official-blog-context"),
       "--output",
@@ -1359,7 +1554,7 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       "reports-data",
       reportDate
     ]),
-    pnpmStage("build", ["run", "build", "--", "--source-watch-report-date", reportDate]),
+    pnpmStage("build", ["run", "build", "--", "--source-watch-report-date", reportDate, "--skip-signals"]),
     pnpmStage("quality_page_check", [
       "run",
       "quality:page-check",

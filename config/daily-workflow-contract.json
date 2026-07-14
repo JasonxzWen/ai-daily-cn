@@ -6,53 +6,128 @@
     "legacy_script": "daily:run",
     "launcher_only": true,
     "summary_path_template": ".tmp/run-summary-YYYY-MM-DD.json",
-    "source_watch": {
-      "producer_stage": "discover_source_watch",
-      "producer_artifact_path_template": ".tmp/source-watch-YYYY-MM-DD.json",
-      "draft_stage": "report_draft",
-      "persistence_stage": "report_write",
-      "candidate_pool_path_template": "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
-      "consumer_stage": "build",
-      "build_consumption_field": "source_watch_consumption",
-      "connected_requires": [
-        "producer_stage_receipt_path_and_sha256_match",
-        "draft_and_report_write_passed",
-        "producer_and_candidate_pool_snapshot_sets_equal",
-        "same_day_candidate_pool_exists",
-        "build_stage_passed",
-        "candidate_pool_path_consumed",
-        "candidate_pool_sha256_matches"
+    "public_signals": {
+      "content_admission_gate": false,
+      "membership_policy": "all_safe_normalized_observations",
+      "labels_are_non_gating": [
+        "source_group",
+        "content_tags",
+        "credibility_tag",
+        "source_health",
+        "access_state"
       ],
-      "zero_included_candidates_still_consumed": true
+      "discovery_lanes": [
+        {
+          "id": "github-trending",
+          "stage_id": "discover_github_trending",
+          "artifact_path_template": ".tmp/github-trending-YYYY-MM-DD.json"
+        },
+        {
+          "id": "source-watch",
+          "stage_id": "discover_source_watch",
+          "artifact_path_template": ".tmp/source-watch-YYYY-MM-DD.json"
+        },
+        {
+          "id": "huggingface-trending",
+          "stage_id": "discover_huggingface_trending",
+          "artifact_path_template": ".tmp/huggingface-trending-YYYY-MM-DD.json"
+        },
+        {
+          "id": "builders",
+          "stage_id": "discover_builders",
+          "artifact_path_template": ".tmp/builders-YYYY-MM-DD.json"
+        },
+        {
+          "id": "china-ai",
+          "stage_id": "discover_china_ai",
+          "artifact_path_template": ".tmp/china-ai-YYYY-MM-DD.json"
+        },
+        {
+          "id": "content-sources",
+          "stage_id": "discover_content_sources",
+          "artifact_path_template": ".tmp/content-sources-YYYY-MM-DD.json"
+        },
+        {
+          "id": "statuspage-incidents",
+          "stage_id": "discover_statuspage_incidents",
+          "artifact_path_template": ".tmp/statuspage-incidents-YYYY-MM-DD.json"
+        },
+        {
+          "id": "search-news",
+          "stage_id": "discover_search_news",
+          "artifact_path_template": ".tmp/search-news-YYYY-MM-DD.json"
+        }
+      ],
+      "publishes_before_legacy_report": true,
+      "history_baseline": {
+        "path_pattern": "reports-data/occurrences/baseline-v1/YYYY-MM.json.gz",
+        "manifest_path": "reports-data/occurrence-baseline-manifest.json",
+        "immutable": true,
+        "production_reads_legacy_artifacts": false,
+        "migration_script": "signals:migrate-baseline"
+      },
+      "source_watch": {
+        "producer_stage": "discover_source_watch",
+        "producer_artifact_path_template": ".tmp/source-watch-YYYY-MM-DD.json",
+        "persistence_stage": "signals_write",
+        "occurrence_store_path_template": "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json",
+        "consumer_stage": "signals_build",
+        "validation_stage": "signals_validate",
+        "public_index_path": "docs/signals/index.json",
+        "connected_requires": [
+          "producer_stage_receipt_path_and_sha256_match",
+          "signals_write_passed",
+          "same_day_occurrence_store_schema_valid",
+          "producer_snapshots_trace_to_occurrence_observation_ids",
+          "signals_build_passed",
+          "signals_validate_passed",
+          "public_signal_index_schema_valid"
+        ],
+        "zero_observations_still_consumed": true
+      }
     },
-    "official_blog_context": {
-      "producer_stage": "official_blog_context",
-      "source_artifact_path_template": ".tmp/content-sources-YYYY-MM-DD.json",
-      "context_artifact_path_template": ".tmp/official-blog-context-YYYY-MM-DD.json",
-      "consumer_stage": "report_draft",
-      "persistence_stage": "report_write",
-      "admission_policy_version": "official-blog-admission-v1",
-      "consumed_requires": [
-        "matching_report_date",
-        "source_artifact_report_date_matches",
-        "source_artifact_sha256_matches",
-        "context_sha256_matches",
-        "bindings_sha256_matches",
-        "bindings_match_context_records_and_source_entries",
-        "context_visibility_internal",
-        "highest_score_content_type_binding_wins"
-      ],
-      "zero_matched_records_still_consumed": true,
-      "invalid_context_degrades_without_consumption": true
+    "legacy_report": {
+      "optional_derivative": true,
+      "cannot_change_signal_membership": true,
+      "runs_after_public_signal_publish": true,
+      "official_blog_context": {
+        "scope": "legacy_report_only",
+        "producer_stage": "official_blog_context",
+        "source_artifact_path_template": ".tmp/content-sources-YYYY-MM-DD.json",
+        "context_artifact_path_template": ".tmp/official-blog-context-YYYY-MM-DD.json",
+        "consumer_stage": "report_draft",
+        "persistence_stage": "report_write",
+        "admission_policy_version": "official-blog-admission-v1",
+        "consumed_requires": [
+          "matching_report_date",
+          "source_artifact_report_date_matches",
+          "source_artifact_sha256_matches",
+          "context_sha256_matches",
+          "bindings_sha256_matches",
+          "bindings_match_context_records_and_source_entries",
+          "context_visibility_internal",
+          "highest_score_content_type_binding_wins"
+        ],
+        "zero_matched_records_still_consumed": true,
+        "invalid_context_degrades_without_consumption": true
+      }
     },
     "modes": {
       "dry_run": {
         "publish_allowed": false,
-        "terminal_status": "generated_only"
+        "allowed_terminal_statuses": [
+          "generated_only",
+          "generated_degraded",
+          "generated_signals_only"
+        ]
       },
       "publish": {
         "publish_allowed": true,
-        "terminal_status": "published"
+        "allowed_terminal_statuses": [
+          "published",
+          "published_signals_only",
+          "published_pending_pages_verification"
+        ]
       }
     },
     "scheduled_dry_run_script": "publish:dry-run:daily"
@@ -69,11 +144,16 @@
     "daily:codex-pipeline": "node scripts/run-daily-codex-pipeline.mjs",
     "daily:codex-dag:contract-run": "node scripts/run-daily-codex-dag.mjs --contract-run --json",
     "daily:run": "node src/cli.js daily:run",
+    "signals:write": "node src/cli.js signals:write",
+    "signals:migrate-baseline": "node scripts/migrate-public-signal-baseline.mjs",
+    "signals:build": "node src/cli.js signals:build --data-input reports-data --out docs",
+    "signals:validate": "node src/cli.js signals:validate --out docs",
     "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
     "workflow:validate": "node scripts/validate-daily-workflow-contract.mjs",
     "resilience:validate": "node scripts/validate-daily-resilience-policy.mjs",
     "dag:validate": "node scripts/validate-daily-codex-dag.mjs",
-    "publish:dry-run:daily": "node src/cli.js publish:dry-run:daily --data-input reports-data --input reports-source --out docs"
+    "publish:dry-run:daily": "node src/cli.js publish:dry-run:daily --data-input reports-data --input reports-source --out docs",
+    "publish:dry-run:signals": "node src/cli.js publish:dry-run:signals --data-input reports-data --out docs"
   },
   "validate_must_include": [
     "pnpm run dag:validate",
@@ -90,18 +170,31 @@
         "completed_stages",
         "publish:dry-run:daily",
         ".tmp/run-summary-YYYY-MM-DD.json",
+        "signals_write",
+        "signals_build",
+        "signals_validate",
+        "signals_publish_dry_run",
+        "signals_publish_real",
+        "signals.status",
+        "legacy_report.status",
         "source_watch.production_status",
         "source_watch.connected",
         "source_watch.consumed",
-        "candidate_pool_hashes",
-        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+        "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json",
+        "reports-data/occurrences/baseline-v1",
+        "reports-data/occurrence-baseline-manifest.json",
+        "signals:migrate-baseline",
+        "docs/signals/index.json",
+        "generated_signals_only",
+        "published_signals_only",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
         "corepack pnpm run resilience:validate",
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
-        "multiple_active_daily_publish_automations"
+        "multiple_active_daily_publish_automations",
+        "next_action"
       ]
     },
     {
@@ -113,6 +206,23 @@
         "completed_stages",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD",
         "publish:dry-run:daily",
+        "signals_write",
+        "signals_build",
+        "signals_validate",
+        "signals_publish_dry_run",
+        "signals_publish_real",
+        "signals.status",
+        "legacy_report.status",
+        "source_watch.production_status",
+        "source_watch.connected",
+        "source_watch.consumed",
+        "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json",
+        "reports-data/occurrences/baseline-v1",
+        "reports-data/occurrence-baseline-manifest.json",
+        "signals:migrate-baseline",
+        "docs/signals/index.json",
+        "generated_signals_only",
+        "published_signals_only",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
@@ -120,11 +230,6 @@
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         ".tmp/run-summary-YYYY-MM-DD.json",
-        "source_watch.production_status",
-        "source_watch.connected",
-        "source_watch.consumed",
-        "candidate_pool_hashes",
-        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
         "next_action",
         "Codex-native runner"
       ]
@@ -138,6 +243,23 @@
         "completed_stages",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD",
         "publish:dry-run:daily",
+        "signals_write",
+        "signals_build",
+        "signals_validate",
+        "signals_publish_dry_run",
+        "signals_publish_real",
+        "signals.status",
+        "legacy_report.status",
+        "source_watch.production_status",
+        "source_watch.connected",
+        "source_watch.consumed",
+        "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json",
+        "reports-data/occurrences/baseline-v1",
+        "reports-data/occurrence-baseline-manifest.json",
+        "signals:migrate-baseline",
+        "docs/signals/index.json",
+        "generated_signals_only",
+        "published_signals_only",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
@@ -146,11 +268,6 @@
         "infrastructure_blocked_after_fallback_exhausted",
         "multiple_active_daily_publish_automations",
         ".tmp/run-summary-YYYY-MM-DD.json",
-        "source_watch.production_status",
-        "source_watch.connected",
-        "source_watch.consumed",
-        "candidate_pool_hashes",
-        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
         "next_action"
       ]
     },
@@ -163,6 +280,22 @@
         "completed_stages",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD",
         "publish:dry-run:daily",
+        "signals_write",
+        "signals_build",
+        "signals_validate",
+        "signals_publish_dry_run",
+        "signals_publish_real",
+        "signals.status",
+        "legacy_report.status",
+        "source_watch.production_status",
+        "source_watch.connected",
+        "source_watch.consumed",
+        "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json",
+        "reports-data/occurrences/baseline-v1",
+        "reports-data/occurrence-baseline-manifest.json",
+        "docs/signals/index.json",
+        "generated_signals_only",
+        "published_signals_only",
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
@@ -170,11 +303,7 @@
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         ".tmp/run-summary-YYYY-MM-DD.json",
-        "source_watch.production_status",
-        "source_watch.connected",
-        "source_watch.consumed",
-        "candidate_pool_hashes",
-        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
+        "next_action"
       ]
     }
   ],
@@ -184,7 +313,11 @@
       "not_contains": [
         "source_reset_preflight",
         "codex_ai_repair_contract",
-        "--source-watch-admitted-artifact"
+        "--source-watch-admitted-artifact",
+        "candidate_pool_hashes",
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+        "discover_source_watch -> report_draft",
+        "--per-source-limit"
       ]
     },
     {
@@ -192,7 +325,11 @@
       "not_contains": [
         "source_reset_preflight",
         "codex_ai_repair_contract",
-        "--source-watch-admitted-artifact"
+        "--source-watch-admitted-artifact",
+        "candidate_pool_hashes",
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+        "discover_source_watch -> report_draft",
+        "--per-source-limit"
       ]
     },
     {
@@ -200,13 +337,21 @@
       "not_contains": [
         "source_reset_preflight",
         "codex_ai_repair_contract",
-        "--source-watch-admitted-artifact"
+        "--source-watch-admitted-artifact",
+        "candidate_pool_hashes",
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+        "discover_source_watch -> report_draft",
+        "--per-source-limit"
       ]
     },
     {
       "path": "prompts/ai-daily/modules/publish-workflow.md",
       "not_contains": [
-        "--source-watch-admitted-artifact"
+        "--source-watch-admitted-artifact",
+        "candidate_pool_hashes",
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+        "discover_source_watch -> report_draft",
+        "--per-source-limit"
       ]
     }
   ],
@@ -225,14 +370,21 @@
       "Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8",
       "source_watch.connected",
       "source_watch.consumed",
-      "candidate_pool_hashes"
+      "occurrence_store_path",
+      "signal_index_path",
+      "signals.status",
+      "legacy_report.status",
+      "generated_signals_only",
+      "published_signals_only"
     ],
     "not_contains": [
       "publish:prepare-worktree",
       "corepack pnpm run publish:dry-run --",
       "pnpm run publish:dry-run --",
       "--source-watch-admitted-artifact",
-      "not_connected",
+      "candidate_pool_hashes",
+      "reports-data/internal/candidates",
+      "source_watch.production_status must stay not_connected",
       "source_watch.consumed 必须是 false"
     ]
   },
