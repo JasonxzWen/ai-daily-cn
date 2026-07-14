@@ -1,31 +1,37 @@
 # Evaluator Rubric
 
-Use this rubric for the S-73 exhausted-repair advisory-isolation slice.
+Use this rubric for the REC-324 repair-convergence slice stacked on S-73.
 
 | Dimension | Score 0-2 | Evidence |
 | --- | --- | --- |
-| Problem match | 2 | The real failure mixed four error-covered public-editorial blockers with ten advisory fidelity tasks; the sibling retry classifier was already fixed, but the terminal degradation classifier still treated every task as a veto. |
-| Correctness | 2 | Safe degradation now requires at least one authorized editorial task and full coverage of every error-severity path; unrelated blockers remain fail-closed. |
-| Authority boundary | 2 | Advisory tasks stay in the review artifact but cannot authorize writes, veto degradation, inflate residual counts, or create affected sections. |
-| Failure behavior | 2 | Empty editorial sets and any non-covered or explicitly non-degradable blocking issue still return the existing hard block. |
-| Compatibility | 2 | Publish commands, scheduler configuration, review schemas, retry budget, and report generation are unchanged. |
-| Runtime reliability | 2 | The fix is inside the repository-owned terminal classifier, so every production invocation uses the same authority rule without scheduler prompt logic. |
-| Verification | 2 | The mixed-task regression (including an unmatched stale editorial task), related runner cases, isolated unit suite (540/540), and full repository gate (911 total / 909 pass / 0 fail / 2 skipped) pass. |
-| Scope discipline | 2 | The slice changes one classifier, one regression, and the existing recovery/evidence records; no Web or generated public artifact changed. |
-| Browser acceptance | 2 | Explicitly skipped because no Web composition changed; `1280x900` remains the sole supported viewport. |
-| Validation efficiency | 2 | Development used one exact RED, one GREEN, one related-pattern batch, one affected suite, and reserves a single full validation for PR preparation. |
-| Agentic loops | 2 | Main-agent Producer, deterministic focused tests, one bounded independent reviewer, and final-head CI form the closeout loop. |
-| Finish closeout | 2 | The bounded independent re-review is Ready with P0/P1=0 after closing stale-task scope and evidence-count findings. |
-| Insight recommendations | 2 | Retry and terminal degradation now reuse one error-covered task helper; the next slices address monotonic progress and real-artifact contract drift. |
-| Handoff readiness | 1 | Local implementation and closeout evidence are complete; PR/CI and fresh scheduled proof remain. |
+| Problem match | 2 | Recent scheduled runs repeatedly consumed stale first-review feedback, rewrote already-cleared paths, spent numeric retry budget without monotonic progress, and could re-enter through the post-write content contract. |
+| Correctness | 2 | Current feedback, strict path/problem subset progress, resolved state, checkpoint rollback, and fail-closed terminal branches are explicit and covered by regressions. |
+| Current feedback | 2 | Every new handoff and template carries only matching error-severity issues plus `issue.details`, active tasks, count, deterministic path/problem keys, and SHA-256 fingerprint; the canonical artifact is updated after repair and synthetic content-contract review. |
+| Monotonic convergence | 2 | A later attempt is accepted only when its blocking-signal set is a strict subset of the last accepted set; same, replaced, or expanded signals enter `stalled` immediately. |
+| Rollback | 2 | A stalled safe-editorial attempt restores the exact pre-attempt report checkpoint before disclosure; a missing checkpoint fails closed instead of claiming rollback. |
+| Path authority | 2 | Direct runner readiness rejects empty, duplicate, and paths absent from the current `ai_review_tasks`; resolved paths remain frozen while legacy summaries without comparable feedback may establish one baseline. |
+| Structural safety | 2 | Only whitelisted editorial content-contract failures matching the stalled active paths may suppress re-entry; story/GitHub/tracking/shape and unrelated path failures retain the hard block. |
+| Resolution semantics | 2 | A successful review clears active signals into `resolved`; a genuinely new later editorial failure creates a fresh baseline instead of being compared with stale blockers. |
+| Artifact integrity | 2 | Production authoring verifies the current review artifact report date and recomputed fingerprint against `next_action` before invoking Codex; stale or overwritten evidence blocks authoring. |
+| Runtime reliability | 2 | The repository-owned runner persists every transition and canonical artifact; the scheduler prompt does not own repair business logic or retry decisions. |
+| Prompt accuracy | 2 | The repair author receives current `issue.details`, actual Han-character semantics, and dynamic validator requirements; the stale fixed Builder `0.45` assertion is removed. |
+| Compatibility | 2 | Old handoffs without fingerprints remain accepted, while old task-only runner summaries get one non-comparable migration attempt; schedule, publish command, and automation configuration are unchanged. |
+| Scope discipline | 2 | The slice changes only exceptional-repair runtime, quality diagnostics, prompt evidence, policy records, and focused tests; no Web, source-selection, schedule, or generated public artifact changes. |
+| Verification | 2 | Focused RED/GREEN tests cover current feedback, strict reduction, path freeze, rollback, structural fail-closed, resolved re-baseline, legacy migration, artifact fingerprints, and one-call stalled completion; final validation passes 918 total / 916 pass / 0 fail / 2 skipped with build-clean, 194-file privacy, E2E, Harness, workflow/resilience, JSON, and diff gates. |
+| Browser acceptance | 2 | Explicitly skipped because this slice changes no Web composition; `1280x900` remains the sole supported viewport. |
+| Validation efficiency | 2 | Development used focused cases and affected suites, then one successful full repository validation at PR preparation; an earlier attempt stopped immediately at the evaluator marker gate before expensive suites. |
+| Agentic loops | 2 | Producer implementation and deterministic tests are followed by a bounded independent P0/P1 review; every review finding is converted into a regression or fail-closed guard before final verdict. |
+| Finish closeout | 2 | Independent re-review is Ready with P0=0/P1=0 after all five findings, including synthetic review persistence, were fixed and retested. |
+| Insight recommendations | 2 | Keep current-review fingerprint validation in the production handoff; use the next real-artifact replay slice to detect source-level schema drift without duplicating repair predicates. |
+| Handoff readiness | 2 | Local implementation, final repository gate, and independent closeout are complete; stacked PR/CI and merged-main scheduled evidence remain external delivery and production-verification gates. |
 
 ## Verdict
 
-- The behavior fix passed final repository validation and bounded independent review.
-- Do not call the issue production-verified until a merged-main scheduled run reaches the expected terminal state.
-- Merge only with explicit user authorization after required checks are green and GitHub reports the PR conflict-free.
+- The repair loop now has a current-feedback, strict-progress, rollback, and re-entry contract instead of relying on remaining retry count.
+- Do not call REC-324 production-verified until consecutive merged-main non-publish or scheduled observations meet its existing acceptance window.
+- Merge only with explicit user authorization after required checks are green and GitHub reports the stacked PR conflict-free.
 
 ## Residual risk
 
-- This slice does not solve stale feedback, non-monotonic repair, or artifact-schema drift; those remain the next two stacked PRs.
-- A later `report_write` contract failure can still block an otherwise degradable run until the production artifact replay slice lands.
+- This slice makes exceptional repair converge safely; it does not prove first-pass authoring is already good enough in production.
+- The next stacked slice must replay real non-publish production artifacts and close source-level contract drift without weakening these fail-closed boundaries.

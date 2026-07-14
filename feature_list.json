@@ -19,6 +19,8 @@
         "A needs_ai_repair handoff is preflighted for kind, clean-root evidence realpaths, and direct launcher .tmp destination before Codex authors a contract and the same entrypoint resumes.",
         "Automated repair is capped at five attempts and records attempted, authored, completed, edit count, terminal reason, and explicit failure state without treating a later block as recovery.",
         "After a repair is applied, advisory review tasks remain evidence while only safe public-editorial tasks covering every error-severity path may enter the next write contract.",
+        "Every repair handoff carries the current matching error issues, issue.details, a deterministic blocking-signal fingerprint, and only the still-active paths; ready contracts cannot edit duplicate, cleared, or undeclared paths.",
+        "A later repair attempt continues only when its path/problem blocking-signal set is a strict subset of the last accepted set; unchanged, replaced, or expanded signals stall immediately, restore the last accepted report, preserve attempted evidence, and cannot re-enter through content_contract.",
         "After the bounded repair budget is exhausted, advisory-only tasks cannot veto a safe editorial degradation; degraded sections and residual counts are derived only from error-covered public-editorial tasks.",
         "Production repair uses read-only schema-constrained UTF-8 Codex output; the host validates and writes the contract, and a bounded timeout terminates the process tree with codex_timeout.",
         "Claim verification overrides misleading source-level inference, quality and report_write share complete candidate coverage, and terminal summaries identify only the latest unresolved failure with non-empty error code, message, failures, and blocking evidence.",
@@ -28,6 +30,8 @@
       ],
       "stop_conditions": [
         "The entrypoint returns needs_ai_repair without exhausting or disabling its declared repair budget.",
+        "A repair prompt reads an initial or stale review after a newer post-attempt review exists, or a stalled loop authors another contract.",
+        "A repair attempt changes a cleared path, fails to strictly reduce blocking signals, or degrades the accepted checkpoint without rollback.",
         "Codex writes outside the bounded pipeline work directory.",
         "A requested Source Watch path is reported as consumed without producer, fingerprint-lineage, persisted-pool, and build evidence.",
         "The live automation prompt contradicts evidence-backed Source Watch summary semantics.",
@@ -93,7 +97,8 @@
         "A complete contract becomes daily-report.authored.json for the first formal review without consuming the exceptional repair budget; Builder translation also synchronizes content through the existing applier.",
         "An unavailable, invalid, incomplete, or partially rejected first-pass contract is recorded as fallback and the untouched deterministic draft proceeds through formal review and bounded repair.",
         "Run summary reports first-pass enabled/status/attempted/task/edit/applied/rejected/reason/first_review_ok/exceptional_repair_task_count separately from automation_ai_repair.",
-        "translation_fidelity remains advisory and is never copied into a repair write contract unless a separate error-covered public-editorial task authorizes that exact path."
+        "translation_fidelity remains advisory and is never copied into a repair write contract unless a separate error-covered public-editorial task authorizes that exact path.",
+        "Exceptional repair consumes current review metrics and requirements, freezes resolved fields, and stops after the first non-improving attempt instead of spending the remaining numeric budget."
       ],
       "stop_conditions": [
         "First-pass authoring happens after quality_review or consumes repair budget.",
