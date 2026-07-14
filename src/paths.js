@@ -24,6 +24,11 @@ export function canonicalReportUrl(siteUrl, reportDate) {
   return new URL(htmlPath, normalizeSiteUrl(siteUrl)).toString();
 }
 
+export function canonicalReportDataUrl(siteUrl, reportDate) {
+  const { dataPath } = reportRelativePaths(reportDate);
+  return new URL(dataPath, normalizeSiteUrl(siteUrl)).toString();
+}
+
 export function relativeAssetHref(fromPath, assetPath) {
   const fromDir = path.posix.dirname(fromPath);
   const rel = path.posix.relative(fromDir, assetPath);

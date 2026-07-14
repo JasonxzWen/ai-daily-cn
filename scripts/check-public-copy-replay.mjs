@@ -5,8 +5,7 @@ import { pathToFileURL } from "node:url";
 
 const DEFAULT_ROOTS = [
   { kind: "docs-data", dir: path.join("docs", "data"), extension: ".json" },
-  { kind: "reports-data", dir: "reports-data", extension: ".json" },
-  { kind: "report-html", dir: path.join("docs", "reports"), extension: ".html" }
+  { kind: "reports-data", dir: "reports-data", extension: ".json" }
 ];
 
 export const PUBLIC_COPY_REPLAY_BANNED_TERMS = [
@@ -41,8 +40,7 @@ export async function evaluatePublicCopyReplay(options = {}) {
 
   for (const artifact of artifacts) {
     const raw = await fs.readFile(artifact.absolutePath, "utf8");
-    const text = artifact.kind === "report-html" ? visibleHtmlText(raw) : raw;
-    const hits = findBannedCopyHits(text).map((hit) => ({
+    const hits = findBannedCopyHits(raw).map((hit) => ({
       path: artifact.relativePath,
       kind: artifact.kind,
       report_date: artifact.reportDate,
@@ -203,96 +201,6 @@ function addDays(dateText, deltaDays) {
   const date = new Date(`${dateText}T00:00:00.000Z`);
   date.setUTCDate(date.getUTCDate() + deltaDays);
   return date.toISOString().slice(0, 10);
-}
-
-function visibleHtmlText(html) {
-  const withoutRawTextBlocks = ["script", "style"].reduce(
-    (text, tagName) => stripRawTextElementBlocks(text, tagName),
-    String(html)
-  );
-
-  return withoutRawTextBlocks
-    .replace(/<[^>]+>/gu, " ")
-    .replace(/&(nbsp|amp|lt|gt|#39|quot);/giu, (_match, entity) => decodeHtmlEntity(entity));
-}
-
-function stripRawTextElementBlocks(html, tagName) {
-  const source = String(html);
-  const lower = source.toLowerCase();
-  const openNeedle = `<${tagName}`;
-  const closeNeedle = `</${tagName}`;
-  let output = "";
-  let index = 0;
-
-  while (index < source.length) {
-    const openIndex = lower.indexOf(openNeedle, index);
-    if (openIndex === -1) {
-      output += source.slice(index);
-      break;
-    }
-
-    if (!isHtmlTagNameBoundary(source.at(openIndex + openNeedle.length))) {
-      output += source.slice(index, openIndex + openNeedle.length);
-      index = openIndex + openNeedle.length;
-      continue;
-    }
-
-    output += `${source.slice(index, openIndex)} `;
-    const openEnd = source.indexOf(">", openIndex + openNeedle.length);
-    if (openEnd === -1) {
-      break;
-    }
-
-    const closeIndex = findRawTextClosingTag(source, lower, closeNeedle, openEnd + 1);
-    if (closeIndex === -1) {
-      break;
-    }
-
-    const closeEnd = source.indexOf(">", closeIndex + closeNeedle.length);
-    if (closeEnd === -1) {
-      break;
-    }
-
-    index = closeEnd + 1;
-  }
-
-  return output;
-}
-
-function findRawTextClosingTag(source, lower, closeNeedle, fromIndex) {
-  let searchFrom = fromIndex;
-  while (searchFrom < source.length) {
-    const closeIndex = lower.indexOf(closeNeedle, searchFrom);
-    if (closeIndex === -1) {
-      return -1;
-    }
-    if (isHtmlTagNameBoundary(source.at(closeIndex + closeNeedle.length))) {
-      return closeIndex;
-    }
-    searchFrom = closeIndex + closeNeedle.length;
-  }
-  return -1;
-}
-
-function isHtmlTagNameBoundary(char) {
-  return char === undefined || char === ">" || char === "/" || isHtmlWhitespace(char);
-}
-
-function isHtmlWhitespace(char) {
-  return char === " " || char === "\n" || char === "\t" || char === "\r" || char === "\f";
-}
-
-function decodeHtmlEntity(entity) {
-  const normalized = String(entity).toLowerCase();
-  const replacements = {
-    nbsp: " ",
-    amp: "&",
-    lt: "<",
-    gt: ">",
-    "#39": "'",
-    quot: "\""
-  };
-  return replacements[normalized] || `&${entity};`;
 }
 
 function normalizeWhitespace(value) {

@@ -765,7 +765,6 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
     legacy_report: plainObject(legacySummary.legacy_report) ? legacySummary.legacy_report : null,
     clean_repo_root: cleanRoot,
     structured_json_path: artifactPaths.structured_json_path,
-    html_path: artifactPaths.html_path,
     docs_data_json_path: artifactPaths.docs_data_json_path,
     artifacts: artifactPaths,
     artifact_sizes: artifactSizes,
@@ -1477,7 +1476,6 @@ function buildDailyReportArtifactPaths({ cleanRoot, reportDate }) {
     structured_json_path: path.join(cleanRoot, "reports-data", year, month, `${reportDate}.json`),
     candidates_json_path: path.join(cleanRoot, "reports-data", ...internalCandidatePoolRelativePath(reportDate).split(path.sep)),
     legacy_candidates_json_path: path.join(cleanRoot, "reports-data", ...legacyCandidatePoolRelativePath(reportDate).split(path.sep)),
-    html_path: path.join(cleanRoot, "docs", "reports", year, month, `${reportDate}.html`),
     docs_data_json_path: path.join(cleanRoot, "docs", "data", year, month, `${reportDate}.json`)
   };
 }
@@ -1562,7 +1560,6 @@ function buildValidationSummary(completedStages) {
     report_write: summarizeStageForContract(completedStages, "report_write"),
     build: summarizeStageForContract(completedStages, "build"),
     content_contract: summarizeStageForContract(completedStages, "content_contract"),
-    quality_page_check: summarizeStageForContract(completedStages, "quality_page_check"),
     npm_validate: summarizeStageForContract(completedStages, "validate"),
     sources_phase5_audit: summarizeStageForContract(completedStages, "sources_phase5_audit"),
     publish_dry_run_daily: summarizeStageForContract(completedStages, "publish_dry_run_daily")
@@ -2614,7 +2611,6 @@ if (isMainModule(import.meta.url)) {
       summary_path: plan.outputs.run_summary,
       pipeline_plan_path: summary.pipeline_plan_path || summary.plan_path || plan.outputs.plan,
       structured_json_path: summary.structured_json_path || "",
-      html_path: summary.html_path || "",
       docs_data_json_path: summary.docs_data_json_path || "",
       publish_requested: summary.publish_requested,
       execute_requested: summary.execute_requested,
@@ -2664,7 +2660,6 @@ if (isMainModule(import.meta.url)) {
       summary_path: summaryPath,
       pipeline_plan_path: existingSummary?.pipeline_plan_path || existingSummary?.plan_path || "",
       structured_json_path: existingSummary?.structured_json_path || "",
-      html_path: existingSummary?.html_path || "",
       publish_requested: existingSummary?.publish_requested ?? fallbackRequestedFlag(rawArgv, "publish", args?.publish),
       execute_requested: existingSummary?.execute_requested ?? fallbackRequestedFlag(rawArgv, "execute", args?.execute),
       source_watch: existingSummary?.source_watch || disconnectedSourceWatchSummary(

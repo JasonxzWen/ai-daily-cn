@@ -364,12 +364,9 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
   const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
   const reportJsonPath = path.join(cleanRoot, "reports-data", "2026", "07", `${reportDate}.json`);
   const candidatesJsonPath = path.join(cleanRoot, "reports-data", "internal", "candidates", "2026", "07", `${reportDate}.candidates.json`);
-  const reportHtmlPath = path.join(cleanRoot, "docs", "reports", "2026", "07", `${reportDate}.html`);
   const docsDataJsonPath = path.join(cleanRoot, "docs", "data", "2026", "07", `${reportDate}.json`);
-  const reportHtml = "<!doctype html><title>Daily</title>\n";
   await fs.mkdir(path.dirname(reportJsonPath), { recursive: true });
   await fs.mkdir(path.dirname(candidatesJsonPath), { recursive: true });
-  await fs.mkdir(path.dirname(reportHtmlPath), { recursive: true });
   await fs.mkdir(path.dirname(docsDataJsonPath), { recursive: true });
   await fs.writeFile(reportJsonPath, `${JSON.stringify({
     report_date: reportDate,
@@ -380,7 +377,6 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
     }
   }, null, 2)}\n`, "utf8");
   await fs.writeFile(candidatesJsonPath, "{\"candidates\":[]}\n", "utf8");
-  await fs.writeFile(reportHtmlPath, reportHtml, "utf8");
   await fs.writeFile(docsDataJsonPath, "{}\n", "utf8");
 
   const plan = await prepareDailyCodexPipeline({
@@ -400,7 +396,6 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
       stages: [
         { id: "report_write", status: "passed", updated_at: "2026-07-06T00:00:01.000Z", output: { report_path: "reports-data/2026/07/2026-07-06.json" } },
         { id: "build", status: "passed", updated_at: "2026-07-06T00:00:03.000Z" },
-        { id: "quality_page_check", status: "passed", updated_at: "2026-07-06T00:00:06.000Z" },
         { id: "validate", status: "passed", updated_at: "2026-07-06T00:00:10.000Z" },
         { id: "publish_dry_run_daily", status: "passed", updated_at: "2026-07-06T00:00:15.000Z" },
         {
@@ -413,7 +408,7 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
             publish_status: {
               repo_pushed: true,
               commit: "abc1234",
-              pages_url: "https://example.com/reports/2026/07/2026-07-06.html"
+              pages_url: "https://example.com/data/2026/07/2026-07-06.json"
             }
           }
         },
@@ -422,7 +417,7 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
           status: "passed",
           updated_at: "2026-07-06T00:00:30.000Z",
           output: {
-            pages_url: "https://example.com/reports/2026/07/2026-07-06.html",
+            pages_url: "https://example.com/data/2026/07/2026-07-06.json",
             http_status: 200
           }
         }
@@ -446,13 +441,12 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
     path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "pipeline-plan.json")
   );
   assert.equal(summary.structured_json_path, reportJsonPath);
-  assert.equal(summary.html_path, reportHtmlPath);
   assert.equal(summary.docs_data_json_path, docsDataJsonPath);
   assert.equal(summary.artifact_sizes.pipeline_plan_path.exists, true);
   assert.equal(summary.artifact_sizes.structured_json_path.exists, true);
   assert.equal(summary.artifact_sizes.candidates_json_path.exists, true);
-  assert.equal(summary.artifact_sizes.html_path.bytes, Buffer.byteLength(reportHtml));
-  assert.equal(summary.stage_timing.stage_count, 7);
+  assert.equal(Object.hasOwn(summary.artifact_sizes, "html_path"), false);
+  assert.equal(summary.stage_timing.stage_count, 6);
   assert(summary.stage_timing.known_stage_duration_ms > 0);
   assert.equal(summary.completed_stages.find((stage) => stage.id === "build").duration_source, "updated_at_delta");
   assert.equal(summary.completed_stages.find((stage) => stage.id === "publish_real").duration_ms, 7000);
@@ -468,7 +462,6 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
   assert.deepEqual(summary.completed_stages.map((stage) => stage.id), [
     "report_write",
     "build",
-    "quality_page_check",
     "validate",
     "publish_dry_run_daily",
     "publish_real",
@@ -479,7 +472,7 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
   assert.equal(saved.automation_pipeline_mode, "single_script_dag_orchestrator");
   assert.equal(saved.mode, "publish");
   assert.equal(saved.final_status, "published");
-  assert.equal(saved.artifact_sizes.html_path.bytes, Buffer.byteLength(reportHtml));
+  assert.equal(Object.hasOwn(saved.artifact_sizes, "html_path"), false);
 });
 
 test("daily Codex production orchestrator runs no-publish execute as production dry-run", async () => {
@@ -489,11 +482,9 @@ test("daily Codex production orchestrator runs no-publish execute as production 
   const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
   const reportJsonPath = path.join(cleanRoot, "reports-data", "2026", "07", `${reportDate}.json`);
   const candidatesJsonPath = path.join(cleanRoot, "reports-data", "internal", "candidates", "2026", "07", `${reportDate}.candidates.json`);
-  const reportHtmlPath = path.join(cleanRoot, "docs", "reports", "2026", "07", `${reportDate}.html`);
   const docsDataJsonPath = path.join(cleanRoot, "docs", "data", "2026", "07", `${reportDate}.json`);
   await fs.mkdir(path.dirname(reportJsonPath), { recursive: true });
   await fs.mkdir(path.dirname(candidatesJsonPath), { recursive: true });
-  await fs.mkdir(path.dirname(reportHtmlPath), { recursive: true });
   await fs.mkdir(path.dirname(docsDataJsonPath), { recursive: true });
   await fs.writeFile(reportJsonPath, `${JSON.stringify({
     report_date: reportDate,
@@ -504,7 +495,6 @@ test("daily Codex production orchestrator runs no-publish execute as production 
     }
   }, null, 2)}\n`, "utf8");
   await fs.writeFile(candidatesJsonPath, "{\"candidates\":[]}\n", "utf8");
-  await fs.writeFile(reportHtmlPath, "<!doctype html><title>Dry run</title>\n", "utf8");
   await fs.writeFile(docsDataJsonPath, "{}\n", "utf8");
 
   const plan = await prepareDailyCodexPipeline({
@@ -526,7 +516,6 @@ test("daily Codex production orchestrator runs no-publish execute as production 
       stages: [
         { id: "report_write", status: "passed", updated_at: "2026-07-06T00:00:01.000Z" },
         { id: "build", status: "passed", updated_at: "2026-07-06T00:00:03.000Z" },
-        { id: "quality_page_check", status: "passed", updated_at: "2026-07-06T00:00:06.000Z" },
         { id: "validate", status: "passed", updated_at: "2026-07-06T00:00:10.000Z" },
         { id: "publish_dry_run_daily", status: "passed", updated_at: "2026-07-06T00:00:15.000Z" }
       ]
@@ -546,16 +535,14 @@ test("daily Codex production orchestrator runs no-publish execute as production 
   assert.equal(summary.publish_requested, false);
   assert.equal(summary.execute_requested, true);
   assert.equal(summary.structured_json_path, reportJsonPath);
-  assert.equal(summary.html_path, reportHtmlPath);
   assert.equal(summary.docs_data_json_path, docsDataJsonPath);
   assert.equal(summary.artifact_sizes.structured_json_path.exists, true);
-  assert.equal(summary.artifact_sizes.html_path.exists, true);
+  assert.equal(Object.hasOwn(summary.artifact_sizes, "html_path"), false);
   assert.equal(summary.publication.repo_pushed, false);
   assert.equal(summary.publication.skipped_reason, "publish_stage_not_reached");
   assert.deepEqual(summary.completed_stages.map((stage) => stage.id), [
     "report_write",
     "build",
-    "quality_page_check",
     "validate",
     "publish_dry_run_daily"
   ]);
@@ -563,7 +550,7 @@ test("daily Codex production orchestrator runs no-publish execute as production 
   const saved = JSON.parse(await fs.readFile(plan.outputs.run_summary, "utf8"));
   assert.equal(saved.mode, "dry-run");
   assert.equal(saved.publish_requested, false);
-  assert.equal(saved.artifact_sizes.html_path.exists, true);
+  assert.equal(Object.hasOwn(saved.artifact_sizes, "html_path"), false);
 });
 
 test("daily Codex production summary reports the latest unresolved failed stage", async () => {
