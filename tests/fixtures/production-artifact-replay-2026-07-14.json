@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-07-14",
+  "generated_at": "2026-07-13T18:43:08.866Z",
+  "automation_run_id": "019f5cc0-25b6-76c0-8247-5669b4af7a83",
+  "verification_scope": "historical_read_only_artifact_replay",
+  "production_verified": false,
+  "original_artifact": {
+    "kind": "source_candidate_pool",
+    "candidate_count": 336,
+    "sha256": "2f25b523189c78ed424f23e055fe17ab49c22071acf312b28eda4c0e41d7fb0e"
+  },
+  "invalid_before": {
+    "total": 32,
+    "by_source_level": {
+      "weekly_ai_news_aggregator": 5,
+      "big_tech_company_watch": 1,
+      "official_open_source_watch": 5,
+      "wechat2rss_medium_trust": 21
+    }
+  },
+  "included_candidate_ids": [
+    "wechat2rss-xixiaoyao-ps-seedream-5-0-pro",
+    "wechat2rss-datawhale-waic-2026-datawhale",
+    "wechat2rss-datawhale-gpt-5-6-sol-bug"
+  ],
+  "source_levels": [
+    {
+      "source_id": "production-github-ai-news-directory",
+      "source_level": "github_ai_news_directory"
+    },
+    {
+      "source_id": "production-weekly-ai-news-aggregator",
+      "source_level": "weekly_ai_news_aggregator"
+    },
+    {
+      "source_id": "production-big-tech-company-watch",
+      "source_level": "big_tech_company_watch"
+    },
+    {
+      "source_id": "production-china-big-tech-company-watch",
+      "source_level": "china_big_tech_company_watch"
+    },
+    {
+      "source_id": "production-official-open-source-watch",
+      "source_level": "official_open_source_watch"
+    },
+    {
+      "source_id": "production-wechat2rss-medium-trust",
+      "source_level": "wechat2rss_medium_trust"
+    }
+  ]
+}

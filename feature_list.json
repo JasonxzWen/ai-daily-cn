@@ -24,6 +24,8 @@
         "After the bounded repair budget is exhausted, advisory-only tasks cannot veto a safe editorial degradation; degraded sections and residual counts are derived only from error-covered public-editorial tasks.",
         "Production repair uses read-only schema-constrained UTF-8 Codex output; the host validates and writes the contract, and a bounded timeout terminates the process tree with codex_timeout.",
         "Claim verification overrides misleading source-level inference, quality and report_write share complete candidate coverage, and terminal summaries identify only the latest unresolved failure with non-empty error code, message, failures, and blocking evidence.",
+        "Source registry, candidate pool, and report schemas expose one order-identical source_level vocabulary; every configured or fallback value is covered, and unknown values fail closed before discovery can become an authoring input.",
+        "Report draft normalizes the complete candidate pool before evidence caching, authoring, quality review, or artifact writes, so a producer contract error cannot survive until report_write.",
         "Production Source Watch is connected only when the producer stage returns the exact artifact path/SHA-256 receipt, the dated producer and candidate pool have identical target_id:snapshot_fingerprint sets, and build proves the exact pool path plus SHA-256; zero inclusion remains a valid consumed state.",
         "A live scheduler that still forces not_connected or consumed:false fails the workflow compatibility gate before release.",
         "The project scheduler inventory contains exactly one automation, ai-2; its prompt reads the dated UTF-8 run summary with explicit PowerShell encoding and delegates health truth to it, while status:self-check remains a manual diagnostic rather than a second scheduled workflow."
@@ -32,6 +34,7 @@
         "The entrypoint returns needs_ai_repair without exhausting or disabling its declared repair budget.",
         "A repair prompt reads an initial or stale review after a newer post-attempt review exists, or a stalled loop authors another contract.",
         "A repair attempt changes a cleared path, fails to strictly reduce blocking signals, or degrades the accepted checkpoint without rollback.",
+        "A source_level passes sources:validate but is rejected by the candidate or report schema, or a malformed candidate pool is written before producer validation.",
         "Codex writes outside the bounded pipeline work directory.",
         "A requested Source Watch path is reported as consumed without producer, fingerprint-lineage, persisted-pool, and build evidence.",
         "The live automation prompt contradicts evidence-backed Source Watch summary semantics.",
@@ -43,6 +46,8 @@
           "node --test tests/daily-codex-pipeline.test.js",
           "node --test tests/source-watch.test.js tests/source-watch-runner-draft.test.js tests/article-index.test.js tests/official-blog-daily-context.test.js",
           "node --test --test-name-pattern \"report:draft.*main stream|report:write allows disclosed low-risk refill|quality review.*candidate|quality review shares\" tests/unit.test.js",
+          "node --test --test-name-pattern \"source level vocabulary|real non-publish candidate artifact replay|report draft rejects unknown source level|source registry rejects unknown source level|preserves snake case\" tests/unit.test.js",
+          "corepack pnpm run sources:validate",
           "corepack pnpm run workflow:validate",
           "corepack pnpm run resilience:validate"
         ]
@@ -59,6 +64,9 @@
           "src/automation-inventory.js",
           "src/workflow-contract.js",
           "schemas/candidates.schema.json",
+          "schemas/sources.schema.json",
+          "schemas/report.schema.json",
+          "tests/fixtures/production-artifact-replay-2026-07-14.json",
           "schemas/articles.schema.json",
           "tests/daily-codex-pipeline.test.js",
           "tests/source-watch.test.js",
@@ -262,11 +270,14 @@
         "GitHub Trending preserves source-scope language separately from repository_language, and the public report uses the repository language while source_scope continues to identify the ranked pool.",
         "GitHub Trending rank movement compares source_rank only within the same source_scope; an unknown or different historical scope fails closed to new.",
         "GitHub README summaries use a content SHA-256 cache key; a first network fetch is a miss and only an exact historical key match may report hit=true.",
-        "GitHub Trending source effectiveness counts each canonical repository once across original and derived candidates, and public inclusion comes from the final github_trending/projects union rather than stale candidate flags."
+        "GitHub Trending source effectiveness counts each canonical repository once across original and derived candidates, and public inclusion comes from the final github_trending/projects union rather than stale candidate flags.",
+        "Every registered and runtime-fallback source_level belongs to the synchronized source/candidate/report vocabulary; legacy camelCase fallback metadata is preserved into candidate facts.",
+        "The complete candidate pool is schema- and reference-validated at the draft producer boundary before any report or candidate artifact is written."
       ],
       "stop_conditions": [
         "Required source audit fields cannot be reconstructed.",
         "The draft would bypass candidate-pool or freshness gates.",
+        "A configured source_level is accepted by the registry but rejected downstream, or a producer writes an invalid candidate pool for later stages to discover.",
         "GitHub source scope, repository language, rank basis, README cache evidence, or canonical effectiveness identity is conflated or inferred across incompatible records."
       ],
       "behavior": "Collect and audit daily AI sources before writing the structured report.",
@@ -280,6 +291,8 @@
           "corepack pnpm run discover:statuspage-incidents -- --date YYYY-MM-DD --limit 20",
           "node --test tests/source-watch.test.js tests/source-watch-runner-draft.test.js tests/official-blog-daily-context.test.js",
           "node --test --test-name-pattern \"GitHub trending|github trending|report:draft merges weekly GitHub|source effectiveness dedupes original|source effectiveness ignores stale\" tests/unit.test.js",
+          "node --test --test-name-pattern \"source level vocabulary|real non-publish candidate artifact replay|report draft rejects unknown source level|source registry rejects unknown source level|preserves snake case\" tests/unit.test.js",
+          "corepack pnpm run sources:validate",
           "corepack pnpm run sources:display-contract"
         ]
       },
@@ -295,6 +308,9 @@
           "src/daily-runner.js",
           "src/draft.js",
           "schemas/candidates.schema.json",
+          "schemas/sources.schema.json",
+          "schemas/report.schema.json",
+          "tests/fixtures/production-artifact-replay-2026-07-14.json",
           "tests/source-watch.test.js",
           "tests/source-watch-runner-draft.test.js",
           "tests/official-blog-daily-context.test.js",
