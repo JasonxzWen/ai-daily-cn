@@ -48,7 +48,7 @@ import { collectMainAuditConsistencyIssues } from "../src/main-audit-consistency
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite, planGeneratedFiles } from "../src/site.js";
-import { validateCandidatePool, validateFeed, validateReport } from "../src/schema.js";
+import { schemas, validateCandidatePool, validateFeed, validateReport } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
@@ -178,6 +178,91 @@ test("candidate audit contract stays aligned with candidate schema", async () =>
   assert.deepEqual(candidateProperties.main_selection_stage.enum, MAIN_SELECTION_STAGES);
   assert.deepEqual(candidateProperties.main_reject_reason.enum, MAIN_REJECT_REASONS);
   assert.deepEqual(candidateProperties.roles.items.enum, CANDIDATE_AUDIT_ROLES);
+});
+
+test("source level vocabulary stays synchronized across registry, candidate, report, and runtime fallbacks", async () => {
+  const registry = await loadSourceRegistry({ rootDir });
+  const registryLevels = schemas.sourceRegistry.$defs.source_level?.enum || [];
+  const candidateLevels = schemas.candidatePool.$defs.source_level.enum;
+  const reportLevels = schemas.report.$defs.source_level.enum;
+  const configuredLevels = new Set([
+    ...registry.sources.map((source) => source.source_level || source.sourceLevel),
+    ...DEFAULT_CONTENT_SOURCES.map((source) => source.source_level || source.sourceLevel)
+  ].filter(Boolean));
+
+  assert.deepEqual(registryLevels, candidateLevels);
+  assert.deepEqual(reportLevels, candidateLevels);
+  assert.deepEqual(
+    [...configuredLevels].filter((sourceLevel) => !candidateLevels.includes(sourceLevel)).sort(),
+    []
+  );
+});
+
+test("real non-publish candidate artifact replay preserves provenance and accepts configured source levels", async () => {
+  const replay = JSON.parse(await readFixture("production-artifact-replay-2026-07-14.json"));
+  const candidatePool = {
+    schema_version: 1,
+    report_date: replay.report_date,
+    generated_at: replay.generated_at,
+    sources: replay.source_levels.map(({ source_id: id }, index) => ({
+      id,
+      name: `Production replay source ${index + 1}`,
+      url: `https://example.com/production-replay/${index + 1}`,
+      category: "community",
+      status: "checked"
+    })),
+    candidates: replay.source_levels.map(({ source_id, source_level: sourceLevel }, index) => ({
+      id: `production-replay-${index + 1}`,
+      source_id,
+      category: "community_lead",
+      title: `Production replay candidate ${index + 1}`,
+      url: `https://example.com/production-replay/${index + 1}`,
+      source: `Production replay source ${index + 1}`,
+      event_date: replay.report_date,
+      status: "excluded",
+      verification_status: "intermediary_only",
+      source_level: sourceLevel
+    }))
+  };
+
+  assert.equal(replay.production_verified, false);
+  assert.equal(replay.automation_run_id, "019f5cc0-25b6-76c0-8247-5669b4af7a83");
+  assert.equal(replay.generated_at, "2026-07-13T18:43:08.866Z");
+  assert.equal(replay.original_artifact.candidate_count, 336);
+  assert.equal(replay.original_artifact.sha256, "2f25b523189c78ed424f23e055fe17ab49c22071acf312b28eda4c0e41d7fb0e");
+  assert.equal(replay.invalid_before.total, 32);
+  assert.equal(replay.included_candidate_ids.length, 3);
+  assert.equal(validateCandidatePool(candidatePool).valid, true);
+
+  const unknown = structuredClone(candidatePool);
+  unknown.candidates[0].source_level = "future_unknown_source_level";
+  assert.equal(validateCandidatePool(unknown).valid, false);
+});
+
+test("report draft rejects unknown source level before writing producer artifacts", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-level-contract-"));
+  const reportDate = "2026-07-14";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const outputPath = path.join(tmp, ".tmp", "daily-report.json");
+  const candidateOutputPath = path.join(tmp, ".tmp", `source-candidates-${reportDate}.json`);
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates[0].source_level = "future_unknown_source_level";
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  await assert.rejects(
+    () => generateReportDraft({
+      rootDir: tmp,
+      reportDate,
+      generatedAt: "2026-07-14T02:33:48.000Z",
+      inputPaths: [discoveryPath],
+      outputPath,
+      candidateOutputPath,
+      cacheEvidence: false
+    }),
+    (error) => error instanceof PublisherError && error.code === "candidate_pool_schema_validation_failed"
+  );
+  assert.equal(fsSync.existsSync(outputPath), false);
+  assert.equal(fsSync.existsSync(candidateOutputPath), false);
 });
 
 test("candidate pool schema accepts specific main refill selection stages", () => {
@@ -5551,6 +5636,31 @@ test("source registry validates required source metadata", () => {
   );
 });
 
+test("source registry rejects unknown source level in snake-case and camel-case before discovery", () => {
+  for (const property of ["source_level", "sourceLevel"]) {
+    assert.throws(
+      () => normalizeSourceRegistry({
+        schema_version: 1,
+        sources: [
+          {
+            id: `unknown-${property}`,
+            name: `Unknown ${property}`,
+            url: `https://example.com/unknown-${property}.xml`,
+            source_kind: "rss",
+            candidate_category: "hot_blog",
+            tier: "T1",
+            authority: "intermediary",
+            enablement: "optional",
+            verification_policy: "primary_required",
+            [property]: "future_unknown_source_level"
+          }
+        ]
+      }),
+      (error) => error instanceof PublisherError && error.code === "source_registry_schema_validation_failed"
+    );
+  }
+});
+
 test("content source discovery defaults to core and optional sources while keeping manual sources opt-in", async () => {
   const checkedUrls = [];
   const collectedDefault = await collectContentSources({
@@ -5587,6 +5697,36 @@ test("content source discovery defaults to core and optional sources while keepi
   assert(!manualUrls.some((url) => url.includes("mp.weixin.qq.com")));
   assert(manualUrls.some((url) => url.includes("ifanr.com/feed")));
   assert(!collectedManual.source_audit.content_sources.sources.some((source) => /WeChat Industry Whitelist/i.test(source.name)));
+});
+
+test("content source discovery preserves snake case and legacy camel case source levels", async () => {
+  const sources = [
+    {
+      id: "snake-source-level",
+      name: "Snake Source Level",
+      url: "https://example.com/snake-source-level.xml",
+      category: "intermediary",
+      source_level: "big_tech_company_watch"
+    },
+    {
+      id: "camel-source-level",
+      name: "Camel Source Level",
+      url: "https://example.com/camel-source-level.xml",
+      category: "intermediary",
+      sourceLevel: "weekly_ai_news_aggregator"
+    }
+  ];
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources,
+    perSourceLimit: 1,
+    fetchImpl: async () => textResponse(contentSourceRssFixture())
+  });
+  const sourceLevels = new Map(collected.candidates.map((candidate) => [candidate.source_id, candidate.source_level]));
+
+  assert.equal(sourceLevels.get("snake-source-level"), "big_tech_company_watch");
+  assert.equal(sourceLevels.get("camel-source-level"), "weekly_ai_news_aggregator");
 });
 
 test("content source discovery keeps self-media as intermediary leads requiring primary verification", async () => {

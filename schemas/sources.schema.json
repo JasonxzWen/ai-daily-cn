@@ -22,6 +22,41 @@
       "type": "string",
       "format": "uri"
     },
+    "source_level": {
+      "enum": [
+        "primary",
+        "official",
+        "paper",
+        "github",
+        "multi_source",
+        "intermediary",
+        "community",
+        "original_social",
+        "unverified",
+        "wechat_primary_like",
+        "wechat_industry_whitelist",
+        "weekly_paper_aggregator",
+        "open_source_aggregator",
+        "tech_weekly_aggregator",
+        "paper_api",
+        "community_api",
+        "paper_aggregator",
+        "ai_news_aggregator",
+        "aigc_content_industry",
+        "ai_funding_product_radar",
+        "official_company_news",
+        "official_open_source_account",
+        "official_model_host_account",
+        "model_registry",
+        "github_ai_news_directory",
+        "weekly_ai_news_aggregator",
+        "big_tech_company_watch",
+        "china_big_tech_company_watch",
+        "official_open_source_watch",
+        "wechat2rss_medium_trust",
+        "platform_exempt_signal"
+      ]
+    },
     "source": {
       "type": "object",
       "additionalProperties": true,
@@ -77,6 +112,12 @@
         },
         "verification_policy": {
           "enum": ["primary_allowed", "primary_required", "multi_source_required", "community_only", "platform_signal_exempt"]
+        },
+        "source_level": {
+          "$ref": "#/$defs/source_level"
+        },
+        "sourceLevel": {
+          "$ref": "#/$defs/source_level"
         },
         "requires_original_url": {
           "type": "boolean"

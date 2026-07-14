@@ -3065,7 +3065,7 @@ function contentCandidateNotes(entry, sourceInfo, originalUrl) {
 
 function contentVerificationFields(entry, sourceInfo, originalUrl) {
   const status = contentVerificationStatus(sourceInfo, originalUrl);
-  const sourceLevel = String(sourceInfo.source_level || entry.source_level || "").trim();
+  const sourceLevel = String(sourceInfo.source_level || sourceInfo.sourceLevel || entry.source_level || entry.sourceLevel || "").trim();
   const fields = {
     verification_status: status,
     verification_sources: [],
@@ -4055,6 +4055,7 @@ function normalizeGenericSource(sourceItem, prefix) {
 }
 
 function toCandidateSource(sourceItem, category, checkedAt, status, notes) {
+  const sourceLevel = String(sourceItem.source_level || sourceItem.sourceLevel || "").trim();
   return {
     id: sourceItem.id,
     name: sourceItem.name,
@@ -4063,6 +4064,7 @@ function toCandidateSource(sourceItem, category, checkedAt, status, notes) {
     status,
     checked_at: checkedAt,
     notes,
+    ...(sourceLevel ? { source_level: sourceLevel } : {}),
     ...(sourceItem.platform ? { platform: sourceItem.platform } : {}),
     ...(sourceItem.rule_id || sourceItem.id ? { rule_id: sourceItem.rule_id || sourceItem.id } : {}),
     ...(isPlatformExemptCategory(sourceItem.candidate_category) ? {
