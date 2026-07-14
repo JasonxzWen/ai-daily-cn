@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -127,6 +128,13 @@ const NON_DEGRADABLE_ISSUE_CODES = new Set([
   "builder_content_translation_mismatch",
   "candidate_pool_not_checked",
   "candidate_pool_reference_invalid"
+]);
+const STALLED_DEGRADABLE_CONTENT_CONTRACT_CODES = new Set([
+  "story_template_narrative",
+  "main_news_bullet_contract_failed",
+  "main_news_summary_not_authored",
+  "hot_blog_summary_contract_failed",
+  "public_copy_banned_audit_or_template_wording"
 ]);
 
 export async function runDailyWorkflow(options = {}) {
@@ -381,7 +389,11 @@ async function resumeDailyWorkflowFromAiRepair({
   }
 
   const contract = await readJsonIfExists(contractPath);
-  const contractReadiness = classifyAiRepairContractReadiness(contract);
+  const contractReadiness = classifyAiRepairContractReadiness(contract, {
+    allowedTasks: Object.prototype.hasOwnProperty.call(previousNextAction, "ai_review_tasks")
+      ? previousNextAction.ai_review_tasks
+      : null
+  });
   if (!contractReadiness.ready) {
     summary.final_status = "needs_ai_repair";
     summary.next_action = {
@@ -438,6 +450,13 @@ async function resumeDailyWorkflowFromAiRepair({
     now
   };
   const sourceReportPath = stagePath(summary.current_report_path, context.cleanRoot) || DEFAULT_REPORT_PATH;
+  const sourceReportAbsolutePath = absoluteCleanPath(context.cleanRoot, sourceReportPath);
+  const sourceReportSnapshot = await readTextIfExists(sourceReportAbsolutePath);
+  const baselineReview = await currentEffectiveQualityReview({
+    previousNextAction,
+    cleanRoot: context.cleanRoot,
+    reportDate
+  });
   const repairStages = buildAiRepairWorkflowStages({
     reportDate,
     sourceReportPath,
@@ -461,10 +480,28 @@ async function resumeDailyWorkflowFromAiRepair({
           summary,
           reportDate,
           maxReviewRepairLoops: effectiveMaxReviewRepairLoops,
-          reportPath: OPTIMIZED_REPORT_PATH
+          reportPath: OPTIMIZED_REPORT_PATH,
+          previousNextAction,
+          baselineReview
         });
         if (repairReviewDecision?.degrade) {
           summary.current_report_path = OPTIMIZED_REPORT_PATH;
+          if (repairReviewDecision.rollback && sourceReportSnapshot === null) {
+            summary.final_status = "blocked";
+            summary.next_action = {
+              kind: "quality_repair_stalled",
+              error_code: "quality_repair_checkpoint_missing",
+              summary_path: summaryPath,
+              message: "Cannot safely degrade a stalled repair because the last accepted report checkpoint is missing."
+            };
+            await writeSummary(summaryPath, summary);
+            return { summary, summaryPath };
+          }
+          if (repairReviewDecision.rollback) {
+            const optimizedPath = absoluteCleanPath(summary.clean_repo_root, OPTIMIZED_REPORT_PATH);
+            await fs.mkdir(path.dirname(optimizedPath), { recursive: true });
+            await fs.writeFile(optimizedPath, sourceReportSnapshot, "utf8");
+          }
           markStageDegraded(summary, stage.id, repairReviewDecision);
           await annotateReportDegraded(absoluteCleanPath(summary.clean_repo_root, OPTIMIZED_REPORT_PATH), repairReviewDecision);
           await writeSummary(summaryPath, summary);
@@ -494,6 +531,31 @@ async function resumeDailyWorkflowFromAiRepair({
         reportPath: OPTIMIZED_REPORT_PATH
       });
       if (repairDecision?.degrade) {
+        if (repairDecision.repair_stalled && sourceReportSnapshot === null) {
+          summary.final_status = "blocked";
+          summary.next_action = {
+            kind: "quality_repair_stalled",
+            error_code: "quality_repair_checkpoint_missing",
+            summary_path: summaryPath,
+            message: "Cannot safely degrade a stalled repair because the last accepted report checkpoint is missing."
+          };
+          await writeSummary(summaryPath, summary);
+          return { summary, summaryPath };
+        }
+        if (repairDecision.repair_stalled) {
+          const optimizedPath = absoluteCleanPath(summary.clean_repo_root, OPTIMIZED_REPORT_PATH);
+          await fs.mkdir(path.dirname(optimizedPath), { recursive: true });
+          await fs.writeFile(optimizedPath, sourceReportSnapshot, "utf8");
+          repairDecision.rollback = true;
+          repairDecision.rollback_reason = "quality_repair_no_strict_progress";
+          await persistCurrentQualityReviewArtifact({
+            summary,
+            reportDate,
+            review: baselineReview,
+            attemptedReview: outcome.normalized.output?.review || outcome.normalized.output,
+            progress: summary.quality_repair_progress
+          });
+        }
         markStageDegraded(summary, stage.id, repairDecision);
         await annotateReportDegraded(absoluteCleanPath(summary.clean_repo_root, summary.current_report_path || OPTIMIZED_REPORT_PATH), repairDecision);
         await writeSummary(summaryPath, summary);
@@ -2026,18 +2088,66 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
   }
   const reviewOk = review?.ok === true || stageResult.output?.ok === true;
   if (reviewOk && stageResult.ok) {
+    if (qualityRepairHasActiveBaseline(summary.quality_repair_progress) && !summary.quality_repair_progress.stalled) {
+      summary.quality_repair_progress = resolveQualityRepairProgress(summary.quality_repair_progress, {
+        attempt: Number(summary.review_repair_attempts || 0)
+      });
+    }
     return null;
   }
 
-  const reviewRepairAttempt = Number(summary.review_repair_attempts || 0) + 1;
-  summary.review_repair_attempts = reviewRepairAttempt;
   const aiTasks = annotateAuthoringTasks(Array.isArray(review?.ai_review_tasks)
     ? review.ai_review_tasks
     : Array.isArray(stageResult.output?.ai_review_tasks)
       ? stageResult.output.ai_review_tasks
       : []);
   const retryTasks = retryablePublicEditorialTasks(review, aiTasks);
+  const feedback = qualityRepairFeedback(review, retryTasks);
+  const existingProgress = summary.quality_repair_progress;
+  if (existingProgress?.stalled) {
+    const stalledDegradation = residualEditorialDegradation(review);
+    if (stalledDegradation) {
+      return {
+        degrade: true,
+        ...stalledDegradation,
+        repair_stalled: true,
+        repair_reentry_suppressed: true,
+        max_review_repair_loops: maxReviewRepairLoops
+      };
+    }
+    return qualityRepairStalledBlock({ summary, reportDate, maxReviewRepairLoops });
+  }
+
+  let progress = existingProgress;
+  if (retryTasks.length > 0 && qualityRepairHasActiveBaseline(existingProgress)) {
+    progress = assessQualityRepairProgress(existingProgress, feedback, {
+      attempt: Number(summary.review_repair_attempts || 0)
+    });
+    summary.quality_repair_progress = progress;
+    if (progress.stalled) {
+      const degradation = residualEditorialDegradation(review);
+      if (degradation) {
+        Object.assign(progress, degradation);
+        return {
+          degrade: true,
+          ...degradation,
+          repair_stalled: true,
+          rollback: false,
+          max_review_repair_loops: maxReviewRepairLoops
+        };
+      }
+      return qualityRepairStalledBlock({ summary, reportDate, maxReviewRepairLoops });
+    }
+  } else if (retryTasks.length > 0) {
+    progress = createQualityRepairBaseline(feedback, {
+      attempt: Number(summary.review_repair_attempts || 0)
+    });
+    summary.quality_repair_progress = progress;
+  }
+
+  const reviewRepairAttempt = Number(summary.review_repair_attempts || 0) + 1;
   if (retryTasks.length > 0 && reviewRepairAttempt <= maxReviewRepairLoops) {
+    summary.review_repair_attempts = reviewRepairAttempt;
     const contractPath = aiRepairContractPath(summary.launcher_root, reportDate, reviewRepairAttempt);
     const authoringHandoff = authoringHandoffMetadata(retryTasks);
     return {
@@ -2053,6 +2163,7 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
         remaining_review_repair_loops: maxReviewRepairLoops - reviewRepairAttempt,
         ...authoringHandoff,
         ai_review_tasks: retryTasks,
+        ...qualityRepairNextActionFeedback(feedback),
         required_contract_status: "ready",
         required_contract_fields: ["schema_version", "report_date", "status", "edits"],
         message: authoringHandoff.handoff_phase
@@ -2084,7 +2195,7 @@ function classifyQualityReviewResult(stageResult, { summary, reportDate, maxRevi
   };
 }
 
-function classifyAiRepairContractReadiness(contract) {
+function classifyAiRepairContractReadiness(contract, { allowedTasks = null } = {}) {
   if (!contract || typeof contract !== "object") {
     return {
       ready: false,
@@ -2095,6 +2206,23 @@ function classifyAiRepairContractReadiness(contract) {
   const status = String(contract.status || "missing").trim() || "missing";
   const edits = Array.isArray(contract.edits) ? contract.edits : [];
   if (status === "ready" && edits.length > 0) {
+    const editPaths = edits.map((edit) => String(edit?.path || "").trim());
+    const uniquePaths = new Set(editPaths);
+    const allowedPaths = allowedTasks === null
+      ? null
+      : new Set((Array.isArray(allowedTasks) ? allowedTasks : [])
+        .map((task) => String(task?.path || "").trim())
+        .filter(Boolean));
+    const validCurrentPaths = editPaths.every((editPath) =>
+      editPath.length > 0 && (allowedPaths === null || allowedPaths.has(editPath))
+    );
+    if (uniquePaths.size !== editPaths.length || !validCurrentPaths) {
+      return {
+        ready: false,
+        status: "invalid",
+        message: "AI repair edits must target unique paths declared by the current ai_review_tasks."
+      };
+    }
     return { ready: true, status };
   }
   return {
@@ -2108,7 +2236,9 @@ async function classifyAiRepairReviewFailure(stageResult, {
   summary,
   reportDate,
   maxReviewRepairLoops,
-  reportPath
+  reportPath,
+  previousNextAction,
+  baselineReview
 }) {
   const output = stageResult.output || {};
   const contractRejected = Array.isArray(output.contract_rejected) ? output.contract_rejected : null;
@@ -2123,6 +2253,64 @@ async function classifyAiRepairReviewFailure(stageResult, {
   if (!review || review.ok === true || retryTasks.length === 0) {
     return null;
   }
+
+  const feedback = qualityRepairFeedback(review, retryTasks);
+  const priorProgress = qualityRepairEffectiveSnapshot(summary.quality_repair_progress)
+    ? summary.quality_repair_progress
+    : createQualityRepairBaseline(
+      qualityRepairFeedback(
+        baselineReview || qualityReviewFromNextAction(previousNextAction, reportDate),
+        annotateAuthoringTasks(Array.isArray(previousNextAction?.ai_review_tasks) ? previousNextAction.ai_review_tasks : [])
+      ),
+      { attempt: Number(summary.review_repair_attempts || 0) }
+    );
+  const hasComparableBaseline = qualityRepairHasActiveBaseline(priorProgress);
+  const progress = hasComparableBaseline
+    ? assessQualityRepairProgress(priorProgress, feedback, {
+        attempt: Number(summary.review_repair_attempts || 0)
+      })
+    : createQualityRepairBaseline(feedback, {
+        attempt: Number(summary.review_repair_attempts || 0)
+      });
+  summary.quality_repair_progress = progress;
+
+  if (progress.stalled) {
+    const effectiveReview = baselineReview || qualityReviewFromNextAction(previousNextAction, reportDate);
+    const degradation = residualEditorialDegradation(effectiveReview);
+    if (degradation) {
+      Object.assign(progress, degradation);
+      await persistCurrentQualityReviewArtifact({
+        summary,
+        reportDate,
+        review: effectiveReview,
+        attemptedReview: review,
+        progress
+      });
+      return {
+        degrade: true,
+        ...degradation,
+        repair_stalled: true,
+        rollback: true,
+        rollback_reason: "quality_repair_no_strict_progress",
+        max_review_repair_loops: maxReviewRepairLoops
+      };
+    }
+    await persistCurrentQualityReviewArtifact({
+      summary,
+      reportDate,
+      review: effectiveReview,
+      attemptedReview: review,
+      progress
+    });
+    return qualityRepairStalledBlock({ summary, reportDate, maxReviewRepairLoops });
+  }
+
+  await persistCurrentQualityReviewArtifact({
+    summary,
+    reportDate,
+    review,
+    progress
+  });
 
   const nextAttempt = await nextAiRepairAttempt({
     launcherRoot: summary.launcher_root,
@@ -2174,6 +2362,7 @@ async function classifyAiRepairReviewFailure(stageResult, {
       remaining_review_repair_loops: maxReviewRepairLoops - nextAttempt.attempt,
       ...authoringHandoff,
       ai_review_tasks: retryTasks,
+      ...qualityRepairNextActionFeedback(feedback),
       contract_status: "template",
       required_contract_status: "ready",
       required_contract_fields: ["schema_version", "report_date", "status", "edits"],
@@ -2194,6 +2383,25 @@ async function classifyContentContractRepairResult(stageResult, {
   const contractIssues = collectContentContractIssues(output);
   if (stageResult.ok || output.ok === true || contractIssues.length === 0) {
     return null;
+  }
+  if (summary.quality_repair_progress?.stalled) {
+    const progress = summary.quality_repair_progress;
+    if (!stalledContentContractIssuesAreDegradable(contractIssues, progress)) {
+      return null;
+    }
+    const degradedSections = Array.isArray(progress.degraded_sections) && progress.degraded_sections.length > 0
+      ? progress.degraded_sections
+      : [...new Set((Array.isArray(progress.active_paths) ? progress.active_paths : [])
+        .map(editorialSectionFromPath)
+        .filter(Boolean))];
+    return {
+      degrade: true,
+      degraded_sections: degradedSections,
+      residual_editorial_tasks: Number(progress.residual_editorial_tasks || progress.active_paths?.length || 0),
+      repair_stalled: true,
+      repair_reentry_suppressed: true,
+      max_review_repair_loops: maxReviewRepairLoops
+    };
   }
 
   const absoluteReportPath = absoluteCleanPath(summary.clean_repo_root, reportPath);
@@ -2235,12 +2443,21 @@ async function classifyContentContractRepairResult(stageResult, {
   };
 
   summary.current_report_path = reportPath;
-  return classifyQualityReviewResult({ ok: false, output: { review } }, {
+  const decision = classifyQualityReviewResult({ ok: false, output: { review } }, {
     summary,
     reportDate,
     maxReviewRepairLoops,
     reportPath
   });
+  if (decision?.next_action?.kind === "codex_ai_repair_contract") {
+    await persistCurrentQualityReviewArtifact({
+      summary,
+      reportDate,
+      review,
+      progress: summary.quality_repair_progress
+    });
+  }
+  return decision;
 }
 
 function collectContentContractIssues(output) {
@@ -2256,6 +2473,25 @@ function collectContentContractIssues(output) {
     }
   }
   return issues.filter((issue) => issue && typeof issue === "object");
+}
+
+function stalledContentContractIssuesAreDegradable(issues, progress) {
+  const activePaths = Array.isArray(progress?.active_paths) ? progress.active_paths : [];
+  if (activePaths.length === 0) return false;
+  return issues.every((issue) => {
+    if (!STALLED_DEGRADABLE_CONTENT_CONTRACT_CODES.has(String(issue?.code || ""))) {
+      return false;
+    }
+    const explicitPaths = contentContractIssuePaths(issue);
+    if (explicitPaths.size > 0) {
+      return activePaths.some((pathName) => explicitPaths.has(pathName));
+    }
+    return activePaths.some((pathName) => contentContractIssueMatchesPath(
+      [issue],
+      pathName,
+      { kind: "public_editorial_rewrite", path: pathName }
+    ));
+  });
 }
 
 function contentContractIssueMatchesTask(issues, task) {
@@ -2386,6 +2622,10 @@ function markStageDegraded(summary, stageId, decision) {
       output.degraded = true;
       output.quality_status = { status: "degraded", degraded_sections: decision?.degraded_sections || [] };
       output.residual_editorial_tasks = decision?.residual_editorial_tasks || 0;
+      if (decision?.repair_stalled) output.repair_stalled = true;
+      if (decision?.rollback) output.rolled_back = true;
+      if (decision?.rollback_reason) output.rollback_reason = decision.rollback_reason;
+      if (decision?.repair_reentry_suppressed) output.repair_reentry_suppressed = true;
       stages[index].output = output;
       return true;
     }
@@ -2491,13 +2731,200 @@ function authoringHandoffMetadata(aiTasks) {
     : {};
 }
 
+export function qualityRepairFeedback(review, aiTasks) {
+  const taskPaths = new Set((Array.isArray(aiTasks) ? aiTasks : [])
+    .map((task) => String(task?.path || ""))
+    .filter(Boolean));
+  const matchingIssues = (Array.isArray(review?.issues) ? review.issues : [])
+    .filter((issue) => String(issue?.severity || "") === "error" && taskPaths.has(String(issue?.path || "")));
+  const reviewIssues = summarizeAiRepairReviewIssues(review, aiTasks);
+  const issueKeys = [...new Set(reviewIssues.flatMap((issue) => {
+    const pathName = String(issue?.path || "");
+    const problems = Array.isArray(issue?.details?.problems)
+      ? issue.details.problems.map((problem) => String(problem || "").trim()).filter(Boolean)
+      : [];
+    const signals = problems.length > 0 ? problems : [String(issue?.code || "unknown").trim() || "unknown"];
+    return signals.map((signal) => `${pathName}|${signal}`);
+  }))].sort();
+  const activePaths = [...new Set(reviewIssues.map((issue) => String(issue?.path || "")).filter(Boolean))].sort();
+  return {
+    comparable: matchingIssues.length > 0,
+    review_issues: reviewIssues,
+    blocking_issue_count: reviewIssues.length,
+    issue_keys: issueKeys,
+    issue_fingerprint: createHash("sha256").update(JSON.stringify(issueKeys)).digest("hex"),
+    active_paths: activePaths
+  };
+}
+
+function qualityRepairNextActionFeedback(feedback) {
+  return {
+    review_issues: feedback.review_issues,
+    blocking_issue_count: feedback.blocking_issue_count,
+    issue_keys: feedback.issue_keys,
+    issue_fingerprint: feedback.issue_fingerprint
+  };
+}
+
+function qualityRepairFeedbackSnapshot(feedback) {
+  return {
+    comparable: feedback?.comparable === true,
+    blocking_issue_count: Number(feedback?.blocking_issue_count || 0),
+    signal_count: Array.isArray(feedback?.issue_keys) ? feedback.issue_keys.length : 0,
+    issue_keys: Array.isArray(feedback?.issue_keys) ? [...feedback.issue_keys] : [],
+    issue_fingerprint: String(feedback?.issue_fingerprint || ""),
+    active_paths: Array.isArray(feedback?.active_paths) ? [...feedback.active_paths] : []
+  };
+}
+
+function qualityRepairEffectiveSnapshot(progress) {
+  return progress?.effective && typeof progress.effective === "object" ? progress.effective : null;
+}
+
+function qualityRepairHasActiveBaseline(progress) {
+  const effective = qualityRepairEffectiveSnapshot(progress);
+  return progress?.state !== "resolved" &&
+    effective?.comparable === true &&
+    Array.isArray(effective.issue_keys) &&
+    effective.issue_keys.length > 0;
+}
+
+function createQualityRepairBaseline(feedback, { attempt }) {
+  const snapshot = qualityRepairFeedbackSnapshot(feedback);
+  return {
+    schema_version: 1,
+    state: "baseline",
+    attempt,
+    stalled: false,
+    strict_progress: null,
+    reason: "blocking_signals_baseline",
+    previous: null,
+    effective: snapshot,
+    attempted: snapshot,
+    active_paths: snapshot.active_paths,
+    frozen_paths: []
+  };
+}
+
+function assessQualityRepairProgress(previousProgress, feedback, { attempt }) {
+  const previous = qualityRepairEffectiveSnapshot(previousProgress) || qualityRepairFeedbackSnapshot({});
+  const attempted = qualityRepairFeedbackSnapshot(feedback);
+  const previousKeys = new Set(Array.isArray(previous.issue_keys) ? previous.issue_keys : []);
+  const attemptedKeys = Array.isArray(attempted.issue_keys) ? attempted.issue_keys : [];
+  const strictProgress = attemptedKeys.length < previousKeys.size && attemptedKeys.every((key) => previousKeys.has(key));
+  const previousActivePaths = Array.isArray(previous.active_paths) ? previous.active_paths : [];
+  const attemptedActivePaths = Array.isArray(attempted.active_paths) ? attempted.active_paths : [];
+  const frozenPaths = [...new Set([
+    ...(Array.isArray(previousProgress?.frozen_paths) ? previousProgress.frozen_paths : []),
+    ...previousActivePaths.filter((pathName) => !attemptedActivePaths.includes(pathName))
+  ])].sort();
+  const effective = strictProgress ? attempted : previous;
+  return {
+    schema_version: 1,
+    state: strictProgress ? "progressing" : "stalled",
+    attempt,
+    stalled: !strictProgress,
+    strict_progress: strictProgress,
+    reason: strictProgress
+      ? "blocking_signals_strictly_reduced"
+      : "blocking_signals_not_strictly_reduced",
+    previous,
+    effective,
+    attempted,
+    active_paths: Array.isArray(effective.active_paths) ? [...effective.active_paths] : [],
+    frozen_paths: frozenPaths
+  };
+}
+
+function resolveQualityRepairProgress(previousProgress, { attempt }) {
+  const previous = qualityRepairEffectiveSnapshot(previousProgress) || qualityRepairFeedbackSnapshot({});
+  const emptyFeedback = {
+    comparable: true,
+    blocking_issue_count: 0,
+    issue_keys: [],
+    issue_fingerprint: createHash("sha256").update(JSON.stringify([])).digest("hex"),
+    active_paths: []
+  };
+  const resolved = qualityRepairFeedbackSnapshot(emptyFeedback);
+  return {
+    schema_version: 1,
+    state: "resolved",
+    attempt,
+    stalled: false,
+    strict_progress: true,
+    reason: "blocking_signals_resolved",
+    previous,
+    effective: resolved,
+    attempted: resolved,
+    active_paths: [],
+    frozen_paths: [...new Set([
+      ...(Array.isArray(previousProgress?.frozen_paths) ? previousProgress.frozen_paths : []),
+      ...(Array.isArray(previous.active_paths) ? previous.active_paths : [])
+    ])].sort()
+  };
+}
+
+function qualityReviewFromNextAction(nextAction, reportDate) {
+  return {
+    ok: false,
+    status: "repair_required",
+    report_date: reportDate,
+    issues: Array.isArray(nextAction?.review_issues) ? nextAction.review_issues : [],
+    ai_review_tasks: Array.isArray(nextAction?.ai_review_tasks) ? nextAction.ai_review_tasks : [],
+    safe_repair_available: true
+  };
+}
+
+async function currentEffectiveQualityReview({ previousNextAction, cleanRoot, reportDate }) {
+  const reviewPath = String(previousNextAction?.quality_review_path || "").trim();
+  if (reviewPath) {
+    const artifact = await readJsonIfExists(absoluteCleanPath(cleanRoot, reviewPath));
+    const review = artifact?.review && typeof artifact.review === "object" ? artifact.review : artifact;
+    if (review && typeof review === "object" && (Array.isArray(review.issues) || Array.isArray(review.ai_review_tasks))) {
+      return review;
+    }
+  }
+  return qualityReviewFromNextAction(previousNextAction, reportDate);
+}
+
+async function persistCurrentQualityReviewArtifact({ summary, reportDate, review, attemptedReview = null, progress }) {
+  const relativePath = summary.quality_review_path || qualityReviewPath(reportDate);
+  const artifactPath = absoluteCleanPath(summary.clean_repo_root, relativePath);
+  const artifact = {
+    ok: review?.ok === true,
+    report_date: reportDate,
+    review,
+    ...(attemptedReview ? { attempted_review: attemptedReview } : {}),
+    quality_repair_progress: progress
+  };
+  await fs.mkdir(path.dirname(artifactPath), { recursive: true });
+  await fs.writeFile(artifactPath, `${JSON.stringify(artifact, null, 2)}\n`, "utf8");
+  return artifactPath;
+}
+
+function qualityRepairStalledBlock({ summary, reportDate, maxReviewRepairLoops }) {
+  return {
+    final_status: "blocked",
+    next_action: {
+      kind: "quality_repair_stalled",
+      error_code: "quality_repair_stalled",
+      summary_path: summary.summary_path,
+      quality_review_path: absoluteCleanPath(summary.clean_repo_root, summary.quality_review_path || qualityReviewPath(reportDate)),
+      max_review_repair_loops: maxReviewRepairLoops,
+      remaining_review_repair_loops: Math.max(0, maxReviewRepairLoops - Number(summary.review_repair_attempts || 0)),
+      message: "AI repair did not strictly reduce the current blocking signals; inspect the effective review and attempted repair."
+    }
+  };
+}
+
 function summarizeAiRepairReviewIssues(review, aiTasks) {
   const taskByPath = new Map(
     aiTasks
       .filter((task) => task?.path)
       .map((task) => [task.path, task])
   );
-  const issues = Array.isArray(review?.issues) ? review.issues : [];
+  const issues = (Array.isArray(review?.issues) ? review.issues : [])
+    .filter((issue) => String(issue?.severity || "") === "error" && taskByPath.has(String(issue?.path || "")));
   if (issues.length > 0) {
     return issues.map((issue) => {
       const task = taskByPath.get(issue?.path);
@@ -2506,6 +2933,7 @@ function summarizeAiRepairReviewIssues(review, aiTasks) {
         severity: String(issue?.severity || ""),
         path: String(issue?.path || ""),
         message: String(issue?.message || ""),
+        ...(issue?.details && typeof issue.details === "object" ? { details: issue.details } : {}),
         task_kind: String(task?.kind || ""),
         phase: String(task?.phase || ""),
         intent: String(task?.intent || ""),
@@ -2594,6 +3022,15 @@ async function writeSummary(summaryPath, summary) {
 async function readJsonIfExists(filePath) {
   try {
     return JSON.parse(await fs.readFile(filePath, "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+async function readTextIfExists(filePath) {
+  try {
+    return await fs.readFile(filePath, "utf8");
   } catch (error) {
     if (error.code === "ENOENT") return null;
     throw error;

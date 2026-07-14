@@ -1292,8 +1292,105 @@ test("daily Codex production repair author returns schema-constrained UTF-8 JSON
   assert.notEqual(codexArgv.indexOf("--output-last-message"), -1);
   const prompt = await fs.readFile(path.join(plan.work_dir, "structured-repair-prompt.txt"), "utf8");
   assert.match(prompt, /Return one JSON object as the final response/);
-  assert.match(prompt, /Chinese-character ratio of at least 0\.45/);
+  assert.match(prompt, /matching error-severity issue and its issue\.details/);
+  assert.match(prompt, /chinese_chars means actual Han characters/);
+  assert.match(prompt, /Never edit a path absent from the current ai_review_tasks/);
+  assert.doesNotMatch(prompt, /Chinese-character ratio of at least 0\.45/);
   assert.doesNotMatch(prompt, /Set-Content|fs\.writeFileSync/);
+});
+
+test("daily Codex production orchestrator reports stalled degraded completion after one author call", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-stalled-degraded-"));
+  const reportDate = "2026-07-14";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, `${JSON.stringify({ report_date: reportDate })}\n`, "utf8");
+  await fs.writeFile(candidatePoolPath, `${JSON.stringify({ report_date: reportDate, candidates: [] })}\n`, "utf8");
+  await fs.writeFile(qualityReviewPath, `${JSON.stringify({ report_date: reportDate, ok: false })}\n`, "utf8");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  let workflowCalls = 0;
+  let authorCalls = 0;
+  const workflowRunner = async ({ summaryPath }) => {
+    workflowCalls += 1;
+    if (workflowCalls === 1) {
+      return {
+        summaryPath,
+        summary: {
+          report_date: reportDate,
+          mode: "publish",
+          final_status: "needs_ai_repair",
+          clean_repo_root: cleanRoot,
+          next_action: {
+            kind: "codex_ai_repair_contract",
+            contract_path: contractPath,
+            source_report_path: sourceReportPath,
+            candidate_pool_path: candidatePoolPath,
+            quality_review_path: qualityReviewPath,
+            ai_review_tasks: [{ path: "hot_blogs[0].summary", kind: "hot_blog_editorial_rewrite" }]
+          },
+          stages: [{ id: "quality_review", status: "failed" }]
+        }
+      };
+    }
+    return {
+      summaryPath,
+      summary: {
+        report_date: reportDate,
+        mode: "publish",
+        final_status: "published_degraded",
+        clean_repo_root: cleanRoot,
+        next_action: { kind: "none" },
+        quality_repair_progress: {
+          schema_version: 1,
+          state: "stalled",
+          stalled: true,
+          reason: "blocking_signals_not_strictly_reduced",
+          active_paths: ["hot_blogs[0].summary"]
+        },
+        stages: [
+          { id: "quality_ai_repair", status: "degraded", output: { repair_stalled: true, rolled_back: true } },
+          { id: "report_write", status: "passed" },
+          { id: "publish_real", status: "passed", output: { publish_status: { repo_pushed: true } } },
+          { id: "pages_verify", status: "passed", output: { http_status: 200 } }
+        ]
+      }
+    };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    aiRepairContractAuthor: async () => {
+      authorCalls += 1;
+      return {
+        schema_version: 1,
+        report_date: reportDate,
+        status: "ready",
+        edits: [{ path: "hot_blogs[0].summary", value: "一次完整重写", reason: "repair" }]
+      };
+    },
+    maxAutomatedAiRepairAttempts: 5
+  });
+
+  assert.equal(workflowCalls, 2);
+  assert.equal(authorCalls, 1);
+  assert.equal(summary.final_status, "published");
+  assert.equal(summary.legacy_final_status, "published_degraded");
+  assert.equal(summary.automation_ai_repair.attempted, 1);
+  assert.equal(summary.automation_ai_repair.authored, 1);
+  assert.equal(summary.automation_ai_repair.completed, 1);
+  assert.equal(summary.automation_ai_repair.terminal_reason, "repair_stalled_degraded");
+  assert.equal(summary.quality_repair_progress.stalled, true);
 });
 
 test("daily Codex production repair author times out and terminates the spawned process tree", async () => {
@@ -1437,6 +1534,77 @@ test("daily Codex production orchestrator blocks an invalid automated repair con
   assert.equal(summary.automation_ai_repair.completed, 0);
   assert.equal(summary.automation_ai_repair.terminal_reason, "repair_failed");
   await assert.rejects(fs.access(contractPath));
+});
+
+test("daily Codex production orchestrator rejects a stale quality-review fingerprint before authoring", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-stale-review-"));
+  const reportDate = "2026-07-14";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  const task = { path: "hot_blogs[0].summary", kind: "hot_blog_editorial_rewrite" };
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, `${JSON.stringify({ report_date: reportDate })}\n`, "utf8");
+  await fs.writeFile(candidatePoolPath, `${JSON.stringify({ report_date: reportDate, candidates: [] })}\n`, "utf8");
+  await fs.writeFile(qualityReviewPath, `${JSON.stringify({
+    report_date: reportDate,
+    review: {
+      report_date: reportDate,
+      ok: false,
+      issues: [{
+        code: "hot_blog_summary_template",
+        severity: "error",
+        path: task.path,
+        details: { problems: ["stale_problem"] }
+      }],
+      ai_review_tasks: [task]
+    }
+  })}\n`, "utf8");
+  const currentFingerprint = createHash("sha256")
+    .update(JSON.stringify([`${task.path}|current_problem`]))
+    .digest("hex");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  let authorCalls = 0;
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner: async ({ summaryPath }) => ({
+      summaryPath,
+      summary: {
+        report_date: reportDate,
+        mode: "publish",
+        final_status: "needs_ai_repair",
+        clean_repo_root: cleanRoot,
+        next_action: {
+          kind: "codex_ai_repair_contract",
+          contract_path: contractPath,
+          source_report_path: sourceReportPath,
+          candidate_pool_path: candidatePoolPath,
+          quality_review_path: qualityReviewPath,
+          ai_review_tasks: [task],
+          issue_fingerprint: currentFingerprint
+        },
+        stages: []
+      }
+    }),
+    aiRepairContractAuthor: async () => {
+      authorCalls += 1;
+      return {};
+    },
+    maxAutomatedAiRepairAttempts: 1
+  });
+
+  assert.equal(authorCalls, 0);
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.error_code, "automated_ai_repair_handoff_invalid");
+  assert.match(summary.error, /current next_action issue_fingerprint/);
 });
 
 test("daily Codex production orchestrator rejects an out-of-scope repair contract path before authoring", async () => {
