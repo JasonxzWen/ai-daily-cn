@@ -48,7 +48,7 @@ import { collectMainAuditConsistencyIssues } from "../src/main-audit-consistency
 import { cacheEvidenceImages } from "../src/evidence-cache.js";
 import { CACHED_DOMAIN_ICONS, CACHED_SOURCE_ICONS } from "../src/source-icon-cache.js";
 import { buildDateIndex, deriveDateSignalStrength, mergeFeed, buildSite, planGeneratedFiles } from "../src/site.js";
-import { validateCandidatePool, validateFeed, validateReport } from "../src/schema.js";
+import { schemas, validateCandidatePool, validateFeed, validateReport } from "../src/schema.js";
 import { validateTrends } from "../src/schema.js";
 import { assemblePrompt } from "../src/prompt.js";
 import { normalizeReportDraft, writeReportDraft } from "../src/report.js";
@@ -81,7 +81,7 @@ import {
   repairReportQuality,
   reviewReportQuality
 } from "../src/quality-loop.js";
-import { runDailyWorkflow } from "../src/daily-runner.js";
+import { qualityRepairFeedback, runDailyWorkflow } from "../src/daily-runner.js";
 import { runStatusSelfCheck } from "../src/status-self-check.js";
 import { pnpmInvocationForArgs } from "../src/process-runner.js";
 import { normalizeUrlIdentity } from "../src/url.js";
@@ -178,6 +178,91 @@ test("candidate audit contract stays aligned with candidate schema", async () =>
   assert.deepEqual(candidateProperties.main_selection_stage.enum, MAIN_SELECTION_STAGES);
   assert.deepEqual(candidateProperties.main_reject_reason.enum, MAIN_REJECT_REASONS);
   assert.deepEqual(candidateProperties.roles.items.enum, CANDIDATE_AUDIT_ROLES);
+});
+
+test("source level vocabulary stays synchronized across registry, candidate, report, and runtime fallbacks", async () => {
+  const registry = await loadSourceRegistry({ rootDir });
+  const registryLevels = schemas.sourceRegistry.$defs.source_level?.enum || [];
+  const candidateLevels = schemas.candidatePool.$defs.source_level.enum;
+  const reportLevels = schemas.report.$defs.source_level.enum;
+  const configuredLevels = new Set([
+    ...registry.sources.map((source) => source.source_level || source.sourceLevel),
+    ...DEFAULT_CONTENT_SOURCES.map((source) => source.source_level || source.sourceLevel)
+  ].filter(Boolean));
+
+  assert.deepEqual(registryLevels, candidateLevels);
+  assert.deepEqual(reportLevels, candidateLevels);
+  assert.deepEqual(
+    [...configuredLevels].filter((sourceLevel) => !candidateLevels.includes(sourceLevel)).sort(),
+    []
+  );
+});
+
+test("real non-publish candidate artifact replay preserves provenance and accepts configured source levels", async () => {
+  const replay = JSON.parse(await readFixture("production-artifact-replay-2026-07-14.json"));
+  const candidatePool = {
+    schema_version: 1,
+    report_date: replay.report_date,
+    generated_at: replay.generated_at,
+    sources: replay.source_levels.map(({ source_id: id }, index) => ({
+      id,
+      name: `Production replay source ${index + 1}`,
+      url: `https://example.com/production-replay/${index + 1}`,
+      category: "community",
+      status: "checked"
+    })),
+    candidates: replay.source_levels.map(({ source_id, source_level: sourceLevel }, index) => ({
+      id: `production-replay-${index + 1}`,
+      source_id,
+      category: "community_lead",
+      title: `Production replay candidate ${index + 1}`,
+      url: `https://example.com/production-replay/${index + 1}`,
+      source: `Production replay source ${index + 1}`,
+      event_date: replay.report_date,
+      status: "excluded",
+      verification_status: "intermediary_only",
+      source_level: sourceLevel
+    }))
+  };
+
+  assert.equal(replay.production_verified, false);
+  assert.equal(replay.automation_run_id, "019f5cc0-25b6-76c0-8247-5669b4af7a83");
+  assert.equal(replay.generated_at, "2026-07-13T18:43:08.866Z");
+  assert.equal(replay.original_artifact.candidate_count, 336);
+  assert.equal(replay.original_artifact.sha256, "2f25b523189c78ed424f23e055fe17ab49c22071acf312b28eda4c0e41d7fb0e");
+  assert.equal(replay.invalid_before.total, 32);
+  assert.equal(replay.included_candidate_ids.length, 3);
+  assert.equal(validateCandidatePool(candidatePool).valid, true);
+
+  const unknown = structuredClone(candidatePool);
+  unknown.candidates[0].source_level = "future_unknown_source_level";
+  assert.equal(validateCandidatePool(unknown).valid, false);
+});
+
+test("report draft rejects unknown source level before writing producer artifacts", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-level-contract-"));
+  const reportDate = "2026-07-14";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const outputPath = path.join(tmp, ".tmp", "daily-report.json");
+  const candidateOutputPath = path.join(tmp, ".tmp", `source-candidates-${reportDate}.json`);
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  discovery.candidates[0].source_level = "future_unknown_source_level";
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  await assert.rejects(
+    () => generateReportDraft({
+      rootDir: tmp,
+      reportDate,
+      generatedAt: "2026-07-14T02:33:48.000Z",
+      inputPaths: [discoveryPath],
+      outputPath,
+      candidateOutputPath,
+      cacheEvidence: false
+    }),
+    (error) => error instanceof PublisherError && error.code === "candidate_pool_schema_validation_failed"
+  );
+  assert.equal(fsSync.existsSync(outputPath), false);
+  assert.equal(fsSync.existsSync(candidateOutputPath), false);
 });
 
 test("candidate pool schema accepts specific main refill selection stages", () => {
@@ -5551,6 +5636,31 @@ test("source registry validates required source metadata", () => {
   );
 });
 
+test("source registry rejects unknown source level in snake-case and camel-case before discovery", () => {
+  for (const property of ["source_level", "sourceLevel"]) {
+    assert.throws(
+      () => normalizeSourceRegistry({
+        schema_version: 1,
+        sources: [
+          {
+            id: `unknown-${property}`,
+            name: `Unknown ${property}`,
+            url: `https://example.com/unknown-${property}.xml`,
+            source_kind: "rss",
+            candidate_category: "hot_blog",
+            tier: "T1",
+            authority: "intermediary",
+            enablement: "optional",
+            verification_policy: "primary_required",
+            [property]: "future_unknown_source_level"
+          }
+        ]
+      }),
+      (error) => error instanceof PublisherError && error.code === "source_registry_schema_validation_failed"
+    );
+  }
+});
+
 test("content source discovery defaults to core and optional sources while keeping manual sources opt-in", async () => {
   const checkedUrls = [];
   const collectedDefault = await collectContentSources({
@@ -5587,6 +5697,36 @@ test("content source discovery defaults to core and optional sources while keepi
   assert(!manualUrls.some((url) => url.includes("mp.weixin.qq.com")));
   assert(manualUrls.some((url) => url.includes("ifanr.com/feed")));
   assert(!collectedManual.source_audit.content_sources.sources.some((source) => /WeChat Industry Whitelist/i.test(source.name)));
+});
+
+test("content source discovery preserves snake case and legacy camel case source levels", async () => {
+  const sources = [
+    {
+      id: "snake-source-level",
+      name: "Snake Source Level",
+      url: "https://example.com/snake-source-level.xml",
+      category: "intermediary",
+      source_level: "big_tech_company_watch"
+    },
+    {
+      id: "camel-source-level",
+      name: "Camel Source Level",
+      url: "https://example.com/camel-source-level.xml",
+      category: "intermediary",
+      sourceLevel: "weekly_ai_news_aggregator"
+    }
+  ];
+  const collected = await collectContentSources({
+    reportDate: "2026-05-26",
+    generatedAt: fixedGeneratedAt,
+    sources,
+    perSourceLimit: 1,
+    fetchImpl: async () => textResponse(contentSourceRssFixture())
+  });
+  const sourceLevels = new Map(collected.candidates.map((candidate) => [candidate.source_id, candidate.source_level]));
+
+  assert.equal(sourceLevels.get("snake-source-level"), "big_tech_company_watch");
+  assert.equal(sourceLevels.get("camel-source-level"), "weekly_ai_news_aggregator");
 });
 
 test("content source discovery keeps self-media as intermediary leads requiring primary verification", async () => {
@@ -11385,15 +11525,34 @@ test("daily runner creates a new empty AI repair template for public editorial r
             review: {
               ok: false,
               ai_review_tasks: [
+                { kind: "hot_blog_editorial_rewrite", path: "hot_blogs[0].summary" },
                 { kind: "hot_blog_editorial_rewrite", path: "hot_blogs[1].summary" },
                 { kind: "translation_fidelity", path: "builder_observations[0].translation" }
               ],
               issues: [
                 {
+                  code: "hot_blog_summary_untranslated",
+                  severity: "error",
+                  path: "hot_blogs[0].summary",
+                  message: "Only this first blocker should be cleared by attempt one.",
+                  details: {
+                    problems: ["summary_too_short", "not_chinese_editorial_summary"],
+                    chinese_chars: 42,
+                    chinese_ratio: 0.32,
+                    requirements: { min_chinese_chars: 100, max_chinese_chars: 200, min_chinese_ratio: 0.45, min_coverage_hits: 2 }
+                  }
+                },
+                {
                   code: "hot_blog_summary_template",
                   severity: "error",
                   path: "hot_blogs[1].summary",
-                  message: "Avoid generic public-copy phrases."
+                  message: "Avoid generic public-copy phrases.",
+                  details: {
+                    problems: ["template_or_low_information"],
+                    chinese_chars: 90,
+                    chinese_ratio: 0.588,
+                    requirements: { min_chinese_chars: 100, max_chinese_chars: 200, min_chinese_ratio: 0.45, min_coverage_hits: 2 }
+                  }
                 }
               ]
             }
@@ -11417,7 +11576,7 @@ test("daily runner creates a new empty AI repair template for public editorial r
     status: "ready",
     edits: [
       {
-        path: "hot_blogs[1].summary",
+        path: "hot_blogs[0].summary",
         value: "第一次修复后的热文摘要。",
         reason: "Replace generic public copy."
       }
@@ -11439,7 +11598,7 @@ test("daily runner creates a new empty AI repair template for public editorial r
           ok: false,
           output: {
             ok: false,
-            contract_applied: [{ path: "hot_blogs[1].summary" }],
+            contract_applied: [{ path: "hot_blogs[0].summary" }],
             contract_rejected: [],
             review: {
               ok: false,
@@ -11452,7 +11611,13 @@ test("daily runner creates a new empty AI repair template for public editorial r
                   code: "hot_blog_summary_template",
                   severity: "error",
                   path: "hot_blogs[1].summary",
-                  message: "仍包含“价值在于”这类泛化表达。"
+                  message: "Current attempt still has one template/coverage problem.",
+                  details: {
+                    problems: ["template_or_low_information"],
+                    chinese_chars: 90,
+                    chinese_ratio: 0.588,
+                    requirements: { min_chinese_chars: 100, max_chinese_chars: 200, min_chinese_ratio: 0.45, min_coverage_hits: 2 }
+                  }
                 }
               ]
             }
@@ -11479,6 +11644,19 @@ test("daily runner creates a new empty AI repair template for public editorial r
   );
   assert.equal(resumed.summary.next_action.ai_review_tasks[0].phase, "first_pass_authoring");
   assert.deepEqual(calls, ["quality_ai_repair"]);
+  assert.equal(resumed.summary.quality_repair_progress.stalled, false);
+  assert.equal(resumed.summary.quality_repair_progress.reason, "blocking_signals_strictly_reduced");
+  assert.deepEqual(resumed.summary.quality_repair_progress.active_paths, ["hot_blogs[1].summary"]);
+  assert.deepEqual(resumed.summary.quality_repair_progress.frozen_paths, ["hot_blogs[0].summary"]);
+  assert.equal(resumed.summary.next_action.review_issues.length, 1);
+  assert.equal(resumed.summary.next_action.review_issues[0].message, "Current attempt still has one template/coverage problem.");
+  assert.equal(resumed.summary.next_action.review_issues[0].details.chinese_chars, 90);
+  assert.equal(resumed.summary.next_action.blocking_issue_count, 1);
+  assert.match(resumed.summary.next_action.issue_fingerprint, /^[a-f0-9]{64}$/);
+  const currentReview = JSON.parse(await fs.readFile(resumed.summary.next_action.quality_review_path, "utf8"));
+  assert.equal(currentReview.review.issues.length, 1);
+  assert.equal(currentReview.review.issues[0].path, "hot_blogs[1].summary");
+  assert.equal(currentReview.quality_repair_progress.stalled, false);
 
   const template = JSON.parse(await fs.readFile(resumed.summary.next_action.contract_path, "utf8"));
   assert.equal(template.schema_version, 1);
@@ -11493,7 +11671,413 @@ test("daily runner creates a new empty AI repair template for public editorial r
   assert.equal(template.review_issues[0].phase, "first_pass_authoring");
   assert.equal(template.review_issues[0].intent, "source_grounded_public_authoring");
   assert.equal(template.review_issues[0].authoring_contract, "public_prose_authoring_v1");
+  assert.equal(template.review_issues[0].details.chinese_chars, 90);
   assert(template.bad_examples.some((example) => example.value.includes("价值在于")));
+});
+
+test("daily runner refuses ready repair edits outside the current task set", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-current-task-freeze-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-07-14.json");
+  const contractPath = path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-07-14.json");
+  await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    status: "ready",
+    edits: [
+      { path: "hot_blogs[0].summary", value: "This cleared path must stay frozen.", reason: "stale edit" }
+    ]
+  }, null, 2), "utf8");
+  await fs.writeFile(summaryPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    mode: "publish",
+    launcher_root: launcherRoot,
+    clean_repo_root: cleanRoot,
+    summary_path: summaryPath,
+    max_review_repair_loops: 5,
+    review_repair_attempts: 2,
+    current_report_path: ".tmp/daily-report.optimized.json",
+    candidate_pool_path: ".tmp/source-candidates-2026-07-14.json",
+    quality_review_path: ".tmp/quality-review-2026-07-14.json",
+    quality_repair_path: ".tmp/quality-repair-2026-07-14.json",
+    stages: [],
+    final_status: "needs_ai_repair",
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: contractPath,
+      summary_path: summaryPath,
+      ai_review_tasks: [{ kind: "hot_blog_editorial_rewrite", path: "hot_blogs[1].summary" }]
+    }
+  }, null, 2), "utf8");
+
+  let stageCalls = 0;
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-14",
+    publish: true,
+    runStage: async () => {
+      stageCalls += 1;
+      return { ok: true, output: {} };
+    }
+  });
+
+  assert.equal(stageCalls, 0);
+  assert.equal(result.summary.final_status, "needs_ai_repair");
+  assert.equal(result.summary.next_action.contract_status, "invalid");
+  assert.match(result.summary.next_action.message, /current ai_review_tasks/i);
+});
+
+test("daily runner rolls back a stalled repair and suppresses content-contract re-entry", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-repair-stalled-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const baselineReportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  await fs.mkdir(path.dirname(baselineReportPath), { recursive: true });
+  await fs.writeFile(baselineReportPath, JSON.stringify({
+    report_date: "2026-07-14",
+    hot_blogs: [{ title: "A", summary: "accepted checkpoint" }]
+  }, null, 2), "utf8");
+  const baselineIssue = {
+    code: "hot_blog_summary_template",
+    severity: "error",
+    path: "hot_blogs[0].summary",
+    message: "Same blocking signal before repair.",
+    details: {
+      problems: ["template_or_low_information"],
+      chinese_chars: 80,
+      chinese_ratio: 0.8,
+      requirements: { min_chinese_chars: 100, max_chinese_chars: 200, min_chinese_ratio: 0.45, min_coverage_hits: 2 }
+    }
+  };
+  const baselineTask = { kind: "hot_blog_editorial_rewrite", path: "hot_blogs[0].summary" };
+
+  const first = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-14",
+    publish: true,
+    maxReviewRepairLoops: 5,
+    prepareCleanWorktree: async () => ({ ok: true, next_cwd: cleanRoot, remote_main_sha: "7".repeat(40) }),
+    runStage: async (stage) => stage.id === "quality_review"
+      ? { ok: false, output: { review: { ok: false, issues: [baselineIssue], ai_review_tasks: [baselineTask] } } }
+      : { ok: true, output: { stage: stage.id } }
+  });
+  assert.equal(first.summary.final_status, "needs_ai_repair");
+  const contractPath = first.summary.next_action.contract_path;
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    status: "ready",
+    edits: [{ path: baselineTask.path, value: "attempted worse copy", reason: "attempt" }]
+  }, null, 2), "utf8");
+
+  const calls = [];
+  const resumed = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-14",
+    publish: true,
+    maxReviewRepairLoops: 5,
+    runStage: async (stage) => {
+      calls.push(stage.id);
+      if (stage.id === "quality_ai_repair") {
+        const optimizedPath = path.join(cleanRoot, ".tmp", "daily-report.optimized.json");
+        await fs.writeFile(optimizedPath, JSON.stringify({
+          report_date: "2026-07-14",
+          hot_blogs: [{ title: "A", summary: "attempted worse copy" }]
+        }, null, 2), "utf8");
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            contract_applied: [{ path: baselineTask.path }],
+            contract_rejected: [],
+            review: {
+              ok: false,
+              issues: [{ ...baselineIssue, message: "Same signal remains after the attempted rewrite." }],
+              ai_review_tasks: [baselineTask]
+            }
+          }
+        };
+      }
+      if (stage.id === "content_contract") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            issues: [{ code: "hot_blog_summary_contract_failed", severity: "error", path: baselineTask.path }]
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(resumed.summary.final_status, "published_degraded");
+  assert.equal(resumed.summary.review_repair_attempts, 1, "stall must not spend or forge another attempt");
+  assert.equal(resumed.summary.quality_repair_progress.stalled, true);
+  assert.equal(resumed.summary.quality_repair_progress.reason, "blocking_signals_not_strictly_reduced");
+  assert.equal(resumed.summary.next_action.kind, "none");
+  const attemptTwoPath = path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-07-14-attempt-2.json");
+  await assert.rejects(fs.access(attemptTwoPath));
+  const optimized = JSON.parse(await fs.readFile(path.join(cleanRoot, ".tmp", "daily-report.optimized.json"), "utf8"));
+  assert.equal(optimized.hot_blogs[0].summary, "accepted checkpoint");
+  const repairStage = resumed.summary.stages.find((stage) => stage.id === "quality_ai_repair");
+  assert.equal(repairStage.output.rolled_back, true);
+  assert.equal(repairStage.output.repair_stalled, true);
+  const contentStage = resumed.summary.stages.find((stage) => stage.id === "content_contract");
+  assert.equal(contentStage.status, "degraded");
+  assert.equal(contentStage.output.repair_reentry_suppressed, true);
+  assert.deepEqual(calls.filter((id) => id === "quality_ai_repair"), ["quality_ai_repair"]);
+});
+
+test("daily runner keeps unrelated structural content-contract failures blocked after repair stalls", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-stalled-structural-block-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-07-14.json");
+  const contractPath = path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-07-14.json");
+  const sourcePath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const task = { kind: "hot_blog_editorial_rewrite", path: "hot_blogs[0].summary" };
+  const issue = {
+    code: "hot_blog_summary_template",
+    severity: "error",
+    path: task.path,
+    message: "The same signal remains.",
+    details: { problems: ["template_or_low_information"] }
+  };
+  await fs.mkdir(path.dirname(sourcePath), { recursive: true });
+  await fs.writeFile(sourcePath, JSON.stringify({
+    report_date: "2026-07-14",
+    hot_blogs: [{ title: "A", summary: "accepted checkpoint" }]
+  }), "utf8");
+  await fs.mkdir(path.dirname(contractPath), { recursive: true });
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    status: "ready",
+    edits: [{ path: task.path, value: "attempt", reason: "repair" }]
+  }), "utf8");
+  await fs.writeFile(summaryPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    mode: "publish",
+    launcher_root: launcherRoot,
+    clean_repo_root: cleanRoot,
+    summary_path: summaryPath,
+    max_review_repair_loops: 5,
+    review_repair_attempts: 1,
+    current_report_path: ".tmp/daily-report.json",
+    candidate_pool_path: ".tmp/source-candidates-2026-07-14.json",
+    quality_review_path: ".tmp/quality-review-2026-07-14.json",
+    quality_repair_path: ".tmp/quality-repair-2026-07-14.json",
+    quality_repair_progress: {
+      schema_version: 1,
+      state: "baseline",
+      stalled: false,
+      effective: {
+        comparable: true,
+        issue_keys: [`${task.path}|template_or_low_information`],
+        active_paths: [task.path]
+      },
+      active_paths: [task.path],
+      frozen_paths: []
+    },
+    stages: [],
+    final_status: "needs_ai_repair",
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: contractPath,
+      source_report_path: sourcePath,
+      quality_review_path: path.join(cleanRoot, ".tmp", "quality-review-2026-07-14.json"),
+      ai_review_tasks: [task],
+      review_issues: [issue]
+    }
+  }), "utf8");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-14",
+    publish: true,
+    runStage: async (stage) => {
+      if (stage.id === "quality_ai_repair") {
+        await fs.writeFile(path.join(cleanRoot, ".tmp", "daily-report.optimized.json"), JSON.stringify({
+          report_date: "2026-07-14",
+          hot_blogs: [{ title: "A", summary: "attempt" }]
+        }), "utf8");
+        return {
+          ok: false,
+          output: {
+            contract_applied: [{ path: task.path }],
+            contract_rejected: [],
+            review: { ok: false, issues: [issue], ai_review_tasks: [task] }
+          }
+        };
+      }
+      if (stage.id === "content_contract") {
+        return {
+          ok: false,
+          output: { ok: false, issues: [{ code: "github_trending_top20_missing", severity: "error", section: "github_trending" }] }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.next_action.stage_id, "content_contract");
+  assert.equal(result.summary.stages.find((stage) => stage.id === "quality_ai_repair").output.rolled_back, true);
+});
+
+test("daily runner starts a fresh repair baseline when content contract finds a new issue after resolution", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-resolved-new-baseline-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-07-14.json");
+  const contractPath = path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-07-14.json");
+  const sourcePath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const task = { kind: "hot_blog_editorial_rewrite", path: "hot_blogs[0].summary" };
+  const issue = {
+    code: "hot_blog_summary_template",
+    severity: "error",
+    path: task.path,
+    message: "Initial blocker.",
+    details: { problems: ["template_or_low_information"] }
+  };
+  await fs.mkdir(path.dirname(sourcePath), { recursive: true });
+  await fs.writeFile(sourcePath, JSON.stringify({ report_date: "2026-07-14", hot_blogs: [] }), "utf8");
+  await fs.mkdir(path.dirname(contractPath), { recursive: true });
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    status: "ready",
+    edits: [{ path: task.path, value: "resolved copy", reason: "repair" }]
+  }), "utf8");
+  await fs.writeFile(summaryPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    mode: "publish",
+    launcher_root: launcherRoot,
+    clean_repo_root: cleanRoot,
+    summary_path: summaryPath,
+    max_review_repair_loops: 5,
+    review_repair_attempts: 1,
+    current_report_path: ".tmp/daily-report.json",
+    candidate_pool_path: ".tmp/source-candidates-2026-07-14.json",
+    quality_review_path: ".tmp/quality-review-2026-07-14.json",
+    quality_repair_path: ".tmp/quality-repair-2026-07-14.json",
+    quality_repair_progress: {
+      schema_version: 1,
+      state: "baseline",
+      stalled: false,
+      effective: { comparable: true, issue_keys: [`${task.path}|template_or_low_information`], active_paths: [task.path] },
+      active_paths: [task.path],
+      frozen_paths: []
+    },
+    stages: [],
+    final_status: "needs_ai_repair",
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: contractPath,
+      source_report_path: sourcePath,
+      ai_review_tasks: [task],
+      review_issues: [issue]
+    }
+  }), "utf8");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-14",
+    publish: true,
+    runStage: async (stage) => {
+      if (stage.id === "quality_ai_repair") return { ok: true, output: { contract_applied: [{ path: task.path }] } };
+      if (stage.id === "quality_review") return { ok: true, output: { review: { ok: true, issues: [], ai_review_tasks: [] } } };
+      if (stage.id === "report_write") {
+        const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+        report.report_date = "2026-07-14";
+        report.hot_blogs[0].summary = "这篇文章提到 agent 工具。";
+        const reportPath = path.join(cleanRoot, "reports-data", "2026", "07", "2026-07-14.json");
+        await fs.mkdir(path.dirname(reportPath), { recursive: true });
+        await fs.writeFile(reportPath, JSON.stringify(report), "utf8");
+        return { ok: true, output: { json_path: reportPath } };
+      }
+      if (stage.id === "content_contract") {
+        return {
+          ok: false,
+          output: { ok: false, issues: [{ code: "hot_blog_summary_contract_failed", severity: "error", section: "hot_blogs" }] }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "needs_ai_repair");
+  assert.equal(result.summary.review_repair_attempts, 2);
+  assert.equal(result.summary.quality_repair_progress.state, "baseline");
+  assert.equal(result.summary.quality_repair_progress.stalled, false);
+  assert.equal(result.summary.next_action.kind, "codex_ai_repair_contract");
+  const currentReviewArtifact = JSON.parse(await fs.readFile(result.summary.next_action.quality_review_path, "utf8"));
+  const currentFeedback = qualityRepairFeedback(currentReviewArtifact.review, result.summary.next_action.ai_review_tasks);
+  assert.equal(currentFeedback.issue_fingerprint, result.summary.next_action.issue_fingerprint);
+});
+
+test("daily runner lets one legacy repair result establish comparable feedback", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-legacy-repair-feedback-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-07-14.json");
+  const contractPath = path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-07-14.json");
+  const task = { kind: "hot_blog_editorial_rewrite", path: "hot_blogs[0].summary" };
+  await fs.mkdir(path.dirname(summaryPath), { recursive: true });
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    status: "ready",
+    edits: [{ path: task.path, value: "legacy attempt", reason: "repair" }]
+  }), "utf8");
+  await fs.writeFile(summaryPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    mode: "publish",
+    launcher_root: launcherRoot,
+    clean_repo_root: cleanRoot,
+    summary_path: summaryPath,
+    max_review_repair_loops: 5,
+    review_repair_attempts: 1,
+    current_report_path: ".tmp/daily-report.json",
+    candidate_pool_path: ".tmp/source-candidates-2026-07-14.json",
+    quality_review_path: ".tmp/quality-review-2026-07-14.json",
+    quality_repair_path: ".tmp/quality-repair-2026-07-14.json",
+    stages: [],
+    final_status: "needs_ai_repair",
+    next_action: { kind: "codex_ai_repair_contract", contract_path: contractPath, ai_review_tasks: [task] }
+  }), "utf8");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-14",
+    publish: true,
+    runStage: async (stage) => stage.id === "quality_ai_repair"
+      ? {
+          ok: false,
+          output: {
+            contract_applied: [{ path: task.path }],
+            contract_rejected: [],
+            review: {
+              ok: false,
+              issues: [{
+                code: "hot_blog_summary_template",
+                severity: "error",
+                path: task.path,
+                details: { problems: ["template_or_low_information"] }
+              }],
+              ai_review_tasks: [task]
+            }
+          }
+        }
+      : { ok: true, output: { stage: stage.id } }
+  });
+
+  assert.equal(result.summary.final_status, "needs_ai_repair");
+  assert.equal(result.summary.quality_repair_progress.state, "baseline");
+  assert.equal(result.summary.quality_repair_progress.stalled, false);
+  assert.match(result.summary.next_action.contract_path, /attempt-2\.json$/);
 });
 
 test("daily runner does not execute AI repair template contracts until marked ready", async () => {
@@ -12086,7 +12670,10 @@ test("quality review flags untranslated or thin hot blog summaries", async () =>
   assert(review.issues.some((issue) =>
     issue.path === "hot_blogs[1].summary" &&
     Array.isArray(issue.details?.problems) &&
-    issue.details.problems.includes("summary_too_short")
+    issue.details.problems.includes("summary_too_short") &&
+    issue.details.requirements?.min_chinese_chars === 100 &&
+    issue.details.requirements?.max_chinese_chars === 200 &&
+    issue.details.requirements?.min_coverage_hits === 2
   ));
   assert(review.ai_review_tasks.some((task) => task.kind === "hot_blog_editorial_rewrite" && task.path === "hot_blogs[0].summary"));
   assert.equal(review.checklist.find((item) => item.id === "hot_blog_editorial_quality").status, "failed");
@@ -12339,6 +12926,8 @@ test("quality review rejects builder translations that are too weak for rendered
     "builder_observations[0].translation"
   ]);
   assert(weakIssues.every((issue) => issue.details.chinese_chars < 10));
+  assert(weakIssues.every((issue) => issue.details.requirements?.min_chinese_chars === 10));
+  assert(weakIssues.every((issue) => issue.details.requirements?.min_chinese_ratio === 0.35));
   assert(review.ai_review_tasks.some((task) => task.kind === "builder_translation_rewrite" && task.path === "builder_observations[0].translation"));
   assert.equal(review.checklist.find((item) => item.id === "builder_translation").status, "failed");
 });

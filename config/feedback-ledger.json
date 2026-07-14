@@ -107,18 +107,23 @@
       "severity": "P1",
       "status": "implemented",
       "title": "Keep registered fixed sources effective",
-      "problem": "Requested RSS/API/aggregator sources could be present in registries and source_audit but fail to affect daily selection because early feeds consumed the global discovery candidate limit.",
-      "expected_behavior": "Content discovery visits the full enabled source surface, records every source in source_audit, fairly preserves candidates from later fixed sources under global limits, and daily runner gives content discovery enough candidate budget for the fixed source surface.",
+      "problem": "Requested RSS/API/aggregator sources could be present in registries and source_audit but fail to affect daily selection because early feeds consumed the global discovery candidate limit; configured source_level values could also pass registry validation and then fail only after the candidate artifact reached report_write.",
+      "expected_behavior": "Content discovery visits the full enabled source surface, records every source in source_audit, fairly preserves candidates from later fixed sources under global limits, and daily runner gives content discovery enough candidate budget for the fixed source surface. Registry, candidate, and report schemas keep one synchronized source_level vocabulary, fallback metadata survives collection, and the draft producer rejects invalid pools before writing or authoring.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
         "src/discovery.js",
+        "src/draft.js",
+        "schemas/sources.schema.json",
+        "schemas/candidates.schema.json",
+        "schemas/report.schema.json",
+        "tests/fixtures/production-artifact-replay-2026-07-14.json",
         "src/daily-runner.js",
         "tests/unit.test.js"
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "content source discovery keeps late fixed sources effective under global candidate limit",
+        "test_name": "source level vocabulary stays synchronized across registry, candidate, report, and runtime fallbacks",
         "gate": "pnpm run validate"
       }
     },
@@ -223,12 +228,14 @@
       "status": "implemented",
       "title": "Run AI-ready quality review before publish",
       "problem": "Daily drafts could pass structural gates while still retaining AI-flavored wording, automatic draft template prose, noisy highlights, thin bullets, Builder translation drift, or unchecked candidate-pool back-references.",
-      "expected_behavior": "Daily publish runs review draft JSON and source candidate pools before report:write, allow only safe automatic text repairs or restricted AI repair contracts, and run a targeted Playwright page checklist after build.",
+      "expected_behavior": "Daily publish reviews draft JSON against the candidate pool before report:write, exposes the current matching issue.details to bounded repair, permits contracts only for current unresolved paths, continues only after strict blocking-signal reduction, rolls back the first stalled attempt, and suppresses content-contract re-entry before the targeted page checklist.",
       "scope": [
         "config/feedback-ledger.json",
         "package.json",
         "src/cli.js",
         "src/quality-loop.js",
+        "src/daily-runner.js",
+        "scripts/run-daily-codex-pipeline.mjs",
         "src/page-checklist.js",
         "scripts/check-daily-page.mjs",
         "tasks/daily-publish-runbook.md",
@@ -237,7 +244,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "quality review flags AI tone highlight and translation issues",
+        "test_name": "daily runner rolls back a stalled repair and suppresses content-contract re-entry",
         "gate": "pnpm run validate"
       }
     },
@@ -1012,7 +1019,7 @@
       "status": "implemented",
       "title": "Gate daily content quality before publish",
       "problem": "The 2026-06-17 run exposed weak generated content that structural checks did not reject: one-bullet main details, filler-heavy hot blog text, shallow GitHub Trending descriptions, zero Builder/X selections despite enough eligible X feed candidates, and fake simplified tracking components.",
-      "expected_behavior": "A deterministic content-contract checker blocks REQ-001, REQ-006, REQ-007, and REQ-008 failures before publish; REQ-010 may degrade when an official snapshot is unavailable, but fake OpenRouter or Artificial Analysis components are blocking. The contract records GitHub Trending weekly all-language plus Python, TypeScript, Rust, Go, and Java Top10 merged to Top20, README-failure fallback behavior, Builder/X eligible threshold, hot-blog 100-200 character public summaries without rendered key_points, and official tracking snapshot requirements. `pnpm run validate` runs the checker against recent real `reports-data` artifacts, not only the synthetic self-test fixture.",
+      "expected_behavior": "A deterministic content-contract checker blocks REQ-001, REQ-006, REQ-007, and REQ-008 failures before publish; REQ-010 may degrade when an official snapshot is unavailable, but fake OpenRouter or Artificial Analysis components are blocking. The contract records GitHub Trending weekly all-language plus Python, TypeScript, Rust, Go, and Java Top10 merged to Top20, README-failure fallback behavior, Builder/X eligible threshold, hot-blog 100-200 character public summaries without rendered key_points, and official tracking snapshot requirements. `pnpm run validate` runs the checker against recent real `reports-data` artifacts, not only the synthetic self-test fixture, and a provenance-bound historical production candidate replay guards source-level artifact drift without claiming production verification.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1025,7 +1032,8 @@
         "prompts/ai-daily/modules/structured-report-json.md",
         "prompts/ai-daily/modules/selection-rules.md",
         "prompts/ai-daily/modules/effective-interact-output.md",
-        "tests/unit.test.js"
+        "tests/unit.test.js",
+        "tests/fixtures/production-artifact-replay-2026-07-14.json"
       ],
       "validation": {
         "command": "pnpm run content:contract",
