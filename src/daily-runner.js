@@ -2344,7 +2344,8 @@ function retryablePublicEditorialTasks(review, tasks) {
 // not safely degradable (then the caller keeps the hard block).
 function residualEditorialDegradation(review) {
   const tasks = annotateAuthoringTasks(Array.isArray(review?.ai_review_tasks) ? review.ai_review_tasks : []);
-  if (tasks.length === 0 || !tasks.every(isPublicEditorialRepairTask)) {
+  const coveredEditorialTasks = retryablePublicEditorialTasks(review, tasks);
+  if (coveredEditorialTasks.length === 0) {
     return null;
   }
   // Every blocking (error-severity) issue must be COVERED by one of those
@@ -2354,7 +2355,7 @@ function residualEditorialDegradation(review) {
   // with editorial rewrite tasks, while non-editorial blockers
   // (plain_language_stock_phrase, candidate_pool_*, missing/mismatched builder
   // translation) keep the hard block.
-  const editorialPaths = new Set(tasks.map((task) => String(task?.path || "")));
+  const editorialPaths = new Set(coveredEditorialTasks.map((task) => String(task?.path || "")));
   const blockingIssues = (Array.isArray(review?.issues) ? review.issues : []).filter(
     (issue) => String(issue?.severity) === "error"
   );
@@ -2366,8 +2367,8 @@ function residualEditorialDegradation(review) {
   if (!allBlockingEditorial) {
     return null;
   }
-  const sections = [...new Set(tasks.map((task) => editorialSectionFromPath(task?.path)).filter(Boolean))];
-  return { degraded_sections: sections, residual_editorial_tasks: tasks.length };
+  const sections = [...new Set(coveredEditorialTasks.map((task) => editorialSectionFromPath(task?.path)).filter(Boolean))];
+  return { degraded_sections: sections, residual_editorial_tasks: coveredEditorialTasks.length };
 }
 
 function editorialSectionFromPath(pathName) {

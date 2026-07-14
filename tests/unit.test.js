@@ -11635,6 +11635,120 @@ test("daily runner blocks non-public-editorial AI repair review failures", async
   assert.equal(result.summary.next_action.stage_id, "quality_ai_repair");
 });
 
+test("daily runner degrades after exhausted AI repair when advisory fidelity tasks accompany editorial blockers", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-advisory-editorial-degrade-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-07-14.json");
+  const contractPath = path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-07-14.json");
+  const optimizedReportPath = path.join(cleanRoot, ".tmp", "daily-report.optimized.json");
+  const stageIds = [];
+  await fs.mkdir(path.dirname(optimizedReportPath), { recursive: true });
+  await fs.writeFile(optimizedReportPath, JSON.stringify({
+    report_date: "2026-07-14",
+    hot_blogs: Array.from({ length: 5 }, (_, index) => ({
+      title: `Hot blog ${index + 1}`,
+      summary: "仍需编辑的公开摘要。"
+    })),
+    builder_observations: Array.from({ length: 10 }, (_, index) => ({
+      author: `Builder ${index + 1}`,
+      translation: "保留为审阅证据的译文。"
+    }))
+  }, null, 2), "utf8");
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    status: "ready",
+    edits: [
+      {
+        path: "hot_blogs[1].summary",
+        value: "修复后的热文摘要。",
+        reason: "Repair one declared public editorial path."
+      }
+    ]
+  }, null, 2), "utf8");
+  await fs.writeFile(summaryPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    mode: "publish",
+    launcher_root: launcherRoot,
+    clean_repo_root: cleanRoot,
+    summary_path: summaryPath,
+    max_review_repair_loops: 1,
+    review_repair_attempts: 1,
+    current_report_path: ".tmp/daily-report.optimized.json",
+    candidate_pool_path: ".tmp/source-candidates-2026-07-14.json",
+    quality_review_path: ".tmp/quality-review-2026-07-14.json",
+    quality_repair_path: ".tmp/quality-repair-2026-07-14.json",
+    stages: [],
+    final_status: "needs_ai_repair",
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: contractPath,
+      summary_path: summaryPath
+    }
+  }, null, 2), "utf8");
+
+  const editorialIssues = Array.from({ length: 4 }, (_, index) => ({
+    code: index === 3 ? "hot_blog_summary_template" : "hot_blog_summary_untranslated",
+    severity: "error",
+    path: `hot_blogs[${index + 1}].summary`,
+    message: "Hot-blog public copy still needs bounded editorial repair."
+  }));
+  const editorialTasks = editorialIssues.map((issue) => ({
+    kind: "hot_blog_editorial_rewrite",
+    path: issue.path,
+    instruction: "Rewrite the hot-blog summary."
+  }));
+  const advisoryTasks = Array.from({ length: 10 }, (_, index) => ({
+    kind: "translation_fidelity",
+    path: `builder_observations[${index}].translation`,
+    instruction: "Check translation fidelity without granting write authority."
+  }));
+  const staleEditorialTask = {
+    kind: "main_item_editorial_rewrite",
+    path: "main_items[0].summary",
+    instruction: "A stale editorial task without a matching blocking issue must not expand degradation."
+  };
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-14",
+    publish: true,
+    prepareCleanWorktree: async () => {
+      throw new Error("prepare should not run during repair resume");
+    },
+    runStage: async (stage) => {
+      stageIds.push(stage.id);
+      if (stage.id === "quality_ai_repair") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            contract_applied: [{ path: "hot_blogs[1].summary" }],
+            contract_rejected: [],
+            review: {
+              ok: false,
+              ai_review_tasks: [...editorialTasks, staleEditorialTask, ...advisoryTasks],
+              issues: editorialIssues
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "published_degraded");
+  assert(stageIds.includes("report_write"), "safe editorial residue must continue to report_write");
+  const repairStage = result.summary.stages.find((stage) => stage.id === "quality_ai_repair");
+  assert.equal(repairStage.status, "degraded");
+  assert.deepEqual(repairStage.output.quality_status.degraded_sections, ["hot_blogs"]);
+  assert.equal(repairStage.output.residual_editorial_tasks, 4);
+  const writtenReport = JSON.parse(await fs.readFile(optimizedReportPath, "utf8"));
+  assert.equal(writtenReport.quality_status.status, "degraded");
+  assert.deepEqual(writtenReport.quality_status.affected_sections, ["hot_blogs"]);
+});
+
 test("daily runner verifies Pages after successful real publish", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pages-real-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
