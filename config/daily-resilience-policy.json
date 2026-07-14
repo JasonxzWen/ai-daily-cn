@@ -208,10 +208,10 @@
       "id": "quality_ai_repair",
       "description": "Apply ready-gated AI repair contracts to public text fields only.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
-      "fallback": { "kind": "fresh_repair_template", "action": "request_new_contract_when_allowed_edits_are_insufficient" },
-      "degrade": { "allowed": true, "action": "publish_after_zero_rejected_public_editorial_repairs" },
+      "fallback": { "kind": "fresh_repair_template", "action": "request_new_contract_only_after_strict_blocking_signal_reduction" },
+      "degrade": { "allowed": true, "action": "rollback_stalled_safe_editorial_attempt_and_publish_with_disclosure" },
       "block": { "allowed": true, "reasons": ["unsafe_public_content", "internal_leakage", "unrecoverable_schema"] },
-      "summary_fields": ["stage_id", "status", "attempts", "contract_path", "accepted_edits", "rejected_edits"],
+      "summary_fields": ["stage_id", "status", "attempts", "contract_path", "accepted_edits", "rejected_edits", "quality_repair_progress", "repair_stalled", "rolled_back", "repair_reentry_suppressed"],
       "replay_fixtures": ["quality-ai-repair-ready-contract", "quality-ai-repair-template-contract"]
     },
     {

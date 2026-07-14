@@ -223,12 +223,14 @@
       "status": "implemented",
       "title": "Run AI-ready quality review before publish",
       "problem": "Daily drafts could pass structural gates while still retaining AI-flavored wording, automatic draft template prose, noisy highlights, thin bullets, Builder translation drift, or unchecked candidate-pool back-references.",
-      "expected_behavior": "Daily publish runs review draft JSON and source candidate pools before report:write, allow only safe automatic text repairs or restricted AI repair contracts, and run a targeted Playwright page checklist after build.",
+      "expected_behavior": "Daily publish reviews draft JSON against the candidate pool before report:write, exposes the current matching issue.details to bounded repair, permits contracts only for current unresolved paths, continues only after strict blocking-signal reduction, rolls back the first stalled attempt, and suppresses content-contract re-entry before the targeted page checklist.",
       "scope": [
         "config/feedback-ledger.json",
         "package.json",
         "src/cli.js",
         "src/quality-loop.js",
+        "src/daily-runner.js",
+        "scripts/run-daily-codex-pipeline.mjs",
         "src/page-checklist.js",
         "scripts/check-daily-page.mjs",
         "tasks/daily-publish-runbook.md",
@@ -237,7 +239,7 @@
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "quality review flags AI tone highlight and translation issues",
+        "test_name": "daily runner rolls back a stalled repair and suppresses content-contract re-entry",
         "gate": "pnpm run validate"
       }
     },

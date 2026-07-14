@@ -1077,6 +1077,8 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks, { autoDraft 
     const latinChars = (plain.match(/[A-Za-z]/g) || []).length;
     const ratioBase = chineseChars + latinChars;
     const chineseRatio = ratioBase > 0 ? chineseChars / ratioBase : 0;
+    const coverageHits = hotBlogEditorialCoverageHits(plain);
+    const templateDetected = looksLikeTemplatedHotBlogSummary(plain);
     const problems = [];
 
     if (chineseChars < HOT_BLOG_SUMMARY_MIN_CHINESE_CHARS) {
@@ -1088,7 +1090,7 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks, { autoDraft 
     if (chineseChars < HOT_BLOG_SUMMARY_MIN_CHINESE_CHARS || chineseRatio < HOT_BLOG_MIN_CHINESE_RATIO || looksLikeUntranslatedEnglish(plain)) {
       problems.push("not_chinese_editorial_summary");
     }
-    if (looksLikeTemplatedHotBlogSummary(plain) || lacksHotBlogEditorialCoverage(plain)) {
+    if (templateDetected || coverageHits < 2) {
       problems.push("template_or_low_information");
     }
 
@@ -1111,7 +1113,15 @@ function collectHotBlogSummaryIssues(report, issues, aiReviewTasks, { autoDraft 
         problems,
         length: plain.length,
         chinese_chars: chineseChars,
-        chinese_ratio: Number(chineseRatio.toFixed(3))
+        chinese_ratio: Number(chineseRatio.toFixed(3)),
+        coverage_hits: coverageHits,
+        template_detected: templateDetected,
+        requirements: {
+          min_chinese_chars: HOT_BLOG_SUMMARY_MIN_CHINESE_CHARS,
+          max_chinese_chars: HOT_BLOG_SUMMARY_MAX_CHINESE_CHARS,
+          min_chinese_ratio: HOT_BLOG_MIN_CHINESE_RATIO,
+          min_coverage_hits: 2
+        }
       }
     });
     if (!(autoDraft && isRepeatedTemplateHotBlogCopy(item))) {
@@ -1176,10 +1186,9 @@ function looksLikeTemplatedHotBlogSummary(value) {
   return HOT_BLOG_TEMPLATE_RE.test(text) || HOT_BLOG_CONTENT_CONTRACT_FILLER_RE.test(text);
 }
 
-function lacksHotBlogEditorialCoverage(value) {
+function hotBlogEditorialCoverageHits(value) {
   const text = String(value || "");
-  const hits = HOT_BLOG_COVERAGE_PATTERNS.filter((pattern) => pattern.test(text)).length;
-  return hits < 2;
+  return HOT_BLOG_COVERAGE_PATTERNS.filter((pattern) => pattern.test(text)).length;
 }
 
 function looksLikeUntranslatedEnglish(value) {
@@ -1400,7 +1409,12 @@ function builderTranslationReaderFacingStats(value) {
     details: {
       chinese_chars: chineseChars,
       chinese_ratio: Number(chineseRatio.toFixed(3)),
-      long_english_run: longEnglishRun
+      long_english_run: longEnglishRun,
+      requirements: {
+        min_chinese_chars: BUILDER_TRANSLATION_MIN_CHINESE_CHARS,
+        min_chinese_ratio: BUILDER_TRANSLATION_MIN_CHINESE_RATIO,
+        long_english_run: false
+      }
     }
   };
 }
