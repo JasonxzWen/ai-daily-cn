@@ -2737,6 +2737,28 @@
           "type": "integer",
           "minimum": 0
         },
+        "transport_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transport_limitation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pages_fetched": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "continuation_url": {
+          "$ref": "#/$defs/absolute_url"
+        },
+        "continuation_urls": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/absolute_url"
+          }
+        },
         "target_id": {
           "type": "string"
         },
