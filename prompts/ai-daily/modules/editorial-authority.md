@@ -1,7 +1,9 @@
-## 唯一权威资产
+> **2026-07-14 权威边界：仅适用于可选遗留编辑报告。** 本文件后文所有“公开页”“公开日报”“主列表”“入选”“去重”和“排序”均只约束将在 PR3 移除的遗留编辑报告及其兼容渲染面。它不治理 `docs/signals/**` 的成员集合、默认时序、分组、分页或发布；这些边界只由 `public-signal-stream-contract:v1` 约束，且不存在内容准入门槛。
 
-- 本模块（`prompts/ai-daily/modules/editorial-authority.md`）是当前中文 AI 日报的唯一权威资产。
-- 如果它与其它 prompt 模块、`docs/*.md`、历史 ROI 清单、旧 runbook、旧任务模板或历史日报说明冲突，以本模块为准。
+## 遗留编辑报告唯一权威资产
+
+- 本模块（`prompts/ai-daily/modules/editorial-authority.md`）仅是可选遗留编辑报告的唯一权威资产。
+- 如果它与其它遗留编辑 prompt 模块、历史 story-first 文档、ROI 清单、旧 runbook、旧任务模板或历史日报说明冲突，以本模块为准；如果与公共信号流合同冲突，`public-signal-stream-contract:v1` 对 `docs/signals/**` 独占优先。
 - 同一板块如果出现新旧两版要求，只执行这里更新后的版本；旧文档只作归档参考，不再参与当前合同裁决。
 
 ### 迭代维护机制

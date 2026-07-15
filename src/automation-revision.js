@@ -34,7 +34,8 @@ export function defaultAutomationRevision(overrides = {}) {
     prompt_manifest: PROMPT_MANIFEST,
     prompt_modules: [],
     source_registry_count: null,
-    source_registry_enablement_counts: {},
+    source_registry_source_group_counts: {},
+    source_registry_credibility_tag_counts: {},
     rules: AUTOMATION_REVISION_RULES,
     ...overrides,
     rules: Array.isArray(overrides.rules) ? overrides.rules : AUTOMATION_REVISION_RULES
@@ -161,12 +162,12 @@ async function readPromptManifest(rootDir) {
 async function readSourceRegistrySummary(rootDir) {
   try {
     const registry = await loadSourceRegistry({
-      rootDir,
-      includeEnablement: "core,optional,manual"
+      rootDir
     });
     return {
       source_registry_count: registry.sources.length,
-      source_registry_enablement_counts: countBy(registry.sources, "enablement")
+      source_registry_source_group_counts: countBy(registry.sources, "source_group"),
+      source_registry_credibility_tag_counts: countBy(registry.sources, "credibility_tag")
     };
   } catch {
     return {};

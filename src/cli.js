@@ -8,6 +8,7 @@ import {
   checkPublishPreflight,
   createDailyPublishPlan,
   createPublishPlan,
+  createSignalPublishPlan,
   isGitHubApiFallbackEligibleError,
   prepareCleanPublishWorktree,
   preparePublishWorktree,
@@ -32,13 +33,12 @@ import { checkSourcesHealth } from "./source-health.js";
 import { auditSourceRunHistory } from "./source-phase5.js";
 import { mergeSourceAuditIntoReport } from "./source-audit.js";
 import { validateSourceRegistryPath } from "./source-registry.js";
-import { generateReportDraft } from "./draft.js";
+import { generateReportDraft, writeDiscoveryOccurrenceStore } from "./draft.js";
 import { cacheEvidenceImages } from "./evidence-cache.js";
 import { writeReportDraft } from "./report.js";
-import { buildSite } from "./site.js";
+import { buildPublicSignals, buildSite, validatePublicSignalsOutput } from "./site.js";
 import { buildWebApp } from "./web-app-build.js";
 import { checkWorktreePreflight } from "./worktree-preflight.js";
-import { checkSourceResetPreflight } from "./source-reset-preflight.js";
 import {
   applyQualityRepairContract,
   repairReportQuality,
@@ -76,6 +76,7 @@ try {
       outDir,
       siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
       generatedAt: args["generated-at"],
+      buildPublicSignals: args["skip-signals"] !== true,
       sourceWatchConsumptionReportDate: args["source-watch-report-date"]
     });
     const webApp = await buildWebApp({ rootDir, outDir });
@@ -90,6 +91,46 @@ try {
         written_files: webApp.writtenFiles
       }
     });
+  } else if (command === "signals:build") {
+    const args = parseArgs(argv);
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const result = await buildPublicSignals({
+      rootDir,
+      dataInputDir: args["data-input"] || "reports-data",
+      outDir: args.out || "docs",
+      generatedAt: args["generated-at"]
+    });
+    printJson({
+      ok: true,
+      total_count: result.publicSignals.index.total_count,
+      page_count: result.publicSignals.pages.length,
+      coverage: result.publicSignals.index.coverage,
+      written_files: result.writtenFiles
+    });
+  } else if (command === "signals:validate") {
+    const args = parseArgs(argv);
+    const result = await validatePublicSignalsOutput({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      outDir: args.out || "docs"
+    });
+    printJson({
+      ok: true,
+      index_path: result.index_path,
+      total_count: result.total_count,
+      page_count: result.page_count,
+      coverage: result.coverage
+    });
+  } else if (command === "publish:dry-run:signals") {
+    const args = parseArgs(argv);
+    const plan = await createSignalPublishPlan({
+      repoRoot: path.resolve(args["repo-root"] || process.cwd()),
+      dataInputDir: args["data-input"] || "reports-data",
+      outDir: args.out || "docs",
+      siteUrl: args["site-url"] || DEFAULT_SITE.siteUrl,
+      allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
+      reportDate: args.date || firstPositionalDate(argv)
+    });
+    printJson({ ok: true, plan });
   } else if (command === "publish:dry-run:daily") {
     const args = parseArgs(argv);
     const plan = await createDailyPublishPlan({
@@ -168,7 +209,6 @@ try {
       automationPromptPath: args["automation-prompt"],
       projectCwds: args["automation-cwd"] ? [args["automation-cwd"]] : undefined,
       sourcesPath: args.sources,
-      enablement: args.enablement,
       inputDir: args.input,
       dataInputDir: args["data-input"],
       outDir: args.out,
@@ -534,15 +574,6 @@ try {
     if (!result.ok) {
       process.exitCode = 1;
     }
-  } else if (command === "source-reset:preflight") {
-    const args = parseArgs(argv);
-    const result = await checkSourceResetPreflight({
-      rootDir: path.resolve(args["repo-root"] || process.cwd())
-    });
-    printJson(result);
-    if (!result.ok) {
-      process.exitCode = 1;
-    }
   } else if (command === "publish:preflight") {
     const args = parseArgs(argv);
     const preflight = await checkPublishPreflight({
@@ -633,6 +664,25 @@ try {
       quality_status: result.report.quality_status || null,
       degraded_sections: result.report.quality_status?.degraded_sections || []
     });
+  } else if (command === "signals:write") {
+    const args = parseArgs(argv);
+    const reportDate = args.date || firstPositionalDate(argv);
+    const result = await writeDiscoveryOccurrenceStore({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate,
+      generatedAt: args["generated-at"] || firstPositionalDateTime(argv),
+      inputPaths: draftInputPaths(argv, args),
+      outputDir: args.out || "reports-data",
+      allowDegradedInputs: Boolean(args["allow-degraded-inputs"])
+    });
+    printJson({
+      ok: true,
+      report_date: result.store.report_date,
+      occurrence_store_path: result.occurrenceStorePath,
+      input_record_count: result.store.input_record_count,
+      occurrence_count: result.store.occurrence_count,
+      normalization_error_count: result.store.normalization_error_count
+    });
   } else if (command === "report:draft") {
     const args = parseArgs(argv);
     const reportDate = args.date || firstPositionalDate(argv);
@@ -645,6 +695,8 @@ try {
       inputPaths: draftInputPaths(argv, args, { outputPath, candidateOutputPath }),
       outputPath,
       candidateOutputPath,
+      occurrenceOutputDir: args["occurrence-output"] || "reports-data",
+      requireOccurrenceStore: true,
       allowDegradedInputs: Boolean(args["allow-degraded-inputs"]),
       officialBlogContextPath: args["official-blog-context"],
       evidenceOutDir: args["evidence-out"] || "docs",
@@ -656,6 +708,7 @@ try {
       report_date: result.report.report_date,
       path: result.path,
       candidate_pool_path: result.candidatePoolPath,
+      occurrence_store_path: result.occurrenceStorePath,
       source_status_history_path: result.sourceStatusHistoryPath,
       evidence_assets: result.evidence_assets,
       evidence_skipped: result.evidence_skipped,
@@ -740,7 +793,6 @@ try {
     const args = parseArgs(argv);
     const positional = positionalArgs(argv);
     const result = await collectGitHubTrending({
-      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "50", 10),
       reportDate: args.date || firstPositionalDate(argv),
       historyDir: args["history-dir"] || "reports-data",
       browserExportPath: args["browser-export"],
@@ -776,6 +828,9 @@ try {
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10),
       endpointLimit: Number.parseInt(args["endpoint-limit"] || "5", 10),
+      transportStatePath: args["transport-state"] || path.join(".tmp", "search-pagination-state.json"),
+      transportRequestBudget: Number.parseInt(args["transport-request-budget"] || "120", 10),
+      transportRuntimeMs: Number.parseInt(args["transport-runtime-ms"] || "180000", 10),
       env: process.env
     });
     const resolvedOutputPath = path.resolve(outputPath);
@@ -800,7 +855,7 @@ try {
     const result = await collectHuggingFaceTrending({
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"],
-      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10),
+      transportPageSize: Number.parseInt(args["transport-page-size"] || "20", 10),
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
@@ -814,8 +869,11 @@ try {
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"],
       sourcesPath: args.sources,
-      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10),
-      perSourceLimit: Number.parseInt(args["per-source-limit"] || "3", 10),
+      transportStatePath: args["transport-state"] || path.join(".tmp", "search-pagination-state.json"),
+      transportRequestBudget: Number.parseInt(args["transport-request-budget"] || "120", 10),
+      transportRuntimeMs: Number.parseInt(args["transport-runtime-ms"] || "180000", 10),
+      xSearchLookbackDays: Number.parseInt(args["x-search-lookback-days"] || "7", 10),
+      xSearchAccounts: splitCliList(args["x-search-account"] || args["x-search-accounts"]),
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
@@ -825,18 +883,18 @@ try {
     });
   } else if (command === "discover:content-sources") {
     const args = parseArgs(argv);
-    const positionalNumbers = positiveIntegers(argv);
     const result = await collectContentSources({
       rootDir: path.resolve(args["repo-root"] || process.cwd()),
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"],
       sourcesPath: args.sources,
       registryPath: args.registry,
-      enablement: args.enablement || firstEnablement(argv) || "core,optional",
       wechatInputPath: args["wechat-input"],
-      limit: Number.parseInt(args.limit || positionalNumbers[0] || "20", 10),
-      perSourceLimit: Number.parseInt(args["per-source-limit"] || positionalNumbers[1] || "3", 10),
-      budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "300000", 10),
+      sourceConcurrency: Number.parseInt(args["source-concurrency"] || "12", 10),
+      transportStatePath: args["transport-state"] || path.join(".tmp", "search-pagination-state.json"),
+      transportRequestBudget: Number.parseInt(args["transport-request-budget"] || "120", 10),
+      transportRuntimeMs: Number.parseInt(args["transport-runtime-ms"] || "180000", 10),
+      providerThrottleMs: Number.parseInt(args["provider-throttle-ms"] || "3000", 10),
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
@@ -846,7 +904,6 @@ try {
     });
   } else if (command === "discover:china-ai") {
     const args = parseArgs(argv);
-    const positionalNumbers = positiveIntegers(argv);
     const result = await collectContentSources({
       rootDir: path.resolve(args["repo-root"] || process.cwd()),
       reportDate: args.date || firstPositionalDate(argv),
@@ -854,11 +911,8 @@ try {
       sourcesPath: args.sources || path.join("config", "sources", "china-ai-sources.json"),
       registryPath: args.registry,
       auditGroupName: "china_ai_sources",
-      enablement: args.enablement || firstEnablement(argv) || "core,optional",
       includeWeChatInput: false,
-      limit: Number.parseInt(args.limit || positionalNumbers[0] || "30", 10),
-      perSourceLimit: Number.parseInt(args["per-source-limit"] || positionalNumbers[1] || "3", 10),
-      budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "180000", 10),
+      sourceConcurrency: Number.parseInt(args["source-concurrency"] || "12", 10),
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
@@ -868,17 +922,19 @@ try {
     });
   } else if (command === "discover:search-news") {
     const args = parseArgs(argv);
-    const positionalNumbers = positiveIntegers(argv);
     const result = await collectSearchNews({
       rootDir: path.resolve(args["repo-root"] || process.cwd()),
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"],
       providers: args.providers || inferProviderList(argv),
       queriesPath: args.queries || firstJsonPath(argv),
-      limit: Number.parseInt(args.limit || positionalNumbers[0] || "40", 10),
-      timeoutMs: Number.parseInt(args["timeout-ms"] || positionalNumbers[1] || "15000", 10),
-      providerTimeoutMs: Number.parseInt(args["provider-timeout-ms"] || "0", 10),
-      budgetMs: Number.parseInt(args["budget-ms"] || positionalNumbers[2] || "300000", 10),
+      transportPageSize: Number.parseInt(args["transport-page-size"] || "20", 10),
+      transportStatePath: args["transport-state"] || path.join(".tmp", "search-pagination-state.json"),
+      transportRequestBudget: Number.parseInt(args["transport-request-budget"] || "120", 10),
+      transportRuntimeMs: Number.parseInt(args["transport-runtime-ms"] || "180000", 10),
+      providerThrottleMs: Number.parseInt(args["provider-throttle-ms"] || "3000", 10),
+      queryConcurrency: Number.parseInt(args["query-concurrency"] || "4", 10),
+      timeoutMs: Number.parseInt(args["timeout-ms"] || "15000", 10),
       shadow: args.shadow !== false,
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
@@ -893,12 +949,12 @@ try {
       rootDir: path.resolve(args["repo-root"] || process.cwd()),
       reportDate: args.date || firstPositionalDate(argv),
       sourcesPath: args.sources || firstSourcePath(argv),
-      enablement: args.enablement || firstEnablement(argv) || "core,optional,manual",
       sourceIds: splitCliList(args["source-id"] || args["source-ids"] || args.source || args.id),
       sourceKinds: splitCliList(args["source-kind"] || args["source-kinds"] || args.kind),
-      tiers: splitCliList(args.tier || args.tiers),
+      sourceGroups: splitCliList(args["source-group"] || args["source-groups"]),
+      credibilityTags: splitCliList(args["credibility-tag"] || args["credibility-tags"]),
       categories: splitCliList(args.category || args.categories || args["candidate-category"]),
-      tags: splitCliList(args.tag || args.tags || args.signal || args["source-level"]),
+      tags: splitCliList(args.tag || args.tags || args.signal),
       filterTokens: sourceHealthFilterTokens(argv),
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
@@ -941,9 +997,9 @@ try {
     printJson({
       ok: true,
       source_count: registry.sources.length,
-      enablement_counts: countBy(registry.sources, "enablement"),
-      tier_counts: countBy(registry.sources, "tier"),
-      source_kind_counts: countBy(registry.sources, "source_kind")
+      source_kind_counts: countBy(registry.sources, "source_kind"),
+      source_group_counts: countBy(registry.sources, "source_group"),
+      credibility_tag_counts: countBy(registry.sources, "credibility_tag")
     });
   } else if (command === "discover:statuspage-incidents") {
     const args = parseArgs(argv);
@@ -951,7 +1007,6 @@ try {
       reportDate: args.date || firstPositionalDate(argv),
       generatedAt: args["generated-at"],
       sourcesPath: args.sources,
-      limit: Number.parseInt(args.limit || firstPositiveInteger(argv) || "20", 10),
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10)
     });
@@ -967,6 +1022,7 @@ try {
       allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
       confirmPush: Boolean(args["confirm-push"]) || positional.includes("confirm-push"),
       reportDate: args.date || firstPositionalDate(argv),
+      scope: args.scope,
       commitMessage: args.message,
       verifyPages: args["skip-pages-verify"] !== true
     });
@@ -994,6 +1050,7 @@ try {
       allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
       confirmPush: Boolean(args["confirm-push"]) || positional.includes("confirm-push"),
       reportDate: args.date || firstPositionalDate(argv),
+      scope: args.scope,
       commitMessage: args.message,
       repository: args.repo,
       inputDir: args.input || "reports-source",
@@ -1062,7 +1119,8 @@ try {
       allowedBranch: args.branch || DEFAULT_SITE.publishBranch,
       confirmPush: Boolean(args["confirm-push"]) || positional.includes("confirm-push"),
       reportDate: args.date || firstPositionalDate(argv),
-      verifyPages: true
+      scope: args.scope,
+      verifyPages: args["skip-pages-verify"] !== true
     });
     const publishOk = !result.verification_error;
     printJson({
@@ -1140,10 +1198,6 @@ function firstPositiveInteger(args) {
 
 function positiveIntegers(args) {
   return args.filter((token) => /^[1-9]\d*$/.test(token));
-}
-
-function firstEnablement(args) {
-  return args.find((token) => /^(core|optional|manual)(,(core|optional|manual))*$/.test(token));
 }
 
 function firstJsonPath(args) {

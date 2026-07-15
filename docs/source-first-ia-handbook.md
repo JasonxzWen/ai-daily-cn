@@ -2,9 +2,13 @@
 
 <!-- source-display-governance:v1 -->
 
-Status: `phase-4-governance`
+<!-- public-signal-stream-contract:v1 -->
 
-Machine contract: `config/source-display-contract.json`
+Status: `public-source-first-current / internal-inventory-retained`
+
+Public machine contracts: `config/public-signal-taxonomy.json`, `schemas/occurrence-store.schema.json`, `schemas/public-signals.schema.json`
+
+Internal inventory contract: `config/source-display-contract.json`
 
 Full inventory order reference: `docs/source-inventory-order.md`
 
@@ -12,9 +16,28 @@ Maintenance owner: `user-reviewed-fixed-source-order`
 
 This handbook is the human-facing maintenance guide for source-first governance and optional diagnostics. The JSON contract is the executable authority; this document explains how to change the fixed source order without making the public daily report expose internal audit panels by default.
 
+## Current Public IA Authority
+
+The public product is a high-coverage source listener, not a source-health dashboard and not an edited-story admission surface.
+
+- No content-admission gate exists. Every safely normalizable source occurrence with an HTTP(S) material URL enters the public stream; missing title text uses a deterministic publisher/source/URL fallback, and malformed individual records are isolated only for technical safety.
+- New observed records receive a persistent `observation_id` before selection from explicit native provenance or stable collector/material/event provenance. Candidate IDs, titles, summaries, tags, classification values, ranks, and input order are not observation identity. Repeated rows for one observation are coalesced with explicit counts; distinct collectors or observation IDs keep same-URL occurrences separate.
+- Credibility, content, source, health, and access metadata are labels and filters only. They never change membership or default chronology.
+- Public level-one groups are `official_blogs`, `github_trending`, `community_discussions`, `x_updates`, `news_newsletters`, `papers_models`, plus conditional `other`.
+- Source-group order is stable presentation order. Items inside a group use occurrence time order; editorial rank, authority, verification, quality, selection, and rejection state are never default sort inputs.
+- Search and filters change only the reader's current view. The default dataset remains the complete stream, and pagination or preview size never becomes an admission cap.
+- The pre-PR2 public history is retained as immutable compressed occurrence stores under `reports-data/occurrences/baseline-v1/`; production combines that baseline with daily stores and never reimports legacy candidate pools or edited reports.
+- Unknown classification falls back visibly to `other` and `pending_review`.
+- Reader-safe publisher, collection channel, summary, labels, time, health, and access state are public. Raw `source_audit`, retries, candidate pools, scores, selection/rejection reasons, repair state, private paths, and machine logs remain internal.
+- `config/source-display-contract.json` and the detailed rank tables below survive only as internal inventory governance. They do not define public occurrence membership or within-group order.
+
+Iteration rule: add public/legal sources directly when collection is technically safe; do not require observation periods, qualification proofs, selection paths, new tier matrices, or compatibility gates. Prefer one direct mapping plus an explicit fallback, and delete superseded public paths in the migration PR rather than maintaining parallel products.
+
+The older fixed-order and runtime sections below are retained as the internal source inventory appendix. Where they say public pages are story-first or source-first is internal-only, this Current Public IA Authority supersedes them.
+
 ## 目标
 
-日报公开页默认保持 story-first。信源运行概况、显式状态焦点、固定顺序信源图谱和全量采集入口属于内部治理/诊断表面，不能作为公开日报首屏或正文默认区块输出。
+公开页默认使用按信源属性分组的 occurrence 时间流。信源运行概况、显式状态焦点、固定顺序治理图谱和全量采集入口清单属于内部诊断表面，不能作为公开页面区块输出；公开卡片只消费读者安全的来源、摘要、链接和标签投影。
 
 The fixed order is intentionally editorial and stable. It answers “which sources should governance track consistently” rather than “which source happened to update today.” In operational terms: do not reorder by daily status.
 
@@ -147,7 +170,7 @@ This is the fixed source insertion handbook for new sources. The goal is to keep
 - Keep `baseline_source_rank_step` at 10 for normal baseline ordering inside a section.
 - Use `insertion_rank_step` 5 when a new source naturally belongs between two existing adjacent sources, such as rank 15 between rank 10 and rank 20.
 - If a section has no available gap, renumber only that section in the same PR, keep 10-point spacing, and explain why the relative order changed.
-- Runtime fields such as included, blocked, skipped, no recent update, candidate count, score, tier, or authority may affect collection and review, but must not change public display rank.
+- Runtime fields such as included, blocked, skipped, no recent update, candidate count, score, tier, or authority are internal diagnostics or visible labels only; they must not change public occurrence membership or default chronology.
 
 ### Collection Entry Only
 
@@ -159,7 +182,7 @@ Promote a collection entry only when source governance should track it as a name
 
 ### User Review
 
-Codex may propose the baseline placement, but the fixed importance order is user-reviewed. The user may tune section placement or rank before merge. Once merged, the JSON contract is the executable authority and daily status remains only a status label.
+Codex may propose the baseline placement for the internal source inventory, but that fixed governance order is user-reviewed. The JSON contract is executable authority only for the internal inventory layout; daily status remains a label and the order never becomes public occurrence admission or chronology.
 
 新增信源先判断“逻辑源”，再判断“采集入口”。多个 RSS、HTML index、GitHub org、Hugging Face org、RSSHub 或人工入口可以汇总到同一个 logical source；public source graph 展示 logical source，不展示每个底层 URL。
 
@@ -173,9 +196,9 @@ Codex may propose the baseline placement, but the fixed importance order is user
 6. 判断是否是英文媒体或搜索聚合。是则进入 `english_media_search`。
 7. 选择 rank：优先使用相邻源之间的空位；没有空位时重排该 section，保持 10 点间隔。
 8. 在同一 PR 中补充测试，证明新 logical source 有 section、rank、display mode 和可推导状态。
-9. 若新增或移动底层采集入口，运行 `node scripts/generate-source-inventory-order.mjs` 刷新 `docs/source-inventory-order.md`，并用 `corepack pnpm run sources:display-contract` 确认 153+ 全量入口参考表仍完整。
+9. 若新增或移动底层采集入口，运行 `node scripts/generate-source-inventory-order.mjs` 刷新 `docs/source-inventory-order.md`，并用 `corepack pnpm run sources:display-contract` 确认全部已注册入口仍完整。
 
-不要把 source `tier`、`authority`、当日候选数或当天是否阻塞作为 public display rank 的动态输入。它们可以影响采集和候选排序，但不能改变固定图谱顺序。
+不要把 source credibility、当日记录数或当天是否阻塞作为公开 occurrence 的准入或排序输入。来源组、内容类别、可信度、健康和访问状态只服务展示、筛选、采集诊断和遗留编辑报告，不能改变公开成员集合、默认时间顺序或内部固定治理图谱。
 
 ## 状态保留规则
 
@@ -185,12 +208,12 @@ Codex may propose the baseline placement, but the fixed importance order is user
 
 | status_label | 展示含义 | 维护规则 |
 |---|---|---|
-| `included` | 今天有内容进入公开页 | 保留原 rank，不上浮 |
-| `updated_not_selected` | 抓到候选但未进入公开页 | 保留原 rank，在状态焦点中显式出现 |
-| `parsed_not_candidate` | 解析到近期内容但未形成候选 | 保留原 rank，后续优化采集或候选准入 |
+| `included` | 今天有内容进入遗留编辑报告 | 保留内部治理 rank，不上浮 |
+| `updated_not_selected` | 抓到候选但未进入遗留编辑报告 | 保留内部治理 rank，在内部状态焦点中显式出现 |
+| `parsed_not_candidate` | 历史状态：已解析但旧候选转换未产出记录 | 保留原 rank；新监听器应保留可安全标准化的记录，并把转换问题写成 normalization error |
 | `no_recent_update` | 可访问但无近期有效更新 | 保留原 rank，避免静默误判 |
-| `blocked` | 已配置但不可达或解析阻塞 | 保留原 rank，并在 public 状态中披露 |
-| `not_configured_or_skipped` | 未配置、缺 token/base URL、手动源、kill switch 或占位源 | 保留原 rank，尤其是 WeChat/Zhihu 平台源 |
+| `blocked` | 已配置但不可达或解析阻塞 | 保留内部治理 rank，并在内部 source-runtime 状态中披露 |
+| `not_configured_or_skipped` | 历史状态：未配置、缺 token/base URL、网络/访问规则受限或占位源 | 保留原 rank；新监听器只记录具体访问原因，不以手动标签或 kill switch 跳过来源 |
 
 ## 验证命令
 
@@ -215,15 +238,15 @@ corepack pnpm run test:e2e
 
 <!-- source-first-v2-contract:v1 -->
 
-Status: `phase-18-contract`
+Status: `historical-internal-runtime-contract`
 
-Source-first runtime is internal governance by default. Source visibility remains important for maintenance and optional diagnostics, but public daily pages remain story-first and exclude source runtime audit sections unless the user explicitly requests a diagnostic surface.
+This section describes the historical internal source-runtime dashboard. Raw source operations remain internal, but the reader-safe public occurrence stream is source-first by default under the Current Public IA Authority above. Story selection and this runtime dashboard cannot gate that stream.
 
 <!-- source-first-v2-layering -->
 
 ### Logical Source Layer
 
-The Logical Source Layer is the reader-facing source graph. A logical source is a named editorial source identity such as `openai-news`, `github-trending`, `chinese-direct-rss`, `community-hotspots`, or `openrouter-rankings`. It can group multiple collection entries when those entries serve the same reader-visible source identity.
+The Logical Source Layer is the historical internal source-runtime graph. A logical source is a named governance identity such as `openai-news`, `github-trending`, `chinese-direct-rss`, `community-hotspots`, or `openrouter-rankings`. It can group multiple collection entries for internal diagnostics, but it does not define public signal membership, grouping, or default order.
 
 Logical sources are ordered by fixed editorial importance in `config/source-display-contract.json`. Daily runtime status may change tags and counts, but it must not move logical sources.
 
@@ -231,7 +254,7 @@ Logical sources are ordered by fixed editorial importance in `config/source-disp
 
 The Collection Entry Layer is the complete registered inventory. Collection entries are concrete feed, page, bridge, manual, API, or platform inputs. They are visible so blocked, skipped, unconfigured, manual, or no-update rows do not disappear from review.
 
-153 collection entries are complete inventory rows, not public daily story content. They remain grouped and expanded in fixed source sections inside the internal source-first runtime with non-hiding search/highlight behavior.
+All registered collection entries are complete inventory rows, not public daily story content. They remain grouped and expanded in fixed source sections inside the internal source-first runtime with non-hiding search/highlight behavior.
 
 Internal source-first inventory rows project a runtime layer onto this fixed inventory: mapped collection entries inherit the daily `status_label` from their logical source; mapped entries whose logical source is missing from today's runtime table show `unreported`; unmapped entries show `collection_only`. The generated `docs/source-inventory-order.md` reference remains a static order and configuration review surface, so runtime status must never reorder it.
 
@@ -239,7 +262,7 @@ Internal source-first inventory rows project a runtime layer onto this fixed inv
 
 ### Internal Source Runtime Order
 
-The internal source-first runtime puts source signal story before source metrics dashboard in internal source-first runtime. When explicitly enabled, the renderer inserts the `system-operating-dashboard` immediately after `source_first_dashboard` and before `source_status_focus`; it is not part of `source_first_section_order`, so the fixed source order remains controlled only by the JSON contract.
+Source-first inventory runtime remains internal governance. It puts source signal story before source metrics dashboard in internal source-first inventory runtime. When explicitly enabled, the renderer inserts the `system-operating-dashboard` immediately after `source_first_dashboard` and before `source_status_focus`; it is not part of `source_first_section_order`, so the fixed source order remains controlled only by the JSON contract.
 
 The source-first section order is:
 
@@ -253,10 +276,10 @@ The source signal story is a compact narrative rollup of effective, updated, blo
 
 The source metrics dashboard has two required metric bands:
 
-- Logical-source operating cards keep the fixed reader-facing source graph visible: total logical sources, public included, updated but not selected, blocked, not configured or skipped, and low-signal sources.
+- Logical-source operating cards keep the fixed internal governance graph visible: total logical sources, legacy edited-report included, updated but not selected for that legacy report, blocked, not configured or skipped, and low-signal sources.
 - Collection-entry runtime cards summarize the complete inventory before readers reach the long inventory: `INVENTORY_TOTAL`, `RUNTIME_KNOWN`, `INHERITED_RUNTIME`, `UNREPORTED_RUNTIME`, and `COLLECTION_ONLY`.
 
-These collection-entry metrics are internal coverage indicators. They are derived from the same 153-row inventory runtime projection used by the full inventory, but they do not replace the expanded `source-inventory-group-*` sections and must not reorder, hide, or filter any collection entry.
+These collection-entry metrics are internal coverage indicators. They are derived from the same complete inventory runtime projection used by the full inventory, but they do not replace the expanded `source-inventory-group-*` sections and must not reorder, hide, or filter any collection entry. Collection entries are complete inventory rows, not public occurrence cards.
 
 The system operating dashboard is an internal metrics layer. It must show exactly five diagnostic cards: `公开内容规模`, `信号模块`, `趋势与追踪`, `信源覆盖`, and `运行质量`. The cards use tags `SYSTEM_CONTENT`, `SYSTEM_SIGNALS`, `SYSTEM_TRENDS`, `SYSTEM_SOURCES`, and `SYSTEM_QUALITY`. They may summarize public arrays and reader-safe quality status, but they must not be rendered into the public daily page by default.
 
@@ -264,7 +287,7 @@ The system operating dashboard is an internal metrics layer. It must show exactl
 
 ### Public Daily Source Audit Exclusion
 
-Public daily pages remain story-first and exclude source runtime audit sections by default. The public renderer must not output `source_signal_story`, `source_first_dashboard`, `system_operating_dashboard`, `source_status_focus`, `source_map`, `source_inventory`, or their `source-map-group-*` / `source-inventory-group-*` detail groups unless a future user-approved diagnostic mode explicitly requests them.
+Public pages use a reader-safe source-grouped occurrence projection and exclude internal source runtime audit sections. The public renderer must not output `source_signal_story`, `source_first_dashboard`, `system_operating_dashboard`, `source_status_focus`, `source_map`, `source_inventory`, or their `source-map-group-*` / `source-inventory-group-*` detail groups. Those machine-oriented sections remain internal even though reader-safe source groups, publishers, collection channels, content tags, and credibility tags are public.
 
 <!-- full-inventory-expansion-semantics -->
 
@@ -296,7 +319,7 @@ The baseline source importance order is:
 
 Within each section, existing rank values remain the baseline until the user reviews a change. Codex may propose a rank, but merged JSON is the executable authority.
 
-Story-centered content remains the fact carrier. Stories explain what happened and why it matters. Source-first sections explain coverage, reliability, gaps, and provenance only in internal governance or explicit diagnostic contexts.
+Reader-safe occurrences are the public fact carrier; story-centered content is an optional legacy editorial derivative. Internal source-first inventory sections explain coverage, reliability, gaps, and operational provenance without governing public occurrence membership or chronology.
 
 <!-- source-promotion-review-loop -->
 

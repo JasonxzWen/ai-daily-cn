@@ -1,5 +1,7 @@
 # AI 日报 generation-first 改造计划（阶段 0）
 
+> **归档说明（2026-07-14）：** 本文记录旧版遗留编辑报告的阶段 0 决策与当时问题，不再描述公共 signal listener 的现状。公共流无来源准入、enablement、kill switch、时间窗口或数量配额；当前合同见 `docs/ai-daily-source-expansion-spec.md` 和 `docs/ai-daily-source-integration-plan.md`。
+>
 > 状态：规划 + POC。配套规格见 `tasks/current-task.md`；红灯测试见 `tests/generation-first.test.js`。
 > 唯一内容权威仍是 `prompts/ai-daily/modules/editorial-authority.md`。
 
@@ -50,6 +52,6 @@ generation-first，不是 gate-first：
 
 ## 6. 信源真问题（与作者层并行处理）
 
-- 微信/知乎源是 `example.com` 占位 + `kill_switch:true`，**结构上产不出内容**：要么接真实 RSS（如 RSSHub），要么正式关闭 REQ-009，别再假装有板块。
+- 当时的微信/知乎入口还是占位地址，无法取得内容；当前实现改为公开可用入口或明确的 base URL / token / 网络访问状态，不能再以 kill switch 或来源分级跳过公共监听。
 - link icon 靠 53 域名静态缓存，新源永远首字母：运行时解析+缓存，或接受现状。
 - `~/.codex/automations/ai-daily/automation.toml` 在磁盘上是双重编码乱码（UTF-8→GBK→UTF-8），定时任务提示词本身是花的中文，建议重写为干净 UTF-8。

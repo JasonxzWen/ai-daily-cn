@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/public-signals.schema.json",
+  "title": "AI Daily Public Signal Artifacts",
+  "oneOf": [
+    { "$ref": "#/$defs/index" },
+    { "$ref": "#/$defs/page" }
+  ],
+  "$defs": {
+    "nullable_text": { "type": ["string", "null"] },
+    "nullable_uri": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_datetime": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "home_url"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "home_url": { "type": "string", "format": "uri" }
+      }
+    },
+    "collector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "cluster_id",
+        "title",
+        "url",
+        "summary",
+        "author",
+        "handle",
+        "original_text",
+        "publisher",
+        "collected_via",
+        "source_group",
+        "content_tags",
+        "credibility_tag",
+        "event_date",
+        "published_at",
+        "collected_at",
+        "date_anomaly",
+        "image_url",
+        "source_health",
+        "access_state"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^occ_[a-f0-9]{24}$" },
+        "cluster_id": { "type": "string", "pattern": "^cluster_[a-f0-9]{24}$" },
+        "title": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" },
+        "summary": { "$ref": "#/$defs/nullable_text" },
+        "author": { "$ref": "#/$defs/nullable_text" },
+        "handle": { "$ref": "#/$defs/nullable_text" },
+        "original_text": { "$ref": "#/$defs/nullable_text" },
+        "publisher": { "$ref": "#/$defs/publisher" },
+        "collected_via": { "$ref": "#/$defs/collector" },
+        "source_group": { "type": "string", "minLength": 1 },
+        "content_tags": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "credibility_tag": { "type": "string", "minLength": 1 },
+        "event_date": { "type": "string", "format": "date" },
+        "published_at": { "$ref": "#/$defs/nullable_datetime" },
+        "collected_at": { "type": "string", "format": "date-time" },
+        "date_anomaly": {
+          "oneOf": [
+            { "const": "future_relative_to_collection" },
+            { "type": "null" }
+          ]
+        },
+        "image_url": { "$ref": "#/$defs/nullable_uri" },
+        "source_health": { "enum": ["available", "degraded", "unknown"] },
+        "access_state": { "enum": ["direct", "indirect", "unknown"] }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_record_count", "occurrence_count", "coalesced_record_count", "normalization_error_count"],
+      "properties": {
+        "input_record_count": { "type": "integer", "minimum": 0 },
+        "occurrence_count": { "type": "integer", "minimum": 0 },
+        "coalesced_record_count": { "type": "integer", "minimum": 0 },
+        "normalization_error_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "group_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "count", "page_count", "first_page_url", "preview"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 1 },
+        "page_count": { "type": "integer", "minimum": 1 },
+        "first_page_url": { "type": "string", "pattern": "^signals/[a-z_]+/page-[0-9]{3,}\\.json$" },
+        "preview": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/occurrence" }
+        }
+      }
+    },
+    "index": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "taxonomy_version", "kind", "generated_at", "total_count", "page_size", "coverage", "groups"],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "taxonomy_version": { "type": "integer", "minimum": 1 },
+        "kind": { "const": "signal_index" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "total_count": { "type": "integer", "minimum": 0 },
+        "page_size": { "type": "integer", "minimum": 1 },
+        "coverage": { "$ref": "#/$defs/coverage" },
+        "groups": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/group_summary" }
+        }
+      }
+    },
+    "group_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "taxonomy_version", "kind", "generated_at", "group", "page", "page_count", "page_size", "total_count", "next_url", "items"],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "taxonomy_version": { "type": "integer", "minimum": 1 },
+        "kind": { "const": "signal_page" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "group": { "$ref": "#/$defs/group_ref" },
+        "page": { "type": "integer", "minimum": 1 },
+        "page_count": { "type": "integer", "minimum": 1 },
+        "page_size": { "type": "integer", "minimum": 1 },
+        "total_count": { "type": "integer", "minimum": 1 },
+        "next_url": {
+          "oneOf": [
+            { "type": "string", "pattern": "^signals/[a-z_]+/page-[0-9]{3,}\\.json$" },
+            { "type": "null" }
+          ]
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/occurrence" }
+        }
+      }
+    }
+  }
+}

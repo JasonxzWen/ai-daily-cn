@@ -1,6 +1,8 @@
 # AI 日报分发、测试与提示词构建规范
 
-> 状态：归档/参考。当前唯一权威资产为 `prompts/ai-daily/modules/editorial-authority.md`；如与本文冲突，以该文件为准。
+> **2026-07-14 适用范围变更：仅保留为 legacy edited report 的归档规格。** 本文中的主体条数、72 小时补位、来源优先级、质量门、提示词和页面分发规则都不得控制公共 occurrence 或 `docs/signals/**`；公共流无内容准入、无年龄窗口、无来源配额，标签只用于筛选与说明。
+>
+> 状态：归档/参考。`prompts/ai-daily/modules/editorial-authority.md` 仅是遗留编辑报告的内容权威；公共监听以 `public-signal-stream-contract:v1` 为准。
 
 > 2026-07-13 后续覆盖：主体合同为最少 5 条、目标 8 条、最多 12 条；Builder/X、热门博客、GitHub、社区弱信号和白名单公众号等低风险候选可参与 sparse-day 主体补位；主体不足时生成端可扩展到 72 小时并记录短缺质量事件。本文中旧的 5-10、5-30、48 小时 fallback 或 Builder 永不计入 `main_items` 规则只作为历史背景，不再作为当前执行合同。
 

@@ -1,6 +1,8 @@
 ## Fixed Source Checklist
 
-Every daily run must check and audit this user-requested source surface, using `config/sources/*.json`, dedicated discovery commands, or a documented equivalent feed endpoint:
+> Scope: this module applies only to the optional legacy edited report after the public signal stream completes. It does not govern `docs/signals/**` and must not change public-signal membership, default chronology, or publication outcome.
+
+Every optional legacy report run must check and audit this user-requested source surface, using `config/sources/*.json`, dedicated discovery commands, or a documented equivalent feed endpoint:
 
 - Open-source aggregators: `follow-builders`, `ML Papers of the Week`, `Awesome AI News`, `ML & AI News of the Week`.
 - Official lab/company sources: `OpenAI Blog RSS`, `OpenAI News RSS`, `Google DeepMind RSS`, `Google Research Blog`, `Meta AI RSS` or `Meta AI Blog`, `Microsoft Research Blog`, `AWS Machine Learning Blog`, `Anthropic News`, `Hugging Face Blog`.
@@ -20,7 +22,7 @@ Map selected items into these six public-topic buckets before rendering:
 
 Same-event multi-source reports must be merged. T3, intermediary, community, and aggregator items must not enter factual sections without primary-source or multi-source confirmation.
 
-From `2026-06-02` onward, this checklist is enforced by the publish quality gate, not only by the prompt. The final `source_audit` should prove these sources were checked, even when individual feeds return `no_signal`. Missing automation revision, invalid schema, broken candidate references, stale duplicate stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, and Pages verification failures are blocking. Source-surface coverage gaps are degraded: `publish:dry-run`, local `publish`, and `publish:github-api` may proceed only when the gap is written into internal `quality_status.degraded_sections`; the public page may show only a short reader-facing gap note, not source audit details.
+From `2026-06-02` onward, this checklist is enforced by the optional legacy report quality gate, not only by the prompt. It is never a public-signal admission gate. The final legacy `source_audit` should prove these sources were checked, even when individual feeds return `no_signal`. Missing automation revision, invalid legacy schema, broken legacy candidate references, stale duplicate stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, and Pages verification failures block only the legacy report unless the independent public-signal publisher itself fails. Source-surface coverage gaps are degraded: legacy `publish:dry-run`, local `publish`, and `publish:github-api` may proceed only when the gap is written into internal `quality_status.degraded_sections`; the legacy public page may show only a short reader-facing gap note, not source audit details.
 
 Discovery command output and network outage rules:
 

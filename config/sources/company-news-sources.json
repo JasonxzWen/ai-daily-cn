@@ -7,14 +7,13 @@
       "url": "https://blog.google/rss/",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Google company/product news lane. Company-wide updates stay as leads unless they pass AI relevance and primary-source checks."
     },
     {
@@ -23,14 +22,13 @@
       "url": "https://blogs.microsoft.com/feed/",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Microsoft company/product news lane for non-research business signals."
     },
     {
@@ -39,14 +37,13 @@
       "url": "https://www.apple.com/newsroom/rss-feed.rss",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Apple company/product news lane for platform, product, and policy signals."
     },
     {
@@ -55,14 +52,13 @@
       "url": "https://about.fb.com/news/feed/",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Meta company/product news lane beyond the Meta AI blog."
     },
     {
@@ -71,14 +67,14 @@
       "url": "https://www.aboutamazon.com/news/rss",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Amazon company/product news lane for AWS, devices, logistics, policy, and business context."
     },
     {
@@ -87,14 +83,13 @@
       "url": "https://nvidianews.nvidia.com/rss.xml",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official NVIDIA newsroom feed for company, platform, partner, and AI infrastructure signals."
     },
     {
@@ -103,67 +98,15 @@
       "url": "https://github.blog/feed/",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "open_source",
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official GitHub company/product blog for platform, developer ecosystem, security, and open-source operations signals."
-    },
-    {
-      "id": "content-openai-company-news",
-      "name": "OpenAI Company News RSS",
-      "url": "https://openai.com/news/rss.xml",
-      "source_kind": "rss",
-      "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_company_news",
-      "notes": "Official OpenAI news feed for company, product, partnership, safety, policy, and platform availability signals."
-    },
-    {
-      "id": "content-anthropic-company-news",
-      "name": "Anthropic Company News",
-      "url": "https://www.anthropic.com/news",
-      "source_kind": "html_index",
-      "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "format": "html_index",
-      "linkPattern": "/news/",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_company_news",
-      "notes": "Official Anthropic news lane for Claude product, policy, safety, research, partnership, and company updates."
-    },
-    {
-      "id": "content-xai-company-news",
-      "name": "xAI Company News",
-      "url": "https://x.ai/news",
-      "source_kind": "html_index",
-      "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "format": "html_index",
-      "linkPattern": "/news/",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_company_news",
-      "notes": "Official xAI news lane for Grok, model, product, infrastructure, company, and platform updates."
     },
     {
       "id": "content-tencent-media-center",
@@ -171,16 +114,16 @@
       "url": "https://www.tencent.com/en-us/media.html",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/en-us/articles/",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Tencent media center covering corporate news and financial releases."
     },
     {
@@ -189,16 +132,15 @@
       "url": "https://www.huawei.com/en/news/",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/en/news/",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Huawei newsroom for company, ICT infrastructure, cloud, device, AI data center, policy, partner, and event signals."
     },
     {
@@ -207,16 +149,16 @@
       "url": "https://www.bytedance.com/en/news",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/en/news/",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official ByteDance company news lane for product, business, organization, trust and safety, TikTok, CapCut, Lark, Feishu, Douyin and platform-policy signals."
     },
     {
@@ -225,16 +167,15 @@
       "url": "https://www.alibabagroup.com/en-US/news-press-releases",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/en-US/document-",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Alibaba Group press-release lane for company, business, and financial signals."
     },
     {
@@ -243,19 +184,18 @@
       "url": "https://ir.baidu.com/index.php/press-releases",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": [
         "news-releases/news-release-details/",
         "/press-releases/"
       ],
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Baidu investor-relations press-release lane for earnings, buybacks, spin-offs, leadership, business and AI platform signals."
     },
     {
@@ -264,10 +204,11 @@
       "url": "https://ir.mi.com/",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": [
         "/news-releases/",
@@ -275,9 +216,7 @@
         "blog.mi.com"
       ],
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Xiaomi investor-relations and newsroom lane for results, events, smartphone, EV, AIoT, HyperOS, and company operations signals."
     },
     {
@@ -286,16 +225,16 @@
       "url": "https://ir.jd.com/news-releases/",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/news-releases/news-release-details/",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official JD.com investor-news lane for results, logistics, retail, overseas expansion, financing, leadership, and operations signals."
     },
     {
@@ -304,16 +243,16 @@
       "url": "https://ir.netease.com/news-releases",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/news-releases/news-release-details/",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official NetEase company-news lane for results, games, cloud music, Youdao, licensing, product, and operating updates."
     },
     {
@@ -322,16 +261,16 @@
       "url": "https://kuaishou.gcs-web.com/news-events/company-news",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/news-releases/news-release-details/",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Kuaishou company-news lane for financial results, Kling AI, livestreaming, e-commerce, content, ESG, and operating updates."
     },
     {
@@ -340,71 +279,16 @@
       "url": "https://www.meituan.com/en-US/investor-relations",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "https://media-meituan.todayir.com/",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official Meituan investor-relations lane for announcements, results, financial reports, and calendar updates."
-    },
-    {
-      "id": "content-moonshot-kimi-company-news",
-      "name": "Moonshot AI Kimi Company News",
-      "url": "https://platform.kimi.com/blog",
-      "source_kind": "html_index",
-      "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "format": "html_index",
-      "linkPattern": "/blog/posts/",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_company_news",
-      "notes": "Official Moonshot AI/Kimi platform blog lane for API, model, pricing, product, and developer-platform updates."
-    },
-    {
-      "id": "content-minimax-company-news",
-      "name": "MiniMax Company News",
-      "url": "https://www.minimax.io/blog",
-      "source_kind": "html_index",
-      "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "format": "html_index",
-      "linkPattern": "/blog/",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_company_news",
-      "notes": "Official MiniMax blog lane for model, Hailuo AI, product, API, business, and creator-platform updates."
-    },
-    {
-      "id": "content-zhipu-zh-news",
-      "name": "Zhipu AI Chinese News",
-      "url": "https://www.zhipuai.cn/zh/news",
-      "source_kind": "html_index",
-      "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "format": "html_index",
-      "linkPattern": "/zh/news/",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_company_news",
-      "notes": "Official Zhipu AI Chinese news lane for GLM, product, API, model, enterprise, ecosystem, and policy updates."
     },
     {
       "id": "content-minimax-news",
@@ -412,35 +296,17 @@
       "url": "https://www.minimax.io/news",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/news/",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Official MiniMax news lane for Hailuo AI, speech, music, model, product, API, and creator-platform releases."
-    },
-    {
-      "id": "content-kimi-official-blog-company-news",
-      "name": "Kimi Official Blog",
-      "url": "https://www.kimi.com/blog/",
-      "source_kind": "html_index",
-      "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "format": "html_index",
-      "linkPattern": "/blog/",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_company_news",
-      "notes": "Official Kimi blog lane for Kimi model, agent, product, developer-platform, and content-workflow updates."
     }
   ]
 }

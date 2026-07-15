@@ -2,13 +2,47 @@
 
 This document is the durable repository home for the 2026-06-26 cross-agent diagnosis. It consolidates Codex and Claude Code session analysis, PR/commit history, scheduled-run retrospectives, automation summaries, and user intent into an implementation order. It is a planning and acceptance contract, not proof that downstream behavior is fixed.
 
-## Highest Priority
+<!-- public-signal-stream-contract:v1 -->
+
+## 2026-07-14 Current Product Direction
+
+Status: `current-authority / implementation-in-progress`.
+
+The product is now a broad, source-first AI signal listener. This section supersedes every later story-first, qualification, quota, admission, authority-ranking, source-diagnostic-only, and frontend-last statement where they conflict. The older eight-slice roadmap remains below only as historical evidence for the legacy edited-report subsystem.
+
+- No content-admission gate exists in the public signal path. Every safely normalizable occurrence with a usable title and HTTP(S) material URL remains publicly discoverable.
+- Credibility, content, source, health, and access metadata are labels and filters only. They cannot change membership or default chronology.
+- Duplicate URLs from distinct collectors or `observation_id` values remain distinct occurrences. Repeated input rows for one observation are transparently coalesced and counted; URL clustering supports navigation and is never a content dedupe or suppression rule.
+- Unknown classification values fall back visibly to `other` / `pending_review`; new metadata never fails the full pool.
+- Raw `source_audit`, candidate scores, selection/rejection reasons, repair state, private paths, and machine logs remain internal. Reader-safe source group, publisher, collection channel, content tag, credibility tag, health, access, summary, and time fields are public.
+- Pagination and the 48-hour homepage preview are transport and presentation devices, never total-count limits.
+
+### Active PR Sequence
+
+| PR | Product slice | Completion boundary |
+|---|---|---|
+| PR1 | Lossless occurrence and public projection | Assign stable observed `observation_id` before selection; preserve collection metadata through merge; persist merged discovery observations with transparent repeat counts; centralize taxonomy and fallback; publish exact paginated `docs/signals/**`; retain historical structured records with explicit origin labels. |
+| PR2 | Aggressive public/legal source expansion and production independence | Add official blogs, GitHub, communities, X through the existing public path, news/newsletters, RSS, papers, and model feeds without observation periods; let signal persistence/build/publication complete independently of legacy editorial quality gates. New authenticated X/Reddit connectors stay deferred. |
+| PR3 | Complete scheme-C public frontend migration | Replace every public page at the sole supported `1280x900` viewport with the source-grouped light-gray/white-panel/indigo system, 48-hour grouped preview, same-page lazy loading, and full history; delete obsolete daily/archive/ops/official-blog rendered pages and compatibility code while preserving useful structured information. |
+| PR4 | Evidence-driven hardening only if needed | Add performance or observability work only after real runtime evidence identifies a concrete problem; do not pre-build another control plane. |
+
+### Current Iteration Style
+
+- Prefer listening coverage and explicit uncertainty labels over proving content worthy of entry.
+- Prefer a direct data contract and one fallback over observation periods, tier matrices, compatibility gates, duplicated vocabularies, or speculative abstractions.
+- Treat safety, privacy, URL validity, provenance, escaping, and renderability as technical boundaries, not content admission.
+- Delete superseded paths when the migration PR reaches them; do not keep parallel public surfaces merely to avoid making a decision.
+- Preserve historical evidence without letting historical rules remain active authority.
+
+The remaining sections document the prior eight-slice plan. They are not the active implementation order after 2026-07-14.
+
+## Historical Highest Priority
 
 The highest-priority change is not a generator rewrite. It is to keep the user's intent, pain, and accepted diagnosis inside the repository before further implementation.
 
 Future agents must treat this file together with `docs/ai-daily-requirements-reconciliation.md`, `config/feedback-ledger.json`, and `docs/feedback-buglist-quick-reference.md` as the starting context for ai-daily improvement work. Raw Codex or Claude Code chat history can be used as evidence during diagnosis, but durable instructions must be promoted into repository files before the work is claimed stable.
 
-## User Intent
+## Historical User Intent
 
 - Publish automatically with minimal rescue work; degraded source lanes are acceptable when disclosed, but routine manual recovery is not.
 - Produce a high-signal Chinese AI daily that answers what matters today, why it matters, and what to inspect next.
@@ -17,13 +51,13 @@ Future agents must treat this file together with `docs/ai-daily-requirements-rec
 - Make the public page dense and scannable like a working document, but only after the content/admission layer improves.
 - Convert user feedback into ledger-backed tests or runtime gates; do not rely on model memory or chat summaries.
 
-## Current Diagnosis
+## Current Diagnosis (Historical Eight-Slice Baseline)
 
 The repository has improved reliability more than content judgment. Recent scheduled runs can reach `published_degraded`, and several PRs improved repair, source coverage, and rendering. The unresolved pain is that the generated report can still look structurally valid while retaining templated prose, low-signal item selection, weak GitHub descriptions, and unstable source lanes.
 
 The main bottleneck is target mismatch: previous work often optimized schema compliance, post-generation repair, and publish survival, while the user expected editorial selection and concise human-readable synthesis. This mismatch must be corrected in the order below.
 
-## Dependency Order
+## Historical Dependency Order
 
 | Order | Slice | Depends On | Scope | Why This Order |
 |---|---|---|---|---|
@@ -36,7 +70,7 @@ The main bottleneck is target mismatch: previous work often optimized schema com
 | 6 | Automation observability cleanup | 0 | automation docs, inventory, run-summary dashboard | Independent reliability work; should not block content-quality slices. |
 | 7 | Frontend information architecture | 1, 2, 3, 4 | interaction input, CSS, Playwright page checks | Dense UI is valuable only after the content it compresses is worth scanning. |
 
-## Independently Verifiable
+## Historical Independently Verifiable Matrix
 
 | Slice | Independently Verifiable | Minimum Evidence |
 |---|---|---|
@@ -49,7 +83,7 @@ The main bottleneck is target mismatch: previous work often optimized schema com
 | 6 Automation observability | yes | Automation config is readable, status is consistent, and run summaries produce a simple published/degraded/repaired/stage-failure view. |
 | 7 Frontend IA | yes after content slices | `1280x900` desktop screenshots show dense sections, no overlap, no hidden source-quality failures, and no public internal diagnostics. |
 
-## Slice Execution Policy
+## Historical Slice Execution Policy
 
 - Treat each roadmap slice as the PR unit. Open one main PR per slice and use multiple commits inside that PR for audit, tags, guards, runtime changes, schema sync, tests, and docs.
 - Do not open separate PRs for each small audit/tag/guard increment unless the user explicitly approves an exception.
@@ -58,7 +92,7 @@ The main bottleneck is target mismatch: previous work often optimized schema com
 - Centralize repeated contracts before expanding them. Stage vocabulary, role vocabulary, reject reasons, schema enums, runtime guards, and tests should come from one shared source or an explicitly documented synchronization point.
 - Keep `.harness-hub/state/` writes low-frequency during implementation: record decision-level changes as they happen, then write complete progress, validation evidence, and restart notes during final handoff.
 
-## Slice Completion Definition Table
+## Historical Slice Completion Definition Table
 
 This table is the pre-development checkpoint. A slice is not "done" because a partial guard, audit field, or renderer patch landed; it is done only when the completion definition and evidence boundary are satisfied.
 
@@ -73,13 +107,13 @@ This table is the pre-development checkpoint. A slice is not "done" because a pa
 | 6 Automation observability cleanup | Automation inventory, status, and run summaries produce a consistent published/degraded/repaired/stage-failure view with enough evidence for unattended operation and recovery. | Locally complete for the current contract: one `ai-2` publisher remains, dated summaries are read explicitly as UTF-8, and semantic stage failures project stable terminal evidence. Fresh merged-main scheduled evidence is still required before production verification. |
 | 7 Frontend information architecture | After content/admission/authoring improve, the `1280x900` desktop page presents dense scannable sections with source quality visible, no overlap, no public internal diagnostics, and browser acceptance evidence. Mobile, tablet, narrow-screen, and touch-only surfaces are not part of the slice. | Deferred: do not spend major effort here until slices 1, 2, 3, and 4 produce content worth compressing into the UI. |
 
-## Current Path Review
+## Historical Path Review
 
 As of 2026-07-14, 7 of the 8 roadmap slices still have material implementation or real-evidence gaps. Slice 0 remains the only closed planning contract. The current source-level replay work stays within Slice 1 and closes one candidate producer-drift sublane; it does not close broader report/HTML evidence or count a historical replay as merged-main production verification. Aify remains within Slice 5 and still requires three post-merge days plus the other source lanes.
 
 The recent implementation path improved Slice 2 auditability through small increments, but it drifted toward partial audit PRs instead of one completed admission/scoring slice. The correction is to stop opening narrow audit/tag/guard PRs and fold remaining Slice 2 work into a single main Slice 2 PR with commits for shared vocabulary, audit completion, scoring behavior, and focused plus affected-suite validation.
 
-## Recommended Sequence
+## Historical Recommended Sequence
 
 1. Finish slice 0 as a small documentation/test/ledger change.
 2. Implement slice 1 next. Without real artifact validation, every later PR can pass while the public report still looks wrong.
@@ -90,7 +124,7 @@ The recent implementation path improved Slice 2 auditability through small incre
 7. Implement slice 6 whenever automation status becomes confusing or blocks unattended publish work.
 8. Implement slice 7 last among the major content work, because layout changes should amplify signal, not mask weak selection.
 
-## Scope Rules
+## Historical Scope Rules
 
 - One main PR owns one slice. A slice PR may contain multiple commits, but small audit, tag, or guard increments should not become separate PRs.
 - Any slice that touches generation, rendering, source discovery, or public HTML must update `.harness-hub/state/current-task.md` with concrete allowed paths and a red test or deterministic substitute.
@@ -99,7 +133,7 @@ The recent implementation path improved Slice 2 auditability through small incre
 - During development, run focused validation plus the affected suite; run full `corepack pnpm run validate` when preparing the slice PR or final material delivery.
 - Before adding another copy of a vocabulary or audit contract, centralize it or document the synchronization point across runtime, schema, and tests.
 
-## Not In This Phase
+## Historical Not In This Phase
 
 - Do not rewrite the whole daily pipeline before real artifact validation exists.
 - Do not add broad new sources without source-health evidence and a selection path.

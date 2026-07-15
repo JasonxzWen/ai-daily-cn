@@ -182,14 +182,14 @@ export function collectCandidateCoverageIssues(report, candidatePool) {
           }
         }
       }
-      const admission = evaluatePublicSourceAdmission({ sectionName, candidate, item });
-      if (!admission.allowed && admission.reason_code === "primary_verification_required") {
+      const eligibility = evaluateLegacyReportEligibility({ sectionName, candidate, item });
+      if (!eligibility.allowed && eligibility.reason_code === "primary_verification_required") {
         errors.push({
           path: `${pathName}.candidate_id`,
           message: `candidate_id 未完成一手或多源核验，不能进入 ${sectionName}：${item.candidate_id}`
         });
       }
-      if (!admission.allowed && admission.reason_code === "non_primary_disclosure_required") {
+      if (!eligibility.allowed && eligibility.reason_code === "non_primary_disclosure_required") {
         errors.push({
           path: `${pathName}.candidate_id`,
           message: `candidate_id 使用非一手来源进入 ${sectionName} 时必须在条目中披露 source_level、verification_status 和 verification_note/risk_note：${item.candidate_id}`
@@ -201,7 +201,7 @@ export function collectCandidateCoverageIssues(report, candidatePool) {
   return errors;
 }
 
-export function evaluatePublicSourceAdmission({ sectionName, candidate = {}, item = {} } = {}) {
+export function evaluateLegacyReportEligibility({ sectionName, candidate = {}, item = {} } = {}) {
   const effectiveCandidate = effectiveCandidateVerification(candidate);
   const verificationUpgraded =
     effectiveCandidate.verification_status !== candidate.verification_status ||

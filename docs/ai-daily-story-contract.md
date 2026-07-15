@@ -1,8 +1,10 @@
 # AI 日报 Story-Centered 生成合同
 
-状态：`implemented / publish-run-validation-pending`
+> **2026-07-14 适用范围变更：仅保留为可选遗留编辑报告合同。** 本文中的 story 资格、8–12 条数量、来源合并、URL/跨期去重、GitHub Top10、质量门和所有“公开”措辞都不治理 `docs/signals/**`。公共产品的成员集合与默认时序只由 `public-signal-stream-contract:v1` 约束：无内容准入门槛，分类与可信度仅作标签和筛选。PR3 将删除本文对应的遗留公开渲染面；结构化历史数据仍可保留。
 
-本文记录 2026-06-23 用户确认的 AI 日报新契约。当前分支已把该契约落到 schema、draft 生成、report 写入、public rendering、page checklist 和回归测试；但某个真实日报是否发布成功，仍只由当次 `daily:run --publish` 的 run summary、Pages 验证和 blocking/degraded 结果证明。
+状态：`implemented-for-optional-legacy-edited-report / publish-run-validation-pending`
+
+本文记录 2026-06-23 用户确认、并于 2026-07-14 被收窄为遗留编辑报告范围的契约。当前分支已把该遗留契约落到 schema、draft 生成、report 写入、legacy public rendering、page checklist 和回归测试；但某个真实遗留日报是否发布成功，仍只由当次 `daily:run --publish` 的 run summary、Pages 验证和 blocking/degraded 结果证明。
 
 ## 读者目标
 

@@ -9,14 +9,14 @@
       "format": "html_index",
       "linkPattern": "/zh-cn/articles/",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Chinese official Tencent newsroom. Prefer zh-cn article URLs over en-us mirrors for China AI coverage."
     },
     {
@@ -27,14 +27,14 @@
       "format": "html_index",
       "linkPattern": "/zh-CN/document-",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Chinese official Alibaba Group news and press release lane."
     },
     {
@@ -45,33 +45,14 @@
       "format": "html_index",
       "linkPattern": "/zh/blog/",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Alibaba Cloud Chinese blog lane for Function Compute, infrastructure, model service, and engineering posts."
-    },
-    {
-      "id": "china-ai-qwen-blog",
-      "name": "Qwen Blog",
-      "url": "https://qwen.ai/blog",
-      "source_kind": "html_index",
-      "format": "html_index",
-      "linkPattern": "/blog/",
-      "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_model_host_account",
-      "notes": "Qwen official model and platform blog. English pages are accepted only when no Chinese official version exists."
     },
     {
       "id": "china-ai-deepseek-news",
@@ -81,14 +62,14 @@
       "format": "html_index",
       "linkPattern": "/updates/",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "model_release",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_model_host_account",
       "notes": "DeepSeek official news and API documentation updates."
     },
     {
@@ -99,51 +80,18 @@
       "format": "html_index",
       "linkPattern": "/zh/news",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
-      "notes": "Zhipu AI Chinese official news lane."
-    },
-    {
-      "id": "china-ai-kimi-blog",
-      "name": "Kimi Blog",
-      "url": "https://www.kimi.com/blog/",
-      "source_kind": "html_index",
-      "format": "html_index",
-      "linkPattern": "/blog/",
-      "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_model_host_account",
-      "notes": "Moonshot/Kimi official product and model blog lane."
-    },
-    {
-      "id": "china-ai-minimax-blog",
-      "name": "MiniMax Blog",
-      "url": "https://www.minimax.io/blog",
-      "source_kind": "html_index",
-      "format": "html_index",
-      "linkPattern": "/blog",
-      "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
-      "requires_original_url": false,
-      "max_items_per_run": 4,
-      "timeout_ms": 15000,
-      "source_level": "official_model_host_account",
-      "notes": "MiniMax official blog lane."
+      "aliases": [
+        "content-zhipu-zh-news"
+      ],
+      "notes": "Zhipu AI Chinese official news lane for GLM, product, API, model, enterprise, ecosystem, and policy updates."
     },
     {
       "id": "china-ai-bytedance-seed-cn",
@@ -153,14 +101,13 @@
       "format": "html_index",
       "linkPattern": "/zh/blog/",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "ByteDance Seed Chinese blog lane, preferred over English mirrors when available."
     },
     {
@@ -171,14 +118,14 @@
       "format": "html_index",
       "linkPattern": "/support/news",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official_company_news",
       "notes": "Baidu AI Cloud Chinese official news lane."
     }
   ]

@@ -1,4 +1,15 @@
-## 信源优先级
+## 公共信号标签与遗留报告信源策略
+
+> 范围声明：公共信号流是独立且先行的监听层；本模块的优先级、回源、筛选和事实核验要求仅适用于公共信号流完成后的可选遗留编辑报告（legacy report），不得改变 `docs/signals/**` 的成员集合、默认时序或发布结果。
+
+两条链路使用同一批来源，但治理方式不同：
+
+- **公共信号流**：所有已发现、标准化且可安全公开的记录都应保留。来源属性、内容类别、可信度、健康、访问性、`manual`、回源状态和原始 X URL 完整度都是非门槛标签，只用于展示、筛选和理解边界。
+- **可选遗留编辑报告**：可以把 T0/T1/T2/T3、回源、多源核验和高风险事实规则用于排序、筛选与成稿。未入选 legacy 报告不等于从公共信号流删除。
+
+公共信号只使用 canonical 可信度标签：`primary_material`、`multi_source_material`、`single_source_relay`、`community_lead`、`monitoring_lead`、`pending_review`。它们只解释材料形态，不评分、不排序、不准入。
+
+以下 T0-T3 仅是遗留编辑报告的历史优先级，不是注册表字段，也不是公共信号标签：
 
 - T0：官方博客、论文、模型卡、GitHub Release、官方 benchmark。
 - T1：builder、研究者、founder、maintainer 的原始帖子或视频。
@@ -7,8 +18,8 @@
 
 优先扩展信源：
 
-- 信源注册表：固定源统一维护在 `config/sources/*.json`，新增源必须带 `source_kind`、`candidate_category`、`tier`、`authority`、`enablement` 和 `verification_policy`，并通过 `corepack pnpm run sources:validate`。默认日报只运行 `core`，`optional/manual` 需要显式启用或用户提供。
-- Builder/X/播客：优先使用 `follow-builders central feed`，再回到原始 X URL、公开视频、播客页或个人博客；Follow AI Builders 可作为 builder 名录和标签线索。需要更大 X 覆盖面时，只使用能保留原始 X status URL 的自托管 RSSHub、twscrape、列表导出或等价工具。Builder 观点入选时必须保留完整 `original_text` 并提供忠实中文 `translation`，不能用二手摘要或自己概括替代；能拿到 handle/头像时同步写入 `handle` 和 `avatar_url`。
+- 信源注册表：固定源统一维护在 `config/sources/*.json`，每个来源直接声明 `source_group`、标准 `content_tags` 和 `credibility_tag`，并通过 `corepack pnpm run sources:validate`。注册表不再接受 `tier`、`authority`、`verification_policy`、`enablement` 或 `source_level`；`manual` 只可作为采集通道 `source_kind`，不得用于跳过来源。监听命令不得在 occurrence 持久化前取样，遗留编辑报告只能消费完整 occurrence 后另行编排。
+- Builder/X/播客：优先使用 `follow-builders central feed`，再回到原始 X URL、公开视频、播客页或个人博客；Follow AI Builders 可作为 builder 名录和标签线索。遗留报告需要更强可审计性时，优先使用能保留原始 X status URL 的自托管 RSSHub、twscrape、列表导出或等价工具；缺原始 status URL 的安全记录仍保留在公共信号流，并标记可追溯性和访问边界。Builder 观点进入遗留报告时必须保留完整 `original_text` 并提供忠实中文 `translation`，不能用二手摘要或自己概括替代；能拿到 handle/头像时同步写入 `handle` 和 `avatar_url`。
 - 官方与实验室工程博客：OpenAI News/RSS、Anthropic Engineering/News、Google DeepMind、Google Research、Meta AI、Microsoft Research、Hugging Face Blog。
 - 广义科技、大厂和行业趋势：TechCrunch AI/Enterprise、The Verge AI/main、Ars Technica、Google Keyword Blog、Official Microsoft Blog、Apple Newsroom、Meta Newsroom、Amazon News 等可以作为候选源；只有当它们影响 AI 供给、开发者工作流、平台政策、算力/云、产品分发、监管或产业结构时才入选。
 - 高质量个人/社区技术博客与访谈：Latent.Space、Interconnects、Simon Willison、Chip Huyen、Karpathy、BAIR Blog，以及对 OpenAI、Anthropic、Google、Meta 等大型实验室工程师的原始访谈或 transcript。
@@ -26,7 +37,7 @@
 - 新日报目标是 55-75 个公开内容单元/天，逻辑上覆盖 AI 核心动态、AIGC 与内容产业、产品与融资雷达、精选博客/播客、X / 社区热点讨论和 GitHub Trending。`model_releases` 是结构化索引，不单独计作公开板块；`projects` 只作为 GitHub Trending highlights 展示。
 - `stories` 目标是默认 8 条、最多 12 条；允许少于 8，但不能用模板化或低核验内容凑数。每条公开正文展示具体标题、`what_happened`、紧凑 `why_it_matters`、`evidence_level` 和来源链接，并使用 `**加粗**` / `==高亮词==` 标重点。高亮词会渲染成加粗变色文字，不是 tag/chip。主体信息只写新闻事实、数据、图表、限制、变化和具体影响，不写对日报自身的“启示/后续跟进/报道口径/扩容建议”。
 - 高信号真实模型发布必须纳入 `stories`，`model_releases` 只作为结构化索引和可用性字段集合，不能让主体信息因此减少。
-- 扩容通过增加候选池和信源标签分层展示实现，不通过降低高风险事实门槛实现。正文少于 45 个内容单元时，不凑旧内容；在 `quality_status` 或 `self_check.notes` 写明缺口来源。
+- 遗留编辑报告的扩容通过增加候选池和信源标签分层展示实现，不通过降低高风险事实核验要求实现。正文少于 45 个内容单元时，不凑旧内容；在 legacy `quality_status` 或 `self_check.notes` 写明缺口来源。公共信号流继续保留全部安全记录，不受这个数量或事实门槛影响。
 
 禁止：
 
@@ -34,7 +45,7 @@
 - 只引用二手媒体而不回源。
 - 把普通微信公众号、自媒体或聚合摘要当作事实最终来源。
 - 把白名单公众号里的融资金额、估值、价格、benchmark、安全事故、监管或模型能力断言当作无须核验的事实。
-- 使用没有原始 X status URL 的 X 热点摘要。
+- 在遗留报告中把没有原始 X status URL 的 X 热点摘要写成已核验事实；公共信号流可以保留该安全记录，但必须标记原始链接缺失、可信度和可追溯性边界。
 - 把搜索结果摘要、公众号正文、媒体转载或聚合页直接写成事实来源；搜索命中必须先回到一手 URL 或保留为 `community_lead`。
 - 把预测、传闻或情绪化观点写成事实。
 - 把没有原文链接或可确认发布日期的博客写入 `hot_blogs`。

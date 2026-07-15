@@ -2,6 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { containsInternalSourceField } from "../src/privacy.js";
 import { buildSourceInventoryRows, CORE_SOURCE_CONTRACTS } from "../src/source-effectiveness.js";
 
 const REQUIRED_STATUS_LABELS = [
@@ -84,8 +85,8 @@ const SOURCE_PROMOTION_DECISIONS = new Set(["promoted", "defer", "retire"]);
 const REQUIRED_PRESENTATION_CONTRACT = {
   version: "source-first-v2",
   surface: "internal_source_governance",
-  public_daily_default: "story_first_without_source_runtime_sections",
-  public_runtime_sections: "excluded_by_default",
+  public_daily_default: "source_grouped_occurrence_stream",
+  public_runtime_sections: "reader_safe_projection_only",
   first_viewport_order: [
     "source_signal_story",
     "source_metrics_dashboard"
@@ -100,7 +101,7 @@ const REQUIRED_PRESENTATION_CONTRACT = {
   reader_source_unit: "logical_source",
   inventory_unit: "collection_entry",
   full_inventory_semantics: "visible_grouped_expanded_non_hiding_search",
-  story_content_contract: "story-centered-daily-contract",
+  story_content_contract: "legacy-editorial-only",
   public_excluded_section_ids: [
     "source_signal_story",
     "source_first_dashboard",
@@ -114,11 +115,11 @@ const REQUIRED_PRESENTATION_CONTRACT = {
 const REQUIRED_SOURCE_FIRST_V2_HANDBOOK_PHRASES = [
   "Logical Source Layer",
   "Collection Entry Layer",
-  "Source-first runtime is internal governance by default",
-  "Public daily pages remain story-first and exclude source runtime audit sections",
-  "source signal story before source metrics dashboard in internal source-first runtime",
-  "153 collection entries are complete inventory rows, not public daily story content",
-  "Story-centered content remains the fact carrier",
+  "Source-first inventory runtime remains internal governance",
+  "Public pages use a reader-safe source-grouped occurrence projection and exclude internal source runtime audit sections",
+  "source signal story before source metrics dashboard in internal source-first inventory runtime",
+  "Collection entries are complete inventory rows, not public occurrence cards",
+  "Reader-safe occurrences are the public fact carrier; story-centered content is an optional legacy editorial derivative",
   "Promote a collection entry only when source governance should track it as a named source"
 ];
 
@@ -453,10 +454,6 @@ function validateInventoryOrderReference(reference, inventoryRows, maintenance, 
       message: "inventory order reference must not expose raw URLs"
     },
     {
-      pattern: /(?:\bAI_DAILY_[A-Z0-9_]+\b|\b[A-Z][A-Z0-9_]*(?:_API_KEY|_TOKEN|_COOKIE|_SECRET|_BASE_URL|_FEED_URL|_URL)\b|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|\bkeywords\b|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug)/i,
-      message: "inventory order reference must not expose internal source fields"
-    },
-    {
       pattern: /(?:[A-Za-z]:[\\/]|\\Users\\|\.codex[\\/]|\/Users\/[^/\s]+\/|\/home\/[^/\s]+\/)/i,
       message: "inventory order reference must not expose local paths"
     },
@@ -469,6 +466,9 @@ function validateInventoryOrderReference(reference, inventoryRows, maintenance, 
     if (check.pattern.test(reference)) {
       failures.push(check.message);
     }
+  }
+  if (containsInternalSourceField(reference)) {
+    failures.push("inventory order reference must not expose internal source fields");
   }
 }
 
@@ -574,10 +574,6 @@ function validateOrderTuningReview(review, inventoryRows, contract, maintenance,
       message: "order tuning review must not expose raw URLs"
     },
     {
-      pattern: /(?:\bAI_DAILY_[A-Z0-9_]+\b|\b[A-Z][A-Z0-9_]*(?:_API_KEY|_TOKEN|_COOKIE|_SECRET|_BASE_URL|_FEED_URL|_URL)\b|required_env|url_env|base_url_env|\burl\b|env_required|allowed_hosts|include_keywords|exclude_keywords|\bkeywords\b|notes|source_audit|candidate_pool|selection_snapshot|self_check|score|debug)/i,
-      message: "order tuning review must not expose internal source fields"
-    },
-    {
       pattern: /(?:[A-Za-z]:[\\/]|\\Users\\|\.codex[\\/]|\/Users\/[^/\s]+\/|\/home\/[^/\s]+\/)/i,
       message: "order tuning review must not expose local paths"
     },
@@ -590,6 +586,9 @@ function validateOrderTuningReview(review, inventoryRows, contract, maintenance,
     if (check.pattern.test(review)) {
       failures.push(check.message);
     }
+  }
+  if (containsInternalSourceField(review)) {
+    failures.push("order tuning review must not expose internal source fields");
   }
 }
 

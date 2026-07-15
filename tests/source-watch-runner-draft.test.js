@@ -23,6 +23,14 @@ test("daily runner collects Source Watch and sends the artifact to report:draft"
     REPORT_DATE,
     "--config",
     "config/source-watchlist.json",
+    "--endpoint-limit",
+    "5",
+    "--transport-state",
+    ".tmp/search-pagination-state.json",
+    "--transport-request-budget",
+    "120",
+    "--transport-runtime-ms",
+    "180000",
     "--output",
     `.tmp/source-watch-${REPORT_DATE}.json`
   ]);

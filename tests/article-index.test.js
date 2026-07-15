@@ -8,7 +8,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
-import { buildArticleIndex, buildHomeData, buildSite } from "../src/site.js";
+import { buildArticleIndex, buildHomeData, buildSite, collectJsonFiles } from "../src/site.js";
 import { renderIndexHtml } from "../src/render.js";
 import { validateArticles, validateHome } from "../src/schema.js";
 
@@ -23,6 +23,18 @@ const AIFY_DOMAINS = new Set([
   "基础模型与算力技术栈",
   "多模态与具身等前沿"
 ]);
+
+test("legacy report scan ignores the public signal baseline manifest", async () => {
+  const dataInputDir = await fs.mkdtemp(path.join(os.tmpdir(), "adc-report-scan-"));
+  const reportDir = path.join(dataInputDir, "2026", "07");
+  await fs.mkdir(reportDir, { recursive: true });
+  await fs.writeFile(path.join(reportDir, "2026-07-14.json"), "{}", "utf8");
+  await fs.writeFile(path.join(dataInputDir, "occurrence-baseline-manifest.json"), "{}", "utf8");
+
+  const files = await collectJsonFiles(dataInputDir);
+
+  assert.deepEqual(files, [path.join(reportDir, "2026-07-14.json")]);
+});
 
 function sampleReport() {
   return {

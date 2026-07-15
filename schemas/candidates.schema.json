@@ -41,67 +41,16 @@
       "format": "uri"
     },
     "editorial_category": {
-      "enum": [
-        "headline",
-        "ai_industry",
-        "engineering_toolchain",
-        "model_release",
-        "company_business",
-        "policy_infra",
-        "content_aigc",
-        "product_radar",
-        "funding",
-        "open_source",
-        "viewpoint_analysis",
-        "podcast",
-        "x_discussion",
-        "community_signal"
-      ]
+      "type": "string",
+      "minLength": 1
     },
     "source_level": {
-      "enum": [
-        "primary",
-        "official",
-        "paper",
-        "github",
-        "multi_source",
-        "intermediary",
-        "community",
-        "original_social",
-        "unverified",
-        "wechat_primary_like",
-        "wechat_industry_whitelist",
-        "weekly_paper_aggregator",
-        "open_source_aggregator",
-        "tech_weekly_aggregator",
-        "paper_api",
-        "community_api",
-        "paper_aggregator",
-        "ai_news_aggregator",
-        "aigc_content_industry",
-        "ai_funding_product_radar",
-        "official_company_news",
-        "official_open_source_account",
-        "official_model_host_account",
-        "model_registry",
-        "github_ai_news_directory",
-        "weekly_ai_news_aggregator",
-        "big_tech_company_watch",
-        "china_big_tech_company_watch",
-        "official_open_source_watch",
-        "wechat2rss_medium_trust",
-        "platform_exempt_signal"
-      ]
+      "type": "string",
+      "minLength": 1
     },
     "verification_status": {
-      "enum": [
-        "primary_confirmed",
-        "multi_source_confirmed",
-        "intermediary_only",
-        "original_social_only",
-        "unverified",
-        "platform_exempt_unverified"
-      ]
+      "type": "string",
+      "minLength": 1
     },
     "source_watch": {
       "type": "object",
@@ -388,6 +337,9 @@
         "id": {
           "$ref": "#/$defs/id"
         },
+        "observation_id": {
+          "$ref": "#/$defs/id"
+        },
         "source_id": {
           "$ref": "#/$defs/id"
         },
@@ -516,6 +468,53 @@
         },
         "evidence": {
           "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "signal": {
+          "type": "string"
+        },
+        "trend": {
+          "enum": ["trending", "new", "up", "down", "same"]
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "published_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "collected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_group": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "credibility_tag": {
+          "type": "string",
+          "minLength": 1
         },
         "author": {
           "type": "string",

@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { parseDailyMarkdown } from "./parser.js";
@@ -15,11 +15,13 @@ import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import {
   candidatePoolRelativePaths,
   internalCandidatePoolRelativePath,
-  REPORTS_DATA_INTERNAL_DIR
+  REPORTS_DATA_INTERNAL_DIR,
+  REPORTS_DATA_OCCURRENCES_DIR
 } from "./reports-data-layout.js";
 import { defaultGeneratedAt } from "./time.js";
 import { validateArticles, validateFeed, validateHome, validateReport, validateTrends } from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
+import { compareOccurrenceChronology } from "./occurrence-store.js";
 import { deriveQualityStatus, normalizeQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 import { withDefaultImportance } from "./importance.js";
@@ -32,11 +34,20 @@ import { loadOfficialBlogKnowledge, toPublicOfficialBlogKnowledge } from "./offi
 import { normalizeGithubReadmeSummary } from "./github-readme.js";
 import { isPublicSurfaceDietEnabled } from "./public-surface-policy.js";
 import { WEB_APP_GENERATED_FILES } from "./web-app-build.js";
+import {
+  buildPublicSignalArtifacts,
+  loadOccurrenceStores,
+  publicSignalPagePath,
+  validatePublicSignalArtifactSet
+} from "./public-signals.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
-const REPORT_DATA_AUXILIARY_JSON = new Set(["source-status-history.json"]);
+const REPORT_DATA_AUXILIARY_JSON = new Set([
+  "source-status-history.json",
+  "occurrence-baseline-manifest.json"
+]);
 const PUBLIC_DATA_PRIVATE_KEYS = new Set([
   "candidate_id",
   "candidate_pool_path",
@@ -435,6 +446,7 @@ export async function buildSite(options = {}) {
   const writtenFiles = [];
 
   await fs.mkdir(outDir, { recursive: true });
+  await recoverInterruptedSignalPublication(outDir, path.resolve(outDir, "signals"));
   await writeFileTracked(outDir, ".nojekyll", "", writtenFiles);
   await writeFileTracked(outDir, adcPublicThemeAssetPath, `${adcPublicThemeCss}\n`, writtenFiles);
   await writeFileTracked(outDir, "assets/style.css", defaultStyleCss, writtenFiles);
@@ -448,7 +460,7 @@ export async function buildSite(options = {}) {
   }
 
   for (const file of reportJsonFiles) {
-    const report = await readReportJson(file);
+    const { report } = await readReportJsonRecord(file);
     reports.push(report);
     reportRecords.push({ report, markdown: null, reportJsonPath: file });
   }
@@ -485,6 +497,13 @@ export async function buildSite(options = {}) {
   const dateIndex = buildDateIndex(feedValidation.value, reports, trendValidation.value);
   const sourceWatchCandidatePoolRecords = await loadSourceWatchCandidatePools(dataInputDir, reports);
   const sourceWatchCandidatePools = sourceWatchCandidatePoolRecords.map((record) => record.candidatePool);
+  const publicSignals = options.buildPublicSignals === false
+    ? { skipped: true, files: [], index: null, pages: [] }
+    : await createPublicSignalArtifacts({
+        dataInputDir,
+        generatedAt,
+        requireBaselineManifest: options.requireBaselineManifest
+      });
   const articles = buildArticleIndex(reports, {
     siteTitle,
     siteUrl,
@@ -527,6 +546,9 @@ export async function buildSite(options = {}) {
   await writeJsonTracked(outDir, "home.json", homeValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "data/official-blogs.json", officialBlogKnowledge, writtenFiles);
+  if (!publicSignals.skipped) {
+    await syncPublicSignalArtifacts(outDir, publicSignals.files, writtenFiles);
+  }
   await writeFileTracked(outDir, "official-blogs/index.html", renderOfficialBlogsHtml(officialBlogKnowledge, {
     styleHref: `../assets/style.css?v=${encodeURIComponent(indexStyleVersion)}`
   }), writtenFiles);
@@ -553,10 +575,93 @@ export async function buildSite(options = {}) {
     home: homeValidation.value,
     trends: trendValidation.value,
     officialBlogKnowledge,
+    publicSignals,
     sourceWatchConsumption,
     dateIndex,
     writtenFiles: uniqueSorted(writtenFiles)
   };
+}
+
+export async function buildPublicSignals(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const dataInputDir = path.resolve(rootDir, options.dataInputDir || "reports-data");
+  const outDir = path.resolve(rootDir, options.outDir || "docs");
+  const generatedAt = options.generatedAt || defaultGeneratedAt();
+  const writtenFiles = [];
+
+  const publicSignals = await createPublicSignalArtifacts({
+    dataInputDir,
+    generatedAt,
+    requireBaselineManifest: options.requireBaselineManifest
+  });
+  await fs.mkdir(outDir, { recursive: true });
+  await syncPublicSignalArtifacts(outDir, publicSignals.files, writtenFiles);
+
+  return {
+    outDir,
+    publicSignals,
+    writtenFiles: uniqueSorted(writtenFiles)
+  };
+}
+
+export async function validatePublicSignalsOutput(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const outDir = path.resolve(rootDir, options.outDir || "docs");
+  const indexPath = path.join(outDir, "signals", "index.json");
+  let index;
+  try {
+    index = JSON.parse(await fs.readFile(indexPath, "utf8"));
+  } catch (error) {
+    throw new PublisherError("public_signal_index_invalid", `Unable to read public signal index: ${indexPath}`, {
+      cause: error.message
+    });
+  }
+  const pages = [];
+  for (const group of Array.isArray(index.groups) ? index.groups : []) {
+    for (let pageNumber = 1; pageNumber <= Number(group.page_count || 0); pageNumber += 1) {
+      const relativePath = publicSignalPagePath(group.id, pageNumber);
+      try {
+        pages.push({
+          path: relativePath,
+          data: JSON.parse(await fs.readFile(path.join(outDir, ...relativePath.split("/")), "utf8"))
+        });
+      } catch (error) {
+        throw new PublisherError("public_signal_page_invalid", `Unable to read public signal page: ${relativePath}`, {
+          cause: error.message
+        });
+      }
+    }
+  }
+  const artifacts = {
+    index,
+    pages,
+    occurrences: pages.flatMap((entry) => entry.data.items || []).sort(compareOccurrenceChronology),
+    files: [{ path: "signals/index.json", data: index }, ...pages]
+  };
+  const validation = validatePublicSignalArtifactSet(artifacts);
+  if (!validation.valid) {
+    throw new PublisherError("public_signal_artifact_set_invalid", "Public signal output failed cross-file validation.", {
+      errors: validation.errors
+    });
+  }
+  return {
+    ok: true,
+    index_path: indexPath,
+    total_count: index.total_count,
+    page_count: pages.length,
+    coverage: index.coverage,
+    artifacts
+  };
+}
+
+async function createPublicSignalArtifacts(options = {}) {
+  const occurrenceStores = await loadOccurrenceStores(options.dataInputDir, {
+    requireBaselineManifest: options.requireBaselineManifest
+  });
+  return buildPublicSignalArtifacts({
+    occurrenceStores,
+    generatedAt: options.generatedAt
+  });
 }
 
 function contentHash(value) {
@@ -593,6 +698,7 @@ export async function collectJsonFiles(inputDir) {
   return files
     .filter((file) => file.toLowerCase().endsWith(".json"))
     .filter((file) => !toPosixRelative(inputDir, file).split("/").includes(REPORTS_DATA_INTERNAL_DIR))
+    .filter((file) => !toPosixRelative(inputDir, file).split("/").includes(REPORTS_DATA_OCCURRENCES_DIR))
     .filter((file) => !file.toLowerCase().endsWith(".candidates.json"))
     .filter((file) => !REPORT_DATA_AUXILIARY_JSON.has(path.basename(file).toLowerCase()))
     .sort();
@@ -633,7 +739,7 @@ export async function planGeneratedFiles(options = {}) {
   }
 
   for (const file of reportJsonFiles) {
-    const report = await readReportJson(file);
+    const { report } = await readReportJsonRecord(file);
     const paths = reportRelativePaths(report.report_date);
     files.push(paths.dataPath, paths.htmlPath);
     files.push(...reportManagedAssetPaths(report));
@@ -645,6 +751,14 @@ export async function planGeneratedFiles(options = {}) {
     }
     reports.push(report);
   }
+
+  const publicSignals = await createPublicSignalArtifacts({
+    dataInputDir,
+    generatedAt,
+    requireBaselineManifest: options.requireBaselineManifest
+  });
+  files.push(...publicSignals.files.map((entry) => entry.path));
+  files.push(...await collectManagedSignalFiles(outDir));
 
   return {
     reports,
@@ -2077,11 +2191,155 @@ async function writeFileTracked(outDir, relativePath, content, writtenFiles) {
   writtenFiles.push(relativePath);
 }
 
+async function syncPublicSignalArtifacts(outDir, files, writtenFiles) {
+  const expected = new Map(files.map((entry) => [entry.path, `${JSON.stringify(entry.data, null, 2)}\n`]));
+  if (expected.size !== files.length) {
+    throw new PublisherError("public_signal_path_duplicate", "Public signal artifact paths must be unique.");
+  }
+  const indexEntry = files.find((entry) => entry.path === "signals/index.json");
+  if (!indexEntry) {
+    throw new PublisherError("public_signal_index_missing", "Public signal artifacts require signals/index.json.");
+  }
+  const managedRoot = path.resolve(outDir, "signals");
+  await recoverInterruptedSignalPublication(outDir, managedRoot);
+  const existing = await collectManagedSignalFiles(outDir);
+  const changed = new Set(existing.filter((relativePath) => !expected.has(relativePath)));
+  for (const [relativePath, content] of expected.entries()) {
+    const target = path.resolve(outDir, ...relativePath.split("/"));
+    if (target === managedRoot || !target.startsWith(`${managedRoot}${path.sep}`)) {
+      throw new PublisherError("public_signal_path_unsafe", `Refusing to stage unmanaged path: ${target}`);
+    }
+    if ((await readExistingText(target)) !== content) changed.add(relativePath);
+  }
+  if (changed.size === 0) return;
+
+  const transactionId = `${process.pid}-${randomUUID()}`;
+  const stagingRoot = path.resolve(outDir, `.signals-stage-${transactionId}`);
+  const backupRoot = path.resolve(outDir, `.signals-backup-${transactionId}`);
+  let movedExisting = false;
+  let published = false;
+  try {
+    await fs.mkdir(stagingRoot, { recursive: false });
+    for (const [relativePath, content] of expected.entries()) {
+      const relativeInsideSignals = relativePath.replace(/^signals\//, "");
+      const target = path.resolve(stagingRoot, ...relativeInsideSignals.split("/"));
+      if (target === stagingRoot || !target.startsWith(`${stagingRoot}${path.sep}`)) {
+        throw new PublisherError("public_signal_stage_unsafe", `Refusing to write outside signal staging tree: ${target}`);
+      }
+      await fs.mkdir(path.dirname(target), { recursive: true });
+      await fs.writeFile(target, content, "utf8");
+    }
+    if (await pathExists(managedRoot)) {
+      await renamePathWithRetry(managedRoot, backupRoot);
+      movedExisting = true;
+    }
+    await renamePathWithRetry(stagingRoot, managedRoot);
+    published = true;
+    if (movedExisting) await fs.rm(backupRoot, { recursive: true, force: true });
+  } catch (error) {
+    if (!published && movedExisting && await pathExists(backupRoot) && !await pathExists(managedRoot)) {
+      await renamePathWithRetry(backupRoot, managedRoot).catch(() => {});
+    }
+    throw error;
+  } finally {
+    await fs.rm(stagingRoot, { recursive: true, force: true }).catch(() => {});
+    if (published) await fs.rm(backupRoot, { recursive: true, force: true }).catch(() => {});
+  }
+  writtenFiles.push(...[...changed].sort());
+}
+
+async function recoverInterruptedSignalPublication(outDir, managedRoot) {
+  const resolvedOutDir = path.resolve(outDir);
+  let entries;
+  try {
+    entries = await fs.readdir(resolvedOutDir, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+  const transactionEntries = entries.filter((entry) =>
+    entry.name.startsWith(".signals-stage-") || entry.name.startsWith(".signals-backup-")
+  );
+  const unsafeEntry = transactionEntries.find((entry) => !entry.isDirectory());
+  if (unsafeEntry) {
+    throw new PublisherError("public_signal_recovery_path_invalid", `Signal transaction path must be a directory: ${unsafeEntry.name}`);
+  }
+  const transactionPath = (entry) => {
+    const target = path.resolve(resolvedOutDir, entry.name);
+    if (target === resolvedOutDir || !target.startsWith(`${resolvedOutDir}${path.sep}`)) {
+      throw new PublisherError("public_signal_recovery_path_unsafe", `Refusing unsafe signal transaction path: ${target}`);
+    }
+    return target;
+  };
+  const backups = transactionEntries
+    .filter((entry) => entry.name.startsWith(".signals-backup-"))
+    .map(transactionPath);
+  const stages = transactionEntries
+    .filter((entry) => entry.name.startsWith(".signals-stage-"))
+    .map(transactionPath);
+  const managedExists = await pathExists(managedRoot);
+  if (!managedExists && backups.length > 1) {
+    throw new PublisherError("public_signal_recovery_ambiguous", "Multiple interrupted signal backups exist; refusing to guess which published tree to restore.");
+  }
+  if (!managedExists && backups.length === 1) {
+    await renamePathWithRetry(backups[0], managedRoot);
+  } else if (managedExists) {
+    for (const backup of backups) {
+      await fs.rm(backup, { recursive: true, force: true });
+    }
+  }
+  for (const stage of stages) {
+    await fs.rm(stage, { recursive: true, force: true });
+  }
+}
+
+async function collectManagedSignalFiles(outDir) {
+  const managedRoot = path.resolve(outDir, "signals");
+  const files = [];
+  try {
+    await walk(managedRoot, files);
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+  const unmanaged = files.filter((file) => !file.toLowerCase().endsWith(".json"));
+  if (unmanaged.length > 0) {
+    throw new PublisherError("public_signal_unmanaged_file", `Signals tree contains unmanaged files: ${unmanaged.map((file) => toPosixRelative(outDir, file)).join(", ")}`);
+  }
+  return files
+    .map((file) => toPosixRelative(outDir, file))
+    .sort();
+}
+
 async function readExistingText(target) {
   try {
     return await fs.readFile(target, "utf8");
   } catch {
     return null;
+  }
+}
+
+async function pathExists(target) {
+  try {
+    await fs.access(target);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function renamePathWithRetry(source, target, options = {}) {
+  const attempts = Number.isInteger(options.attempts) && options.attempts > 0 ? options.attempts : 8;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      await fs.rename(source, target);
+      return;
+    } catch (error) {
+      const retryable = ["EPERM", "EBUSY", "ENOTEMPTY"].includes(String(error?.code || ""));
+      if (!retryable || attempt === attempts - 1) throw error;
+      const delayMs = Math.min(25 * (2 ** attempt), 400);
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
   }
 }
 
@@ -2142,9 +2400,10 @@ export function applyDailyReportHtmlOverrides(html, _reportDate) {
   return `${styles}\n${result}`;
 }
 
-async function readReportJson(filePath) {
+async function readReportJsonRecord(filePath) {
   const raw = await fs.readFile(filePath, "utf8");
-  const candidate = JSON.parse(raw);
+  const persistedReport = JSON.parse(raw);
+  const candidate = structuredClone(persistedReport);
   const hasExplicitQualityStatus = Object.prototype.hasOwnProperty.call(candidate, "quality_status");
   const validation = validateReport(candidate);
   if (!validation.valid) {
@@ -2166,7 +2425,7 @@ async function readReportJson(filePath) {
     });
   }
 
-  return finalValidation.value;
+  return { report: finalValidation.value, persistedReport };
 }
 
 function qualityStatusForPublishedReport(report, options = {}) {

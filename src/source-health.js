@@ -1,6 +1,6 @@
 import { contentSourceRequestUrl, contentSourceSkipReason, createDiscoveryFetch, formatDiscoveryErrorNote } from "./discovery.js";
 import { PublisherError } from "./errors.js";
-import { loadSourceRegistry, normalizeEnablements } from "./source-registry.js";
+import { loadSourceRegistry } from "./source-registry.js";
 import { isValidDateString } from "./time.js";
 
 const SOURCE_SPECIFIC_TRACKING_KINDS = new Set([
@@ -8,8 +8,10 @@ const SOURCE_SPECIFIC_TRACKING_KINDS = new Set([
   "artificial_analysis_index_public_playwright",
   "swe_bench_pro_public_playwright"
 ]);
+const RETIRED_HEALTH_FILTER_KEYS = ["tier", "tiers"];
 
 export async function checkSourcesHealth(options = {}) {
+  assertNoRetiredHealthFilters(options);
   const reportDate = requireReportDate(options.reportDate);
   const fetchImpl = createDiscoveryFetch(options.fetchImpl || globalThis.fetch, options);
   if (typeof fetchImpl !== "function") {
@@ -18,75 +20,14 @@ export async function checkSourcesHealth(options = {}) {
 
   const registry = await loadSourceRegistry({
     rootDir: options.rootDir || process.cwd(),
-    sourcesPath: options.sourcesPath || options.sources || "config/sources",
-    includeEnablement: options.enablement || ["core", "optional", "manual"]
+    sourcesPath: options.sourcesPath || options.sources || "config/sources"
   });
-  const enabled = new Set(normalizeEnablements(options.enablement || "core,optional,manual"));
-  const enabledSources = registry.sources.filter((source) => enabled.has(source.enablement));
-  const filters = resolveHealthFilters(options, enabledSources);
-  const sources = applyHealthFilters(enabledSources, filters);
-  assertHealthFiltersMatched(filters, enabledSources, sources);
-  const results = [];
-
-  for (const source of sources) {
-    const skipped = skipReasonForSource(source);
-    if (skipped) {
-      const status = typeof skipped === "string" ? skipped : skipped.status;
-      const notes = typeof skipped === "string" ? skipped : skipped.notes;
-      results.push(healthResult(source, status, {
-        notes
-      }));
-      continue;
-    }
-
-    try {
-      const response = await fetchImpl(contentSourceRequestUrl(source, options.env || process.env, reportDate), {
-        headers: {
-          accept: "application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
-          "user-agent": "ai-daily-cn-static-publisher"
-        },
-        ...timeoutInit(source.timeoutMs || source.timeout_ms || 15000)
-      });
-      if (!response.ok) {
-        results.push(healthResult(source, "blocked", {
-          http_status: response.status,
-          notes: `HTTP ${response.status}`
-        }));
-        continue;
-      }
-
-      const text = await response.text();
-      const sourceSpecific = sourceSpecificHealthResult(source, text, response.status, reportDate);
-      if (sourceSpecific) {
-        results.push(sourceSpecific);
-        continue;
-      }
-
-      const entries = parseFeedEntries(text);
-      const feedLike = isFeedLike(text);
-      const htmlIndex = source.source_kind === "html_index";
-      const recentEntries = entries.filter((entry) => isWithinHours(entry.event_date, reportDate, 48));
-      const originalUrlCount = source.requires_original_url || source.requiresOriginalUrl
-        ? entries.filter((entry) => [entry.url, ...entry.links].some(isOriginalXUrl)).length
-        : null;
-      const status = htmlIndex ? "checked" : feedLike ? recentEntries.length > 0 ? "checked" : "no_signal" : "blocked";
-      results.push(healthResult(source, status, {
-        http_status: response.status,
-        feed_like: feedLike,
-        recent_48h_entries: recentEntries.length,
-        original_url_count: originalUrlCount,
-        notes: htmlIndex
-          ? "html_index source is reachable; feed_like=false"
-          : feedLike
-          ? `${entries.length} feed entries parsed; ${recentEntries.length} within 48h`
-          : "response is not feed-like"
-      }));
-    } catch (error) {
-      results.push(healthResult(source, "blocked", {
-        notes: formatDiscoveryErrorNote(error)
-      }));
-    }
-  }
+  const filters = resolveHealthFilters(options, registry.sources);
+  const sources = applyHealthFilters(registry.sources, filters);
+  assertHealthFiltersMatched(filters, registry.sources, sources);
+  const sourceConcurrency = positiveInteger(options.sourceConcurrency || options["source-concurrency"], 12);
+  const results = await mapWithConcurrency(sources, sourceConcurrency, (source) =>
+    checkSourceHealth(source, { fetchImpl, reportDate, env: options.env || process.env }));
 
   const summary = healthSummary(results, filters);
   return {
@@ -97,11 +38,12 @@ export async function checkSourcesHealth(options = {}) {
         total_sources: results.length,
         status_counts: summary.status_counts,
         source_kind_counts: summary.source_kind_counts,
-        enablement_counts: summary.enablement_counts,
+        source_group_counts: summary.source_group_counts,
+        credibility_tag_counts: summary.credibility_tag_counts,
         filter_summary: summary.filter_summary,
         candidates_found: 0,
         included: 0,
-        notes: "Health check validates configured source availability, feed shape, 48h recency, and original URL requirements without admitting content into the report."
+        notes: "Health check reports configured source availability, feed shape, 48h recency, and original URL presence as diagnostics; these fields do not admit or suppress listener content."
       }
     },
     summary,
@@ -109,11 +51,65 @@ export async function checkSourcesHealth(options = {}) {
   };
 }
 
-function resolveHealthFilters(options, enabledSources) {
+async function checkSourceHealth(source, context) {
+  const skipped = skipReasonForSource(source);
+  if (skipped) {
+    return healthResult(source, typeof skipped === "string" ? skipped : skipped.status, {
+      notes: typeof skipped === "string" ? skipped : skipped.notes
+    });
+  }
+
+  try {
+    const response = await context.fetchImpl(contentSourceRequestUrl(source, context.env, context.reportDate), {
+      headers: {
+        accept: "application/atom+xml, application/rss+xml, application/xml, text/xml, text/html, */*",
+        "user-agent": "ai-daily-cn-static-publisher"
+      },
+      ...timeoutInit(source.timeoutMs || source.timeout_ms || 15000)
+    });
+    if (!response.ok) {
+      return healthResult(source, "blocked", {
+        http_status: response.status,
+        notes: `HTTP ${response.status}`
+      });
+    }
+
+    const text = await response.text();
+    const sourceSpecific = sourceSpecificHealthResult(source, text, response.status, context.reportDate);
+    if (sourceSpecific) return sourceSpecific;
+
+    const entries = parseFeedEntries(text);
+    const feedLike = isFeedLike(text);
+    const htmlIndex = source.source_kind === "html_index";
+    const recentEntries = entries.filter((entry) => isWithinHours(entry.event_date, context.reportDate, 48));
+    const originalUrlCount = source.requires_original_url || source.requiresOriginalUrl
+      ? entries.filter((entry) => [entry.url, ...entry.links].some(isOriginalXUrl)).length
+      : null;
+    const status = htmlIndex ? "checked" : feedLike ? recentEntries.length > 0 ? "checked" : "no_signal" : "blocked";
+    return healthResult(source, status, {
+      http_status: response.status,
+      feed_like: feedLike,
+      recent_48h_entries: recentEntries.length,
+      original_url_count: originalUrlCount,
+      notes: htmlIndex
+        ? "html_index source is reachable; feed_like=false"
+        : feedLike
+        ? `${entries.length} feed entries parsed; ${recentEntries.length} within 48h`
+        : "response is not feed-like"
+    });
+  } catch (error) {
+    return healthResult(source, "blocked", {
+      notes: formatDiscoveryErrorNote(error)
+    });
+  }
+}
+
+function resolveHealthFilters(options, registeredSources) {
   const filters = {
     sourceIds: normalizeFilterValues(options.sourceIds || options.sourceId || options["source-id"] || options["source-ids"]),
     sourceKinds: normalizeFilterValues(options.sourceKinds || options.sourceKind || options["source-kind"] || options["source-kinds"]),
-    tiers: normalizeFilterValues(options.tiers || options.tier),
+    sourceGroups: normalizeFilterValues(options.sourceGroups || options.sourceGroup || options["source-group"] || options["source-groups"]),
+    credibilityTags: normalizeFilterValues(options.credibilityTags || options.credibilityTag || options["credibility-tag"] || options["credibility-tags"]),
     categories: normalizeFilterValues(options.categories || options.category || options["candidate-category"]),
     tags: normalizeFilterValues(options.tags || options.tag),
     unknownTokens: []
@@ -123,14 +119,16 @@ function resolveHealthFilters(options, enabledSources) {
     return filters;
   }
 
-  const indexes = sourceFilterIndexes(enabledSources);
+  const indexes = sourceFilterIndexes(registeredSources);
   for (const token of tokenValues) {
     if (indexes.sourceIds.has(token)) {
       filters.sourceIds.push(token);
     } else if (indexes.sourceKinds.has(token)) {
       filters.sourceKinds.push(token);
-    } else if (indexes.tiers.has(token)) {
-      filters.tiers.push(token);
+    } else if (indexes.sourceGroups.has(token)) {
+      filters.sourceGroups.push(token);
+    } else if (indexes.credibilityTags.has(token)) {
+      filters.credibilityTags.push(token);
     } else if (indexes.categories.has(token)) {
       filters.categories.push(token);
     } else if (indexes.tags.has(token)) {
@@ -158,7 +156,8 @@ function dedupeHealthFilters(filters) {
   return {
     sourceIds: [...new Set(filters.sourceIds)],
     sourceKinds: [...new Set(filters.sourceKinds)],
-    tiers: [...new Set(filters.tiers)],
+    sourceGroups: [...new Set(filters.sourceGroups)],
+    credibilityTags: [...new Set(filters.credibilityTags)],
     categories: [...new Set(filters.categories)],
     tags: [...new Set(filters.tags)],
     unknownTokens: [...new Set(filters.unknownTokens)]
@@ -173,7 +172,10 @@ function applyHealthFilters(sources, filters) {
     if (filters.sourceKinds.length > 0 && !filters.sourceKinds.includes(source.source_kind)) {
       return false;
     }
-    if (filters.tiers.length > 0 && !filters.tiers.includes(source.tier)) {
+    if (filters.sourceGroups.length > 0 && !filters.sourceGroups.includes(source.source_group)) {
+      return false;
+    }
+    if (filters.credibilityTags.length > 0 && !filters.credibilityTags.includes(source.credibility_tag)) {
       return false;
     }
     if (filters.categories.length > 0 && !filters.categories.includes(source.candidate_category)) {
@@ -186,17 +188,18 @@ function applyHealthFilters(sources, filters) {
   });
 }
 
-function assertHealthFiltersMatched(filters, enabledSources, filteredSources) {
+function assertHealthFiltersMatched(filters, registeredSources, filteredSources) {
   const hasFilters = filterCount(filters) > 0;
   if (!hasFilters) {
     return;
   }
 
-  const indexes = sourceFilterIndexes(enabledSources);
+  const indexes = sourceFilterIndexes(registeredSources);
   const unmatched = {
     sourceIds: filters.sourceIds.filter((value) => !indexes.sourceIds.has(value)),
     sourceKinds: filters.sourceKinds.filter((value) => !indexes.sourceKinds.has(value)),
-    tiers: filters.tiers.filter((value) => !indexes.tiers.has(value)),
+    sourceGroups: filters.sourceGroups.filter((value) => !indexes.sourceGroups.has(value)),
+    credibilityTags: filters.credibilityTags.filter((value) => !indexes.credibilityTags.has(value)),
     categories: filters.categories.filter((value) => !indexes.categories.has(value)),
     tags: filters.tags.filter((value) => !indexes.tags.has(value)),
     unknownTokens: filters.unknownTokens
@@ -214,7 +217,8 @@ function assertHealthFiltersMatched(filters, enabledSources, filteredSources) {
 function filterCount(filters) {
   return filters.sourceIds.length +
     filters.sourceKinds.length +
-    filters.tiers.length +
+    filters.sourceGroups.length +
+    filters.credibilityTags.length +
     filters.categories.length +
     filters.tags.length +
     filters.unknownTokens.length;
@@ -224,7 +228,8 @@ function sourceFilterIndexes(sources) {
   return sources.reduce((acc, source) => {
     if (source.id) acc.sourceIds.add(source.id);
     if (source.source_kind) acc.sourceKinds.add(source.source_kind);
-    if (source.tier) acc.tiers.add(source.tier);
+    if (source.source_group) acc.sourceGroups.add(source.source_group);
+    if (source.credibility_tag) acc.credibilityTags.add(source.credibility_tag);
     if (source.candidate_category) acc.categories.add(source.candidate_category);
     for (const tag of sourceHealthTags(source)) {
       acc.tags.add(tag);
@@ -233,7 +238,8 @@ function sourceFilterIndexes(sources) {
   }, {
     sourceIds: new Set(),
     sourceKinds: new Set(),
-    tiers: new Set(),
+    sourceGroups: new Set(),
+    credibilityTags: new Set(),
     categories: new Set(),
     tags: new Set()
   });
@@ -242,10 +248,9 @@ function sourceFilterIndexes(sources) {
 function sourceHealthTags(source) {
   return [
     source.signal,
-    source.source_level,
     source.platform,
-    source.source_group,
     source.display_section,
+    ...(Array.isArray(source.content_tags) ? source.content_tags : normalizeFilterValues(source.content_tags)),
     ...(Array.isArray(source.tags) ? source.tags : normalizeFilterValues(source.tags))
   ]
     .map((value) => String(value || "").trim())
@@ -257,7 +262,8 @@ function healthSummary(results, filters) {
     total_sources: results.length,
     status_counts: countBy(results, "status"),
     source_kind_counts: countBy(results, "source_kind"),
-    enablement_counts: countBy(results, "enablement"),
+    source_group_counts: countBy(results, "source_group"),
+    credibility_tag_counts: countBy(results, "credibility_tag"),
     filter_summary: filterSummary(filters)
   };
 }
@@ -266,7 +272,8 @@ function filterSummary(filters) {
   return {
     source_ids: filters.sourceIds,
     source_kinds: filters.sourceKinds,
-    tiers: filters.tiers,
+    source_groups: filters.sourceGroups,
+    credibility_tags: filters.credibilityTags,
     categories: filters.categories,
     tags: filters.tags,
     unknown_tokens: filters.unknownTokens
@@ -283,15 +290,6 @@ function countBy(items, key) {
 }
 
 function skipReasonForSource(source) {
-  if (source.source_kind === "manual") {
-    return "skipped_manual_source";
-  }
-  if (source.verification_policy === "platform_signal_exempt" && source.kill_switch === true) {
-    return {
-      status: "skipped_manual_source",
-      notes: "kill_switch_enabled"
-    };
-  }
   return contentSourceSkipReason(source);
 }
 
@@ -381,10 +379,9 @@ function healthResult(source, status, extra = {}) {
     name: source.name,
     url: source.url,
     source_kind: source.source_kind,
-    tier: source.tier,
-    authority: source.authority,
-    enablement: source.enablement,
-    verification_policy: source.verification_policy,
+    source_group: source.source_group,
+    credibility_tag: source.credibility_tag,
+    content_tags: Array.isArray(source.content_tags) ? source.content_tags : [],
     ...(source.platform ? { platform: source.platform } : {}),
     requires_original_url: source.requires_original_url === true || source.requiresOriginalUrl === true,
     status,
@@ -394,6 +391,16 @@ function healthResult(source, status, extra = {}) {
     original_url_count: extra.original_url_count,
     notes: extra.notes || ""
   };
+}
+
+function assertNoRetiredHealthFilters(options) {
+  const selected = RETIRED_HEALTH_FILTER_KEYS.filter((key) => normalizeFilterValues(options[key]).length > 0);
+  if (selected.length > 0) {
+    throw new PublisherError(
+      "source_health_filter_retired",
+      `Health filters ${selected.join(", ")} were removed; use source-group or credibility-tag selectors.`
+    );
+  }
 }
 
 function isFeedLike(text) {
@@ -503,6 +510,26 @@ function requireReportDate(reportDate) {
     throw new Error("reportDate must be YYYY-MM-DD");
   }
   return reportDate;
+}
+
+function positiveInteger(value, fallback) {
+  const number = Number.parseInt(value, 10);
+  return Number.isInteger(number) && number > 0 ? number : fallback;
+}
+
+async function mapWithConcurrency(values, concurrency, worker) {
+  const items = Array.isArray(values) ? values : [];
+  const results = new Array(items.length);
+  let cursor = 0;
+  const workers = Math.min(positiveInteger(concurrency, 1), Math.max(items.length, 1));
+  await Promise.all(Array.from({ length: workers }, async () => {
+    while (cursor < items.length) {
+      const index = cursor;
+      cursor += 1;
+      results[index] = await worker(items[index], index);
+    }
+  }));
+  return results;
 }
 
 function timeoutInit(timeoutMs) {
