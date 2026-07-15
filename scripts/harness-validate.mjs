@@ -51,7 +51,7 @@ const sizeLimits = {
   '.harness-hub/state/capability-events.jsonl': 64 * 1024,
 };
 const requiredMarkers = {
-  'AGENTS.md': ['Codex', 'Initialization Gate', 'Loop Control Plane', 'Interrupt Policy', 'harness-validate.mjs', 'harness-hub check', 'LLM Wiki', '.harness-hub/context/wiki', 'current-task.md', 'checkpoint commit', 'quality snapshot', 'worktree', 'decisions.md', 'session-handoff', 'P0/P1/P2', 'agent-run browser', 'PR status', 'PR handoff', 'mergeability', 'CI/check-run', 'agentic loops', 'delegated-agent', 'Arbiters are read-only', 'finish closeout', 'insight'],
+  'AGENTS.md': ['Codex', 'Initialization Gate', 'Loop Control Plane', 'Interrupt Policy', 'harness-validate.mjs', 'harness-hub check', 'LLM Wiki', '.harness-hub/context/wiki', 'current-task.md', 'checkpoint commit', 'quality snapshot', 'worktree', 'decisions.md', 'session-handoff', 'P0/P1/P2', 'agent-run browser', 'PR status', 'PR handoff', 'mergeability', 'CI/check-run', 'agentic loops', 'delegated-agent', 'Arbiters are read-only', 'finish closeout', 'insight', 'origin/main', 'Every PR must target', 'merge every PR into'],
   '.harness-hub/.gitignore': ['state/', 'reports/'],
   '.harness-hub/context/AGENTS.md': ['LLM Wiki', 'Raw sources', 'No Redundant Facts', 'human confirmation', 'Contradiction Register'],
   '.harness-hub/context/README.md': ['Agent Context Pack', 'Raw sources', 'Wiki pages', 'Obsidian', 'Update Flow'],

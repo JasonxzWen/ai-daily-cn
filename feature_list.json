@@ -1089,6 +1089,8 @@
     "safety_boundary": "Do not use production accounts, real payments, or external writes unless explicitly approved."
   },
   "pr_closeout_policy": {
+    "branch_origin": "Before the first write, fetch origin/main and create the task branch directly from the latest origin/main; feature-branch and stale-main starting points are prohibited.",
+    "pr_base": "Every PR targets main directly; stacked PRs and intermediate feature-branch bases are prohibited.",
     "applies_after": [
       "PR creation",
       "PR update",
@@ -1114,7 +1116,7 @@
       "protected-branch override",
       "external service recovery"
     ],
-    "merge_boundary": "Do not merge a PR unless the user explicitly requests that remote mutation."
+    "merge_boundary": "After required checks pass, merge every PR into main under the repository-level standing user authorization; only an explicit task-specific pause or a recorded permission, branch-protection, or external-service blocker may leave it unmerged."
   },
   "finish_closeout_policy": {
     "applies_after": [
@@ -1132,7 +1134,7 @@
     ],
     "subagent_boundary": "Use subagents only for independent read-only review or verification; the main agent owns synthesis and final decisions.",
     "insight_boundary": "Use insight to audit tool calling, repeated low-value lookup loops, misleading evidence, docs/code conflicts, AI infrastructure lessons, and skill or workflow extraction candidates.",
-    "merge_boundary": "Drive to merge-ready or complete the merge only when the user explicitly authorizes that remote mutation."
+    "merge_boundary": "A delivery is complete only after its PR lands in main; the repository-level standing user authorization permits the merge after required checks pass unless the user explicitly pauses that specific merge."
   },
   "agentic_loop_policy": {
     "loop_model": "Producer -> Verifier -> Arbiter -> Main Agent Decision",

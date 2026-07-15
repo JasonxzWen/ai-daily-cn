@@ -3,6 +3,7 @@
 A Codex task is done only when the worktree proves it.
 
 - The goal and non-goals are stated in `.harness-hub/state/current-task.md`.
+- The task branch was created directly from the latest fetched `origin/main` before the first write; changes were not started from a feature branch or stale main baseline.
 - Requirement intake, selected direction, rejected alternatives, target spec, open questions, and alignment status are recorded for change work.
 - Acceptance criteria are satisfied by direct evidence.
 - The P0/P1/P2 test matrix was defined before implementation; P0 passed, P1 was run or risk-assessed, and P2 was run or explicitly deferred.
@@ -17,6 +18,7 @@ A Codex task is done only when the worktree proves it.
 - Runtime logs, health checks, or failure messages that informed the result are captured in progress or handoff state.
 - Material work has Agentic loop evidence or an explicit skip reason: producer/verifier/arbiter separation, delegated-agent or deterministic-check evidence, and the main agent's decision.
 - If a PR was created or updated, PR status records mergeability, CI/check-run status, conflicts, branch-protection blockers, any in-scope fixes, validation reruns, and whether the remaining blocker requires user/external action.
+- Every PR targets `main` directly and is merged into `main` after required checks pass. Delivery is not done while its PR remains open or exists only in an intermediate branch, unless a recorded permission, protection, or external-service blocker prevents the merge.
 - Material changes have finish closeout evidence: final independent review or explicit skip reason, technical-debt/drift findings, PR/merge-readiness status, and `insight` audit recommendations or skip reason.
 - If commits are permitted, completed atomic work is saved as verified checkpoint commits instead of one large end-of-task commit.
 - Material implementation or review work has an evaluator rubric verdict and any quality snapshot updates.

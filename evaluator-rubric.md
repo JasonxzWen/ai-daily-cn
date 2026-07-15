@@ -21,13 +21,13 @@ Use this rubric for the REC-401 source-level artifact replay slice stacked on RE
 | Production truth | 2 | The exact candidate artifact now validates 336/336 at SHA-256 `2f25b5...fb0e`; the optimized report has zero source-level errors. Historical replay remains evidence only, not a merged-main production claim. |
 | Finish closeout | 2 | Final independent review is Ready with P0=0/P1=0 after its camelCase fail-closed and task-path findings were corrected; only two non-blocking P2 hardening suggestions remain. |
 | Insight recommendations | 2 | The 15-day audit identifies validation closure, environment readiness, and tool-branch friction as the top collaboration costs. Keep exact artifact replay and contract synchronization in the existing delivery/verification workflow; do not create another standalone skill or entrypoint. |
-| Handoff readiness | 1 | Local delivery is green and independently reviewed. Stacked PR/CI and fresh merged-main non-publish evidence remain before remote delivery/production verification. |
+| Handoff readiness | 1 | This row records the historical stacked delivery state only; it is not current workflow precedent. Current work must start from the latest `origin/main`, target `main` directly, and land there. |
 
 ## Verdict
 
 - The hidden post-repair blocker is corrected at the earliest stable producer boundary without weakening REC-324 repair safety.
 - Do not call REC-401 or REC-311 production-verified from this historical replay; require a fresh run from merged `origin/main`.
-- Merge only with explicit user authorization after required checks are green and GitHub reports the stacked PR conflict-free.
+- The historical stacked-PR instruction is superseded: the repository now has standing user authorization to merge every green PR directly into `main`, unless the user explicitly pauses that specific merge.
 
 ## Residual risk
 
