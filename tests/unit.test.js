@@ -127,6 +127,31 @@ test("schema allows OpenRouter snapshot on a source audit source", async () => {
   assert.equal(source.snapshot.top_entries.length, 10);
 });
 
+test("report schema preserves source transport diagnostics without turning them into admission gates", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  report.source_audit = sourceAuditFixture();
+  Object.assign(report.source_audit.content_sources.sources[0], {
+    transport_status: "degraded",
+    transport_limitation: "provider_has_no_reliable_exhaustive_pagination",
+    pages_fetched: 2,
+    continuation_url: "https://example.com/content-feed.xml?page=3",
+    continuation_urls: [
+      "https://example.com/content-feed.xml?page=3",
+      "https://example.com/content-feed.xml?page=4"
+    ]
+  });
+
+  const validation = validateReport(report);
+
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+  const source = validation.value.source_audit.content_sources.sources[0];
+  assert.equal(source.transport_status, "degraded");
+  assert.equal(source.transport_limitation, "provider_has_no_reliable_exhaustive_pagination");
+  assert.equal(source.pages_fetched, 2);
+  assert.equal(source.continuation_url, "https://example.com/content-feed.xml?page=3");
+  assert.equal(source.continuation_urls.length, 2);
+});
+
 test("candidate pool schema accepts curated first-party builder candidates", () => {
   const candidatePool = {
     schema_version: 1,
