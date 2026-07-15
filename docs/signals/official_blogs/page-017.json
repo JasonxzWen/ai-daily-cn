@@ -2,53 +2,23 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-09T13:04:36.709Z",
+  "generated_at": "2026-07-15T03:02:17.127Z",
   "group": {
     "id": "official_blogs",
     "label": "官网博客"
   },
   "page": 17,
-  "page_count": 32,
+  "page_count": 115,
   "page_size": 50,
-  "total_count": 1570,
+  "total_count": 5718,
   "next_url": "signals/official_blogs/page-018.json",
   "items": [
     {
-      "id": "occ_e53344ed54325ee53b1d1217",
-      "cluster_id": "cluster_c000018ba1f035750668b9f2",
-      "title": "Predicting model behavior before release by simulating deployment",
-      "url": "https://openai.com/index/deployment-simulation",
-      "summary": "OpenAI introduces Deployment Simulation, a method to predict AI model behavior before deployment using real conversation data to improve safety and evaluation accuracy.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "openai.com",
-        "home_url": "https://openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI News RSS",
-        "url": "https://openai.com/news/rss.xml"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-16",
-      "published_at": null,
-      "collected_at": "2026-06-17T11:00:59.232Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f4faced4540c7a61878aa739",
-      "cluster_id": "cluster_b8dceccf6185c4cfe0109200",
-      "title": "Parallelize speculative decoding with P-EAGLE on Amazon SageMaker AI",
-      "url": "https://aws.amazon.com/blogs/machine-learning/parallelize-speculative-decoding-with-p-eagle-on-amazon-sagemaker-ai/",
-      "summary": "This post walks you through how to use P-EAGLE directly within Amazon SageMaker AI. It will demonstrate how to select a compatible model from the SageMaker JumpStart catalog, configure the parallel drafting specifications, and deploy a high",
+      "id": "occ_5ec4466625765042c75bd458",
+      "cluster_id": "cluster_9283a6f418d96ab7c48c2940",
+      "title": "Structured memory filtering with metadata in AgentCore Memory",
+      "url": "https://aws.amazon.com/blogs/machine-learning/structured-memory-filtering-with-metadata-in-agentcore-memory/",
+      "summary": "In this post, you will learn how metadata works across configuration, ingestion, and retrieval, explore enterprise use cases including multi-agent and multi-tenant architectures, and discover best practices for implementation.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -65,20 +35,441 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-06-16",
+      "event_date": "2026-07-01",
       "published_at": null,
-      "collected_at": "2026-06-17T11:00:59.232Z",
+      "collected_at": "2026-07-02T09:00:49.015Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_fe18c9de0fabfc1355297af0",
-      "cluster_id": "cluster_44c5c0c45647de1963244064",
-      "title": "HPE AI Factory With NVIDIA Expands for the Era of Agents",
-      "url": "https://blogs.nvidia.com/blog/hpe-ai-factory-agentic-enterprise/",
-      "summary": "Enterprises are moving agentic AI from proof of concept to production — and the next generation of AI factories are built for the era of agents. At HPE Discover Las Vegas, running through Thursday, June 18, NVIDIA and HPE are expanding the。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_66c39e3414e65d21a533fe33",
+      "cluster_id": "cluster_ec2f807a213757d1fc1f6161",
+      "title": "Alibaba Cloud 讲解云上 CI/CD 与 DevOps 流水线",
+      "url": "https://www.alibabacloud.com/blog/cicd-pipelines-on-alibaba-cloud-complete-devops-workflow_603318",
+      "summary": "Alibaba Cloud 介绍如何用云原生 DevOps 与容器服务搭建生产级 CI/CD 流水线，覆盖代码提交、构建、部署和流程自动化。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "alibabacloud.com",
+        "home_url": "https://www.alibabacloud.com/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · alibabacloud.com",
+        "url": "https://www.alibabacloud.com/blog/cicd-pipelines-on-alibaba-cloud-complete-devops-workflow_603318"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "other"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_87e8afad25265e8483f82ab2",
+      "cluster_id": "cluster_e6839319879809c7ff3c1a57",
+      "title": "NVIDIA Developer Blog 讲解 agent 强化学习技巧",
+      "url": "https://developer.nvidia.com/blog/mastering-agentic-techniques-ai-agent-reinforcement-learning/",
+      "summary": "NVIDIA Developer Blog 讲解把强化学习用于 AI agent 的训练与优化，重点是奖励设计、环境反馈、任务成功率和多步决策。文章适合已经在做工具调用或自动化 agent 的工程团队，用来理解为什么仅靠提示词很难稳定解决长链路任务。它把 agent 训练拆到可评估的动作、状态和反馈循环上，便于后续设计实验、回放失败案例和比较策略改进效果。",
+      "author": "NVIDIA Developer Blog",
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "NVIDIA Developer Blog",
+        "home_url": "https://developer.nvidia.com/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · NVIDIA Developer Blog",
+        "url": "https://developer.nvidia.com/blog/mastering-agentic-techniques-ai-agent-reinforcement-learning/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9002faf9e5522478e000f5b6",
+      "cluster_id": "cluster_dc57fe4bb76578549e1674be",
+      "title": "Google 汇总 2026 年 6 月 AI 更新",
+      "url": "https://blog.google/innovation-and-ai/technology/ai/google-ai-updates-june-2026/",
+      "summary": "Google 这篇月度索引按产品、研究和平台把 6 月 AI 公告串起来，列出 Gemini、开发者工具、Workspace、教育和实验项目等入口。它的用法不是替代原文，而是帮助读者按产品线回查发布日期、可用范围、目标用户、接入条件和限制，适合团队整理 6 月 Google AI 路线、试点清单、采购讨论和培训材料。",
+      "author": "Google Keyword Blog",
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Google Keyword Blog",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Google Keyword Blog",
+        "url": "https://blog.google/innovation-and-ai/technology/ai/google-ai-updates-june-2026/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/260701_ICYMI-June-AI_Thumb.max-600x600.format-webp.webp",
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_92cad2e5f397bcb68cbb8e0e",
+      "cluster_id": "cluster_f64e2fd8a1805beae87ab38e",
+      "title": "New York City educators and industry leaders gathered at Google’s offices to shape the future of AI in classrooms.",
+      "url": "https://blog.google/products-and-platforms/products/education/nyc-ai-summit/",
+      "summary": "Google, the New York Jobs CEO Council and Urban Assembly hosted an AI summit for 150 education and industry leaders. Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blog.google",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "Google Keyword Blog",
+        "url": "https://blog.google/rss/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Summit_Photo_1.max-600x600.format-webp.webp",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_94bad5d5dfd9ce9e5d0a5fca",
+      "cluster_id": "cluster_dc57fe4bb76578549e1674be",
+      "title": "The latest AI news we announced in June 2026",
+      "url": "https://blog.google/innovation-and-ai/technology/ai/google-ai-updates-june-2026/",
+      "summary": "June Pixel Drop hero。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blog.google",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "Google Keyword Blog",
+        "url": "https://blog.google/rss/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/260701_ICYMI-June-AI_Thumb.max-600x600.format-webp.webp",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a49dd89e5c718be1d1d4e7dd",
+      "cluster_id": "cluster_ea1e24cb2b7760849696f59f",
+      "title": "B3 用 Android Enterprise 构建受管 AI 办公设备",
+      "url": "https://blog.google/products-and-platforms/products/android-enterprise/b3-android-enterprise/",
+      "summary": "Google 介绍 B3 选择 Android Enterprise 来部署安全、可管理的 AI 办公体验，重点落在设备注册、企业移动管理和生产力场景。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blog.google",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Google Keyword Blog",
+        "url": "https://blog.google/products-and-platforms/products/android-enterprise/b3-android-enterprise/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c75479323c7d512730897c7b",
+      "cluster_id": "cluster_e6839319879809c7ff3c1a57",
+      "title": "Mastering Agentic Techniques: AI Agent Reinforcement Learning",
+      "url": "https://developer.nvidia.com/blog/mastering-agentic-techniques-ai-agent-reinforcement-learning/",
+      "summary": "Reinforcement learning (RL) is central to aligning language models, from reinforcement learning with human feedback (RLHF) within AI assistants to newer...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "developer.nvidia.com",
+        "home_url": "https://developer.nvidia.com/"
+      },
+      "collected_via": {
+        "name": "NVIDIA Developer Blog",
+        "url": "https://developer.nvidia.com/blog/feed/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_cda95e9469fc7806cd0e423f",
+      "cluster_id": "cluster_ea1e24cb2b7760849696f59f",
+      "title": "B3 用 Android Enterprise 构建受管 AI 办公设备",
+      "url": "https://blog.google/products-and-platforms/products/android-enterprise/b3-android-enterprise/",
+      "summary": "Google 介绍 B3 选择 Android Enterprise 来部署安全、可管理的 AI 办公体验，重点落在设备注册、企业移动管理和生产力场景。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blog.google",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · blog.google",
+        "url": "https://blog.google/products-and-platforms/products/android-enterprise/b3-android-enterprise/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "other"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_d56245dbdd91abff5911b4cc",
+      "cluster_id": "cluster_ba113af7f72bebf3010d6e6c",
+      "title": "Alibaba Cloud 用 DAS Agent、MCP Server 和 Dify 做跨账号数据库运维",
+      "url": "https://www.alibabacloud.com/blog/cross-account-intelligent-database-operations-integrating-das-agent-mcp-server-and-dify_603320",
+      "summary": "Alibaba Cloud 介绍把 DAS Agent、MCP Server 与 Dify 连接起来，对多个阿里云账号下的数据库实例做统一智能运维。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "alibabacloud.com",
+        "home_url": "https://www.alibabacloud.com/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · alibabacloud.com",
+        "url": "https://www.alibabacloud.com/blog/cross-account-intelligent-database-operations-integrating-das-agent-mcp-server-and-dify_603320"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "other"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_dfa1d528e9537ea04db262f8",
+      "cluster_id": "cluster_f64e2fd8a1805beae87ab38e",
+      "title": "Google 与纽约教育伙伴办 AI 课堂峰会，150 名教育和行业负责人参会",
+      "url": "https://blog.google/products-and-platforms/products/education/nyc-ai-summit/",
+      "summary": "Google、New York Jobs CEO Council 和 Urban Assembly 在 Google 办公室举办 AI 教育峰会，聚集 150 名教育与行业负责人，讨论课堂 AI 培训、学校试点和产业合作。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blog.google",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · blog.google",
+        "url": "https://blog.google/products-and-platforms/products/education/nyc-ai-summit/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "other"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_e58db64dc86e99ffe8561e15",
+      "cluster_id": "cluster_f64e2fd8a1805beae87ab38e",
+      "title": "New York City educators and industry leaders gathered at Google’s offices to shape the future of AI in classrooms.",
+      "url": "https://blog.google/products-and-platforms/products/education/nyc-ai-summit/",
+      "summary": "Google, the New York Jobs CEO Council and Urban Assembly hosted an AI summit for 150 education and industry leaders. Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blog.google",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "Google Keyword Blog",
+        "url": "https://blog.google/rss/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Summit_Photo_1.max-600x600.format-webp.webp",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_e5b0661dec9502c25516d828",
+      "cluster_id": "cluster_6d6892cddcec8a02b6d401d9",
+      "title": "Run NVIDIA Nemotron and OpenAI GPT OSS models on Amazon Bedrock in AWS GovCloud (US)",
+      "url": "https://aws.amazon.com/blogs/machine-learning/run-nvidia-nemotron-and-openai-gpt-oss-models-on-amazon-bedrock-in-aws-govcloud-us/",
+      "summary": "We're excited to introduce US-based frontier open-weight models in AWS GovCloud (US). With this release, Amazon Bedrock now supports OpenAI’s open-weight GPT OSS models (120B and 20B) and NVIDIA Nemotron (Nano 9B v2, Nano 12B v2, Nano 30B,",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "aws.amazon.com",
+        "home_url": "https://aws.amazon.com/"
+      },
+      "collected_via": {
+        "name": "AWS Machine Learning Blog",
+        "url": "https://aws.amazon.com/blogs/machine-learning/feed/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_e620cb371bca7c71b8b94259",
+      "cluster_id": "cluster_2d4641141019c0f329d34c41",
+      "title": "The Second Half of the Enterprise Agent Era: How to Make Agents Smarter the More They Are Used?",
+      "url": "https://www.alibabacloud.com/blog/the-second-half-of-the-enterprise-agent-era-how-to-make-agents-smarter-the-more-they-are-used_603319",
+      "summary": "This article introduces AgentLoop, Alibaba Cloud's one-stop platform that enables enterprise AI agents to continuously self-evolve through full-stack observability and automated evaluation.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "alibabacloud.com",
+        "home_url": "https://www.alibabacloud.com/"
+      },
+      "collected_via": {
+        "name": "Alibaba Cloud Blog",
+        "url": "https://www.alibabacloud.com/blog"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_fd587616884b7bea494e07c1",
+      "cluster_id": "cluster_f64e2fd8a1805beae87ab38e",
+      "title": "Google 与纽约教育伙伴办 AI 课堂峰会，150 名教育和行业负责人参会",
+      "url": "https://blog.google/products-and-platforms/products/education/nyc-ai-summit/",
+      "summary": "Google、New York Jobs CEO Council 和 Urban Assembly 在 Google 办公室举办 AI 教育峰会，聚集 150 名教育与行业负责人，讨论课堂 AI 培训、学校试点和产业合作。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blog.google",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Google Keyword Blog",
+        "url": "https://blog.google/products-and-platforms/products/education/nyc-ai-summit/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_ffec7bef929993519b5c1ebd",
+      "cluster_id": "cluster_c815807553a0a9fc82116a87",
+      "title": "NVIDIA and Partners Build in America, for America",
+      "url": "https://blogs.nvidia.com/blog/nvidia-and-partners-build-in-america-for-america/",
+      "summary": "NVIDIA and its partners are investing in American manufacturing, supply chains, energy grids and skilled workforces so the U.S. can produce the infrastructure needed for better healthcare, breakthrough scientific discovery, stronger industr。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -92,24 +483,836 @@
       },
       "source_group": "official_blogs",
       "content_tags": [
-        "engineering",
+        "industry_news",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-06-16",
+      "event_date": "2026-07-01",
       "published_at": null,
-      "collected_at": "2026-06-17T11:00:59.232Z",
+      "collected_at": "2026-07-02T09:00:49.015Z",
       "date_anomaly": null,
-      "image_url": "https://iprsoftwaremedia.com/219/files/202606/5c1b7efd25e1d133d7ef74cadad50733/6a317a433d6332e79060c1e0_logo-lockup-press-hpe-1600x900-4603000-842x450/logo-lockup-press-hpe-1600x900-4603000-842x450_thmb.jpg",
+      "image_url": "https://iprsoftwaremedia.com/219/files/202607/03fa60ff120062cc51e952ee179f258f/6a450fd73d63327bc9a7eb33_made-in-america-still-1920x1080-1-842x450/made-in-america-still-1920x1080-1-842x450_thmb.jpg",
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_feac151669d300bc8280d6cf",
-      "cluster_id": "cluster_fbbc754b41dd69e1216765ac",
-      "title": "Build On-Device AI Companions with the NVIDIA ACE Game Agent SDK and Unreal Engine 5 Plugins",
-      "url": "https://developer.nvidia.com/blog/build-on-device-ai-companions-with-the-nvidia-ace-game-agent-sdk-and-unreal-engine-5-plugins/",
-      "summary": "NVIDIA RTX technologies are deeply integrated into Unreal Engine 5 through the NVIDIA RTX Branch of Unreal Engine and the NVIDIA DLSS Unreal Engine plugin. This...",
+      "id": "occ_2172f8fe0963e4710de384c3",
+      "cluster_id": "cluster_620341b6212c2365ae5813cb",
+      "title": "Subliminal Learning: Language Models Transmit Behavioral Traits via Hidden Signals in Data.",
+      "url": "https://alignment.anthropic.com/2025/subliminal-learning/",
+      "summary": "|[Subliminal Learning: Language Models Transmit Behavioral Traits via Hidden Signals in Data.](https://alignment.anthropic.com/2025/subliminal-learning/) | Anthropic found that language models can unintentionally pick up behavioral traits l。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "alignment.anthropic.com",
+        "home_url": "https://alignment.anthropic.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_451d79fabf2ea5cdb57fd387",
+      "cluster_id": "cluster_3a98c948bc0db67315cc9fe9",
+      "title": "DropK",
+      "url": "https://apps.apple.com/cn/iphone/today",
+      "summary": "The tray that doesn't pretend Discussion | Link。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact. 已打开 官网 确认用途：在 App Store 上查找适用于 iPhone、iPad、Mac 等设备的 App 和游戏。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "apps.apple.com",
+        "home_url": "https://apps.apple.com/"
+      },
+      "collected_via": {
+        "name": "Product Hunt Developer Tools Feed",
+        "url": "https://www.producthunt.com/feed?category=developer-tools"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_4e44e6cf1785a55ed06b237b",
+      "cluster_id": "cluster_3a98c948bc0db67315cc9fe9",
+      "title": "Cursor for iOS",
+      "url": "https://apps.apple.com/cn/iphone/today",
+      "summary": "Build with coding agents from anywhere Discussion | Link。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact. 已打开 官网 确认用途：在 App Store 上查找适用于 iPhone、iPad、Mac 等设备的 App 和游戏。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "apps.apple.com",
+        "home_url": "https://apps.apple.com/"
+      },
+      "collected_via": {
+        "name": "Product Hunt Trending Feed",
+        "url": "https://www.producthunt.com/feed"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_7b031b4cd135fa50fc2fd97f",
+      "cluster_id": "cluster_594d7cc3421fa5e823e6773f",
+      "title": "Gemini Deep Think Achieves IMO Gold.",
+      "url": "https://deepmind.google/discover/blog/advanced-version-of-gemini-with-deep-think-officially-achieves-gold-medal-standard-at-the-international-mathematical-olympiad/",
+      "summary": "|[Gemini Deep Think Achieves IMO Gold.](https://deepmind.google/discover/blog/advanced-version-of-gemini-with-deep-think-officially-achieves-gold-medal-standard-at-the-international-mathematical-olympiad/) |Following OpenAI's gold medal ach。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "deepmind.google",
+        "home_url": "https://deepmind.google/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a1fece4c18b89a19d7c74925",
+      "cluster_id": "cluster_b3b1b85723aa610411da81d9",
+      "title": "Safely Releasing Frontier Models to Customers",
+      "url": "https://aws.amazon.com/blogs/machine-learning/safely-releasing-frontier-models-to-customers/",
+      "summary": "It’s our goal for AWS to be the most secure place to run any workload, and in support of that we’ve been deeply investing in security across our services since AWS&apos;s inception more than two decades ago. Our AI services like Amazon Bedr。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "aws.amazon.com",
+        "home_url": "https://aws.amazon.com/"
+      },
+      "collected_via": {
+        "name": "Planet AI",
+        "url": "https://www.planet-ai.net/rss.xml"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b74be840cc6a127a1263e6f6",
+      "cluster_id": "cluster_b3b1b85723aa610411da81d9",
+      "title": "Safely Releasing Frontier Models to Customers",
+      "url": "https://aws.amazon.com/blogs/machine-learning/safely-releasing-frontier-models-to-customers/",
+      "summary": "It’s our goal for AWS to be the most secure place to run any workload, and in support of that we’ve been deeply investing in security across our services since AWS's inception more than two decades ago. Our AI services like Amazon Bedrock a",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "aws.amazon.com",
+        "home_url": "https://aws.amazon.com/"
+      },
+      "collected_via": {
+        "name": "AWS Machine Learning Blog",
+        "url": "https://aws.amazon.com/blogs/machine-learning/feed/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c97b50e7af9c5b48130628a2",
+      "cluster_id": "cluster_47b99712c11b213913e16976",
+      "title": "Google DeepMind launches Aeneas AI model for ancient Roman inscription analysis.",
+      "url": "https://deepmind.google/discover/blog/aeneas-transforms-how-historians-connect-the-past/",
+      "summary": "|[Google DeepMind launches Aeneas AI model for ancient Roman inscription analysis.](https://deepmind.google/discover/blog/aeneas-transforms-how-historians-connect-the-past/) |Aeneas is the first AI model built to assist historians in unders。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "deepmind.google",
+        "home_url": "https://deepmind.google/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_d617c3cff3d868758a8ebdff",
+      "cluster_id": "cluster_684a18e96f3c7cb5fad5b42c",
+      "title": "OpenAI's new economic analysis.",
+      "url": "https://openai.com/global-affairs/new-economic-analysis/",
+      "summary": "|[OpenAI's new economic analysis.](https://openai.com/global-affairs/new-economic-analysis/) |OpenAI's latest economic research shows that 28% of working U.S. adults now use ChatGPT on the job, a sharp rise from 8% in 2023. The data indicat。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "openai.com",
+        "home_url": "https://openai.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_10084e2fc789d761229bbf2a",
+      "cluster_id": "cluster_fdd9745edc3aad4e2c44e2c4",
+      "title": "Redeploying Fable 5",
+      "url": "https://www.anthropic.com/news/redeploying-fable-5",
+      "summary": "Fable 5 returns globally July 1. We're also proposing an industry-wide framework for scoring jailbreak severity, together with Amazon, Microsoft, Google, and other Glasswing partners.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "anthropic.com",
+        "home_url": "https://www.anthropic.com/"
+      },
+      "collected_via": {
+        "name": "Anthropic News",
+        "url": "https://www.anthropic.com/news"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "research",
+        "company_business",
+        "policy_infrastructure",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_27e0e0813609c3dd65708dd1",
+      "cluster_id": "cluster_d5af1c09ec92c84e2df4458d",
+      "title": "How Jaiveer Singh Is Helping Robots — and Developers — Move Faster",
+      "url": "https://blogs.nvidia.com/blog/nvidia-life-jaiveer-singh/",
+      "summary": "When Jaiveer Singh talks about robots, he doesn’t begin with spectacle. He begins with infrastructure: the boards inside machines, the software that lets developers see through a robot’s cameras and the engineering required before a robot c。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blogs.nvidia.com",
+        "home_url": "https://blogs.nvidia.com/"
+      },
+      "collected_via": {
+        "name": "NVIDIA Newsroom RSS",
+        "url": "https://nvidianews.nvidia.com/rss.xml"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": "https://iprsoftwaremedia.com/219/files/202606/4a49d8cc2176b28150170f1fd646d533/6a43da873d6332962ecebea3_JaiveerNVIDIALife-13-842x450/JaiveerNVIDIALife-13-842x450_thmb.jpg",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_2890573ee8690a32f9dbd862",
+      "cluster_id": "cluster_fdd9745edc3aad4e2c44e2c4",
+      "title": "Redeploying Fable 5",
+      "url": "https://www.anthropic.com/news/redeploying-fable-5",
+      "summary": "Jun 30, 2026 Announcements Redeploying Fable 5",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "anthropic.com",
+        "home_url": "https://www.anthropic.com/"
+      },
+      "collected_via": {
+        "name": "Anthropic News",
+        "url": "https://www.anthropic.com/news"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "research",
+        "company_business",
+        "policy_infrastructure",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_2c7a597220be24e44401a85e",
+      "cluster_id": "cluster_5c4b950aaeff3364c385793f",
+      "title": "OpenAI API Changelog · July, 2026",
+      "url": "https://developers.openai.com/api/docs/guides/latest-model",
+      "summary": "Jul 9 Feature gpt-5.6-sol gpt-5.6-terra gpt-5.6-luna v1/responses v1/chat/completions v1/batch Released the GPT-5.6 model family , including GPT-5.6 Sol for frontier capability, GPT-5.6 Terra for a balance of intelligence and cost, and GPT-",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "developers.openai.com",
+        "home_url": "https://developers.openai.com/"
+      },
+      "collected_via": {
+        "name": "OpenAI API Changelog",
+        "url": "https://developers.openai.com/api/docs/changelog"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "model_release",
+        "product_update",
+        "engineering"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_306e88337b3798cb7d4f6883",
+      "cluster_id": "cluster_f1f7d4f8001b4288ac8c42bb",
+      "title": "Core dump epidemiology: fixing an 18-year-old bug",
+      "url": "https://openai.com/index/core-dump-epidemiology-data-infrastructure-bug",
+      "summary": "OpenAI engineers used large-scale core dump analysis to debug rare infrastructure crashes, uncovering both a hardware fault and a long-standing software bug.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "openai.com",
+        "home_url": "https://openai.com/"
+      },
+      "collected_via": {
+        "name": "OpenAI News RSS",
+        "url": "https://openai.com/news/rss.xml"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "company_business",
+        "policy_infrastructure",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_3fa05a0033d4d942ebce64ff",
+      "cluster_id": "cluster_3e6731e7403eb19710368207",
+      "title": "Gemini API Changelog · June 30, 2026",
+      "url": "https://ai.google.dev/gemini-api/docs/interactions-overview",
+      "summary": "Gemini Omni Flash in public preview : Released gemini-omni-flash-preview , a high-performance multimodal model designed for high-speed video generation and conversational video editing. Using the Interactions API , you can generate 3–10 sec",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "ai.google.dev",
+        "home_url": "https://ai.google.dev/"
+      },
+      "collected_via": {
+        "name": "Gemini API Changelog",
+        "url": "https://ai.google.dev/gemini-api/docs/changelog?hl=en"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "model_release",
+        "product_update",
+        "engineering"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_4771831faa635e2ab9dac31d",
+      "cluster_id": "cluster_b92dd0b94679a471d10e4f69",
+      "title": "Expanding our Heat Resilience data to 50+ global cities",
+      "url": "https://research.google/blog/expanding-our-heat-resilience-data-to-50-global-cities/",
+      "summary": "Climate & Sustainability",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "research.google",
+        "home_url": "https://research.google/"
+      },
+      "collected_via": {
+        "name": "Google Research Blog",
+        "url": "https://research.google/blog/rss/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "research"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-research2023-media/original_images/Heat-Resilience-1.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_49fcac628e0dfd9e5d5ee26b",
+      "cluster_id": "cluster_5318e0ba4dd3f11c49c78cea",
+      "title": "Unlocking Britain’s next era of productivity: Building a nation of AI trailblazers",
+      "url": "https://blog.google/company-news/inside-google/around-the-globe/google-europe/united-kingdom/unlocking-britains-next-era-of-productivity-building-a-nation-of-ai-trailblazers/",
+      "summary": "Four illustrated characters representing different professional roles, including a scientist, technician, explorer, and observer.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blog.google",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "Google AI Blog RSS",
+        "url": "https://blog.google/innovation-and-ai/technology/ai/rss/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "research",
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Gemini_Generated_Image_k2dxu1k2.max-600x600.format-webp.webp",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_4b375a99c9e2aec7e82f5cdb",
+      "cluster_id": "cluster_a94ed041d388ca8c04d8796d",
+      "title": "SkillOpt: Agent skills as trainable parameters",
+      "url": "https://www.microsoft.com/en-us/research/blog/skillopt-agent-skills-as-trainable-parameters/",
+      "summary": "AI agents often fail because their instructions, or skills, are manually modified with no guarantee of improvement. Learn how SkillOpt turns skill editing into a training process, making agent behavior more reliable without changing model w",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "microsoft.com",
+        "home_url": "https://www.microsoft.com/"
+      },
+      "collected_via": {
+        "name": "Microsoft Research Blog",
+        "url": "https://www.microsoft.com/en-us/research/feed/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "research"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_510d4ec763d306994fe0fbf0",
+      "cluster_id": "cluster_d2b47e5ca2b10e4d38ddb26f",
+      "title": "ScarfBench: Benchmarking AI Agents for Enterprise Java Framework Migration",
+      "url": "https://huggingface.co/blog/ibm-research/scarfbench",
+      "summary": "Hugging Face Blog published this blog/interview entry.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Blog",
+        "url": "https://huggingface.co/blog/feed.xml"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_52558a42508c0fb9be01ef9c",
+      "cluster_id": "cluster_36fb49cc499e6c2275a7abe8",
+      "title": "Azure IaaS: How to design, build, and optimize cloud infrastructure for long-term cost efficiency",
+      "url": "https://azure.microsoft.com/en-us/blog/azure-iaas-how-to-design-build-and-optimize-cloud-infrastructure-for-long-term-cost-optimization-efficiency/",
+      "summary": "As organizations modernize infrastructure, migrate mission-critical workloads, build cloud-native applications, and scale AI—cost efficiency remains a foundational principle of cloud architectures. The post Azure IaaS: How to design, build,",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "azure.microsoft.com",
+        "home_url": "https://azure.microsoft.com/"
+      },
+      "collected_via": {
+        "name": "Azure Blog",
+        "url": "https://azure.microsoft.com/en-us/blog/feed/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_54816f13dde64f397927f31e",
+      "cluster_id": "cluster_4307222bc7e5f2e471152174",
+      "title": "Introducing Claude Sonnet 5",
+      "url": "https://www.anthropic.com/news/claude-sonnet-5",
+      "summary": "Jun 30, 2026 Product Introducing Claude Sonnet 5",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "anthropic.com",
+        "home_url": "https://www.anthropic.com/"
+      },
+      "collected_via": {
+        "name": "Anthropic News",
+        "url": "https://www.anthropic.com/news"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "research",
+        "company_business",
+        "policy_infrastructure",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_57ebf7bd80720e5735f2cdf3",
+      "cluster_id": "cluster_0b8dc2473cab870ca2495ea7",
+      "title": "Introducing GeneBench-Pro",
+      "url": "https://openai.com/index/introducing-genebench-pro",
+      "summary": "Introducing GeneBench-Pro, a new benchmark testing AI performance in genomics, biology, and scientific research using complex, real-world datasets.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "openai.com",
+        "home_url": "https://openai.com/"
+      },
+      "collected_via": {
+        "name": "OpenAI Blog RSS",
+        "url": "https://openai.com/blog/rss.xml"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_5ffd94dc4f265bf8b5f6c568",
+      "cluster_id": "cluster_4dda5844ed060a93f9660745",
+      "title": "Next Day Disclosure Return 2026-06-30",
+      "url": "https://media-meituan.todayir.com/20260630200801228712223442_en.pdf",
+      "summary": "2026-06-30。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "media-meituan.todayir.com",
+        "home_url": "https://media-meituan.todayir.com/"
+      },
+      "collected_via": {
+        "name": "Meituan Investor Relations",
+        "url": "https://www.meituan.com/en-US/investor-relations"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": "https://p0.meituan.net/smartvenus/8080974872c772f50926404b0ae0ce5e1804.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_6ccd1c0493bc1f0f819a6b40",
+      "cluster_id": "cluster_9f340727232d898a6ead94d0",
+      "title": "Why Specialization Is Inevitable",
+      "url": "https://huggingface.co/blog/Dharma-AI/why-specialization-is-inevitable",
+      "summary": "Hugging Face Blog published this blog/interview entry.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Blog",
+        "url": "https://huggingface.co/blog/feed.xml"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_6eaf9fc103661fecbea4ecbc",
+      "cluster_id": "cluster_13a6d9819972b9b7d709cc9f",
+      "title": "https://deepmind.google/blog/empowering-indias-next-generation-of-innovators-with-atl-saathi/",
+      "url": "https://deepmind.google/blog/empowering-indias-next-generation-of-innovators-with-atl-saathi/",
+      "summary": "Google DeepMind Blog published this blog/interview entry.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "deepmind.google",
+        "home_url": "https://deepmind.google/"
+      },
+      "collected_via": {
+        "name": "Google DeepMind Blog",
+        "url": "https://deepmind.google/discover/blog/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_7959c5623c6706d98647fe4b",
+      "cluster_id": "cluster_617f45738c65d6baaf10b9cf",
+      "title": "Inside Genebench-Pro",
+      "url": "https://openai.com/index/genebench-pro/case-studies",
+      "summary": "OpenAI News RSS published this blog/interview entry.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "openai.com",
+        "home_url": "https://openai.com/"
+      },
+      "collected_via": {
+        "name": "OpenAI News RSS",
+        "url": "https://openai.com/news/rss.xml"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "company_business",
+        "policy_infrastructure",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_7c466fe2839d26aecc2e517b",
+      "cluster_id": "cluster_030a472b782235ba4f79bc71",
+      "title": "NVIDIA BioNeMo Agent Toolkit Brings Accelerated AI to Life Sciences Researchers in Claude Science",
+      "url": "https://blogs.nvidia.com/blog/claude-science-bionemo-agent-toolkit/",
+      "summary": "Life sciences has entered an era of computational scale, and for more than a decade, NVIDIA has built the full GPU-accelerated computing stack — spanning hardware, frameworks, libraries, models, microservices and domain-specific tools — to。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blogs.nvidia.com",
+        "home_url": "https://blogs.nvidia.com/"
+      },
+      "collected_via": {
+        "name": "NVIDIA Newsroom RSS",
+        "url": "https://nvidianews.nvidia.com/rss.xml"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": "https://iprsoftwaremedia.com/219/files/202606/87fcaecc8e2e0705958c997424700a1a/6a43f6783d6332202b542014_anthropic-nvidia-842x450/anthropic-nvidia-842x450_thmb.jpg",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_7d19232e14831dc7c65cbf9a",
+      "cluster_id": "cluster_e0d46eee40f3ae2c022ab4c7",
+      "title": "How to Automate AI Model Documentation with the NVIDIA MCG Toolkit",
+      "url": "https://developer.nvidia.com/blog/how-to-automate-ai-model-documentation-with-the-nvidia-mcg-toolkit/",
+      "summary": "As AI models grow in complexity and regulatory scrutiny intensifies under frameworks including California’s AB-2013 and the EU AI Act, software teams...",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -126,473 +1329,46 @@
         "engineering"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-06-16",
+      "event_date": "2026-06-30",
       "published_at": null,
-      "collected_at": "2026-06-17T11:00:59.232Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_4ba43b16acd797e9ec044436",
-      "cluster_id": "cluster_924a65058152cc2c22678e33",
-      "title": "Alibaba Cloud ECS 上で Telegram 連携機能付きの OpenClaw をデプロイする",
-      "url": "https://www.alibabacloud.com/blog/alibaba-cloud-ecs-%E4%B8%8A%E3%81%A7-telegram-%E9%80%A3%E6%90%BA%E6%A9%9F%E8%83%BD%E4%BB%98%E3%81%8D%E3%81%AE-openclaw-%E3%82%92%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E3%81%99%E3%82%8B_603255",
-      "summary": "クラウドで独自の AI コーディングエージェントを実行するためのステップバイステップガイド",
+      "id": "occ_920ed18d0b7a5f16cbc42c3b",
+      "cluster_id": "cluster_8cc1837ba6892f6f01dc3818",
+      "title": "Start building with Nano Banana 2 Lite and Gemini Omni Flash",
+      "url": "https://deepmind.google/blog/start-building-with-nano-banana-2-lite-and-gemini-omni-flash/",
+      "summary": "Google DeepMind RSS published this blog/interview entry.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
+        "name": "deepmind.google",
+        "home_url": "https://deepmind.google/"
       },
       "collected_via": {
-        "name": "Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog"
+        "name": "Google DeepMind RSS",
+        "url": "https://deepmind.google/blog/rss.xml"
       },
       "source_group": "official_blogs",
       "content_tags": [
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-06-16",
+      "event_date": "2026-06-30",
       "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_6df36425bd5fe7c6460ec57e",
-      "cluster_id": "cluster_cb994fd033719e40741e6e09",
-      "title": "The time the x86 emulator team found code so bad they fixed it during emulation",
-      "url": "https://devblogs.microsoft.com/oldnewthing/20260615-00/?p=112419",
-      "summary": "Article URL: https://devblogs.microsoft.com/oldnewthing/20260615-00/?p=112419 Comments URL: https://news.ycombinator.com/item?id=48550693 Points: 52 # Comments: 1。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "devblogs.microsoft.com",
-        "home_url": "https://devblogs.microsoft.com/"
-      },
-      "collected_via": {
-        "name": "HNRSS Frontpage",
-        "url": "https://hnrss.org/frontpage"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "community_lead",
-      "event_date": "2026-06-16",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_75a8f11380193065f21af61e",
-      "cluster_id": "cluster_cb994fd033719e40741e6e09",
-      "title": "The time the x86 emulator team found code so bad they fixed it during emulation",
-      "url": "https://devblogs.microsoft.com/oldnewthing/20260615-00/?p=112419",
-      "summary": "Hacker News Topstories API published this intermediary lead entry. Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "devblogs.microsoft.com",
-        "home_url": "https://devblogs.microsoft.com/"
-      },
-      "collected_via": {
-        "name": "Hacker News Topstories API",
-        "url": "https://hacker-news.firebaseio.com/v0/topstories.json"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "community_lead",
-      "event_date": "2026-06-16",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_96edf7a7cb9484fa5b97cb02",
-      "cluster_id": "cluster_edbd26e9d8e5463aee337312",
-      "title": "OpenAI Status: Users may experience issue with Codex Cloud tasks",
-      "url": "https://status.openai.com//incidents/01KV6W1JX2T4T1455777Q1R2W5",
-      "summary": "Status: Resolved All impacted services have now fully recovered. Affected components Codex Web (Operational)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "status.openai.com",
-        "home_url": "https://status.openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI Status",
-        "url": "https://status.openai.com/history.atom"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "engineering",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-16",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_afd2cbe543e1381d5a5666c3",
-      "cluster_id": "cluster_924a65058152cc2c22678e33",
-      "title": "Alibaba Cloud ECS 上で Telegram 連携機能付きの OpenClaw をデプロイする",
-      "url": "https://www.alibabacloud.com/blog/alibaba-cloud-ecs-%E4%B8%8A%E3%81%A7-telegram-%E9%80%A3%E6%90%BA%E6%A9%9F%E8%83%BD%E4%BB%98%E3%81%8D%E3%81%AE-openclaw-%E3%82%92%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E3%81%99%E3%82%8B_603255",
-      "summary": "クラウドで独自の AI コーディングエージェントを実行するためのステップバイステップガイド",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
-      },
-      "collected_via": {
-        "name": "Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-16",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_ddc18364d00971f4bce14421",
-      "cluster_id": "cluster_2fed0b1d5ba158140c53f56f",
-      "title": "Alibaba Cloud ECS에 Telegram 통합 기능을 갖춘 OpenClaw 배포",
-      "url": "https://www.alibabacloud.com/blog/alibaba-cloud-ecs%EC%97%90-telegram-%ED%86%B5%ED%95%A9-%EA%B8%B0%EB%8A%A5%EC%9D%84-%EA%B0%96%EC%B6%98-openclaw-%EB%B0%B0%ED%8F%AC_603254",
-      "summary": "클라우드에서 자체 AI 코딩 에이전트를 실행하기 위한 단계별 가이드",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
-      },
-      "collected_via": {
-        "name": "Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-16",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e9857b39737aa3c80d6e117f",
-      "cluster_id": "cluster_924a65058152cc2c22678e33",
-      "title": "这篇教程讲的是如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接到日常协作入口",
-      "url": "https://www.alibabacloud.com/blog/alibaba-cloud-ecs-%E4%B8%8A%E3%81%A7-telegram-%E9%80%A3%E6%90%BA%E6%A9%9F%E8%83%BD%E4%BB%98%E3%81%8D%E3%81%AE-openclaw-%E3%82%92%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E3%81%99%E3%82%8B_603255",
-      "summary": "这篇教程说明如何在阿里云 ECS 上部署 OpenClaw，并通过 Telegram 把自建 coding agent 接入日常协作入口。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog/alibaba-cloud-ecs-%E4%B8%8A%E3%81%A7-telegram-%E9%80%A3%E6%90%BA%E6%A9%9F%E8%83%BD%E4%BB%98%E3%81%8D%E3%81%AE-openclaw-%E3%82%92%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E3%81%99%E3%82%8B_603255"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-16",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_362700c484ac414a40261425",
-      "cluster_id": "cluster_f726def2872976b09571b37e",
-      "title": "OpenAI Status: OAuth Account Creation / Login Error",
-      "url": "https://status.openai.com//incidents/01KV67B3HB2B6JKHAMHCCYS0KZ",
-      "summary": "Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Login (Operational)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "status.openai.com",
-        "home_url": "https://status.openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI Status",
-        "url": "https://status.openai.com/history.atom"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-17T11:00:59.232Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7c1c5e1f6a033fb3d694f103",
-      "cluster_id": "cluster_d2e2d25b8ef595ba5d174a66",
-      "title": "Security New Features in May 2026",
-      "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
-      "summary": "CloudSecurity June 15, 2026",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
-      },
-      "collected_via": {
-        "name": "Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-17T11:00:59.232Z",
-      "date_anomaly": null,
-      "image_url": "https://img.alicdn.com/tfs/TB1zuigpQCWBuNjy0FaXXXUlXXa-30-30.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_16f22233cba4948d1e85d39b",
-      "cluster_id": "cluster_f726def2872976b09571b37e",
-      "title": "OpenAI Status: OAuth Account Creation / Login Error",
-      "url": "https://status.openai.com//incidents/01KV67B3HB2B6JKHAMHCCYS0KZ",
-      "summary": "Status: Resolved All impacted services have now fully recovered. Affected components Login (Operational) Login (Operational)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "status.openai.com",
-        "home_url": "https://status.openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI Status",
-        "url": "https://status.openai.com/history.atom"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_237f89df7b1ea12af6daa2dd",
-      "cluster_id": "cluster_707e6c047c917db51a2f9d5a",
-      "title": "用高级融合内核提升 MoE 训练吞吐",
-      "url": "https://developer.nvidia.com/blog/boosting-moe-training-throughput-with-advanced-fusion-kernels/",
-      "summary": "NVIDIA 文章聚焦 MoE 训练吞吐瓶颈，说明融合内核如何减少调度和数据搬运开销。具体方法落在训练系统实现层，包括 kernel 融合、专家路由和并行数据流的配合。训练团队复现时需要同时对齐硬件、通信拓扑和 batch 规模，否则公开吞吐提升很难直接迁移。",
-      "author": "NVIDIA Developer Blog",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "NVIDIA Developer Blog",
-        "home_url": "https://developer.nvidia.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · NVIDIA Developer Blog",
-        "url": "https://developer.nvidia.com/blog/boosting-moe-training-throughput-with-advanced-fusion-kernels/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4061e6bce179f9ded0aa5f64",
-      "cluster_id": "cluster_b5689f5df3fd2b9593eb0c0d",
-      "title": "We’re strengthening our presence in Alabama through new investments and community support.",
-      "url": "https://blog.google/innovation-and-ai/infrastructure-and-cloud/global-network/alabama-investment-june-2026/",
-      "summary": "Google has announced a $1.5 billion investment for 2026 and 2027 to expand its data center campus in Jackson County, Alabama. Operating since 2019 on a repurposed former…。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "blog.google",
-        "home_url": "https://blog.google/"
-      },
-      "collected_via": {
-        "name": "Google Keyword Blog",
-        "url": "https://blog.google/rss/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_43c8c41701b9a21637834f65",
-      "cluster_id": "cluster_707e6c047c917db51a2f9d5a",
-      "title": "Boosting MoE Training Throughput with Advanced Fusion Kernels",
-      "url": "https://developer.nvidia.com/blog/boosting-moe-training-throughput-with-advanced-fusion-kernels/",
-      "summary": "Mixture-of-experts (MoE) models have quickly become a foundational component of modern, large-scale AI systems. They are widely adopted because they enable...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "developer.nvidia.com",
-        "home_url": "https://developer.nvidia.com/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Developer Blog",
-        "url": "https://developer.nvidia.com/blog/feed/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4882f10394d89789037a4830",
-      "cluster_id": "cluster_1a87fa6d803978df940571e9",
-      "title": "Introducing Gemma 4 models on Amazon Bedrock",
-      "url": "https://aws.amazon.com/blogs/machine-learning/introducing-gemma-4-models-on-amazon-bedrock/",
-      "summary": "Today, we are announcing the availability of the Gemma 4 family on Amazon Bedrock. Built by Google DeepMind and released under the Apache 2.0 license, Gemma 4 is a family of open-weight models designed with a focus on intelligence-per-param",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "aws.amazon.com",
-        "home_url": "https://aws.amazon.com/"
-      },
-      "collected_via": {
-        "name": "AWS Machine Learning Blog",
-        "url": "https://aws.amazon.com/blogs/machine-learning/feed/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7388af2ae0d956a1874a5855",
-      "cluster_id": "cluster_24de1a92076d60c3039fe0d4",
-      "title": "Google Fitbit Air is now HSA/FSA eligible in the U.S.",
-      "url": "https://blog.google/products-and-platforms/devices/fitbit/buy-fitbit-air-pre-tax-health-savings/",
-      "summary": "U.S. customers can use pre-tax HSA and FSA funds to buy the Google Fitbit Air to monitor daily health and wellness routines. Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "blog.google",
-        "home_url": "https://blog.google/"
-      },
-      "collected_via": {
-        "name": "Google Keyword Blog",
-        "url": "https://blog.google/rss/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_76bbf16f101adfa10ac0ad85",
+      "id": "occ_a04db4bff058e9937ba6717e",
       "cluster_id": "cluster_37ecf7760d3ac9a6faf6f931",
       "title": "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models",
       "url": "https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/",
@@ -610,654 +1386,148 @@
       },
       "source_group": "official_blogs",
       "content_tags": [
-        "industry_news"
+        "engineering"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
+      "event_date": "2026-06-30",
       "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_7f56b470c9d82b62b4d8d4c1",
-      "cluster_id": "cluster_a080c977e68ca2ff4e47bbc5",
-      "title": "英伟达用 BioNeMo 与 LoRA 演示生物基础模型微调",
-      "url": "https://developer.nvidia.com/blog/fine-tuning-biological-foundation-models-with-lora-using-nvidia-bionemo-recipes/",
-      "summary": "英伟达开发者博客介绍如何用 BioNeMo Recipes 和 LoRA 微调生物基础模型，面向生物计算场景降低实验门槛。",
+      "id": "occ_a322a97008d092310bab3582",
+      "cluster_id": "cluster_a577f205a73beafce77aadea",
+      "title": "Claude Science, an AI workbench for scientists, is now available",
+      "url": "https://www.anthropic.com/news/claude-science-ai-workbench",
+      "summary": "Claude Science is a customizable app that integrates the tools and packages researchers most often use, produces auditable artifacts, and provides flexible access to computing resources.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "developer.nvidia.com",
-        "home_url": "https://developer.nvidia.com/"
+        "name": "anthropic.com",
+        "home_url": "https://www.anthropic.com/"
       },
       "collected_via": {
-        "name": "AI Daily legacy report · NVIDIA Developer Blog",
-        "url": "https://developer.nvidia.com/blog/fine-tuning-biological-foundation-models-with-lora-using-nvidia-bionemo-recipes/"
+        "name": "Anthropic News",
+        "url": "https://www.anthropic.com/news"
       },
       "source_group": "official_blogs",
       "content_tags": [
+        "product_update",
+        "research",
+        "company_business",
+        "policy_infrastructure",
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
+      "event_date": "2026-06-30",
       "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_829a44751744f58d4384a996",
-      "cluster_id": "cluster_f71f77e1b69b777f79ede627",
-      "title": "OpenAI Status: FedRAMP workspaces and API orgs have degraded performance",
-      "url": "https://status.openai.com//incidents/01KV6NGBYE50GK3TRXHD2EMTXA",
-      "summary": "Status: Investigating We are investigating the issue for the listed services. Affected components FedRAMP (Degraded performance)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "status.openai.com",
-        "home_url": "https://status.openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI Status",
-        "url": "https://status.openai.com/history.atom"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_975beef12153c0fd4fe13f7d",
-      "cluster_id": "cluster_a080c977e68ca2ff4e47bbc5",
-      "title": "Fine-Tuning Biological Foundation Models with LoRA Using NVIDIA BioNeMo Recipes",
-      "url": "https://developer.nvidia.com/blog/fine-tuning-biological-foundation-models-with-lora-using-nvidia-bionemo-recipes/",
-      "summary": "Foundation models are reshaping computational biology. Pretrained on massive corpora of protein or genomic sequences, models such as ESM2 (a protein language...",
+      "id": "occ_a5b3b02a7bcfa0478ace4dee",
+      "cluster_id": "cluster_aa1123efba66a9780b6a2cd4",
+      "title": "10 Years of Meta’s Commitment to Python",
+      "url": "https://engineering.fb.com/2026/06/30/open-source/10-years-of-metas-commitment-to-python/",
+      "summary": "This year marks Meta’s 10th consecutive year as a sponsor of the Python Software Foundation (PSF), the charitable organization dedicated to advancing, supporting, and protecting the open-source Python programming language and the community",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "developer.nvidia.com",
-        "home_url": "https://developer.nvidia.com/"
+        "name": "engineering.fb.com",
+        "home_url": "https://engineering.fb.com/"
       },
       "collected_via": {
-        "name": "NVIDIA Developer Blog",
-        "url": "https://developer.nvidia.com/blog/feed/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_9cff7bafc0bf9c34ff6aaf8e",
-      "cluster_id": "cluster_12500c0bbe5e4d6f5bfdf7c8",
-      "title": "AWS 用 Strands Evals 做 AI agent 失败检测和根因分析",
-      "url": "https://aws.amazon.com/blogs/machine-learning/ai-agent-failure-detection-and-root-cause-analysis-with-strands-evals/",
-      "summary": "AWS 文章把 agent 失败检测和根因分析放进 Strands Evals 的评测流程，说明如何沿任务轨迹定位失败原因。方法覆盖工具调用、失败模式和可复现评测样例，适合把最终答案对错扩展成过程级检查。团队采用时需要把评测数据、失败分类和自有任务映射起来，才能形成内部 agent 发布安全门。",
-      "author": "AWS Machine Learning Blog",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "AWS Machine Learning Blog",
-        "home_url": "https://aws.amazon.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · AWS Machine Learning Blog",
-        "url": "https://aws.amazon.com/blogs/machine-learning/ai-agent-failure-detection-and-root-cause-analysis-with-strands-evals/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_9fb7c8e5febe3163d3a1ac2d",
-      "cluster_id": "cluster_a080c977e68ca2ff4e47bbc5",
-      "title": "Fine-Tuning Biological Foundation Models with LoRA Using NVIDIA BioNeMo Recipes",
-      "url": "https://developer.nvidia.com/blog/fine-tuning-biological-foundation-models-with-lora-using-nvidia-bionemo-recipes/",
-      "summary": "Foundation models are reshaping computational biology. Pretrained on massive corpora of protein or genomic sequences, models such as ESM2 (a protein language...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "developer.nvidia.com",
-        "home_url": "https://developer.nvidia.com/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Developer Blog",
-        "url": "https://developer.nvidia.com/blog/feed/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_ab7b8fff90c99634f90acf9b",
-      "cluster_id": "cluster_37ecf7760d3ac9a6faf6f931",
-      "title": "从预训练想象到微调用于行动：世界行动模型的兴起",
-      "url": "https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/",
-      "summary": "NVIDIA 文章讨论世界行动模型如何先学习环境表征，再面向行动决策做微调。它的重点不是单个 demo，而是把“想象未来状态”和“选择下一步动作”放进同一类模型能力框架。读者可以用它判断具身智能、仿真训练和机器人 agent 什么时候需要从语言推理转向世界模型评估。",
-      "author": "NVIDIA Developer Blog",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "NVIDIA Developer Blog",
-        "home_url": "https://developer.nvidia.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · NVIDIA Developer Blog",
-        "url": "https://developer.nvidia.com/blog/pretrained-to-imagine-fine-tuned-to-act-the-rise-of-world-action-models/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_b05e7f5fd397e6a4298a8188",
-      "cluster_id": "cluster_12500c0bbe5e4d6f5bfdf7c8",
-      "title": "AI Agent Failure Detection and Root Cause Analysis with Strands Evals",
-      "url": "https://aws.amazon.com/blogs/machine-learning/ai-agent-failure-detection-and-root-cause-analysis-with-strands-evals/",
-      "summary": "In this post, we walk you through calling the detector functions to diagnose real agent failures. You learn how to interpret their structured output: categorized failures with confidence scores, causal chains linking root causes to downstre",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "aws.amazon.com",
-        "home_url": "https://aws.amazon.com/"
-      },
-      "collected_via": {
-        "name": "AWS Machine Learning Blog",
-        "url": "https://aws.amazon.com/blogs/machine-learning/feed/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_b074364f256fa280ef33f18d",
-      "cluster_id": "cluster_458a500fddf08457db043bf0",
-      "title": "Alibaba Cloud Releases RCA Benchmark, the Industry's First Open Source Root Cause Analysis Benchmark System for Agentic Ops",
-      "url": "https://www.alibabacloud.com/blog/alibaba-cloud-releases-rca-benchmark-the-industrys-first-open-source-root-cause-analysis-benchmark-system-for-agentic-ops_603252",
-      "summary": "This article introduces Alibaba Cloud's open-source RCA Benchmark for evaluating AI agents in IT operations.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
-      },
-      "collected_via": {
-        "name": "Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_cead7bf5efe53e1c0eeda69a",
-      "cluster_id": "cluster_1a87fa6d803978df940571e9",
-      "title": "AWS 在 Bedrock 上线 Gemma 4 模型",
-      "url": "https://aws.amazon.com/blogs/machine-learning/introducing-gemma-4-models-on-amazon-bedrock/",
-      "summary": "AWS 宣布在 Amazon Bedrock 中提供 Gemma 4 模型，让企业用户通过 Bedrock 的托管模型能力调用这组模型。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "aws.amazon.com",
-        "home_url": "https://aws.amazon.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · AWS Machine Learning Blog",
-        "url": "https://aws.amazon.com/blogs/machine-learning/introducing-gemma-4-models-on-amazon-bedrock/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d45ed9b6c191dcb5ec06283a",
-      "cluster_id": "cluster_2f2101adc8737656c31ab72d",
-      "title": "Build context-rich research agents with Deep Agents and Bedrock AgentCore",
-      "url": "https://aws.amazon.com/blogs/machine-learning/build-context-rich-research-agents-with-deep-agents-and-bedrock-agentcore/",
-      "summary": "In this post, you'll build a competitive research agent that demonstrates this pattern end to end. This walkthrough targets developers building multi-step AI workflows who need isolated execution environments for their agents. In Part 2 of",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "aws.amazon.com",
-        "home_url": "https://aws.amazon.com/"
-      },
-      "collected_via": {
-        "name": "AWS Machine Learning Blog",
-        "url": "https://aws.amazon.com/blogs/machine-learning/feed/"
+        "name": "Meta Engineering",
+        "url": "https://engineering.fb.com/feed/"
       },
       "source_group": "official_blogs",
       "content_tags": [
         "engineering"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
+      "event_date": "2026-06-30",
       "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_d4b341431fece479067cc184",
-      "cluster_id": "cluster_2f2101adc8737656c31ab72d",
-      "title": "用 Deep Agents 和 Bedrock AgentCore 构建上下文充足的研究代理",
-      "url": "https://aws.amazon.com/blogs/machine-learning/build-context-rich-research-agents-with-deep-agents-and-bedrock-agentcore/",
-      "summary": "AWS 文章介绍如何把 Deep Agents 与 Bedrock AgentCore 组合起来构建研究型 agent，重点是让代理在较长任务中保留上下文。内容覆盖工具接入、上下文组织和研究流程拆分，而不是只给一个聊天式示例。权限边界、数据访问、成本和失败恢复方式会决定这套方案是否适合内部研究工作流。",
-      "author": "AWS Machine Learning Blog",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "AWS Machine Learning Blog",
-        "home_url": "https://aws.amazon.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · AWS Machine Learning Blog",
-        "url": "https://aws.amazon.com/blogs/machine-learning/build-context-rich-research-agents-with-deep-agents-and-bedrock-agentcore/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e90e6db99bd1bb17bcd05c11",
-      "cluster_id": "cluster_458a500fddf08457db043bf0",
-      "title": "阿里云发布 RCA Benchmark，面向 Agentic Ops 根因分析评测",
-      "url": "https://www.alibabacloud.com/blog/alibaba-cloud-releases-rca-benchmark-the-industrys-first-open-source-root-cause-analysis-benchmark-system-for-agentic-ops_603252",
-      "summary": "阿里云把 RCA Benchmark 开源，用于评测 agent 在运维根因分析任务中的定位和解释能力。",
+      "id": "occ_bb598ec195606ac2a0fc4bbe",
+      "cluster_id": "cluster_1030a08d4b82eccc35798d33",
+      "title": "Into the Omniverse: Three Workflows for Improving Vision AI Agent Accuracy With Synthetic Data and Fine-Tuning",
+      "url": "https://blogs.nvidia.com/blog/vision-ai-agent-skills-omniverse-metropolis/",
+      "summary": "Editor’s note: This post is part of Into the Omniverse, a series focused on how developers, 3D practitioners, and enterprises can transform their workflows using the latest advances in OpenUSD and NVIDIA Omniverse. Vision AI agents are beco。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
+        "name": "blogs.nvidia.com",
+        "home_url": "https://blogs.nvidia.com/"
       },
       "collected_via": {
-        "name": "AI Daily legacy report · Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog/alibaba-cloud-releases-rca-benchmark-the-industrys-first-open-source-root-cause-analysis-benchmark-system-for-agentic-ops_603252"
+        "name": "NVIDIA Newsroom RSS",
+        "url": "https://nvidianews.nvidia.com/rss.xml"
       },
       "source_group": "official_blogs",
       "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_ed666d8ad92d57521b7a754d",
-      "cluster_id": "cluster_1a87fa6d803978df940571e9",
-      "title": "Introducing Gemma 4 models on Amazon Bedrock",
-      "url": "https://aws.amazon.com/blogs/machine-learning/introducing-gemma-4-models-on-amazon-bedrock/",
-      "summary": "Today, we are announcing the availability of the Gemma 4 family on Amazon Bedrock. Built by Google DeepMind and released under the Apache 2.0 license, Gemma 4 is a family of open-weight models designed with a focus on intelligence-per-param",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "aws.amazon.com",
-        "home_url": "https://aws.amazon.com/"
-      },
-      "collected_via": {
-        "name": "AWS Machine Learning Blog",
-        "url": "https://aws.amazon.com/blogs/machine-learning/feed/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_ef0e7b92d2154faabd468217",
-      "cluster_id": "cluster_458a500fddf08457db043bf0",
-      "title": "Alibaba Cloud Releases RCA Benchmark, the Industry's First Open Source Root Cause Analysis Benchmark System for Agentic Ops",
-      "url": "https://www.alibabacloud.com/blog/alibaba-cloud-releases-rca-benchmark-the-industrys-first-open-source-root-cause-analysis-benchmark-system-for-agentic-ops_603252",
-      "summary": "This article introduces Alibaba Cloud's open-source RCA Benchmark for evaluating AI agents in IT operations.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
-      },
-      "collected_via": {
-        "name": "Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_78d7462a17a2334325e851aa",
-      "cluster_id": "cluster_d2e2d25b8ef595ba5d174a66",
-      "title": "阿里云汇总 2026 年 5 月安全产品新功能",
-      "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
-      "summary": "这篇阿里云博客按产品线汇总 2026 年 5 月安全产品更新，重点是面向国际市场的安全能力变化。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "product_update"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7f6ca8e810d8b77837d3a766",
-      "cluster_id": "cluster_3b0807bda95b127aec75674b",
-      "title": "Cut Checkpoint Costs with About 30 Lines of Python and NVIDIA nvCOMP",
-      "url": "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/",
-      "summary": "Training LLMs requires periodic checkpoints. These full snapshots of model weights, optimizer states, and gradients are saved to storage so training can resume...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "developer.nvidia.com",
-        "home_url": "https://developer.nvidia.com/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Developer Blog",
-        "url": "https://developer.nvidia.com/blog/feed/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_9e16776a218211da0ffb5e46",
-      "cluster_id": "cluster_d2e2d25b8ef595ba5d174a66",
-      "title": "Security New Features in May 2026",
-      "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
-      "summary": "This blog post summarizes the feature updates for Alibaba Cloud Security Products targeting international markets in May 2026.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
-      },
-      "collected_via": {
-        "name": "Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "product_update"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_c872aca674a451d8b081ae1c",
-      "cluster_id": "cluster_3b0807bda95b127aec75674b",
-      "title": "Cut Checkpoint Costs with About 30 Lines of Python and NVIDIA nvCOMP",
-      "url": "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/",
-      "summary": "Training LLMs requires periodic checkpoints. These full snapshots of model weights, optimizer states, and gradients are saved to storage so training can resume...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "developer.nvidia.com",
-        "home_url": "https://developer.nvidia.com/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Developer Blog",
-        "url": "https://developer.nvidia.com/blog/feed/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_dfc871375a1c9773f1f827ce",
-      "cluster_id": "cluster_3b0807bda95b127aec75674b",
-      "title": "英伟达用压缩库和约 30 行代码降低训练检查点成本",
-      "url": "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/",
-      "summary": "NVIDIA 文章把训练检查点成本压缩落到 nvCOMP 和约 30 行 Python 代码，关注权重、优化器状态和梯度快照的存储开销。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "developer.nvidia.com",
-        "home_url": "https://developer.nvidia.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · NVIDIA Developer Blog",
-        "url": "https://developer.nvidia.com/blog/cut-checkpoint-costs-with-about-30-lines-of-python-and-nvidia-nvcomp/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e0b2bcbf1d3fbee208a6973d",
-      "cluster_id": "cluster_d2e2d25b8ef595ba5d174a66",
-      "title": "Security New Features in May 2026",
-      "url": "https://www.alibabacloud.com/blog/security-new-features-in-may-2026_603251",
-      "summary": "This blog post summarizes the feature updates for Alibaba Cloud Security Products targeting international markets in May 2026.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "alibabacloud.com",
-        "home_url": "https://www.alibabacloud.com/"
-      },
-      "collected_via": {
-        "name": "Alibaba Cloud Blog",
-        "url": "https://www.alibabacloud.com/blog"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "product_update"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-15",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": "https://img.alicdn.com/tfs/TB1h1SxbkOWBuNjSsppXXXPgpXa-28-28.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_19967ada7cb243efac749d2a",
-      "cluster_id": "cluster_4a1a2edfc53fbcf838cd3e67",
-      "title": "OpenAI 发布 Partner Network，面向企业客户整理合作伙伴入口",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "summary": null,
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "openai.com",
-        "home_url": "https://openai.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · OpenAI Company News RSS",
-        "url": "https://openai.com/index/introducing-openai-partner-network"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
+        "company_business",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
+      "event_date": "2026-06-30",
       "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
+      "image_url": "https://iprsoftwaremedia.com/219/files/202606/231eeae3a3671e68ca1f8ffd16a44d56/6a43be0d3d63320baa2820b2_nv-ov-ito-jun-1280x680-1-842x450/nv-ov-ito-jun-1280x680-1-842x450_thmb.jpg",
+      "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_22ae3041bd76d4f94838157d",
-      "cluster_id": "cluster_4a1a2edfc53fbcf838cd3e67",
-      "title": "Introducing the OpenAI Partner Network",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "summary": "OpenAI launches the Partner Network, investing $150M to help global partners accelerate enterprise AI adoption, deployment, and transformation.",
+      "id": "occ_c826ac41c945f669373e24c2",
+      "cluster_id": "cluster_09003992a429ebe53bdda998",
+      "title": "Introducing TabFM: A zero-shot foundation model for tabular data",
+      "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data/",
+      "summary": "Data Management",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "research.google",
+        "home_url": "https://research.google/"
+      },
+      "collected_via": {
+        "name": "Google Research Blog",
+        "url": "https://research.google/blog/rss/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "research"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-research2023-media/original_images/TabFM1_Hero.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_ca04917127bcffc855da3d5b",
+      "cluster_id": "cluster_f1f7d4f8001b4288ac8c42bb",
+      "title": "Core dump epidemiology: fixing an 18-year-old bug",
+      "url": "https://openai.com/index/core-dump-epidemiology-data-infrastructure-bug",
+      "summary": "OpenAI engineers used large-scale core dump analysis to debug rare infrastructure crashes, uncovering both a hardware fault and a long-standing software bug.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1271,259 +1541,15 @@
       },
       "source_group": "official_blogs",
       "content_tags": [
-        "product_update"
+        "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
+      "event_date": "2026-06-30",
       "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_731564c1bf20dd7982462f4f",
-      "cluster_id": "cluster_9d07462df194cc233a570003",
-      "title": "Read Sundar Pichai’s 2026 Commencement Address at Stanford University",
-      "url": "https://blog.google/company-news/inside-google/message-ceo/stanford-commencement-speech-2026/",
-      "summary": "a graduation crowd celebrating。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "blog.google",
-        "home_url": "https://blog.google/"
-      },
-      "collected_via": {
-        "name": "Google Keyword Blog",
-        "url": "https://blog.google/rss/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/WIDE.00_00_32_00.Still008.max-600x600.format-webp.webp",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7ed5918cf4b5ecb1e35c9d27",
-      "cluster_id": "cluster_4a1a2edfc53fbcf838cd3e67",
-      "title": "Introducing the OpenAI Partner Network",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "summary": "OpenAI launches the Partner Network, investing $150M to help global partners accelerate enterprise AI adoption, deployment, and transformation. Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "openai.com",
-        "home_url": "https://openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI Company News RSS",
-        "url": "https://openai.com/news/rss.xml"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "product_update",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_9284cd85ed26a286504339e9",
-      "cluster_id": "cluster_4a1a2edfc53fbcf838cd3e67",
-      "title": "Introducing the OpenAI Partner Network",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "summary": "OpenAI launches the Partner Network, investing $150M to help global partners accelerate enterprise AI adoption, deployment, and transformation.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "openai.com",
-        "home_url": "https://openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI News RSS",
-        "url": "https://openai.com/news/rss.xml"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "product_update"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
-      "published_at": null,
-      "collected_at": "2026-06-16T05:24:27.434Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_79df8cbe8b006f61b5fd635c",
-      "cluster_id": "cluster_4a1a2edfc53fbcf838cd3e67",
-      "title": "Introducing the OpenAI Partner Network",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "summary": "OpenAI launches the Partner Network, investing $150M to help global partners accelerate enterprise AI adoption, deployment, and transformation.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "openai.com",
-        "home_url": "https://openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI Blog RSS",
-        "url": "https://openai.com/blog/rss.xml"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "product_update"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_c6fc954588007edc2fc4dc36",
-      "cluster_id": "cluster_4a1a2edfc53fbcf838cd3e67",
-      "title": "Introducing the OpenAI Partner Network",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "summary": "OpenAI launches the Partner Network, investing $150M to help global partners accelerate enterprise AI adoption, deployment, and transformation.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "openai.com",
-        "home_url": "https://openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI News RSS",
-        "url": "https://openai.com/news/rss.xml"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "product_update"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e0dfd066a495661a02beb9e4",
-      "cluster_id": "cluster_9d07462df194cc233a570003",
-      "title": "Read Sundar Pichai’s 2026 Commencement Address at Stanford University",
-      "url": "https://blog.google/company-news/inside-google/message-ceo/stanford-commencement-speech-2026/",
-      "summary": "a gradient G。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "blog.google",
-        "home_url": "https://blog.google/"
-      },
-      "collected_via": {
-        "name": "Google Keyword Blog",
-        "url": "https://blog.google/rss/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/3_Hero_gradient.max-600x600.format-webp.webp",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f731317800a83cc23eee9a0c",
-      "cluster_id": "cluster_4a1a2edfc53fbcf838cd3e67",
-      "title": "Introducing the OpenAI Partner Network",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "summary": "OpenAI launches the Partner Network, investing $150M to help global partners accelerate enterprise AI adoption, deployment, and transformation. Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "openai.com",
-        "home_url": "https://openai.com/"
-      },
-      "collected_via": {
-        "name": "OpenAI Company News RSS",
-        "url": "https://openai.com/news/rss.xml"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "product_update",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f7b82d5e7f62b14c2a69d749",
-      "cluster_id": "cluster_4a1a2edfc53fbcf838cd3e67",
-      "title": "OpenAI 发布 Partner Network，面向企业客户整理合作伙伴入口",
-      "url": "https://openai.com/index/introducing-openai-partner-network",
-      "summary": null,
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "openai.com",
-        "home_url": "https://openai.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · OpenAI Company News RSS",
-        "url": "https://openai.com/index/introducing-openai-partner-network"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-06-14",
-      "published_at": null,
-      "collected_at": "2026-06-16T04:12:45.930Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
       "access_state": "direct"
     }
   ]
