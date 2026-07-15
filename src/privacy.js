@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 
 import { isPublicNetworkHost, isSensitivePrivateNetworkHost } from "./public-url.js";
@@ -18,9 +19,7 @@ export const PUBLIC_ARTIFACT_PATHS = [
 const TEXT_EXTENSIONS = new Set([".html", ".json", ".txt", ".xml"]);
 const LOCAL_INFO_PATTERNS = [
   { name: "codex_home_variable", pattern: /\$CODEX_HOME|%CODEX_HOME%/i },
-  { name: "windows_user_path", pattern: /\b[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/][^"'<>\\/\s]+/i },
   { name: "windows_local_system_path", pattern: /\b[A-Za-z]:[\\/](?:Windows|ProgramData|Temp|tmp)[\\/]/i },
-  { name: "unix_user_path", pattern: /(?:^|[^A-Za-z0-9_])\/(?:Users|home)\/[^"' <>\n\r/]+/i },
   { name: "codex_automation_path", pattern: /\.codex[\\/]automations|automations[\\/]ai-daily[\\/]inputs/i },
   { name: "file_url_local_path", pattern: /file:\/\/\/?(?:[A-Za-z]:|\/(?:Users|home|tmp)\b)/i }
 ];
@@ -63,6 +62,7 @@ export async function scanPublicArtifactsForLocalInfo(options = {}) {
   const extraForbidden = Array.isArray(options.extraForbidden) ? options.extraForbidden : [];
   const patterns = [
     ...LOCAL_INFO_PATTERNS,
+    ...localEnvironmentPathPatterns(rootDir),
     ...extraForbidden.filter(Boolean).map((value) => ({
       name: "explicit_forbidden_value",
       pattern: new RegExp(escapeRegExp(String(value)), "i")
@@ -113,6 +113,56 @@ export async function scanPublicArtifactsForLocalInfo(options = {}) {
     files_checked: files.length,
     findings
   };
+}
+
+function localEnvironmentPathPatterns(rootDir) {
+  const patterns = [];
+  const localRoots = new Set([
+    rootDir,
+    os.homedir(),
+    process.env.HOME,
+    process.env.USERPROFILE,
+    process.env.CODEX_HOME
+  ].filter(Boolean).map((value) => path.resolve(String(value))));
+  const localIdentities = new Set([
+    process.env.USERNAME,
+    process.env.USER,
+    process.env.LOGNAME
+  ].filter(Boolean).map((value) => String(value).trim()).filter(Boolean));
+
+  for (const localRoot of localRoots) {
+    const normalized = localRoot.replace(/\\/g, "/");
+    const identityMatch = normalized.match(/\/(?:Users|home)\/([^/]+)/i);
+    if (identityMatch?.[1]) localIdentities.add(identityMatch[1]);
+    const exactPattern = exactLocalPathPattern(normalized);
+    if (exactPattern) {
+      patterns.push({ name: "local_environment_path", pattern: exactPattern });
+    }
+  }
+
+  for (const identity of localIdentities) {
+    const escapedIdentity = escapeRegExp(identity);
+    patterns.push({
+      name: "windows_user_path",
+      pattern: new RegExp(`\\b[A-Za-z]:[\\\\/](?:Users|Documents and Settings)[\\\\/]${escapedIdentity}(?=[\\\\/"' <>\\n\\r]|$)`, "i")
+    });
+    patterns.push({
+      name: "unix_user_path",
+      pattern: new RegExp(`(?:^|[^A-Za-z0-9_])\\/(?:Users|home)\\/${escapedIdentity}(?=[/"' <>\\n\\r]|$)`, "i")
+    });
+  }
+  return patterns;
+}
+
+function exactLocalPathPattern(normalizedPath) {
+  const trimmed = String(normalizedPath || "").replace(/\/+$/, "");
+  if (!trimmed || trimmed === "/" || /^[A-Za-z]:$/.test(trimmed)) return null;
+  const isWindows = /^[A-Za-z]:\//.test(trimmed);
+  const segments = trimmed.split("/").filter(Boolean).map(escapeRegExp);
+  if (segments.length === 0) return null;
+  const prefix = isWindows ? "\\b" : "(?:^|[^A-Za-z0-9_])\\/";
+  const body = segments.join("[\\\\/]");
+  return new RegExp(`${prefix}${body}(?=[\\\\/"' <>\\n\\r]|$)`, "i");
 }
 
 function findPrivatePublicUrlIndex(text, relativeFile) {

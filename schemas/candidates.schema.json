@@ -241,6 +241,22 @@
         "category": {
           "enum": ["official_release", "github_trending", "huggingface_trending", "builder", "blog", "project", "community", "model_registry", "repository", "other"]
         },
+        "source_group": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "credibility_tag": {
+          "type": "string",
+          "minLength": 1
+        },
         "status": {
           "enum": ["checked", "blocked", "no_signal"]
         },

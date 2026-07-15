@@ -98,22 +98,36 @@ async function discoverArtifacts({ rootDir, roots, windowStart, currentDate }) {
       continue;
     }
     for (const absolutePath of await walkFiles(absoluteRoot, root.extension)) {
-      const basename = path.basename(absolutePath, root.extension);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(basename)) {
+      const reportDate = canonicalArtifactDate(absoluteRoot, absolutePath, root.extension);
+      if (!reportDate) {
         continue;
       }
-      if (basename < windowStart || basename > currentDate) {
+      if (reportDate < windowStart || reportDate > currentDate) {
         continue;
       }
       artifacts.push({
         kind: root.kind,
-        reportDate: basename,
+        reportDate,
         absolutePath,
         relativePath: normalizePath(path.relative(rootDir, absolutePath))
       });
     }
   }
   return artifacts.sort((a, b) => a.relativePath.localeCompare(b.relativePath));
+}
+
+function canonicalArtifactDate(absoluteRoot, absolutePath, extension) {
+  const parts = normalizePath(path.relative(absoluteRoot, absolutePath)).split("/");
+  if (parts.length !== 3) {
+    return "";
+  }
+  const [year, month, fileName] = parts;
+  const reportDate = path.posix.basename(fileName, extension);
+  return fileName === `${reportDate}${extension}` &&
+    /^\d{4}-\d{2}-\d{2}$/.test(reportDate) &&
+    reportDate.startsWith(`${year}-${month}-`)
+    ? reportDate
+    : "";
 }
 
 async function walkFiles(dir, extension) {

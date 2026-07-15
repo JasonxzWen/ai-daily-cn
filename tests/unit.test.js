@@ -174,6 +174,32 @@ test("candidate pool schema accepts curated first-party builder candidates", () 
   assert.equal(validateCandidatePool(invalidReason).valid, false);
 });
 
+test("candidate pool source records preserve non-gating source, content, and credibility labels", () => {
+  const candidatePool = {
+    schema_version: 1,
+    report_date: "2026-07-15",
+    generated_at: "2026-07-15T03:02:17.127Z",
+    sources: [{
+      id: "official-source-with-display-labels",
+      name: "Official source with display labels",
+      url: "https://example.com/official-source",
+      category: "blog",
+      status: "checked",
+      source_group: "official_blogs",
+      content_tags: ["model_release", "product_update"],
+      credibility_tag: "primary_material"
+    }],
+    candidates: []
+  };
+
+  const validation = validateCandidatePool(candidatePool);
+
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+  assert.equal(validation.value.sources[0].source_group, "official_blogs");
+  assert.deepEqual(validation.value.sources[0].content_tags, ["model_release", "product_update"]);
+  assert.equal(validation.value.sources[0].credibility_tag, "primary_material");
+});
+
 test("candidate audit contract stays aligned with candidate schema", async () => {
   const schema = JSON.parse(await fs.readFile(path.join(rootDir, "schemas", "candidates.schema.json"), "utf8"));
   const candidateProperties = schema.$defs.candidate.properties;
@@ -6720,12 +6746,13 @@ test("public artifact privacy scan blocks local machine path leakage", async () 
   await fs.mkdir(path.join(tmp, "docs/reports"), { recursive: true });
   await fs.mkdir(path.join(tmp, "docs/data"), { recursive: true });
   await fs.mkdir(path.join(tmp, "reports-data"), { recursive: true });
-  await fs.writeFile(path.join(tmp, "docs/reports/report.html"), "<p>C:\\Users\\Admin\\.codex\\automations\\ai-daily</p>", "utf8");
+  const localAutomationPath = path.join(os.homedir(), ".codex", "automations", "ai-daily");
+  await fs.writeFile(path.join(tmp, "docs/reports/report.html"), `<p>${localAutomationPath}</p>`, "utf8");
   await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"ok\":true}", "utf8");
   await fs.writeFile(path.join(tmp, "docs/index.html"), "<p>clean public index</p>", "utf8");
   const blocked = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
   assert.equal(blocked.ok, false);
-  assert(blocked.findings.some((finding) => finding.pattern === "windows_user_path"));
+  assert(blocked.findings.some((finding) => ["local_environment_path", "windows_user_path", "unix_user_path"].includes(finding.pattern)));
 
   await fs.writeFile(path.join(tmp, "docs/reports/report.html"), "<p>https://mp.weixin.qq.com/s/example</p>", "utf8");
   await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"wechat_items\":[],\"source_effectiveness\":[],\"code\":\"content_sources_blocked\"}", "utf8");
@@ -6742,6 +6769,24 @@ test("public artifact privacy scan blocks local machine path leakage", async () 
   await fs.writeFile(path.join(tmp, "docs/index.html"), "<p>clean public index</p>", "utf8");
   const clean = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
   assert.equal(clean.ok, true, JSON.stringify(clean.findings));
+});
+
+test("public artifact privacy scan allows third-party paths quoted by public source content", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-privacy-third-party-path-"));
+  await fs.mkdir(path.join(tmp, "docs/signals"), { recursive: true });
+  await fs.mkdir(path.join(tmp, "reports-data/occurrences/2026/07"), { recursive: true });
+  const publicQuote = {
+    summary: "A public incident report says a command removed files under /Users/mattsdevbox before the bug was fixed."
+  };
+  await fs.writeFile(path.join(tmp, "docs/signals/page-001.json"), JSON.stringify(publicQuote), "utf8");
+  await fs.writeFile(
+    path.join(tmp, "reports-data/occurrences/2026/07/2026-07-15.json"),
+    JSON.stringify(publicQuote),
+    "utf8"
+  );
+
+  const result = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
+  assert.equal(result.ok, true, JSON.stringify(result.findings));
 });
 
 test("CLI JSON commands can write clean UTF-8 output files", async () => {

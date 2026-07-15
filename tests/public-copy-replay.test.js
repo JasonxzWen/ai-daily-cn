@@ -44,6 +44,10 @@ test("public copy replay scans docs data, reports data, and rendered HTML inside
   await writeText(tmp, "reports-data/2026/07/2026-07-07.json", JSON.stringify({ report_date: "2026-07-07", summary: "这个项目存在复现门槛。" }));
   await writeText(tmp, "docs/reports/2026/07/2026-07-06.html", "<main>优先核对许可证和维护状态。</main>");
   await writeText(tmp, "docs/data/2026/06/2026-06-10.json", JSON.stringify({ report_date: "2026-06-10", summary: "阅读时先看旧文。" }));
+  await writeText(tmp, "reports-data/occurrences/2026/07/2026-07-08.json", JSON.stringify({
+    report_date: "2026-07-08",
+    title: "苹果新 Siri AI 设三层准入门槛"
+  }));
 
   const result = await evaluatePublicCopyReplay({
     rootDir: tmp,

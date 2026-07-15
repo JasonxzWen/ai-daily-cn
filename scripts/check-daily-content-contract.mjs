@@ -239,7 +239,7 @@ async function discoverReportArtifacts(options) {
   const dataRoot = path.resolve(rootDir, options.dataInput || DEFAULT_DATA_INPUT);
   const htmlRoot = path.resolve(rootDir, options.htmlInput || DEFAULT_HTML_INPUT);
   const files = [];
-  await collectReportJsonFiles(dataRoot, files);
+  await collectReportJsonFiles(dataRoot, dataRoot, files);
   files.sort((a, b) => a.reportDate.localeCompare(b.reportDate) || a.reportPath.localeCompare(b.reportPath));
   return files.slice(-normalizeLatestCount(options.latest)).map((artifact) => ({
     ...artifact,
@@ -247,7 +247,7 @@ async function discoverReportArtifacts(options) {
   }));
 }
 
-async function collectReportJsonFiles(dir, files) {
+async function collectReportJsonFiles(dir, dataRoot, files) {
   let entries;
   try {
     entries = await fs.readdir(dir, { withFileTypes: true });
@@ -257,14 +257,19 @@ async function collectReportJsonFiles(dir, files) {
   for (const entry of entries) {
     const absolutePath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      await collectReportJsonFiles(absolutePath, files);
+      await collectReportJsonFiles(absolutePath, dataRoot, files);
       continue;
     }
-    const match = entry.name.match(/^(\d{4}-\d{2}-\d{2})\.json$/);
+    const relativePath = normalizePath(path.relative(dataRoot, absolutePath));
+    const match = relativePath.match(/^(\d{4})\/(\d{2})\/(\d{4}-\d{2}-\d{2})\.json$/);
     if (!match) {
       continue;
     }
-    files.push({ reportDate: match[1], reportPath: absolutePath });
+    const [, year, month, reportDate] = match;
+    if (!reportDate.startsWith(`${year}-${month}-`)) {
+      continue;
+    }
+    files.push({ reportDate, reportPath: absolutePath });
   }
 }
 
