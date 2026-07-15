@@ -186,6 +186,7 @@ test("Validate workflow gates pull requests and pushes to main", async () => {
   assert.match(workflow, /push:\r?\n\s+branches: \["main"\]/);
   assert.match(workflow, /uses: actions\/checkout@v6/);
   assert.match(workflow, /node-version: "22"/);
+  assert.match(workflow, /LANG: zh_CN\.UTF-8/);
   assert.match(workflow, /cache: pnpm/);
   assert.match(workflow, /corepack pnpm install --frozen-lockfile/);
   assert.match(workflow, /corepack pnpm exec playwright install --with-deps chromium/);

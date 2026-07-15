@@ -12,6 +12,8 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      LANG: zh_CN.UTF-8
     steps:
       - name: Checkout
         uses: actions/checkout@v6
