@@ -17,6 +17,7 @@ import {
   buildPublicSignalArtifacts,
   projectOccurrenceStore,
   PUBLIC_SIGNAL_PAGE_SIZE,
+  PUBLIC_SIGNAL_RECENT_WINDOW_HOURS,
   validatePublicSignalArtifactSet
 } from "../src/public-signals.js";
 import { occurrenceStoreRelativePath } from "../src/reports-data-layout.js";
@@ -860,6 +861,13 @@ test("signal validators enforce counts, uniqueness, pagination, and chronology s
   falseCoverage.index.coverage.occurrence_count = 0;
   assert.equal(validatePublicSignalArtifactSet(falseCoverage).valid, false);
 
+  const falseRecentCount = structuredClone(artifacts);
+  falseRecentCount.index.recent_count = 0;
+  falseRecentCount.index.groups[0].recent_count = 0;
+  falseRecentCount.files[0].data.recent_count = 0;
+  falseRecentCount.files[0].data.groups[0].recent_count = 0;
+  assert.equal(validatePublicSignalArtifactSet(falseRecentCount).valid, false);
+
   const crossPageReordered = structuredClone(artifacts);
   const groupPages = crossPageReordered.pages.filter((entry) => entry.data.group.id === crossPageReordered.index.groups[0].id);
   [groupPages[0].data.items, groupPages[1].data.items] = [groupPages[1].data.items, groupPages[0].data.items];
@@ -903,6 +911,9 @@ test("public signal pages are exact, finite, conditional by group, and schema-va
   });
 
   assert.equal(artifacts.index.total_count, 7);
+  assert.equal(artifacts.index.recent_count, 7);
+  assert.equal(artifacts.index.recent_window_hours, 48);
+  assert.equal(artifacts.index.groups[0].recent_count, 7);
   assert.equal(artifacts.index.page_size, 2);
   assert.deepEqual(artifacts.index.groups.map((group) => group.id), ["community_discussions"]);
   assert.equal(artifacts.index.groups.some((group) => group.id === "other"), false);
@@ -1130,6 +1141,7 @@ test("independent signal writer persists discovery records without running edito
 
 test("public signal defaults use bounded transport pages only, never an item cap", () => {
   assert.equal(PUBLIC_SIGNAL_PAGE_SIZE, 50);
+  assert.equal(PUBLIC_SIGNAL_RECENT_WINDOW_HOURS, 48);
   const store = buildOccurrenceStore({
     reportDate: "2026-07-14",
     generatedAt,
@@ -1147,6 +1159,25 @@ test("public signal defaults use bounded transport pages only, never an item cap
   assert.equal(artifacts.index.total_count, 121);
   assert.equal(pageItems.length, 121);
   assert.equal(artifacts.pages.length, 3);
+});
+
+test("public signal index separates the recent 48-hour stream from the lossless archive", () => {
+  const store = buildOccurrenceStore({
+    reportDate: "2026-07-14",
+    generatedAt,
+    sources: [source()],
+    candidates: [
+      candidate({ id: "recent", event_date: "2026-07-14" }),
+      candidate({ id: "archive", event_date: "2026-07-10", url: "https://example.com/archive" })
+    ]
+  });
+  const artifacts = buildPublicSignalArtifacts({ occurrenceStores: [store], generatedAt });
+
+  assert.equal(artifacts.index.total_count, 2);
+  assert.equal(artifacts.index.recent_count, 1);
+  assert.equal(artifacts.index.groups[0].count, 2);
+  assert.equal(artifacts.index.groups[0].recent_count, 1);
+  assert.equal(artifacts.pages.flatMap((entry) => entry.data.items).length, 2);
 });
 
 test("repository contract keeps public signal membership lossless and labels non-gating", async () => {

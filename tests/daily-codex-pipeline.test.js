@@ -2296,6 +2296,8 @@ async function writeProductionSourceWatchEvidence({
     kind: "signal_index",
     generated_at: `${reportDate}T08:00:00.000Z`,
     total_count: occurrenceItems.length,
+    recent_count: occurrenceItems.length,
+    recent_window_hours: 48,
     page_size: 50,
     coverage: {
       input_record_count: occurrenceItems.length,
@@ -2307,6 +2309,7 @@ async function writeProductionSourceWatchEvidence({
       id: githubTrendingGroup.id,
       label: githubTrendingGroup.label,
       count: publicItems.length,
+      recent_count: publicItems.length,
       page_count: 1,
       first_page_url: "signals/github_trending/page-001.json",
       preview: publicItems

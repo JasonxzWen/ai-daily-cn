@@ -19,6 +19,9 @@ test("React homepage is a source-grouped public signal monitor", async () => {
   assert.match(app, /data-load-more=/);
   assert.match(app, /RECENT_WINDOW_MS\s*=\s*48\s*\*\s*60\s*\*\s*60\s*\*\s*1000/);
   assert.match(app, /timestamp\(signalIndex\.generated_at\)\s*-\s*RECENT_WINDOW_MS/);
+  assert.match(app, /signalIndex\.recent_count/);
+  assert.match(app, /group\.recent_count/);
+  assert.match(app, /历史库存/);
   assert.match(app, /first_page_url/);
   assert.match(app, /next_url/);
   assert.match(app, /appendUniqueSignals/);

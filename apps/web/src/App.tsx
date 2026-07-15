@@ -34,6 +34,7 @@ type SignalGroup = {
   id: string;
   label: string;
   count: number;
+  recent_count: number;
   page_count: number;
   first_page_url: string;
   preview: SignalOccurrence[];
@@ -44,6 +45,8 @@ type SignalIndex = {
   kind: "signal_index";
   generated_at: string;
   total_count: number;
+  recent_count: number;
+  recent_window_hours: 48;
   groups: SignalGroup[];
 };
 
@@ -145,7 +148,11 @@ export function App() {
         </div>
         <dl className="adc-snapshot" aria-label="信号快照">
           <div>
-            <dt>已收录信号</dt>
+            <dt>近 48 小时</dt>
+            <dd>{signalIndex ? formatCount(signalIndex.recent_count) : "—"}</dd>
+          </div>
+          <div>
+            <dt>历史库存</dt>
             <dd>{signalIndex ? formatCount(signalIndex.total_count) : "—"}</dd>
           </div>
           <div>
@@ -176,7 +183,7 @@ function SignalBoard({ index, recentCutoff }: { index: SignalIndex; recentCutoff
             {index.groups.map((group) => (
               <a key={group.id} href={`#group-${group.id}`}>
                 <span>{group.label}</span>
-                <strong>{formatCount(group.count)}</strong>
+                <strong title={`历史共 ${formatCount(group.count)} 条`}>{formatCount(group.recent_count)}</strong>
               </a>
             ))}
           </nav>
@@ -212,7 +219,9 @@ function SignalGroupSection({ group, recentCutoff }: { group: SignalGroup; recen
   const [nextUrl, setNextUrl] = useState<string | null>(group.first_page_url);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
   const [historyMode, setHistoryMode] = useState(false);
-  const [boundaryReached, setBoundaryReached] = useState(false);
+  const [boundaryReached, setBoundaryReached] = useState(
+    () => group.preview.some((item) => effectiveTimestamp(item) < recentCutoff)
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -268,7 +277,7 @@ function SignalGroupSection({ group, recentCutoff }: { group: SignalGroup; recen
           <p>{group.label}</p>
           <h2>{group.label}</h2>
         </div>
-        <span>{formatCount(group.count)} 条</span>
+        <span>近 48 小时 {formatCount(group.recent_count)} 条 · 历史 {formatCount(group.count)} 条</span>
       </header>
 
       {visibleItems.length > 0 ? (

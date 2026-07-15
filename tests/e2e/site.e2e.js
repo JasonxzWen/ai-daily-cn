@@ -117,6 +117,8 @@ async function writeSignalFixture(outDir) {
     kind: "signal_index",
     generated_at: snapshotAt,
     total_count: officialItems.length + githubItems.length,
+    recent_count: officialItems.length + githubItems.length - 1,
+    recent_window_hours: 48,
     page_size: 50,
     coverage: {
       input_record_count: officialItems.length + githubItems.length,
@@ -129,6 +131,7 @@ async function writeSignalFixture(outDir) {
         id: "official_blogs",
         label: "官网博客",
         count: officialItems.length,
+        recent_count: officialItems.length - 1,
         page_count: 1,
         first_page_url: "signals/official_blogs/page-001.json",
         preview: officialItems.slice(0, 8)
@@ -137,6 +140,7 @@ async function writeSignalFixture(outDir) {
         id: "github_trending",
         label: "GitHub 趋势",
         count: githubItems.length,
+        recent_count: githubItems.length,
         page_count: 1,
         first_page_url: "signals/github_trending/page-001.json",
         preview: githubItems
