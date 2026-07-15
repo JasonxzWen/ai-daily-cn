@@ -438,7 +438,7 @@ async function validateRepositoryMigration(targetRoot, manifestPath) {
   if (manifest.schemaVersion !== 1) {
     failures.push('.harness-hub/manifest.json: schemaVersion must be 1');
   }
-  if (manifest.source?.url !== 'https://github.com/JasonxzWen/harness-hub.git') {
+  if (manifest.source?.url !== 'https://github.com/JasonxzWen/harness-hub') {
     failures.push('.harness-hub/manifest.json: source URL must be the canonical Harness Hub repository');
   }
   if (!/^[0-9a-f]{40}$/.test(manifest.source?.commit || '')) {
