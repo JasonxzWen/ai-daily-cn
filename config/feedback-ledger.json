@@ -123,7 +123,7 @@
       ],
       "validation": {
         "command": "corepack pnpm run test",
-        "test_name": "legacy source and classification fields remain open metadata across registry, candidate, and report schemas",
+        "test_name": "registry rejects retired source classification while candidate and report schemas keep legacy read compatibility",
         "gate": "pnpm run validate"
       }
     },
@@ -138,12 +138,13 @@
         "config/feedback-ledger.json",
         "src/search-news.js",
         "src/discovery.js",
+        "tests/source-listener.test.js",
         "tasks/daily-publish-runbook.md",
         "prompts/ai-daily/modules/fixed-source-checklist.md"
       ],
       "validation": {
-        "command": "node --test tests/unit.test.js",
-        "test_name": "search news discovery preserves provider-level partial results and timing",
+        "command": "corepack pnpm run test",
+        "test_name": "search transport page size limits each request without capping aggregate listener output",
         "gate": "pnpm run validate"
       }
     },
@@ -1244,7 +1245,7 @@
       ],
       "validation": {
         "command": "pnpm run test",
-        "test_name": "configured source reset includes GitHub watchlist, Chinese direct RSS, and community hotspots",
+        "test_name": "registered listener sources cover broader tech, official changelogs, and community feeds",
         "gate": "pnpm run validate"
       }
     },

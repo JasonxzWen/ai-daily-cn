@@ -11,6 +11,7 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { publicSignalTaxonomy } from "../src/schema.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const cfgPath = path.join(__dirname, "..", "config", "sources", "default-content-sources.json");
@@ -21,8 +22,24 @@ const allSources = fs.readdirSync(sourceDir)
   .filter((name) => name.endsWith(".json"))
   .flatMap((name) => JSON.parse(fs.readFileSync(path.join(sourceDir, name), "utf8")).sources || []);
 const allById = new Map(allSources.map((s) => [s.id, s]));
+const sourceGroupIds = new Set(publicSignalTaxonomy.source_groups.map((item) => item.id));
+const credibilityTagIds = new Set(publicSignalTaxonomy.credibility_tags.map((item) => item.id));
+const contentTagIds = new Set(publicSignalTaxonomy.content_tags.map((item) => item.id));
 
-test("headline-lab engineering/research sources are monitored as core T0 primary", () => {
+test("every registry source uses the public taxonomy and omits retired admission metadata", () => {
+  const retiredFields = ["tier", "authority", "enablement", "verification_policy", "source_level", "sourceLevel"];
+  for (const source of allSources) {
+    assert(sourceGroupIds.has(source.source_group), `${source.id} source_group must use the public taxonomy`);
+    assert(credibilityTagIds.has(source.credibility_tag), `${source.id} credibility_tag must use the public taxonomy`);
+    assert(Array.isArray(source.content_tags) && source.content_tags.length > 0, `${source.id} must declare content_tags`);
+    assert(source.content_tags.every((tag) => contentTagIds.has(tag)), `${source.id} content_tags must use the public taxonomy`);
+    for (const field of retiredFields) {
+      assert.equal(Object.hasOwn(source, field), false, `${source.id} must not reintroduce ${field}`);
+    }
+  }
+});
+
+test("headline-lab engineering/research sources are monitored as official primary material", () => {
   const required = [
     ["content-anthropic-engineering", "/engineering/"],
     ["content-anthropic-research", "/research/"]
@@ -30,9 +47,9 @@ test("headline-lab engineering/research sources are monitored as core T0 primary
   for (const [id, linkPattern] of required) {
     const s = byId.get(id);
     assert.ok(s, `${id} must be a registered content source`);
-    assert.equal(s.tier, "T0", `${id} must be T0`);
-    assert.equal(s.authority, "primary", `${id} must be primary authority`);
-    assert.equal(s.enablement, "core", `${id} must be core (always checked)`);
+    assert.equal(s.source_group, "official_blogs", `${id} must stay in the official blog source group`);
+    assert.equal(s.credibility_tag, "primary_material", `${id} must stay tagged as primary material`);
+    assert(s.content_tags.some((tag) => tag === "engineering" || tag === "research"), `${id} must declare an engineering or research content tag`);
     assert.equal(s.source_kind, "html_index", `${id} must be html_index (no RSS)`);
     assert.equal(s.linkPattern, linkPattern, `${id} linkPattern`);
   }
@@ -43,7 +60,9 @@ test("individual-builder blog class is registered (catch-net for practitioner po
   assert.ok(builders.length >= 2, "at least two individual-builder blog sources");
   for (const s of builders) {
     assert.equal(s.candidate_category, "hot_blog");
-    assert.equal(s.authority, "secondary", `${s.id} individual builder = secondary authority`);
+    assert.equal(s.source_group, "news_newsletters", `${s.id} must stay in the news/newsletter source group`);
+    assert(credibilityTagIds.has(s.credibility_tag), `${s.id} must expose a public credibility tag`);
+    assert(s.content_tags.includes("analysis_opinion"), `${s.id} must expose its analysis/opinion content type`);
     assert.ok(["rss", "html_index"].includes(s.source_kind));
   }
 });
@@ -62,8 +81,9 @@ test("handoff source plan registers official GitHub org feeds and removes placeh
     assert.ok(source, `${id} must be registered in config/sources`);
     assert.equal(source.source_kind, "rss", `${id} must use GitHub Atom/RSS semantics`);
     assert.match(source.url, /^https:\/\/github\.com\/.+\.atom$/i, `${id} must point at a GitHub organization Atom feed`);
-    assert.equal(source.authority, "primary", `${id} must remain a first-party source`);
-    assert.equal(source.verification_policy, "primary_allowed", `${id} should be usable as primary evidence`);
+    assert.equal(source.source_group, "github_trending", `${id} must stay in the GitHub source group`);
+    assert.equal(source.credibility_tag, "primary_material", `${id} must remain first-party material`);
+    assert(source.content_tags.includes("open_source"), `${id} must declare open-source content`);
   }
 
   const removedPlaceholderRoutes = [
@@ -80,7 +100,7 @@ test("handoff source plan registers official GitHub org feeds and removes placeh
   }
 });
 
-test("Wechat2RSS public feeds are registered as medium-trust Chinese AI leads", () => {
+test("Wechat2RSS public feeds are registered as community-tagged Chinese AI leads", () => {
   const wechat2rssFeeds = [
     "wechat2rss-jiqizhixin",
     "wechat2rss-xinzhiyuan",
@@ -101,12 +121,10 @@ test("Wechat2RSS public feeds are registered as medium-trust Chinese AI leads", 
     assert.ok(source, `${id} must be registered in config/sources`);
     assert.equal(source.source_kind, "rss", `${id} must use Wechat2RSS RSS output`);
     assert.equal(source.candidate_category, "community_lead", `${id} must stay in lead discovery`);
-    assert.equal(source.tier, "T3", `${id} must remain a low-priority discovery tier`);
-    assert.equal(source.authority, "intermediary", `${id} must not be treated as primary authority`);
-    assert.equal(source.enablement, "optional", `${id} should run in default content discovery`);
-    assert.equal(source.verification_policy, "primary_required", `${id} must require primary-source confirmation`);
+    assert.equal(source.source_group, "community_discussions", `${id} must stay in the community source group`);
+    assert.equal(source.credibility_tag, "community_lead", `${id} must carry its public community-lead tag`);
+    assert(source.content_tags.some((tag) => tag === "industry_news" || tag === "community_discussion"), `${id} must declare a public content tag`);
     assert.equal(source.platform, "wechat", `${id} must be marked as a WeChat-derived feed`);
-    assert.equal(source.source_level, "wechat2rss_medium_trust", `${id} must declare the medium-trust lane`);
     assert.match(source.url, /^https:\/\/wechat2rss\.xlab\.app\/feed\/[a-f0-9]+\.xml$/i, `${id} must point at a public Wechat2RSS feed`);
   }
 });

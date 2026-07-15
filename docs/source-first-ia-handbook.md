@@ -26,6 +26,7 @@ The public product is a high-coverage source listener, not a source-health dashb
 - Public level-one groups are `official_blogs`, `github_trending`, `community_discussions`, `x_updates`, `news_newsletters`, `papers_models`, plus conditional `other`.
 - Source-group order is stable presentation order. Items inside a group use occurrence time order; editorial rank, authority, verification, quality, selection, and rejection state are never default sort inputs.
 - Search and filters change only the reader's current view. The default dataset remains the complete stream, and pagination or preview size never becomes an admission cap.
+- The pre-PR2 public history is retained as immutable compressed occurrence stores under `reports-data/occurrences/baseline-v1/`; production combines that baseline with daily stores and never reimports legacy candidate pools or edited reports.
 - Unknown classification falls back visibly to `other` and `pending_review`.
 - Reader-safe publisher, collection channel, summary, labels, time, health, and access state are public. Raw `source_audit`, retries, candidate pools, scores, selection/rejection reasons, repair state, private paths, and machine logs remain internal.
 - `config/source-display-contract.json` and the detailed rank tables below survive only as internal inventory governance. They do not define public occurrence membership or within-group order.
@@ -195,9 +196,9 @@ Codex may propose the baseline placement for the internal source inventory, but 
 6. 判断是否是英文媒体或搜索聚合。是则进入 `english_media_search`。
 7. 选择 rank：优先使用相邻源之间的空位；没有空位时重排该 section，保持 10 点间隔。
 8. 在同一 PR 中补充测试，证明新 logical source 有 section、rank、display mode 和可推导状态。
-9. 若新增或移动底层采集入口，运行 `node scripts/generate-source-inventory-order.mjs` 刷新 `docs/source-inventory-order.md`，并用 `corepack pnpm run sources:display-contract` 确认 153+ 全量入口参考表仍完整。
+9. 若新增或移动底层采集入口，运行 `node scripts/generate-source-inventory-order.mjs` 刷新 `docs/source-inventory-order.md`，并用 `corepack pnpm run sources:display-contract` 确认全部已注册入口仍完整。
 
-不要把 source `tier`、`authority`、当日候选数或当天是否阻塞作为公开 occurrence 的准入或排序输入。它们可以服务内部采集诊断和遗留编辑报告，但不能改变公开成员集合、默认时间顺序或内部固定治理图谱。
+不要把 source credibility、当日记录数或当天是否阻塞作为公开 occurrence 的准入或排序输入。来源组、内容类别、可信度、健康和访问状态只服务展示、筛选、采集诊断和遗留编辑报告，不能改变公开成员集合、默认时间顺序或内部固定治理图谱。
 
 ## 状态保留规则
 
@@ -209,10 +210,10 @@ Codex may propose the baseline placement for the internal source inventory, but 
 |---|---|---|
 | `included` | 今天有内容进入遗留编辑报告 | 保留内部治理 rank，不上浮 |
 | `updated_not_selected` | 抓到候选但未进入遗留编辑报告 | 保留内部治理 rank，在内部状态焦点中显式出现 |
-| `parsed_not_candidate` | 解析到近期内容但未形成候选 | 保留原 rank，后续优化采集或候选准入 |
+| `parsed_not_candidate` | 历史状态：已解析但旧候选转换未产出记录 | 保留原 rank；新监听器应保留可安全标准化的记录，并把转换问题写成 normalization error |
 | `no_recent_update` | 可访问但无近期有效更新 | 保留原 rank，避免静默误判 |
 | `blocked` | 已配置但不可达或解析阻塞 | 保留内部治理 rank，并在内部 source-runtime 状态中披露 |
-| `not_configured_or_skipped` | 未配置、缺 token/base URL、手动源、kill switch 或占位源 | 保留原 rank，尤其是 WeChat/Zhihu 平台源 |
+| `not_configured_or_skipped` | 历史状态：未配置、缺 token/base URL、网络/访问规则受限或占位源 | 保留原 rank；新监听器只记录具体访问原因，不以手动标签或 kill switch 跳过来源 |
 
 ## 验证命令
 
@@ -253,7 +254,7 @@ Logical sources are ordered by fixed editorial importance in `config/source-disp
 
 The Collection Entry Layer is the complete registered inventory. Collection entries are concrete feed, page, bridge, manual, API, or platform inputs. They are visible so blocked, skipped, unconfigured, manual, or no-update rows do not disappear from review.
 
-153 collection entries are complete inventory rows, not public daily story content. They remain grouped and expanded in fixed source sections inside the internal source-first runtime with non-hiding search/highlight behavior.
+All registered collection entries are complete inventory rows, not public daily story content. They remain grouped and expanded in fixed source sections inside the internal source-first runtime with non-hiding search/highlight behavior.
 
 Internal source-first inventory rows project a runtime layer onto this fixed inventory: mapped collection entries inherit the daily `status_label` from their logical source; mapped entries whose logical source is missing from today's runtime table show `unreported`; unmapped entries show `collection_only`. The generated `docs/source-inventory-order.md` reference remains a static order and configuration review surface, so runtime status must never reorder it.
 

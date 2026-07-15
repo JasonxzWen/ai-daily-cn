@@ -7,13 +7,20 @@
       "url": "https://openai.com/news/rss.xml",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "company_business",
+        "policy_infrastructure",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "aliases": [
+        "content-openai-company-news"
+      ],
+      "notes": "Official OpenAI news feed for company, product, partnership, safety, policy, and platform availability signals."
     },
     {
       "id": "content-openai-blog-rss",
@@ -21,12 +28,12 @@
       "url": "https://openai.com/blog/rss.xml",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -35,15 +42,23 @@
       "url": "https://www.anthropic.com/news",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "research",
+        "company_business",
+        "policy_infrastructure",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/news/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "aliases": [
+        "content-anthropic-company-news"
+      ],
+      "notes": "Official Anthropic news lane for Claude product, policy, safety, research, partnership, and company updates."
     },
     {
       "id": "content-anthropic-engineering",
@@ -51,14 +66,14 @@
       "url": "https://www.anthropic.com/engineering",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "engineering"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/engineering/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000,
       "notes": "Anthropic engineering deep-dives (Claude Code, agent harness, MCP, context engineering). No RSS; HTML index. Must-report class."
     },
@@ -68,14 +83,14 @@
       "url": "https://www.anthropic.com/research",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/research/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000,
       "notes": "Anthropic research index (alignment, interpretability, capability write-ups). No RSS; HTML index."
     },
@@ -85,13 +100,13 @@
       "url": "https://simonwillison.net/atom/everything/",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T1",
-      "authority": "secondary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "format": "rss",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000,
       "notes": "Individual-builder/practitioner blog class (the catch-net for html-effectiveness-style posts). High-signal LLM/agent tooling write-ups."
     },
@@ -101,13 +116,13 @@
       "url": "https://lilianweng.github.io/index.xml",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T1",
-      "authority": "secondary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "format": "rss",
       "requires_original_url": false,
-      "max_items_per_run": 2,
       "timeout_ms": 15000,
       "notes": "Individual-builder/practitioner blog class. Deep ML/agent concept write-ups."
     },
@@ -117,12 +132,12 @@
       "url": "https://huggingface.co/blog/feed.xml",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -131,12 +146,13 @@
       "url": "https://github.blog/changelog/feed/",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "open_source"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -145,12 +161,12 @@
       "url": "https://research.google/blog/rss/",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -159,14 +175,14 @@
       "url": "https://deepmind.google/discover/blog/",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/blog/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -175,12 +191,12 @@
       "url": "https://deepmind.google/blog/rss.xml",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -189,14 +205,14 @@
       "url": "https://ai.meta.com/blog/",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "https://ai.meta.com/blog/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -205,12 +221,12 @@
       "url": "https://www.microsoft.com/en-us/research/feed/",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -219,12 +235,12 @@
       "url": "https://machinelearning.apple.com/rss.xml",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -233,12 +249,12 @@
       "url": "https://developer.nvidia.com/blog/feed/",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "engineering"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -247,12 +263,12 @@
       "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -261,12 +277,12 @@
       "url": "https://azure.microsoft.com/en-us/blog/feed/",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -275,12 +291,12 @@
       "url": "https://engineering.fb.com/feed/",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "engineering"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -289,15 +305,22 @@
       "url": "https://x.ai/news",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "model_release",
+        "engineering",
+        "company_business",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/news/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "aliases": [
+        "content-xai-company-news"
+      ],
+      "notes": "Official xAI news lane for Grok, model, product, infrastructure, company, and platform updates."
     },
     {
       "id": "content-bytedance-seed-blog",
@@ -305,14 +328,14 @@
       "url": "https://seed.bytedance.com/en/blog?view_from=homepage_tab",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/en/blog/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -321,14 +344,14 @@
       "url": "https://developers.tiktok.com/blogs/",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "engineering"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/blog/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -337,16 +360,15 @@
       "url": "https://runwayml.com/en/changelog",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/en/changelog",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official",
       "notes": "AIGC official product-update lane for video, image, creative workflow, and Game Worlds style signals."
     },
     {
@@ -355,16 +377,15 @@
       "url": "https://lumalabs.ai/changelog",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/changelog/",
       "requires_original_url": false,
-      "max_items_per_run": 4,
       "timeout_ms": 15000,
-      "source_level": "official",
       "notes": "AIGC official product-update lane for Dream Machine image/video generation and creative agents."
     },
     {
@@ -373,16 +394,15 @@
       "url": "https://pika.art/",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "https://pika.art/",
       "requires_original_url": false,
-      "max_items_per_run": 2,
       "timeout_ms": 15000,
-      "source_level": "official",
       "notes": "AIGC product surface for video app and creator workflow changes; usually produces no_signal unless dated links are present."
     },
     {
@@ -391,16 +411,15 @@
       "url": "https://kling.art/",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "https://kling.art/",
       "requires_original_url": false,
-      "max_items_per_run": 2,
       "timeout_ms": 15000,
-      "source_level": "official",
       "notes": "AIGC product surface for image/video/audio generation updates; usually produces no_signal unless dated links are present."
     },
     {
@@ -409,16 +428,15 @@
       "url": "https://unity.com/muse",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "other"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/muse",
       "requires_original_url": false,
-      "max_items_per_run": 2,
       "timeout_ms": 15000,
-      "source_level": "official",
       "notes": "Game-development AIGC/product surface for Unity AI tooling; usually produces no_signal unless dated links are present."
     },
     {
@@ -427,14 +445,14 @@
       "url": "https://www.tencent.com/en-us/business/artificial-intelligence.html",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/en-us/articles/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -443,14 +461,14 @@
       "url": "https://llm.hunyuan.tencent.com/#/Blog",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/blog/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -459,15 +477,20 @@
       "url": "https://qwen.ai/blog",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "model_release",
+        "product_update"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/blog/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "aliases": [
+        "china-ai-qwen-blog"
+      ],
+      "notes": "Qwen official model and platform blog. English pages are accepted when no Chinese official version exists."
     },
     {
       "id": "content-alibaba-cloud-blog",
@@ -475,14 +498,14 @@
       "url": "https://www.alibabacloud.com/blog",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/blog/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -491,15 +514,22 @@
       "url": "https://platform.kimi.com/blog",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "model_release",
+        "product_update",
+        "engineering",
+        "company_business"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/blog/posts/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "aliases": [
+        "content-moonshot-kimi-company-news"
+      ],
+      "notes": "Official Moonshot AI/Kimi platform blog for API, model, pricing, product, and developer-platform updates."
     },
     {
       "id": "content-kimi-technical-blog",
@@ -507,15 +537,22 @@
       "url": "https://www.kimi.com/blog/",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "model_release",
+        "product_update",
+        "engineering"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/blog/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "aliases": [
+        "china-ai-kimi-blog",
+        "content-kimi-official-blog-company-news"
+      ],
+      "notes": "Official Kimi blog for model, agent, product, developer-platform, and content-workflow updates."
     },
     {
       "id": "content-minimax-blog",
@@ -523,15 +560,23 @@
       "url": "https://www.minimax.io/blog",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "model_release",
+        "product_update",
+        "engineering",
+        "creative_ai"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/blog/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000
+      "timeout_ms": 15000,
+      "aliases": [
+        "china-ai-minimax-blog",
+        "content-minimax-company-news"
+      ],
+      "notes": "Official MiniMax blog for model, Hailuo AI, product, API, business, and creator-platform updates."
     },
     {
       "id": "content-zhipu-research",
@@ -539,14 +584,14 @@
       "url": "https://www.zhipuai.cn/en/research",
       "source_kind": "html_index",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/en/research/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -555,12 +600,12 @@
       "url": "https://blog.cloudflare.com/rss/",
       "source_kind": "rss",
       "candidate_category": "hot_blog",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "official_blogs",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -569,12 +614,13 @@
       "url": "https://www.nature.com/subjects/machine-learning.rss",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "secondary",
-      "enablement": "core",
-      "verification_policy": "primary_required",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -583,12 +629,12 @@
       "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "intermediary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -597,12 +643,12 @@
       "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "intermediary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -611,12 +657,12 @@
       "url": "https://techcrunch.com/category/enterprise/feed/",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "intermediary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -625,12 +671,12 @@
       "url": "https://www.theverge.com/rss/index.xml",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "intermediary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -639,12 +685,12 @@
       "url": "https://feeds.arstechnica.com/arstechnica/index",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "intermediary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -653,12 +699,12 @@
       "url": "https://www.technologyreview.com/feed/",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "intermediary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -667,12 +713,13 @@
       "url": "https://venturebeat.com/category/ai/feed",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "intermediary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "funding",
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -681,16 +728,16 @@
       "url": "https://raw.githubusercontent.com/dair-ai/ML-Papers-of-the-Week/main/README.md",
       "source_kind": "github_report_markdown",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "aggregator",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news"
+      ],
+      "credibility_tag": "monitoring_lead",
       "requires_original_url": false,
-      "max_items_per_run": 8,
-      "lookback_days": 14,
       "timeout_ms": 15000,
-      "latest_report_link_pattern": "years/\\d{4}\\.md#",
-      "source_level": "weekly_paper_aggregator"
+      "latest_report_link_pattern": "years/\\d{4}\\.md#"
     },
     {
       "id": "content-awesome-ai-news",
@@ -698,15 +745,14 @@
       "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md",
       "source_kind": "github_report_markdown",
       "candidate_category": "project",
-      "tier": "T2",
-      "authority": "aggregator",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news"
+      ],
+      "credibility_tag": "monitoring_lead",
       "requires_original_url": false,
-      "max_items_per_run": 5,
-      "lookback_days": 30,
-      "timeout_ms": 15000,
-      "source_level": "github_ai_news_directory"
+      "timeout_ms": 15000
     },
     {
       "id": "content-salvatorera-ml-news-week",
@@ -714,16 +760,23 @@
       "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md",
       "source_kind": "github_report_markdown",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "aggregator",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news"
+      ],
+      "credibility_tag": "monitoring_lead",
       "requires_original_url": false,
-      "max_items_per_run": 8,
-      "lookback_days": 14,
       "timeout_ms": 20000,
       "latest_report_link_pattern": "#ML-news-Week",
-      "source_level": "weekly_ai_news_aggregator"
+      "aliases": [
+        "github-watch-ml-news-of-the-week-readme"
+      ],
+      "repository": "SalvatoreRa/ML-news-of-the-week",
+      "watch_surface": "weekly_readme",
+      "public_section_hint": "github_repository_updates",
+      "listening_plan": "Probe result 2026-07-01: main commits Atom and README returned 200; README is large and weekly. Treat as recommended weekly context, not daily filler."
     },
     {
       "id": "content-product-hunt-trending",
@@ -731,12 +784,14 @@
       "url": "https://www.producthunt.com/feed",
       "source_kind": "rss",
       "candidate_category": "project",
-      "tier": "T2",
-      "authority": "aggregator",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "community_discussions",
+      "content_tags": [
+        "product_update",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "community_lead",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000,
       "signal": "product_hunt"
     },
@@ -746,12 +801,14 @@
       "url": "https://www.producthunt.com/feed?category=developer-tools",
       "source_kind": "rss",
       "candidate_category": "project",
-      "tier": "T2",
-      "authority": "aggregator",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "community_discussions",
+      "content_tags": [
+        "product_update",
+        "engineering",
+        "community_discussion"
+      ],
+      "credibility_tag": "community_lead",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000,
       "signal": "product_hunt"
     },
@@ -761,12 +818,12 @@
       "url": "https://www.latent.space/feed",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "secondary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -775,14 +832,14 @@
       "url": "http://export.arxiv.org/api/query?search_query=cat:cs.AI&sortBy=submittedDate&sortOrder=descending&max_results=20",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 5,
-      "timeout_ms": 15000,
-      "source_level": "paper_api"
+      "timeout_ms": 15000
     },
     {
       "id": "content-arxiv-cs-cl",
@@ -790,14 +847,14 @@
       "url": "http://export.arxiv.org/api/query?search_query=cat:cs.CL&sortBy=submittedDate&sortOrder=descending&max_results=20",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 5,
-      "timeout_ms": 15000,
-      "source_level": "paper_api"
+      "timeout_ms": 15000
     },
     {
       "id": "content-arxiv-cs-lg",
@@ -805,14 +862,14 @@
       "url": "http://export.arxiv.org/api/query?search_query=cat:cs.LG&sortBy=submittedDate&sortOrder=descending&max_results=20",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 5,
-      "timeout_ms": 15000,
-      "source_level": "paper_api"
+      "timeout_ms": 15000
     },
     {
       "id": "content-arxiv-cs-ma",
@@ -820,14 +877,14 @@
       "url": "http://export.arxiv.org/api/query?search_query=cat:cs.MA&sortBy=submittedDate&sortOrder=descending&max_results=20",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T1",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 5,
-      "timeout_ms": 15000,
-      "source_level": "paper_api"
+      "timeout_ms": 15000
     },
     {
       "id": "content-arxiv-stat-ml",
@@ -835,14 +892,14 @@
       "url": "http://export.arxiv.org/api/query?search_query=cat:stat.ML&sortBy=submittedDate&sortOrder=descending&max_results=20",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "optional",
-      "verification_policy": "primary_allowed",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "requires_original_url": false,
-      "max_items_per_run": 5,
-      "timeout_ms": 15000,
-      "source_level": "paper_api"
+      "timeout_ms": 15000
     },
     {
       "id": "content-hacker-news-api",
@@ -850,14 +907,15 @@
       "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
       "source_kind": "search_api",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "community",
-      "enablement": "optional",
-      "verification_policy": "community_only",
+      "source_group": "community_discussions",
+      "content_tags": [
+        "engineering",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "community_lead",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000,
-      "source_level": "community_api"
+      "timeout_ms": 15000
     },
     {
       "id": "content-huggingface-daily-papers",
@@ -865,14 +923,14 @@
       "url": "https://huggingface.co/api/daily_papers?date={YYYY-MM-DD}",
       "source_kind": "huggingface_daily_papers_api",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "aggregator",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research"
+      ],
+      "credibility_tag": "monitoring_lead",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000,
-      "source_level": "paper_api"
+      "timeout_ms": 15000
     },
     {
       "id": "content-smol-ai-news",
@@ -880,15 +938,14 @@
       "url": "https://news.smol.ai/rss.xml",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "aggregator",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "lookback_days": 7,
-      "timeout_ms": 15000,
-      "source_level": "ai_news_aggregator"
+      "timeout_ms": 15000
     },
     {
       "id": "content-interconnects",
@@ -896,12 +953,12 @@
       "url": "https://www.interconnects.ai/feed",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "secondary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -910,16 +967,17 @@
       "url": "https://themagnifier.ai/",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T2",
-      "authority": "secondary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "creative_ai",
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "format": "html_index",
       "linkPattern": "https://themagnifier.ai/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000,
-      "source_level": "aigc_content_industry"
+      "timeout_ms": 15000
     },
     {
       "id": "content-crunchbase-ai-news",
@@ -927,16 +985,18 @@
       "url": "https://news.crunchbase.com/sections/ai/",
       "source_kind": "html_index",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "secondary",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "format": "html_index",
       "linkPattern": "/",
       "requires_original_url": false,
-      "max_items_per_run": 3,
-      "timeout_ms": 15000,
-      "source_level": "ai_funding_product_radar"
+      "timeout_ms": 15000
     },
     {
       "id": "content-planet-ai",
@@ -944,12 +1004,12 @@
       "url": "https://www.planet-ai.net/rss.xml",
       "source_kind": "rss",
       "candidate_category": "community_lead",
-      "tier": "T3",
-      "authority": "aggregator",
-      "enablement": "optional",
-      "verification_policy": "primary_required",
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "single_source_relay",
       "requires_original_url": false,
-      "max_items_per_run": 3,
       "timeout_ms": 15000
     },
     {
@@ -958,13 +1018,14 @@
       "url": "https://openrouter.ai/rankings",
       "source_kind": "openrouter_rankings_public_playwright",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "linkPattern": "/rankings",
       "requires_original_url": false,
-      "max_items_per_run": 1,
       "timeout_ms": 30000
     },
     {
@@ -973,14 +1034,16 @@
       "url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
       "source_kind": "artificial_analysis_index_public_playwright",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research",
+        "analysis_opinion"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/evaluations/",
       "requires_original_url": false,
-      "max_items_per_run": 1,
       "timeout_ms": 15000
     },
     {
@@ -989,14 +1052,15 @@
       "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
       "source_kind": "swe_bench_pro_public_playwright",
       "candidate_category": "community_lead",
-      "tier": "T0",
-      "authority": "primary",
-      "enablement": "core",
-      "verification_policy": "primary_allowed",
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research"
+      ],
+      "credibility_tag": "primary_material",
       "format": "html_index",
       "linkPattern": "/leaderboard/swe_bench_pro_public",
       "requires_original_url": false,
-      "max_items_per_run": 1,
       "timeout_ms": 15000
     }
   ]

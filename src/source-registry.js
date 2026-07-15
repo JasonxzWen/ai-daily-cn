@@ -2,9 +2,12 @@ import fs from "node:fs/promises";
 import fsSync from "node:fs";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
-import { validateSourceRegistry } from "./schema.js";
+import { publicSignalTaxonomy, schemas, validateSourceRegistry } from "./schema.js";
 
 const DEFAULT_SOURCE_DIR = path.join("config", "sources");
+const PUBLIC_SOURCE_GROUPS = new Set(publicSignalTaxonomy.source_groups.map((item) => item.id));
+const PUBLIC_CREDIBILITY_TAGS = new Set(publicSignalTaxonomy.credibility_tags.map((item) => item.id));
+const PUBLIC_CONTENT_TAGS = new Set(publicSignalTaxonomy.content_tags.map((item) => item.id));
 
 export async function loadSourceRegistry(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -16,12 +19,6 @@ export async function loadSourceRegistry(options = {}) {
     schema_version: 1,
     sources
   });
-
-  if (options.includeEnablement) {
-    const allowed = new Set(normalizeEnablements(options.includeEnablement));
-    normalized.sources = normalized.sources.filter((source) => allowed.has(source.enablement));
-  }
-
   return normalized;
 }
 
@@ -35,12 +32,6 @@ export function loadSourceRegistrySync(options = {}) {
     schema_version: 1,
     sources
   });
-
-  if (options.includeEnablement) {
-    const allowed = new Set(normalizeEnablements(options.includeEnablement));
-    normalized.sources = normalized.sources.filter((source) => allowed.has(source.enablement));
-  }
-
   return normalized;
 }
 
@@ -58,11 +49,18 @@ export async function validateSourceRegistryPath(options = {}) {
 }
 
 export function normalizeSourceRegistry(payload) {
+  assertRegistryTaxonomyContract();
   const registry = normalizeRegistryPayload(payload);
   const validation = validateSourceRegistry(registry);
   if (!validation.valid) {
     throw new PublisherError("source_registry_schema_validation_failed", "信源注册表未通过 schema 校验。", {
       errors: validation.errors
+    });
+  }
+  const taxonomyErrors = sourceRegistryTaxonomyErrors(validation.value.sources);
+  if (taxonomyErrors.length > 0) {
+    throw new PublisherError("source_registry_taxonomy_validation_failed", "信源注册表未通过公共 taxonomy 校验。", {
+      errors: taxonomyErrors
     });
   }
 
@@ -79,26 +77,15 @@ export function normalizeRegisteredSource(source) {
     ...source,
     source_kind: sourceKind,
     candidate_category: candidateCategory,
-    category: source.category || legacySourceCategory(candidateCategory, source.authority),
+    category: source.category || legacySourceCategory(candidateCategory, source.source_group),
     format: source.format || (sourceKind === "html_index" ? "html_index" : undefined),
-    tier: source.tier,
-    authority: source.authority,
-    enablement: source.enablement,
-    verification_policy: source.verification_policy,
+    source_group: normalizeSourceGroup(source.source_group),
+    credibility_tag: normalizeCredibilityTag(source.credibility_tag),
+    content_tags: normalizeContentTags(source.content_tags),
     requiresOriginalUrl: source.requiresOriginalUrl ?? source.requires_original_url,
-    maxItemsPerRun: source.maxItemsPerRun || source.max_items_per_run,
+    fetchPageSize: source.fetchPageSize || source.fetch_page_size,
     timeoutMs: source.timeoutMs || source.timeout_ms
   };
-}
-
-export function normalizeEnablements(value) {
-  if (Array.isArray(value)) {
-    return value;
-  }
-  return String(value || "core")
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
 }
 
 async function readRegistryPayloads(resolvedPath) {
@@ -156,11 +143,11 @@ function legacyCandidateCategory(category) {
   return category || "hot_blog";
 }
 
-function legacySourceCategory(candidateCategory, authority) {
+function legacySourceCategory(candidateCategory, sourceGroup) {
   if (candidateCategory === "project") {
     return "project";
   }
-  if (candidateCategory === "community_lead" || authority === "community" || authority === "intermediary" || authority === "aggregator") {
+  if (["community_lead", "wechat_item", "zhihu_item", "reddit_item"].includes(candidateCategory) || sourceGroup === "community_discussions") {
     return "community";
   }
   if (candidateCategory === "builder_observation") {
@@ -179,4 +166,61 @@ function duplicateSourceIdErrors(sources) {
     seen.add(source.id);
   }
   return errors;
+}
+
+function normalizeSourceGroup(value) {
+  const group = String(value || "").trim();
+  return PUBLIC_SOURCE_GROUPS.has(group) ? group : "";
+}
+
+function normalizeCredibilityTag(value) {
+  const tag = String(value || "").trim();
+  return PUBLIC_CREDIBILITY_TAGS.has(tag) ? tag : "";
+}
+
+function normalizeContentTags(value) {
+  return [...new Set(Array.isArray(value) ? value : [])]
+    .map((tag) => String(tag || "").trim())
+    .filter((tag) => PUBLIC_CONTENT_TAGS.has(tag));
+}
+
+function assertRegistryTaxonomyContract() {
+  const sourceProperties = schemas.sourceRegistry?.$defs?.source?.properties || {};
+  const contracts = [
+    ["source_group", sourceProperties.source_group?.enum, publicSignalTaxonomy.source_groups],
+    ["credibility_tag", sourceProperties.credibility_tag?.enum, publicSignalTaxonomy.credibility_tags],
+    ["content_tags", sourceProperties.content_tags?.items?.enum, publicSignalTaxonomy.content_tags]
+  ];
+  const mismatches = contracts.flatMap(([field, schemaValues, taxonomyItems]) => {
+    const schemaIds = [...new Set(Array.isArray(schemaValues) ? schemaValues : [])].sort();
+    const taxonomyIds = [...new Set((Array.isArray(taxonomyItems) ? taxonomyItems : []).map((item) => item.id))].sort();
+    return arraysEqual(schemaIds, taxonomyIds) ? [] : [{ field, schema_ids: schemaIds, taxonomy_ids: taxonomyIds }];
+  });
+  if (mismatches.length > 0) {
+    throw new PublisherError("source_registry_taxonomy_contract_drift", "信源注册表 schema 与公共 taxonomy 不一致。", {
+      mismatches
+    });
+  }
+}
+
+function sourceRegistryTaxonomyErrors(sources = []) {
+  const errors = [];
+  for (const [index, source] of sources.entries()) {
+    if (!PUBLIC_SOURCE_GROUPS.has(source.source_group)) {
+      errors.push({ path: `$.sources[${index}].source_group`, message: `未知 source_group：${source.source_group}` });
+    }
+    if (!PUBLIC_CREDIBILITY_TAGS.has(source.credibility_tag)) {
+      errors.push({ path: `$.sources[${index}].credibility_tag`, message: `未知 credibility_tag：${source.credibility_tag}` });
+    }
+    for (const [tagIndex, tag] of (Array.isArray(source.content_tags) ? source.content_tags : []).entries()) {
+      if (!PUBLIC_CONTENT_TAGS.has(tag)) {
+        errors.push({ path: `$.sources[${index}].content_tags[${tagIndex}]`, message: `未知 content tag：${tag}` });
+      }
+    }
+  }
+  return errors;
+}
+
+function arraysEqual(left, right) {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
 }

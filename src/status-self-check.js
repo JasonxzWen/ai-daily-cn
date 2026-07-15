@@ -112,7 +112,6 @@ export async function runStatusSelfCheck(options = {}) {
       rootDir: checkRoot,
       reportDate,
       sourcesPath: options.sourcesPath || "config/sources",
-      enablement: options.enablement || "core,optional,manual",
       fetchImpl: options.sourceFetchImpl || options.fetchImpl
     })
   );

@@ -1,6 +1,6 @@
 # AI 日报发布链路加固
 
-> 状态：活跃配套文档。本文只记录发布链路的稳健性与恢复顺序；内容合同、板块口径和迭代覆盖关系以 `prompts/ai-daily/modules/editorial-authority.md` 为准，如与本文冲突，以该文件为准。
+> 状态：活跃配套文档。本文只记录发布链路的稳健性与恢复顺序。`prompts/ai-daily/modules/editorial-authority.md` 仅约束可选的遗留编辑日报；公共 signal listener 以 `public-signal-stream-contract:v1` 为准，独立完成 occurrence 写入、构建和发布。
 
 本文记录定时任务发布链路的稳健性约束，配合 `docs/codex-automation-setup.md` 使用。
 
@@ -26,7 +26,7 @@
 
 ## 验收要求
 
-质量门禁分为两级：`blocking_issues` 必须阻断发布；固定信源面、GitHub Trending、Builder X、evidence asset、空板块或模型发布镜像不足属于 `degraded_sections`，允许发布但必须在 JSON 与公开 HTML 中标注。
+遗留编辑日报的质量门禁分为两级：`blocking_issues` 只阻断该日报产物；固定信源面、GitHub Trending、Builder X、evidence asset、空板块或模型发布镜像不足属于 `degraded_sections`，允许该日报降级并在 JSON 与公开 HTML 中标注。公共 signals 不读取这些编辑状态，仅受单条记录结构、URL/隐私安全、渲染安全和运输失败边界约束；局部来源失败不得阻断其他来源或已经持久化的 signals。
 
 发布链路变更完成后至少运行：
 

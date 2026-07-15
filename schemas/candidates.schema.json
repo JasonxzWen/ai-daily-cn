@@ -475,6 +475,18 @@
         "description": {
           "type": "string"
         },
+        "name": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "signal": {
+          "type": "string"
+        },
+        "trend": {
+          "enum": ["trending", "new", "up", "down", "same"]
+        },
         "publisher": {
           "type": "string",
           "minLength": 1
@@ -499,6 +511,10 @@
           },
           "uniqueItems": true,
           "default": []
+        },
+        "credibility_tag": {
+          "type": "string",
+          "minLength": 1
         },
         "author": {
           "type": "string",

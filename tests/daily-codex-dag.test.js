@@ -51,8 +51,8 @@ test("daily codex DAG manifest validates target node contract", async () => {
   const manifest = await loadManifest();
 
   assert.equal(result.ok, true, result.failures.join("\n"));
-  assert.equal(result.node_ids.length, 16);
-  assert(result.node_ids.includes("fetch-source-health"));
+  assert.equal(result.node_ids.length, 22);
+  assert(result.node_ids.includes("fetch-source-inputs"));
   assert(result.node_ids.includes("publish-cleanup"));
   assert(result.checked_files.some((file) => file.endsWith("config/daily-codex-dag.json")));
   assert(result.checked_files.some((file) => file.endsWith("config/daily-resilience-policy.json")));
@@ -61,6 +61,67 @@ test("daily codex DAG manifest validates target node contract", async () => {
     false,
     "production manifest must not carry node_execution_spec before executor migration"
   );
+});
+
+test("daily codex DAG keeps public signal publication independent from legacy admission and quality", async () => {
+  const manifest = await loadManifest();
+  const nodesById = new Map(manifest.nodes.map((item) => [item.id, item]));
+  const ancestors = new Set();
+  const visit = (nodeId) => {
+    for (const dependency of nodesById.get(nodeId)?.dependencies || []) {
+      if (ancestors.has(dependency)) continue;
+      ancestors.add(dependency);
+      visit(dependency);
+    }
+  };
+  visit("publish-public-signals");
+
+  for (const required of [
+    "persist-signal-occurrences",
+    "build-public-signals",
+    "validate-public-signals",
+    "plan-signal-publish"
+  ]) {
+    assert(ancestors.has(required), `signal publish should depend on ${required}`);
+  }
+  for (const forbidden of [
+    "classify-tag-entity",
+    "score",
+    "freshness-history-check",
+    "verify-source-authority",
+    "admit-reject",
+    "quality-audit",
+    "assemble-daily-edition",
+    "build-cards-page",
+    "publish-cleanup"
+  ]) {
+    assert.equal(ancestors.has(forbidden), false, `${forbidden} must not gate public signal publication`);
+  }
+
+  const allowedRunnerStages = new Set([
+    "collect",
+    "signals_write",
+    "signals_build",
+    "signals_validate",
+    "signals_publish_dry_run"
+  ]);
+  for (const ancestorId of ancestors) {
+    assert(allowedRunnerStages.has(nodesById.get(ancestorId).runner_stage_ref), ancestorId);
+  }
+});
+
+test("daily codex DAG validator rejects legacy gates or missing lineage on public signal publication", async () => {
+  const gatedManifest = await loadManifest();
+  node(gatedManifest, "publish-public-signals").dependencies.push("admit-reject");
+  const gated = await validateDailyCodexDag({ rootDir, manifest: gatedManifest });
+  assert.equal(gated.ok, false);
+  assert.match(gated.failures.join("\n"), /publish-public-signals ancestor admit-reject uses non-signal runner stage admit/);
+
+  const disconnectedManifest = await loadManifest();
+  node(disconnectedManifest, "publish-public-signals").dependencies = ["validate-public-signals"];
+  const disconnected = await validateDailyCodexDag({ rootDir, manifest: disconnectedManifest });
+  assert.equal(disconnected.ok, false);
+  assert.match(disconnected.failures.join("\n"), /publish-public-signals must transitively depend on plan-signal-publish/);
 });
 
 test("daily codex DAG plan projection is deterministic and topological", async () => {
@@ -75,9 +136,9 @@ test("daily codex DAG plan projection is deterministic and topological", async (
   assert.equal(JSON.stringify(manifest), originalManifest, "planner must not mutate manifest input");
 
   const plan = first.plan;
-  assert.equal(plan.node_count, 16);
-  assert.equal(plan.nodes.length, 16);
-  assert.equal(new Set(plan.nodes.map((item) => item.id)).size, 16);
+  assert.equal(plan.node_count, 22);
+  assert.equal(plan.nodes.length, 22);
+  assert.equal(new Set(plan.nodes.map((item) => item.id)).size, 22);
 
   const levelById = new Map(plan.nodes.map((item) => [item.id, item.level]));
   for (const item of plan.nodes) {
@@ -153,7 +214,7 @@ test("daily codex DAG plan projection refuses invalid manifests without throwing
   assert.equal(structuralResult.plan, null);
   assert(structuralResult.validation);
   assert(
-    structuralResult.failures.some((failure) => failure.includes("/nodes/4/inputs must be array")),
+    structuralResult.failures.some((failure) => failure.includes("/nodes/10/inputs must be array")),
     structuralResult.failures.join("\n")
   );
 });
@@ -910,7 +971,7 @@ test("daily codex DAG command node executor rejects preflight failures before ex
 
 test("daily codex DAG command node executor resolves real output artifact metadata from disk", async () => {
   const manifest = await loadManifest();
-  const proofNode = structuredCloneJson(node(manifest, "fetch-source-health"));
+  const proofNode = structuredCloneJson(node(manifest, "fetch-source-inputs"));
   const artifactPath = [
     ".tmp",
     "daily-codex-pipeline",
@@ -976,7 +1037,7 @@ test("daily codex DAG command node executor resolves real output artifact metada
 
 test("daily codex DAG command node executor fails structurally when a required output is missing", async () => {
   const manifest = await loadManifest();
-  const proofNode = structuredCloneJson(node(manifest, "fetch-source-health"));
+  const proofNode = structuredCloneJson(node(manifest, "fetch-source-inputs"));
   const missingArtifactPath = [
     ".tmp",
     "daily-codex-pipeline",
@@ -1390,7 +1451,7 @@ test("daily codex DAG real-node adapter MVP summary validation pins the score pr
   await removeRealNodeAdapterFixtureArtifacts();
 });
 
-test("daily codex DAG source-watch collect MVP runs fetch-source-health fixture and summarizes source audit", async () => {
+test("daily codex DAG source-watch collect MVP runs fetch-source-inputs fixture and summarizes source audit", async () => {
   const reportDate = "2026-07-06";
   await removeSourceWatchCollectFixtureArtifacts(reportDate);
   const result = await createDailyCodexDagSourceWatchCollectMvp({
@@ -1405,25 +1466,25 @@ test("daily codex DAG source-watch collect MVP runs fetch-source-health fixture 
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert.equal(result.mode, "daily_codex_dag_source_watch_collect_mvp");
   assert.equal(result.run.final_status, "executed_source_watch_collect");
-  assert.deepEqual(result.run.planned_nodes, ["fetch-source-health"]);
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health"]);
+  assert.deepEqual(result.run.planned_nodes, ["fetch-source-inputs"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs"]);
   assert.deepEqual(result.run.blocked_nodes, []);
   assert.equal(result.plan.node_count, 1);
-  assert.equal(result.plan.nodes[0].id, "fetch-source-health");
+  assert.equal(result.plan.nodes[0].id, "fetch-source-inputs");
   assert.deepEqual(result.plan.nodes[0].dependencies, []);
   assert.equal(result.plan.nodes[0].execution_contract.readiness, "node_executable");
   assert.equal(Object.hasOwn(result.plan.nodes[0].execution_contract, "node_execution_spec"), false);
   assert.deepEqual(result.source_watch, {
-    artifact_path: ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json",
+    artifact_path: ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-inputs.json",
     artifact_kind: "source_watch_candidates",
     watched_repos: 2,
     fetched_repos: 2,
     changed_repos: 0,
     watched_sites: 2,
     fetched_sites: 2,
-    github_candidates_found: 2,
+    github_candidates_found: 7,
     site_candidates_found: 2,
-    total_candidates_found: 4,
+    total_candidates_found: 9,
     failure_count: 0,
     empty: false,
     rate_limits: [{
@@ -1445,30 +1506,30 @@ test("daily codex DAG source-watch collect MVP runs fetch-source-health fixture 
   assert.equal(result.node_results.length, 1);
   assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
   const nodeResult = result.node_results[0];
-  assert.equal(nodeResult.node_id, "fetch-source-health");
+  assert.equal(nodeResult.node_id, "fetch-source-inputs");
   assert.equal(nodeResult.node_kind, "command");
   assert.equal(nodeResult.runner_stage_ref, "collect");
   assert.equal(nodeResult.status, "success");
   assert.deepEqual(nodeResult.dependency_results, []);
   assert.deepEqual(nodeResult.declared_inputs, []);
-  assert.equal(nodeResult.declared_outputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json");
+  assert.equal(nodeResult.declared_outputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-inputs.json");
   assert.deepEqual(nodeResult.resolved_inputs, []);
   assert.equal(nodeResult.resolved_outputs.length, 1);
   assertResolvedArtifactMetadata(nodeResult.resolved_outputs[0]);
   assert.equal(Object.hasOwn(nodeResult, "stdout"), false);
   assert.equal(Object.hasOwn(nodeResult, "stderr"), false);
   assert.deepEqual(result.executed_commands, [{
-    node_id: "fetch-source-health",
+    node_id: "fetch-source-inputs",
     runner: "node",
     script: "scripts/run-source-watch-collect-fixture.mjs"
   }]);
   assert.equal(result.codex_invocations.length, 0);
   assert.equal(JSON.stringify(result).includes("ML news of the week tracks machine learning updates"), false);
 
-  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "source-health.json");
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "source-inputs.json");
   const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
   assert.equal(artifact.kind, "source_watch_candidates");
-  assert.equal(artifact.candidates.length, 4);
+  assert.equal(artifact.candidates.length, 9);
   assert.equal(artifact.source_audit.github_watch.watched_repos, 2);
   assert.equal(artifact.source_audit.github_watch.fetched_repos, 2);
   assert.equal(artifact.source_audit.site_watch.watched_sites, 2);
@@ -1535,7 +1596,7 @@ test("daily codex DAG source-watch collect MVP summary validation rejects incons
   await removeSourceWatchCollectFixtureArtifacts(reportDate);
 });
 
-test("daily codex DAG source-watch downstream MVP consumes source-health artifact into parse-extract output", async () => {
+test("daily codex DAG source-watch downstream MVP consumes source-inputs artifact into parse-extract output", async () => {
   const reportDate = "2026-07-06";
   await removeSourceWatchDownstreamFixtureArtifacts(reportDate);
   const result = await createDailyCodexDagSourceWatchDownstreamMvp({
@@ -1550,24 +1611,24 @@ test("daily codex DAG source-watch downstream MVP consumes source-health artifac
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert.equal(result.mode, "daily_codex_dag_source_watch_downstream_mvp");
   assert.equal(result.run.final_status, "executed_source_watch_downstream");
-  assert.deepEqual(result.run.planned_nodes, ["fetch-source-health", "parse-extract"]);
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract"]);
+  assert.deepEqual(result.run.planned_nodes, ["fetch-source-inputs", "parse-extract"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract"]);
   assert.deepEqual(result.run.blocked_nodes, []);
   assert.equal(result.plan.node_count, 2);
   assert.deepEqual(result.plan.levels, [
-    { level: 0, node_ids: ["fetch-source-health"] },
+    { level: 0, node_ids: ["fetch-source-inputs"] },
     { level: 1, node_ids: ["parse-extract"] }
   ]);
-  assert.deepEqual(result.plan.nodes.map((node) => node.id), ["fetch-source-health", "parse-extract"]);
+  assert.deepEqual(result.plan.nodes.map((node) => node.id), ["fetch-source-inputs", "parse-extract"]);
   assert.deepEqual(result.plan.nodes[0].dependencies, []);
-  assert.deepEqual(result.plan.nodes[1].dependencies, ["fetch-source-health"]);
-  assert.equal(result.source_watch.total_candidates_found, 4);
+  assert.deepEqual(result.plan.nodes[1].dependencies, ["fetch-source-inputs"]);
+  assert.equal(result.source_watch.total_candidates_found, 9);
   assert.deepEqual(result.downstream, {
     artifact_path: ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json",
     artifact_kind: "source_watch_extracted_candidates",
     input_kind: "source_watch_candidates",
-    total_candidates: 4,
-    github_watch_candidates: 2,
+    total_candidates: 9,
+    github_watch_candidates: 7,
     site_watch_candidates: 2,
     other_candidates: 0,
     empty: false,
@@ -1577,16 +1638,16 @@ test("daily codex DAG source-watch downstream MVP consumes source-health artifac
   assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
 
   const [collectResult, downstreamResult] = result.node_results;
-  assert.equal(collectResult.node_id, "fetch-source-health");
+  assert.equal(collectResult.node_id, "fetch-source-inputs");
   assert.equal(collectResult.status, "success");
   assert.equal(downstreamResult.node_id, "parse-extract");
   assert.equal(downstreamResult.node_kind, "command");
   assert.equal(downstreamResult.runner_stage_ref, "collect");
   assert.equal(downstreamResult.status, "success");
-  assert.equal(downstreamResult.dependency_results[0].node_id, "fetch-source-health");
+  assert.equal(downstreamResult.dependency_results[0].node_id, "fetch-source-inputs");
   assert.equal(downstreamResult.dependency_results[0].execution_id, collectResult.execution_id);
   assert.equal(downstreamResult.dependency_results[0].status, "success");
-  assert.equal(downstreamResult.declared_inputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json");
+  assert.equal(downstreamResult.declared_inputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-inputs.json");
   assert.equal(downstreamResult.declared_outputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json");
   assert.equal(downstreamResult.resolved_inputs[0].path, collectResult.resolved_outputs[0].path);
   assertResolvedArtifactMetadata(collectResult.resolved_outputs[0]);
@@ -1597,7 +1658,7 @@ test("daily codex DAG source-watch downstream MVP consumes source-health artifac
   assert.equal(Object.hasOwn(downstreamResult, "stdout"), false);
   assert.equal(Object.hasOwn(downstreamResult, "stderr"), false);
   assert.deepEqual(result.executed_commands, [{
-    node_id: "fetch-source-health",
+    node_id: "fetch-source-inputs",
     runner: "node",
     script: "scripts/run-source-watch-collect-fixture.mjs"
   }, {
@@ -1612,8 +1673,8 @@ test("daily codex DAG source-watch downstream MVP consumes source-health artifac
   const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
   assert.equal(artifact.kind, "source_watch_extracted_candidates");
   assert.equal(artifact.input_kind, "source_watch_candidates");
-  assert.equal(artifact.candidates.length, 4);
-  assert.deepEqual(artifact.signal_counts, { github_watch: 2, site_watch: 2 });
+  assert.equal(artifact.candidates.length, 9);
+  assert.deepEqual(artifact.signal_counts, { github_watch: 7, site_watch: 2 });
   assert(artifact.candidates.some((candidate) => candidate.signal === "github_watch"));
   assert(artifact.candidates.some((candidate) => candidate.signal === "site_watch"));
   assertAifyLaneCandidate(artifact.candidates.find((candidate) => candidate.source_id === "site-aify-news"));
@@ -1655,16 +1716,16 @@ test("daily codex DAG source-watch downstream MVP blocks parse-extract when coll
   assert.equal(result.mode, "daily_codex_dag_source_watch_downstream_mvp");
   assert.equal(result.run.final_status, "blocked");
   assert.deepEqual(result.run.completed_nodes, []);
-  assert.deepEqual(result.run.blocked_nodes, ["fetch-source-health", "parse-extract"]);
+  assert.deepEqual(result.run.blocked_nodes, ["fetch-source-inputs", "parse-extract"]);
   assert.equal(result.executed_commands.length, 1);
-  assert.equal(result.executed_commands[0].node_id, "fetch-source-health");
+  assert.equal(result.executed_commands[0].node_id, "fetch-source-inputs");
   const [collectResult, downstreamResult] = result.node_results;
-  assert.equal(collectResult.node_id, "fetch-source-health");
+  assert.equal(collectResult.node_id, "fetch-source-inputs");
   assert.equal(collectResult.status, "failure");
   assert.equal(downstreamResult.node_id, "parse-extract");
   assert.equal(downstreamResult.status, "blocked");
   assert.equal(downstreamResult.audit.resilience_policy_ref, "discover_content_sources");
-  assert.equal(downstreamResult.dependency_results[0].node_id, "fetch-source-health");
+  assert.equal(downstreamResult.dependency_results[0].node_id, "fetch-source-inputs");
   assert.equal(downstreamResult.dependency_results[0].status, "failure");
   assert.equal(downstreamResult.resolved_inputs.length, 0);
   assert.equal(downstreamResult.resolved_outputs.length, 0);
@@ -1695,25 +1756,25 @@ test("daily codex DAG source-watch normalize MVP consumes extracted candidates i
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert.equal(result.mode, "daily_codex_dag_source_watch_normalize_mvp");
   assert.equal(result.run.final_status, "executed_source_watch_normalize");
-  assert.deepEqual(result.run.planned_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(result.run.planned_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize"]);
   assert.deepEqual(result.run.blocked_nodes, []);
   assert.equal(result.plan.node_count, 3);
   assert.deepEqual(result.plan.levels, [
-    { level: 0, node_ids: ["fetch-source-health"] },
+    { level: 0, node_ids: ["fetch-source-inputs"] },
     { level: 1, node_ids: ["parse-extract"] },
     { level: 2, node_ids: ["normalize-canonicalize"] }
   ]);
-  assert.deepEqual(result.plan.nodes.map((node) => node.id), ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(result.plan.nodes.map((node) => node.id), ["fetch-source-inputs", "parse-extract", "normalize-canonicalize"]);
   assert.deepEqual(result.plan.nodes[2].dependencies, ["parse-extract"]);
-  assert.equal(result.source_watch.total_candidates_found, 4);
-  assert.equal(result.downstream.total_candidates, 4);
+  assert.equal(result.source_watch.total_candidates_found, 9);
+  assert.equal(result.downstream.total_candidates, 9);
   assert.deepEqual(result.normalized, {
     artifact_path: ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json",
     artifact_kind: "source_watch_canonical_candidates",
     input_kind: "source_watch_extracted_candidates",
-    total_candidates: 4,
-    github_watch_candidates: 2,
+    total_candidates: 9,
+    github_watch_candidates: 7,
     site_watch_candidates: 2,
     other_candidates: 0,
     empty: false,
@@ -1740,7 +1801,7 @@ test("daily codex DAG source-watch normalize MVP consumes extracted candidates i
   assert.equal(Object.hasOwn(normalizeResult, "stdout"), false);
   assert.equal(Object.hasOwn(normalizeResult, "stderr"), false);
   assert.deepEqual(result.executed_commands, [{
-    node_id: "fetch-source-health",
+    node_id: "fetch-source-inputs",
     runner: "node",
     script: "scripts/run-source-watch-collect-fixture.mjs"
   }, {
@@ -1759,8 +1820,8 @@ test("daily codex DAG source-watch normalize MVP consumes extracted candidates i
   const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
   assert.equal(artifact.kind, "source_watch_canonical_candidates");
   assert.equal(artifact.input_kind, "source_watch_extracted_candidates");
-  assert.equal(artifact.candidates.length, 4);
-  assert.deepEqual(artifact.signal_counts, { github_watch: 2, site_watch: 2 });
+  assert.equal(artifact.candidates.length, 9);
+  assert.deepEqual(artifact.signal_counts, { github_watch: 7, site_watch: 2 });
   assert(artifact.candidates.every((candidate) => typeof candidate.canonical_id === "string" && candidate.canonical_id.startsWith("source-watch:")));
   assert(artifact.candidates.every((candidate) => typeof candidate.canonical_url === "string"));
   assertAifyLaneCandidate(artifact.candidates.find((candidate) => candidate.source_id === "site-aify-news"));
@@ -1803,9 +1864,9 @@ test("daily codex DAG source-watch normalize MVP blocks parse and normalize when
   assert.equal(result.mode, "daily_codex_dag_source_watch_normalize_mvp");
   assert.equal(result.run.final_status, "blocked");
   assert.deepEqual(result.run.completed_nodes, []);
-  assert.deepEqual(result.run.blocked_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(result.run.blocked_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize"]);
   assert.equal(result.executed_commands.length, 1);
-  assert.equal(result.executed_commands[0].node_id, "fetch-source-health");
+  assert.equal(result.executed_commands[0].node_id, "fetch-source-inputs");
   const [collectResult, downstreamResult, normalizeResult] = result.node_results;
   assert.equal(collectResult.status, "failure");
   assert.equal(downstreamResult.node_id, "parse-extract");
@@ -1855,12 +1916,12 @@ test("daily codex DAG source-watch normalize MVP blocks normalize when parse-ext
   assert.equal(result.ok, false);
   assert.equal(result.mode, "daily_codex_dag_source_watch_normalize_mvp");
   assert.equal(result.run.final_status, "blocked");
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs"]);
   assert.deepEqual(result.run.blocked_nodes, ["parse-extract", "normalize-canonicalize"]);
-  assert.equal(result.source_watch.total_candidates_found, 4);
+  assert.equal(result.source_watch.total_candidates_found, 9);
   assert.equal(result.downstream.total_candidates, 0);
   assert.equal(result.normalized.total_candidates, 0);
-  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-health", "parse-extract"]);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-inputs", "parse-extract"]);
   const [collectResult, downstreamResult, normalizeResult] = result.node_results;
   assert.equal(collectResult.status, "success");
   assert.equal(downstreamResult.status, "failure");
@@ -1910,12 +1971,12 @@ test("daily codex DAG source-watch normalize MVP records structured normalize fa
   assert.equal(result.ok, false);
   assert.equal(result.mode, "daily_codex_dag_source_watch_normalize_mvp");
   assert.equal(result.run.final_status, "blocked");
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract"]);
   assert.deepEqual(result.run.blocked_nodes, ["normalize-canonicalize"]);
-  assert.equal(result.source_watch.total_candidates_found, 4);
-  assert.equal(result.downstream.total_candidates, 4);
+  assert.equal(result.source_watch.total_candidates_found, 9);
+  assert.equal(result.downstream.total_candidates, 9);
   assert.equal(result.normalized.total_candidates, 0);
-  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-inputs", "parse-extract", "normalize-canonicalize"]);
   const [collectResult, downstreamResult, normalizeResult] = result.node_results;
   assert.equal(collectResult.status, "success");
   assert.equal(downstreamResult.status, "success");
@@ -1952,35 +2013,35 @@ test("daily codex DAG source-watch quality MVP consumes canonical candidates int
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert.equal(result.mode, "daily_codex_dag_source_watch_quality_mvp");
   assert.equal(result.run.final_status, "executed_source_watch_quality");
-  assert.deepEqual(result.run.planned_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.deepEqual(result.run.planned_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
   assert.deepEqual(result.run.blocked_nodes, []);
   assert.equal(result.plan.node_count, 4);
   assert.deepEqual(result.plan.levels, [
-    { level: 0, node_ids: ["fetch-source-health"] },
+    { level: 0, node_ids: ["fetch-source-inputs"] },
     { level: 1, node_ids: ["parse-extract"] },
     { level: 2, node_ids: ["normalize-canonicalize"] },
     { level: 3, node_ids: ["freshness-history-check"] }
   ]);
-  assert.equal(result.source_watch.total_candidates_found, 4);
-  assert.equal(result.downstream.total_candidates, 4);
-  assert.equal(result.normalized.total_candidates, 4);
+  assert.equal(result.source_watch.total_candidates_found, 9);
+  assert.equal(result.downstream.total_candidates, 9);
+  assert.equal(result.normalized.total_candidates, 9);
   assert.deepEqual(result.quality, {
     artifact_path: ".tmp/daily-codex-pipeline/{report_date}/artifacts/quality-candidates.json",
     artifact_kind: "source_watch_quality_candidates",
     input_kind: "source_watch_canonical_candidates",
-    total_candidates: 4,
+    total_candidates: 9,
     admitted_candidates: 3,
-    suppressed_candidates: 1,
-    duplicate_candidates: 0,
+    suppressed_candidates: 6,
+    duplicate_candidates: 5,
     stale_candidates: 1,
     unchanged_repo_candidates: 1,
-    github_watch_candidates: 2,
+    github_watch_candidates: 7,
     site_watch_candidates: 2,
     other_candidates: 0,
     empty: false,
     signals: ["github_watch", "site_watch"],
-    suppressed_reasons: ["repo_unchanged", "seen_recently"],
+    suppressed_reasons: ["duplicate_current", "repo_unchanged", "seen_recently"],
     public_surface: false
   });
   assert.equal(result.node_results.length, 4);
@@ -2008,7 +2069,7 @@ test("daily codex DAG source-watch quality MVP consumes canonical candidates int
   assert.equal(Object.hasOwn(qualityResult, "stdout"), false);
   assert.equal(Object.hasOwn(qualityResult, "stderr"), false);
   assert.deepEqual(result.executed_commands, [{
-    node_id: "fetch-source-health",
+    node_id: "fetch-source-inputs",
     runner: "node",
     script: "scripts/run-source-watch-collect-fixture.mjs"
   }, {
@@ -2031,8 +2092,8 @@ test("daily codex DAG source-watch quality MVP consumes canonical candidates int
   const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
   assert.equal(artifact.kind, "source_watch_quality_candidates");
   assert.equal(artifact.input_kind, "source_watch_canonical_candidates");
-  assert.equal(artifact.candidates.length, 4);
-  assert.deepEqual(artifact.signal_counts, { github_watch: 2, site_watch: 2 });
+  assert.equal(artifact.candidates.length, 9);
+  assert.deepEqual(artifact.signal_counts, { github_watch: 7, site_watch: 2 });
   assert.equal(artifact.quality_audit.public_surface, false);
   const changedRepo = artifact.candidates.find((candidate) => candidate.repo === "SalvatoreRa/ML-news-of-the-week");
   const unchangedRepo = artifact.candidates.find((candidate) => candidate.repo === "taielab/awesome-ai-news");
@@ -2088,10 +2149,10 @@ test("daily codex DAG source-watch quality MVP records structured quality failur
   assert.equal(result.ok, false);
   assert.equal(result.mode, "daily_codex_dag_source_watch_quality_mvp");
   assert.equal(result.run.final_status, "blocked");
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize"]);
   assert.deepEqual(result.run.blocked_nodes, ["freshness-history-check"]);
   assert.equal(result.quality.total_candidates, 0);
-  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
   const [collectResult, downstreamResult, normalizeResult, qualityResult] = result.node_results;
   assert.equal(collectResult.status, "success");
   assert.equal(downstreamResult.status, "success");
@@ -2128,12 +2189,12 @@ test("daily codex DAG source-watch admit MVP consumes quality candidates into ad
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert.equal(result.mode, "daily_codex_dag_source_watch_admit_mvp");
   assert.equal(result.run.final_status, "executed_source_watch_admit");
-  assert.deepEqual(result.run.planned_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
+  assert.deepEqual(result.run.planned_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
   assert.deepEqual(result.run.blocked_nodes, []);
   assert.equal(result.plan.node_count, 5);
   assert.deepEqual(result.plan.levels, [
-    { level: 0, node_ids: ["fetch-source-health"] },
+    { level: 0, node_ids: ["fetch-source-inputs"] },
     { level: 1, node_ids: ["parse-extract"] },
     { level: 2, node_ids: ["normalize-canonicalize"] },
     { level: 3, node_ids: ["freshness-history-check"] },
@@ -2178,7 +2239,7 @@ test("daily codex DAG source-watch admit MVP consumes quality candidates into ad
   assert.equal(Object.hasOwn(admitResult, "stdout"), false);
   assert.equal(Object.hasOwn(admitResult, "stderr"), false);
   assert.deepEqual(result.executed_commands, [{
-    node_id: "fetch-source-health",
+    node_id: "fetch-source-inputs",
     runner: "node",
     script: "scripts/run-source-watch-collect-fixture.mjs"
   }, {
@@ -2256,10 +2317,10 @@ test("daily codex DAG source-watch admit MVP blocks admit when quality fails", a
   assert.equal(result.ok, false);
   assert.equal(result.mode, "daily_codex_dag_source_watch_admit_mvp");
   assert.equal(result.run.final_status, "blocked");
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize"]);
   assert.deepEqual(result.run.blocked_nodes, ["freshness-history-check", "admit-reject"]);
   assert.equal(result.admitted.total_candidates, 0);
-  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
   const [collectResult, downstreamResult, normalizeResult, qualityResult, admitResult] = result.node_results;
   assert.equal(qualityResult.status, "failure");
   assert.equal(admitResult.status, "blocked");
@@ -2308,10 +2369,10 @@ test("daily codex DAG source-watch admit MVP records structured admit failure af
   assert.equal(result.ok, false);
   assert.equal(result.mode, "daily_codex_dag_source_watch_admit_mvp");
   assert.equal(result.run.final_status, "blocked");
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
   assert.deepEqual(result.run.blocked_nodes, ["admit-reject"]);
   assert.equal(result.admitted.total_candidates, 0);
-  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
   const [collectResult, downstreamResult, normalizeResult, qualityResult, admitResult] = result.node_results;
   assert.equal(qualityResult.status, "success");
   assert.equal(admitResult.status, "failure");
@@ -2347,12 +2408,12 @@ test("daily codex DAG source-watch article-index MVP persists admitted candidate
   assert.equal(result.ok, true, result.failures.join("\n"));
   assert.equal(result.mode, "daily_codex_dag_source_watch_article_index_mvp");
   assert.equal(result.run.final_status, "executed_source_watch_article_index");
-  assert.deepEqual(result.run.planned_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject", "persist-article-db"]);
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject", "persist-article-db"]);
+  assert.deepEqual(result.run.planned_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject", "persist-article-db"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject", "persist-article-db"]);
   assert.deepEqual(result.run.blocked_nodes, []);
   assert.equal(result.plan.node_count, 6);
   assert.deepEqual(result.plan.levels, [
-    { level: 0, node_ids: ["fetch-source-health"] },
+    { level: 0, node_ids: ["fetch-source-inputs"] },
     { level: 1, node_ids: ["parse-extract"] },
     { level: 2, node_ids: ["normalize-canonicalize"] },
     { level: 3, node_ids: ["freshness-history-check"] },
@@ -2398,7 +2459,7 @@ test("daily codex DAG source-watch article-index MVP persists admitted candidate
   assert.equal(Object.hasOwn(articleResult, "stdout"), false);
   assert.equal(Object.hasOwn(articleResult, "stderr"), false);
   assert.deepEqual(result.executed_commands, [{
-    node_id: "fetch-source-health",
+    node_id: "fetch-source-inputs",
     runner: "node",
     script: "scripts/run-source-watch-collect-fixture.mjs"
   }, {
@@ -2495,10 +2556,10 @@ test("daily codex DAG source-watch article-index MVP records structured persist 
   assert.equal(result.ok, false);
   assert.equal(result.mode, "daily_codex_dag_source_watch_article_index_mvp");
   assert.equal(result.run.final_status, "blocked");
-  assert.deepEqual(result.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
+  assert.deepEqual(result.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
   assert.deepEqual(result.run.blocked_nodes, ["persist-article-db"]);
   assert.equal(result.articles.total_articles, 0);
-  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject", "persist-article-db"]);
+  assert.deepEqual(result.executed_commands.map((command) => command.node_id), ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject", "persist-article-db"]);
   const [collectResult, downstreamResult, normalizeResult, qualityResult, admitResult, articleResult] = result.node_results;
   assert.equal(admitResult.status, "success");
   assert.equal(articleResult.status, "failure");
@@ -2786,7 +2847,7 @@ test("daily codex DAG dry-run helper is deterministic and level ordered", async 
   assert.equal(first.report_date, "2026-07-03");
   assert.equal(first.generated_at, fixedNow);
   assert.equal(first.run.final_status, "dry_run_only");
-  assert.equal(first.plan.node_count, 16);
+  assert.equal(first.plan.node_count, 22);
   assert.deepEqual(first.run.levels, first.plan.levels);
   assert.deepEqual(first.run.completed_nodes, []);
   assert.deepEqual(first.run.blocked_nodes, []);
@@ -3019,7 +3080,7 @@ test("daily codex DAG contract-run helper emits validated skipped node results",
   assert.equal(result.generated_at, fixedNow);
   assert.equal(result.run_id, "daily-codex-dag:2026-07-03:contract-run");
   assert.equal(result.run.final_status, "contract_validated_only");
-  assert.equal(result.plan.node_count, 16);
+  assert.equal(result.plan.node_count, 22);
   assert.equal(result.node_results.length, result.plan.node_count);
   assert.equal(result.node_result_validation.ok, true, result.node_result_validation.failures.join("\n"));
   assert.equal(result.node_result_validation.checked_results, result.node_results.length);
@@ -3075,6 +3136,12 @@ test("daily codex DAG contract-run helper emits validated skipped node results",
   assert.equal(qualityAudit.result_scope, "node");
   assert.equal(qualityAudit.barrier, null);
   assert.deepEqual(result.fanout_expansions, [
+    {
+      node_id: "validate-public-signals",
+      kind: "barrier",
+      status: "not_expanded",
+      item_count: null
+    },
     {
       node_id: "per-item-summary",
       kind: "fanout",
@@ -3642,7 +3709,7 @@ test("daily codex DAG dry-run CLI writes JSON to stdout only", async () => {
   assert.equal(parsed.mode, "daily_codex_dag_dry_run");
   assert.equal(parsed.report_date, "2026-07-03");
   assert.equal(parsed.run.final_status, "dry_run_only");
-  assert.equal(parsed.plan.node_count, 16);
+  assert.equal(parsed.plan.node_count, 22);
   await assertValidDagRunSummary(parsed);
   assert.deepEqual(await forbiddenPathSnapshot(), forbiddenBefore, "stdout-only dry-run must not mutate production or scratch paths");
 });
@@ -3748,7 +3815,7 @@ test("daily codex DAG real-node adapter MVP CLI writes JSON to stdout only", asy
   await removeRealNodeAdapterFixtureArtifacts();
 });
 
-test("daily codex DAG source-watch collect MVP CLI writes source-health artifact under .tmp only", async () => {
+test("daily codex DAG source-watch collect MVP CLI writes source-inputs artifact under .tmp only", async () => {
   const reportDate = "2026-07-06";
   await removeSourceWatchCollectFixtureArtifacts(reportDate);
   const forbiddenBefore = await forbiddenPathSnapshot();
@@ -3761,23 +3828,23 @@ test("daily codex DAG source-watch collect MVP CLI writes source-health artifact
   assert.equal(parsed.mode, "daily_codex_dag_source_watch_collect_mvp");
   assert.equal(parsed.report_date, reportDate);
   assert.equal(parsed.run.final_status, "executed_source_watch_collect");
-  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-health"]);
+  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-inputs"]);
   assert.equal(parsed.source_watch.watched_repos, 2);
   assert.equal(parsed.source_watch.fetched_repos, 2);
   assert.equal(parsed.source_watch.watched_sites, 2);
   assert.equal(parsed.source_watch.fetched_sites, 2);
-  assert.equal(parsed.source_watch.total_candidates_found, 4);
+  assert.equal(parsed.source_watch.total_candidates_found, 9);
   assert.equal(parsed.source_watch.empty, false);
   assert.equal(parsed.node_results.length, 1);
-  assert.equal(parsed.node_results[0].node_id, "fetch-source-health");
+  assert.equal(parsed.node_results[0].node_id, "fetch-source-inputs");
   assert.equal(parsed.node_results[0].status, "success");
-  assert.equal(parsed.node_results[0].declared_outputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json");
+  assert.equal(parsed.node_results[0].declared_outputs[0].path, ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-inputs.json");
   assertResolvedArtifactMetadata(parsed.node_results[0].resolved_outputs[0]);
   assert.equal(Object.hasOwn(parsed.node_results[0], "stdout"), false);
   assert.equal(Object.hasOwn(parsed.node_results[0], "stderr"), false);
   assert.equal(JSON.stringify(parsed).includes("SECRET"), false);
 
-  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "source-health.json");
+  const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "source-inputs.json");
   const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
   assert.equal(artifact.source_audit.github_watch.fetched_repos, 2);
   assert.equal(artifact.source_audit.site_watch.fetched_sites, 2);
@@ -3804,13 +3871,13 @@ test("daily codex DAG source-watch downstream MVP CLI writes collect and parse a
   assert.equal(parsed.mode, "daily_codex_dag_source_watch_downstream_mvp");
   assert.equal(parsed.report_date, reportDate);
   assert.equal(parsed.run.final_status, "executed_source_watch_downstream");
-  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-health", "parse-extract"]);
+  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-inputs", "parse-extract"]);
   assert.deepEqual(parsed.downstream.signals, ["github_watch", "site_watch"]);
-  assert.equal(parsed.downstream.total_candidates, 4);
-  assert.equal(parsed.downstream.github_watch_candidates, 2);
+  assert.equal(parsed.downstream.total_candidates, 9);
+  assert.equal(parsed.downstream.github_watch_candidates, 7);
   assert.equal(parsed.downstream.site_watch_candidates, 2);
   assert.equal(parsed.node_results.length, 2);
-  assert.equal(parsed.node_results[0].node_id, "fetch-source-health");
+  assert.equal(parsed.node_results[0].node_id, "fetch-source-inputs");
   assert.equal(parsed.node_results[0].status, "success");
   assert.equal(parsed.node_results[1].node_id, "parse-extract");
   assert.equal(parsed.node_results[1].status, "success");
@@ -3827,7 +3894,7 @@ test("daily codex DAG source-watch downstream MVP CLI writes collect and parse a
   const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "extracted-candidates.json");
   const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
   assert.equal(artifact.kind, "source_watch_extracted_candidates");
-  assert.equal(artifact.candidate_count, 4);
+  assert.equal(artifact.candidate_count, 9);
 
   await assertValidDagRunSummary(parsed);
   const forbiddenAfter = await forbiddenPathSnapshot();
@@ -3849,10 +3916,10 @@ test("daily codex DAG source-watch normalize MVP CLI writes collect parse and ca
   assert.equal(parsed.mode, "daily_codex_dag_source_watch_normalize_mvp");
   assert.equal(parsed.report_date, reportDate);
   assert.equal(parsed.run.final_status, "executed_source_watch_normalize");
-  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize"]);
+  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize"]);
   assert.deepEqual(parsed.normalized.signals, ["github_watch", "site_watch"]);
-  assert.equal(parsed.normalized.total_candidates, 4);
-  assert.equal(parsed.normalized.github_watch_candidates, 2);
+  assert.equal(parsed.normalized.total_candidates, 9);
+  assert.equal(parsed.normalized.github_watch_candidates, 7);
   assert.equal(parsed.normalized.site_watch_candidates, 2);
   assert.equal(parsed.node_results.length, 3);
   assert.equal(parsed.node_results[2].node_id, "normalize-canonicalize");
@@ -3869,7 +3936,7 @@ test("daily codex DAG source-watch normalize MVP CLI writes collect parse and ca
   const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "canonical-candidates.json");
   const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
   assert.equal(artifact.kind, "source_watch_canonical_candidates");
-  assert.equal(artifact.candidate_count, 4);
+  assert.equal(artifact.candidate_count, 9);
 
   await assertValidDagRunSummary(parsed);
   const forbiddenAfter = await forbiddenPathSnapshot();
@@ -3891,10 +3958,10 @@ test("daily codex DAG source-watch quality MVP CLI writes internal quality artif
   assert.equal(parsed.mode, "daily_codex_dag_source_watch_quality_mvp");
   assert.equal(parsed.report_date, reportDate);
   assert.equal(parsed.run.final_status, "executed_source_watch_quality");
-  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
-  assert.equal(parsed.quality.total_candidates, 4);
+  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check"]);
+  assert.equal(parsed.quality.total_candidates, 9);
   assert.equal(parsed.quality.admitted_candidates, 3);
-  assert.equal(parsed.quality.suppressed_candidates, 1);
+  assert.equal(parsed.quality.suppressed_candidates, 6);
   assert.equal(parsed.quality.public_surface, false);
   assert.equal(parsed.node_results.length, 4);
   assert.equal(parsed.node_results[3].node_id, "freshness-history-check");
@@ -3910,8 +3977,8 @@ test("daily codex DAG source-watch quality MVP CLI writes internal quality artif
   const artifactPath = path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "quality-candidates.json");
   const artifact = JSON.parse(await fs.readFile(artifactPath, "utf8"));
   assert.equal(artifact.kind, "source_watch_quality_candidates");
-  assert.equal(artifact.candidate_count, 4);
-  assert.equal(artifact.suppressed_count, 1);
+  assert.equal(artifact.candidate_count, 9);
+  assert.equal(artifact.suppressed_count, 6);
   assert.equal(artifact.quality_audit.public_surface, false);
   assertAifyLaneCandidate(artifact.candidates.find((candidate) => candidate.source_id === "site-aify-news"));
 
@@ -3935,7 +4002,7 @@ test("daily codex DAG source-watch admit MVP CLI writes internal admitted artifa
   assert.equal(parsed.mode, "daily_codex_dag_source_watch_admit_mvp");
   assert.equal(parsed.report_date, reportDate);
   assert.equal(parsed.run.final_status, "executed_source_watch_admit");
-  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
+  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject"]);
   assert.equal(parsed.quality.admitted_candidates, 3);
   assert.equal(parsed.admitted.total_candidates, 3);
   assert.equal(parsed.admitted.public_surface, false);
@@ -3979,7 +4046,7 @@ test("daily codex DAG source-watch article-index MVP CLI writes articles artifac
   assert.equal(parsed.mode, "daily_codex_dag_source_watch_article_index_mvp");
   assert.equal(parsed.report_date, reportDate);
   assert.equal(parsed.run.final_status, "executed_source_watch_article_index");
-  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-health", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject", "persist-article-db"]);
+  assert.deepEqual(parsed.run.completed_nodes, ["fetch-source-inputs", "parse-extract", "normalize-canonicalize", "freshness-history-check", "admit-reject", "persist-article-db"]);
   assert.equal(parsed.admitted.total_candidates, 3);
   assert.equal(parsed.articles.total_articles, 3);
   assert.equal(parsed.articles.source_watch_articles, 3);
@@ -4314,7 +4381,7 @@ test("daily codex DAG validator catches structural and boundary regressions", as
     {
       name: "dependency cycle",
       mutate(manifest) {
-        node(manifest, "fetch-source-health").dependencies = ["publish-cleanup"];
+        node(manifest, "fetch-source-inputs").dependencies = ["publish-cleanup"];
       },
       expected: "dependency cycle detected"
     },
@@ -4862,7 +4929,7 @@ test("daily codex DAG validator catches structural and boundary regressions", as
     {
       name: "planned node missing resilience policy stage",
       mutate(manifest) {
-        node(manifest, "fetch-source-health").resilience_policy_ref = "missing_policy_stage";
+        node(manifest, "fetch-source-inputs").resilience_policy_ref = "missing_policy_stage";
       },
       expected: "references missing resilience policy stage missing_policy_stage"
     },
@@ -5258,7 +5325,7 @@ async function removeRealNodeAdapterFixtureArtifacts(reportDate = "2026-07-03") 
 }
 
 async function removeSourceWatchCollectFixtureArtifacts(reportDate = "2026-07-06") {
-  await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "source-health.json"), {
+  await fs.rm(path.join(rootDir, ".tmp", "daily-codex-pipeline", reportDate, "artifacts", "source-inputs.json"), {
     force: true
   });
 }

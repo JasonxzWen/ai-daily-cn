@@ -11,6 +11,8 @@ const REQUIRED_TERMINAL_STATUSES = [
   "published",
   "published_degraded",
   "generated_only",
+  "generated_signals_only",
+  "published_signals_only",
   "needs_ai_repair",
   "unsafe_blocked",
   "infrastructure_blocked_after_fallback_exhausted"
@@ -29,6 +31,7 @@ const EXTRA_REQUIRED_STAGE_IDS = [
   "prepare_clean_worktree",
   "quality_ai_repair",
   "publish_github_api_fallback",
+  "signals_publish_github_api_fallback",
   "pages_verify",
   "retrospective_write",
   "retrospective_finalize",
@@ -36,11 +39,37 @@ const EXTRA_REQUIRED_STAGE_IDS = [
   "retrospective_correction_write",
   "retrospective_correction_validate"
 ];
-const RETIRED_DISCOVERY_STAGE_IDS = new Set([
-  "discover_wechat_platform",
-  "discover_zhihu_platform",
-  "discover_reddit_platform"
+const PUBLIC_SIGNAL_DISCOVERY_STAGE_IDS = new Set([
+  "discover_github_trending",
+  "discover_source_watch",
+  "discover_huggingface_trending",
+  "discover_builders",
+  "discover_china_ai",
+  "discover_content_sources",
+  "discover_statuspage_incidents",
+  "discover_search_news"
 ]);
+const SHARED_PREFLIGHT_STAGE_IDS = new Set([
+  "prepare_clean_worktree",
+  "prompt_build",
+  "sources_validate"
+]);
+const STAGE_SCOPES = new Set([
+  "shared_preflight",
+  "public_signal_input",
+  "public_signals",
+  "diagnostic_after_signals",
+  "legacy_report_only"
+]);
+
+const SIGNAL_DOC_MARKERS = [
+  "signals_publish_dry_run",
+  "signals_publish_real",
+  "generated_signals_only",
+  "published_signals_only",
+  "signals.status",
+  "legacy_report.status"
+];
 
 const DOC_MARKERS = [
   {
@@ -49,7 +78,8 @@ const DOC_MARKERS = [
       "config/daily-resilience-policy.json",
       "corepack pnpm run resilience:validate",
       "published_degraded",
-      "infrastructure_blocked_after_fallback_exhausted"
+      "infrastructure_blocked_after_fallback_exhausted",
+      ...SIGNAL_DOC_MARKERS
     ]
   },
   {
@@ -58,7 +88,8 @@ const DOC_MARKERS = [
       "config/daily-resilience-policy.json",
       "corepack pnpm run resilience:validate",
       "published_degraded",
-      "infrastructure_blocked_after_fallback_exhausted"
+      "infrastructure_blocked_after_fallback_exhausted",
+      ...SIGNAL_DOC_MARKERS
     ]
   },
   {
@@ -67,7 +98,8 @@ const DOC_MARKERS = [
       "config/daily-resilience-policy.json",
       "corepack pnpm run resilience:validate",
       "published_degraded",
-      "infrastructure_blocked_after_fallback_exhausted"
+      "infrastructure_blocked_after_fallback_exhausted",
+      ...SIGNAL_DOC_MARKERS
     ]
   },
   {
@@ -76,7 +108,8 @@ const DOC_MARKERS = [
       "config/daily-resilience-policy.json",
       "corepack pnpm run resilience:validate",
       "published_degraded",
-      "infrastructure_blocked_after_fallback_exhausted"
+      "infrastructure_blocked_after_fallback_exhausted",
+      ...SIGNAL_DOC_MARKERS
     ]
   }
 ];
@@ -184,10 +217,20 @@ function validatePolicyDocument({ policy, failures, requiredStageIds }) {
       failures.push(`config/daily-resilience-policy.json: duplicate stage id ${JSON.stringify(stage.id)}.`);
     }
     seen.add(stage.id);
-    if (RETIRED_DISCOVERY_STAGE_IDS.has(stage.id)) {
-      failures.push(`config/daily-resilience-policy.json: retired platform discovery stage ${stage.id} must not be registered.`);
-    }
     validateStagePolicy({ stage, label: `${label} (${stage.id})`, blockingWhitelist, failures });
+    const expectedScope = expectedStageScope(stage.id);
+    if (!STAGE_SCOPES.has(stage.scope)) {
+      failures.push(`${label} (${stage.id}).scope must be one of ${[...STAGE_SCOPES].join(", ")}.`);
+    } else if (stage.scope !== expectedScope) {
+      failures.push(`${label} (${stage.id}).scope must be ${expectedScope}, found ${stage.scope}.`);
+    }
+    if (
+      PUBLIC_SIGNAL_DISCOVERY_STAGE_IDS.has(stage.id)
+      && Array.isArray(stage.block?.reasons)
+      && stage.block.reasons.includes("high_risk_unverified_fact")
+    ) {
+      failures.push(`config/daily-resilience-policy.json: ${stage.id} must label high-risk unverified observations; it cannot block the public signal lane.`);
+    }
   }
 
   for (const stageId of requiredStageIds) {
@@ -205,6 +248,14 @@ function validatePolicyDocument({ policy, failures, requiredStageIds }) {
   }
 
   return stageIds;
+}
+
+function expectedStageScope(stageId) {
+  if (SHARED_PREFLIGHT_STAGE_IDS.has(stageId)) return "shared_preflight";
+  if (PUBLIC_SIGNAL_DISCOVERY_STAGE_IDS.has(stageId)) return "public_signal_input";
+  if (String(stageId).startsWith("signals_")) return "public_signals";
+  if (stageId === "sources_health") return "diagnostic_after_signals";
+  return "legacy_report_only";
 }
 
 function validateStagePolicy({ stage, label, blockingWhitelist, failures }) {

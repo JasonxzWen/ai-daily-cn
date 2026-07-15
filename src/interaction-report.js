@@ -4440,7 +4440,8 @@ function formatSourceInventoryIndexSection(rows = [], sectionGroups = []) {
 }
 
 function formatSourceInventorySectionCard(group, index) {
-  const enablement = countBy(group.rows, "enablement");
+  const sourceGroups = countBy(group.rows, "source_group");
+  const credibilityTags = countBy(group.rows, "credibility_tag");
   const kinds = countBy(group.rows, "source_kind");
   const logicalSources = new Set(group.rows.map((row) => row.logical_source_id).filter(Boolean));
   const rankLabel = Number.isFinite(Number(group.rank)) ? `rank ${group.rank}` : "rank unknown";
@@ -4458,15 +4459,17 @@ function formatSourceInventorySectionCard(group, index) {
     stats: [
       { label: "采集入口", value: String(group.rows.length), detail: "固定清单行" },
       { label: "逻辑源", value: String(logicalSources.size) },
-      { label: "core", value: String(enablement.core || 0) },
-      { label: "optional", value: String(enablement.optional || 0) },
-      { label: "manual", value: String(enablement.manual || 0) }
+      { label: "信源板块", value: String(Object.keys(sourceGroups).length), detail: "标签种类" },
+      { label: "可信标签", value: String(Object.keys(credibilityTags).length), detail: "标签种类" },
+      { label: "待核材料", value: String(credibilityTags.pending_review || 0) }
     ],
     body: `固定排序第 ${index + 1} 组；完整 ${group.rows.length} 条采集入口在下方明细展开，今日状态不会改变排序。`,
     points: [
       { label: "代表源", value: formatSourceInventoryPlainNameSample(group.rows) },
+      { label: "信源板块", value: formatSourceInventoryPlainCountChips(sourceGroups) },
+      { label: "可信标签", value: formatSourceInventoryPlainCountChips(credibilityTags) },
       { label: "类型分布", value: formatSourceInventoryPlainCountChips(kinds) },
-      { label: "保留规则", value: "阻塞、未配置、跳过、手动或无更新的入口仍保留在本组。" }
+      { label: "保留规则", value: "阻塞、未配置、跳过、待核或无更新的入口仍保留在本组。" }
     ]
   };
 }
@@ -4483,112 +4486,6 @@ function formatSourceInventoryPlainNameSample(rows = []) {
     .slice(0, 4)
     .map((row) => row.name || row.id)
     .filter(Boolean);
-  if (rows.length > names.length) {
-    names.push(`等 ${rows.length} 个`);
-  }
-  return names.join("、");
-}
-
-function formatSourceInventoryQuickFilters(rows = [], groups = []) {
-  const sectionLinks = groups
-    .map((group) => `[${escapeMarkdownText(group.label)}](#section-${sourceInventoryGroupAnchor(group)}) ${group.rows.length}`)
-    .join(" · ");
-  return [
-    "### 快速定位（静态扫描，不会隐藏或重排）",
-    `- 板块快速定位：${sectionLinks}`,
-    `- 启用层级快速定位：${formatSourceInventoryCountChips(countBy(rows, "enablement"))}`,
-    `- 类型快速定位：${formatSourceInventoryCountChips(countBy(rows, "source_kind"))}`
-  ].join("\n");
-}
-
-function formatSourceInventoryFocusLanes(rows = [], groups = []) {
-  const lanes = [
-    {
-      label: "配置待补",
-      detail: "安全配置或入口待补齐",
-      predicate: (row) => row.config_status === "configuration_needed"
-    },
-    {
-      label: "人工复核",
-      detail: "需要人工确认或手动复核",
-      predicate: (row) => row.config_status === "manual_review"
-    },
-    {
-      label: "已停用",
-      detail: "当前不参与自动采集",
-      predicate: (row) => row.config_status === "disabled"
-    },
-    {
-      label: "手动维护",
-      detail: "通过人工或半自动流程维护",
-      predicate: (row) => row.enablement === "manual"
-    },
-    {
-      label: "平台桥接",
-      detail: "平台/RSSHub 桥接入口",
-      predicate: (row) => row.source_kind === "rsshub" || ["wechat", "zhihu", "reddit"].includes(String(row.platform || "").toLowerCase())
-    }
-  ];
-  const tableRows = lanes
-    .map((lane) => {
-      const matches = rows.filter(lane.predicate);
-      return [
-        lane.label,
-        matches.length,
-        matches.length > 0 ? formatSourceInventoryLaneLinks(matches, groups) : "当前无",
-        `${matches.length > 0 ? formatSourceInventoryNameSample(matches) : "当前无"}；${lane.detail}`
-      ];
-    })
-    .filter(Boolean);
-
-  if (tableRows.length === 0) {
-    return "";
-  }
-
-  return [
-    "### 聚焦入口（静态索引，不会隐藏或重排）",
-    "这些入口只把需要关注的固定切片提前到总览；完整 154 条仍在下方分组。",
-    "",
-    "| 聚焦 | 数量 | 入口 | 代表源 |",
-    "|---|---:|---|---|",
-    ...tableRows.map((row) =>
-      `| ${escapeMarkdownTableCell(row[0])} | ${escapeMarkdownTableCell(row[1])} | ${row[2]} | ${escapeMarkdownTableCell(row[3])} |`
-    )
-  ].join("\n");
-}
-
-function formatSourceInventoryLaneLinks(rows = [], groups = []) {
-  const groupById = new Map(groups.map((group) => [group.id, group]));
-  const counts = new Map();
-  for (const row of rows) {
-    const sectionId = String(row?.display_section || "uncategorized");
-    counts.set(sectionId, (counts.get(sectionId) || 0) + 1);
-  }
-  const links = [...counts.entries()]
-    .map(([sectionId, count]) => {
-      const group = groupById.get(sectionId) || {
-        id: sectionId,
-        label: String(rows.find((row) => row.display_section === sectionId)?.display_section_label || sectionId),
-        rank: 999
-      };
-      return { group, count };
-    })
-    .sort((left, right) => Number(left.group.rank || 999) - Number(right.group.rank || 999) || String(left.group.label || "").localeCompare(String(right.group.label || "")));
-  const visibleLinks = links.slice(0, 3).map(({ group, count }) =>
-    `[${escapeMarkdownText(group.label)}](#section-${sourceInventoryGroupAnchor(group)}) ${count}`
-  );
-  if (links.length > visibleLinks.length) {
-    visibleLinks.push(`另 ${links.length - visibleLinks.length} 组`);
-  }
-  return visibleLinks.join(" · ");
-}
-
-function formatSourceInventoryNameSample(rows = []) {
-  const names = rows
-    .slice(0, 4)
-    .map((row) => row.name || row.id)
-    .filter(Boolean)
-    .map(escapeMarkdownText);
   if (rows.length > names.length) {
     names.push(`等 ${rows.length} 个`);
   }
@@ -4615,19 +4512,6 @@ function groupedSourceInventoryRows(rows = []) {
   return groups.sort((left, right) => left.rank - right.rank || left.label.localeCompare(right.label));
 }
 
-function formatSourceInventorySectionSummary(groups = []) {
-  return [
-    "| 板块 | 采集入口 | 逻辑源映射 | 核心 | 可选 | 手动 |",
-    "|---|---:|---:|---:|---:|---:|",
-    ...groups.map((group) => {
-      const enablement = countBy(group.rows, "enablement");
-      const logicalSources = new Set(group.rows.map((row) => row.logical_source_id).filter(Boolean));
-      const href = `#section-${sourceInventoryGroupAnchor(group)}`;
-      return `| [${escapeMarkdownTableCell(group.label)}](${href}) | ${group.rows.length} | ${logicalSources.size} | ${enablement.core || 0} | ${enablement.optional || 0} | ${enablement.manual || 0} |`;
-    })
-  ].join("\n");
-}
-
 function formatSourceInventoryCompactSummary(title, counts = {}) {
   return `**${escapeMarkdownText(title)}**：${formatSourceInventoryCountChips(counts)}`;
 }
@@ -4640,38 +4524,41 @@ function formatSourceInventoryCountChips(counts = {}) {
 }
 
 function formatSourceInventoryGroup(group) {
-  const enablement = countBy(group.rows, "enablement");
+  const sourceGroups = countBy(group.rows, "source_group");
+  const credibilityTags = countBy(group.rows, "credibility_tag");
   const kinds = countBy(group.rows, "source_kind");
   const summary = [
     `${group.rows.length} 个注册采集入口`,
-    `core ${enablement.core || 0}`,
-    `optional ${enablement.optional || 0}`,
-    `manual ${enablement.manual || 0}`
+    `${Object.keys(sourceGroups).length} 类信源板块`,
+    `${Object.keys(credibilityTags).length} 类可信标签`
   ].join(" · ");
   return [
     "[回到全量信源清单](#section-source-inventory)",
     "",
     `**本组密度**：${summary}`,
     "",
-    formatSourceInventoryCompactSummary("启用层级", enablement),
+    formatSourceInventoryCompactSummary("信源板块", sourceGroups),
+    "",
+    formatSourceInventoryCompactSummary("可信标签", credibilityTags),
     "",
     formatSourceInventoryCompactSummary("类型分布", kinds),
     "",
-    "**保留规则**：阻塞、未配置、跳过、手动或无更新的入口仍保留在本组；今日状态不会改变排序。",
+    "**保留规则**：阻塞、未配置、跳过、待核或无更新的入口仍保留在本组；今日状态不会改变排序。",
     "",
     ...group.rows.map(formatSourceInventoryRow)
   ].join("\n");
 }
 
 function formatSourceInventoryGroupSection(group) {
-  const enablement = countBy(group.rows, "enablement");
+  const sourceGroups = countBy(group.rows, "source_group");
+  const credibilityTags = countBy(group.rows, "credibility_tag");
   return {
     type: "markdown",
     title: `${group.label} · 采集入口`,
     richId: sourceInventoryGroupAnchor(group),
     group: "main",
     collapsed: false,
-    summary: `${group.rows.length} 个注册采集入口 · core ${enablement.core || 0} · optional ${enablement.optional || 0} · manual ${enablement.manual || 0}`,
+    summary: `${group.rows.length} 个注册采集入口 · ${Object.keys(sourceGroups).length} 类信源板块 · ${Object.keys(credibilityTags).length} 类可信标签`,
     content: formatSourceInventoryGroup(group)
   };
 }
@@ -4687,9 +4574,9 @@ function sourceInventoryGroupAnchor(group) {
 function formatSourceInventoryRow(row) {
   const details = [
     row.source_kind,
-    row.enablement,
-    row.tier,
-    row.authority,
+    `source_group:${row.source_group || "other"}`,
+    `credibility:${row.credibility_tag || "pending_review"}`,
+    Array.isArray(row.content_tags) && row.content_tags.length > 0 ? `content:${row.content_tags.join(",")}` : "content:other",
     row.platform ? `platform:${row.platform}` : "",
     row.config_status
   ].filter(Boolean).map(escapeMarkdownText).join(" / ");

@@ -24,16 +24,16 @@ export function buildSourceInventoryOrderMarkdown({ rootDir = process.cwd() } = 
     "",
     `Snapshot: ${rows.length} registered collection entries, generated mode ${generatedAt}.`,
     "",
-    "This reference is the static human review surface for the full collection-entry order used by the public `source-inventory-group-*` sections. It deliberately shows only source names, ids, logical-source mapping, source kind, enablement, tier, authority, platform, and generic configuration status.",
+    "This reference is the static human review surface for the full collection-entry order used by the public `source-inventory-group-*` sections. It deliberately shows only source names, ids, logical-source mapping, source kind, source group, credibility tag, content tags, platform, and generic configuration status.",
     "",
     "Internal source-first runtime may project a per-row runtime layer onto these entries: mapped entries inherit their logical source `status_label`, mapped-but-missing entries show `unreported`, and unmapped entries show `collection_only`. Public daily pages do not render this inventory by default. That runtime layer is intentionally omitted here so this file remains a fixed order reference.",
     "",
-    "Daily source status must not reorder this reference. Blocked, unconfigured, manual, skipped, or no-update entries stay in their fixed section so source gaps remain visible.",
+    "Daily source status must not reorder this reference. Blocked, unconfigured, skipped, or no-update entries stay in their fixed section so source gaps remain visible.",
     "",
     "## Section Counts",
     "",
-    "| Section | Entries | Logical mappings | Core | Optional | Manual |",
-    "|---|---:|---:|---:|---:|---:|",
+    "| Section | Entries | Logical mappings | Source groups | Credibility tags |",
+    "|---|---:|---:|---|---|",
     ...groups.map((group) => sectionCountRow(group)),
     "",
     "## How To Tune The Order",
@@ -88,9 +88,10 @@ function groupInventoryRows(rows = []) {
 }
 
 function sectionCountRow(group) {
-  const enablement = countBy(group.rows, "enablement");
+  const sourceGroups = countBy(group.rows, "source_group");
+  const credibilityTags = countBy(group.rows, "credibility_tag");
   const logicalSources = new Set(group.rows.map((row) => row.logical_source_id).filter(Boolean));
-  return `| \`${escapeTable(group.id)}\` ${escapeTable(group.label)} | ${group.rows.length} | ${logicalSources.size} | ${enablement.core || 0} | ${enablement.optional || 0} | ${enablement.manual || 0} |`;
+  return `| \`${escapeTable(group.id)}\` ${escapeTable(group.label)} | ${group.rows.length} | ${logicalSources.size} | ${formatCounts(sourceGroups)} | ${formatCounts(credibilityTags)} |`;
 }
 
 function sectionLines(group) {
@@ -99,7 +100,7 @@ function sectionLines(group) {
     "",
     `<!-- inventory-section:${group.id} count:${group.rows.length} -->`,
     "",
-    "| Order | Source ID | Name | Logical source | Kind | Enablement | Tier | Authority | Platform | Config status |",
+    "| Order | Source ID | Name | Logical source | Kind | Source group | Credibility | Content tags | Platform | Config status |",
     "|---:|---|---|---|---|---|---|---|---|---|",
     ...group.rows.map((row, index) => inventoryRow(group, row, index)),
     ""
@@ -114,9 +115,9 @@ function inventoryRow(group, row, index) {
     escapeTable(row.name || row.id),
     codeCell(row.logical_source_id || "unmapped"),
     codeCell(row.source_kind || "unknown"),
-    codeCell(row.enablement || "unknown"),
-    codeCell(row.tier || "-"),
-    codeCell(row.authority || "-"),
+    codeCell(row.source_group || "other"),
+    codeCell(row.credibility_tag || "pending_review"),
+    codeCell(Array.isArray(row.content_tags) && row.content_tags.length > 0 ? row.content_tags.join(", ") : "other"),
     codeCell(row.platform || "-"),
     codeCell(row.config_status || "placeholder")
   ].join(" | ") + " |";
@@ -129,6 +130,13 @@ function countBy(rows = [], field) {
     counts[key] = (counts[key] || 0) + 1;
   }
   return counts;
+}
+
+function formatCounts(counts = {}) {
+  return Object.entries(counts)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([label, count]) => `\`${escapeTable(label)}\` ${count}`)
+    .join(" · ");
 }
 
 function codeCell(value) {

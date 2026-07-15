@@ -21,6 +21,7 @@ import {
 import { defaultGeneratedAt } from "./time.js";
 import { validateArticles, validateFeed, validateHome, validateReport, validateTrends } from "./schema.js";
 import { normalizeCandidatePool } from "./candidates.js";
+import { compareOccurrenceChronology } from "./occurrence-store.js";
 import { deriveQualityStatus, normalizeQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
 import { withDefaultImportance } from "./importance.js";
@@ -35,14 +36,18 @@ import { isPublicSurfaceDietEnabled } from "./public-surface-policy.js";
 import { WEB_APP_GENERATED_FILES } from "./web-app-build.js";
 import {
   buildPublicSignalArtifacts,
-  loadLegacyCandidatePools,
-  loadOccurrenceStores
+  loadOccurrenceStores,
+  publicSignalPagePath,
+  validatePublicSignalArtifactSet
 } from "./public-signals.js";
 
 const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
 const AVATAR_MAX_BYTES = 1_000_000;
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
-const REPORT_DATA_AUXILIARY_JSON = new Set(["source-status-history.json"]);
+const REPORT_DATA_AUXILIARY_JSON = new Set([
+  "source-status-history.json",
+  "occurrence-baseline-manifest.json"
+]);
 const PUBLIC_DATA_PRIVATE_KEYS = new Set([
   "candidate_id",
   "candidate_pool_path",
@@ -437,7 +442,6 @@ export async function buildSite(options = {}) {
   const markdownFiles = await collectMarkdownFiles(inputDir);
   const reportJsonFiles = await collectJsonFiles(dataInputDir);
   const reports = [];
-  const signalReports = [];
   const reportRecords = [];
   const writtenFiles = [];
 
@@ -452,14 +456,12 @@ export async function buildSite(options = {}) {
     const markdown = await fs.readFile(file, "utf8");
     const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt });
     reports.push(report);
-    signalReports.push(report);
     reportRecords.push({ report, markdown, reportJsonPath: null });
   }
 
   for (const file of reportJsonFiles) {
-    const { report, persistedReport } = await readReportJsonRecord(file);
+    const { report } = await readReportJsonRecord(file);
     reports.push(report);
-    signalReports.push(persistedReport);
     reportRecords.push({ report, markdown: null, reportJsonPath: file });
   }
 
@@ -495,14 +497,13 @@ export async function buildSite(options = {}) {
   const dateIndex = buildDateIndex(feedValidation.value, reports, trendValidation.value);
   const sourceWatchCandidatePoolRecords = await loadSourceWatchCandidatePools(dataInputDir, reports);
   const sourceWatchCandidatePools = sourceWatchCandidatePoolRecords.map((record) => record.candidatePool);
-  const occurrenceStoreRecords = await loadOccurrenceStores(dataInputDir);
-  const legacyCandidatePoolRecords = await loadLegacyCandidatePools(dataInputDir);
-  const publicSignals = buildPublicSignalArtifacts({
-    occurrenceStores: occurrenceStoreRecords,
-    legacyCandidatePools: legacyCandidatePoolRecords,
-    reports: signalReports,
-    generatedAt
-  });
+  const publicSignals = options.buildPublicSignals === false
+    ? { skipped: true, files: [], index: null, pages: [] }
+    : await createPublicSignalArtifacts({
+        dataInputDir,
+        generatedAt,
+        requireBaselineManifest: options.requireBaselineManifest
+      });
   const articles = buildArticleIndex(reports, {
     siteTitle,
     siteUrl,
@@ -545,7 +546,9 @@ export async function buildSite(options = {}) {
   await writeJsonTracked(outDir, "home.json", homeValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "trends.json", trendValidation.value, writtenFiles);
   await writeJsonTracked(outDir, "data/official-blogs.json", officialBlogKnowledge, writtenFiles);
-  await syncPublicSignalArtifacts(outDir, publicSignals.files, writtenFiles);
+  if (!publicSignals.skipped) {
+    await syncPublicSignalArtifacts(outDir, publicSignals.files, writtenFiles);
+  }
   await writeFileTracked(outDir, "official-blogs/index.html", renderOfficialBlogsHtml(officialBlogKnowledge, {
     styleHref: `../assets/style.css?v=${encodeURIComponent(indexStyleVersion)}`
   }), writtenFiles);
@@ -577,6 +580,88 @@ export async function buildSite(options = {}) {
     dateIndex,
     writtenFiles: uniqueSorted(writtenFiles)
   };
+}
+
+export async function buildPublicSignals(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const dataInputDir = path.resolve(rootDir, options.dataInputDir || "reports-data");
+  const outDir = path.resolve(rootDir, options.outDir || "docs");
+  const generatedAt = options.generatedAt || defaultGeneratedAt();
+  const writtenFiles = [];
+
+  const publicSignals = await createPublicSignalArtifacts({
+    dataInputDir,
+    generatedAt,
+    requireBaselineManifest: options.requireBaselineManifest
+  });
+  await fs.mkdir(outDir, { recursive: true });
+  await syncPublicSignalArtifacts(outDir, publicSignals.files, writtenFiles);
+
+  return {
+    outDir,
+    publicSignals,
+    writtenFiles: uniqueSorted(writtenFiles)
+  };
+}
+
+export async function validatePublicSignalsOutput(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const outDir = path.resolve(rootDir, options.outDir || "docs");
+  const indexPath = path.join(outDir, "signals", "index.json");
+  let index;
+  try {
+    index = JSON.parse(await fs.readFile(indexPath, "utf8"));
+  } catch (error) {
+    throw new PublisherError("public_signal_index_invalid", `Unable to read public signal index: ${indexPath}`, {
+      cause: error.message
+    });
+  }
+  const pages = [];
+  for (const group of Array.isArray(index.groups) ? index.groups : []) {
+    for (let pageNumber = 1; pageNumber <= Number(group.page_count || 0); pageNumber += 1) {
+      const relativePath = publicSignalPagePath(group.id, pageNumber);
+      try {
+        pages.push({
+          path: relativePath,
+          data: JSON.parse(await fs.readFile(path.join(outDir, ...relativePath.split("/")), "utf8"))
+        });
+      } catch (error) {
+        throw new PublisherError("public_signal_page_invalid", `Unable to read public signal page: ${relativePath}`, {
+          cause: error.message
+        });
+      }
+    }
+  }
+  const artifacts = {
+    index,
+    pages,
+    occurrences: pages.flatMap((entry) => entry.data.items || []).sort(compareOccurrenceChronology),
+    files: [{ path: "signals/index.json", data: index }, ...pages]
+  };
+  const validation = validatePublicSignalArtifactSet(artifacts);
+  if (!validation.valid) {
+    throw new PublisherError("public_signal_artifact_set_invalid", "Public signal output failed cross-file validation.", {
+      errors: validation.errors
+    });
+  }
+  return {
+    ok: true,
+    index_path: indexPath,
+    total_count: index.total_count,
+    page_count: pages.length,
+    coverage: index.coverage,
+    artifacts
+  };
+}
+
+async function createPublicSignalArtifacts(options = {}) {
+  const occurrenceStores = await loadOccurrenceStores(options.dataInputDir, {
+    requireBaselineManifest: options.requireBaselineManifest
+  });
+  return buildPublicSignalArtifacts({
+    occurrenceStores,
+    generatedAt: options.generatedAt
+  });
 }
 
 function contentHash(value) {
@@ -643,7 +728,6 @@ export async function planGeneratedFiles(options = {}) {
   ];
   files.push(...WEB_APP_GENERATED_FILES.filter((file) => file !== "index.html"));
   const reports = [];
-  const signalReports = [];
 
   for (const file of markdownFiles) {
     const markdown = await fs.readFile(file, "utf8");
@@ -652,11 +736,10 @@ export async function planGeneratedFiles(options = {}) {
     files.push(paths.markdownPath, paths.dataPath, paths.htmlPath);
     files.push(...reportManagedAssetPaths(report));
     reports.push(report);
-    signalReports.push(report);
   }
 
   for (const file of reportJsonFiles) {
-    const { report, persistedReport } = await readReportJsonRecord(file);
+    const { report } = await readReportJsonRecord(file);
     const paths = reportRelativePaths(report.report_date);
     files.push(paths.dataPath, paths.htmlPath);
     files.push(...reportManagedAssetPaths(report));
@@ -667,16 +750,12 @@ export async function planGeneratedFiles(options = {}) {
       files.push(report.markdown_path);
     }
     reports.push(report);
-    signalReports.push(persistedReport);
   }
 
-  const occurrenceStoreRecords = await loadOccurrenceStores(dataInputDir);
-  const legacyCandidatePoolRecords = await loadLegacyCandidatePools(dataInputDir);
-  const publicSignals = buildPublicSignalArtifacts({
-    occurrenceStores: occurrenceStoreRecords,
-    legacyCandidatePools: legacyCandidatePoolRecords,
-    reports: signalReports,
-    generatedAt
+  const publicSignals = await createPublicSignalArtifacts({
+    dataInputDir,
+    generatedAt,
+    requireBaselineManifest: options.requireBaselineManifest
   });
   files.push(...publicSignals.files.map((entry) => entry.path));
   files.push(...await collectManagedSignalFiles(outDir));

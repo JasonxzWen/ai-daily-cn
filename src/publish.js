@@ -1,17 +1,20 @@
 import { execFile, spawn } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
-import { promisify } from "node:util";
+import { isDeepStrictEqual, promisify } from "node:util";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
 import { classifyPublishQuality, requirePublishableQuality } from "./quality-status.js";
-import { planGeneratedFiles, reportManagedAssetPaths } from "./site.js";
+import { planGeneratedFiles, reportManagedAssetPaths, validatePublicSignalsOutput } from "./site.js";
 import { buildAutomationRevision } from "./automation-revision.js";
+import { buildPublicSignalArtifacts, loadOccurrenceStores } from "./public-signals.js";
+import { validateOccurrenceStore } from "./schema.js";
 import { mergeCommandEnv, pnpmCommandText, pnpmInvocationForArgs } from "./process-runner.js";
 import {
   candidatePoolRelativePaths,
+  occurrenceStoreRelativePath,
   sourceStatusHistoryRelativePaths,
   toRepoPath
 } from "./reports-data-layout.js";
@@ -309,6 +312,9 @@ export async function prepareCleanPublishWorktree(options = {}) {
 }
 
 export async function createPublishPlan(options = {}) {
+  if (normalizePublishScope(options.scope) === "signals") {
+    return createSignalPublishPlan(options);
+  }
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
   const allowedBranch = options.allowedBranch || DEFAULT_SITE.publishBranch;
   const git = options.git || createGitAdapter(repoRoot);
@@ -387,6 +393,7 @@ export async function createPublishPlan(options = {}) {
   const stageFiles = uniqueSorted([
     ...repoFiles,
     ...dirtyGeneratedFiles,
+    ...statusEntries.map((entry) => entry.path).filter((file) => file.startsWith("docs/signals/")),
     ...dirtyDateScopedEvidenceFiles,
     ...(await plannedReportsDataFiles(repoRoot, dates)),
     ...(await plannedRetrospectiveFiles(repoRoot, dates)),
@@ -419,6 +426,51 @@ export async function createPublishPlan(options = {}) {
   };
 }
 
+export async function createSignalPublishPlan(options = {}) {
+  const reportDate = requireDailyReportDate(options.reportDate);
+  const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const allowedBranch = options.allowedBranch || DEFAULT_SITE.publishBranch;
+  const git = options.git || createGitAdapter(repoRoot);
+  const branch = await git.branch();
+  if (branch !== allowedBranch) {
+    throw new PublisherError("wrong_branch", `当前分支是 ${branch || "(detached)"}，允许发布分支是 ${allowedBranch}。`, {
+      branch,
+      allowedBranch
+    });
+  }
+
+  await refreshRemoteTracking(repoRoot, git, allowedBranch);
+  const remote = await git.remoteStatus();
+  if (remote.remoteAhead > 0) {
+    throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续发布。`, remote);
+  }
+
+  await requireSignalArtifacts(repoRoot, reportDate, options);
+  const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
+  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path, "signals", reportDate));
+  if (unrelated.length > 0) {
+    throw new PublisherError("dirty_worktree", "工作树存在 signal scope 之外的未提交改动，信号发布预演已停止。", {
+      status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
+    });
+  }
+  const stageFiles = dirtyPublisherFilesForPublish(statusEntries, reportDate, "signals");
+  assertDirtyPublisherFilesCovered(statusEntries, stageFiles, "signals", reportDate);
+  return {
+    mode: "signals-dry-run",
+    scope: "signals",
+    repo_root: repoRoot,
+    branch,
+    allowed_branch: allowedBranch,
+    remote,
+    will_write_files: stageFiles.filter((file) => file.startsWith("docs/signals/")),
+    will_stage_files: stageFiles,
+    current_dirty_files: statusEntries.map((entry) => entry.path).sort(),
+    commit_message: `chore: publish AI signal stream ${reportDate}`,
+    expected_pages_url: options.siteUrl || DEFAULT_SITE.siteUrl,
+    reports: []
+  };
+}
+
 export async function createDailyPublishPlan(options = {}) {
   const reportDate = requireDailyReportDate(options.reportDate);
   const plan = await createPublishPlan({
@@ -440,6 +492,7 @@ export async function publishGeneratedArtifacts(options = {}) {
   }
 
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const scope = normalizePublishScope(options.scope);
   const branch = options.allowedBranch || DEFAULT_SITE.publishBranch;
   const git = options.git || createGitAdapter(repoRoot);
   const currentBranch = await git.branch();
@@ -457,8 +510,8 @@ export async function publishGeneratedArtifacts(options = {}) {
   }
 
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
-  const publishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate);
-  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
+  const publishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate, scope);
+  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path, scope, options.reportDate));
 
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，已停止发布。", {
@@ -466,32 +519,36 @@ export async function publishGeneratedArtifacts(options = {}) {
     });
   }
 
-  assertDirtyPublisherFilesCovered(statusEntries, publishFiles);
+  assertDirtyPublisherFilesCovered(statusEntries, publishFiles, scope, options.reportDate);
 
   if (publishFiles.length === 0) {
-    return {
+    return publishResultEnvelope({
       mode: "publish",
-      publish_mode: "git",
+      scope,
+      publishMode: "git",
       branch,
+      reportDate: options.reportDate,
       remote,
-      repo_updated: false,
-      committed: false,
-      pushed: false,
       message: "没有发布产物变更需要提交。"
-    };
+    });
   }
 
-  await requirePublishableReportDate(repoRoot, options.reportDate, {
-    currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
-  });
+  if (scope === "signals") {
+    await requireSignalArtifacts(repoRoot, requireDailyReportDate(options.reportDate), options);
+  } else {
+    await requirePublishableReportDate(repoRoot, options.reportDate, {
+      currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
+    });
+  }
 
   if (typeof git.gitDir === "function") {
     await assertGitDirectoryWritable(repoRoot, git, options.gitWritableCheck);
   }
   await checkPushTransport(repoRoot, git, branch);
 
-  const commitMessage =
-    options.commitMessage || `chore: publish AI daily report${options.reportDate ? ` ${options.reportDate}` : ""}`;
+  const commitMessage = options.commitMessage || (scope === "signals"
+    ? `chore: publish AI signal stream ${options.reportDate}`
+    : `chore: publish AI daily report${options.reportDate ? ` ${options.reportDate}` : ""}`);
   await git.add(publishFiles);
   const commitOutput = await git.commit(commitMessage);
   const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
@@ -521,11 +578,14 @@ export async function publishGeneratedArtifacts(options = {}) {
         })
       : { ok: false, error: "" };
 
-  return {
+  return publishResultEnvelope({
     mode: "publish",
-    publish_mode: "git",
+    scope,
+    publishMode: "git",
     branch,
+    reportDate: options.reportDate,
     remote,
+    repo_updated: true,
     committed: true,
     pushed: true,
     staged_files: publishFiles.sort(),
@@ -535,7 +595,7 @@ export async function publishGeneratedArtifacts(options = {}) {
     pages_url: pagesUrl,
     pages_verified: Boolean(verification.ok),
     verification_error: verification.error ? `pages_verification_failed: ${verification.error}` : ""
-  };
+  });
 }
 
 export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
@@ -547,41 +607,46 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   }
 
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const scope = normalizePublishScope(options.scope);
   const branch = options.allowedBranch || DEFAULT_SITE.publishBranch;
   const git = options.git || createGitAdapter(repoRoot);
   const sourceBranch = await git.branch();
 
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
-  const hasPublisherDirtyFiles = statusEntries.some((entry) => isPublisherOwnedPath(entry.path));
-  const dirtyPublishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate);
-  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
+  const hasPublisherDirtyFiles = statusEntries.some((entry) => isPublisherOwnedPath(entry.path, scope, options.reportDate));
+  const dirtyPublishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate, scope);
+  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path, scope, options.reportDate));
 
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，GitHub API 发布已停止。", {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
     });
   }
-  await requirePublishableReportDate(repoRoot, options.reportDate, {
-    currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
-  });
-  assertDirtyPublisherFilesCovered(statusEntries, dirtyPublishFiles);
+  if (scope === "signals") {
+    await requireSignalArtifacts(repoRoot, requireDailyReportDate(options.reportDate), options);
+  } else {
+    await requirePublishableReportDate(repoRoot, options.reportDate, {
+      currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
+    });
+  }
+  assertDirtyPublisherFilesCovered(statusEntries, dirtyPublishFiles, scope, options.reportDate);
 
   const publishFiles = uniqueSorted(
     hasPublisherDirtyFiles
       ? dirtyPublishFiles
-      : await plannedPublisherFiles(repoRoot, options)
+      : await plannedPublisherFiles(repoRoot, { ...options, scope })
   );
 
   if (publishFiles.length === 0) {
-    return {
+    return publishResultEnvelope({
       mode: "publish-github-api",
-      publish_mode: "github-api-fallback",
+      scope,
+      publishMode: "github-api-fallback",
       branch,
+      reportDate: options.reportDate,
       source_branch: sourceBranch,
-      committed: false,
-      pushed: false,
       message: "没有发布产物变更需要提交。"
-    };
+    });
   }
 
   const token = await resolveGitHubToken(options, repoRoot, git);
@@ -630,25 +695,34 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
       .filter((entry) => entry.type === "blob")
       .map((entry) => [entry.path, entry.sha])
   );
-  const treeEntries = await createChangedTreeEntries(repoRoot, publishFiles, remoteBlobShas);
+  const remoteSignalFiles = [...remoteBlobShas.keys()].filter((file) => file.startsWith("docs/signals/") && file.endsWith(".json"));
+  const effectivePublishFiles = uniqueSorted([
+    ...publishFiles,
+    ...remoteSignalFiles,
+    ...(scope === "signals"
+      ? [...remoteBlobShas.keys()].filter((file) => isPublisherOwnedPath(file, "signals", options.reportDate))
+      : [])
+  ]);
+  const treeEntries = await createChangedTreeEntries(repoRoot, effectivePublishFiles, remoteBlobShas);
 
   if (treeEntries.length === 0) {
-    return {
+    return publishResultEnvelope({
       mode: "publish-github-api",
-      publish_mode: "github-api-fallback",
+      scope,
+      publishMode: "github-api-fallback",
       branch,
+      reportDate: options.reportDate,
       source_branch: sourceBranch,
       repository,
       base_commit_sha: baseCommitSha,
-      committed: false,
-      pushed: false,
       published_files: [],
       message: "远端已经包含相同发布产物，没有需要提交的变更。"
-    };
+    });
   }
 
-  const commitMessage =
-    options.commitMessage || `chore: publish AI daily report${options.reportDate ? ` ${options.reportDate}` : ""}`;
+  const commitMessage = options.commitMessage || (scope === "signals"
+    ? `chore: publish AI signal stream ${options.reportDate}`
+    : `chore: publish AI daily report${options.reportDate ? ` ${options.reportDate}` : ""}`);
   const newTree = await client.request("POST", "/git/trees", {
     base_tree: baseTreeSha,
     tree: treeEntries
@@ -674,14 +748,17 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
         })
       : { ok: false, error: "" };
 
-  return {
+  return publishResultEnvelope({
     mode: "publish-github-api",
-    publish_mode: "github-api-fallback",
+    scope,
+    publishMode: "github-api-fallback",
     branch,
+    reportDate: options.reportDate,
     source_branch: sourceBranch,
     repository,
     base_commit_sha: baseCommitSha,
     commit_sha: newCommit.sha,
+    repo_updated: true,
     committed: true,
     pushed: true,
     published_files: treeEntries.map((entry) => entry.path).sort(),
@@ -689,7 +766,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
     pages_url: pagesUrl,
     pages_verified: Boolean(verification.ok),
     verification_error: verification.error ? `pages_verification_failed: ${verification.error}` : ""
-  };
+  });
 }
 
 export async function resumePublishPush(options = {}) {
@@ -701,6 +778,7 @@ export async function resumePublishPush(options = {}) {
   }
 
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
+  const scope = normalizePublishScope(options.scope);
   const branch = options.allowedBranch || DEFAULT_SITE.publishBranch;
   const git = options.git || createGitAdapter(repoRoot);
   const currentBranch = await git.branch();
@@ -712,9 +790,12 @@ export async function resumePublishPush(options = {}) {
   }
 
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
-  if (statusEntries.length > 0) {
+  const blockingStatusEntries = scope === "signals"
+    ? statusEntries.filter((entry) => isPublisherOwnedPath(entry.path, "signals", options.reportDate))
+    : statusEntries;
+  if (blockingStatusEntries.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树仍有未提交改动，不能直接续推已有发布提交。", {
-      status: statusEntries.map((entry) => `${entry.code} ${entry.path}`)
+      status: blockingStatusEntries.map((entry) => `${entry.code} ${entry.path}`)
     });
   }
 
@@ -723,19 +804,24 @@ export async function resumePublishPush(options = {}) {
   if (remote.remoteAhead > 0) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续推送。`, remote);
   }
-  await requirePublishableReportDate(repoRoot, options.reportDate, {
-    currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
-  });
+  if (scope === "signals") {
+    await requireSignalArtifacts(repoRoot, requireDailyReportDate(options.reportDate), options);
+  } else {
+    await requirePublishableReportDate(repoRoot, options.reportDate, {
+      currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
+    });
+  }
   if (remote.localAhead <= 0) {
-    return {
+    return publishResultEnvelope({
       mode: "publish-resume-push",
+      scope,
+      publishMode: "git-resume",
       branch,
+      reportDate: options.reportDate,
       remote,
-      committed: false,
-      pushed: false,
       pushed_existing_commits: false,
       message: "本地没有领先远端的提交需要继续推送。"
-    };
+    });
   }
 
   await checkPushTransport(repoRoot, git, branch);
@@ -751,9 +837,12 @@ export async function resumePublishPush(options = {}) {
         })
       : { ok: false, error: "" };
 
-  return {
+  return publishResultEnvelope({
     mode: "publish-resume-push",
+    scope,
+    publishMode: "git-resume",
     branch,
+    reportDate: options.reportDate,
     remote,
     repo_updated: true,
     committed: false,
@@ -763,7 +852,7 @@ export async function resumePublishPush(options = {}) {
     pages_url: pagesUrl,
     pages_verified: Boolean(verification.ok),
     verification_error: verification.error ? `pages_verification_failed: ${verification.error}` : ""
-  };
+  });
 }
 
 export async function verifyPublishedUrl(url, options = {}) {
@@ -898,6 +987,9 @@ function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
   if (paths.markdownPath) {
     keep.add(`${outPrefix}/${paths.markdownPath}`);
   }
+  for (const file of files) {
+    if (file.startsWith(`${outPrefix}/signals/`)) keep.add(file);
+  }
   const report = reports.find((item) => item.report_date === reportDate);
   for (const evidencePath of reportEvidenceAssetPaths(report)) {
     keep.add(`${outPrefix}/${evidencePath}`);
@@ -907,6 +999,9 @@ function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
 }
 
 async function plannedPublisherFiles(repoRoot, options = {}) {
+  if (normalizePublishScope(options.scope) === "signals") {
+    return plannedSignalPublisherFiles(repoRoot, requireDailyReportDate(options.reportDate));
+  }
   const generated = await planGeneratedFiles({
     rootDir: repoRoot,
     inputDir: options.inputDir || "reports-source",
@@ -937,6 +1032,110 @@ async function plannedPublisherFiles(repoRoot, options = {}) {
     }
   }
   return existing;
+}
+
+async function plannedSignalPublisherFiles(repoRoot, reportDate) {
+  const files = [];
+  const signalsRoot = path.join(repoRoot, "docs", "signals");
+  async function visit(currentDir) {
+    let entries = [];
+    try {
+      entries = await fs.readdir(currentDir, { withFileTypes: true });
+    } catch (error) {
+      if (error.code === "ENOENT") return;
+      throw error;
+    }
+    for (const entry of entries) {
+      const target = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        await visit(target);
+      } else if (entry.isFile() && entry.name.endsWith(".json")) {
+        files.push(path.relative(repoRoot, target).replaceAll("\\", "/"));
+      }
+    }
+  }
+  await visit(signalsRoot);
+  const occurrencePath = toRepoPath("reports-data", occurrenceStoreRelativePath(reportDate));
+  if (await exists(path.join(repoRoot, ...occurrencePath.split("/")))) files.push(occurrencePath);
+  return uniqueSorted(files);
+}
+
+async function requireSignalArtifacts(repoRoot, reportDate, options = {}) {
+  assertDefaultSignalArtifactRoots(options);
+  const occurrenceStores = await loadOccurrenceStores(path.join(repoRoot, "reports-data"), {
+    requireBaselineManifest: true
+  });
+  const occurrencePath = toRepoPath("reports-data", occurrenceStoreRelativePath(reportDate));
+  const absoluteOccurrencePath = path.join(repoRoot, ...occurrencePath.split("/"));
+  let occurrence;
+  try {
+    occurrence = JSON.parse(await fs.readFile(absoluteOccurrencePath, "utf8"));
+  } catch (error) {
+    throw new PublisherError("signal_occurrence_store_missing", `Signal publication requires ${occurrencePath}.`, {
+      cause: error.message
+    });
+  }
+  const occurrenceValidation = validateOccurrenceStore(occurrence);
+  if (!occurrenceValidation.valid || occurrenceValidation.value.report_date !== reportDate) {
+    throw new PublisherError("signal_occurrence_store_invalid", `Signal occurrence store does not match ${reportDate}.`, {
+      path: occurrencePath,
+      errors: occurrenceValidation.errors
+    });
+  }
+  const validation = await validatePublicSignalsOutput({
+    rootDir: repoRoot,
+    outDir: "docs"
+  });
+  const expectedArtifacts = buildPublicSignalArtifacts({ occurrenceStores });
+  const expectedOccurrences = expectedArtifacts.occurrences;
+  const publishedById = new Map(validation.artifacts.occurrences.map((item) => [item.id, item]));
+  const expectedById = new Map(expectedOccurrences.map((item) => [item.id, item]));
+  const missingIds = [];
+  const extraIds = [];
+  const mismatchedIds = [];
+  for (const item of expectedOccurrences) {
+    const published = publishedById.get(item.id);
+    if (!published) {
+      missingIds.push(item.id);
+    } else if (!isDeepStrictEqual(published, item)) {
+      mismatchedIds.push(item.id);
+    }
+  }
+  for (const item of validation.artifacts.occurrences) {
+    if (!expectedById.has(item.id)) extraIds.push(item.id);
+  }
+  const artifactSetMismatch = !isDeepStrictEqual(validation.artifacts.index, expectedArtifacts.index) ||
+    !isDeepStrictEqual(validation.artifacts.pages, expectedArtifacts.pages);
+  if (missingIds.length > 0 || extraIds.length > 0 || mismatchedIds.length > 0 || artifactSetMismatch) {
+    throw new PublisherError(
+      "signal_occurrence_lineage_mismatch",
+      "Public signal pages are not the exact projection of every immutable baseline and dated occurrence store.",
+      {
+        occurrence_path: occurrencePath,
+        expected_count: expectedOccurrences.length,
+        published_count: validation.artifacts.occurrences.length,
+        missing_ids: missingIds,
+        extra_ids: extraIds,
+        mismatched_ids: mismatchedIds,
+        artifact_set_mismatch: artifactSetMismatch
+      }
+    );
+  }
+  return { occurrencePath, occurrence: occurrenceValidation.value, validation };
+}
+
+function assertDefaultSignalArtifactRoots(options) {
+  for (const [field, expected] of [["dataInputDir", "reports-data"], ["outDir", "docs"]]) {
+    if (options[field] === undefined) continue;
+    const actual = path.normalize(String(options[field])).replaceAll("\\", "/").replace(/^\.\//, "").replace(/\/$/, "");
+    if (actual !== expected) {
+      throw new PublisherError(
+        "signal_custom_artifact_root_unsupported",
+        `Signal publication owns fixed ${expected}/ artifacts; custom ${field} is unsupported.`,
+        { field, expected, actual }
+      );
+    }
+  }
 }
 
 function requireDailyReportDate(reportDate) {
@@ -983,6 +1182,7 @@ async function plannedReportsDataFiles(repoRoot, dates) {
     const [year, month] = date.split("-");
     const filesForDate = [
       `reports-data/${year}/${month}/${date}.json`,
+      toRepoPath("reports-data", occurrenceStoreRelativePath(date)),
       ...candidatePoolRelativePaths(date).map((relativePath) => toRepoPath("reports-data", relativePath))
     ];
     for (const file of filesForDate) {
@@ -1201,7 +1401,10 @@ export function parsePorcelain(output) {
     });
 }
 
-function isPublisherOwnedPath(filePath) {
+function isPublisherOwnedPath(filePath, scope = "daily", reportDate = "") {
+  if (normalizePublishScope(scope) === "signals") {
+    return isSignalPublisherOwnedPath(filePath, reportDate);
+  }
   return (
     filePath === "docs/.nojekyll" ||
     filePath === "docs/articles.json" ||
@@ -1211,6 +1414,7 @@ function isPublisherOwnedPath(filePath) {
     filePath === "docs/index.html" ||
     filePath === "docs/ops.html" ||
     filePath === "docs/trends.json" ||
+    filePath.startsWith("docs/signals/") ||
     filePath === "retrospectives/index.json" ||
     isPublishRetrospectiveRecordPath(filePath) ||
     filePath.startsWith("docs/assets/") ||
@@ -1220,14 +1424,41 @@ function isPublisherOwnedPath(filePath) {
   );
 }
 
+function normalizePublishScope(value) {
+  return String(value || "daily").trim().toLowerCase() === "signals" ? "signals" : "daily";
+}
+
+function publishResultEnvelope({ mode, scope, publishMode, branch, reportDate, ...details }) {
+  const pagesUrl = reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, reportDate) : "";
+  return {
+    mode,
+    scope: normalizePublishScope(scope),
+    publish_mode: publishMode,
+    branch,
+    repo_updated: false,
+    committed: false,
+    pushed: false,
+    pages_url: pagesUrl,
+    pages_verified: false,
+    verification_error: "",
+    ...details
+  };
+}
+
+function isSignalPublisherOwnedPath(filePath, reportDate) {
+  if (filePath.startsWith("docs/signals/") && filePath.endsWith(".json")) return true;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(reportDate || ""))) return false;
+  return filePath === toRepoPath("reports-data", occurrenceStoreRelativePath(reportDate));
+}
+
 function isPublishRetrospectiveRecordPath(filePath) {
   return /^retrospectives\/\d{4}\/\d{2}\/\d{4}-\d{2}-\d{2}\.(?:daily_publish|rollup)\.[a-z0-9][a-z0-9-]*\.json$/.test(String(filePath || ""));
 }
 
-function dirtyPublisherFilesForPublish(statusEntries, reportDate) {
+function dirtyPublisherFilesForPublish(statusEntries, reportDate, scope = "daily") {
   const files = statusEntries
     .map((entry) => entry.path)
-    .filter((file) => isPublisherOwnedPath(file));
+    .filter((file) => isPublisherOwnedPath(file, scope, reportDate));
   if (!reportDate) {
     return uniqueSorted(files);
   }
@@ -1248,11 +1479,11 @@ function reportEvidenceAssetPaths(report) {
   return reportManagedAssetPaths(report);
 }
 
-function assertDirtyPublisherFilesCovered(statusEntries, stageFiles) {
+function assertDirtyPublisherFilesCovered(statusEntries, stageFiles, scope = "daily", reportDate = "") {
   const planned = new Set(stageFiles);
   const uncovered = statusEntries
     .map((entry) => entry.path)
-    .filter((file) => isPublisherOwnedPath(file))
+    .filter((file) => isPublisherOwnedPath(file, scope, reportDate))
     .filter((file) => !planned.has(file));
   if (uncovered.length > 0) {
     throw new PublisherError(

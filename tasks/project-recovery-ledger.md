@@ -233,9 +233,9 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 | replaced | content-themagnifier-ai / content-crunchbase-news-ai | corrected current Magnifier and Crunchbase IDs |
 | replaced | generic wechat-wechat2rss-feed and old WeChat platform inputs | 12 curated public Wechat2RSS feeds plus date-scoped input |
 | retired-broken | Adobe AI blog, FastCompany creator economy, Reddit MachineLearning, four community Reddit feeds | repeated 404/403/blocked evidence |
-| retired-editorial | Bens Bites, HelloGitHub, RuanYF Weekly | low threshold or overly broad/noisy output |
-| retired-default | Zhihu, Jike, RSSHub placeholders | explicitly forbidden by source-reset preflight |
-| retired-but-effective | platform-reddit-local-llama-feed | previously productive, but removed for trust/noise/public-surface diet; restore only as an explicit optional/manual product decision |
+| historical-default-removal | Bens Bites, HelloGitHub, RuanYF Weekly | removed from an earlier edited-report default; breadth/noise is now expressed by source/content/credibility tags and is not a categorical listener ban |
+| historical-retirement | Earlier default-only Zhihu/Jike/RSSHub collectors | no longer governed by a categorical source-reset ban; any future public/legal collector enters as a tagged listener source and is judged only by transport/safety validity |
+| deferred-collector | platform-reddit-local-llama-feed | the old authenticated/platform-specific collector remains absent, but a public/legal feed may re-enter as a tagged listener without a trust/noise admission review |
 | investigate-then-decide | content-rctv-generative-video | existed only in snapshot d63ebd8 and never landed on main |
 
 - Acceptance: registry/docs preserve replace/retire/investigate state so later sessions do not blindly restore removed IDs.
@@ -243,21 +243,21 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 ### REC-316 - Decide 24 unexecuted logical-source promotion proposals
 
 - Type: source ranking / planned-only configuration.
-- Fact evidence: none of the 24 proposal IDs in source-order-tuning-review entered the display contract; 78 collection entries remain unmapped. Eleven of the 24 produced candidates on 2026-07-09, but only Google Keyword, Alibaba Cloud, and Leiphone contributed included items.
+- Fact evidence: at that review phase, none of the 24 proposal IDs in source-order-tuning-review had entered the display contract and 78 collection entries were unmapped. Eleven of the 24 produced candidates on 2026-07-09, but only Google Keyword, Alibaba Cloud, and Leiphone contributed included items.
 - Root cause: a review proposal was later read as implementation progress without a production promotion decision.
 - State: locally_verified.
 - Decision: 38 stored daily artifacts support 9 promotions (`azure-ai-blog`, `cloudflare-ai-platform`, `google-keyword-ai`, `baidu-ai`, `alibaba-cloud-ai`, `latent-space`, `nature-machine-learning`, `sspai-ai`, `leiphone-ai`), 12 deferrals, and 3 retired promotion proposals. Retired proposals keep their collection entries.
-- Implementation: 49 logical sources now map through `CORE_SOURCE_CONTRACTS` and the display contract; 69 collection entries remain unmapped. `docs/source-order-tuning-review.md` records every per-source decision and evidence; the validator rejects invalid actions or mapped defer/retire rows. Aify News is the separately user-directed 49th identity and remains in observation under REC-331 rather than being counted as production-proven by this historical promotion review.
+- Implementation: 49 logical sources now map through `CORE_SOURCE_CONTRACTS` and the display contract; after the public-listener expansion, 98 collection entries remain unmapped. Unmapped means internal inventory-only mapping, not exclusion from collection or publication. `docs/source-order-tuning-review.md` records every historical per-source decision and evidence; the validator rejects invalid actions or mapped defer/retire rows. Aify News is the separately user-directed 49th identity and remains in observation under REC-331 rather than being counted as production-proven by this historical promotion review.
 - Evidence: source display validation passes; 8 focused governance/promotion/inventory tests pass.
 - Acceptance: the internal display contract, source_effectiveness, and candidate output agree per logical source; promotion never raises source authority, changes public occurrence membership/order, or bypasses factual verification inside the optional legacy edited report.
 
-### REC-317 - Keep RSSHub/RSS-Bridge optional, not default
+### REC-317 - Accept configured public RSSHub/RSS-Bridge listeners
 
-- Type: replaced/retired default capability.
-- Fact evidence: the current 166-source registry contains no RSSHub/RSS-Bridge defaults; preflight forbids the old placeholders, while external `--sources` fixtures still support private integrations. The Aify News aggregator entry is an explicit product decision governed by REC-331, not a restored generic aggregator default.
-- Root cause: the old integration plan was not updated after source reset.
-- State: replaced.
-- Action: update the old plan to label this a standalone private capability; do not restore placeholders. Later remove compatibility code only if no real user remains.
+- Type: public listener capability.
+- Fact evidence: the current registry supports direct RSS, relay feeds, and environment-resolved RSSHub/RSS-Bridge routes. The former source-reset preflight and its categorical placeholder ban were removed because source shape is already validated by the registry contract.
+- Root cause: the earlier default-only source diet conflated collector configuration with public content admission.
+- State: implementing.
+- Action: keep missing base URLs and access failures as health/access metadata, not membership policy. Any explicitly configured public/legal route is eligible for collection; authenticated or private routes remain deployment choices rather than repository-wide bans.
 
 ### REC-318 - Make all eight search-provider states explicit
 

@@ -8,6 +8,8 @@
     "published_pending_pages_verification",
     "generated_only",
     "generated_degraded",
+    "generated_signals_only",
+    "published_signals_only",
     "needs_ai_repair",
     "unsafe_blocked",
     "infrastructure_blocked_after_fallback_exhausted",
@@ -36,6 +38,7 @@
   "stages": [
     {
       "id": "prepare_clean_worktree",
+      "scope": "shared_preflight",
       "description": "Prepare a clean current-origin/main worktree before the daily run.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["git_fetch_timeout", "transient_filesystem_error"] },
       "fallback": { "kind": "bootstrap_latest_main", "action": "prepare_dedicated_publish_checkout" },
@@ -45,17 +48,8 @@
       "replay_fixtures": ["daily-runner-clean-worktree"]
     },
     {
-      "id": "source_reset_preflight",
-      "description": "Fail fast when the checked-out daily code lacks the public-surface source reset contract.",
-      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
-      "fallback": { "kind": "none", "action": "block_on_stale_or_incomplete_daily_code" },
-      "degrade": { "allowed": false, "action": "none" },
-      "block": { "allowed": true, "reasons": ["publish_plan_violation", "internal_leakage"] },
-      "summary_fields": ["stage_id", "status", "attempts", "checked_files", "error_code"],
-      "replay_fixtures": ["daily-runner-source-reset-preflight"]
-    },
-    {
       "id": "prompt_build",
+      "scope": "shared_preflight",
       "description": "Build the dated generation prompt from committed prompt modules.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "none", "action": "block_on_prompt_contract_error" },
@@ -66,6 +60,7 @@
     },
     {
       "id": "sources_validate",
+      "scope": "shared_preflight",
       "description": "Validate source registry configuration before discovery.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "none", "action": "block_on_invalid_source_config" },
@@ -75,68 +70,141 @@
       "replay_fixtures": ["daily-runner-sources-validate"]
     },
     {
+      "id": "signals_write",
+      "scope": "public_signals",
+      "description": "Persist every safely normalized discovery occurrence before any legacy editorial selection.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_unrecoverable_signal_schema" },
+      "degrade": { "allowed": true, "action": "retain_valid_occurrences_and_count_normalization_errors" },
+      "block": { "allowed": true, "reasons": ["unrecoverable_schema", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "occurrence_store_path", "occurrence_count", "normalization_error_count", "error_code"],
+      "replay_fixtures": ["signal-occurrence-lossless-write"]
+    },
+    {
+      "id": "signals_build",
+      "scope": "public_signals",
+      "description": "Build the source-grouped public signal JSON tree independently of the legacy report.",
+      "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["transient_filesystem_error"] },
+      "fallback": { "kind": "none", "action": "block_on_unrenderable_signal_artifact" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["unrecoverable_rendering", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "total_count", "page_count", "coverage", "error_code"],
+      "replay_fixtures": ["signal-build-atomic-tree"]
+    },
+    {
+      "id": "signals_validate",
+      "scope": "public_signals",
+      "description": "Validate signal counts, chronology, privacy, grouping, and pagination without editorial admission rules.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_on_invalid_signal_contract" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["unrecoverable_schema", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "total_count", "page_count", "coverage", "error_code"],
+      "replay_fixtures": ["signal-cross-file-validation"]
+    },
+    {
+      "id": "signals_publish_dry_run",
+      "scope": "public_signals",
+      "description": "Verify the signal-only publish boundary before any legacy report files are created.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "restart_latest_main", "action": "restart_on_remote_ahead_without_api_fallback" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "remote_ahead", "internal_leakage"] },
+      "summary_fields": ["stage_id", "status", "attempts", "will_stage_files", "remote_ahead", "error_code"],
+      "replay_fixtures": ["signal-publish-plan"]
+    },
+    {
+      "id": "signals_publish_real",
+      "scope": "public_signals",
+      "description": "Commit and push the validated signal scope before starting the optional legacy report.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "github_api_publish", "action": "publish_signal_scope_then_restart_latest_main_for_legacy" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["publish_plan_violation", "remote_ahead", "infrastructure_exhausted"] },
+      "summary_fields": ["stage_id", "status", "attempts", "publish_mode", "commit_sha", "stdout", "stderr", "error_code"],
+      "replay_fixtures": ["signal-git-publish"]
+    },
+    {
+      "id": "signals_publish_github_api_fallback",
+      "scope": "public_signals",
+      "description": "Publish only validated signal artifacts through GitHub API when the git transport fails.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "none", "action": "block_after_signal_publish_fallback_exhausted" },
+      "degrade": { "allowed": false, "action": "none" },
+      "block": { "allowed": true, "reasons": ["infrastructure_exhausted", "publish_plan_violation"] },
+      "summary_fields": ["stage_id", "status", "attempts", "publish_mode", "commit_sha", "stdout", "stderr", "error_code"],
+      "replay_fixtures": ["signal-github-api-publish"]
+    },
+    {
       "id": "discover_github_trending",
+      "scope": "public_signal_input",
       "description": "Collect GitHub Trending candidates from the required weekly language scopes.",
       "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
       "fallback": { "kind": "cached_or_readme_labeled_candidates", "action": "use_recent_cache_or_label_readme_failure" },
       "degrade": { "allowed": true, "action": "publish_with_degraded_github_trending_lane" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
       "summary_fields": ["stage_id", "status", "attempts", "candidate_count", "fallback_used", "degraded_reason"],
       "replay_fixtures": ["github-trending-timeout", "github-trending-readme-fallback"]
     },
     {
       "id": "discover_source_watch",
+      "scope": "public_signal_input",
       "description": "Collect material GitHub repository and watched-site snapshot changes for the separate public Source Watch rail.",
       "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
       "fallback": { "kind": "persistent_candidate_history_only", "action": "omit_new_source_watch_events_and_keep_existing_public_history" },
       "degrade": { "allowed": true, "action": "publish_without_new_source_watch_events" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact", "internal_leakage"] },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content", "internal_leakage"] },
       "summary_fields": ["stage_id", "status", "attempts", "output_path", "artifact_sha256", "watched_target_count", "candidate_count", "fallback_used", "degraded_reason"],
       "replay_fixtures": ["source-watch-partial-target-outage"]
     },
     {
       "id": "discover_huggingface_trending",
+      "scope": "public_signal_input",
       "description": "Collect Hugging Face trending model candidates.",
       "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
       "fallback": { "kind": "cached_candidates", "action": "use_recent_cache_or_empty_degraded_lane" },
       "degrade": { "allowed": true, "action": "publish_with_degraded_huggingface_lane" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
       "summary_fields": ["stage_id", "status", "attempts", "candidate_count", "fallback_used", "degraded_reason"],
       "replay_fixtures": ["huggingface-trending-timeout"]
     },
     {
       "id": "discover_builders",
+      "scope": "public_signal_input",
       "description": "Collect AI builder observations from original posts, feeds, and fallback sources.",
       "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
       "fallback": { "kind": "original_source_backfill", "action": "use_original_status_or_interview_fallbacks" },
       "degrade": { "allowed": true, "action": "publish_with_builder_lane_degraded_note" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
-      "summary_fields": ["stage_id", "status", "attempts", "candidate_count", "eligible_after_filter", "selected_count", "degraded_reason"],
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
+      "summary_fields": ["stage_id", "status", "attempts", "candidate_count", "degraded_reason"],
       "replay_fixtures": ["builders-feed-fetch-failed", "builders-original-source-backfill"]
     },
     {
       "id": "discover_china_ai",
+      "scope": "public_signal_input",
       "description": "Collect China AI source candidates across registered lanes.",
       "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "rate_limit", "network_error"] },
       "fallback": { "kind": "per_source_partial_results", "action": "keep_successful_sources_and_mark_failed_sources" },
       "degrade": { "allowed": true, "action": "publish_with_degraded_china_ai_lane" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
       "summary_fields": ["stage_id", "status", "attempts", "source_count", "failed_source_count", "degraded_reason"],
       "replay_fixtures": ["china-ai-partial-source-outage"]
     },
     {
       "id": "discover_content_sources",
+      "scope": "public_signal_input",
       "description": "Collect fixed official content source candidates.",
       "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "network_error", "feed_parse_error"] },
       "fallback": { "kind": "registered_source_public_backfill", "action": "use_opened_original_pages_or_mark_source_unavailable" },
       "degrade": { "allowed": true, "action": "publish_with_source_outage_disclosure" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
       "summary_fields": ["stage_id", "status", "attempts", "checked_source_count", "blocked_source_count", "degraded_reason"],
       "replay_fixtures": ["content-sources-node-fetch-failed"]
     },
     {
       "id": "official_blog_context",
-      "description": "Build a same-day compact context from already reviewed official-blog knowledge without changing daily admission.",
+      "scope": "legacy_report_only",
+      "description": "Build optional legacy-report context from already reviewed official-blog knowledge after public signals are complete.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "summary_only_degraded_audit", "action": "continue_without_official_blog_context" },
       "degrade": { "allowed": true, "action": "record_context_not_consumed_and_continue" },
@@ -146,27 +214,30 @@
     },
     {
       "id": "discover_statuspage_incidents",
+      "scope": "public_signal_input",
       "description": "Collect AI service statuspage incidents.",
       "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["timeout", "network_error"] },
       "fallback": { "kind": "empty_degraded_lane", "action": "publish_without_incident_items_if_source_unavailable" },
       "degrade": { "allowed": true, "action": "mark_statuspage_lane_degraded" },
-      "block": { "allowed": true, "reasons": ["high_risk_unverified_fact"] },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
       "summary_fields": ["stage_id", "status", "attempts", "incident_count", "degraded_reason"],
       "replay_fixtures": ["statuspage-timeout"]
     },
     {
       "id": "discover_search_news",
+      "scope": "public_signal_input",
       "description": "Collect search/news candidates from configured providers.",
       "retry": { "max_attempts": 3, "backoff_ms": [0, 5000, 15000], "on": ["provider_timeout", "network_error"] },
       "fallback": { "kind": "per_provider_partial_results", "action": "keep_successful_providers_and_label_failed_providers" },
       "degrade": { "allowed": true, "action": "publish_with_degraded_search_lane" },
-      "block": { "allowed": true, "reasons": ["unsafe_public_content", "high_risk_unverified_fact"] },
+      "block": { "allowed": true, "reasons": ["unsafe_public_content"] },
       "summary_fields": ["stage_id", "status", "attempts", "provider_count", "failed_provider_count", "candidate_count"],
       "replay_fixtures": ["search-news-provider-timeout"]
     },
     {
       "id": "sources_health",
-      "description": "Run source health checks and expose outages.",
+      "scope": "diagnostic_after_signals",
+      "description": "Run post-signal source health diagnostics and expose local outages without changing signal membership or publication.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["timeout", "network_error"] },
       "fallback": { "kind": "health_from_discovery_audit", "action": "derive_degraded_health_from_discovery_results" },
       "degrade": { "allowed": true, "action": "publish_with_source_health_degraded_status" },
@@ -176,7 +247,8 @@
     },
     {
       "id": "report_draft",
-      "description": "Generate the structured report draft from discovery inputs.",
+      "scope": "legacy_report_only",
+      "description": "Generate the optional legacy edited-report draft after public signals are complete.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["transient_io", "candidate_pool_read_error"] },
       "fallback": { "kind": "known_discovery_input_degraded_lane", "action": "replace_missing_known_discovery_input_with_public_degraded_source_audit" },
       "degrade": { "allowed": true, "action": "draft_with_explicit_degraded_source_lanes" },
@@ -186,7 +258,8 @@
     },
     {
       "id": "first_pass_authoring",
-      "description": "Author every declared reader-facing story, hot-blog, GitHub, and Builder field before the first formal quality review.",
+      "scope": "legacy_report_only",
+      "description": "Author every declared legacy-report story, hot-blog, GitHub, and Builder field before its first formal quality review.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "deterministic_draft_quality_review", "action": "continue_to_formal_review_and_bounded_exceptional_repair" },
       "degrade": { "allowed": true, "action": "record_first_pass_fallback_and_continue_to_formal_review" },
@@ -196,7 +269,8 @@
     },
     {
       "id": "quality_review",
-      "description": "Review public text quality and request AI repair when scoped editorial fixes are needed.",
+      "scope": "legacy_report_only",
+      "description": "Review optional legacy-report text and request AI repair when scoped editorial fixes are needed.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "codex_ai_repair_contract", "action": "create_ready_gated_public_text_repair_template" },
       "degrade": { "allowed": true, "action": "continue_after_allowed_public_editorial_repairs" },
@@ -206,7 +280,8 @@
     },
     {
       "id": "quality_ai_repair",
-      "description": "Apply ready-gated AI repair contracts to public text fields only.",
+      "scope": "legacy_report_only",
+      "description": "Apply ready-gated AI repair contracts to optional legacy-report text fields only.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "fresh_repair_template", "action": "request_new_contract_only_after_strict_blocking_signal_reduction" },
       "degrade": { "allowed": true, "action": "rollback_stalled_safe_editorial_attempt_and_publish_with_disclosure" },
@@ -216,7 +291,8 @@
     },
     {
       "id": "report_write",
-      "description": "Normalize and write the public report JSON.",
+      "scope": "legacy_report_only",
+      "description": "Normalize and write the optional legacy edited-report JSON.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "schema_aware_normalizer", "action": "drop_or_normalize_only_allowlisted_public_degraded_fields" },
       "degrade": { "allowed": true, "action": "normalize_public_degraded_fields" },
@@ -226,7 +302,8 @@
     },
     {
       "id": "build",
-      "description": "Build static public HTML and data artifacts.",
+      "scope": "legacy_report_only",
+      "description": "Build remaining legacy static HTML and data artifacts without rebuilding public signals.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["transient_filesystem_error"] },
       "fallback": { "kind": "none", "action": "block_on_unrenderable_public_artifact" },
       "degrade": { "allowed": false, "action": "none" },
@@ -236,7 +313,8 @@
     },
     {
       "id": "quality_page_check",
-      "description": "Check rendered public pages for content, layout, media, and theme regressions.",
+      "scope": "legacy_report_only",
+      "description": "Check rendered legacy pages for content, layout, media, and theme regressions.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "none", "action": "block_on_public_page_quality_failure" },
       "degrade": { "allowed": false, "action": "none" },
@@ -246,7 +324,8 @@
     },
     {
       "id": "content_contract",
-      "description": "Run the post-write public content contract before full repository validation.",
+      "scope": "legacy_report_only",
+      "description": "Run the post-write legacy-report content contract before full repository validation.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "ai_repair_contract", "action": "route_repairable_public_copy_failures_to_ai_repair_loop" },
       "degrade": { "allowed": false, "action": "none" },
@@ -256,7 +335,8 @@
     },
     {
       "id": "validate",
-      "description": "Run repository validation before any publish attempt.",
+      "scope": "legacy_report_only",
+      "description": "Validate the remaining legacy-report branch after independent public-signal publication.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "none", "action": "block_on_validation_failure" },
       "degrade": { "allowed": false, "action": "none" },
@@ -266,7 +346,8 @@
     },
     {
       "id": "sources_phase5_audit",
-      "description": "Audit recent source coverage and disclose durable source degradation.",
+      "scope": "legacy_report_only",
+      "description": "Audit optional legacy-report source coverage and disclose durable source degradation.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["transient_io"] },
       "fallback": { "kind": "summary_only_degraded_audit", "action": "write_audit_degraded_note_without_blocking_publish" },
       "degrade": { "allowed": true, "action": "publish_with_sources_phase5_degraded_note" },
@@ -276,7 +357,8 @@
     },
     {
       "id": "publish_dry_run_daily",
-      "description": "Run the scheduled daily dry-run publish gate before real publish.",
+      "scope": "legacy_report_only",
+      "description": "Plan publication of the remaining legacy-report artifacts after public signals are already published.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "restart_latest_main", "action": "rerun_daily_workflow_from_current_origin_main" },
       "degrade": { "allowed": false, "action": "none" },
@@ -286,7 +368,8 @@
     },
     {
       "id": "publish_real",
-      "description": "Publish through the git-based publish path when publish mode is allowed.",
+      "scope": "legacy_report_only",
+      "description": "Publish remaining legacy-report artifacts through the git-based path when publish mode is allowed.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["git_push_timeout", "network_error"] },
       "fallback": { "kind": "github_api_publish", "action": "try_publish_github_api_fallback_for_transport_errors_only" },
       "degrade": { "allowed": false, "action": "none" },
@@ -296,7 +379,8 @@
     },
     {
       "id": "publish_github_api_fallback",
-      "description": "Fallback publish through the GitHub API when git publish fails.",
+      "scope": "legacy_report_only",
+      "description": "Fallback-publish remaining legacy-report artifacts through the GitHub API when git publish fails.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 5000], "on": ["api_timeout", "network_error"] },
       "fallback": { "kind": "none", "action": "write_blocked_publish_correction" },
       "degrade": { "allowed": false, "action": "none" },
@@ -306,7 +390,8 @@
     },
     {
       "id": "pages_verify",
-      "description": "Verify the published GitHub Pages URL after a successful publish or fallback publish.",
+      "scope": "legacy_report_only",
+      "description": "Verify the GitHub Pages URL after the remaining legacy-report publish or fallback publish.",
       "retry": { "max_attempts": 5, "backoff_ms": [0, 10000, 20000, 40000, 60000], "on": ["pages_cache_delay", "network_error"] },
       "fallback": { "kind": "published_pending_pages_verification", "action": "mark_pending_when_publish_succeeded_but_pages_lags" },
       "degrade": { "allowed": true, "action": "publish_pending_pages_verification" },
@@ -316,7 +401,8 @@
     },
     {
       "id": "retrospective_write",
-      "description": "Write a sanitized generated-only retrospective before validation.",
+      "scope": "legacy_report_only",
+      "description": "Write a sanitized generated-only retrospective for the optional legacy-report branch.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "none", "action": "block_on_missing_retrospective_record" },
       "degrade": { "allowed": false, "action": "none" },
@@ -326,7 +412,8 @@
     },
     {
       "id": "retrospective_finalize",
-      "description": "Finalize the retrospective as published immediately before real publish.",
+      "scope": "legacy_report_only",
+      "description": "Finalize the legacy-report retrospective immediately before its real publish.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "none", "action": "block_on_unfinalized_publish_retrospective" },
       "degrade": { "allowed": false, "action": "none" },
@@ -336,6 +423,7 @@
     },
     {
       "id": "retrospective_validate",
+      "scope": "legacy_report_only",
       "description": "Validate retrospective records before real publish.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "none", "action": "block_on_retrospective_validation_failure" },
@@ -346,6 +434,7 @@
     },
     {
       "id": "retrospective_correction_write",
+      "scope": "legacy_report_only",
       "description": "Write a blocked-run correction when publish and fallback both fail.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "none", "action": "block_with_recovery_action_when_correction_cannot_be_written" },
@@ -356,6 +445,7 @@
     },
     {
       "id": "retrospective_correction_validate",
+      "scope": "legacy_report_only",
       "description": "Validate blocked-run correction records.",
       "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
       "fallback": { "kind": "none", "action": "keep_publish_blocked_with_correction_path" },

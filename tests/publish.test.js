@@ -10,6 +10,7 @@ import {
   checkPublishPreflight,
   createDailyPublishPlan,
   createPublishPlan,
+  createSignalPublishPlan,
   isGitHubApiFallbackEligibleError,
   parsePorcelain,
   prepareCleanPublishWorktree,
@@ -19,7 +20,8 @@ import {
   resumePublishPush,
   verifyPublishedUrl
 } from "../src/publish.js";
-import { buildSite } from "../src/site.js";
+import { buildOccurrenceStore, writeOccurrenceStore } from "../src/occurrence-store.js";
+import { buildPublicSignals, buildSite } from "../src/site.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -95,6 +97,201 @@ test("daily dry-run requires an explicit report date and stays date-scoped", asy
   assert(plan.will_stage_files.includes("docs/official-blogs/index.html"));
   assert(plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.json"));
   assert(!plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.candidates.json"));
+});
+
+test("signal dry-run stages only the dated occurrence store and public signal tree", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const occurrencePath = "reports-data/occurrences/2026/05/2026-05-13.json";
+  const plan = await createSignalPublishPlan({
+    repoRoot,
+    reportDate: "2026-05-13",
+    git: fakeGit({
+      status: [` M docs/signals/index.json`, `?? docs/signals/community_discussions/page-001.json`, `?? ${occurrencePath}`].join("\n")
+    })
+  });
+
+  assert.equal(plan.mode, "signals-dry-run");
+  assert.equal(plan.scope, "signals");
+  assert.deepEqual(plan.reports, []);
+  assert(plan.will_stage_files.includes("docs/signals/index.json"));
+  assert(plan.will_stage_files.includes("docs/signals/community_discussions/page-001.json"));
+  assert(plan.will_stage_files.includes(occurrencePath));
+  assert(plan.will_stage_files.every((file) => file.startsWith("docs/signals/") || file === occurrencePath));
+});
+
+test("signal scope rejects legacy publisher changes instead of widening its stage plan", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      git: fakeGit({ status: " M docs/signals/index.json\n M docs/index.html" })
+    }),
+    (error) => error instanceof PublisherError && error.code === "dirty_worktree"
+  );
+});
+
+test("signal scope rejects custom artifact roots instead of validating and staging different trees", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      dataInputDir: "custom-data",
+      git: fakeGit({ status: " M docs/signals/index.json" })
+    }),
+    (error) => error instanceof PublisherError && error.code === "signal_custom_artifact_root_unsupported"
+  );
+});
+
+test("signal scope rejects a valid but stale signal tree that omits the dated occurrence store", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  const reportDate = "2026-05-13";
+  await writeSignalFixture(repoRoot, reportDate);
+  await writeOccurrenceStore({
+    rootDir: repoRoot,
+    outputDir: "reports-data",
+    store: buildOccurrenceStore({
+      reportDate,
+      generatedAt: `${reportDate}T09:00:00.000Z`,
+      sources: [{
+        id: "community-listener",
+        name: "Community listener",
+        url: "https://example.com/feed.xml",
+        category: "community",
+        source_group: "community_discussions",
+        status: "checked"
+      }],
+      candidates: [
+        {
+          id: "signal-item",
+          observation_id: "signal-item-observation",
+          source_id: "community-listener",
+          category: "community_lead",
+          title: "Community signal",
+          url: "https://example.com/signals/one",
+          source: "Community listener",
+          event_date: reportDate,
+          collected_at: `${reportDate}T08:00:00.000Z`,
+          status: "excluded"
+        },
+        {
+          id: "new-unbuilt-signal",
+          observation_id: "new-unbuilt-signal-observation",
+          source_id: "community-listener",
+          category: "community_lead",
+          title: "New signal missing from stale pages",
+          url: "https://example.com/signals/two",
+          source: "Community listener",
+          event_date: reportDate,
+          collected_at: `${reportDate}T09:00:00.000Z`
+        }
+      ]
+    })
+  });
+
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate,
+      git: fakeGit({ status: " M docs/signals/index.json" })
+    }),
+    (error) => error instanceof PublisherError && error.code === "signal_occurrence_lineage_mismatch"
+  );
+});
+
+test("signal scope rejects publication when the immutable history baseline changed after build", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  const reportDate = "2026-05-13";
+  const baselinePath = await writePublishBaselineFixture(repoRoot);
+  await writeSignalFixture(repoRoot, reportDate);
+
+  const baseline = JSON.parse(await fs.readFile(baselinePath, "utf8"));
+  baseline.occurrences[0].summary = "This valid mutation is not authorized by the baseline manifest.";
+  await fs.writeFile(baselinePath, `${JSON.stringify(baseline, null, 2)}\n`, "utf8");
+
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate,
+      git: fakeGit({ status: " M docs/signals/index.json" })
+    }),
+    (error) => error instanceof PublisherError && error.code === "occurrence_baseline_manifest_invalid"
+  );
+});
+
+test("signal scope rejects a self-consistent public tree with occurrences absent from storage", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  const reportDate = "2026-05-13";
+  await writeSignalFixture(repoRoot, reportDate);
+  const extraDate = "2026-05-12";
+  await writeOccurrenceStore({
+    rootDir: repoRoot,
+    outputDir: "reports-data",
+    store: buildOccurrenceStore({
+      reportDate: extraDate,
+      generatedAt: `${extraDate}T08:00:00.000Z`,
+      sources: [{ id: "extra-listener", name: "Extra listener", url: "https://example.com/extra.xml", status: "checked" }],
+      candidates: [{
+        id: "extra-signal",
+        observation_id: "extra-signal-observation",
+        source_id: "extra-listener",
+        category: "community_lead",
+        title: "Extra public signal",
+        url: "https://example.com/signals/extra",
+        source: "Extra listener",
+        event_date: extraDate,
+        collected_at: `${extraDate}T08:00:00.000Z`
+      }]
+    })
+  });
+  await buildPublicSignals({ rootDir: repoRoot, dataInputDir: "reports-data", outDir: "docs" });
+  await fs.rm(path.join(repoRoot, "reports-data", "occurrences", "2026", "05", `${extraDate}.json`));
+
+  await assert.rejects(
+    createSignalPublishPlan({ repoRoot, reportDate, git: fakeGit({ status: " M docs/signals/index.json" }) }),
+    (error) => error instanceof PublisherError && error.code === "signal_occurrence_lineage_mismatch"
+  );
+});
+
+test("signal scope fails closed when the required empty baseline manifest is deleted", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  const reportDate = "2026-05-13";
+  await writeSignalFixture(repoRoot, reportDate);
+  await fs.rm(path.join(repoRoot, "reports-data", "occurrence-baseline-manifest.json"));
+
+  await assert.rejects(
+    createSignalPublishPlan({ repoRoot, reportDate, git: fakeGit({ status: " M docs/signals/index.json" }) }),
+    (error) => error instanceof PublisherError && error.code === "occurrence_baseline_manifest_invalid"
+  );
+});
+
+test("signal publish commits only signal-owned files without report quality admission", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const calls = [];
+  const occurrencePath = "reports-data/occurrences/2026/05/2026-05-13.json";
+  const result = await publishGeneratedArtifacts({
+    repoRoot,
+    reportDate: "2026-05-13",
+    scope: "signals",
+    confirmPush: true,
+    git: fakeGit({
+      calls,
+      status: ` M docs/signals/index.json\n M ${occurrencePath}`
+    })
+  });
+
+  assert.equal(result.scope, "signals");
+  assert.equal(result.repo_updated, true);
+  assert.equal(result.pushed, true);
+  assert.deepEqual(calls.find((call) => call.name === "add").files.sort(), ["docs/signals/index.json", occurrencePath].sort());
+  assert.match(calls.find((call) => call.name === "commit").message, /signal stream/);
 });
 
 test("daily dry-run stages sanitized retrospective records for the selected date", async () => {
@@ -889,6 +1086,23 @@ test("publish 需要显式确认参数", async () => {
   );
 });
 
+test("publish no-op returns the same result envelope as a real publish", async () => {
+  const result = await publishGeneratedArtifacts({
+    confirmPush: true,
+    reportDate: "2026-05-13",
+    git: fakeGit({ status: "" })
+  });
+
+  assert.equal(result.scope, "daily");
+  assert.equal(result.publish_mode, "git");
+  assert.equal(result.repo_updated, false);
+  assert.equal(result.committed, false);
+  assert.equal(result.pushed, false);
+  assert.equal(result.pages_verified, false);
+  assert.equal(result.verification_error, "");
+  assert.equal(result.pages_url, "https://jasonxzwen.github.io/ai-daily-cn/reports/2026/05/2026-05-13.html");
+});
+
 test("github api publish 需要显式确认参数", async () => {
   await assert.rejects(
     publishGeneratedArtifactsViaGitHubApi({ git: fakeGit({ status: " M docs/index.html" }) }),
@@ -917,6 +1131,8 @@ test("github api publish 通过远端 API 提交发布产物且不写本机 git 
 
   assert.equal(result.committed, true);
   assert.equal(result.pushed, true);
+  assert.equal(result.scope, "daily");
+  assert.equal(result.repo_updated, true);
   assert.equal(result.commit_sha, "commit-new");
   assert.deepEqual(result.published_files, ["docs/index.html"]);
   assert.equal(result.pages_verified, true);
@@ -991,6 +1207,10 @@ test("github api publish 跳过远端已一致的发布产物", async () => {
 
   assert.equal(result.committed, false);
   assert.equal(result.pushed, false);
+  assert.equal(result.scope, "daily");
+  assert.equal(result.repo_updated, false);
+  assert.equal(result.pages_verified, false);
+  assert.equal(result.verification_error, "");
   assert.equal(result.message, "远端已经包含相同发布产物，没有需要提交的变更。");
   assert.equal(calls.some((call) => call.method === "POST"), false);
 });
@@ -1438,6 +1658,115 @@ async function tempRepoWithFixture() {
     path.join(inputDir, "official-release.md")
   );
   return tmp;
+}
+
+async function writeSignalFixture(repoRoot, reportDate) {
+  await ensurePublishBaselineManifest(repoRoot);
+  const generatedAt = `${reportDate}T08:00:00.000Z`;
+  const sources = [{
+    id: "community-listener",
+    name: "Community listener",
+    url: "https://example.com/feed.xml",
+    category: "community",
+    source_group: "community_discussions",
+    status: "checked"
+  }];
+  const candidates = [{
+    id: "signal-item",
+    observation_id: "signal-item-observation",
+    source_id: "community-listener",
+    category: "community_lead",
+    title: "Community signal",
+    url: "https://example.com/signals/one",
+    source: "Community listener",
+    event_date: reportDate,
+    collected_at: generatedAt,
+    status: "excluded"
+  }];
+  await writeOccurrenceStore({
+    rootDir: repoRoot,
+    outputDir: "reports-data",
+    store: buildOccurrenceStore({ reportDate, generatedAt, sources, candidates })
+  });
+  await buildPublicSignals({
+    rootDir: repoRoot,
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt
+  });
+}
+
+async function ensurePublishBaselineManifest(repoRoot) {
+  const manifestPath = path.join(repoRoot, "reports-data", "occurrence-baseline-manifest.json");
+  try {
+    await fs.access(manifestPath);
+    return;
+  } catch {
+    // A fixture with no historical baseline still declares the required immutable empty set.
+  }
+  await fs.writeFile(
+    manifestPath,
+    `${JSON.stringify({
+      schema_version: 1,
+      kind: "public_signal_occurrence_baseline",
+      source: { occurrence_count: 0 },
+      migration: { production_reads_legacy_artifacts: false },
+      files: []
+    }, null, 2)}\n`,
+    "utf8"
+  );
+}
+
+async function writePublishBaselineFixture(repoRoot) {
+  const reportDate = "2026-04-01";
+  const generatedAt = `${reportDate}T08:00:00.000Z`;
+  const store = buildOccurrenceStore({
+    reportDate,
+    generatedAt,
+    sources: [{
+      id: "baseline-listener",
+      name: "Baseline listener",
+      url: "https://example.com/baseline.xml",
+      category: "community",
+      source_group: "community_discussions",
+      status: "checked"
+    }],
+    candidates: [{
+      id: "baseline-item",
+      observation_id: "baseline-item-observation",
+      source_id: "baseline-listener",
+      category: "community_lead",
+      title: "Historical community signal",
+      url: "https://example.com/signals/historical",
+      source: "Baseline listener",
+      event_date: reportDate,
+      collected_at: generatedAt,
+      status: "excluded"
+    }]
+  });
+  const baselinePath = path.join(repoRoot, "reports-data", "occurrences", "baseline-v1", "2026-04.json");
+  await fs.mkdir(path.dirname(baselinePath), { recursive: true });
+  const bytes = Buffer.from(`${JSON.stringify(store, null, 2)}\n`);
+  await fs.writeFile(baselinePath, bytes);
+  const relativePath = path.relative(repoRoot, baselinePath).replaceAll("\\", "/");
+  await fs.writeFile(
+    path.join(repoRoot, "reports-data", "occurrence-baseline-manifest.json"),
+    `${JSON.stringify({
+      schema_version: 1,
+      kind: "public_signal_occurrence_baseline",
+      source: { occurrence_count: store.occurrence_count },
+      migration: { production_reads_legacy_artifacts: false },
+      files: [{
+        path: relativePath,
+        report_date: store.report_date,
+        occurrence_count: store.occurrence_count,
+        sha256: crypto.createHash("sha256").update(bytes).digest("hex"),
+        compressed_bytes: bytes.length
+      }]
+    }, null, 2)}\n`,
+    "utf8"
+  );
+  return baselinePath;
 }
 
 async function writeRetrospectiveFixture(repoRoot, reportDate, options = {}) {

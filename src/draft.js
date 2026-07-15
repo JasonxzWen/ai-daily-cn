@@ -43,6 +43,8 @@ import {
 } from "./main-audit-contract.js";
 import { normalizeCandidatePool } from "./candidates.js";
 import { buildOccurrenceStore, writeOccurrenceStore } from "./occurrence-store.js";
+import { occurrenceStoreRelativePath } from "./reports-data-layout.js";
+import { validateOccurrenceStore } from "./schema.js";
 import { isValidDateTimeString } from "./time.js";
 import {
   applyDirectPrimaryTargetVerification,
@@ -144,14 +146,18 @@ const REPORT_AUDIT_GROUP_FIELDS = new Set([
   "candidates_found",
   "included",
   "sources_checked",
-  "enablement_counts",
-  "tier_counts",
   "source_kind_counts",
+  "source_group_counts",
+  "credibility_tag_counts",
   "shadow",
   "blocked_reason",
   "last_successful_feed_at",
   "provider_runtime_ms",
   "provider_cost_units",
+  "provider_transport_status",
+  "provider_transport_limitations",
+  "provider_pages_fetched",
+  "transport_budget",
   "notes"
 ]);
 const AIGC_RE = /\bAIGC\b|generative\s+(?:ai|video|image|media|game|art|audio)|(?:ai|image|video|music|audio|speech|game|3d)\s+generation|AI\s+(?:video|image|music|game|short|film|asset|avatar|media|creator)|text-to-(?:image|video|speech|3d)|creator\s+tool|content\s+generation|game\s+(?:asset|world|level|character)\s+generation|runway|pika|sora|veo|luma|kling|hailuo|midjourney|stable diffusion|图像生成|图片生成|视频生成|影像生成|音乐生成|音频生成|语音生成|配音|短剧|漫剧|游戏资产|游戏生成|动画生成|三维生成|数字人|创作者工具|内容产业|文生图|文生视频|生图|生视频/i;
@@ -286,11 +292,10 @@ export async function generateReportDraft(options = {}) {
     sources: merged.sources,
     candidates: merged.occurrenceCandidates
   });
-  const occurrenceStorePath = await writeOccurrenceStore({
-    rootDir,
-    outputDir: options.occurrenceOutputDir || "reports-data",
-    store: occurrenceStore
-  });
+  const occurrenceOutputDir = options.occurrenceOutputDir || "reports-data";
+  const occurrenceStorePath = options.requireOccurrenceStore === true
+    ? await requireMatchingOccurrenceStore({ rootDir, outputDir: occurrenceOutputDir, store: occurrenceStore })
+    : "";
   const recentMainUrlHistory = await loadRecentMainUrlHistory(rootDir, reportDate);
   const reportsDataDir = options.sourceStatusOutputDir || "reports-data";
   const sourceWatchHistory = await loadSourceWatchSnapshotHistory(rootDir, reportsDataDir, reportDate, merged.candidates);
@@ -378,6 +383,56 @@ export async function generateReportDraft(options = {}) {
   };
 }
 
+async function requireMatchingOccurrenceStore({ rootDir, outputDir, store }) {
+  const target = path.resolve(rootDir, outputDir, ...occurrenceStoreRelativePath(store.report_date).split("/"));
+  let existing;
+  try {
+    existing = JSON.parse(await fs.readFile(target, "utf8"));
+  } catch (error) {
+    throw new PublisherError("occurrence_store_missing", "report:draft requires the occurrence store written by signals:write, but it is missing or unreadable.", {
+      path: target,
+      cause: error.message
+    });
+  }
+  const existingValidation = validateOccurrenceStore(existing);
+  const expectedValidation = validateOccurrenceStore(store);
+  const existingIds = new Set(existingValidation.valid
+    ? existingValidation.value.occurrences.map((item) => item.id)
+    : []);
+  const missingOccurrenceIds = expectedValidation.valid
+    ? expectedValidation.value.occurrences.map((item) => item.id).filter((id) => !existingIds.has(id))
+    : [];
+  const existingErrorCounts = countNormalizationErrors(existingValidation.valid
+    ? existingValidation.value.normalization_errors
+    : []);
+  const expectedErrorCounts = countNormalizationErrors(expectedValidation.valid
+    ? expectedValidation.value.normalization_errors
+    : []);
+  const missingNormalizationErrorCodes = [...expectedErrorCounts.entries()]
+    .filter(([code, count]) => (existingErrorCounts.get(code) || 0) < count)
+    .map(([code]) => code);
+  if (!existingValidation.valid || !expectedValidation.valid ||
+      existingValidation.value.report_date !== expectedValidation.value.report_date ||
+      missingOccurrenceIds.length > 0 || missingNormalizationErrorCodes.length > 0) {
+    throw new PublisherError("occurrence_store_mismatch", "report:draft discovery inputs do not match the occurrence store written by signals:write.", {
+      path: target,
+      existing_occurrence_count: existing?.occurrence_count,
+      expected_occurrence_count: store.occurrence_count,
+      missing_occurrence_ids: missingOccurrenceIds,
+      missing_normalization_error_codes: missingNormalizationErrorCodes
+    });
+  }
+  return target;
+}
+
+function countNormalizationErrors(errors) {
+  const counts = new Map();
+  for (const error of errors) {
+    counts.set(error.code, (counts.get(error.code) || 0) + 1);
+  }
+  return counts;
+}
+
 export async function writeDiscoveryOccurrenceStore(options = {}) {
   const rootDir = options.rootDir || process.cwd();
   const reportDate = requireReportDate(options.reportDate);
@@ -398,9 +453,18 @@ export async function writeDiscoveryOccurrenceStore(options = {}) {
   const occurrenceStorePath = await writeOccurrenceStore({
     rootDir,
     outputDir: options.outputDir || "reports-data",
-    store
+    store,
+    mergeExisting: true
   });
-  return { store, occurrenceStorePath };
+  const persistedStore = JSON.parse(await fs.readFile(occurrenceStorePath, "utf8"));
+  const persistedValidation = validateOccurrenceStore(persistedStore);
+  if (!persistedValidation.valid) {
+    throw new PublisherError("occurrence_store_existing_invalid", "Persisted occurrence store is invalid after write.", {
+      path: occurrenceStorePath,
+      errors: persistedValidation.errors
+    });
+  }
+  return { store: persistedValidation.value, occurrenceStorePath };
 }
 
 export function mergeDiscoveryPayloads(payloads, options = {}) {
@@ -3187,10 +3251,9 @@ function sanitizeReportAuditSource(source) {
     status: source?.status || "no_signal",
     ...(source?.id ? { id: String(source.id) } : {}),
     ...(source?.source_kind ? { source_kind: String(source.source_kind) } : {}),
-    ...(source?.tier ? { tier: String(source.tier) } : {}),
-    ...(source?.authority ? { authority: String(source.authority) } : {}),
-    ...(source?.enablement ? { enablement: String(source.enablement) } : {}),
-    ...(source?.verification_policy ? { verification_policy: String(source.verification_policy) } : {}),
+    ...(source?.source_group ? { source_group: String(source.source_group) } : {}),
+    ...(source?.credibility_tag ? { credibility_tag: String(source.credibility_tag) } : {}),
+    ...(Array.isArray(source?.content_tags) ? { content_tags: source.content_tags.map(String) } : {}),
     ...(source?.platform ? { platform: String(source.platform) } : {}),
     ...(typeof source?.requires_original_url === "boolean" ? { requires_original_url: source.requires_original_url } : {}),
     ...(Number.isInteger(source?.http_status) || source?.http_status === null ? { http_status: source.http_status } : {}),
@@ -3198,6 +3261,11 @@ function sanitizeReportAuditSource(source) {
     ...(Number.isInteger(source?.recent_48h_entries) ? { recent_48h_entries: source.recent_48h_entries } : {}),
     ...(Number.isInteger(source?.original_url_count) || source?.original_url_count === null ? { original_url_count: source.original_url_count } : {}),
     ...(Number.isInteger(source?.parsed_count) ? { parsed_count: source.parsed_count } : {}),
+    ...(source?.transport_status ? { transport_status: String(source.transport_status) } : {}),
+    ...(source?.transport_limitation ? { transport_limitation: String(source.transport_limitation) } : {}),
+    ...(Number.isInteger(source?.pages_fetched) ? { pages_fetched: source.pages_fetched } : {}),
+    ...(source?.continuation_url ? { continuation_url: String(source.continuation_url) } : {}),
+    ...(Array.isArray(source?.continuation_urls) ? { continuation_urls: source.continuation_urls.map(String) } : {}),
     ...(source?.notes ? { notes: String(source.notes) } : {}),
     ...(snapshot ? { snapshot } : {})
   };
@@ -3346,8 +3414,9 @@ function addSourcesFromAudit(sourceMap, audit, generatedAt) {
         checked_at: generatedAt,
         notes: primitiveText(source.notes),
         platform: primitiveText(source.platform) || platformForAuditGroup(groupName),
-        source_level: source.source_level,
-        verification_status: source.verification_status
+        source_group: source.source_group,
+        credibility_tag: source.credibility_tag,
+        content_tags: source.content_tags
       }, generatedAt);
     }
   }
@@ -3382,8 +3451,9 @@ function addCandidateSource(sourceMap, source, generatedAt) {
     checked_at: isValidDateTimeString(source.checked_at) ? String(source.checked_at) : generatedAt,
     notes: primitiveText(source.notes),
     ...(primitiveText(source.platform) ? { platform: primitiveText(source.platform) } : {}),
-    ...(primitiveText(source.source_level) ? { source_level: primitiveText(source.source_level) } : {}),
-    ...(primitiveText(source.verification_status) ? { verification_status: primitiveText(source.verification_status) } : {})
+    ...(primitiveText(source.source_group) ? { source_group: primitiveText(source.source_group) } : {}),
+    ...(primitiveText(source.credibility_tag) ? { credibility_tag: primitiveText(source.credibility_tag) } : {}),
+    ...(Array.isArray(source.content_tags) ? { content_tags: source.content_tags.map((tag) => primitiveText(tag)).filter(Boolean) } : {})
   };
   if (!sourceMap.has(id)) {
     sourceMap.set(id, normalized);
@@ -3426,6 +3496,7 @@ function normalizeCandidate(rawCandidate, context) {
     ...(isValidDateTimeString(rawCandidate.published_at) ? { published_at: String(rawCandidate.published_at) } : {}),
     ...(isValidDateTimeString(rawCandidate.collected_at) ? { collected_at: String(rawCandidate.collected_at) } : {}),
     ...(rawCandidate.source_group ? { source_group: trimText(rawCandidate.source_group, 120) } : {}),
+    ...(primitiveText(rawCandidate.credibility_tag) ? { credibility_tag: trimText(rawCandidate.credibility_tag, 120) } : {}),
     ...(Array.isArray(rawCandidate.content_tags)
       ? { content_tags: [...new Set(rawCandidate.content_tags.map((tag) => trimText(tag, 100)).filter(Boolean))].slice(0, 32) }
       : {}),
@@ -3494,7 +3565,7 @@ function occurrenceCandidateFromRaw(rawCandidate, normalizedCandidate) {
     ...normalizedCandidate,
     category: primitiveText(rawCandidate.category) || "other"
   };
-  for (const field of ["source_level", "verification_status", "editorial_category", "source_group"]) {
+  for (const field of ["source_level", "verification_status", "editorial_category", "source_group", "credibility_tag"]) {
     const value = primitiveText(rawCandidate[field]);
     if (value) {
       occurrenceCandidate[field] = value;

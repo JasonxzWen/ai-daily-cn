@@ -262,14 +262,18 @@ function collectPublicSignalSemanticErrors(value) {
   if (value?.kind === "signal_index") {
     const groups = Array.isArray(value.groups) ? value.groups : [];
     const groupCount = groups.reduce((sum, group) => sum + Number(group.count || 0), 0);
-    const coverageCount = Object.entries(value.coverage || {})
-      .filter(([key]) => key.endsWith("_count") && key !== "normalization_error_count")
-      .reduce((sum, [, count]) => sum + Number(count || 0), 0);
+    const coverage = value.coverage || {};
     if (value.total_count !== groupCount) {
       errors.push(semanticError("/total_count", "index total_count must equal the sum of group counts"));
     }
-    if (value.total_count !== coverageCount) {
-      errors.push(semanticError("/coverage", "coverage origin counts must equal total_count"));
+    if (value.total_count !== Number(coverage.occurrence_count || 0)) {
+      errors.push(semanticError("/coverage/occurrence_count", "coverage occurrence_count must equal total_count"));
+    }
+    const accountedInputCount = Number(coverage.occurrence_count || 0) +
+      Number(coverage.coalesced_record_count || 0) +
+      Number(coverage.normalization_error_count || 0);
+    if (Number(coverage.input_record_count || 0) !== accountedInputCount) {
+      errors.push(semanticError("/coverage/input_record_count", "coverage input records must be conserved as occurrences, coalesced rows, or normalization errors"));
     }
     const order = new Map(publicSignalTaxonomy.source_groups.map((group) => [group.id, group.order]));
     const groupIds = groups.map((group) => group.id);

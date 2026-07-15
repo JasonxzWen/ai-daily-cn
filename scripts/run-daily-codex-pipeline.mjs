@@ -9,8 +9,10 @@ import { fileURLToPath } from "node:url";
 import { qualityRepairFeedback, runDailyWorkflow } from "../src/daily-runner.js";
 import {
   internalCandidatePoolRelativePath,
-  legacyCandidatePoolRelativePath
+  legacyCandidatePoolRelativePath,
+  occurrenceStoreRelativePath
 } from "../src/reports-data-layout.js";
+import { validateOccurrenceStore, validatePublicSignals } from "../src/schema.js";
 import { buildSite } from "../src/site.js";
 import { buildWebApp } from "../src/web-app-build.js";
 
@@ -174,6 +176,8 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
         orchestration_node_count: orchestration.node_count,
         completed_stages: [],
         ...pendingProductionSourceWatchSummary(),
+        signals: null,
+        legacy_report: null,
         publish_requested: Boolean(plan.publish_requested),
         execute_requested: true,
         updated_at: new Date().toISOString()
@@ -696,8 +700,7 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
   const sourceWatch = await deriveProductionSourceWatchSummary({
     cleanRoot,
     reportDate: plan.report_date,
-    completedStages,
-    legacySummary
+    completedStages
   });
   const publication = buildPublicationSummary({ legacySummary, completedStages, finalStatus });
   const pages = buildPagesSummary({ completedStages, finalStatus, publication });
@@ -758,6 +761,8 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
     publish_requested: Boolean(plan.publish_requested),
     execute_requested: true,
     source_watch: sourceWatch,
+    signals: plainObject(legacySummary.signals) ? legacySummary.signals : null,
+    legacy_report: plainObject(legacySummary.legacy_report) ? legacySummary.legacy_report : null,
     clean_repo_root: cleanRoot,
     structured_json_path: artifactPaths.structured_json_path,
     html_path: artifactPaths.html_path,
@@ -791,7 +796,7 @@ function pendingProductionSourceWatchSummary(reason = "awaiting_same_run_source_
   };
 }
 
-async function deriveProductionSourceWatchSummary({ cleanRoot, reportDate, completedStages, legacySummary = {} }) {
+async function deriveProductionSourceWatchSummary({ cleanRoot, reportDate, completedStages }) {
   const producerStage = findStage(completedStages, "discover_source_watch");
   if (!stagePassed(producerStage)) {
     return disconnectedSourceWatchSummary("producer_stage_not_completed");
@@ -823,88 +828,84 @@ async function deriveProductionSourceWatchSummary({ cleanRoot, reportDate, compl
     });
   }
 
-  if (!stagePassed(findStage(completedStages, "report_draft"))) {
-    return disconnectedSourceWatchSummary("report_draft_not_completed", {
-      producer_artifact_path: producerArtifactPath,
-      producer_artifact_sha256: producerRecord.sha256
-    });
-  }
-  if (!stagePassed(findStage(completedStages, "report_write"))) {
-    return disconnectedSourceWatchSummary("report_write_not_completed", {
+  if (!stagePassed(findStage(completedStages, "signals_write"))) {
+    return disconnectedSourceWatchSummary("signals_write_not_completed", {
       producer_artifact_path: producerArtifactPath,
       producer_artifact_sha256: producerRecord.sha256
     });
   }
 
-  const candidatePoolPath = path.join(
+  const occurrenceStorePath = path.join(
     cleanRoot,
     "reports-data",
-    ...internalCandidatePoolRelativePath(reportDate).split(path.sep)
+    ...occurrenceStoreRelativePath(reportDate).split(path.sep)
   );
-  const candidatePool = await readJsonOrNull(candidatePoolPath);
-  const candidatePoolRecord = await artifactRecord(candidatePoolPath);
-  if (!candidatePoolRecord.exists || candidatePool?.report_date !== reportDate) {
-    return disconnectedSourceWatchSummary("candidate_pool_missing_or_invalid", {
+  const occurrenceStore = await readJsonOrNull(occurrenceStorePath);
+  const occurrenceStoreRecord = await artifactRecord(occurrenceStorePath);
+  const occurrenceValidation = validateOccurrenceStore(occurrenceStore);
+  if (
+    !occurrenceStoreRecord.exists
+    || !occurrenceValidation.valid
+    || occurrenceValidation.value.report_date !== reportDate
+  ) {
+    return disconnectedSourceWatchSummary("occurrence_store_missing_or_invalid", {
       producer_artifact_path: producerArtifactPath,
       producer_artifact_sha256: producerRecord.sha256,
-      candidate_pool_path: candidatePoolPath
+      occurrence_store_path: occurrenceStorePath
     });
   }
 
-  const lineage = compareSourceWatchCandidateLineage(producerArtifact, candidatePool);
+  const lineage = traceSourceWatchSnapshotsToOccurrenceStore(
+    producerArtifact,
+    occurrenceValidation.value
+  );
   if (!lineage.matches) {
-    return disconnectedSourceWatchSummary("producer_candidate_pool_lineage_mismatch", {
+    return disconnectedSourceWatchSummary("producer_occurrence_lineage_mismatch", {
       producer_artifact_path: producerArtifactPath,
       producer_artifact_sha256: producerRecord.sha256,
-      candidate_pool_path: candidatePoolPath,
-      candidate_pool_sha256: candidatePoolRecord.sha256,
-      producer_candidate_count: lineage.producer_count,
-      persisted_candidate_count: lineage.persisted_count,
-      lineage_error: lineage.error
+      occurrence_store_path: occurrenceStorePath,
+      occurrence_store_sha256: occurrenceStoreRecord.sha256,
+      producer_snapshot_count: lineage.producer_count,
+      persisted_snapshot_count: lineage.persisted_count,
+      occurrence_count: lineage.occurrence_count,
+      lineage_error: lineage.error,
+      missing_observation_ids: lineage.missing_observation_ids
     });
   }
 
-  const buildStage = findStage(completedStages, "build");
-  if (!stagePassed(buildStage)) {
-    return disconnectedSourceWatchSummary("build_stage_not_completed", {
+  if (!stagePassed(findStage(completedStages, "signals_build"))) {
+    return disconnectedSourceWatchSummary("signals_build_not_completed", {
       producer_artifact_path: producerArtifactPath,
       producer_artifact_sha256: producerRecord.sha256,
-      candidate_pool_path: candidatePoolPath,
-      candidate_pool_sha256: candidatePoolRecord.sha256
+      occurrence_store_path: occurrenceStorePath,
+      occurrence_store_sha256: occurrenceStoreRecord.sha256
     });
   }
-  const consumption = normalizeSourceWatchConsumption(
-    sourceWatchConsumptionFromStage(buildStage)
-      || legacySummary.source_watch_consumption
-      || legacySummary.sourceWatchConsumption
-  );
-  if (!consumption) {
-    return disconnectedSourceWatchSummary("build_consumption_missing_or_invalid", {
+  if (!stagePassed(findStage(completedStages, "signals_validate"))) {
+    return disconnectedSourceWatchSummary("signals_validate_not_completed", {
       producer_artifact_path: producerArtifactPath,
       producer_artifact_sha256: producerRecord.sha256,
-      candidate_pool_path: candidatePoolPath,
-      candidate_pool_sha256: candidatePoolRecord.sha256
+      occurrence_store_path: occurrenceStorePath,
+      occurrence_store_sha256: occurrenceStoreRecord.sha256
     });
   }
 
-  const consumedPath = consumption.candidate_pool_paths.find((item) => samePath(item, candidatePoolPath));
-  if (!consumedPath) {
-    return disconnectedSourceWatchSummary("candidate_pool_not_consumed", {
+  const signalIndexPath = path.join(cleanRoot, "docs", "signals", "index.json");
+  const signalIndex = await readJsonOrNull(signalIndexPath);
+  const signalIndexRecord = await artifactRecord(signalIndexPath);
+  const signalIndexValidation = validatePublicSignals(signalIndex);
+  if (
+    !signalIndexRecord.exists
+    || !signalIndexValidation.valid
+    || signalIndexValidation.value.kind !== "signal_index"
+    || signalIndexValidation.value.total_count < lineage.producer_count
+  ) {
+    return disconnectedSourceWatchSummary("signal_index_missing_or_invalid", {
       producer_artifact_path: producerArtifactPath,
       producer_artifact_sha256: producerRecord.sha256,
-      candidate_pool_path: candidatePoolPath,
-      candidate_pool_sha256: candidatePoolRecord.sha256,
-      consumption
-    });
-  }
-  const consumedHash = consumption.candidate_pool_hashes.find((item) => samePath(item.path, candidatePoolPath));
-  if (!consumedHash || consumedHash.sha256 !== candidatePoolRecord.sha256) {
-    return disconnectedSourceWatchSummary("candidate_pool_hash_mismatch", {
-      producer_artifact_path: producerArtifactPath,
-      producer_artifact_sha256: producerRecord.sha256,
-      candidate_pool_path: candidatePoolPath,
-      candidate_pool_sha256: candidatePoolRecord.sha256,
-      consumption
+      occurrence_store_path: occurrenceStorePath,
+      occurrence_store_sha256: occurrenceStoreRecord.sha256,
+      signal_index_path: signalIndexPath
     });
   }
 
@@ -913,65 +914,91 @@ async function deriveProductionSourceWatchSummary({ cleanRoot, reportDate, compl
     connected: true,
     consumed: true,
     producer_stage: "discover_source_watch",
-    persistence_stage: "report_write",
-    consumer_stage: "build",
+    persistence_stage: "signals_write",
+    consumer_stage: "signals_build",
+    validation_stage: "signals_validate",
     producer_artifact_path: producerArtifactPath,
     producer_artifact_sha256: producerRecord.sha256,
-    candidate_pool_path: candidatePoolPath,
-    candidate_pool_sha256: candidatePoolRecord.sha256,
-    producer_candidate_count: lineage.producer_count,
-    persisted_candidate_count: lineage.persisted_count,
-    consumption,
-    reason: "same_run_producer_persistence_build_evidence_verified"
+    occurrence_store_path: occurrenceStorePath,
+    occurrence_store_sha256: occurrenceStoreRecord.sha256,
+    signal_index_path: signalIndexPath,
+    signal_index_sha256: signalIndexRecord.sha256,
+    signal_index_total_count: signalIndexValidation.value.total_count,
+    producer_snapshot_count: lineage.producer_count,
+    persisted_snapshot_count: lineage.persisted_count,
+    occurrence_count: lineage.occurrence_count,
+    reason: "same_run_producer_occurrence_signal_artifacts_verified"
   };
 }
 
-function compareSourceWatchCandidateLineage(producerArtifact, candidatePool) {
-  const producer = sourceWatchCandidateLineageKeys(producerArtifact, { requireSourceWatchForEveryCandidate: true });
-  const persisted = sourceWatchCandidateLineageKeys(candidatePool);
-  if (!producer.valid || !persisted.valid) {
+function traceSourceWatchSnapshotsToOccurrenceStore(producerArtifact, occurrenceStore) {
+  const producer = sourceWatchObservationIds(producerArtifact);
+  const occurrenceIds = new Set((Array.isArray(occurrenceStore?.occurrences) ? occurrenceStore.occurrences : [])
+    .map((item) => String(item?.observation_id || "").trim())
+    .filter(Boolean));
+  if (!producer.valid) {
     return {
       matches: false,
-      producer_count: producer.keys.length,
-      persisted_count: persisted.keys.length,
-      error: producer.error || persisted.error || "invalid_source_watch_lineage"
+      producer_count: producer.ids.length,
+      persisted_count: 0,
+      occurrence_count: occurrenceIds.size,
+      missing_observation_ids: [],
+      error: producer.error || "invalid_source_watch_lineage"
     };
   }
-  const producerKeys = [...producer.keys].sort();
-  const persistedKeys = [...persisted.keys].sort();
+  const missingObservationIds = producer.ids.filter((id) => !occurrenceIds.has(id));
   return {
-    matches: producerKeys.length === persistedKeys.length
-      && producerKeys.every((key, index) => key === persistedKeys[index]),
-    producer_count: producerKeys.length,
-    persisted_count: persistedKeys.length,
-    error: producerKeys.length === persistedKeys.length ? "snapshot_key_mismatch" : "snapshot_count_mismatch"
+    matches: missingObservationIds.length === 0,
+    producer_count: producer.ids.length,
+    persisted_count: producer.ids.length - missingObservationIds.length,
+    occurrence_count: occurrenceIds.size,
+    missing_observation_ids: missingObservationIds,
+    error: missingObservationIds.length > 0 ? "source_watch_observation_missing" : ""
   };
 }
 
-function sourceWatchCandidateLineageKeys(payload, options = {}) {
+function sourceWatchObservationIds(payload) {
   if (!Array.isArray(payload?.candidates)) {
-    return { valid: false, keys: [], error: "candidates_not_array" };
+    return { valid: false, ids: [], error: "candidates_not_array" };
   }
-  const keys = [];
+  const ids = [];
+  const snapshotKeys = [];
   for (const candidate of payload.candidates) {
     const sourceWatch = plainObject(candidate?.source_watch) ? candidate.source_watch : null;
     if (!sourceWatch) {
-      if (options.requireSourceWatchForEveryCandidate) {
-        return { valid: false, keys, error: "producer_candidate_missing_source_watch" };
-      }
-      continue;
+      return { valid: false, ids, error: "producer_candidate_missing_source_watch" };
     }
     const targetId = String(sourceWatch.target_id || "").trim().toLowerCase();
-    const fingerprint = String(sourceWatch.snapshot_fingerprint || "").trim().toLowerCase();
+    const rawFingerprint = String(sourceWatch.snapshot_fingerprint || "").trim();
+    const fingerprint = rawFingerprint.toLowerCase();
     if (!targetId || !/^sha256:[a-f0-9]{64}$/.test(fingerprint)) {
-      return { valid: false, keys, error: "source_watch_snapshot_identity_invalid" };
+      return { valid: false, ids, error: "source_watch_snapshot_identity_invalid" };
     }
-    keys.push(`${targetId}:${fingerprint}`);
+    const sourceId = normalizeContractIdentifier(candidate?.source_id || sourceWatch.target_id, "source");
+    if (!sourceId) {
+      return { valid: false, ids, error: "source_watch_source_identity_invalid" };
+    }
+    const explicitObservationId = String(candidate?.observation_id || "").trim();
+    const observationId = explicitObservationId
+      ? normalizeContractIdentifier(explicitObservationId, "obs")
+      : `obs_${createHash("sha256")
+        .update([sourceId, "source_watch.snapshot_fingerprint", rawFingerprint].join("|"))
+        .digest("hex")
+        .slice(0, 24)}`;
+    ids.push(observationId);
+    snapshotKeys.push(`${targetId}:${fingerprint}`);
   }
-  if (new Set(keys).size !== keys.length) {
-    return { valid: false, keys, error: "duplicate_source_watch_snapshot_identity" };
+  if (new Set(snapshotKeys).size !== snapshotKeys.length || new Set(ids).size !== ids.length) {
+    return { valid: false, ids, error: "duplicate_source_watch_snapshot_identity" };
   }
-  return { valid: true, keys, error: "" };
+  return { valid: true, ids, error: "" };
+}
+
+function normalizeContractIdentifier(value, prefix) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  if (text.length <= 500 && /^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(text)) return text;
+  return `${prefix}_${createHash("sha256").update(text).digest("hex").slice(0, 24)}`;
 }
 
 function disconnectedSourceWatchSummary(reason, evidence = {}) {
@@ -980,8 +1007,9 @@ function disconnectedSourceWatchSummary(reason, evidence = {}) {
     connected: false,
     consumed: false,
     producer_stage: "discover_source_watch",
-    persistence_stage: "report_write",
-    consumer_stage: "build",
+    persistence_stage: "signals_write",
+    consumer_stage: "signals_build",
+    validation_stage: "signals_validate",
     ...evidence,
     reason
   };
@@ -1090,7 +1118,9 @@ function productionSummaryOk(finalStatus) {
   return [
     "generated_only",
     "generated_degraded",
+    "generated_signals_only",
     "published",
+    "published_signals_only",
     "published_pending_pages_verification"
   ].includes(String(finalStatus || ""));
 }
@@ -1380,6 +1410,8 @@ async function writeRunSummary(state, { finalStatus }) {
     publish_requested: Boolean(state.plan.publish_requested),
     execute_requested: Boolean(state.plan.execute_requested),
     source_watch: disconnectedSourceWatchSummary("production_evidence_not_available_in_dag_lite"),
+    signals: null,
+    legacy_report: null,
     artifact_sizes: artifactSizes,
     publication: state.publication,
     validation: state.finalValidation || state.validation || null,
@@ -1434,6 +1466,7 @@ function buildSingleScriptOrchestration({ plan, dagManifest, pipelinePlanPath })
 function normalizeProductionFinalStatus(value) {
   if (value === "published" || value === "published_degraded") return "published";
   if (value === "published_pending_pages_verification") return "published_pending_pages_verification";
+  if (value === "generated_signals_only" || value === "published_signals_only") return value;
   return value || "blocked";
 }
 
@@ -2531,6 +2564,8 @@ async function writeEntryFailureRunSummary({
     publish_requested: Boolean(publishRequested),
     execute_requested: Boolean(executeRequested),
     source_watch: disconnectedSourceWatchSummary("initialization_failed_before_source_watch_evidence"),
+    signals: null,
+    legacy_report: null,
     publication: null,
     updated_at: new Date().toISOString()
   });
@@ -2584,6 +2619,8 @@ if (isMainModule(import.meta.url)) {
       publish_requested: summary.publish_requested,
       execute_requested: summary.execute_requested,
       source_watch: summary.source_watch || null,
+      signals: summary.signals || null,
+      legacy_report: summary.legacy_report || null,
       publication: summary.publication,
       validation: summary.validation,
       publish: summary.publish,
@@ -2633,6 +2670,8 @@ if (isMainModule(import.meta.url)) {
       source_watch: existingSummary?.source_watch || disconnectedSourceWatchSummary(
         args ? "run_failed_before_source_watch_evidence_completed" : "initialization_failed_before_source_watch_evidence"
       ),
+      signals: existingSummary?.signals || null,
+      legacy_report: existingSummary?.legacy_report || null,
       publication: existingSummary?.publication || null,
       validation: existingSummary?.validation || null,
       publish: existingSummary?.publish || null,

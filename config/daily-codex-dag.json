@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "name": "daily-codex-dag-contract",
-  "description": "Target Codex CLI DAG contract for the daily generation flow. This is a manifest contract slice; planned nodes are not yet standalone runner stages.",
+  "description": "Target Codex CLI DAG contract with an independent lossless public-signal lane and an optional legacy editorial-report lane. Planned nodes are not yet standalone runner stages.",
   "resilience_policy_path": "config/daily-resilience-policy.json",
   "nodes": [
     {
-      "id": "fetch-source-health",
-      "title": "Fetch source health and raw candidate lanes",
+      "id": "fetch-source-inputs",
+      "title": "Fetch raw public-source input lanes",
       "kind": "command",
       "execution_status": "planned",
       "execution_contract": {
@@ -15,7 +15,7 @@
       },
       "dependencies": [],
       "inputs": [],
-      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-inputs.json", "required": true }],
       "schemas": {
         "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
         "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
@@ -23,7 +23,7 @@
       "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
       "parallel_group": "source-lanes",
       "runner_stage_ref": "collect",
-      "resilience_policy_ref": "sources_health",
+      "resilience_policy_ref": "discover_source_watch",
       "failure_policy": {
         "mode": "planned",
         "summary": "Will derive retry/degrade/block behavior from source lane policies when this node becomes executable."
@@ -40,8 +40,8 @@
         "readiness": "planned_only",
         "summary": "Planned-only DAG node; contract-run validates declared shape but must not execute this node."
       },
-      "dependencies": ["fetch-source-health"],
-      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-health.json", "required": true }],
+      "dependencies": ["fetch-source-inputs"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/source-inputs.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/extracted-candidates.json", "required": true }],
       "schemas": {
         "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
@@ -86,8 +86,173 @@
       "owner_path_scope": "internal_workdir"
     },
     {
+      "id": "persist-signal-occurrences",
+      "title": "Persist every safe normalized observation without editorial admission",
+      "kind": "command",
+      "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Mapped to the production signal writer; labels and editorial metadata cannot change occurrence membership or chronology."
+      },
+      "dependencies": ["normalize-canonicalize"],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json", "required": true }],
+      "outputs": [{ "path": "reports-data/occurrences/{yyyy}/{mm}/{report_date}.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/occurrence-store.schema.json"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "signal-lane",
+      "runner_stage_ref": "signals_write",
+      "resilience_policy_ref": "signals_write",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Only unsafe or schema-invalid records are isolated; credibility, category, age, duplication, and editorial value are non-gating labels."
+      },
+      "public_artifact": true,
+      "owner_path_scope": "reports_data"
+    },
+    {
+      "id": "build-public-signals",
+      "title": "Build source-grouped public signal index and pages",
+      "kind": "command",
+      "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Mapped to the production public-signal builder and independent from the legacy report builder."
+      },
+      "dependencies": ["persist-signal-occurrences"],
+      "inputs": [{ "path": "reports-data/occurrences/{yyyy}/{mm}/{report_date}.json", "required": true }],
+      "outputs": [{ "path": "docs/signals/index.json", "required": true }],
+      "schemas": {
+        "input": "schemas/occurrence-store.schema.json",
+        "output": "schemas/public-signals.schema.json"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "signal-lane",
+      "runner_stage_ref": "signals_build",
+      "resilience_policy_ref": "signals_build",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Build failures are scoped to the signal artifact contract and never depend on legacy editorial quality."
+      },
+      "public_artifact": true,
+      "owner_path_scope": "docs"
+    },
+    {
+      "id": "validate-public-signals",
+      "title": "Validate public signal schema, counts, lineage, and privacy",
+      "kind": "barrier",
+      "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Mapped to the production signal validator; content credibility and editorial value are not validation gates."
+      },
+      "dependencies": ["build-public-signals"],
+      "inputs": [{ "path": "docs/signals/index.json", "required": true }],
+      "outputs": [],
+      "schemas": {
+        "input": "schemas/public-signals.schema.json",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "signal-lane",
+      "runner_stage_ref": "signals_validate",
+      "resilience_policy_ref": "signals_validate",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Schema, lineage, count, and privacy failures block the signal artifact; editorial selection never does."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "none",
+      "barrier": {
+        "wait_for": ["build-public-signals"]
+      }
+    },
+    {
+      "id": "plan-signal-publish",
+      "title": "Plan a signal-scoped publish without legacy report files",
+      "kind": "command",
+      "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Mapped to the signal-only publish dry run."
+      },
+      "dependencies": ["validate-public-signals"],
+      "inputs": [{ "path": "docs/signals/index.json", "required": true }],
+      "outputs": [],
+      "schemas": {
+        "input": "schemas/public-signals.schema.json",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "signal-lane",
+      "runner_stage_ref": "signals_publish_dry_run",
+      "resilience_policy_ref": "signals_publish_dry_run",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "The publish plan is restricted to the dated occurrence store and docs/signals tree."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "none"
+    },
+    {
+      "id": "publish-public-signals",
+      "title": "Publish validated public signals before the optional legacy report",
+      "kind": "command",
+      "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Mapped to the production signal-only publisher; GitHub API fallback remains a conditional resilience transition."
+      },
+      "dependencies": ["plan-signal-publish"],
+      "inputs": [{ "path": "docs/signals/index.json", "required": true }],
+      "outputs": [],
+      "schemas": {
+        "input": "schemas/public-signals.schema.json",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "signal-lane",
+      "runner_stage_ref": "signals_publish_real",
+      "resilience_policy_ref": "signals_publish_real",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Signal transport failure may use the configured API fallback and cannot be caused by legacy admission or report quality."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "none"
+    },
+    {
+      "id": "observe-source-health",
+      "title": "Observe source health after public signal publication",
+      "kind": "command",
+      "execution_status": "mapped",
+      "execution_contract": {
+        "readiness": "legacy_mapped",
+        "summary": "Mapped to the post-signal diagnostic stage; health labels cannot change signal membership, chronology, or publication."
+      },
+      "dependencies": ["publish-public-signals"],
+      "inputs": [],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/sources-health.json", "required": true }],
+      "schemas": {
+        "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
+        "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
+      },
+      "fixture": "tests/fixtures/daily-codex-dag/planned-node-replay.json",
+      "parallel_group": "post-signal-diagnostics",
+      "runner_stage_ref": "sources_health",
+      "resilience_policy_ref": "sources_health",
+      "failure_policy": {
+        "mode": "resilience_policy_ref",
+        "summary": "Source outages remain local diagnostics after signal publication and cannot roll back persisted or published observations."
+      },
+      "public_artifact": false,
+      "owner_path_scope": "internal_workdir"
+    },
+    {
       "id": "classify-tag-entity",
-      "title": "Classify domain, flavor, channel, tags, and entities",
+      "title": "Classify optional legacy edited-report candidates",
       "kind": "codex_exec",
       "execution_status": "planned",
       "execution_contract": {
@@ -107,14 +272,14 @@
       "resilience_policy_ref": "",
       "failure_policy": {
         "mode": "planned",
-        "summary": "Will require schema-valid taxonomy fields before scoring."
+        "summary": "Optional legacy edited-report classification only; it cannot change public signal membership or ordering."
       },
       "public_artifact": false,
       "owner_path_scope": "internal_workdir"
     },
     {
       "id": "score",
-      "title": "Score candidate relevance and public value",
+      "title": "Score optional legacy edited-report relevance",
       "kind": "command",
       "execution_status": "planned",
       "execution_contract": {
@@ -134,14 +299,14 @@
       "resilience_policy_ref": "",
       "failure_policy": {
         "mode": "planned",
-        "summary": "Will stop or repair when score output cannot satisfy admission contract."
+        "summary": "Will stop or repair only the optional legacy selection when scoring output is invalid; public signals are already persisted independently."
       },
       "public_artifact": false,
       "owner_path_scope": "internal_workdir"
     },
     {
       "id": "dedupe-cross-language",
-      "title": "Dedupe same story across languages and source variants",
+      "title": "Dedupe optional legacy stories across source variants",
       "kind": "command",
       "execution_status": "planned",
       "execution_contract": {
@@ -161,14 +326,14 @@
       "resilience_policy_ref": "",
       "failure_policy": {
         "mode": "planned",
-        "summary": "Will keep canonical candidates and block only on unrecoverable identity conflicts."
+        "summary": "Will dedupe only optional legacy stories; occurrence records from every collector remain intact in the public signal lane."
       },
       "public_artifact": false,
       "owner_path_scope": "internal_workdir"
     },
     {
       "id": "freshness-history-check",
-      "title": "Check freshness and recent publication history",
+      "title": "Check optional legacy story freshness",
       "kind": "command",
       "execution_status": "planned",
       "execution_contract": {
@@ -188,14 +353,14 @@
       "resilience_policy_ref": "",
       "failure_policy": {
         "mode": "planned",
-        "summary": "Will reject stale items and preserve audit evidence in internal artifacts."
+        "summary": "Will exclude stale items only from the optional legacy report and preserve audit evidence; no public signal is removed."
       },
       "public_artifact": false,
       "owner_path_scope": "internal_workdir"
     },
     {
       "id": "verify-source-authority",
-      "title": "Verify primary source authority and evidence links",
+      "title": "Verify optional legacy high-risk claims and evidence links",
       "kind": "codex_exec",
       "execution_status": "planned",
       "execution_contract": {
@@ -215,14 +380,14 @@
       "resilience_policy_ref": "report_draft",
       "failure_policy": {
         "mode": "planned",
-        "summary": "Will block high-risk unverified facts and degrade only source-lane outages."
+        "summary": "Will block high-risk unverified claims only from the optional legacy report; credibility remains a non-gating public signal tag."
       },
       "public_artifact": false,
       "owner_path_scope": "internal_workdir"
     },
     {
       "id": "admit-reject",
-      "title": "Admit or reject report-worthy items",
+      "title": "Select optional legacy edited-report items",
       "kind": "codex_exec",
       "execution_status": "mapped",
       "execution_contract": {
@@ -231,7 +396,7 @@
       },
       "dependencies": ["verify-source-authority"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/verified-candidates.json", "required": true }],
-      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/admission.json", "required": true }],
+      "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/legacy-selection.json", "required": true }],
       "schemas": {
         "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
         "output": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeOutput"
@@ -242,14 +407,14 @@
       "resilience_policy_ref": "report_draft",
       "failure_policy": {
         "mode": "resilience_policy_ref",
-        "summary": "Current admission behavior is covered through the report_draft resilience policy until this node is split out."
+        "summary": "Optional legacy selection is covered through report_draft resilience; it has no authority over the independent public signal lane."
       },
       "public_artifact": false,
       "owner_path_scope": "internal_workdir"
     },
     {
       "id": "per-item-summary",
-      "title": "Summarize each admitted item in isolated Codex contexts",
+      "title": "Summarize each selected optional legacy item",
       "kind": "fanout",
       "execution_status": "mapped",
       "execution_contract": {
@@ -257,7 +422,7 @@
         "summary": "Legacy mapped runner stage; contract-run validates declared shape but this is not standalone node execution."
       },
       "dependencies": ["admit-reject"],
-      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/admission.json", "required": true }],
+      "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/legacy-selection.json", "required": true }],
       "outputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/summaries/{item_id}.json", "required": true }],
       "schemas": {
         "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
@@ -280,7 +445,7 @@
     },
     {
       "id": "quality-audit",
-      "title": "Audit summary quality and public copy safety",
+      "title": "Audit optional legacy summary quality and copy safety",
       "kind": "barrier",
       "execution_status": "mapped",
       "execution_contract": {
@@ -310,7 +475,7 @@
     },
     {
       "id": "repair-regenerate",
-      "title": "Repair or regenerate scoped public text defects",
+      "title": "Repair optional legacy edited-report text defects",
       "kind": "codex_exec",
       "execution_status": "mapped",
       "execution_contract": {
@@ -337,7 +502,7 @@
     },
     {
       "id": "persist-article-db",
-      "title": "Persist public article library data",
+      "title": "Persist legacy public article-library data",
       "kind": "command",
       "execution_status": "planned",
       "execution_contract": {
@@ -364,7 +529,7 @@
     },
     {
       "id": "assemble-daily-edition",
-      "title": "Assemble normalized daily report JSON",
+      "title": "Assemble optional legacy daily-report JSON",
       "kind": "codex_exec",
       "execution_status": "mapped",
       "execution_contract": {
@@ -391,7 +556,7 @@
     },
     {
       "id": "build-cards-page",
-      "title": "Build public cards, pages, feed, and indexes",
+      "title": "Build optional legacy cards, pages, feed, and indexes",
       "kind": "command",
       "execution_status": "mapped",
       "execution_contract": {

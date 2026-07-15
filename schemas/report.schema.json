@@ -2583,9 +2583,17 @@
           "minimum": 0
         },
         "enablement_counts": {
-          "$ref": "#/$defs/non_negative_count_map"
+          "$ref": "#/$defs/non_negative_count_map",
+          "deprecated": true
         },
         "tier_counts": {
+          "$ref": "#/$defs/non_negative_count_map",
+          "deprecated": true
+        },
+        "source_group_counts": {
+          "$ref": "#/$defs/non_negative_count_map"
+        },
+        "credibility_tag_counts": {
           "$ref": "#/$defs/non_negative_count_map"
         },
         "source_kind_counts": {
@@ -2660,16 +2668,33 @@
           "type": "string"
         },
         "tier": {
-          "type": "string"
+          "type": "string",
+          "deprecated": true
         },
         "authority": {
-          "type": "string"
+          "type": "string",
+          "deprecated": true
         },
         "enablement": {
-          "type": "string"
+          "type": "string",
+          "deprecated": true
         },
         "verification_policy": {
-          "type": "string"
+          "type": "string",
+          "deprecated": true
+        },
+        "source_group": {
+          "enum": ["official_blogs", "github_trending", "community_discussions", "x_updates", "news_newsletters", "papers_models", "other"]
+        },
+        "credibility_tag": {
+          "enum": ["primary_material", "multi_source_material", "single_source_relay", "community_lead", "monitoring_lead", "pending_review"]
+        },
+        "content_tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": ["model_release", "product_update", "open_source", "research", "engineering", "company_business", "funding", "policy_infrastructure", "industry_news", "creative_ai", "analysis_opinion", "podcast", "community_discussion", "other"]
+          }
         },
         "platform": {
           "enum": ["wechat", "zhihu", "reddit"]

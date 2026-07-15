@@ -1,10 +1,12 @@
 ## Effective Interact 日报生成规范
 
-每日公开日报 HTML 必须通过本仓库内的 `.codex/skills/effective-interact` 生成，不再直接手写生产日报模板，也不得用独立公开 renderer 伪装成 `pre-rendered` 产物。
+> 范围声明：本模块仅适用于公共信号流完成后的可选遗留编辑报告（legacy report）。它不治理 `docs/signals/**`，不得改变公共信号流的成员集合、默认时序或发布结果；这里的 HTML 和成稿质量要求不构成公共信号发布门槛。
+
+可选遗留编辑日报 HTML 必须通过本仓库内的 `.codex/skills/effective-interact` 生成，不再直接手写生产日报模板，也不得用独立公开 renderer 伪装成 `pre-rendered` 产物。
 
 执行边界：
 
-- 结构化草稿可以由 `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute` 分阶段生成；该入口会把信息收集、准入判断、逐条新闻概括和组装拆成独立 Codex CLI 上下文。旧的 `corepack pnpm run report:draft -- --date YYYY-MM-DD --input <discovery-jsons> --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json` 仍保留为确定性回退路径。两条路径最终都必须用 `corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 标准化。
+- 结构化草稿可以由 `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute` 分阶段生成；该入口会把信息收集、legacy 选稿判断、逐条新闻概括和组装拆成独立 Codex CLI 上下文。旧的 `corepack pnpm run report:draft -- --date YYYY-MM-DD --input <discovery-jsons> --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json` 仍保留为确定性回退路径。两条路径最终都必须用 `corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD` 标准化。
 - `corepack pnpm run build` 会把标准化后的日报 JSON 转成 effective-interact interaction input，并调用 `.codex/skills/effective-interact/scripts/create-interaction.mjs` 生成公开 HTML。
 - 公开日报使用 `renderMode: "pre-rendered"`，不得依赖远程脚本、远程字体或 CDN runtime。
 - interaction input 必须保留日报日期、覆盖时间范围、摘要、主体信息、非空热门博客、GitHub Trending weekly Top20、Builder 观察、社区线索、公开“信源覆盖与缺口”摘要、结构化 JSON 链接和 effective-interact 组件能力；空数组对应板块不要渲染到正文和导航中；国内/中文动态并入现有栏目，不生成独立“国内动态”导航项。

@@ -1,224 +1,146 @@
 # Daily Publish Runbook
 
-Use this runbook for daily AI report generation and GitHub Pages publishing.
+用于每日公开信号监听、可选编辑报告生成与 GitHub Pages 发布。
 
-- 唯一权威资产：`prompts/ai-daily/modules/editorial-authority.md`。如果与旧规范文档、旧 ROI 清单、旧 prompt 模块或历史说明冲突，以这份资产为准。
-- 同一板块如果出现新旧两版要求，只执行唯一权威资产里的较新版本；旧文档只作归档参考。
+内容权威边界见 `prompts/ai-daily/modules/editorial-authority.md`。项目的迭代默认偏向扩大监听面：安全、可公开的记录先进入公共信号流，再用信源、内容、可信度、健康和访问标签帮助读者判断；不建立观察期、晋级、配额或内容准入门。
 
-## Codex-Native Runner Contract
+## 生产合同
 
-- Scheduled and long-running publish tasks start from the launcher worktree and invoke `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute`.
-- Dry-run-only mode is the default. It runs generation and quality gates, writes `.tmp/run-summary-YYYY-MM-DD.json`, and reports `final_status:"generated_only"`.
-- Real publish requires `corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish`. Publish mode runs `publish:dry-run:daily` before real publish and Pages verification.
-- Production Source Watch uses `discover_source_watch -> report_draft -> report_write -> build`. Read `source_watch.production_status`, `source_watch.connected`, and `source_watch.consumed` from the run summary. Connected/consumed requires the producer stage's exact artifact path/SHA-256 receipt, equal producer/pool snapshot sets, `reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json`, and matching `source_watch.consumption.candidate_pool_hashes`. Zero inclusion is valid; mismatch remains false. The scheduler passes no sidecar and never scans `.tmp`.
-- Official-blog context keeps `official-blog-admission-v1`: producer/draft verify wrapper/source dates, source/context/bindings SHA-256, binding record/type/score/source-entry relations, highest-score precedence, and private visibility. Zero matches is valid; invalid context is explicit unconsumed degradation and never auto-writes curated knowledge.
-- The pipeline owns stages, cwd, status, summary, validation, `sources:phase5-audit`, dry-run, and publish. Information collection, admission, per-item summarization, assembly, quality review, source Phase 5 audit, content contract, page check, publish dry-run, real publish, and Pages verification are separate stages and should be read from `completed_stages`.
-- To intentionally discard same-date pipeline state, delete or replace `.tmp/daily-codex-pipeline/YYYY-MM-DD` before rerunning the same command.
-- Scheduled automation must use `publish:dry-run:daily` as the only dry-run command. The older `publish:dry-run -- --date YYYY-MM-DD` remains for manual diagnostics only.
-- `status:self-check` is no longer separately scheduled. The production `.tmp/run-summary-YYYY-MM-DD.json` is the single publish and health truth source; the command remains manual-only for current artifacts, Pages HTTP, `quality_status`, `sources:health`, `publish:dry-run:daily`, and automation inventory diagnostics. `multiple_active_daily_publish_automations` remains a blocking issue.
-
-## Preflight
-
-- Confirm the target date in `Asia/Shanghai` as `YYYY-MM-DD`.
-- 先按 `prompts/ai-daily/modules/editorial-authority.md` 校对当天内容合同，不要并行参考多份旧文档裁决冲突。
-- 如果当天为了修正文风、板块、选题阈值或坏例复发而改 prompt / 规则，必须把 `editorial-authority.md` 里的 `本轮修改清单`、`Good Case`、`Bad Case`、`迭代历史` 一并更新，不要只改实现不留维护面。
-- Review `git status --short --branch` before mutating files.
-- For automation and publish runs, treat the latest `origin/main` as the only authoritative baseline. Unmerged PR branches, detached HEAD work, and local experiment branches must not affect the daily report.
-- User-confirmed feedback that must persist is P1 by default. It must be recorded in `config/feedback-ledger.json` with existing scope files, a validation command covered by `corepack pnpm run validate`, and an existing test assertion or runtime gate; otherwise it is only a session-local suggestion.
-- Preserve unrelated user changes in the launcher worktree; do not run manual `git reset --hard`, force push, or automatic stash there.
-- Automation runs must not modify or commit `progress.md`, `session-handoff.md`, or `tasks/current-task.md`; those files are for human handoff and project iteration sessions.
-- The runner prepares a dedicated clean publish checkout internally before generation. Use the command below only for manual diagnostics or when debugging checkout preparation:
+定时任务只调用一个入口：
 
 ```powershell
-corepack pnpm run publish:prepare-clean-worktree
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
 ```
 
-- When run manually, read `prepared.next_cwd` from the command output before executing lower-level generation commands. The default location is `.tmp/publish-worktrees/main` under the launcher repository; it is an isolated clone that may be reset to `origin/main` without touching user work in the launcher worktree.
-- Do not use `publish:prepare-worktree` for scheduled automation. It is retained only for manual recovery sessions where the user explicitly wants to save and switch the current worktree.
-- Use `corepack pnpm run publish:preflight` as the read-only publish boundary check when generation is not yet needed.
+- 默认是 dry run；真实发布必须显式传入 `--publish`。
+- `publish:dry-run:daily` 是 runner 内部的遗留整体验证阶段，调度器不得另行调用。
+- `.tmp/run-summary-YYYY-MM-DD.json` 是唯一运行事实源，`completed_stages` 是阶段证据。
+- `.tmp/daily-codex-pipeline/YYYY-MM-DD` 只保存同日恢复状态，不能由调度器扫描并猜测 sidecar。
+- `status:self-check` 仅用于人工诊断。存在 `multiple_active_daily_publish_automations` 时必须停止。
 
-## Source Discovery
+## 两通道顺序
 
-- Build the run contract:
+共享发现和规范化完成后，公共信号通道先执行：
+
+1. `signals_write`：把所有安全、可公开的观察持久化到 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json`。
+2. `signals_build`：生成 `docs/signals/index.json` 与分组分页。
+3. `signals_validate`：验证 schema、lineage、隐私与公开路径。
+4. `signals_publish_dry_run`：检查仅包含 occurrence 与 `docs/signals/**` 的发布范围。
+5. `signals_publish_real`：发布公共信号；Git transport 失败时按 resilience policy 尝试 GitHub API fallback。
+
+公共信号没有内容准入门。以下信息只可作为 tag/filter，不得用于删除、延后或阻断信号：
+
+- 信源板块与来源属性；
+- 内容类别；
+- 可信度；
+- 信源健康状态；
+- 访问状态；
+- 是否为社区讨论、单一来源、旧内容、重复事件或缺少原始 X 链接。
+
+唯一可阻断公共信号的条件是不可恢复的 schema/lineage 错误、内部或隐私字段泄漏、无法生成有效公开 artifact，或信号发布基础设施及允许的 fallback 均已耗尽。
+
+公共信号完成后才运行可选 legacy 编辑报告。事实复核、选题、候选选择、数量目标、正文质量与来源回溯只约束该派生报告，绝不能改变 `docs/signals/**` 的成员集合、默认时序或已完成发布。
+
+历史信号通过一次性迁移固化在 `reports-data/occurrences/baseline-v1/YYYY-MM.json.gz`，清单为 `reports-data/occurrence-baseline-manifest.json`。生产构建读取这份 immutable occurrence 基线和每日 occurrence store，但绝不重新扫描候选池、旧日报或旧 public JSON；`signals:migrate-baseline` 只用于可审计迁移，不是每日阶段。
+
+## Source Watch 验收
+
+Source Watch lineage 固定为：
+
+```text
+discover_source_watch -> signals_write -> signals_build -> signals_validate
+```
+
+只从 summary 检查：
+
+- `source_watch.production_status`
+- `source_watch.connected`
+- `source_watch.consumed`
+- producer artifact 的路径与 SHA-256
+- occurrence store 的路径与 SHA-256
+- signal index 的路径与 SHA-256
+- producer observation 与 occurrence `observation_id` 的覆盖关系
+
+零条观察只要同日 store、index 和 lineage 有效，也算 consumed。遗留报告的成功或失败不是 Source Watch 的连接条件。
+
+## 运行前检查
+
+1. 目标日期使用 `Asia/Shanghai` 的 `YYYY-MM-DD`。
+2. 查看 `git status --short --branch`，保留 launcher 中用户的无关改动。
+3. 生产运行只接受本次 fetch 后最新 `origin/main` 的干净发布工作树。
+4. 先验证静态合同：
 
 ```powershell
-corepack pnpm run prompt:build -- YYYY-MM-DD
+corepack pnpm run sources:validate
+corepack pnpm run sources:display-contract
+corepack pnpm run dag:validate
+corepack pnpm run workflow:validate
+corepack pnpm run resilience:validate
 ```
 
-- Check source lanes before writing the draft:
+信源扩展以公开、合法、可自动化为默认；抓取失败、受限或返回空结果都写健康/访问标签，不把源从配置中静默删除。人工诊断可以只跑局部源，但其结果不得覆盖当日 occurrence store 或影响公共 signal membership。
 
-```powershell
-node src/cli.js discover:github-trending --date YYYY-MM-DD --limit 50 --history-root reports-data --output .tmp/github-trending-YYYY-MM-DD.json
-node src/cli.js discover:huggingface-trending --date YYYY-MM-DD --limit 50 --output .tmp/huggingface-trending-YYYY-MM-DD.json
-node src/cli.js discover:china-ai --date YYYY-MM-DD --limit 30 --per-source-limit 3 --output .tmp/china-ai-YYYY-MM-DD.json
-node src/cli.js discover:builders --date YYYY-MM-DD --limit 20 --output .tmp/builders-YYYY-MM-DD.json
-node src/cli.js discover:content-sources --date YYYY-MM-DD --limit 60 --per-source-limit 3 --output .tmp/content-sources-YYYY-MM-DD.json
-node src/cli.js discover:statuspage-incidents --date YYYY-MM-DD --limit 20 --output .tmp/statuspage-incidents-YYYY-MM-DD.json
-```
+## 运行与读取结果
 
-- Prefer discovery command `--output` over PowerShell `Tee-Object` or stdout redirection. The command writes UTF-8 JSON directly, so npm banners, shell encoding, or BOM handling cannot pollute the audit artifact.
-- Run shadow search with provider-level timing and partial-result retention:
-
-```powershell
-node src/cli.js discover:search-news --date YYYY-MM-DD --providers gdelt,openalex,arxiv --queries config/search-queries.json --limit 40 --provider-timeout-ms 45000 --shadow --output .tmp/search-news-YYYY-MM-DD.json
-node src/cli.js sources:health --date YYYY-MM-DD --sources config/sources --enablement core,optional,manual --output .tmp/sources-health-YYYY-MM-DD.json
-```
-
-- Do not run retired platform discovery lanes (`discover:wechat-platform`, `discover:zhihu-platform`, or `discover:reddit-platform`). The current source reset uses direct Chinese RSS, the GitHub watchlist, and bottom community-hotspot feeds through `config/sources/*.json` and `discover:content-sources`.
-- `daily:codex-pipeline` must run from a latest-main clean baseline before discovery. If bootstrap or source validation fails, treat the checkout as stale or incomplete source-reset code and stop; do not continue to generate a public daily from old scripts.
-- Keep direct Chinese RSS as intermediary leads only: QbitAI, InfoQ CN, 36Kr, and any actually working direct feed such as Machine Heart when the endpoint is verified as RSS/XML. Do not reintroduce RSSHub, WeChat aggregator templates, Zhihu scraping, or broad self-media feeds into the default run.
-- GitHub watchlist sources are fixed daily checks: `LearnPrompt/ai-news-radar`, `zarazhangrui/follow-builders`, `nickzren/ai-news-agent`, and `SalvatoreRa/ML-news-of-the-week`. `follow-builders` raw X JSON is the core Builder lane; repo commits and weekly README surfaces are context signals and must not become filler main stories without primary backtrace.
-- Community-hotspot feeds belong at the bottom of the public daily page when selected: HNRSS frontpage 100+, HNRSS AI newest, Reddit r/MachineLearning, r/LocalLLaMA, r/singularity, and r/artificial. HNRSS/Reddit blockages stay internal diagnostics unless the selected content itself changes reader-facing judgment.
-
-- Hugging Face Trending is a separate model/dataset/Space trend lane, not a substitute for GitHub Trending or ordinary Hugging Face organization pages.
-- GitHub Trending contract: collect weekly all-language Top10 plus Python, TypeScript, Rust, Go, and Java weekly Top10, then merge and dedupe to Top20. README fetch failure is allowed only when the item still shows rank/star/trend metadata, explicitly marks `README拉取失败`, and does not invent a project description.
-- `discover:china-ai` is a hard checked lane for reports dated `2026-06-11` or later. Missing `source_audit.china_ai_sources` blocks strict publish; an executed lane with no qualified recent signal is degraded and must be publicly disclosed.
-
-- Generate the draft and candidate pool from discovery outputs; do not hand-write the final draft:
-
-```powershell
-corepack pnpm run report:draft -- --date YYYY-MM-DD --input .tmp/github-trending-YYYY-MM-DD.json,.tmp/huggingface-trending-YYYY-MM-DD.json,.tmp/china-ai-YYYY-MM-DD.json,.tmp/builders-YYYY-MM-DD.json,.tmp/content-sources-YYYY-MM-DD.json,.tmp/statuspage-incidents-YYYY-MM-DD.json,.tmp/search-news-YYYY-MM-DD.json,.tmp/sources-health-YYYY-MM-DD.json --output .tmp/daily-report.json --candidate-output .tmp/source-candidates-YYYY-MM-DD.json
-```
-
-- `report:draft` writes source successes, failures, empty results, selected `included` markers, and cached `image_url` evidence assets. If it cannot cache an image, keep the skipped reason in command output and let `quality_status.degraded_sections` disclose evidence coverage gaps.
-- For reports dated `2026-06-02` or later, apply the two-level publish quality gate. `blocking_issues` stop dry-run and real publish: invalid automation revision, report generation commit not proving latest `origin/main` through `origin_main_sha`, schema or candidate back-reference failures, stale/duplicated stories, unverified factual claims, unconfirmed remote `main`, `remote_ahead`, dirty non-publisher files, API fallback token/base commit failures, or pre-publish public page quality failures. Fixed source surface gaps, GitHub Trending / Builder X / evidence asset coverage gaps, empty sections, and model-release mirroring gaps are `degraded_sections`: the report may publish, but source-health details stay in structured JSON/internal diagnostics. Public HTML shows degradation only when the issue changes reader-facing interpretation of the content. If repository publish succeeds but GitHub Pages has not refreshed after retries, report `published_pending_pages_verification` and verify the URL later instead of repeating publish.
-- If `daily:codex-pipeline` ends with `next_action.kind:"restart_latest_main"` after publish dry-run or real publish, do not reuse the stale generated artifacts. Re-run from the launcher worktree so the pipeline fetches the current `origin/main` and regenerates the report against that baseline:
+dry run：
 
 ```powershell
 corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute
 ```
 
-  Add `--publish` only when the original run was an explicitly approved real publish run.
-- Also for reports dated `2026-06-02` or later, enforce the long-form engineer daily gate: public `summary` must be an editorial lead, not a generation log; every `main_items` entry must include `why_it_matters` or `reader_relevance`; `main_items` must use primary, official, paper, GitHub, or multi-source confirmed evidence; non-primary leads may only appear in viewpoint/product/Builder/community sections with `source_level`, `verification_status`, and `verification_note` or `risk_note`; keep `model_releases` empty for new drafts unless preserving legacy data.
-- A fixed source with `status:"blocked"` still counts as checked source-surface proof when the final `source_audit` records the source name, URL, HTTP/error detail, and notes. Do not promote facts from blocked sources; use them only as audit evidence that the source was attempted.
-- If multiple fixed source groups are mostly `blocked` with `fetch failed`, treat it as a likely scheduled-task network outage. The public `quality_status.degraded_sections` must include `source_discovery_network_unavailable`, and the final response must tell the user to check `config.toml` or Codex settings and enable network access for workspace-write sandbox mode: `[sandbox_workspace_write] network_access = true`, also shown in the UI as `当沙盒设置为工作区写入时允许网络访问`.
-- If all active fixed source lanes are blocked by network errors and no factual item can be verified, write `report_status:"empty_due_to_network_outage"` with `main_items: []`. The report is publishable only as degraded output: keep the blocked `source_audit`, disclose `empty_due_to_network_outage` in `quality_status.degraded_sections`, and do not add placeholder main items.
-- Before selecting items, compare every collected candidate against the previous reports and candidate pools in `reports-data` for at least the recent 7 daily report dates. Dedupe by URL first, then by same event/title/vendor/source topic; keep repeated items excluded unless the new candidate adds a concrete new dated development.
-- Keep `main_items`, `github_trending`, `hot_blogs`, `projects`, and `builder_observations` tied to `candidate_id` values.
-- When `discover:builders` or the final candidate pool has at least five qualified Builder candidates, publish 5-20 `builder_observations`; fewer than five must be disclosed as degraded Builder coverage with the selection/filter reason. For follow-builders X feed specifically, after low-signal and non-AI filtering, at least 3 eligible AI/tech candidates means `builder_observations` cannot be 0. English original X posts may be converted into deterministic Chinese summaries from the original text.
-- Do not bypass freshness, duplicate URL, or source-window gates.
-
-## Public Report Contract
-
-- The hero/date area must state the report coverage window, not only the publish date.
-- Main-item source names are not written into the visible title/body; the source is represented by the source icon and link.
-- Main-item titles are larger links without underline. Body `==...==` markers are inline bold colored keywords, not tag UI.
-- Tags are reserved for importance, trend state, star velocity, topic, and project highlight; renderers must color these tag types differently and de-duplicate identical tags.
-- `model_releases` remains a structured JSON index only. Do not render a public `模型发布` section; model news must be written into `main_items`.
-- `projects` remains highlight metadata for GitHub Trending. Do not render a public `今日值得关注的项目` section, `项目 highlights` subheading, or extra project list; only add a `项目 highlight` tag plus compact domain/use-case text to matching GitHub Trending Top20 entries.
-- Domestic / Chinese dynamics remain visible inside existing main groups, hot blogs, GitHub Trending, or the shared `社区线索` section. Do not render a separate public `国内动态` navigation item.
-- AIGC, image generation, video generation, creator tools, and AI-assisted game-creation signals should appear as the existing `AIGC 动态` main group when they pass primary/official/paper/GitHub/multi-source verification. Intermediary AIGC leads stay in community leads with verification notes.
-- Hot blog public cards render only a 100-200 Chinese-character article summary plus source. Do not render `key_points` on the public page; if internal JSON keeps legacy `key_points`, interaction output must ignore them. Attach high-signal original evidence images through `evidence_assets` when available; do not invent decorative images.
-- Body evidence images and hot blog/card media images must support click-to-enlarge lightbox behavior; source icons remain inert identifiers.
-- GitHub Trending stores the merged weekly Top20 scope, but the public daily page renders Top10 with rank/trend/star tags and README-grounded Chinese summaries that explain what the repo is, what it solves, and why it is worth watching. README failures stay visible as metadata-only rows with a `README拉取失败` marker.
-- Builder observations must preserve `original_text` and a complete, precise Chinese `translation`; `content` should match the translation, not a summary. Use `handle` and `avatar_url` when available so build can cache Twitter-like preview avatars into `docs/assets/avatars/**`. The target public count is 5-20 when qualified candidates exist.
-- OpenRouter and Artificial Analysis cards must render from parsed data or sanitized official DOM/CSS snapshots. Missing official snapshots may degrade; Artificial Analysis should hide the data card and show source unavailable when no snapshot exists. Fake simplified components block publish.
-- Public daily pages must not render `source_audit`, candidate pools, source coverage/gap blocks, access-gate language, or retired WeChat/Zhihu/Reddit platform sections. Community hotspots render only as the bottom `community_leads` section after filtering to HNRSS and the configured Reddit subreddit feeds.
-
-## AI Quality Review And Repair
-
-- After writing `.tmp/daily-report.json` and before `report:write`, run the local quality review:
+已获得真实发布授权时：
 
 ```powershell
-corepack pnpm run quality:review -- .tmp/daily-report.json .tmp/quality-review-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
+corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
 ```
 
-- The review checks public text for AI stock phrasing, automatic `report:draft` template wording, overly broad or missing inline `==...==` highlights, thin main-item bullets, Builder translation/content mismatches, and the same category/URL/date/verification/disclosure candidate coverage enforced by `report:write`. Treat `ai_review_tasks` as the Codex/AI semantic review checklist; translation fidelity and factual wording may be fixed only from existing `candidate_pool`, `source_audit`, original links, or `original_text`.
-- Apply safe automatic repairs to a new optimized draft rather than mutating facts in place:
+运行后用 UTF-8 读取 summary：
 
 ```powershell
-corepack pnpm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.json .tmp/quality-repair-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
+$summaryPath = ".tmp/run-summary-YYYY-MM-DD.json"
+$summary = Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8 | ConvertFrom-Json
 ```
 
-- If Codex or another AI reviewer proposes wording changes, save them as a repair contract and apply them through the restricted contract gate:
+至少检查：
+
+- `automation_pipeline_mode`、orchestration node count 与 plan path；
+- `completed_stages`；
+- `signals.status` 和 `legacy_report.status`；
+- Source Watch 的 production/connected/consumed 与 artifact hashes；
+- `next_action`；
+- publish dry run、真实 publish、GitHub API fallback 与 Pages verification。
+
+`sources:phase5-audit` 属于 runner 维护的来源审计，不得成为公共信号内容准入门。
+
+## 终态解释
+
+- `generated_only`：公共信号和 legacy 报告均已生成。
+- `generated_degraded`：legacy 报告带降级项，但公共信号独立有效。
+- `generated_signals_only`：公共信号已生成，legacy 报告未完成。
+- `published`：公共信号及 legacy 报告已发布。
+- `published_signals_only`：公共信号已发布，legacy 报告未完成；这是部分成功，不是未发布。
+- `published_pending_pages_verification`：仓库已经发布，Pages 暂未刷新；不要重复发布。
+- `published_degraded`：可能出现在 `legacy_report.status`，外层 runner 会按其真实公共发布结果归一化。
+- `needs_ai_repair`：legacy 报告等待可恢复修订；单独读取 `signals.status`。
+- `infrastructure_blocked_after_fallback_exhausted`：允许的基础设施 fallback 已耗尽。
+
+若 `next_action.kind` 是 `restart_latest_main`，从 launcher 重新执行同一命令；不要复用旧工作树或旧产物。若是 signal-only 终态，保留并如实报告公共信号结果，再描述 legacy 失败。
+
+## 恢复与兜底
+
+恢复策略以 `config/daily-resilience-policy.json` 为唯一机器合同。修改 runner 阶段、终态或 fallback 后必须运行：
 
 ```powershell
-corepack pnpm run quality:repair -- .tmp/daily-report.json .tmp/daily-report.optimized.json .tmp/quality-repair-YYYY-MM-DD.json .tmp/quality-ai-repair-YYYY-MM-DD.json .tmp/source-candidates-YYYY-MM-DD.json
+corepack pnpm run resilience:validate
 ```
 
-- AI repair contracts may edit only public text fields. Production authoring runs Codex with `--ignore-user-config`, a read-only sandbox, and a JSON output schema; the CLI writes the final object as UTF-8 and the host performs all validated file writes. Each Codex call has a 20-minute default timeout (configurable with `--codex-timeout-ms`), and timeout kills the process tree with `codex_timeout`. Contracts must include `status:"ready"` and non-empty `edits`; they must not change URLs, dates, source names, `candidate_id`, `source_audit`, `quality_status`, evidence paths, or publish metadata. If the optimized draft still has blocking review issues after the mode budget is exhausted, stop and report `.tmp/run-summary-YYYY-MM-DD.json`, `.tmp/quality-review-YYYY-MM-DD.json`, and `.tmp/quality-repair-YYYY-MM-DD.json`; dry-run defaults to one attempt, publish mode to at most five.
-- Use `.tmp/daily-report.optimized.json` as the input to `report:write` when repairs were applied.
+- signal Git publish 失败：只对 signal scope 使用 GitHub API fallback。
+- signal fallback 成功：终态可以是 `published_signals_only`，并要求下一次从最新 main 重启 legacy 工作。
+- legacy 发布失败：不得回滚已发布的 signal。
+- Pages verification pending：报告 pending，不重复 push。
+- 所有基础设施恢复耗尽：使用 `infrastructure_blocked_after_fallback_exhausted`。
 
-## Report Write
+## 交接
 
-- The structured draft should already be written by `corepack pnpm run report:draft`; if you edit it manually, rerun `report:draft` or update `.tmp/source-candidates-YYYY-MM-DD.json` so every selected item still points to an included candidate.
-- Normalize it with:
-
-```powershell
-corepack pnpm run report:write -- .tmp/daily-report.json reports-data YYYY-MM-DD
-```
-
-- Stop and repair the draft when `candidate_pool_missing`, `candidate_pool_reference_invalid`, or `freshness_gate_failed` appears.
-- Stop and repair the draft when `mainline_source_authority_gate_failed` appears. If `editorial_summary_gate_failed`, `editorial_context_gate_failed`, or `non_primary_source_disclosure_gate_failed` appears in `degraded_sections`, repair before publish unless the user explicitly accepts a degraded report.
-- If you commit/push any workflow, prompt, source, renderer, or quality-gate code after `report:write`, rerun `report:write` and `corepack pnpm run build` so `self_check.automation_revision.git_commit` matches current `HEAD` and `origin_main_sha` proves the latest remote baseline.
-
-## Build And Validate
-
-- Generate static Pages output:
-
-```powershell
-corepack pnpm run build
-```
-
-- The daily HTML must come from `.codex/skills/effective-interact/scripts/create-interaction.mjs` in `pre-rendered` mode.
-- Run the targeted page checklist for the affected daily page:
-
-```powershell
-corepack pnpm run quality:page-check -- YYYY-MM-DD docs .tmp/page-check-YYYY-MM-DD.json
-```
-- Run the deterministic content-contract gate before dry-run or real publish:
-
-```powershell
-node scripts/check-daily-content-contract.mjs --report reports-data/YYYY/MM/YYYY-MM-DD.json --html docs/reports/YYYY/MM/YYYY-MM-DD.html --json
-```
-
-- REQ-001, REQ-006, REQ-007, and REQ-008 failures are blocking. REQ-010 source unavailability can be degraded, but fake OpenRouter or Artificial Analysis components are blocking.
-- Daily resilience policy is versioned in `config/daily-resilience-policy.json`; run `corepack pnpm run resilience:validate` before treating a changed workflow as publishable. The policy favors retry and fallback before degradation, allows `published_degraded` only for public safe degraded content, reports `published_pending_pages_verification` when a successful publish is waiting on Pages cache propagation, and reserves `infrastructure_blocked_after_fallback_exhausted` for exhausted publish or infrastructure paths.
-- After build, inspect the affected daily HTML at `1280x900` and confirm it contains the coverage window, has no `模型发布` heading, has no `今日值得关注的项目` heading or `项目 highlights` subheading, has keyword spans/classes for inline highlights, has star/project highlight tags only inside GitHub Trending items, has no duplicate star tags on a single Trending item, and opens body/blog/card images in the desktop lightbox.
-- Inspect the affected HTML or interaction input and confirm there is no `source_audit`, `candidate_pool`, `public-source-coverage`, access-gate wording, retired WeChat/Zhihu/Reddit platform section, or banned public-copy wording such as `披露` / `准入门槛`.
-- Run the full gate before any real publish:
-
-```powershell
-corepack pnpm run validate
-```
-
-## Dry Run
-
-- Preview the publish plan:
-
-```powershell
-corepack pnpm run publish:dry-run:daily -- --date YYYY-MM-DD
-```
-
-- Capture changed files, commit message, and expected Pages URL.
-- Confirm every `current_dirty_files` publisher artifact is also present in `will_stage_files`. A `publisher_dirty_outside_publish_plan` error is a real safety gate: repair the publish plan or move unrelated stale artifacts out of the worktree before publishing.
-- Check that every report-linked `evidence_assets[*].local_path` appears in `will_stage_files` as `docs/assets/evidence/...`; local file existence alone is not enough for GitHub Pages. If Builder avatars were cached, confirm `docs/assets/avatars/**` is also in `will_stage_files`.
-- If dry-run fails, keep the generated local HTML/JSON artifacts and report the blocker. If it succeeds with `quality_status.status: "degraded"`, capture the `degraded_sections` summary and make sure the public HTML includes `发布质量说明`.
-
-## Real Publish
-
-- Only publish after explicit confirmation:
-
-```powershell
-corepack pnpm run publish -- --confirm-push --date YYYY-MM-DD
-```
-
-- This path may commit and push only publisher-managed `docs/` and `reports-data/` files.
-- After push, verify the daily Pages URL returns HTTP 200 and contains `YYYY-MM-DD`. If the repository publish succeeded but Pages verification keeps returning cache/network misses, do not republish; report `published_pending_pages_verification` with the URL and retry later.
-
-## GitHub API Fallback
-
-- Use this only when local git metadata, branch switching, or Git transport (`git_fetch_unavailable` / `git_push_unavailable`) blocks real publish after report artifacts passed validation. Do not use it to bypass `remote_ahead`; the runner reports `next_action.kind:"restart_latest_main"` for that case and the correct recovery is to regenerate from current `origin/main`:
-
-```powershell
-corepack pnpm run publish:github-api -- --confirm-push --date YYYY-MM-DD
-```
-
-- Required token source: `GH_TOKEN`, `GITHUB_TOKEN`, or `gh auth token`.
-- The fallback must read the remote `main` commit/tree through the GitHub API, publish only artifacts generated from the latest `origin/main`, write only publisher-managed `docs/` and `reports-data/` files with `force:false`, and report `publish_mode: github-api-fallback` plus `base_commit_sha`.
-
-## Handoff
-
-- Final response must include the daily HTML path, structured JSON path, validate result, dry-run result, expected Pages URL, real publish verification, and at most three prompt or rule iteration suggestions.
-- If the run changed any content contract, also report which `editorial-authority.md` sections were updated so the next iteration does not rely on chat history.
-- Human-assisted publish runs update `progress.md` and `session-handoff.md` when the run changes repo state or publish status. Scheduled automation runs do not modify or commit `progress.md`, `session-handoff.md`, or `tasks/current-task.md`.
+最终交接必须包含：bootstrap main SHA、clean publish root、summary 与 pipeline plan 路径、`completed_stages` 摘要、`signals.status`、`legacy_report.status`、Source Watch occurrence/index 证据、真实 publish 或 fallback、Pages 状态、blocking/degraded 项和 `next_action`。不要用 legacy 报告失败掩盖公共信号已经生成或发布的事实。

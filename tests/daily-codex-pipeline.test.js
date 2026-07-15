@@ -13,6 +13,7 @@ import {
   spawnWithPrompt,
   validateDailyCodexMvpArtifact
 } from "../scripts/run-daily-codex-pipeline.mjs";
+import { publicSignalTaxonomy } from "../src/schema.js";
 
 const execFileAsync = promisify(execFile);
 const repoRoot = path.resolve(".");
@@ -744,7 +745,7 @@ test("daily Codex structured summaries use the latest duplicate stage result", a
   assert.equal(summary.pages.message, "");
 });
 
-test("daily Codex production orchestrator claims Source Watch only from same-run producer, persisted pool, and build consumption", async () => {
+test("daily Codex production orchestrator claims Source Watch only from same-run producer, occurrence store, and signal artifacts", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-source-watch-status-"));
   const reportDate = "2026-07-06";
   await writeMinimalRepoFiles(rootDir);
@@ -764,15 +765,15 @@ test("daily Codex production orchestrator claims Source Watch only from same-run
     assert.equal(runningSummary.source_watch.production_status, "not_connected");
     assert.equal(runningSummary.source_watch.connected, false);
     assert.equal(runningSummary.source_watch.consumed, false);
+    assert.equal(runningSummary.signals, null);
+    assert.equal(runningSummary.legacy_report, null);
     const legacySummary = {
       report_date: reportDate,
       mode: "dry-run",
       final_status: "generated_only",
       clean_repo_root: cleanRoot,
       next_action: { kind: "none" },
-      stages: sourceWatchEvidenceStages(evidence).map((stage) => stage.id === "build"
-        ? { ...stage, output: { sourceWatchConsumption: evidence.consumption } }
-        : stage)
+      stages: sourceWatchEvidenceStages(evidence)
     };
     await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
     return { summary: legacySummary, summaryPath };
@@ -785,19 +786,25 @@ test("daily Codex production orchestrator claims Source Watch only from same-run
   assert.equal(summary.source_watch.production_status, "connected");
   assert.equal(summary.source_watch.connected, true);
   assert.equal(summary.source_watch.consumed, true);
-  assert.equal(summary.source_watch.reason, "same_run_producer_persistence_build_evidence_verified");
+  assert.equal(summary.source_watch.reason, "same_run_producer_occurrence_signal_artifacts_verified");
+  assert.equal(summary.source_watch.persistence_stage, "signals_write");
+  assert.equal(summary.source_watch.consumer_stage, "signals_build");
+  assert.equal(summary.source_watch.validation_stage, "signals_validate");
   assert.equal(summary.source_watch.producer_artifact_path, evidence.producerPath);
-  assert.equal(summary.source_watch.candidate_pool_path, evidence.candidatePoolPath);
-  assert.equal(summary.source_watch.candidate_pool_sha256, evidence.candidatePoolSha256);
-  assert.deepEqual(summary.source_watch.consumption, evidence.consumption);
+  assert.equal(summary.source_watch.occurrence_store_path, evidence.occurrenceStorePath);
+  assert.equal(summary.source_watch.occurrence_store_sha256, evidence.occurrenceStoreSha256);
+  assert.equal(summary.source_watch.signal_index_path, evidence.signalIndexPath);
+  assert.equal(summary.source_watch.signal_index_sha256, evidence.signalIndexSha256);
+  assert.equal(summary.source_watch.producer_snapshot_count, 1);
+  assert.equal(summary.source_watch.persisted_snapshot_count, 1);
 });
 
-test("daily Codex production orchestrator keeps zero-inclusion Source Watch consumption connected", async () => {
+test("daily Codex production orchestrator keeps an empty Source Watch snapshot set connected", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-source-watch-zero-"));
   const reportDate = "2026-07-06";
   await writeMinimalRepoFiles(rootDir);
   const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
-  const evidence = await writeProductionSourceWatchEvidence({ cleanRoot, reportDate, includedCandidateCount: 0, publicArticleCount: 0 });
+  const evidence = await writeProductionSourceWatchEvidence({ cleanRoot, reportDate, producerCandidateCount: 0 });
   const plan = await prepareDailyCodexPipeline({
     rootDir,
     reportDate,
@@ -815,42 +822,11 @@ test("daily Codex production orchestrator keeps zero-inclusion Source Watch cons
 
   assert.equal(summary.source_watch.connected, true);
   assert.equal(summary.source_watch.consumed, true);
-  assert.equal(summary.source_watch.consumption.included_candidate_count, 0);
-  assert.equal(summary.source_watch.consumption.public_article_count, 0);
+  assert.equal(summary.source_watch.producer_snapshot_count, 0);
+  assert.equal(summary.source_watch.persisted_snapshot_count, 0);
 });
 
-test("daily Codex production orchestrator preserves Source Watch consumption from truncated build output", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-source-watch-truncated-"));
-  const reportDate = "2026-07-06";
-  await writeMinimalRepoFiles(rootDir);
-  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
-  const evidence = await writeProductionSourceWatchEvidence({ cleanRoot, reportDate });
-  const plan = await prepareDailyCodexPipeline({
-    rootDir,
-    reportDate,
-    executeRequested: true,
-    publishRequested: false,
-    codexBin: "codex.cmd"
-  });
-  const preview = `${JSON.stringify({
-    ok: true,
-    source_watch_consumption: evidence.consumption,
-    written_files: []
-  }).slice(0, -1)},"written_files_preview":"${"x".repeat(12000)}`;
-  const stages = sourceWatchEvidenceStages(evidence).map((stage) => stage.id === "build"
-    ? { id: "build", status: "passed", output: { truncated: true, bytes: 24000, preview } }
-    : stage);
-  const workflowRunner = productionSourceWatchWorkflowRunner({ reportDate, cleanRoot, stages });
-
-  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
-
-  assert.equal(summary.source_watch.connected, true);
-  assert.equal(summary.source_watch.consumed, true);
-  const build = summary.completed_stages.find((stage) => stage.id === "build");
-  assert.deepEqual(build.output.source_watch_consumption, evidence.consumption);
-});
-
-test("daily Codex production orchestrator refuses incomplete or mismatched Source Watch evidence", async () => {
+test("daily Codex production orchestrator refuses incomplete or mismatched signal-native Source Watch evidence", async () => {
   const cases = [
     {
       name: "producer-missing",
@@ -878,50 +854,59 @@ test("daily Codex production orchestrator refuses incomplete or mismatched Sourc
       reason: "producer_stage_receipt_missing_or_mismatch"
     },
     {
-      name: "draft-missing",
+      name: "signals-write-missing",
       mutate(stages) {
-        return stages.filter((stage) => stage.id !== "report_draft");
+        return stages.filter((stage) => stage.id !== "signals_write");
       },
-      reason: "report_draft_not_completed"
+      reason: "signals_write_not_completed"
     },
     {
-      name: "current-pool-not-consumed",
-      mutate(stages) {
-        return stages.map((stage) => stage.id === "build"
-          ? {
-              ...stage,
-              output: {
-                source_watch_consumption: {
-                  ...stage.output.source_watch_consumption,
-                  candidate_pool_paths: [],
-                  candidate_pool_hashes: [],
-                  candidate_pool_count: 0
-                }
-              }
-            }
-          : stage);
+      name: "occurrence-store-invalid",
+      async mutateEvidence(evidence) {
+        await fs.writeFile(evidence.occurrenceStorePath, "{}\n", "utf8");
       },
-      reason: "candidate_pool_not_consumed"
+      mutate(stages) {
+        return stages;
+      },
+      reason: "occurrence_store_missing_or_invalid"
     },
     {
-      name: "hash-mismatch",
-      mutate(stages) {
-        return stages.map((stage) => stage.id === "build"
-          ? {
-              ...stage,
-              output: {
-                source_watch_consumption: {
-                  ...stage.output.source_watch_consumption,
-                  candidate_pool_hashes: stage.output.source_watch_consumption.candidate_pool_hashes.map((record) => ({
-                    ...record,
-                    sha256: "0".repeat(64)
-                  }))
-                }
-              }
-            }
-          : stage);
+      name: "occurrence-lineage-missing",
+      async mutateEvidence(evidence) {
+        const store = JSON.parse(await fs.readFile(evidence.occurrenceStorePath, "utf8"));
+        store.input_record_count = 0;
+        store.occurrence_count = 0;
+        store.occurrences = [];
+        await fs.writeFile(evidence.occurrenceStorePath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
       },
-      reason: "candidate_pool_hash_mismatch"
+      mutate(stages) {
+        return stages;
+      },
+      reason: "producer_occurrence_lineage_mismatch"
+    },
+    {
+      name: "signals-build-missing",
+      mutate(stages) {
+        return stages.filter((stage) => stage.id !== "signals_build");
+      },
+      reason: "signals_build_not_completed"
+    },
+    {
+      name: "signals-validate-missing",
+      mutate(stages) {
+        return stages.filter((stage) => stage.id !== "signals_validate");
+      },
+      reason: "signals_validate_not_completed"
+    },
+    {
+      name: "signal-index-invalid",
+      async mutateEvidence(evidence) {
+        await fs.writeFile(evidence.signalIndexPath, "{}\n", "utf8");
+      },
+      mutate(stages) {
+        return stages;
+      },
+      reason: "signal_index_missing_or_invalid"
     }
   ];
 
@@ -938,6 +923,7 @@ test("daily Codex production orchestrator refuses incomplete or mismatched Sourc
       publishRequested: false,
       codexBin: "codex.cmd"
     });
+    if (item.mutateEvidence) await item.mutateEvidence(evidence);
     const stages = item.mutate(sourceWatchEvidenceStages(evidence));
     const workflowRunner = productionSourceWatchWorkflowRunner({ reportDate, cleanRoot, stages });
 
@@ -949,35 +935,57 @@ test("daily Codex production orchestrator refuses incomplete or mismatched Sourc
   }
 });
 
-test("daily Codex production orchestrator rejects Source Watch pool snapshots absent from the producer", async () => {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-source-watch-lineage-"));
-  const reportDate = "2026-07-06";
-  await writeMinimalRepoFiles(rootDir);
-  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
-  const evidence = await writeProductionSourceWatchEvidence({ cleanRoot, reportDate });
-  const producer = JSON.parse(await fs.readFile(evidence.producerPath, "utf8"));
-  producer.candidates = [];
-  const producerRaw = `${JSON.stringify(producer, null, 2)}\n`;
-  await fs.writeFile(evidence.producerPath, producerRaw, "utf8");
-  evidence.producerArtifactSha256 = createHash("sha256").update(producerRaw).digest("hex");
-  const plan = await prepareDailyCodexPipeline({
-    rootDir,
-    reportDate,
-    executeRequested: true,
-    publishRequested: false,
-    codexBin: "codex.cmd"
-  });
-  const workflowRunner = productionSourceWatchWorkflowRunner({
-    reportDate,
-    cleanRoot,
-    stages: sourceWatchEvidenceStages(evidence)
-  });
+test("daily Codex production summary keeps signal success and legacy report failure as independent results", async () => {
+  for (const finalStatus of ["generated_signals_only", "published_signals_only"]) {
+    const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), `daily-codex-production-dual-result-${finalStatus}-`));
+    const reportDate = "2026-07-06";
+    await writeMinimalRepoFiles(rootDir);
+    const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+    const evidence = await writeProductionSourceWatchEvidence({ cleanRoot, reportDate });
+    const plan = await prepareDailyCodexPipeline({
+      rootDir,
+      reportDate,
+      executeRequested: true,
+      publishRequested: finalStatus === "published_signals_only",
+      codexBin: "codex.cmd"
+    });
+    const signals = {
+      status: finalStatus === "published_signals_only" ? "published" : "generated",
+      occurrence_store_path: evidence.occurrenceStorePath,
+      index_path: evidence.signalIndexPath
+    };
+    const legacyReport = {
+      status: "failed",
+      failed_stage_id: "report_draft",
+      error_code: "legacy_report_failed"
+    };
+    const workflowRunner = async ({ summaryPath }) => {
+      const legacySummary = {
+        report_date: reportDate,
+        mode: finalStatus === "published_signals_only" ? "publish" : "dry-run",
+        final_status: finalStatus,
+        clean_repo_root: cleanRoot,
+        next_action: { kind: "inspect_legacy_report_failure" },
+        signals,
+        legacy_report: legacyReport,
+        stages: [
+          ...sourceWatchEvidenceStages(evidence),
+          { id: "report_draft", status: "failed", error_code: "legacy_report_failed", error: "legacy report failed" }
+        ]
+      };
+      await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+      return { summary: legacySummary, summaryPath };
+    };
 
-  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+    const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
 
-  assert.equal(summary.source_watch.connected, false);
-  assert.equal(summary.source_watch.consumed, false);
-  assert.equal(summary.source_watch.reason, "producer_candidate_pool_lineage_mismatch");
+    assert.equal(summary.ok, true, finalStatus);
+    assert.equal(summary.final_status, finalStatus);
+    assert.deepEqual(summary.signals, signals);
+    assert.deepEqual(summary.legacy_report, legacyReport);
+    assert.equal(summary.source_watch.connected, true);
+    assert.deepEqual(summary.failures, []);
+  }
 });
 
 test("daily Codex production orchestrator preserves daily runner mode when automated AI repair is disabled", async () => {
@@ -2178,24 +2186,31 @@ async function writeReportSourceFixture(rootDir) {
 async function writeProductionSourceWatchEvidence({
   cleanRoot,
   reportDate,
-  includedCandidateCount = 1,
-  publicArticleCount = includedCandidateCount
+  producerCandidateCount = 1
 }) {
   const producerPath = path.join(cleanRoot, ".tmp", `source-watch-${reportDate}.json`);
-  const candidatePoolPath = path.join(
+  const occurrenceStorePath = path.join(
     cleanRoot,
     "reports-data",
-    "internal",
-    "candidates",
+    "occurrences",
     reportDate.slice(0, 4),
     reportDate.slice(5, 7),
-    `${reportDate}.candidates.json`
+    `${reportDate}.json`
   );
+  const signalIndexPath = path.join(cleanRoot, "docs", "signals", "index.json");
+  const signalPagePath = path.join(cleanRoot, "docs", "signals", "github_trending", "page-001.json");
   await fs.mkdir(path.dirname(producerPath), { recursive: true });
-  await fs.mkdir(path.dirname(candidatePoolPath), { recursive: true });
-  const producerCandidateCount = Math.max(1, includedCandidateCount);
+  await fs.mkdir(path.dirname(occurrenceStorePath), { recursive: true });
+  await fs.mkdir(path.dirname(signalIndexPath), { recursive: true });
+  await fs.mkdir(path.dirname(signalPagePath), { recursive: true });
   const producerCandidates = Array.from({ length: producerCandidateCount }, (_, index) => ({
     id: `source-watch-${index + 1}`,
+    source_id: `source-watch-target-${index + 1}`,
+    category: "project",
+    title: `Source Watch ${index + 1}`,
+    url: `https://example.com/source-watch-${index + 1}`,
+    source: `Source Watch target ${index + 1}`,
+    event_date: reportDate,
     status: "excluded",
     source_watch: {
       target_id: `source-watch-target-${index + 1}`,
@@ -2212,33 +2227,137 @@ async function writeProductionSourceWatchEvidence({
   }, null, 2)}\n`;
   await fs.writeFile(producerPath, producerRaw, "utf8");
   const producerArtifactSha256 = createHash("sha256").update(producerRaw).digest("hex");
-  const candidatePool = {
+
+  const occurrenceItems = producerCandidates.map((candidate) => {
+    const observationId = sourceWatchObservationIdForTest(candidate);
+    const digest = createHash("sha256").update(`${candidate.id}|${observationId}`).digest("hex").slice(0, 24);
+    return {
+      id: `occ_${digest}`,
+      observation_id: observationId,
+      raw_record_count: 1,
+      cluster_id: `cluster_${createHash("sha256").update(candidate.url).digest("hex").slice(0, 24)}`,
+      title: candidate.title,
+      url: candidate.url,
+      summary: null,
+      publisher_hint: "example.com",
+      collector: {
+        name: candidate.source,
+        url: candidate.url,
+        health: "available",
+        category: "repository"
+      },
+      raw_content_kind: "project",
+      raw_source_level: "github",
+      raw_verification_status: "primary_confirmed",
+      raw_credibility_tag: null,
+      raw_content_category: "open_source",
+      raw_source_group: "github_trending",
+      raw_tags: [],
+      author: null,
+      handle: null,
+      original_text: null,
+      event_date: reportDate,
+      published_at: null,
+      collected_at: `${reportDate}T08:00:00.000Z`,
+      date_anomaly: null,
+      image_url: null,
+      access_state: "direct"
+    };
+  });
+  const occurrenceStore = {
     schema_version: 1,
+    kind: "occurrence_store",
     report_date: reportDate,
     generated_at: `${reportDate}T08:00:00.000Z`,
-    sources: [],
-    candidates: producerCandidates.map((candidate, index) => ({
-      ...candidate,
-      status: index < includedCandidateCount ? "included" : "excluded",
-      ...(index < includedCandidateCount ? { included_in: "source_watch" } : {})
-    }))
+    input_record_count: occurrenceItems.length,
+    occurrence_count: occurrenceItems.length,
+    coalesced_record_count: 0,
+    normalization_error_count: 0,
+    normalization_errors: [],
+    occurrences: occurrenceItems
   };
-  const candidatePoolRaw = `${JSON.stringify(candidatePool, null, 2)}\n`;
-  await fs.writeFile(candidatePoolPath, candidatePoolRaw, "utf8");
-  const candidatePoolSha256 = createHash("sha256").update(candidatePoolRaw).digest("hex");
+  const occurrenceStoreRaw = `${JSON.stringify(occurrenceStore, null, 2)}\n`;
+  await fs.writeFile(occurrenceStorePath, occurrenceStoreRaw, "utf8");
+  const occurrenceStoreSha256 = createHash("sha256").update(occurrenceStoreRaw).digest("hex");
+
+  const publicItems = occurrenceItems.map((item) => ({
+    id: item.id,
+    cluster_id: item.cluster_id,
+    title: item.title,
+    url: item.url,
+    summary: item.summary,
+    author: item.author,
+    handle: item.handle,
+    original_text: item.original_text,
+    publisher: { name: item.publisher_hint, home_url: "https://example.com/" },
+    collected_via: { name: item.collector.name, url: item.collector.url },
+    source_group: "github_trending",
+    content_tags: ["open_source"],
+    credibility_tag: "monitoring_lead",
+    event_date: item.event_date,
+    published_at: item.published_at,
+    collected_at: item.collected_at,
+    date_anomaly: item.date_anomaly,
+    image_url: item.image_url,
+    source_health: item.collector.health,
+    access_state: item.access_state
+  }));
+  const githubTrendingGroup = publicSignalTaxonomy.source_groups.find((group) => group.id === "github_trending");
+  const signalIndex = {
+    schema_version: 1,
+    taxonomy_version: publicSignalTaxonomy.schema_version,
+    kind: "signal_index",
+    generated_at: `${reportDate}T08:00:00.000Z`,
+    total_count: occurrenceItems.length,
+    page_size: 50,
+    coverage: {
+      input_record_count: occurrenceItems.length,
+      occurrence_count: occurrenceItems.length,
+      coalesced_record_count: 0,
+      normalization_error_count: 0
+    },
+    groups: publicItems.length > 0 ? [{
+      id: githubTrendingGroup.id,
+      label: githubTrendingGroup.label,
+      count: publicItems.length,
+      page_count: 1,
+      first_page_url: "signals/github_trending/page-001.json",
+      preview: publicItems
+    }] : []
+  };
+  const signalIndexRaw = `${JSON.stringify(signalIndex, null, 2)}\n`;
+  await fs.writeFile(signalIndexPath, signalIndexRaw, "utf8");
+  if (publicItems.length > 0) {
+    await fs.writeFile(signalPagePath, `${JSON.stringify({
+      schema_version: 1,
+      taxonomy_version: publicSignalTaxonomy.schema_version,
+      kind: "signal_page",
+      generated_at: `${reportDate}T08:00:00.000Z`,
+      group: { id: githubTrendingGroup.id, label: githubTrendingGroup.label },
+      page: 1,
+      page_count: 1,
+      page_size: 50,
+      total_count: publicItems.length,
+      next_url: null,
+      items: publicItems
+    }, null, 2)}\n`, "utf8");
+  }
+  const signalIndexSha256 = createHash("sha256").update(signalIndexRaw).digest("hex");
   return {
     producerPath,
     producerArtifactSha256,
-    candidatePoolPath,
-    candidatePoolSha256,
-    consumption: {
-      candidate_pool_count: 1,
-      candidate_pool_paths: [candidatePoolPath],
-      candidate_pool_hashes: [{ path: candidatePoolPath, sha256: candidatePoolSha256 }],
-      included_candidate_count: includedCandidateCount,
-      public_article_count: publicArticleCount
-    }
+    occurrenceStorePath,
+    occurrenceStoreSha256,
+    signalIndexPath,
+    signalIndexSha256,
+    producerCandidateCount
   };
+}
+
+function sourceWatchObservationIdForTest(candidate) {
+  const fingerprint = candidate.source_watch.snapshot_fingerprint.toLowerCase();
+  const identity = [candidate.source_id, "source_watch.snapshot_fingerprint", fingerprint].join("|");
+  return `obs_${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
 }
 
 function sourceWatchEvidenceStages(evidence) {
@@ -2254,12 +2373,16 @@ function sourceWatchEvidenceStages(evidence) {
         artifact_sha256: evidence.producerArtifactSha256
       }
     },
-    { id: "report_draft", status: "passed" },
-    { id: "report_write", status: "passed" },
     {
-      id: "build",
+      id: "signals_write",
       status: "passed",
-      output: { source_watch_consumption: evidence.consumption }
+      output: { occurrence_store_path: evidence.occurrenceStorePath }
+    },
+    { id: "signals_build", status: "passed", output: { total_count: evidence.producerCandidateCount } },
+    {
+      id: "signals_validate",
+      status: "passed",
+      output: { index_path: evidence.signalIndexPath, total_count: evidence.producerCandidateCount }
     }
   ];
 }

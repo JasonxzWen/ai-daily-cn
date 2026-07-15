@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { gzipSync } from "node:zlib";
 
 import {
   buildOccurrenceStore,
@@ -13,8 +15,6 @@ import {
 } from "../src/occurrence-store.js";
 import {
   buildPublicSignalArtifacts,
-  projectLegacyCandidatePool,
-  projectLegacyReport,
   projectOccurrenceStore,
   PUBLIC_SIGNAL_PAGE_SIZE,
   validatePublicSignalArtifactSet
@@ -22,7 +22,7 @@ import {
 import { occurrenceStoreRelativePath } from "../src/reports-data-layout.js";
 import { scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
 import { validateOccurrenceStore, validatePublicSignals } from "../src/schema.js";
-import { buildSite, planGeneratedFiles } from "../src/site.js";
+import { buildPublicSignals, buildSite, planGeneratedFiles, validatePublicSignalsOutput } from "../src/site.js";
 import { mergeDiscoveryPayloads, writeDiscoveryOccurrenceStore } from "../src/draft.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -170,10 +170,10 @@ test("unknown taxonomy falls back visibly while invalid records are isolated per
   assert.equal(store.normalization_error_count, 1);
   const projected = projectOccurrenceStore(store);
   assert.equal(projected.occurrences.length, 2);
-  const unknown = projected.occurrences.find((item) => item.id === store.occurrences.find((item) => item.source_level === "future_level").id);
-  assert.equal(unknown.source_group, "official_blogs");
+  const unknown = projected.occurrences.find((item) => item.id === store.occurrences.find((item) => item.raw_source_level === "future_level").id);
+  assert.equal(unknown.source_group, "community_discussions");
   assert.equal(unknown.credibility_tag, "pending_review");
-  assert.deepEqual(unknown.content_tags, ["other"]);
+  assert.deepEqual(unknown.content_tags, ["community_discussion"]);
   assert(projected.occurrences.some((item) => item.title === "Collector A RSS"));
 });
 
@@ -487,13 +487,38 @@ test("unknown discovery classification remains other and pending on the occurren
   const signal = projectOccurrenceStore(store).occurrences[0];
 
   assert.equal(merged.candidates[0].category, "community_lead", "legacy candidate pool keeps its closed compatibility category");
-  assert.equal(store.occurrences[0].candidate_category, "future_new_kind");
-  assert.equal(store.occurrences[0].source_level, null);
-  assert.equal(store.occurrences[0].verification_status, null);
-  assert.equal(store.occurrences[0].editorial_category, null);
+  assert.equal(store.occurrences[0].raw_content_kind, "future_new_kind");
+  assert.equal(store.occurrences[0].raw_source_level, null);
+  assert.equal(store.occurrences[0].raw_verification_status, null);
+  assert.equal(store.occurrences[0].raw_content_category, null);
   assert.equal(signal.source_group, "other");
   assert.deepEqual(signal.content_tags, ["other"]);
   assert.equal(signal.credibility_tag, "pending_review");
+});
+
+test("explicit credibility tag survives discovery normalization and wins over legacy metadata", () => {
+  const raw = candidate({
+    id: "explicit-credibility",
+    credibility_tag: "single_source_relay",
+    source_level: "official",
+    verification_status: "primary_confirmed"
+  });
+  const merged = mergeDiscoveryPayloads([{ sources: [source()], candidates: [raw] }], {
+    reportDate: "2026-07-14",
+    generatedAt
+  });
+  const store = buildOccurrenceStore({
+    reportDate: "2026-07-14",
+    generatedAt,
+    sources: merged.sources,
+    candidates: merged.occurrenceCandidates
+  });
+  const signal = projectOccurrenceStore(store).occurrences[0];
+
+  assert.equal(merged.candidates[0].credibility_tag, "single_source_relay");
+  assert.equal(merged.occurrenceCandidates[0].credibility_tag, "single_source_relay");
+  assert.equal(store.occurrences[0].raw_credibility_tag, "single_source_relay");
+  assert.equal(signal.credibility_tag, "single_source_relay");
 });
 
 test("malformed observation identifiers do not coalesce distinct safe discovery records", () => {
@@ -705,25 +730,6 @@ test("public X signals preserve author handle and original post text", () => {
   assert.equal(signal.summary, "Alice 介绍了一个新的 AI 开发工具。");
   assert.equal(signal.publisher.name, "x.com");
   assert.notEqual(signal.publisher.name, signal.author);
-
-  const legacySignal = projectLegacyReport({
-    report_date: "2026-07-14",
-    generated_at: generatedAt,
-    builder_observations: [{
-      id: "legacy-x-post",
-      title: "Legacy X post",
-      url: "https://x.com/alice/status/456",
-      author: "Alice",
-      handle: "@alice",
-      original_text: originalText,
-      summary: "历史结构中的 X 讨论摘要。"
-    }]
-  }).occurrences[0];
-  assert.equal(legacySignal.author, "Alice");
-  assert.equal(legacySignal.handle, "@alice");
-  assert.equal(legacySignal.original_text, originalText);
-  assert.equal(legacySignal.publisher.name, "x.com");
-  assert.notEqual(legacySignal.publisher.name, legacySignal.author);
 });
 
 test("invalid collector URLs defer to a safe candidate collector URL without placeholders", () => {
@@ -769,32 +775,43 @@ test("invalid collector URLs defer to a safe candidate collector URL without pla
   assert.equal(auditStore.occurrences[0].collector.url.includes("example.com"), false);
 });
 
-test("empty source stores fall back to every useful legacy report URL", () => {
+test("empty occurrence stores stay authoritative and ignore legacy candidates and reports", () => {
   const emptyStore = buildOccurrenceStore({
     reportDate: "2026-07-14",
     generatedAt,
     sources: [],
     candidates: []
   });
-  const report = {
-    report_date: "2026-07-14",
-    generated_at: generatedAt,
-    stories: [{
-      story_id: "story-with-source-link",
-      title: "Story source fallback",
-      what_happened: "A story retained through its source list.",
-      sources: [{ name: "Story Publisher", url: "https://story.example/item" }]
+  const artifacts = buildPublicSignalArtifacts({
+    occurrenceStores: [emptyStore],
+    legacyCandidatePools: [{
+      report_date: "2026-07-14",
+      generated_at: "2099-01-01T00:00:00.000Z",
+      sources: [source()],
+      candidates: [candidate({ id: "legacy-candidate" })]
     }],
-    github_trending: [{ title: "GitHub fallback", repo_url: "https://github.com/example/fallback" }],
-    chinese_media_dynamics: [{ title: "Chinese media fallback", url: "https://media.example/china-ai" }],
-    daily_tracking: [{ title: "Tracking fallback", url: "https://metrics.example/index" }]
-  };
-  const direct = projectLegacyReport(report);
-  const artifacts = buildPublicSignalArtifacts({ occurrenceStores: [emptyStore], reports: [report], generatedAt });
+    reports: [{
+      report_date: "2026-07-14",
+      generated_at: "2099-01-02T00:00:00.000Z",
+      stories: [{
+        title: "Legacy report item",
+        url: "https://legacy-report.example/item"
+      }]
+    }],
+    generatedAt: "2099-01-03T00:00:00.000Z"
+  });
 
-  assert.equal(direct.occurrences.length, 4);
-  assert.equal(artifacts.index.total_count, 4);
-  assert.equal(artifacts.index.coverage.legacy_editorial_count, 4);
+  assert.equal(artifacts.index.generated_at, generatedAt);
+  assert.equal(artifacts.index.total_count, 0);
+  assert.deepEqual(artifacts.index.groups, []);
+  assert.deepEqual(artifacts.pages, []);
+  assert.deepEqual(artifacts.occurrences, []);
+  assert.deepEqual(artifacts.index.coverage, {
+    input_record_count: 0,
+    occurrence_count: 0,
+    coalesced_record_count: 0,
+    normalization_error_count: 0
+  });
 });
 
 test("signal validators enforce counts, uniqueness, pagination, and chronology semantics", () => {
@@ -840,8 +857,7 @@ test("signal validators enforce counts, uniqueness, pagination, and chronology s
   assert.equal(validatePublicSignalArtifactSet(mixedGeneration).valid, false);
 
   const falseCoverage = structuredClone(artifacts);
-  falseCoverage.index.coverage.observed_count = 0;
-  falseCoverage.index.coverage.legacy_candidate_count = falseCoverage.index.total_count;
+  falseCoverage.index.coverage.occurrence_count = 0;
   assert.equal(validatePublicSignalArtifactSet(falseCoverage).valid, false);
 
   const crossPageReordered = structuredClone(artifacts);
@@ -863,20 +879,6 @@ test("signal validators enforce counts, uniqueness, pagination, and chronology s
   assert.equal(validatePublicSignalArtifactSet(mismatchedDeclaredFile).valid, false);
 });
 
-test("legacy candidate pools remain rich but are explicitly marked as historical coverage", async () => {
-  const candidatePool = JSON.parse(await fs.readFile(
-    path.join(rootDir, "reports-data", "internal", "candidates", "2026", "07", "2026-07-09.candidates.json"),
-    "utf8"
-  ));
-  const projected = projectLegacyCandidatePool(candidatePool);
-
-  assert.equal(candidatePool.candidates.length, 370);
-  assert.equal(projected.occurrences.length, 370);
-  assert.equal(projected.occurrences.every((item) => item.record_origin === "legacy_candidate_pool"), true);
-  assert.equal(new Set(projected.occurrences.map((item) => item.cluster_id)).size, 319);
-  assert.equal(projected.occurrences.some((item) => item.url === "https://github.com/MadsLorentzen/ai-job-search"), true);
-});
-
 test("public signal pages are exact, finite, conditional by group, and schema-valid", () => {
   const candidates = Array.from({ length: 7 }, (_, index) => candidate({
     id: `candidate-${index}`,
@@ -895,8 +897,6 @@ test("public signal pages are exact, finite, conditional by group, and schema-va
   });
   const artifacts = buildPublicSignalArtifacts({
     occurrenceStores: [store],
-    legacyCandidatePools: [],
-    reports: [],
     generatedAt,
     pageSize: 2,
     previewSize: 1
@@ -904,7 +904,7 @@ test("public signal pages are exact, finite, conditional by group, and schema-va
 
   assert.equal(artifacts.index.total_count, 7);
   assert.equal(artifacts.index.page_size, 2);
-  assert.deepEqual(artifacts.index.groups.map((group) => group.id), ["official_blogs", "github_trending"]);
+  assert.deepEqual(artifacts.index.groups.map((group) => group.id), ["community_discussions"]);
   assert.equal(artifacts.index.groups.some((group) => group.id === "other"), false);
   assert.equal(artifacts.pages.length, 4);
 
@@ -922,7 +922,7 @@ test("public signal pages are exact, finite, conditional by group, and schema-va
   assert.equal(artifacts.pages.at(-1).data.next_url, null);
 });
 
-test("non-contributing invalid legacy inputs cannot change public signal generation time", () => {
+test("only occurrence stores determine public signal generation time", () => {
   const store = buildOccurrenceStore({
     reportDate: "2026-07-14",
     generatedAt,
@@ -932,15 +932,16 @@ test("non-contributing invalid legacy inputs cannot change public signal generat
   const artifacts = buildPublicSignalArtifacts({
     occurrenceStores: [store],
     legacyCandidatePools: [{
-      report_date: "2099-01-01-junk",
+      report_date: "2099-01-01",
       generated_at: "2099-01-01T00:00:00.000Z",
       sources: [],
       candidates: []
     }],
     reports: [{
-      report_date: "invalid",
+      report_date: "2099-12-31",
       generated_at: "2099-12-31T00:00:00.000Z"
-    }]
+    }],
+    generatedAt: "2100-01-01T00:00:00.000Z"
   });
 
   assert.equal(artifacts.index.generated_at, generatedAt);
@@ -962,6 +963,117 @@ test("occurrence store writes to a stable dated path independent of report outpu
     path.join(tmp, "reports-data", ...occurrenceStoreRelativePath("2026-07-14").split(path.sep))
   );
   assert.deepEqual(JSON.parse(await fs.readFile(target, "utf8")), store);
+});
+
+test("occurrence store refuses a same-day rewrite that drops or mutates an existing occurrence", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-occurrence-monotonic-"));
+  const initial = buildOccurrenceStore({
+    reportDate: "2026-07-14",
+    generatedAt,
+    sources: [source()],
+    candidates: [
+      candidate({ id: "kept-a", url: "https://example.com/a" }),
+      candidate({ id: "kept-b", url: "https://example.com/b" })
+    ]
+  });
+  const target = await writeOccurrenceStore({ rootDir: tmp, outputDir: "reports-data", store: initial });
+
+  const dropping = buildOccurrenceStore({
+    reportDate: "2026-07-14",
+    generatedAt,
+    sources: [source()],
+    candidates: [candidate({ id: "kept-a", url: "https://example.com/a" })]
+  });
+  const missingId = initial.occurrences.find((item) => item.url === "https://example.com/b")?.id;
+  await assert.rejects(
+    writeOccurrenceStore({ rootDir: tmp, outputDir: "reports-data", store: dropping }),
+    (error) => error?.code === "occurrence_store_non_monotonic_rewrite" &&
+      error?.details?.missing_occurrence_ids?.includes(missingId)
+  );
+
+  const mutating = structuredClone(initial);
+  mutating.occurrences[0].title = "rewritten after persistence";
+  await assert.rejects(
+    writeOccurrenceStore({ rootDir: tmp, outputDir: "reports-data", store: mutating }),
+    (error) => error?.code === "occurrence_store_non_monotonic_rewrite" &&
+      error?.details?.changed_occurrence_ids?.includes(initial.occurrences[0].id)
+  );
+
+  assert.deepEqual(JSON.parse(await fs.readFile(target, "utf8")), initial);
+});
+
+test("occurrence store permits an exact same-day superset without rewriting prior rows", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-occurrence-superset-"));
+  const first = candidate({ id: "stable-a", url: "https://example.com/a" });
+  const initial = buildOccurrenceStore({
+    reportDate: "2026-07-14",
+    generatedAt,
+    sources: [source()],
+    candidates: [first]
+  });
+  await writeOccurrenceStore({ rootDir: tmp, outputDir: "reports-data", store: initial });
+  const expanded = buildOccurrenceStore({
+    reportDate: "2026-07-14",
+    generatedAt,
+    sources: [source()],
+    candidates: [first, candidate({ id: "stable-b", url: "https://example.com/b" })]
+  });
+
+  const target = await writeOccurrenceStore({ rootDir: tmp, outputDir: "reports-data", store: expanded });
+  const persisted = JSON.parse(await fs.readFile(target, "utf8"));
+  assert.equal(persisted.occurrence_count, 2);
+  assert.deepEqual(persisted.occurrences.find((item) => item.id === initial.occurrences[0].id), initial.occurrences[0]);
+});
+
+test("independent signal writer merges same-day reruns while freezing persisted evidence", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-occurrence-rerun-"));
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const initialPayload = {
+    report_date: "2026-07-14",
+    generated_at: generatedAt,
+    sources: [source()],
+    candidates: [
+      candidate({ id: "stable-a", title: "First observed title", summary: "First observed summary" }),
+      null
+    ]
+  };
+  await fs.writeFile(discoveryPath, `${JSON.stringify(initialPayload, null, 2)}\n`, "utf8");
+  const first = await writeDiscoveryOccurrenceStore({
+    rootDir: tmp,
+    reportDate: "2026-07-14",
+    generatedAt,
+    inputPaths: [discoveryPath]
+  });
+  const frozenOccurrence = structuredClone(first.store.occurrences[0]);
+  const frozenErrors = structuredClone(first.store.normalization_errors);
+
+  const rerunGeneratedAt = "2026-07-14T09:00:00.000Z";
+  initialPayload.generated_at = rerunGeneratedAt;
+  initialPayload.candidates = [
+    candidate({ id: "stable-a", title: "Mutable upstream title", summary: "Mutable upstream summary" }),
+    null,
+    candidate({ id: "stable-b", url: "https://example.com/b" }),
+    candidate({ id: "unsafe-new", url: "javascript:alert(1)" })
+  ];
+  await fs.writeFile(discoveryPath, `${JSON.stringify(initialPayload, null, 2)}\n`, "utf8");
+  const rerun = await writeDiscoveryOccurrenceStore({
+    rootDir: tmp,
+    reportDate: "2026-07-14",
+    generatedAt: rerunGeneratedAt,
+    inputPaths: [discoveryPath]
+  });
+  const persisted = JSON.parse(await fs.readFile(rerun.occurrenceStorePath, "utf8"));
+
+  assert.deepEqual(rerun.store, persisted);
+  assert.deepEqual(persisted.occurrences.find((item) => item.id === frozenOccurrence.id), frozenOccurrence);
+  assert.equal(persisted.occurrences.some((item) => item.observation_id === "observation-stable-b"), true);
+  assert.deepEqual(persisted.normalization_errors.slice(0, frozenErrors.length), frozenErrors);
+  assert.equal(persisted.normalization_error_count, 2);
+  assert.equal(
+    persisted.input_record_count,
+    persisted.occurrences.reduce((sum, item) => sum + item.raw_record_count, 0) + persisted.normalization_errors.length
+  );
+  assert.equal(validateOccurrenceStore(persisted).valid, true);
 });
 
 test("independent signal writer persists discovery records without running editorial selection", async () => {
@@ -1183,7 +1295,7 @@ test("site build writes and plans every signal page while safely removing stale 
     generatedAt
   });
   assert.equal(planned.files.includes("signals/index.json"), true);
-  assert.equal(planned.files.includes("signals/github_trending/page-001.json"), true);
+  assert.equal(planned.files.includes("signals/community_discussions/page-001.json"), true);
   assert.equal(planned.files.includes("signals/other/page-999.json"), true);
 
   const result = await buildSite({
@@ -1193,9 +1305,9 @@ test("site build writes and plans every signal page while safely removing stale 
     outDir: "docs",
     generatedAt
   });
-  assert.equal(result.publicSignals.index.total_count, 7);
-  assert.equal(result.publicSignals.index.coverage.observed_count, 3);
-  assert.equal(result.publicSignals.index.coverage.legacy_candidate_count, 4);
+  assert.equal(result.publicSignals.index.total_count, 3);
+  assert.equal(result.publicSignals.index.coverage.occurrence_count, 3);
+  assert.equal((await validatePublicSignalsOutput({ rootDir: tmp, outDir: "docs" })).ok, true);
   assert.equal(result.writtenFiles.includes("signals/index.json"), true);
   assert.equal(await fileExists(path.join(outDir, "signals", "index.json")), true);
   assert.equal(await fileExists(stalePath), false);
@@ -1231,6 +1343,7 @@ test("site build writes and plans every signal page while safely removing stale 
   await writeOccurrenceStore({
     rootDir: tmp,
     outputDir: "reports-data",
+    mergeExisting: true,
     store: buildOccurrenceStore({
       reportDate: "2026-07-14",
       generatedAt: "2026-07-14T09:00:00.000Z",
@@ -1250,10 +1363,206 @@ test("site build writes and plans every signal page while safely removing stale 
     outDir: "docs",
     generatedAt: "2026-07-14T10:00:00.000Z"
   });
-  assert.equal(occurrenceOnlyUpdate.publicSignals.index.total_count, 8);
+  assert.equal(occurrenceOnlyUpdate.publicSignals.index.total_count, 4);
   assert.equal(occurrenceOnlyUpdate.publicSignals.index.generated_at, "2026-07-14T09:00:00.000Z");
   assert.equal(occurrenceOnlyUpdate.writtenFiles.includes("signals/index.json"), true);
 });
+
+test("standalone public signal build atomically replaces only the managed signals tree", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-public-signal-standalone-"));
+  const dataInputDir = path.join(tmp, "reports-data");
+  const outDir = path.join(tmp, "docs");
+  const poolDir = path.join(dataInputDir, "internal", "candidates", "2026", "07");
+  const legacyArtifacts = new Map([
+    ["index.html", "<!doctype html><title>Legacy home</title>\n"],
+    ["feed.json", "{\"legacy\":\"feed\"}\n"],
+    ["articles.json", "{\"legacy\":\"articles\"}\n"],
+    ["reports/2026/07/2026-07-14.html", "<!doctype html><title>Legacy report</title>\n"]
+  ]);
+  await fs.mkdir(poolDir, { recursive: true });
+  for (const [relativePath, content] of legacyArtifacts) {
+    const target = path.join(outDir, ...relativePath.split("/"));
+    await fs.mkdir(path.dirname(target), { recursive: true });
+    await fs.writeFile(target, content, "utf8");
+  }
+  await fs.writeFile(path.join(poolDir, "2026-07-14.candidates.json"), `${JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    generated_at: generatedAt,
+    sources: [source()],
+    candidates: [candidate({ id: "legacy-candidate" })]
+  }, null, 2)}\n`, "utf8");
+  const persistedReportPath = path.join(dataInputDir, "2026", "07", "2026-07-09.json");
+  await fs.mkdir(path.dirname(persistedReportPath), { recursive: true });
+  await fs.copyFile(
+    path.join(rootDir, "reports-data", "2026", "07", "2026-07-09.json"),
+    persistedReportPath
+  );
+  await writeOccurrenceStore({
+    rootDir: tmp,
+    outputDir: "reports-data",
+    store: buildOccurrenceStore({
+      reportDate: "2026-07-14",
+      generatedAt,
+      sources: [source()],
+      candidates: [candidate({ id: "observed-candidate" })]
+    })
+  });
+
+  const stalePath = path.join(outDir, "signals", "other", "page-999.json");
+  await fs.mkdir(path.dirname(stalePath), { recursive: true });
+  await fs.writeFile(stalePath, "{}\n", "utf8");
+
+  const first = await buildPublicSignals({
+    rootDir: tmp,
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt
+  });
+
+  assert.equal(first.publicSignals.index.total_count, 1);
+  assert.equal(first.publicSignals.index.coverage.occurrence_count, 1);
+  assert.equal(first.publicSignals.index.generated_at, generatedAt);
+  assert(first.writtenFiles.length > 0);
+  assert(first.writtenFiles.every((relativePath) => relativePath.startsWith("signals/")));
+  assert.equal(await fileExists(stalePath), false);
+  for (const [relativePath, content] of legacyArtifacts) {
+    assert.equal(await fs.readFile(path.join(outDir, ...relativePath.split("/")), "utf8"), content);
+  }
+  assert.equal(await fileExists(path.join(outDir, ".nojekyll")), false);
+  assert.equal(await fileExists(path.join(outDir, "home.json")), false);
+  assert.equal(await fileExists(path.join(outDir, "trends.json")), false);
+
+  const firstIndexBytes = await fs.readFile(path.join(outDir, "signals", "index.json"), "utf8");
+  const second = await buildPublicSignals({
+    rootDir: tmp,
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt
+  });
+  assert.deepEqual(second.writtenFiles, []);
+  assert.equal(await fs.readFile(path.join(outDir, "signals", "index.json"), "utf8"), firstIndexBytes);
+
+  const emptyTmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-public-signal-empty-"));
+  const emptyGeneratedAt = "2026-07-14T09:00:00.000Z";
+  await writeOccurrenceStore({
+    rootDir: emptyTmp,
+    outputDir: "reports-data",
+    store: buildOccurrenceStore({
+      reportDate: "2026-07-14",
+      generatedAt: emptyGeneratedAt,
+      sources: [],
+      candidates: []
+    })
+  });
+  const empty = await buildPublicSignals({
+    rootDir: emptyTmp,
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: "2099-01-01T00:00:00.000Z"
+  });
+  assert.equal(empty.publicSignals.index.generated_at, emptyGeneratedAt);
+  assert.equal(empty.publicSignals.index.total_count, 0);
+  assert.deepEqual(empty.publicSignals.index.groups, []);
+  assert.deepEqual(empty.publicSignals.occurrences, []);
+  assert.equal(empty.publicSignals.index.coverage.occurrence_count, 0);
+  assert.equal(await fileExists(path.join(emptyTmp, "docs", "signals", "index.json")), true);
+  assert.equal(await fileExists(persistedReportPath), true);
+  assert.equal(await fileExists(path.join(poolDir, "2026-07-14.candidates.json")), true);
+});
+
+test("public signal build loads immutable compressed occurrence baselines", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-signal-baseline-"));
+  const store = buildOccurrenceStore({
+    reportDate: "2026-07-14",
+    generatedAt,
+    sources: [source()],
+    candidates: [candidate({ id: "compressed-baseline" })]
+  });
+  const baselineDir = path.join(tmp, "reports-data", "occurrences", "baseline-v1");
+  const baselinePath = path.join(baselineDir, "2026-07.json.gz");
+  await fs.mkdir(baselineDir, { recursive: true });
+  const compressed = gzipSync(Buffer.from(`${JSON.stringify(store, null, 2)}\n`), { level: 9, mtime: 0 });
+  await fs.writeFile(baselinePath, compressed);
+  await writeBaselineManifest(tmp, [{ filePath: baselinePath, store, compressed }]);
+
+  const result = await buildPublicSignals({
+    rootDir: tmp,
+    dataInputDir: "reports-data",
+    outDir: "docs"
+  });
+
+  assert.equal(result.publicSignals.index.total_count, 1);
+  assert.equal(result.publicSignals.index.coverage.input_record_count, 1);
+  assert.equal(result.publicSignals.index.coverage.occurrence_count, 1);
+  assert.equal(result.publicSignals.occurrences[0].title, store.occurrences[0].title);
+});
+
+test("public signal build rejects missing or mutated immutable baseline shards", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-signal-baseline-invalid-"));
+  const store = buildOccurrenceStore({
+    reportDate: "2026-07-14",
+    generatedAt,
+    sources: [source()],
+    candidates: [candidate({ id: "compressed-baseline-invalid" })]
+  });
+  const baselineDir = path.join(tmp, "reports-data", "occurrences", "baseline-v1");
+  const baselinePath = path.join(baselineDir, "2026-07.json.gz");
+  await fs.mkdir(baselineDir, { recursive: true });
+  const compressed = gzipSync(Buffer.from(`${JSON.stringify(store, null, 2)}\n`), { level: 9, mtime: 0 });
+  await fs.writeFile(baselinePath, compressed);
+  await writeBaselineManifest(tmp, [{ filePath: baselinePath, store, compressed }]);
+
+  const mutatedStore = structuredClone(store);
+  mutatedStore.occurrences[0].summary = "Manifest did not authorize this otherwise valid mutation.";
+  const mutated = gzipSync(Buffer.from(`${JSON.stringify(mutatedStore, null, 2)}\n`), { level: 9, mtime: 0 });
+  await fs.writeFile(baselinePath, mutated);
+  await assert.rejects(
+    buildPublicSignals({ rootDir: tmp, dataInputDir: "reports-data", outDir: "docs" }),
+    (error) => error?.code === "occurrence_baseline_manifest_invalid"
+  );
+
+  await fs.rm(baselinePath);
+  await assert.rejects(
+    buildPublicSignals({ rootDir: tmp, dataInputDir: "reports-data", outDir: "docs" }),
+    (error) => error?.code === "occurrence_baseline_manifest_invalid"
+  );
+});
+
+test("public signal build fails closed when a required manifest and baseline directory are both missing", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-signal-baseline-deleted-"));
+  await assert.rejects(
+    buildPublicSignals({
+      rootDir: tmp,
+      dataInputDir: "reports-data",
+      outDir: "docs",
+      requireBaselineManifest: true
+    }),
+    (error) => error?.code === "occurrence_baseline_manifest_invalid"
+  );
+});
+
+async function writeBaselineManifest(workspaceRoot, entries) {
+  const files = entries.map(({ filePath, store, compressed }) => ({
+    path: path.relative(workspaceRoot, filePath).split(path.sep).join("/"),
+    report_date: store.report_date,
+    occurrence_count: store.occurrence_count,
+    sha256: createHash("sha256").update(compressed).digest("hex"),
+    compressed_bytes: compressed.length
+  }));
+  const manifest = {
+    schema_version: 1,
+    kind: "public_signal_occurrence_baseline",
+    source: { occurrence_count: files.reduce((sum, item) => sum + item.occurrence_count, 0) },
+    migration: { production_reads_legacy_artifacts: false },
+    files
+  };
+  await fs.writeFile(
+    path.join(workspaceRoot, "reports-data", "occurrence-baseline-manifest.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    "utf8"
+  );
+}
 
 async function fileExists(filePath) {
   try {
