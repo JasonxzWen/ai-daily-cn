@@ -685,47 +685,6 @@ async function runPostQualityStages({
       await writeSummary(summaryPath, summary);
       return { summary, summaryPath };
     }
-    // Editorial weak-card page-check failures degrade instead of hard-blocking.
-    // quality_page_check runs after build, so to publish WITH disclosure we
-    // annotate the written report and re-render docs (deriveQualityStatus merges
-    // the injected degraded_sections), then mark the run degraded — keeping the
-    // run summary and the public artifact consistent. Structural page-check
-    // failures still exit non-zero and hard-block below.
-    if (
-      stage.id === "quality_page_check" &&
-      !outcome.blocked &&
-      outcome.normalized.ok &&
-      Array.isArray(outcome.normalized.output?.degraded_checks) &&
-      outcome.normalized.output.degraded_checks.length > 0
-    ) {
-      const decision = {
-        degraded_sections: Array.isArray(outcome.normalized.output.degraded_sections)
-          ? outcome.normalized.output.degraded_sections
-          : [],
-        residual_editorial_tasks: 0
-      };
-      const [year, month] = String(reportDate).split("-");
-      await annotateReportDegraded(
-        absoluteCleanPath(summary.clean_repo_root, `reports-data/${year}/${month}/${reportDate}.json`),
-        decision
-      );
-      const rerender = await runAndRecordStage({
-        stage: pnpmStage("build_disclosure", ["run", "build", "--", "--skip-signals"]),
-        context,
-        summary,
-        runStage,
-        now
-      });
-      if (rerender.blocked || !rerender.normalized.ok) {
-        summary.final_status = "blocked";
-        summary.next_action = { kind: "inspect_stage_failure", stage_id: "build_disclosure", summary_path: summaryPath };
-        await writeSummary(summaryPath, summary);
-        return { summary, summaryPath };
-      }
-      markStageDegraded(summary, stage.id, decision);
-      await writeSummary(summaryPath, summary);
-      continue;
-    }
     if (stage.id === "content_contract" && !outcome.blocked && !outcome.normalized.ok) {
       const repairDecision = await classifyContentContractRepairResult(outcome.normalized, {
         summary,
@@ -1555,20 +1514,10 @@ function buildPostQualityWorkflowStages({ reportDate, publish, reportPath }) {
       reportDate
     ]),
     pnpmStage("build", ["run", "build", "--", "--source-watch-report-date", reportDate, "--skip-signals"]),
-    pnpmStage("quality_page_check", [
-      "run",
-      "quality:page-check",
-      "--",
-      reportDate,
-      "docs",
-      tmp("page-check")
-    ]),
     nodeStage("content_contract", [
       "scripts/check-daily-content-contract.mjs",
       "--report",
       reportDataPath(reportDate),
-      "--html",
-      reportHtmlPath(reportDate),
       "--json"
     ], { parse_json_failure: true }),
     pnpmStage("validate", ["run", "validate"]),
@@ -3249,11 +3198,6 @@ function candidatePoolPath(reportDate) {
 function reportDataPath(reportDate) {
   const [year, month] = String(reportDate).split("-");
   return `reports-data/${year}/${month}/${reportDate}.json`;
-}
-
-function reportHtmlPath(reportDate) {
-  const [year, month] = String(reportDate).split("-");
-  return `docs/reports/${year}/${month}/${reportDate}.html`;
 }
 
 function qualityReviewPath(reportDate) {

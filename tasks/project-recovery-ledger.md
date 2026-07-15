@@ -35,17 +35,17 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Blocker: the first merged-main non-publish pipeline proof stopped in `prepare_clean_worktree`; REC-006 must land and produce a fresh terminal summary before Source Watch can advance beyond `locally_verified`.
 - Recurrence prevention: semantic contract tests and a thin scheduler prompt with no business state machine.
 
-### REC-003 - All-history ADC shared asset
+### REC-003 - Single Scheme C public surface
 
 - Type: frontend / generated archive.
-- Fact evidence: src/site.js contains ADC_PUBLIC_THEME_START_DATE 2026-07-09; earlier report regeneration can retain legacy visuals and the current overlay is duplicated into report HTML.
-- Root cause: visual rollout was date-gated and optimized for a partial migration rather than one durable generation contract.
+- Fact evidence: Vite now owns the only public HTML surface; `src/site.js` retains information JSON while removing legacy report, ops, official-blog HTML, duplicated theme assets, and avatar-only page assets.
+- Root cause: the former visual rollout was date-gated and duplicated across React, static shells, and generated report pages.
 - State: runtime_verified.
-- Implementation path: src/site.js, src/render.js, src/adc-theme.js, packages/design/src/adc-theme.css, docs/assets/style.css, generated reports, and tests/adc-visual-contract.test.js.
-- Validation commands: focused visual/unit tests; corepack pnpm run build; browser acceptance for early/latest reports and public shells; corepack pnpm run validate.
-- Runtime/production evidence: all 49 generated report pages reference the same shared ADC asset; current REC-330 acceptance covers home, ops, official blog, and representative reports at the canonical `1280x900` desktop viewport with no console, network, HTTP, or overflow failures. Earlier narrow-screen evidence remains historical only.
+- Implementation path: apps/web/src/App.tsx, apps/web/src/styles.css, src/site.js, packages/design/src/adc-theme.css, generated React assets, and tests/adc-visual-contract.test.js.
+- Validation commands: focused visual/unit tests; corepack pnpm run build; browser acceptance for the Scheme C source-grouped monitor at `1280x900`; corepack pnpm run validate.
+- Runtime/production evidence: the built monitor presents the 10,966-occurrence baseline in seven source groups, lazy-loads group pages and same-page history, and completes canonical `1280x900` acceptance with no console, network, HTTP, or overflow failures. Earlier narrow-screen and retired-page evidence remains historical only.
 - Blocker: none known.
-- Recurrence prevention: remove date eligibility, make the shared asset a generation invariant, and cover early/latest fixtures.
+- Recurrence prevention: keep Vite as the single HTML owner and guard retired routes, duplicated assets, desktop-only layout, and signal-page lazy loading in visual/browser contracts.
 
 ### REC-004 - Proven dead-weight removal
 

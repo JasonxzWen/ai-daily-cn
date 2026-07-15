@@ -110,11 +110,12 @@
     "group_summary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "label", "count", "page_count", "first_page_url", "preview"],
+      "required": ["id", "label", "count", "recent_count", "page_count", "first_page_url", "preview"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "label": { "type": "string", "minLength": 1 },
         "count": { "type": "integer", "minimum": 1 },
+        "recent_count": { "type": "integer", "minimum": 0 },
         "page_count": { "type": "integer", "minimum": 1 },
         "first_page_url": { "type": "string", "pattern": "^signals/[a-z_]+/page-[0-9]{3,}\\.json$" },
         "preview": {
@@ -126,13 +127,15 @@
     "index": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["schema_version", "taxonomy_version", "kind", "generated_at", "total_count", "page_size", "coverage", "groups"],
+      "required": ["schema_version", "taxonomy_version", "kind", "generated_at", "total_count", "recent_count", "recent_window_hours", "page_size", "coverage", "groups"],
       "properties": {
         "schema_version": { "const": 1 },
         "taxonomy_version": { "type": "integer", "minimum": 1 },
         "kind": { "const": "signal_index" },
         "generated_at": { "type": "string", "format": "date-time" },
         "total_count": { "type": "integer", "minimum": 0 },
+        "recent_count": { "type": "integer", "minimum": 0 },
+        "recent_window_hours": { "const": 48 },
         "page_size": { "type": "integer", "minimum": 1 },
         "coverage": { "$ref": "#/$defs/coverage" },
         "groups": {

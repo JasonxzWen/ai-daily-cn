@@ -5,7 +5,7 @@ import { isDeepStrictEqual, promisify } from "node:util";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
-import { canonicalReportUrl, reportRelativePaths } from "./paths.js";
+import { canonicalReportDataUrl, reportRelativePaths } from "./paths.js";
 import { classifyPublishQuality, requirePublishableQuality } from "./quality-status.js";
 import { planGeneratedFiles, reportManagedAssetPaths, validatePublicSignalsOutput } from "./site.js";
 import { buildAutomationRevision } from "./automation-revision.js";
@@ -415,11 +415,14 @@ export async function createPublishPlan(options = {}) {
     will_stage_files: stageFiles,
     current_dirty_files: statusEntries.map((entry) => entry.path).sort(),
     commit_message: commitMessage,
-    expected_pages_url: reports.length === 1 ? reports[0].canonical_url : DEFAULT_SITE.siteUrl,
+    expected_pages_url:
+      reports.length === 1
+        ? canonicalReportDataUrl(options.siteUrl || DEFAULT_SITE.siteUrl, reports[0].report_date)
+        : (options.siteUrl || DEFAULT_SITE.siteUrl),
     reports: reports.map((report) => ({
       report_date: report.report_date,
       title: report.title,
-      canonical_url: report.canonical_url,
+      canonical_url: canonicalReportDataUrl(options.siteUrl || DEFAULT_SITE.siteUrl, report.report_date),
       quality_status: report.quality_status?.status || "ok",
       degraded_sections: classifyPublishQuality(report, { rootDir: repoRoot, currentAutomationRevision }).degraded_sections
     }))
@@ -551,7 +554,7 @@ export async function publishGeneratedArtifacts(options = {}) {
     : `chore: publish AI daily report${options.reportDate ? ` ${options.reportDate}` : ""}`);
   await git.add(publishFiles);
   const commitOutput = await git.commit(commitMessage);
-  const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  const pagesUrl = options.reportDate ? canonicalReportDataUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
   let pushOutput = "";
   try {
     pushOutput = await git.push(branch);
@@ -737,7 +740,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
     force: false
   });
 
-  const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  const pagesUrl = options.reportDate ? canonicalReportDataUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
   const verification =
     pagesUrl && options.verifyPages
       ? await verifyPublishedUrl(pagesUrl, {
@@ -825,7 +828,7 @@ export async function resumePublishPush(options = {}) {
   }
 
   await checkPushTransport(repoRoot, git, branch);
-  const pagesUrl = options.reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
+  const pagesUrl = options.reportDate ? canonicalReportDataUrl(DEFAULT_SITE.siteUrl, options.reportDate) : "";
   const pushOutput = await git.push(branch);
   const verification =
     pagesUrl && options.verifyPages
@@ -973,20 +976,13 @@ function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
     `${outPrefix}/.nojekyll`,
     `${outPrefix}/articles.json`,
     `${outPrefix}/favicon.ico`,
-    `${outPrefix}/assets/style.css`,
     `${outPrefix}/feed.json`,
     `${outPrefix}/home.json`,
     `${outPrefix}/index.html`,
-    `${outPrefix}/ops.html`,
     `${outPrefix}/trends.json`,
     `${outPrefix}/data/official-blogs.json`,
-    `${outPrefix}/official-blogs/index.html`,
-    `${outPrefix}/${paths.dataPath}`,
-    `${outPrefix}/${paths.htmlPath}`
+    `${outPrefix}/${paths.dataPath}`
   ]);
-  if (paths.markdownPath) {
-    keep.add(`${outPrefix}/${paths.markdownPath}`);
-  }
   for (const file of files) {
     if (file.startsWith(`${outPrefix}/signals/`)) keep.add(file);
   }
@@ -1412,14 +1408,12 @@ function isPublisherOwnedPath(filePath, scope = "daily", reportDate = "") {
     filePath === "docs/feed.json" ||
     filePath === "docs/home.json" ||
     filePath === "docs/index.html" ||
-    filePath === "docs/ops.html" ||
     filePath === "docs/trends.json" ||
     filePath.startsWith("docs/signals/") ||
     filePath === "retrospectives/index.json" ||
     isPublishRetrospectiveRecordPath(filePath) ||
     filePath.startsWith("docs/assets/") ||
     filePath.startsWith("docs/data/") ||
-    filePath.startsWith("docs/reports/") ||
     filePath.startsWith("reports-data/")
   );
 }
@@ -1434,7 +1428,7 @@ function normalizePublishScope(value) {
 }
 
 function publishResultEnvelope({ mode, scope, publishMode, branch, reportDate, ...details }) {
-  const pagesUrl = reportDate ? canonicalReportUrl(DEFAULT_SITE.siteUrl, reportDate) : "";
+  const pagesUrl = reportDate ? canonicalReportDataUrl(DEFAULT_SITE.siteUrl, reportDate) : "";
   return {
     mode,
     scope: normalizePublishScope(scope),

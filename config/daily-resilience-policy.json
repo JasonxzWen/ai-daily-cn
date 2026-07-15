@@ -303,24 +303,13 @@
     {
       "id": "build",
       "scope": "legacy_report_only",
-      "description": "Build remaining legacy static HTML and data artifacts without rebuilding public signals.",
+      "description": "Build remaining legacy report JSON and the React public app without rebuilding public signals.",
       "retry": { "max_attempts": 2, "backoff_ms": [0, 3000], "on": ["transient_filesystem_error"] },
       "fallback": { "kind": "none", "action": "block_on_unrenderable_public_artifact" },
       "degrade": { "allowed": false, "action": "none" },
       "block": { "allowed": true, "reasons": ["unrecoverable_rendering", "internal_leakage"] },
-      "summary_fields": ["stage_id", "status", "attempts", "html_path", "json_path", "error_code"],
+      "summary_fields": ["stage_id", "status", "attempts", "json_path", "error_code"],
       "replay_fixtures": ["build-render-error"]
-    },
-    {
-      "id": "quality_page_check",
-      "scope": "legacy_report_only",
-      "description": "Check rendered legacy pages for content, layout, media, and theme regressions.",
-      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
-      "fallback": { "kind": "none", "action": "block_on_public_page_quality_failure" },
-      "degrade": { "allowed": false, "action": "none" },
-      "block": { "allowed": true, "reasons": ["unrecoverable_rendering", "internal_leakage", "fake_tracking_component", "unsafe_public_content"] },
-      "summary_fields": ["stage_id", "status", "attempts", "page_check_path", "blocking_count", "degraded_count"],
-      "replay_fixtures": ["page-check-promptlayer-layout", "page-check-broad-official-snapshot"]
     },
     {
       "id": "content_contract",

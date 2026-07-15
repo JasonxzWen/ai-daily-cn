@@ -91,7 +91,6 @@
         "config/feedback-ledger.json",
         "src/quality-status.js",
         "src/interaction-report.js",
-        "src/render.js",
         "prompts/ai-daily/modules/fixed-source-checklist.md",
         "tasks/daily-publish-runbook.md",
         "docs/codex-automation-setup.md"
@@ -238,8 +237,6 @@
         "src/quality-loop.js",
         "src/daily-runner.js",
         "scripts/run-daily-codex-pipeline.mjs",
-        "src/page-checklist.js",
-        "scripts/check-daily-page.mjs",
         "tasks/daily-publish-runbook.md",
         "tests/unit.test.js",
         "tests/e2e/site.e2e.js"
@@ -307,8 +304,6 @@
         "src/draft.js",
         "src/quality-status.js",
         "src/site.js",
-        "src/render.js",
-        "src/page-checklist.js",
         "src/automation-revision.js",
         "tests/unit.test.js",
         "tests/publish.test.js"
@@ -338,7 +333,6 @@
         "src/evidence-cache.js",
         "src/interaction-report.js",
         "src/quality-loop.js",
-        "src/page-checklist.js",
         "src/quality-status.js",
         "tests/unit.test.js",
         "tests/e2e/site.e2e.js"
@@ -525,7 +519,6 @@
         "prompts/ai-daily/modules/output-html.md",
         "prompts/ai-daily/modules/effective-interact-output.md",
         "src/interaction-report.js",
-        "src/page-checklist.js",
         "tests/unit.test.js"
       ],
       "validation": {
@@ -545,7 +538,6 @@
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
         "src/interaction-report.js",
-        "src/page-checklist.js",
         "tests/unit.test.js"
       ],
       "validation": {
@@ -748,7 +740,6 @@
         "schemas/report.schema.json",
         "src/draft.js",
         "src/interaction-report.js",
-        "src/page-checklist.js",
         "src/quality-loop.js",
         "tests/unit.test.js"
       ],
@@ -908,7 +899,6 @@
         "src/draft.js",
         "src/report.js",
         "src/interaction-report.js",
-        "src/page-checklist.js",
         "tests/unit.test.js",
         "tests/e2e/site.e2e.js"
       ],
@@ -930,7 +920,6 @@
         "docs/feedback-buglist-quick-reference.md",
         "src/draft.js",
         "src/interaction-report.js",
-        "src/page-checklist.js",
         "src/presentation.js",
         "src/quality-loop.js",
         "tests/e2e/site.e2e.js",
@@ -957,7 +946,6 @@
         "src/draft.js",
         "src/story-first.js",
         "src/interaction-report.js",
-        "src/page-checklist.js",
         "src/source-health.js",
         ".codex/skills/effective-interact/assets/components/interaction-ui.css",
         "tests/e2e/site.e2e.js",
@@ -984,14 +972,13 @@
         "prompts/ai-daily/modules/editorial-authority.md",
         "prompts/ai-daily/modules/plain-language.md",
         "src/site.js",
-        "src/page-checklist.js",
         "src/interaction-report.js",
         "tests/unit.test.js",
         "tests/e2e/site.e2e.js"
       ],
       "validation": {
         "command": "node --test tests/unit.test.js",
-        "test_name": "buildSite writes effective-interact report html for 2026-06-15 without internal leakage",
+        "test_name": "buildSite writes reader-safe public JSON for 2026-06-15 without internal leakage",
         "gate": "pnpm run validate"
       }
     },
@@ -1043,7 +1030,7 @@
       ],
       "validation": {
         "command": "pnpm run content:contract",
-        "test_name": "real artifact content contract scans report directory and surfaces blocking issues",
+        "test_name": "real artifact content contract scans report JSON and surfaces blocking issues",
         "gate": "pnpm run validate"
       }
     },
@@ -1061,7 +1048,6 @@
         "src/discovery.js",
         "src/tracking-components.js",
         "src/interaction-report.js",
-        "src/page-checklist.js",
         "scripts/check-daily-content-contract.mjs",
         ".codex/skills/effective-interact/scripts/create-interaction.mjs",
         ".codex/skills/effective-interact/assets/components/interaction-ui.css",
@@ -1110,7 +1096,6 @@
         "src/draft.js",
         "src/report.js",
         "src/interaction-report.js",
-        "src/page-checklist.js",
         "tests/e2e/site.e2e.js",
         "tests/unit.test.js"
       ],
@@ -1208,7 +1193,6 @@
         "src/story-first.js",
         "src/interaction-report.js",
         "src/presentation.js",
-        "src/page-checklist.js",
         "src/source-effectiveness.js",
         "tests/unit.test.js"
       ],
@@ -1269,7 +1253,6 @@
         "prompts/ai-daily/modules/publish-workflow.md",
         "scripts/run-daily-codex-pipeline.mjs",
         "src/interaction-report.js",
-        "src/page-checklist.js",
         "src/quality-loop.js",
         "src/site.js",
         "tests/content-contract.test.js",

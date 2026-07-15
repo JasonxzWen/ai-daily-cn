@@ -262,12 +262,16 @@ function collectPublicSignalSemanticErrors(value) {
   if (value?.kind === "signal_index") {
     const groups = Array.isArray(value.groups) ? value.groups : [];
     const groupCount = groups.reduce((sum, group) => sum + Number(group.count || 0), 0);
+    const groupRecentCount = groups.reduce((sum, group) => sum + Number(group.recent_count || 0), 0);
     const coverage = value.coverage || {};
     if (value.total_count !== groupCount) {
       errors.push(semanticError("/total_count", "index total_count must equal the sum of group counts"));
     }
     if (value.total_count !== Number(coverage.occurrence_count || 0)) {
       errors.push(semanticError("/coverage/occurrence_count", "coverage occurrence_count must equal total_count"));
+    }
+    if (value.recent_count !== groupRecentCount) {
+      errors.push(semanticError("/recent_count", "index recent_count must equal the sum of group recent counts"));
     }
     const accountedInputCount = Number(coverage.occurrence_count || 0) +
       Number(coverage.coalesced_record_count || 0) +
@@ -283,6 +287,9 @@ function collectPublicSignalSemanticErrors(value) {
     for (const [index, group] of groups.entries()) {
       if (group.page_count !== Math.ceil(group.count / value.page_size)) {
         errors.push(semanticError(`/groups/${index}/page_count`, "group page_count must match count and page_size"));
+      }
+      if (group.recent_count > group.count) {
+        errors.push(semanticError(`/groups/${index}/recent_count`, "group recent_count cannot exceed its archive count"));
       }
       if ((group.preview || []).some((item) => item.source_group !== group.id)) {
         errors.push(semanticError(`/groups/${index}/preview`, "preview items must belong to their group"));

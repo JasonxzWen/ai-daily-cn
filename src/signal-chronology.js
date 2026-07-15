@@ -1,7 +1,7 @@
 const MAX_FUTURE_SKEW_MS = 24 * 60 * 60 * 1000;
 
 export function compareOccurrenceChronology(left, right) {
-  const effectiveDelta = effectiveTimestamp(right) - effectiveTimestamp(left);
+  const effectiveDelta = effectiveOccurrenceTimestamp(right) - effectiveOccurrenceTimestamp(left);
   if (effectiveDelta !== 0) return effectiveDelta;
   const publishedDelta = chronologyReportedTimestamp(right, "published_at") - chronologyReportedTimestamp(left, "published_at");
   if (publishedDelta !== 0) return publishedDelta;
@@ -28,7 +28,7 @@ export function isOccurrenceChronologySorted(items) {
   return Array.isArray(items) && items.every((item, index) => index === 0 || compareOccurrenceChronology(items[index - 1], item) <= 0);
 }
 
-function effectiveTimestamp(item) {
+export function effectiveOccurrenceTimestamp(item) {
   if (classifyOccurrenceDateAnomaly(item)) return timestamp(item?.collected_at);
   return timestamp(item?.published_at) || timestamp(dateStart(item?.event_date)) || timestamp(item?.collected_at);
 }

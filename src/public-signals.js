@@ -6,11 +6,12 @@ import { gunzipSync } from "node:zlib";
 import { PublisherError } from "./errors.js";
 import { compareOccurrenceChronology } from "./occurrence-store.js";
 import { publicSignalTaxonomy, validateOccurrenceStore, validatePublicSignals } from "./schema.js";
-import { isOccurrenceChronologySorted } from "./signal-chronology.js";
+import { effectiveOccurrenceTimestamp, isOccurrenceChronologySorted } from "./signal-chronology.js";
 import { isValidDateTimeString } from "./time.js";
 
 export const PUBLIC_SIGNAL_PAGE_SIZE = 50;
 export const PUBLIC_SIGNAL_PREVIEW_SIZE = 8;
+export const PUBLIC_SIGNAL_RECENT_WINDOW_HOURS = 48;
 
 const GROUPS = [...publicSignalTaxonomy.source_groups].sort((left, right) => left.order - right.order);
 const GROUP_IDS = new Set(GROUPS.map((item) => item.id));
@@ -57,6 +58,7 @@ export function buildPublicSignalArtifacts(options = {}) {
   }
 
   const occurrences = uniqueOccurrences(projected).sort(compareOccurrenceChronology);
+  const recentCutoff = Date.parse(generatedAt) - PUBLIC_SIGNAL_RECENT_WINDOW_HOURS * 60 * 60 * 1000;
   const byGroup = new Map(GROUPS.map((group) => [group.id, []]));
   for (const occurrence of occurrences) {
     const groupId = GROUP_IDS.has(occurrence.source_group) ? occurrence.source_group : "other";
@@ -92,6 +94,7 @@ export function buildPublicSignalArtifacts(options = {}) {
       id: group.id,
       label: group.label,
       count: items.length,
+      recent_count: items.filter((item) => effectiveOccurrenceTimestamp(item) >= recentCutoff).length,
       page_count: pageCount,
       first_page_url: publicSignalPagePath(group.id, 1),
       preview: items.slice(0, previewSize)
@@ -110,6 +113,8 @@ export function buildPublicSignalArtifacts(options = {}) {
     kind: "signal_index",
     generated_at: generatedAt,
     total_count: occurrences.length,
+    recent_count: occurrences.filter((item) => effectiveOccurrenceTimestamp(item) >= recentCutoff).length,
+    recent_window_hours: PUBLIC_SIGNAL_RECENT_WINDOW_HOURS,
     page_size: pageSize,
     coverage,
     groups
@@ -156,6 +161,8 @@ export function validatePublicSignalArtifactSet(artifacts = {}) {
   }
 
   const allItems = [];
+  let allRecentItems = 0;
+  const recentCutoff = Date.parse(index.generated_at) - index.recent_window_hours * 60 * 60 * 1000;
   for (const group of index.groups) {
     const groupPages = (pagesByGroup.get(group.id) || [])
       .sort((left, right) => left.data.page - right.data.page);
@@ -183,6 +190,11 @@ export function validatePublicSignalArtifactSet(artifacts = {}) {
     if (!isOccurrenceChronologySorted(items)) {
       errors.push(artifactSetError(`/groups/${group.id}`, "page union must preserve global occurrence chronology across page boundaries"));
     }
+    const recentItems = items.filter((item) => effectiveOccurrenceTimestamp(item) >= recentCutoff).length;
+    if (group.recent_count !== recentItems) {
+      errors.push(artifactSetError(`/groups/${group.id}/recent_count`, "group recent_count must equal its exact 48-hour page union"));
+    }
+    allRecentItems += recentItems;
     const expectedPreview = items.slice(0, group.preview.length);
     if (JSON.stringify(group.preview) !== JSON.stringify(expectedPreview)) {
       errors.push(artifactSetError(`/groups/${group.id}/preview`, "index preview must equal the first chronological page items"));
@@ -198,6 +210,9 @@ export function validatePublicSignalArtifactSet(artifacts = {}) {
   }
   if (index.coverage.occurrence_count !== allItems.length) {
     errors.push(artifactSetError("/index/coverage/occurrence_count", "occurrence count must equal the page union"));
+  }
+  if (index.recent_count !== allRecentItems) {
+    errors.push(artifactSetError("/index/recent_count", "index recent_count must equal the exact 48-hour page union"));
   }
   const accountedInputCount = index.coverage.occurrence_count +
     index.coverage.coalesced_record_count +

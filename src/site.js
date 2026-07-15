@@ -4,13 +4,6 @@ import { createHash, randomUUID } from "node:crypto";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError } from "./errors.js";
 import { parseDailyMarkdown } from "./parser.js";
-import { defaultStyleCss, renderIndexHtml, renderOfficialBlogsHtml, renderOpsIndexHtml } from "./render.js";
-import { renderReportWithEffectiveInteract } from "./interaction-report.js";
-import {
-  adcPublicThemeAssetPath,
-  adcPublicThemeCss,
-  adcPublicThemeVersion
-} from "./adc-theme.js";
 import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import {
   candidatePoolRelativePaths,
@@ -41,9 +34,6 @@ import {
   validatePublicSignalArtifactSet
 } from "./public-signals.js";
 
-const AVATAR_DOWNLOAD_TIMEOUT_MS = 2500;
-const AVATAR_MAX_BYTES = 1_000_000;
-const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
 const REPORT_DATA_AUXILIARY_JSON = new Set([
   "source-status-history.json",
   "occurrence-baseline-manifest.json"
@@ -218,218 +208,6 @@ const PUBLIC_SOURCE_FILTER_SECTIONS = [
   "zhihu_items",
   "reddit_items"
 ];
-const TRACKING_HISTORY_LIMIT = 7;
-const DAILY_REPORT_HTML_OVERRIDES = `<style data-ai-daily-css-overrides>
-/* Stage D: denser collapsible panels on the supported desktop surface. */
-.report-section-stack .collapsible-panel {
-  margin: 0;
-}
-
-.report-section-stack .collapsible-summary {
-  padding: 8px 12px;
-}
-
-.collapsible-subtitle {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  color: var(--muted);
-}
-
-.report-shell {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-}
-
-.report-section-stack > section[id^="section-track-"] {
-  border-radius: 8px;
-}
-
-.report-section-stack > section[id^="section-track-"] .rendered-markdown {
-  font-size: 0.95rem;
-  line-height: 1.66;
-}
-
-.report-section-stack > section[id^="section-track-"] .rendered-markdown > p:first-child {
-  margin-top: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.report-section-stack > section[id^="section-track-"] .rendered-markdown strong {
-  display: block;
-  margin-top: 14px;
-  color: var(--ink);
-  font-size: 1rem;
-  line-height: 1.38;
-}
-
-.report-section-stack > section[id^="section-track-"] .rendered-markdown ul {
-  margin: 6px 0 14px;
-  padding-left: 1.15rem;
-}
-
-.report-section-stack > section[id^="section-track-"] .rendered-markdown li {
-  margin: 4px 0;
-}
-
-.inline-site-icon {
-  width: 16px !important;
-  height: 16px !important;
-  max-width: 16px;
-  max-height: 16px;
-  object-fit: cover;
-}
-
-.card-title-icon {
-  width: 18px !important;
-  height: 18px !important;
-  max-width: 18px;
-  max-height: 18px;
-  flex: 0 0 18px;
-}
-
-.chip,
-.text-highlight,
-.daily-tag,
-.tag-highlight,
-.tag-stars,
-.tag-topic,
-.tag-major,
-.tag-notable,
-.tag-general {
-  font-size: 0.78rem;
-  line-height: 1.2;
-  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
-}
-
-.chip:hover,
-a.chip:hover,
-.text-highlight:hover,
-.daily-tag:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--accent) 44%, var(--line));
-  background: color-mix(in srgb, var(--accent-soft) 76%, #ffffff);
-  color: var(--accent);
-}
-
-.chip-topic,
-.tag-topic {
-  border-color: #adc4ce;
-  background: #edf3f5;
-  color: #31586a;
-}
-
-.chip-major,
-.tag-major {
-  border-color: #d7a06a;
-  background: #fff1df;
-  color: #8a431c;
-}
-
-.chip-notable,
-.tag-notable {
-  border-color: #b7c68f;
-  background: #eef4df;
-  color: #526a2d;
-}
-
-/* Reader report left rail is the only supported desktop navigation layout. */
-
-  .report-layout {
-    grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
-    gap: 20px;
-  }
-
-  .report-nav {
-    position: sticky;
-    top: 12px;
-    z-index: 3;
-    flex-direction: column;
-    align-items: stretch;
-    max-height: calc(100vh - 24px);
-    overflow-x: hidden;
-    overflow-y: auto;
-    backdrop-filter: none;
-  }
-
-  .report-nav-group {
-    flex-direction: column;
-    align-items: stretch;
-    overflow: visible;
-  }
-
-  .report-nav a {
-    white-space: normal;
-    border-radius: 6px;
-  }
-
-  .report-nav a[href^="#section-track-"] {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    justify-content: flex-start;
-    border-left: 3px solid transparent;
-    margin-top: 8px;
-    font-size: 0.88rem;
-    font-weight: 760;
-  }
-
-  .report-nav a[href^="#section-track-"]::before {
-    display: block;
-    content: "正文主线";
-    color: var(--muted);
-    font-size: 0.66rem;
-    font-weight: 700;
-    letter-spacing: 0;
-    line-height: 1.1;
-  }
-
-  .report-nav a[href="#section-github-trending"]::before,
-  .report-nav a[href="#section-huggingface-trending"]::before {
-    content: "开源与模型";
-  }
-
-  .report-nav a[href="#section-trend-tracking"]::before,
-  .report-nav a[href="#section-model-releases"]::before {
-    content: "趋势追踪";
-  }
-
-  .report-nav a[href="#section-subscribed-rss"]::before,
-  .report-nav a[href="#section-hot-blogs"]::before,
-  .report-nav a[href="#section-chinese-media-dynamics"]::before {
-    content: "媒体与订阅";
-  }
-
-  .report-nav a[href^="#section-track-"]:hover,
-  .report-nav a[href^="#section-track-"][aria-current="true"] {
-    border-left-color: var(--accent);
-  }
-
-  .report-nav a:not([href^="#section-track-"]) {
-    padding-left: 18px;
-    color: var(--muted);
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-
-  .report-nav a[href^="#section-story-"] {
-    display: none;
-  }
-
-  .report-nav a + a {
-    border-left-color: transparent;
-  }
-
-  .report-nav a span {
-    overflow: visible;
-    white-space: normal;
-  }
-
-
-
-</style>`;
 
 export async function buildSite(options = {}) {
   const rootDir = options.rootDir || process.cwd();
@@ -446,11 +224,9 @@ export async function buildSite(options = {}) {
   const writtenFiles = [];
 
   await fs.mkdir(outDir, { recursive: true });
+  await removeRetiredPublicSurfaces(outDir);
   await recoverInterruptedSignalPublication(outDir, path.resolve(outDir, "signals"));
   await writeFileTracked(outDir, ".nojekyll", "", writtenFiles);
-  await writeFileTracked(outDir, adcPublicThemeAssetPath, `${adcPublicThemeCss}\n`, writtenFiles);
-  await writeFileTracked(outDir, "assets/style.css", defaultStyleCss, writtenFiles);
-  const indexStyleVersion = contentHash(defaultStyleCss);
 
   for (const file of markdownFiles) {
     const markdown = await fs.readFile(file, "utf8");
@@ -526,17 +302,8 @@ export async function buildSite(options = {}) {
       errors: homeValidation.errors
     });
   }
-  const reportNavigationByDate = buildReportNavigation(feedValidation.value.reports, dateIndex.items);
-  const trackingHistoryByDate = buildDailyTrackingHistoryByReportDate(reports);
-
   for (const record of reportRecords) {
-    await writeReportArtifacts(rootDir, outDir, record.report, writtenFiles, record.markdown, record.reportJsonPath, {
-      trendAnnotations: trendValidation.value.annotations_by_date[record.report.report_date],
-      reportNavigation: reportNavigationByDate.get(record.report.report_date),
-      dateIndexItem: dateIndex.items.find((item) => item.date === record.report.report_date),
-      trackingHistoryById: trackingHistoryByDate.get(record.report.report_date),
-      fetchImpl: options.fetchImpl,
-      siteUrl,
+    await writeReportDataArtifacts(outDir, record.report, writtenFiles, record.reportJsonPath, {
       includeInternalData: Boolean(options.includeInternalData)
     });
   }
@@ -549,18 +316,6 @@ export async function buildSite(options = {}) {
   if (!publicSignals.skipped) {
     await syncPublicSignalArtifacts(outDir, publicSignals.files, writtenFiles);
   }
-  await writeFileTracked(outDir, "official-blogs/index.html", renderOfficialBlogsHtml(officialBlogKnowledge, {
-    styleHref: `../assets/style.css?v=${encodeURIComponent(indexStyleVersion)}`
-  }), writtenFiles);
-  await writeFileTracked(outDir, "ops.html", renderOpsIndexHtml(feedValidation.value, trendValidation.value, dateIndex, {
-    styleVersion: indexStyleVersion,
-    officialBlogKnowledge
-  }), writtenFiles);
-  await writeFileTracked(outDir, "index.html", renderIndexHtml(feedValidation.value, trendValidation.value, dateIndex, {
-    styleVersion: indexStyleVersion,
-    officialBlogKnowledge,
-    articles: articleValidation.value
-  }), writtenFiles);
 
   const sourceWatchConsumption = buildSourceWatchConsumption(
     sourceWatchCandidatePoolRecords,
@@ -580,6 +335,42 @@ export async function buildSite(options = {}) {
     dateIndex,
     writtenFiles: uniqueSorted(writtenFiles)
   };
+}
+
+async function removeRetiredPublicSurfaces(outDir) {
+  for (const relativePath of [
+    "ops.html",
+    "official-blogs/index.html",
+    "assets/style.css",
+    "assets/adc-theme.css"
+  ]) {
+    await fs.rm(path.join(outDir, ...relativePath.split("/")), { force: true });
+  }
+  await removeMatchingFiles(path.join(outDir, "reports"), (entry) => entry.name.toLowerCase().endsWith(".html"));
+  await removeMatchingFiles(path.join(outDir, "official-blogs"), () => false);
+  await fs.rm(path.join(outDir, "assets", "avatars"), { recursive: true, force: true });
+}
+
+async function removeMatchingFiles(directory, shouldRemove) {
+  let entries;
+  try {
+    entries = await fs.readdir(directory, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+  for (const entry of entries) {
+    const target = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      await removeMatchingFiles(target, shouldRemove);
+    } else if (entry.isFile() && shouldRemove(entry)) {
+      await fs.rm(target, { force: true });
+    }
+  }
+  const remaining = await fs.readdir(directory);
+  if (remaining.length === 0) {
+    await fs.rmdir(directory);
+  }
 }
 
 export async function buildPublicSignals(options = {}) {
@@ -664,10 +455,6 @@ async function createPublicSignalArtifacts(options = {}) {
   });
 }
 
-function contentHash(value) {
-  return createHash("sha256").update(String(value)).digest("hex").slice(0, 12);
-}
-
 export async function collectMarkdownFiles(inputDir) {
   try {
     const stat = await fs.stat(inputDir);
@@ -715,25 +502,20 @@ export async function planGeneratedFiles(options = {}) {
   const reportJsonFiles = await collectJsonFiles(dataInputDir);
   const files = [
     ".nojekyll",
-    adcPublicThemeAssetPath,
-    "assets/style.css",
     "feed.json",
     "articles.json",
     "home.json",
-    "index.html",
-    "ops.html",
     "trends.json",
-    "data/official-blogs.json",
-    "official-blogs/index.html"
+    "data/official-blogs.json"
   ];
-  files.push(...WEB_APP_GENERATED_FILES.filter((file) => file !== "index.html"));
+  files.push(...WEB_APP_GENERATED_FILES);
   const reports = [];
 
   for (const file of markdownFiles) {
     const markdown = await fs.readFile(file, "utf8");
     const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt });
     const paths = reportRelativePaths(report.report_date);
-    files.push(paths.markdownPath, paths.dataPath, paths.htmlPath);
+    files.push(paths.dataPath);
     files.push(...reportManagedAssetPaths(report));
     reports.push(report);
   }
@@ -741,13 +523,10 @@ export async function planGeneratedFiles(options = {}) {
   for (const file of reportJsonFiles) {
     const { report } = await readReportJsonRecord(file);
     const paths = reportRelativePaths(report.report_date);
-    files.push(paths.dataPath, paths.htmlPath);
+    files.push(paths.dataPath);
     files.push(...reportManagedAssetPaths(report));
     if (options.includeInternalData && (report.candidate_pool_path || (await existingCandidatePoolPath(file, report.report_date)))) {
       files.push(paths.candidateDataPath);
-    }
-    if (report.markdown_path) {
-      files.push(report.markdown_path);
     }
     reports.push(report);
   }
@@ -782,15 +561,12 @@ export function mergeFeed(existingFeed, reports, options = {}) {
       report_date: report.report_date,
       title: report.title,
       summary: report.summary,
-      url: paths.htmlPath,
+      url: paths.dataPath,
       data_url: paths.dataPath,
       main_items: report.main_items.length,
       builder_observations: report.builder_observations.length,
       generated_at: report.generated_at
     };
-    if (report.markdown_path) {
-      entry.markdown_url = report.markdown_path;
-    }
     byDate.set(report.report_date, entry);
   }
 
@@ -905,7 +681,7 @@ function buildHomeEdition(report, feedByDate) {
     report_date: report.report_date,
     title: cleanArticleText(feedEntry.title || report.title || `AI 日报 ${report.report_date}`),
     summary: cleanArticleText(feedEntry.summary || report.summary || "本期暂无编辑摘要。"),
-    report_url: cleanArticleText(feedEntry.url || paths.htmlPath),
+    report_url: cleanArticleText(feedEntry.data_url || feedEntry.url || paths.dataPath),
     data_url: cleanArticleText(feedEntry.data_url || paths.dataPath),
     generated_at: cleanArticleText(feedEntry.generated_at || report.generated_at || `${report.report_date}T00:00:00.000Z`),
     story_count: stories.length,
@@ -1060,7 +836,7 @@ function articleFromReportItem(report, section, item, options = {}) {
     source,
     section,
     report_date: report.report_date,
-    report_url: paths.htmlPath,
+    report_url: paths.dataPath,
     data_url: paths.dataPath,
     quality_score: scoreArticle(section, item, importance, summary),
     importance,
@@ -1780,18 +1556,6 @@ export function deriveDateSignalStrength(metrics = {}) {
   };
 }
 
-function buildReportNavigation(feedReports = [], dateIndexItems = []) {
-  const ordered = [...(Array.isArray(feedReports) ? feedReports : [])]
-    .sort((a, b) => String(a.report_date || "").localeCompare(String(b.report_date || "")));
-  const dateIndexByDate = new Map(dateIndexItems.map((item) => [item.date, item]));
-  return new Map(ordered.map((report, index) => [report.report_date, {
-    previous: ordered[index - 1] || null,
-    next: ordered[index + 1] || null,
-    index_url: "index.html",
-    dateIndexItem: dateIndexByDate.get(report.report_date) || null
-  }]));
-}
-
 function topicLookupByDate(trends) {
   const byDate = new Map();
   const topics = Array.isArray(trends?.topics) ? trends.topics : [];
@@ -1985,118 +1749,6 @@ function publicSourceSearchText(value) {
   }
 }
 
-function buildDailyTrackingHistoryByReportDate(reports = []) {
-  const sortedReports = arrayValue(reports)
-    .filter((report) => report?.report_date)
-    .slice()
-    .sort((left, right) => String(left.report_date).localeCompare(String(right.report_date)));
-  const historyByReportDate = new Map();
-
-  for (const report of sortedReports) {
-    const reportDate = String(report.report_date || "");
-    const windowReports = sortedReports
-      .filter((candidate) => String(candidate.report_date || "") <= reportDate)
-      .slice(-TRACKING_HISTORY_LIMIT);
-    const historyById = {};
-
-    for (const historyReport of windowReports) {
-      const historyDate = String(historyReport.report_date || "");
-      for (const item of arrayValue(historyReport.daily_tracking)) {
-        const point = dailyTrackingHistoryPoint(historyDate, item);
-        if (!point) {
-          continue;
-        }
-        if (!historyById[point.sourceId]) {
-          historyById[point.sourceId] = [];
-        }
-        historyById[point.sourceId].push(point);
-      }
-    }
-
-    for (const [sourceId, points] of Object.entries(historyById)) {
-      const byDate = new Map();
-      for (const point of points) {
-        byDate.set(point.date, point);
-      }
-      historyById[sourceId] = [...byDate.values()]
-        .sort((left, right) => String(left.date).localeCompare(String(right.date)))
-        .slice(-TRACKING_HISTORY_LIMIT);
-    }
-    historyByReportDate.set(reportDate, historyById);
-  }
-
-  return historyByReportDate;
-}
-
-function dailyTrackingHistoryPoint(reportDate, item) {
-  if (!item || item.publish_to_public === false) {
-    return null;
-  }
-  const sourceId = String(item.id || item.name || item.source || item.url || "").trim();
-  if (!sourceId) {
-    return null;
-  }
-  const entry = firstTrackingHistoryEntry(item);
-  const rows = dailyTrackingHistoryRows(item);
-  const valueLabel = firstNonEmpty(entry?.tokens, entry?.value_label, entry?.value, entry?.score, entry?.metric);
-  const value = parseTrackingHistoryNumericValue(valueLabel);
-  if (!Number.isFinite(value)) {
-    return null;
-  }
-  return {
-    sourceId,
-    date: reportDate,
-    label: String(reportDate || "").slice(5),
-    value,
-    valueLabel: String(valueLabel || ""),
-    topLabel: firstNonEmpty(entry?.model, entry?.name, entry?.title, item.name),
-    rank: Number.isFinite(Number(entry?.rank)) ? Number(entry.rank) : 1,
-    rows
-  };
-}
-
-function dailyTrackingHistoryRows(item) {
-  const snapshotEntries = arrayValue(item?.snapshot?.top_entries);
-  const sourceRows = snapshotEntries.length > 0
-    ? snapshotEntries
-    : arrayValue(item?.tracking_component_snapshot?.rows);
-  return sourceRows
-    .map((entry, index) => {
-      const valueLabel = firstNonEmpty(entry?.tokens, entry?.value_label, entry?.value, entry?.score, entry?.metric);
-      const value = parseTrackingHistoryNumericValue(valueLabel);
-      const model = firstNonEmpty(entry?.model, entry?.name, entry?.title, entry?.label);
-      if (!model || !Number.isFinite(value)) {
-        return null;
-      }
-      return {
-        rank: Number.isFinite(Number(entry?.rank)) ? Number(entry.rank) : index + 1,
-        model,
-        provider: firstNonEmpty(entry?.provider, entry?.vendor, entry?.source),
-        value,
-        valueLabel: String(valueLabel || ""),
-        change: firstNonEmpty(entry?.change, entry?.weekly_change, entry?.delta)
-      };
-    })
-    .filter(Boolean)
-    .slice(0, 10);
-}
-
-function firstTrackingHistoryEntry(item) {
-  const snapshotEntries = arrayValue(item?.snapshot?.top_entries);
-  if (snapshotEntries.length > 0) {
-    return snapshotEntries[0];
-  }
-  const componentRows = arrayValue(item?.tracking_component_snapshot?.rows);
-  if (componentRows.length > 0) {
-    return componentRows[0];
-  }
-  const metrics = arrayValue(item?.metrics);
-  if (metrics.length > 0) {
-    return metrics[0];
-  }
-  return null;
-}
-
 function firstNonEmpty(...values) {
   for (const value of values) {
     const text = String(value ?? "").trim();
@@ -2105,29 +1757,6 @@ function firstNonEmpty(...values) {
     }
   }
   return "";
-}
-
-function parseTrackingHistoryNumericValue(value) {
-  const text = String(value || "").replace(/,/g, "").trim();
-  const match = text.match(/[-+]?\d+(?:\.\d+)?/);
-  if (!match) {
-    return NaN;
-  }
-  const amount = Number(match[0]);
-  if (!Number.isFinite(amount)) {
-    return NaN;
-  }
-  const unit = String((text.match(/\b([KMBGT])(?:\b|(?=\s*tokens?))/i) || [])[1] || "").toUpperCase();
-  const multiplier = unit === "T"
-    ? 1_000_000_000_000
-    : unit === "G" || unit === "B"
-      ? 1_000_000_000
-      : unit === "M"
-        ? 1_000_000
-        : unit === "K"
-          ? 1_000
-          : 1;
-  return amount * multiplier;
 }
 
 function weekdayLabel(dateString) {
@@ -2343,61 +1972,12 @@ async function renamePathWithRetry(source, target, options = {}) {
   }
 }
 
-async function writeReportArtifacts(rootDir, outDir, report, writtenFiles, markdown = null, reportJsonPath = null, options = {}) {
+async function writeReportDataArtifacts(outDir, report, writtenFiles, reportJsonPath = null, options = {}) {
   const paths = reportRelativePaths(report.report_date);
-  await localizeBuilderAvatars(rootDir, outDir, report, writtenFiles, {
-    fetchImpl: options.fetchImpl
-  });
-  const reportHtml = applyDailyReportHtmlOverrides(await renderReportWithEffectiveInteract(report, {
-    rootDir,
-    assetRootDir: outDir,
-    trendAnnotations: options.trendAnnotations,
-    reportNavigation: options.reportNavigation,
-    dateIndexItem: options.dateIndexItem,
-    trackingHistoryById: options.trackingHistoryById
-  }), report.report_date);
   await writeJsonTracked(outDir, paths.dataPath, publicReportData(report), writtenFiles);
-  await writeFileTracked(outDir, paths.htmlPath, reportHtml, writtenFiles);
   if (options.includeInternalData && reportJsonPath) {
     await copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writtenFiles);
   }
-  if (markdown !== null && report.markdown_path) {
-    await writeFileTracked(outDir, report.markdown_path, markdown.replace(/\r\n/g, "\n"), writtenFiles);
-  }
-}
-
-export function applyDailyReportHtmlOverrides(html, _reportDate) {
-  let result = html;
-  if (!result) {
-    return result;
-  }
-  if (result.includes("<body") && !result.includes("data-adc-public-surface=")) {
-    result = result.replace("<body", '<body data-adc-public-surface="report"');
-  }
-  if (result.includes("<body") && !result.includes('class="adc-report-brand"')) {
-    result = result.replace(
-      /(<body[^>]*>)/,
-      '$1\n<a class="adc-report-brand" href="../../../index.html"><strong>ADC.</strong><span>AI Daily CN</span></a>'
-    );
-  }
-  const styleBlocks = [];
-  if (!/<link\b[^>]*\brel=["']icon["'][^>]*>/i.test(result)) {
-    styleBlocks.push('<link rel="icon" href="../../../favicon.ico">');
-  }
-  if (!result.includes("data-adc-public-theme")) {
-    styleBlocks.push(`<link rel="stylesheet" data-adc-public-theme href="../../../${adcPublicThemeAssetPath}?v=${adcPublicThemeVersion}">`);
-  }
-  if (!result.includes("data-ai-daily-css-overrides")) {
-    styleBlocks.push(DAILY_REPORT_HTML_OVERRIDES);
-  }
-  if (styleBlocks.length === 0) {
-    return result;
-  }
-  const styles = styleBlocks.join("\n");
-  if (result.includes("</head>")) {
-    return result.replace("</head>", `${styles}\n</head>`);
-  }
-  return `${styles}\n${result}`;
 }
 
 async function readReportJsonRecord(filePath) {
@@ -2826,151 +2406,13 @@ function uniqueSorted(items) {
 }
 
 export function reportManagedAssetPaths(report) {
-  return uniqueSorted([...evidenceAssetPaths(report), ...builderAvatarAssetPaths(report)]);
+  return uniqueSorted(evidenceAssetPaths(report));
 }
 
 function evidenceAssetPaths(report) {
   return (Array.isArray(report?.evidence_assets) ? report.evidence_assets : [])
     .map((asset) => asset?.local_path)
     .filter(Boolean);
-}
-
-function builderAvatarAssetPaths(report) {
-  return (Array.isArray(report?.builder_observations) ? report.builder_observations : [])
-    .map((item) => builderAvatarAssetPath(report, item))
-    .filter(Boolean);
-}
-
-export function builderAvatarAssetPath(report, item) {
-  if (item?.avatar_local_path) {
-    return item.avatar_local_path;
-  }
-  const avatarUrl = normalizeHttpUrl(item?.avatar_url);
-  if (!avatarUrl || !report?.report_date) {
-    return "";
-  }
-  const [year, month] = report.report_date.split("-");
-  const slug = slugForAsset(item.handle || xHandleFromStatusUrl(item.url) || item.author || "builder");
-  return `assets/avatars/${year}/${month}/${report.report_date}-${slug}${imageExtensionFromUrl(avatarUrl) || ".png"}`;
-}
-
-async function localizeBuilderAvatars(rootDir, outDir, report, writtenFiles, options = {}) {
-  const fetchImpl = options.fetchImpl || globalThis.fetch;
-  const items = Array.isArray(report?.builder_observations) ? report.builder_observations : [];
-  if (typeof fetchImpl !== "function" || items.length === 0) {
-    return;
-  }
-
-  await Promise.all(items.map((item) => localizeSingleBuilderAvatar(outDir, report, item, writtenFiles, fetchImpl)));
-}
-
-async function localizeSingleBuilderAvatar(outDir, report, item, writtenFiles, fetchImpl) {
-  if (!item || item.avatar_data_uri) {
-    return;
-  }
-  const avatarUrl = builderAvatarDownloadUrl(item);
-  const relativePath = item.avatar_local_path || builderAvatarAssetPath(report, item);
-  if (!avatarUrl || !relativePath) {
-    return;
-  }
-
-  const target = safeOutPath(outDir, relativePath);
-  if (!target) {
-    return;
-  }
-  if (await exists(target)) {
-    return;
-  }
-
-  const downloaded = await downloadImage(fetchImpl, avatarUrl, target);
-  if (downloaded) {
-    writtenFiles.push(relativePath);
-  }
-}
-
-async function downloadImage(fetchImpl, url, target) {
-  try {
-    const response = await fetchImpl(url, {
-      redirect: "follow",
-      signal: AbortSignal.timeout(AVATAR_DOWNLOAD_TIMEOUT_MS),
-      headers: {
-        accept: "image/avif,image/webp,image/png,image/jpeg,image/gif,image/*",
-        "user-agent": "ai-daily-cn-static-publisher"
-      }
-    });
-    if (!response.ok) {
-      return false;
-    }
-    const contentType = String(response.headers?.get?.("content-type") || "").toLowerCase();
-    if (contentType && !contentType.startsWith("image/")) {
-      return false;
-    }
-    const buffer = Buffer.from(await response.arrayBuffer());
-    if (buffer.length === 0 || buffer.length > AVATAR_MAX_BYTES) {
-      return false;
-    }
-    await fs.mkdir(path.dirname(target), { recursive: true });
-    await fs.writeFile(target, buffer);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function builderAvatarDownloadUrl(item) {
-  return normalizeHttpUrl(item?.avatar_url);
-}
-
-function normalizeHttpUrl(value) {
-  try {
-    const url = new URL(String(value || "").trim());
-    return ["http:", "https:"].includes(url.protocol) ? url.toString() : "";
-  } catch {
-    return "";
-  }
-}
-
-function normalizeXHandle(value) {
-  const handle = String(value || "").trim().replace(/^@/, "");
-  return /^[A-Za-z0-9_]{1,32}$/.test(handle) ? handle : "";
-}
-
-function xHandleFromStatusUrl(value) {
-  try {
-    const [, handle] = new URL(String(value || "")).pathname.match(/^\/([^/]+)\/status\/\d+/i) || [];
-    return normalizeXHandle(handle);
-  } catch {
-    return "";
-  }
-}
-
-function imageExtensionFromUrl(value) {
-  try {
-    const ext = path.extname(new URL(String(value || "")).pathname).toLowerCase();
-    return IMAGE_EXTENSIONS.has(ext) ? ext : "";
-  } catch {
-    return "";
-  }
-}
-
-function safeOutPath(outDir, relativePath) {
-  const normalized = String(relativePath || "").replaceAll("\\", "/");
-  if (!normalized || normalized.startsWith("/") || normalized.includes("\0") || normalized.split("/").includes("..")) {
-    return "";
-  }
-  const target = path.resolve(outDir, ...normalized.split("/"));
-  const root = path.resolve(outDir);
-  return target === root || target.startsWith(`${root}${path.sep}`) ? target : "";
-}
-
-function slugForAsset(value) {
-  return String(value || "")
-    .trim()
-    .toLowerCase()
-    .replace(/^@/, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60) || "builder";
 }
 
 async function copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writtenFiles) {
