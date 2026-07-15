@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import os from "node:os";
@@ -13,6 +14,52 @@ const skillDir = path.join(rootDir, ".codex", "skills", "effective-interact");
 const skillPath = path.join(skillDir, "SKILL.md");
 const createReportScript = path.join(skillDir, "scripts", "create-interaction.mjs");
 const validateReportScript = path.join(skillDir, "scripts", "validate-interaction.mjs");
+const harnessValidatorScript = path.join(rootDir, "scripts", "harness-validate.mjs");
+
+function sha256(content) {
+  return crypto.createHash("sha256").update(content).digest("hex");
+}
+
+async function createHarnessContractFixture(sourceUrl = "https://github.com/JasonxzWen/harness-hub") {
+  const fixtureRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "ai-daily-harness-contract-"));
+  const managedContent = "managed capability\n";
+  const okfValidator = "export function validateOkf() { return { findings: [] }; }\n";
+
+  await fsp.mkdir(path.join(fixtureRoot, ".harness-hub"), { recursive: true });
+  await fsp.mkdir(path.join(fixtureRoot, ".codex", "skills", "target-owned"), { recursive: true });
+  await fsp.writeFile(path.join(fixtureRoot, "CLAUDE.md"), "@AGENTS.md\n", "utf8");
+  await fsp.writeFile(path.join(fixtureRoot, "managed.txt"), managedContent, "utf8");
+  await fsp.writeFile(path.join(fixtureRoot, ".harness-hub", "okf-validate.mjs"), okfValidator, "utf8");
+  await fsp.writeFile(
+    path.join(fixtureRoot, ".codex", "skills", "target-owned", "SKILL.md"),
+    "target-owned compatibility skill\n",
+    "utf8"
+  );
+
+  const manifest = {
+    schemaVersion: 1,
+    source: {
+      url: sourceUrl,
+      commit: "0123456789abcdef0123456789abcdef01234567"
+    },
+    hosts: ["codex"],
+    primaryHost: "codex",
+    files: [{ path: "managed.txt", sha256: sha256(managedContent) }]
+  };
+  await fsp.writeFile(
+    path.join(fixtureRoot, ".harness-hub", "manifest.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    "utf8"
+  );
+  return { fixtureRoot, manifest };
+}
+
+function runHarnessValidator(cwd) {
+  return spawnSync(process.execPath, [harnessValidatorScript], {
+    cwd,
+    encoding: "utf8"
+  });
+}
 
 test("repo has Chinese defaults and effective-interact delivery routing", async () => {
   const agents = await fsp.readFile(path.join(rootDir, "AGENTS.md"), "utf8");
@@ -20,6 +67,133 @@ test("repo has Chinese defaults and effective-interact delivery routing", async 
   assert.match(agents, /Use concise Chinese by default/);
   assert.match(agents, /load `effective-interact`/);
   assert.match(agents, /rerun proportionate deterministic validation/);
+});
+
+test("Harness migration validator accepts canonical source URL variants and target-owned Codex skills", async (t) => {
+  for (const sourceUrl of [
+    "https://github.com/JasonxzWen/harness-hub",
+    "https://github.com/JasonxzWen/harness-hub.git"
+  ]) {
+    const { fixtureRoot } = await createHarnessContractFixture(sourceUrl);
+    t.after(() => fsp.rm(fixtureRoot, { recursive: true, force: true }));
+    const result = runHarnessValidator(fixtureRoot);
+    assert.equal(result.status, 0, result.stderr || result.stdout);
+    assert.match(result.stdout, /Harness validation passed/);
+  }
+});
+
+test("Harness migration validator enforces public manifest and legacy-surface contracts", async (t) => {
+  const cases = [
+    {
+      name: "schema version",
+      mutate: ({ manifest }) => { manifest.schemaVersion = 2; },
+      expected: /schemaVersion must be 1/
+    },
+    {
+      name: "Codex-only hosts",
+      mutate: ({ manifest }) => { manifest.hosts = ["codex", "claude"]; },
+      expected: /Codex as its only and primary Host/
+    },
+    {
+      name: "primary Host",
+      mutate: ({ manifest }) => { manifest.primaryHost = "claude"; },
+      expected: /Codex as its only and primary Host/
+    },
+    {
+      name: "canonical source",
+      mutate: ({ manifest }) => { manifest.source.url = "https://example.com/harness-hub"; },
+      expected: /source URL must be the canonical Harness Hub repository/
+    },
+    {
+      name: "full source commit",
+      mutate: ({ manifest }) => { manifest.source.commit = "0123456"; },
+      expected: /source commit must be a full Git SHA/
+    },
+    {
+      name: "managed file presence",
+      mutate: async ({ fixtureRoot }) => { await fsp.rm(path.join(fixtureRoot, "managed.txt")); },
+      expected: /managed\.txt: missing managed file/
+    },
+    {
+      name: "managed file digest",
+      mutate: async ({ fixtureRoot }) => {
+        await fsp.writeFile(path.join(fixtureRoot, "managed.txt"), "changed\n", "utf8");
+      },
+      expected: /managed\.txt: SHA-256 differs/
+    },
+    {
+      name: "CLAUDE contract",
+      mutate: async ({ fixtureRoot }) => {
+        await fsp.writeFile(path.join(fixtureRoot, "CLAUDE.md"), "# duplicate contract\n", "utf8");
+      },
+      expected: /CLAUDE\.md: must contain exactly @AGENTS\.md/
+    }
+  ];
+
+  for (const contractCase of cases) {
+    const fixture = await createHarnessContractFixture();
+    t.after(() => fsp.rm(fixture.fixtureRoot, { recursive: true, force: true }));
+    await contractCase.mutate(fixture);
+    await fsp.writeFile(
+      path.join(fixture.fixtureRoot, ".harness-hub", "manifest.json"),
+      `${JSON.stringify(fixture.manifest, null, 2)}\n`,
+      "utf8"
+    );
+    const result = runHarnessValidator(fixture.fixtureRoot);
+    assert.notEqual(result.status, 0, `${contractCase.name} should fail`);
+    assert.match(`${result.stderr}\n${result.stdout}`, contractCase.expected);
+  }
+
+  for (const legacyPath of [
+    ".harness-hub/lock.json",
+    ".codex/harness-hub-aggregation.json",
+    "scripts/update-harness-hub.mjs"
+  ]) {
+    const fixture = await createHarnessContractFixture();
+    t.after(() => fsp.rm(fixture.fixtureRoot, { recursive: true, force: true }));
+    const absolutePath = path.join(fixture.fixtureRoot, ...legacyPath.split("/"));
+    await fsp.mkdir(path.dirname(absolutePath), { recursive: true });
+    await fsp.writeFile(absolutePath, "legacy\n", "utf8");
+    const result = runHarnessValidator(fixture.fixtureRoot);
+    assert.notEqual(result.status, 0, `${legacyPath} should fail`);
+    assert.match(`${result.stderr}\n${result.stdout}`, new RegExp(legacyPath.replace(/[.*+?^\${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
+test("Harness migration validator rejects dangling legacy installation links", async (t) => {
+  const fixture = await createHarnessContractFixture();
+  t.after(() => fsp.rm(fixture.fixtureRoot, { recursive: true, force: true }));
+  const legacyPath = path.join(fixture.fixtureRoot, ".harness-hub", "lock.json");
+  try {
+    await fsp.symlink("missing-lock-target", legacyPath, "file");
+  } catch (error) {
+    if (["EACCES", "EPERM", "ENOTSUP", "UNKNOWN"].includes(error.code)) {
+      t.skip(`symlink creation unavailable: ${error.code}`);
+      return;
+    }
+    throw error;
+  }
+
+  const result = runHarnessValidator(fixture.fixtureRoot);
+  assert.notEqual(result.status, 0, ".harness-hub/lock.json dangling link should fail");
+  assert.match(`${result.stderr}\n${result.stdout}`, /\.harness-hub\/lock\.json/);
+});
+
+test("Validate workflow gates pull requests and pushes to main", async () => {
+  const workflow = await fsp.readFile(path.join(rootDir, ".github", "workflows", "validate.yml"), "utf8");
+
+  assert.match(workflow, /pull_request:\r?\n\s+branches: \["main"\]/);
+  assert.match(workflow, /push:\r?\n\s+branches: \["main"\]/);
+  assert.match(workflow, /uses: actions\/checkout@v6/);
+  assert.match(workflow, /node-version: "22"/);
+  assert.match(workflow, /LANG: zh_CN\.UTF-8/);
+  assert.match(workflow, /cache: pnpm/);
+  assert.match(workflow, /corepack pnpm install --frozen-lockfile/);
+  assert.match(workflow, /corepack pnpm exec playwright install --with-deps chromium/);
+  assert.match(workflow, /corepack pnpm run validate/);
+  assert.match(workflow, /node scripts\/harness-validate\.mjs/);
+  assert.match(workflow, /node \.harness-hub\/okf-validate\.mjs \./);
+  assert.match(workflow, /git diff --check/);
 });
 
 test("effective-interact skill is installed with generator, validator, schema, and templates", async () => {

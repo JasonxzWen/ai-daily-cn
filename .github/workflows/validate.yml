@@ -1,0 +1,47 @@
+name: Validate
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      LANG: zh_CN.UTF-8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: corepack pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: corepack pnpm exec playwright install --with-deps chromium
+
+      - name: Validate
+        run: corepack pnpm run validate
+
+      - name: Validate Harness
+        run: node scripts/harness-validate.mjs
+
+      - name: Validate OKF
+        run: node .harness-hub/okf-validate.mjs .
+
+      - name: Check diff
+        run: git diff --check
