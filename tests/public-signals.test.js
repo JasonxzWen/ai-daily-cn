@@ -750,7 +750,7 @@ test("invalid collector URLs defer to a safe candidate collector URL without pla
   });
 
   assert.equal(store.occurrences[0].collector.url, "https://safe-collector.example/feed.xml");
-  assert.equal(store.occurrences[0].collector.url.includes("example.com"), false);
+  assert.notEqual(new URL(store.occurrences[0].collector.url).hostname, "example.com");
 
   const auditMerged = mergeDiscoveryPayloads([{
     source_audit: {
@@ -772,7 +772,7 @@ test("invalid collector URLs defer to a safe candidate collector URL without pla
     candidates: auditMerged.occurrenceCandidates
   });
   assert.equal(auditStore.occurrences[0].collector.url, "https://publisher.example/audit-fallback");
-  assert.equal(auditStore.occurrences[0].collector.url.includes("example.com"), false);
+  assert.notEqual(new URL(auditStore.occurrences[0].collector.url).hostname, "example.com");
 });
 
 test("empty occurrence stores stay authoritative and ignore legacy candidates and reports", () => {

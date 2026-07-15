@@ -2,6 +2,7 @@ import { contentSourceRequestUrl, contentSourceSkipReason, createDiscoveryFetch,
 import { PublisherError } from "./errors.js";
 import { loadSourceRegistry } from "./source-registry.js";
 import { isValidDateString } from "./time.js";
+import { decodeXmlEntitiesOnce as decodeXml } from "./xml.js";
 
 const SOURCE_SPECIFIC_TRACKING_KINDS = new Set([
   "openrouter_rankings_public_playwright",
@@ -482,17 +483,6 @@ function isOriginalXUrl(value) {
 
 function stripTags(value) {
   return String(value).replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]*>/g, " ");
-}
-
-function decodeXml(value) {
-  return String(value)
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number.parseInt(code, 10)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(Number.parseInt(code, 16)));
 }
 
 function dateOnly(value) {

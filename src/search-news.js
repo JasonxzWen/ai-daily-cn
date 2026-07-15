@@ -11,6 +11,7 @@ import {
 import { sanitizePublicHttpUrl } from "./public-url.js";
 import { isValidDateString } from "./time.js";
 import { transportCompletenessTags } from "./public-signal-lanes.js";
+import { decodeXmlEntitiesOnce as decodeXml } from "./xml.js";
 
 const DEFAULT_PROVIDERS = ["gdelt", "openalex", "arxiv"];
 const ACADEMIC_PROVIDERS = new Set(["openalex", "arxiv", "semantic_scholar"]);
@@ -958,18 +959,6 @@ function atomLink(block) {
 
 function stripTags(value) {
   return String(value).replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]*>/g, " ");
-}
-
-function decodeXml(value) {
-  return String(value)
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number.parseInt(code, 10)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(Number.parseInt(code, 16)))
-    .replace(/&nbsp;/g, " ");
 }
 
 function cleanText(value) {
