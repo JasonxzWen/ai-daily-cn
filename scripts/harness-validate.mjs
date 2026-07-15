@@ -5,6 +5,12 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const root = process.cwd();
+const canonicalHarnessHubSourceUrl = 'https://github.com/JasonxzWen/harness-hub';
+const obsoleteHarnessFiles = [
+  '.harness-hub/lock.json',
+  '.codex/harness-hub-aggregation.json',
+  'scripts/update-harness-hub.mjs',
+];
 const migrationManifestPath = path.join(root, '.harness-hub', 'manifest.json');
 if (fs.existsSync(migrationManifestPath)) {
   const migrationFailures = await validateRepositoryMigration(root, migrationManifestPath);
@@ -438,7 +444,7 @@ async function validateRepositoryMigration(targetRoot, manifestPath) {
   if (manifest.schemaVersion !== 1) {
     failures.push('.harness-hub/manifest.json: schemaVersion must be 1');
   }
-  if (manifest.source?.url !== 'https://github.com/JasonxzWen/harness-hub') {
+  if (normalizeHarnessHubSourceUrl(manifest.source?.url) !== canonicalHarnessHubSourceUrl) {
     failures.push('.harness-hub/manifest.json: source URL must be the canonical Harness Hub repository');
   }
   if (!/^[0-9a-f]{40}$/.test(manifest.source?.commit || '')) {
@@ -449,6 +455,13 @@ async function validateRepositoryMigration(targetRoot, manifestPath) {
   }
   if (!Array.isArray(manifest.files) || manifest.files.length === 0) {
     failures.push('.harness-hub/manifest.json: files must be a non-empty array');
+  }
+
+  for (const obsoleteFile of obsoleteHarnessFiles) {
+    const obsoletePath = path.join(targetRoot, ...obsoleteFile.split('/'));
+    if (fs.lstatSync(obsoletePath, { throwIfNoEntry: false })) {
+      failures.push(`${obsoleteFile}: obsolete Harness Hub installation file must not be present`);
+    }
   }
 
   const claudePath = path.join(targetRoot, 'CLAUDE.md');
@@ -507,6 +520,24 @@ async function validateRepositoryMigration(targetRoot, manifestPath) {
   }
 
   return failures;
+}
+
+function normalizeHarnessHubSourceUrl(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== 'https:' || parsed.hostname.toLowerCase() !== 'github.com'
+    || parsed.port || parsed.username || parsed.password || parsed.search || parsed.hash) {
+    return null;
+  }
+  const pathname = parsed.pathname.replace(/\/+$/, '').replace(/\.git$/i, '');
+  return `https://github.com${pathname}`;
 }
 
 function hasLinkedPath(targetRoot, filePath) {
