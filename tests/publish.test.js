@@ -120,6 +120,39 @@ test("signal dry-run stages only the dated occurrence store and public signal tr
   assert(plan.will_stage_files.every((file) => file.startsWith("docs/signals/") || file === occurrencePath));
 });
 
+test("signal dry-run tolerates same-day discovery evidence without widening the signal commit", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const evidencePath = "docs/assets/evidence/content-openrouter-rankings-2026-05-13-1.png";
+  const plan = await createSignalPublishPlan({
+    repoRoot,
+    reportDate: "2026-05-13",
+    git: fakeGit({
+      status: ` M docs/signals/index.json\n?? ${evidencePath}`
+    })
+  });
+
+  assert(plan.current_dirty_files.includes(evidencePath));
+  assert.equal(plan.will_stage_files.includes(evidencePath), false);
+  assert.deepEqual(plan.will_stage_files, ["docs/signals/index.json"]);
+});
+
+test("signal dry-run still rejects discovery evidence from a different date", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: " M docs/signals/index.json\n?? docs/assets/evidence/content-openrouter-rankings-2026-05-12-1.png"
+      })
+    }),
+    (error) => error instanceof PublisherError && error.code === "dirty_worktree"
+  );
+});
+
 test("signal scope rejects legacy publisher changes instead of widening its stage plan", async () => {
   const repoRoot = await tempRepoWithFixture();
   await writeSignalFixture(repoRoot, "2026-05-13");
@@ -283,7 +316,11 @@ test("signal publish commits only signal-owned files without report quality admi
     confirmPush: true,
     git: fakeGit({
       calls,
-      status: ` M docs/signals/index.json\n M ${occurrencePath}`
+      status: [
+        " M docs/signals/index.json",
+        ` M ${occurrencePath}`,
+        "?? docs/assets/evidence/content-openrouter-rankings-2026-05-13-1.png"
+      ].join("\n")
     })
   });
 
@@ -292,6 +329,28 @@ test("signal publish commits only signal-owned files without report quality admi
   assert.equal(result.pushed, true);
   assert.deepEqual(calls.find((call) => call.name === "add").files.sort(), ["docs/signals/index.json", occurrencePath].sort());
   assert.match(calls.find((call) => call.name === "commit").message, /signal stream/);
+});
+
+test("signal GitHub API fallback leaves same-day discovery evidence out of the signal tree", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const evidencePath = "docs/assets/evidence/content-openrouter-rankings-2026-05-13-1.png";
+  const result = await publishGeneratedArtifactsViaGitHubApi({
+    repoRoot,
+    reportDate: "2026-05-13",
+    scope: "signals",
+    confirmPush: true,
+    token: "test-token",
+    repository: "owner/repo",
+    verifyPages: false,
+    git: fakeGit({
+      status: ` M docs/signals/index.json\n?? ${evidencePath}`
+    }),
+    fetchImpl: fakeGitHubFetch()
+  });
+
+  assert.equal(result.published_files.includes("docs/signals/index.json"), true);
+  assert.equal(result.published_files.includes(evidencePath), false);
 });
 
 test("daily dry-run stages sanitized retrospective records for the selected date", async () => {

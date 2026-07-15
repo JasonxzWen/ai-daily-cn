@@ -447,7 +447,7 @@ export async function createSignalPublishPlan(options = {}) {
 
   await requireSignalArtifacts(repoRoot, reportDate, options);
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
-  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path, "signals", reportDate));
+  const unrelated = statusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, "signals", reportDate));
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在 signal scope 之外的未提交改动，信号发布预演已停止。", {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
@@ -511,7 +511,7 @@ export async function publishGeneratedArtifacts(options = {}) {
 
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const publishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate, scope);
-  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path, scope, options.reportDate));
+  const unrelated = statusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, scope, options.reportDate));
 
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，已停止发布。", {
@@ -615,7 +615,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const hasPublisherDirtyFiles = statusEntries.some((entry) => isPublisherOwnedPath(entry.path, scope, options.reportDate));
   const dirtyPublishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate, scope);
-  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path, scope, options.reportDate));
+  const unrelated = statusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, scope, options.reportDate));
 
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，GitHub API 发布已停止。", {
@@ -1424,6 +1424,11 @@ function isPublisherOwnedPath(filePath, scope = "daily", reportDate = "") {
   );
 }
 
+function isPublishWorktreePathAllowed(filePath, scope = "daily", reportDate = "") {
+  return isPublisherOwnedPath(filePath, scope, reportDate) ||
+    (normalizePublishScope(scope) === "signals" && isDateScopedEvidenceAssetPath(filePath, "docs", reportDate));
+}
+
 function normalizePublishScope(value) {
   return String(value || "daily").trim().toLowerCase() === "signals" ? "signals" : "daily";
 }
@@ -1506,16 +1511,20 @@ function generatedPublisherDirtyFiles(statusEntries, generatedRepoFiles) {
 }
 
 function dateScopedEvidenceAssetDirtyFiles(statusEntries, outDir, reportDate) {
-  if (!reportDate) {
-    return [];
-  }
-  const outPrefix = outDir.replaceAll("\\", "/").replace(/\/$/, "");
-  const evidencePrefix = `${outPrefix}/assets/evidence/`;
   return statusEntries
     .map((entry) => entry.path)
-    .filter((file) => file.startsWith(evidencePrefix))
-    .filter((file) => path.posix.basename(file).includes(reportDate))
-    .filter((file) => /\.(?:png|jpe?g|webp|gif|avif)$/i.test(file));
+    .filter((file) => isDateScopedEvidenceAssetPath(file, outDir, reportDate));
+}
+
+function isDateScopedEvidenceAssetPath(filePath, outDir, reportDate) {
+  if (!reportDate) {
+    return false;
+  }
+  const outPrefix = String(outDir || "docs").replaceAll("\\", "/").replace(/\/$/, "");
+  const evidencePrefix = `${outPrefix}/assets/evidence/`;
+  return String(filePath || "").startsWith(evidencePrefix) &&
+    path.posix.basename(filePath).includes(reportDate) &&
+    /\.(?:png|jpe?g|webp|gif|avif)$/i.test(filePath);
 }
 
 function uniqueSorted(values) {
