@@ -1,0 +1,14 @@
+{
+  "name": "website-cloner-harness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve-static.mjs",
+    "build": "node scripts/validate-site.mjs",
+    "check": "node scripts/validate-site.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

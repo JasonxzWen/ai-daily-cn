@@ -1,0 +1,809 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "url": "https://github.com/JasonxzWen/harness-hub.git",
+    "commit": "750550254dfc3c90d6da214e75c4809909c0d9bd"
+  },
+  "hosts": [
+    "codex"
+  ],
+  "primaryHost": "codex",
+  "files": [
+    {
+      "path": ".agents/skills/agent-interaction-audit/SKILL.md",
+      "sha256": "aae46affdbaed9f0f7bf0bee73631a5fbb213d4d33b28dd3c2d30813ec2a068b"
+    },
+    {
+      "path": ".agents/skills/agent-interaction-audit/references/analysis-rubric.md",
+      "sha256": "1ce20482d9650e5593e850748537b71d9fd3a6accc6ee59298f9967d085a68d8"
+    },
+    {
+      "path": ".agents/skills/agent-interaction-audit/references/data-sources.md",
+      "sha256": "86cc5a05de358037d9032f66d5100f33cab87f2b2f31095d5501ef670151f3bd"
+    },
+    {
+      "path": ".agents/skills/agent-interaction-audit/references/host-adapters.md",
+      "sha256": "19bd67c94e0f5f4e963c61de350e02c84e51bdb53731b0a5fca834f54b7c73e1"
+    },
+    {
+      "path": ".agents/skills/agent-interaction-audit/references/report-shape.md",
+      "sha256": "b5129ce5f57467009cf60968c7a19a82d98489aed0f043d89c41a76e3698b7cc"
+    },
+    {
+      "path": ".agents/skills/agent-interaction-audit/scripts/build-agent-interaction-report.mjs",
+      "sha256": "cf4250c3e2b534a81cd0a8cd8b94ccaeb88eb11a750b5ff7457d868cba28de9d"
+    },
+    {
+      "path": ".agents/skills/agent-interaction-audit/scripts/collect-agent-interaction-events.mjs",
+      "sha256": "31a933a5903247b921da5c9bf37e712d95db78ef2deb2954f8f663d5c31376a6"
+    },
+    {
+      "path": ".agents/skills/agent-introspection-debugging/SKILL.md",
+      "sha256": "c372cdd2045199bbaa98e4293650ed90ff29ef9e0b1a86d5c4f59e4e84036bfe"
+    },
+    {
+      "path": ".agents/skills/agent-reach/LICENSE.txt",
+      "sha256": "e94c131ac1c2f78cfd8f7e69da354c0ff58e4e54071697703d56856c036de402"
+    },
+    {
+      "path": ".agents/skills/agent-reach/SKILL.md",
+      "sha256": "1c040ee2410842b353e06764ed0963fb4a5413d04b40c446c25266c3eedcd073"
+    },
+    {
+      "path": ".agents/skills/claude-api/LICENSE.txt",
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    {
+      "path": ".agents/skills/claude-api/SKILL.md",
+      "sha256": "f7501d73bf9e0e557e7de1edd8e331533a43fe7da2d63031e8bf69f21beec2bd"
+    },
+    {
+      "path": ".agents/skills/claude-api/references/live-sources.md",
+      "sha256": "d9eca44abf6c83b90104daf2681d267bb22538dfcb6dc000eb4f6d6f006ada27"
+    },
+    {
+      "path": ".agents/skills/clone-website/SKILL.md",
+      "sha256": "180e3c8d95d93a0efe48e782c3f2cd7094fd8c54fa8e9f693c1dabfa2cf47ff4"
+    },
+    {
+      "path": ".agents/skills/clone-website/assets/component-spec-template.md",
+      "sha256": "ca064a63b29e4c602d51c52f2a6a9ca54a3b601510e8b9cf5efabb4a184fe51f"
+    },
+    {
+      "path": ".agents/skills/clone-website/assets/website-cloner/AGENTS.md",
+      "sha256": "ecd9593c21ff73653bf9bfd3c7be6dd1802087b12795baa9b8f76d2881eb5827"
+    },
+    {
+      "path": ".agents/skills/clone-website/assets/website-cloner/README.md",
+      "sha256": "eaf9773e5b461c349bf977269403e7ed1f8a6b16091e7362a2ef6a55346a73f3"
+    },
+    {
+      "path": ".agents/skills/clone-website/assets/website-cloner/docs/design-references/README.md",
+      "sha256": "567d33ad530eb0dcc2fdd261b4bddb735e1cfda11a455884b18865aea26187b5"
+    },
+    {
+      "path": ".agents/skills/clone-website/assets/website-cloner/docs/research/README.md",
+      "sha256": "bd8de490bb52e392d825b4ffdbe0bdb3cf551f11c193f43462d49b31ea66c9ac"
+    },
+    {
+      "path": ".agents/skills/clone-website/assets/website-cloner/package.json",
+      "sha256": "4fa178b4145bf3c2d2e6cadbdc74e979a1d7754f7bfd214d0a8232d31c5e6a7f"
+    },
+    {
+      "path": ".agents/skills/clone-website/assets/website-cloner/scripts/serve-static.mjs",
+      "sha256": "ac2379f3806780b9b98a0fdc9098c3ec53cd78d8d28119752006bbcbe9bab044"
+    },
+    {
+      "path": ".agents/skills/clone-website/assets/website-cloner/scripts/validate-site.mjs",
+      "sha256": "4e2bca884d1a555291d877a8db48b97eb113a09bb74ba0f45dcf13aa7f793a6e"
+    },
+    {
+      "path": ".agents/skills/clone-website/assets/website-cloner/site/index.html",
+      "sha256": "910fee06d8390b52b6e781c31bfca51f40e3f5e82cbf3c8e12af1ef73db81407"
+    },
+    {
+      "path": ".agents/skills/clone-website/references/extraction-checklist.md",
+      "sha256": "525222cfe95976ac2f66e12dc2763e635a3bc969683e533efe731f358b823734"
+    },
+    {
+      "path": ".agents/skills/clone-website/references/safety-and-permissions.md",
+      "sha256": "949b31bdaa92712d24dfaecfe3831bb7341454e212fd25d73822d4a09e6b15d4"
+    },
+    {
+      "path": ".agents/skills/clone-website/references/upstream-workflow.md",
+      "sha256": "55baad7529f71dc32b9606edd86c059a4a96c8d9e09564b8a6fc528f73a800f3"
+    },
+    {
+      "path": ".agents/skills/code-review/LICENSE.everyinc.txt",
+      "sha256": "61d89de7646effdaba2d0a4ab7bd0eba60b4094b83efe5bc73c7940e43e93fc6"
+    },
+    {
+      "path": ".agents/skills/code-review/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/code-review/SKILL.md",
+      "sha256": "8698e5d8406386911630f0d72c3f98bcd522094cf8420c9ec76eb552101d72e7"
+    },
+    {
+      "path": ".agents/skills/codebase-design/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/codebase-design/SKILL.md",
+      "sha256": "16e68a2b45e96b3a1a2c1f6cba28669e666c4d5ecbf3a84d7b800ee46d6c22ea"
+    },
+    {
+      "path": ".agents/skills/decision-ui/SKILL.md",
+      "sha256": "5aca7f431d948e8260708196d3a9d2c7c773f97dfe5057c1d3ced261ff84e516"
+    },
+    {
+      "path": ".agents/skills/design-taste-frontend/SKILL.md",
+      "sha256": "80183ffb411ee0116a71ed8de9a642a9cf307fa732e8ff1b1fe92b46ce5b6c44"
+    },
+    {
+      "path": ".agents/skills/design-taste-frontend/references/design-read-and-systems.md",
+      "sha256": "a3a5a2a0a1a314084d777cb0835dd25a056602ad7553b63ac2372f7fae83dd54"
+    },
+    {
+      "path": ".agents/skills/design-taste-frontend/references/redesign-and-preflight.md",
+      "sha256": "6d8d7240ecde63e5ad3433f899b4644c003f325de50405f5851fb8f4c5a5df7a"
+    },
+    {
+      "path": ".agents/skills/design-taste-frontend/references/visual-discipline.md",
+      "sha256": "d0a7b8acc2ec9580af2a2064d1a92b1dbf4fc9b332abada307f7d7afae1656f5"
+    },
+    {
+      "path": ".agents/skills/diagnose/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/diagnose/SKILL.md",
+      "sha256": "4b69cb9298b164599a26e234b9d24d76723e2ede110c1edf8363a49ed779de7b"
+    },
+    {
+      "path": ".agents/skills/diagnose/scripts/hitl-loop.template.ps1",
+      "sha256": "5f3be003e590a21a40d5cbdd7832dd7544876e557bf7296496d274805bdeec00"
+    },
+    {
+      "path": ".agents/skills/doc-coauthoring/SKILL.md",
+      "sha256": "cd1f162fc725717886a13187dc2a9182afa9c0fb001e6f585484dc7b2ba3df4b"
+    },
+    {
+      "path": ".agents/skills/documentation-lookup/SKILL.md",
+      "sha256": "54400847a3c2b12415204e4ecafe2329b9a313718e504daad1a09d5a7a7e3496"
+    },
+    {
+      "path": ".agents/skills/e2e-testing/SKILL.md",
+      "sha256": "6083d2578e492a4ddc210466240e55c78e7741347d1d940e6c0295fb572a7e96"
+    },
+    {
+      "path": ".agents/skills/effective-interact/.gitignore",
+      "sha256": "6a049d2185189ae46cf1b776ef55c8ec6dbf97be774475f9960e88a02a86ac9a"
+    },
+    {
+      "path": ".agents/skills/effective-interact/DESIGN.md",
+      "sha256": "8589749f12dd036add8ecf6b9ec0b73e239bfe8e5e72ae9e0b73a79bdaa2fbfa"
+    },
+    {
+      "path": ".agents/skills/effective-interact/SKILL.md",
+      "sha256": "01265e43dce56115797e5378dfd6ce273eca5ab50e7d5bf2a79e5fdda9056a29"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/components/interaction-ui.css",
+      "sha256": "3452b3d609f3cc2d527e41bb3566406917c92665c227760382a4edae33b6afd1"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/components/interaction-ui.js",
+      "sha256": "c3072948eb9275b730f50a8be5b1f38f60586d1b8e61393b6c7019008fdf7c31"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/components/rich-render-runtime.css",
+      "sha256": "5e6292f81c03b8c74e01a8f07b0a88d1b2d19f188483a2e9574286a513f88cd9"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/components/rich-render-runtime.js",
+      "sha256": "0853cea9fdc1e2fb2d38c25f4bd1195a70216bbdb69ea3f754cd389f1cc11adf"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/chart-accessibility-stress-report.json",
+      "sha256": "f8aac1d161d941604374d3584e9d663d4229c4eb51cccea32d3b5953651f72c4"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/communication-mode-cases.json",
+      "sha256": "2d8f6fe4fa8319e47a773c71adf372084d6275989f10355167af9afb08ffd48a"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/concise-handoff-report.json",
+      "sha256": "94e2c2822693d57d557d1b5c9cac9b6fd6f3f3495b61cb958b2e5d715d1bb166"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/content-first-change-report.json",
+      "sha256": "b69dcdd994f8beb0e9c4ac2ca0e33bd121e3d8fc21378cb57e82e4eb7fdd6c79"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/decision-quality-report.json",
+      "sha256": "a3b37ce22ed6f4269f9ff47a263b76387297692b369d6e077db17f71a5549516"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/disposable-export-editor-report.json",
+      "sha256": "4b6790e984d029fd4441d50fae7696f168971576f0ed515d41517d0fae95fbcf"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/html-effectiveness-pattern-library-report.json",
+      "sha256": "41f63815f8a8a2d01a181980600ad1f8b9218810c6f1eeb11a5e9751756eb02e"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/mode-structure-cases.json",
+      "sha256": "0c938a0b3b64c2a7e49ccd10c77eeeded79310dd19fe35ec28590addbdffc4dc"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/option-gallery-report.json",
+      "sha256": "d7341579b5078a32dd682aa81b3bc455c1cd15c554235128c01ce9dc95150e0b"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/pre-rendered-report.json",
+      "sha256": "37674ac27413a282b834922620d3ff4abbe81a028f415d1b7d74fb32633e4da9"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/runtime-cdn-stress-report.json",
+      "sha256": "c26c1839c86570bb22d29b90cf2a2cd9d37afee319789d9e9d340105dc9ef80f"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/runtime-report.json",
+      "sha256": "32d0d1742acc5880f1d2cc57ec7cbebbb19070e1c107d4b07e4aaf29e2a84d86"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/session-ledger-report.json",
+      "sha256": "7afb211b396654276f408239a77bd6eddd11174e9aae75236ac6c5aaf156873b"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/skill-structure-map-report.json",
+      "sha256": "00273cfebb4580af4635aff152fea261fead4537b3b4c787901a3c650ec8e650"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/fixtures/table-component-report.json",
+      "sha256": "630969c2be1567d3b9bf070c1fc37c22fd31054fe00d4285fa98f6b0b147b0e5"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/templates/conclusion-dashboard.html",
+      "sha256": "363ba4bb310aec2a9aa325ea42e2d5bf0db9cda3f73e5d1379704b941ea97412"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/templates/decision-matrix.html",
+      "sha256": "3554acd3f9941a6ff7a7d8bae4a0f9d75e23e805669707b1fccfaad32fd9671f"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/templates/editor-workbench.html",
+      "sha256": "0286ee630c42b43da7bd04d04c140aa477e8419752a6fd654c2101f3eb670bd2"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/templates/implementation-handoff.html",
+      "sha256": "1f74d15fa4400a4f944e2c124710dc5c3de487961e26748dc983fe05c618f10d"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/templates/implementation-plan.html",
+      "sha256": "2cfb2e19db6d2380936f62e06ed1e3a0b8440adfc849a10ae12e5c8f1ff6805e"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/templates/research-explainer.html",
+      "sha256": "0917337b93f876018a85f0f35f2d0483da07192773b06ece4a9dd6d544f5b95d"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/templates/review-findings.html",
+      "sha256": "d11c16408ae66d306b5de04b9c775248bc22c7ee180499240c5d28a0b3c43b67"
+    },
+    {
+      "path": ".agents/skills/effective-interact/assets/templates/visual-exploration.html",
+      "sha256": "e3e19434fa930914091bac4edb4e53c97ecd11e4e00543d91615106d79b17b16"
+    },
+    {
+      "path": ".agents/skills/effective-interact/evals/routing-cases.json",
+      "sha256": "4562a20da6fbc47d41b06659a6090d897a51b80608be5dc1de349397860d6283"
+    },
+    {
+      "path": ".agents/skills/effective-interact/references/component-contracts.md",
+      "sha256": "05e038549f70b4e665d39029da7dc1a09bf5e21e0de28d6caf5aa9babce452d8"
+    },
+    {
+      "path": ".agents/skills/effective-interact/references/generator-validation-contract.md",
+      "sha256": "70eb8bd02800c1ef9ff2115487c7102d0e20580dd1187bf82beaa352f743303a"
+    },
+    {
+      "path": ".agents/skills/effective-interact/references/html-aesthetic-preflight.md",
+      "sha256": "b1a6a90d3712f4dcd846ee63657a2dd214c1a09a30e2a407fa191a28e27d4d82"
+    },
+    {
+      "path": ".agents/skills/effective-interact/references/html-effectiveness-patterns.md",
+      "sha256": "6369cb9a917eda0738385e992f1dfc83cf2949944545bf5212d9d72135976c5c"
+    },
+    {
+      "path": ".agents/skills/effective-interact/references/interaction-input-schema.json",
+      "sha256": "2244cb0baaa88557d125151e0452649e8d93b33120fab1ec062801499028a1b4"
+    },
+    {
+      "path": ".agents/skills/effective-interact/references/interaction-patterns.md",
+      "sha256": "662f6a7cc274175fc8f2c7779e4032be0ab466e4b527f8352842bb03ec25946d"
+    },
+    {
+      "path": ".agents/skills/effective-interact/references/report-ia.md",
+      "sha256": "68c754dd02d53611b4e1dbd7fc78b79be254321369526fa7ebd0a3fd17eb5594"
+    },
+    {
+      "path": ".agents/skills/effective-interact/references/session-ledger-schema.json",
+      "sha256": "d10c276c7ea21e3d4504e84305e256f58386eefb4e4c9c1eb01a8fbab2b5b611"
+    },
+    {
+      "path": ".agents/skills/effective-interact/references/visual-language.md",
+      "sha256": "4099c2bf82964d81b90632923525475655b48783da3568c694356563e5440e63"
+    },
+    {
+      "path": ".agents/skills/effective-interact/scripts/check-mode-structure.mjs",
+      "sha256": "44a74d17bcf6962f54f7bce260028bf8e2948417ef0684ec882753d4484a6d1d"
+    },
+    {
+      "path": ".agents/skills/effective-interact/scripts/create-interaction.mjs",
+      "sha256": "2b720a3cb82ceb36ec755926a5f7fa39469fe0703c325a357a9e54ce598ad47a"
+    },
+    {
+      "path": ".agents/skills/effective-interact/scripts/serve-artifact.mjs",
+      "sha256": "d04fc8983283cf8b2ec4e4f3ef9074289767d89ff80742f6f8eccd45f005cb8c"
+    },
+    {
+      "path": ".agents/skills/effective-interact/scripts/validate-interaction.mjs",
+      "sha256": "c9d428334acfd009c4cdf1e9798463a260e005b2e54c42e0425c18f31b0d2e8d"
+    },
+    {
+      "path": ".agents/skills/frontend-design/LICENSE.txt",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "path": ".agents/skills/frontend-design/SKILL.md",
+      "sha256": "af16ed123171c5bbc0c8bde10d786ad3fd07abfd03a9033c223fc0d8e0b18bde"
+    },
+    {
+      "path": ".agents/skills/frontend-patterns/SKILL.md",
+      "sha256": "760e6efc88f8f546dd244e346870dc59bb6587b4b902735c6602e07c3b39ae97"
+    },
+    {
+      "path": ".agents/skills/frontend-patterns/references/pattern-checklist.md",
+      "sha256": "e14a17269e0929ddfb23e21c45461ae60271f93395b3190ce4fbab462f5a3e14"
+    },
+    {
+      "path": ".agents/skills/frontend-slides/SKILL.md",
+      "sha256": "cf403216de517bc98a6416f34df4bdb7e4f427e30a0307adb844df18894750b5"
+    },
+    {
+      "path": ".agents/skills/frontend-slides/STYLE_PRESETS.md",
+      "sha256": "f3448493022f8fa3f858319b14c0c48a35d441864dc78a2411f7938c28e7a265"
+    },
+    {
+      "path": ".agents/skills/grill-me/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/grill-me/SKILL.md",
+      "sha256": "1a47f340bcf621dcc7513bdaa46a8a5f5e638cd11beb222219b03169b2bbd722"
+    },
+    {
+      "path": ".agents/skills/grill-with-docs/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/grill-with-docs/SKILL.md",
+      "sha256": "0fddda383c6bbb3d69a0e1157fef7372e98608157b4669ea52af21f6558b4b7d"
+    },
+    {
+      "path": ".agents/skills/grill-with-docs/references/domain-modeling.md",
+      "sha256": "de6cdee9437b79f27baa355e6134a4bbadd2f758374e9c34c4cffb82cf221e06"
+    },
+    {
+      "path": ".agents/skills/handoff/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/handoff/SKILL.md",
+      "sha256": "a108576ade0aa787046702d039fab412b7d305520d65892f6eca52281c075dcb"
+    },
+    {
+      "path": ".agents/skills/internal-comms/LICENSE.txt",
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    {
+      "path": ".agents/skills/internal-comms/SKILL.md",
+      "sha256": "f27fd8efcd9746d13750eb5bcc0c3b487033908248c4c7f1e2a0a4e5b1d93f26"
+    },
+    {
+      "path": ".agents/skills/internal-comms/references/3p-updates.md",
+      "sha256": "f7cb618918a047b0a633b47185958208698bc07a58bd1b723c42379eff3a8dd6"
+    },
+    {
+      "path": ".agents/skills/internal-comms/references/company-newsletter.md",
+      "sha256": "30f81cfbdb03858a006169c72169024089c7c5d3d32611d337782da4f38c86b5"
+    },
+    {
+      "path": ".agents/skills/internal-comms/references/faq-answers.md",
+      "sha256": "5ecd3356cd6666937f2ebefa753253edfdbdca15e368d07baf398bfcced72484"
+    },
+    {
+      "path": ".agents/skills/internal-comms/references/general-comms.md",
+      "sha256": "4d3a4bb198a77626bcf018e96b2b45a2dbabed172d4ade0fcd70d23ae8a47a47"
+    },
+    {
+      "path": ".agents/skills/karpathy-guidelines/SKILL.md",
+      "sha256": "e70d75f2fab68c6f0bf337e3cd1a799ab481c05456f50ac7f973bea4f4d123be"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/LICENSE.txt",
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/SKILL.md",
+      "sha256": "cbbefaca740faae600ce7612692c2b5d3044ad705e5e91ae6be5ec9f697d79d2"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/references/evaluation.md",
+      "sha256": "31b8cc15cd6185c304d20114d29176d0a707fc649a1041e12fd6e6b37fbe0477"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/references/mcp_best_practices.md",
+      "sha256": "80fb4369a349447cf18ecdd7494fe7938b6065377e9f08c077cec411093a3007"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/references/node_mcp_server.md",
+      "sha256": "c3ba35a4f599dd53be9c6555ae72c19a7bf412cd5426576c2c08d42755482c66"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/references/python_mcp_server.md",
+      "sha256": "df1b236d8d8c83007ab1bd41826a1d3ca3de755567ce8b714cbc2385c488bd7a"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/scripts/connections.py",
+      "sha256": "294d84a87ada527a12ec66d6955ba0560671767d41c7b2e3634bef343a047908"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/scripts/evaluation.py",
+      "sha256": "97a907f08b7f4253e9a0919f26cb552351797761e63a20697f950e59ccca3589"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/scripts/example_evaluation.xml",
+      "sha256": "9272b348ddcc4b06ba562367ccd0770e018158c0068ac5116d5e34aaeff8777a"
+    },
+    {
+      "path": ".agents/skills/mcp-builder/scripts/requirements.txt",
+      "sha256": "d5d7558b2368ecea9dfeed7d1fbc71ee9e0750bebd1282faa527d528a344c3c7"
+    },
+    {
+      "path": ".agents/skills/openspec-apply-change/SKILL.md",
+      "sha256": "c6ad6f734b1a0cd8907bad64a604ce68b5e32e2c902dbf9c5330e15961450af4"
+    },
+    {
+      "path": ".agents/skills/openspec-archive-change/SKILL.md",
+      "sha256": "360dc272f23547183991933ba00f3832001741ea72464b5b5ec27c2f9540d49c"
+    },
+    {
+      "path": ".agents/skills/openspec-explore/SKILL.md",
+      "sha256": "fe33b548cc6c17d8a9df984494116ac47e01b788416e015ce33d0bd07bffcbf1"
+    },
+    {
+      "path": ".agents/skills/openspec-propose/SKILL.md",
+      "sha256": "900aa3187dd9f21403df00f3c2fbe67f7b37e9f5f03d02e131e21d6a81e42193"
+    },
+    {
+      "path": ".agents/skills/package-release-sniffer/SKILL.md",
+      "sha256": "fe1c01203c9aeb7c82d01eecaaa61ff6aef7b6cb63e9be1144c7bed8fbf76cb8"
+    },
+    {
+      "path": ".agents/skills/ponytail/SKILL.md",
+      "sha256": "d2b7f50f73019fdb26e35e248bfc4bce351234a0a994a78f2d43e561870c4242"
+    },
+    {
+      "path": ".agents/skills/product-capability/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/product-capability/SKILL.md",
+      "sha256": "af392fb5d7cc0e1fac42e73e2a2f5f0aff2edcc0cd0eaacf00c412a0864ee8dc"
+    },
+    {
+      "path": ".agents/skills/product-ui-review/SKILL.md",
+      "sha256": "d7508e74abf139e41435f82151f5d45cfc30cc3c8a802a85b7a058fbf50f10f2"
+    },
+    {
+      "path": ".agents/skills/product-ui-review/references/review-lenses.md",
+      "sha256": "cea1d9ad4d05781784cb4b77bc6845ee330f17c842439e48286294d0533eed4e"
+    },
+    {
+      "path": ".agents/skills/prototype/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/prototype/SKILL.md",
+      "sha256": "d5b5e58180abd7d5d67bfa57e964d4a7ede4df5fab66c9a3172054eeecade2bc"
+    },
+    {
+      "path": ".agents/skills/prototype/references/logic-prototype.md",
+      "sha256": "f43d06976626d8d49e9f2944ca91ae60b9091ab2181e5a1e0e75fdf540733f65"
+    },
+    {
+      "path": ".agents/skills/prototype/references/ui-prototype.md",
+      "sha256": "e01b91a052f26b6c6dd6fdf7355182b182f91e08afd7badef433682319634f08"
+    },
+    {
+      "path": ".agents/skills/quick-learn/SKILL.md",
+      "sha256": "406e847bf77fc5ec5445014fb27bea9dcfdb4bd08d9a97219750c9533a2ab561"
+    },
+    {
+      "path": ".agents/skills/quick-learn/references/learning-project-lifecycle.md",
+      "sha256": "e84057ae689d1b3465264a8db23372e064b06d6d2a54edc7ddf58a29749725c9"
+    },
+    {
+      "path": ".agents/skills/quick-learn/references/review-and-orchestration.md",
+      "sha256": "3a876df6c07021c4d947a61fcef55beb8a33ff0a42420c40e9b24fb557bb9e53"
+    },
+    {
+      "path": ".agents/skills/quick-learn/references/source-strategy.md",
+      "sha256": "f61e2daa20cf0f9cd85ab0932f1b9d9010689a831a4ba7ef7774cc07419bf0f5"
+    },
+    {
+      "path": ".agents/skills/quick-learn/references/teaching-and-assessment.md",
+      "sha256": "06d5bdb0fa70ea190c9ff8940f6fbdcfea345f4ab6d38bd8154b5c10e7306c60"
+    },
+    {
+      "path": ".agents/skills/quick-learn/scripts/log_quick_learn_event.py",
+      "sha256": "26bac0296fc2c29c7704c7e68db50412707b4dfca6bb1516fdf7d0f26a1e969a"
+    },
+    {
+      "path": ".agents/skills/security-review/SKILL.md",
+      "sha256": "ecc6cb44123afd0acb3b1056ea380858fa3afe049b15ede0751ef3c7e5797522"
+    },
+    {
+      "path": ".agents/skills/skill-creator/LICENSE.mattpocock.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/skill-creator/LICENSE.txt",
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    {
+      "path": ".agents/skills/skill-creator/SKILL.md",
+      "sha256": "aaf99164a36eb97bf9eed221b815eba26e5625c0b7af0cb669b113e46261b642"
+    },
+    {
+      "path": ".agents/skills/skill-creator/references/evaluation-template.md",
+      "sha256": "0834485e9f5954abe809248ee0296e9dc26288d6e75894ea0070b01ba381e922"
+    },
+    {
+      "path": ".agents/skills/slack-gif-creator/LICENSE.txt",
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    {
+      "path": ".agents/skills/slack-gif-creator/SKILL.md",
+      "sha256": "a480b7530275628bc637371b1014c96f140565e0e5d641a4f3026e60d1fb10aa"
+    },
+    {
+      "path": ".agents/skills/slack-gif-creator/scripts/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": ".agents/skills/slack-gif-creator/scripts/core/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": ".agents/skills/slack-gif-creator/scripts/core/easing.py",
+      "sha256": "60bc943449802541f0f0881a874faa7ef408aaaf0b758fde756664ada7740452"
+    },
+    {
+      "path": ".agents/skills/slack-gif-creator/scripts/core/frame_composer.py",
+      "sha256": "a127ea8f2a58893ea10a5c7b5cab4e2010af6515adc538676eb0cc14f5a03985"
+    },
+    {
+      "path": ".agents/skills/slack-gif-creator/scripts/core/gif_builder.py",
+      "sha256": "b6f50d738c491ee0438a2e86e897f71cdab9792494ba4605f140befb0bddbf89"
+    },
+    {
+      "path": ".agents/skills/slack-gif-creator/scripts/core/validators.py",
+      "sha256": "56bd19e3aae05f8387d78ec8185d6098b3dc909d1fa041211753da37212528a3"
+    },
+    {
+      "path": ".agents/skills/slack-gif-creator/scripts/requirements.txt",
+      "sha256": "edc7108a0c6b56183566c71ee96830f6dc791e3b41952112d9cb56b33a6bd757"
+    },
+    {
+      "path": ".agents/skills/source-post/SKILL.md",
+      "sha256": "a0b951b9b6d56c841c81820669f61da951a9344f6c0cde8f389fb5b5df17f4df"
+    },
+    {
+      "path": ".agents/skills/source-post/assets/source-post-checklist.md",
+      "sha256": "d5f8a99b14bd452ae4830be2d6b431fa924743bfc318546fe6683d6035c2cc9c"
+    },
+    {
+      "path": ".agents/skills/source-post/references/copyright-and-fidelity.md",
+      "sha256": "4199c11d5b72e8e3214fc07f27ae60d90809777f6920366f0e05894ecbcc1517"
+    },
+    {
+      "path": ".agents/skills/source-post/references/workflow.md",
+      "sha256": "f6acef68695fdf3b38cae6239e6426537a6a941e206a55e97a5aed93821f3bc3"
+    },
+    {
+      "path": ".agents/skills/source-post/scripts/validate-source-post.mjs",
+      "sha256": "80ffed915fa6e69307bfd2203274bc3024f8daa6d390f8975bdb3015c64fe34f"
+    },
+    {
+      "path": ".agents/skills/stop-slop/SKILL.md",
+      "sha256": "a3b48eb3767be104f7b56adf0106ceb01003b07ec1b6f8bfcc74dcb41e98f60a"
+    },
+    {
+      "path": ".agents/skills/stop-slop/references/examples.md",
+      "sha256": "49c592899eb4457f95d0767e15e3143569e2cef50f2927c3174e62432984cd3d"
+    },
+    {
+      "path": ".agents/skills/stop-slop/references/phrases.md",
+      "sha256": "4ca1b7e97123b5c67eff3dc97e5e977332e0b24021265c1553888a93ec33fa93"
+    },
+    {
+      "path": ".agents/skills/stop-slop/references/structures.md",
+      "sha256": "ffbf1316c7fb5aaf552de005609a64a9639b546ecd76bfb0e482864d5bbe6f58"
+    },
+    {
+      "path": ".agents/skills/tdd/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/tdd/SKILL.md",
+      "sha256": "2ba87d1a213c43a357985942e8b79c2925663f0fa94314d60c821515f8135c3a"
+    },
+    {
+      "path": ".agents/skills/tdd/references/interface-design.md",
+      "sha256": "369fe8ef0b405b3057f2501b82880a6c7119b629438bd7a100da15857c04cd44"
+    },
+    {
+      "path": ".agents/skills/tdd/references/mocking.md",
+      "sha256": "5424b8b65cf6d1a6dd80ae5f5c0edb61c8aaa6016435e4fa8c3b9c0096413734"
+    },
+    {
+      "path": ".agents/skills/tdd/references/refactoring.md",
+      "sha256": "f6d4f9ee43bd0345d01eb9f05ec7c220f6ae2f28e842e93de690000dc55ba60a"
+    },
+    {
+      "path": ".agents/skills/tdd/references/tests.md",
+      "sha256": "1db025646be8c3b5e0ba9ee2abf84bf9c37700f4d3bcee65e697d1685a27874e"
+    },
+    {
+      "path": ".agents/skills/theme-factory/LICENSE.txt",
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    {
+      "path": ".agents/skills/theme-factory/SKILL.md",
+      "sha256": "2d4f77c5f48b36bd0ab416e73648cbb38d8a8024b8713cd204d912f292367fc5"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/theme-showcase.pdf",
+      "sha256": "3e126eca9fe99088051f7cb984c97cedb31c7d9e09ce0ba5d61bd01e70a0d253"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/arctic-frost.md",
+      "sha256": "868a75a8fb5b2a61d0f0ab87c437fe632d3cbab6371c418f06aa2816ac109ae0"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/botanical-garden.md",
+      "sha256": "222cb8e7496abc9b75b29453c809fb9839e7e4b01fa45deecdd896b38d087765"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/desert-rose.md",
+      "sha256": "bd065b8629be3b64655183927e248e3d892a27b8d184b009cfba89c96102744f"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/forest-canopy.md",
+      "sha256": "ecb722efa24688e808b5bf323c334ca2349e989cfddd72ce8400ce5d4c4bd3e7"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/golden-hour.md",
+      "sha256": "3444a00df971d3c2f06b665e21a2e9eb5d7d7d6f6281f2758773b8345776a139"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/midnight-galaxy.md",
+      "sha256": "0e134c4c0324df41e34ac314269aa6829cd378cf3c304b31858d0cd158d2f944"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/modern-minimalist.md",
+      "sha256": "b8bc572b75948d4df69c401af703b9262ed6820a3ceb270da30a529e92763614"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/ocean-depths.md",
+      "sha256": "a7ad8eec85341dbfcb2665da827a4b6a4baee08ab3335ac02421f18e6b46b2e2"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/sunset-boulevard.md",
+      "sha256": "658af11ab04be4923692571081ffb42a428141ae537703117b9236d9f8ee22a3"
+    },
+    {
+      "path": ".agents/skills/theme-factory/assets/themes/tech-innovation.md",
+      "sha256": "183648163026dd5eeba3df5effa335b55ba333c3ee1fe215278605e55f40a52a"
+    },
+    {
+      "path": ".agents/skills/to-tickets/LICENSE.txt",
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    {
+      "path": ".agents/skills/to-tickets/SKILL.md",
+      "sha256": "6f68f5645df8b2a4bc0891b8f80a163ea91f3c73f436607ce2b24ac4c3200186"
+    },
+    {
+      "path": ".agents/skills/verification/SKILL.md",
+      "sha256": "3913d58fb011802236ec46d2d69f3bd52f23aa445a25f345facf52b1c7be526b"
+    },
+    {
+      "path": ".agents/skills/web-artifacts-builder/LICENSE.txt",
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    {
+      "path": ".agents/skills/web-artifacts-builder/SKILL.md",
+      "sha256": "e462fff19c27263d250e297d9aca5eb4f2bab4db3fb8ad14898dc57cb2e7dcfd"
+    },
+    {
+      "path": ".agents/skills/web-artifacts-builder/scripts/bundle-artifact.sh",
+      "sha256": "abf0e480bf6585b56fab8526a407dfb7dc740812bddd70c636e1e8f3df5f9618"
+    },
+    {
+      "path": ".agents/skills/web-artifacts-builder/scripts/init-artifact.sh",
+      "sha256": "355e5dd4382aaaee91f01f1627eaeab30b2676ffa8d9b3ec328a1ae450ebccaa"
+    },
+    {
+      "path": ".agents/skills/web-artifacts-builder/scripts/shadcn-components.tar.gz",
+      "sha256": "1296f069e825de7933de7e8ac63672495cacce3f88f2dc45554dbcddbcbca60f"
+    },
+    {
+      "path": ".agents/skills/web-design-guidelines/SKILL.md",
+      "sha256": "2c59deebf28d4008935a4b7eda6dce4727a384a0402d0f3afcc4e5ba5949507e"
+    },
+    {
+      "path": ".agents/skills/webapp-testing/LICENSE.txt",
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    {
+      "path": ".agents/skills/webapp-testing/SKILL.md",
+      "sha256": "14497510fc3ed2b45c8605df9e98f41cd4b63376b00189eb5db0f503dec9620c"
+    },
+    {
+      "path": ".agents/skills/webapp-testing/examples/console_logging.py",
+      "sha256": "e4ff1f403fb0101295b2b93a88e110e0b22b356ad0fef054a6f5ae06fc14f7c0"
+    },
+    {
+      "path": ".agents/skills/webapp-testing/examples/element_discovery.py",
+      "sha256": "1ac4641777e2d07d968215ccead71ea2d0d0a11136e7db77bbdd7c2ee6b185eb"
+    },
+    {
+      "path": ".agents/skills/webapp-testing/examples/static_html_automation.py",
+      "sha256": "389f35fb8e82dab230e1071f195163f48dbc334e3ce473b500562d957cf7f454"
+    },
+    {
+      "path": ".agents/skills/webapp-testing/scripts/with_server.py",
+      "sha256": "b0dcf4918935b795f4eda9821579b9902119235ff4447f687a30286e7d0925fd"
+    },
+    {
+      "path": ".codex/hooks.json",
+      "sha256": "53ff99947ccc65ad634e1fdffc5975f4b9c1970eb372885388b0491730ea247c"
+    },
+    {
+      "path": ".harness-hub/.gitignore",
+      "sha256": "e4b180e647d3aa1cea23dc12783fa54e09fd988cf59bf610b3a7c379a75ba9fc"
+    },
+    {
+      "path": ".harness-hub/okf-validate.mjs",
+      "sha256": "67ce8c2ebf36da185cd3df05df2e9bcd23aeed081a772159ab766ca3650c5a5b"
+    },
+    {
+      "path": ".harness-hub/safety-hook.mjs",
+      "sha256": "6b7697671050738df488b779dc1f2ee07b772466bc1958d8f37aef5d7bc4af5a"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "ab68937e74ecd3410c76f09319f43890863b92894b1c82fb70ab57ede75cd1b7"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49"
+    }
+  ]
+}

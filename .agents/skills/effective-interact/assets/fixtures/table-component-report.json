@@ -1,0 +1,83 @@
+{
+  "title": "HTML 汇报技能维护交付",
+  "summary": "结论先行：data-table 承载分段交付信息，inline 强调提供阅读锚点，验证结果继续留在同一份 HTML 里。",
+  "status": "complete",
+  "renderMode": "pre-rendered",
+  "generatedAt": "2026-05-15T00:00:00.000Z",
+  "sections": [
+    {
+      "type": "markdown",
+      "title": "交付结论",
+      "group": "summary",
+      "status": "ready",
+      "content": "- **Table-first**: structured delivery details move into a table before they become long prose.\n- Use *short phrases* and ==visual anchor== markers for key risks and verification results."
+    },
+    {
+      "type": "data-table",
+      "title": "维护交付矩阵",
+      "group": "details",
+      "status": "ready",
+      "summary": "把变更、风险和验证写成可比较的短语。",
+      "caption": "Hover 或 Tab 聚焦任意单元格，查看当前格、所在行和列的定位反馈。",
+      "columns": [
+        {
+          "key": "stage",
+          "label": "事项",
+          "width": "18%"
+        },
+        {
+          "key": "points",
+          "label": "变更点",
+          "width": "34%"
+        },
+        {
+          "key": "reporting",
+          "label": "汇报重点",
+          "width": "30%"
+        },
+        {
+          "key": "hover",
+          "label": "定位反馈",
+          "align": "center",
+          "width": "18%"
+        }
+      ],
+      "rows": [
+        {
+          "stage": "文字重点",
+          "points": [
+            "结论先行",
+            "风险显式标记"
+          ],
+          "reporting": "**Risk** and ==row + column== states stay visible in the maintenance matrix.",
+          "hover": "可扫读"
+        },
+        {
+          "stage": "表格表达",
+          "points": [
+            "短语优先",
+            "稳定行列对比"
+          ],
+          "reporting": "结构化数据进入表格，长解释移到后续段落。",
+          "hover": "格子放大"
+        },
+        {
+          "stage": "验证",
+          "points": [
+            "静态结构",
+            "浏览器 hover"
+          ],
+          "reporting": "==Verification== stays beside the changed behavior, not hidden in prose.",
+          "hover": "行列高亮"
+        }
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "label": "表格组件",
+      "status": "pass",
+      "detail": "示例报告通过生成器和浏览器校验。"
+    }
+  ]
+}
