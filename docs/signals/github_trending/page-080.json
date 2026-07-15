@@ -2,7 +2,7 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-15T03:02:17.127Z",
+  "generated_at": "2026-07-15T03:34:30.755Z",
   "group": {
     "id": "github_trending",
     "label": "GitHub 趋势"
@@ -10,9 +10,39 @@
   "page": 80,
   "page_count": 93,
   "page_size": 50,
-  "total_count": 4639,
+  "total_count": 4640,
   "next_url": "signals/github_trending/page-081.json",
   "items": [
+    {
+      "id": "occ_f5f7dff7991063684a54931a",
+      "cluster_id": "cluster_a20220596b25af30d1ddb51b",
+      "title": "twentyhq/twenty",
+      "url": "https://github.com/twentyhq/twenty",
+      "summary": "GitHub Trending daily rank 4; previous daily rank 5.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending daily web fallback",
+        "url": "https://github.com/trending?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-05-30",
+      "published_at": null,
+      "collected_at": "2026-05-29T18:39:17.274Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
     {
       "id": "occ_f8dff64dfd2191f8ce3d6e40",
       "cluster_id": "cluster_8ba92212f68080ea31a01bc7",
@@ -1483,36 +1513,6 @@
       "date_anomaly": null,
       "image_url": null,
       "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_45f89cfb9fe1c20fc9953fb3",
-      "cluster_id": "cluster_d46d1480c37c463a902b46f4",
-      "title": "unclecode/crawl4ai",
-      "url": "https://github.com/unclecode/crawl4ai",
-      "summary": "unclecode/crawl4ai appeared on GitHub Trending Python daily with 210 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending daily",
-        "url": "https://github.com/trending?since=daily"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
       "access_state": "direct"
     }
   ]

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-15T03:02:17.127Z",
+  "generated_at": "2026-07-15T03:34:30.755Z",
   "group": {
     "id": "github_trending",
     "label": "GitHub 趋势"
@@ -10,9 +10,40 @@
   "page": 21,
   "page_count": 93,
   "page_size": 50,
-  "total_count": 4639,
+  "total_count": 4640,
   "next_url": "signals/github_trending/page-022.json",
   "items": [
+    {
+      "id": "occ_b61962259c1dcacc52ef348e",
+      "cluster_id": "cluster_9eabba3e9e3916fd08c98f87",
+      "title": "chore: update ai news snapshot",
+      "url": "https://github.com/LearnPrompt/ai-news-radar/commit/c998a76a25dc59bd5b7cce852e8be07439a458cd",
+      "summary": "chore: update ai news snapshot。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "ai-news-radar GitHub commits",
+        "url": "https://github.com/LearnPrompt/ai-news-radar/commits/master.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-05",
+      "published_at": null,
+      "collected_at": "2026-07-06T07:16:26.939Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
     {
       "id": "occ_b8611659449d909d2264adc7",
       "cluster_id": "cluster_2a193a141e55541a5d0e9d36",
@@ -1492,36 +1523,6 @@
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_03646f07e18fecc47790aab1",
-      "cluster_id": "cluster_75267d807e2f909de2293660",
-      "title": "hashicorp/terraform",
-      "url": "https://github.com/hashicorp/terraform",
-      "summary": "hashicorp/terraform 是基础设施即代码工具，本期榜单变化可用于观察云资源编排、环境复现和自动化运维在 AI 应用中的基础作用。对平台团队来说，稳定的基础设施描述仍是模型应用部署和回滚的关键依赖。同时检查许可证、近期维护记录、可运行示例和部署成本，判断它是否适合进入团队试点。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending Go weekly",
-        "url": "https://github.com/hashicorp/terraform"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
       "access_state": "direct"
     }
   ]

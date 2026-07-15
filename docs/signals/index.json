@@ -2,23 +2,54 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_index",
-  "generated_at": "2026-07-15T03:02:17.127Z",
-  "total_count": 26716,
+  "generated_at": "2026-07-15T03:34:30.755Z",
+  "total_count": 27038,
   "page_size": 50,
   "coverage": {
-    "input_record_count": 26967,
-    "occurrence_count": 26716,
-    "coalesced_record_count": 251,
+    "input_record_count": 27836,
+    "occurrence_count": 27038,
+    "coalesced_record_count": 798,
     "normalization_error_count": 0
   },
   "groups": [
     {
       "id": "official_blogs",
       "label": "官网博客",
-      "count": 5718,
+      "count": 5720,
       "page_count": 115,
       "first_page_url": "signals/official_blogs/page-001.json",
       "preview": [
+        {
+          "id": "occ_fbb17a16e636c148b4b869f4",
+          "cluster_id": "cluster_9b021b306d559ed7c2ab05c3",
+          "title": "Contact",
+          "url": "https://pika.art/cdn-cgi/l/email-protection",
+          "summary": "Contact。Treat this as a community lead unless it is backed by a primary source.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "pika.art",
+            "home_url": "https://pika.art/"
+          },
+          "collected_via": {
+            "name": "Pika Product Updates",
+            "url": "https://pika.art/"
+          },
+          "source_group": "official_blogs",
+          "content_tags": [
+            "product_update",
+            "community_discussion"
+          ],
+          "credibility_tag": "primary_material",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
         {
           "id": "occ_006f0fdbe1934cd93c234f10",
           "cluster_id": "cluster_dc51f13ee3f9e8eba37412c5",
@@ -235,48 +266,49 @@
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
-        },
-        {
-          "id": "occ_0a1ae78a4220a8fe6ffbd35a",
-          "cluster_id": "cluster_80c491d34eb09c4446759462",
-          "title": "How Tencent Built a Workplace for Humans and Wildlife",
-          "url": "https://www.tencent.com/en-us/articles/2202288.html",
-          "summary": "How Tencent Built a Workplace for Humans and Wildlife。Treat this as a community lead unless it is backed by a primary source.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "tencent.com",
-            "home_url": "https://www.tencent.com/"
-          },
-          "collected_via": {
-            "name": "Tencent Media Center",
-            "url": "https://www.tencent.com/en-us/media.html"
-          },
-          "source_group": "official_blogs",
-          "content_tags": [
-            "company_business",
-            "industry_news",
-            "community_discussion"
-          ],
-          "credibility_tag": "primary_material",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": "https://static.www.tencent.com/uploads/2026/03/03/c068d31df78192994c897eb66b4d97ff.png",
-          "source_health": "available",
-          "access_state": "direct"
         }
       ]
     },
     {
       "id": "github_trending",
       "label": "GitHub 趋势",
-      "count": 4639,
+      "count": 4640,
       "page_count": 93,
       "first_page_url": "signals/github_trending/page-001.json",
       "preview": [
+        {
+          "id": "occ_40fcdb3211a4681b9175d3d2",
+          "cluster_id": "cluster_d1bfed94dbc3e3b290d5343e",
+          "title": "b10015",
+          "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b10015",
+          "summary": "opencl: do not use clCreateBufferWithProperties when targeting CL 2.x ( #25673 ) macOS/iOS: macOS Apple Silicon (arm64) macOS Apple Silicon (arm64, KleidiAI enabled) DISABLED macOS Intel (x64) iOS XCFramework Linux: Ubuntu x64 (CPU) Ubuntu",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "github.com",
+            "home_url": "https://github.com/"
+          },
+          "collected_via": {
+            "name": "ggml-org/llama.cpp Releases",
+            "url": "https://github.com/ggml-org/llama.cpp/releases.atom"
+          },
+          "source_group": "github_trending",
+          "content_tags": [
+            "model_release",
+            "open_source",
+            "engineering",
+            "industry_news"
+          ],
+          "credibility_tag": "primary_material",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
         {
           "id": "occ_003ce7fbb04913b0ec9ec5c7",
           "cluster_id": "cluster_d74e98bda3193d33c74b0281",
@@ -494,46 +526,206 @@
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
-        },
-        {
-          "id": "occ_070f55fa87cb2b78438d24a9",
-          "cluster_id": "cluster_50d9c5663d2944bddb915e3d",
-          "title": "yuliskov/SmartTube",
-          "url": "https://github.com/yuliskov/SmartTube",
-          "summary": "yuliskov/SmartTube appeared on GitHub Trending Java weekly with 265 stars this week. 近 7 天本地记录曾在 2026-07-08、2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "github.com",
-            "home_url": "https://github.com/"
-          },
-          "collected_via": {
-            "name": "GitHub Trending Java weekly",
-            "url": "https://github.com/trending/java?since=weekly"
-          },
-          "source_group": "github_trending",
-          "content_tags": [
-            "open_source"
-          ],
-          "credibility_tag": "pending_review",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
         }
       ]
     },
     {
       "id": "community_discussions",
       "label": "社区讨论",
-      "count": 4018,
+      "count": 4028,
       "page_count": 81,
       "first_page_url": "signals/community_discussions/page-001.json",
       "preview": [
+        {
+          "id": "occ_2b00bfec84bf76f2a543c040",
+          "cluster_id": "cluster_db99039d31c2da5b979d0478",
+          "title": "Show HN: Timeline Studio – Open-source AI video editing",
+          "url": "https://video-editor.ai-creator.top/",
+          "summary": "Article URL: https://video-editor.ai-creator.top/ Comments URL: https://news.ycombinator.com/item?id=48915771 Points: 1 # Comments: 0。Treat this as a community lead unless it is backed by a primary source.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "video-editor.ai-creator.top",
+            "home_url": "https://video-editor.ai-creator.top/"
+          },
+          "collected_via": {
+            "name": "Hacker News AI newest",
+            "url": "https://hnrss.org/newest?q=AI"
+          },
+          "source_group": "community_discussions",
+          "content_tags": [
+            "industry_news",
+            "community_discussion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_7aa62acfa16b6f2043b80bb6",
+          "cluster_id": "cluster_c41a3616ab8da839a5fbc234",
+          "title": "The cost of AI-assisted development: cognitive fatigue",
+          "url": "https://warpedvisions.org/blog/2025/hitting-the-wall-at-ai-speed/",
+          "summary": "Article URL: https://warpedvisions.org/blog/2025/hitting-the-wall-at-ai-speed/ Comments URL: https://news.ycombinator.com/item?id=48915714 Points: 1 # Comments: 1。Treat this as a community lead unless it is backed by a primary source.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "warpedvisions.org",
+            "home_url": "https://warpedvisions.org/"
+          },
+          "collected_via": {
+            "name": "Hacker News AI newest",
+            "url": "https://hnrss.org/newest?q=AI"
+          },
+          "source_group": "community_discussions",
+          "content_tags": [
+            "industry_news",
+            "community_discussion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_8a9c8821c40c7dd5bfac4272",
+          "cluster_id": "cluster_0d15af861f868e97e925cbc6",
+          "title": "Jurassic Park computers in excruciating detail",
+          "url": "https://fabiensanglard.net/jurrasic_park_computers/index.html",
+          "summary": "Hacker News Topstories API published this intermediary lead entry. Treat this as a community lead unless it is backed by a primary source.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "fabiensanglard.net",
+            "home_url": "https://fabiensanglard.net/"
+          },
+          "collected_via": {
+            "name": "Hacker News Topstories API",
+            "url": "https://hacker-news.firebaseio.com/v0/topstories.json"
+          },
+          "source_group": "community_discussions",
+          "content_tags": [
+            "engineering",
+            "industry_news",
+            "community_discussion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_99e5a7b913f0bebfd785efdf",
+          "cluster_id": "cluster_f874ee048b05bbfb2f1af519",
+          "title": "Data centers have hiked electricity prices on the public by $23B",
+          "url": "https://fortune.com/2026/07/14/data-centers-23-billion-electricity-bills/",
+          "summary": "Article URL: https://fortune.com/2026/07/14/data-centers-23-billion-electricity-bills/ Comments URL: https://news.ycombinator.com/item?id=48914683 Points: 101 # Comments: 51。Treat this as a community lead unless it is backed by a primary source.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "fortune.com",
+            "home_url": "https://fortune.com/"
+          },
+          "collected_via": {
+            "name": "Hacker News Frontpage 100+",
+            "url": "https://hnrss.org/frontpage?points=100"
+          },
+          "source_group": "community_discussions",
+          "content_tags": [
+            "industry_news",
+            "community_discussion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_ddf5e1dece6d1bfba9658abe",
+          "cluster_id": "cluster_58dae233b05b703722dd749b",
+          "title": "Data Showing Palantir's Positive Impact on NHS Riddled with Errors",
+          "url": "https://novaramedia.com/2026/07/13/data-showing-palantirs-positive-impact-on-nhs-riddled-with-errors/",
+          "summary": "Hacker News Topstories API published this intermediary lead entry. Treat this as a community lead unless it is backed by a primary source.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "novaramedia.com",
+            "home_url": "https://novaramedia.com/"
+          },
+          "collected_via": {
+            "name": "Hacker News Topstories API",
+            "url": "https://hacker-news.firebaseio.com/v0/topstories.json"
+          },
+          "source_group": "community_discussions",
+          "content_tags": [
+            "engineering",
+            "industry_news",
+            "community_discussion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_ecc4aa08cd68c636578aa914",
+          "cluster_id": "cluster_e099bafc757bab41f2e382fc",
+          "title": "Show HN: GWZ – Git Workspace Zone (multi-repo that feels like plain Git)",
+          "url": "https://hacker-news.firebaseio.com/v0/showstories.json",
+          "summary": "Coming from the land of the mono-repo (ex-googler), I decided to embrace the multi-repo, plain-git style. Methought, “hey, submodules, what could possibly go wrong”. Well, how about everything: detached HEADs, impossibly tedious commit mana。Treat this as a community lead unless it is backed by a primary source.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "hacker-news.firebaseio.com",
+            "home_url": "https://hacker-news.firebaseio.com/"
+          },
+          "collected_via": {
+            "name": "Hacker News Show Stories API",
+            "url": "https://hacker-news.firebaseio.com/v0/showstories.json"
+          },
+          "source_group": "community_discussions",
+          "content_tags": [
+            "product_update",
+            "engineering",
+            "industry_news",
+            "community_discussion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
         {
           "id": "occ_01b1f406bc91a6b6b9f7c848",
           "cluster_id": "cluster_02efeeb7f91808601f4243a4",
@@ -598,220 +790,25 @@
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
-        },
-        {
-          "id": "occ_0235a2a273387bd13aeab4ce",
-          "cluster_id": "cluster_32c39c4952e9f626b55ba57d",
-          "title": "Sim",
-          "url": "https://www.sim.ai/?ref=producthunt",
-          "summary": "Open-source workspace for AI agents and workflows Discussion | Link。已打开 官网 确认用途：Sim is the open-source AI workspace where teams build, deploy, and manage AI agents across 1,000+ integrations and every major LLM.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "sim.ai",
-            "home_url": "https://www.sim.ai/"
-          },
-          "collected_via": {
-            "name": "Product Hunt Trending Feed",
-            "url": "https://www.producthunt.com/feed"
-          },
-          "source_group": "community_discussions",
-          "content_tags": [
-            "product_update",
-            "open_source",
-            "industry_news",
-            "community_discussion"
-          ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_02b6227b701d3d8b53da58dd",
-          "cluster_id": "cluster_2072b9c2043a6111b7f624f3",
-          "title": "ClawTeams",
-          "url": "https://clawteams.ai/?ref=producthunt",
-          "summary": "The first goal-driven, proactive AI team for e-commerce Discussion | Link。已打开 官网 确认用途：An IM-native AI staff collaboration platform. Say the task once; the lead splits it, dispatches experts in parallel, checks quality, and sends finished work back to your chat.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "clawteams.ai",
-            "home_url": "https://clawteams.ai/"
-          },
-          "collected_via": {
-            "name": "Product Hunt Trending Feed",
-            "url": "https://www.producthunt.com/feed"
-          },
-          "source_group": "community_discussions",
-          "content_tags": [
-            "product_update",
-            "open_source",
-            "industry_news",
-            "community_discussion"
-          ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_02f60c8902105a101a1bf1a1",
-          "cluster_id": "cluster_55db8c4a9630f4ca610b220a",
-          "title": "AutoShelf 2.0",
-          "url": "https://useautoshelf.com/?ref=producthunt",
-          "summary": "Auto-organize files on your Mac now with MCP & CLI support Discussion | Link。已打开 官网 确认用途：AutoShelf is a macOS app that watches your folders and auto-organizes files. Set a rule once and never think about it again. Free to try, unlock unlimited for $19.99.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "useautoshelf.com",
-            "home_url": "https://useautoshelf.com/"
-          },
-          "collected_via": {
-            "name": "Product Hunt Trending Feed",
-            "url": "https://www.producthunt.com/feed"
-          },
-          "source_group": "community_discussions",
-          "content_tags": [
-            "product_update",
-            "open_source",
-            "industry_news",
-            "community_discussion"
-          ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_0827df2deaf22551b69d377f",
-          "cluster_id": "cluster_02a90f22069a4b045ec243aa",
-          "title": "Show HN: PullCard – Pull your AI coding style as a holographic trading card",
-          "url": "https://pullcard.sakimyto.com/",
-          "summary": "Article URL: https://pullcard.sakimyto.com Comments URL: https://news.ycombinator.com/item?id=48915464 Points: 1 # Comments: 0。Treat this as a community lead unless it is backed by a primary source.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "pullcard.sakimyto.com",
-            "home_url": "https://pullcard.sakimyto.com/"
-          },
-          "collected_via": {
-            "name": "Hacker News AI newest",
-            "url": "https://hnrss.org/newest?q=AI"
-          },
-          "source_group": "community_discussions",
-          "content_tags": [
-            "industry_news",
-            "community_discussion"
-          ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_0b6b97d9e117b0652f1af984",
-          "cluster_id": "cluster_90e6d55f03839d044924f5fa",
-          "title": "PgDog",
-          "url": "https://pgdog.dev/?ref=producthunt",
-          "summary": "Scale PostgreSQL without changing your app Discussion | Link。已打开 官网 确认用途：PgDog is an open-source connection pooler, load balancer, and sharding proxy for PostgreSQL.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "pgdog.dev",
-            "home_url": "https://pgdog.dev/"
-          },
-          "collected_via": {
-            "name": "Product Hunt Trending Feed",
-            "url": "https://www.producthunt.com/feed"
-          },
-          "source_group": "community_discussions",
-          "content_tags": [
-            "product_update",
-            "open_source",
-            "industry_news",
-            "community_discussion"
-          ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_10c32f00dc19ae19c34c9704",
-          "cluster_id": "cluster_c59e25b88d79db5e7be37515",
-          "title": "IBM stock drops the most since 1987",
-          "url": "https://finance.yahoo.com/markets/stocks/article/ibm-stock-closes-down-more-than-25-after-preannounced-earnings-results-150605880.html",
-          "summary": "Hacker News Topstories API published this intermediary lead entry. Treat this as a community lead unless it is backed by a primary source.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "finance.yahoo.com",
-            "home_url": "https://finance.yahoo.com/"
-          },
-          "collected_via": {
-            "name": "Hacker News Topstories API",
-            "url": "https://hacker-news.firebaseio.com/v0/topstories.json"
-          },
-          "source_group": "community_discussions",
-          "content_tags": [
-            "engineering",
-            "industry_news",
-            "community_discussion"
-          ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
         }
       ]
     },
     {
       "id": "x_updates",
       "label": "X 动态",
-      "count": 997,
-      "page_count": 20,
+      "count": 1234,
+      "page_count": 25,
       "first_page_url": "signals/x_updates/page-001.json",
       "preview": [
         {
-          "id": "occ_259911688c6447e083b895af",
-          "cluster_id": "cluster_c4d0c0d9627b42a470fdfd86",
-          "title": "X builder: How Gen AI and agentic workflows are transforming ...",
-          "url": "https://x.com/ClusterProtocol/article/1853496407723774443",
-          "summary": "An artificial intelligence (AI) agent is a system or program designed to autonomously carry out tasks for users or other systems by creating",
+          "id": "occ_01246975f0382e675932d435",
+          "cluster_id": "cluster_c01496830f6adeedd99b8e2f",
+          "title": "X builder: the complete guide to claude mcp connectors",
+          "url": "https://x.com/socialwithaayan/article/2074509637693403190",
+          "summary": "MCP stands for Model Context Protocol. Anthropic created it as an open standard in November 2024, and by mid-2026 every major AI platform",
           "author": "X builder",
           "handle": null,
-          "original_text": "An artificial intelligence (AI) agent is a system or program designed to autonomously carry out tasks for users or other systems by creating",
+          "original_text": "MCP stands for Model Context Protocol. Anthropic created it as an open standard in November 2024, and by mid-2026 every major AI platform",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -827,21 +824,51 @@
           "credibility_tag": "pending_review",
           "event_date": "2026-07-15",
           "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
+          "collected_at": "2026-07-15T03:34:30.755Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "indirect"
         },
         {
-          "id": "occ_459aa30ff785f79955eb46a3",
-          "cluster_id": "cluster_5b63a9a9d0f369ba6410ca89",
-          "title": "X builder: AI Agents Community on X - 15.0K Members",
-          "url": "https://x.com/i/communities/1670204079619055616",
-          "summary": "We are running an experiment called the World Cup Agent Arena, where more than 40 independent AI agents predict 2026 World Cup matches on Polymarket with real money. We score them on two things:... 1.7K1.7K user avatar Jennifer quinn Jun 27 Gm CT ☕️ Gettt tf up from bed and touch some grass and go to bed again cause it's a weekend. And well btw, every green…",
+          "id": "occ_046601278cf8d0d9a8c10de7",
+          "cluster_id": "cluster_b8925e7586d2ce44baf02985",
+          "title": "X builder: 20 Examples Of Application Software",
+          "url": "https://rigorousthemes.com/blog/popular-examples-of-application-software",
+          "summary": "You can also use this tool to design graphics. Although it isn’t as powerful as a graphic tool, most people with little or no graphic design knowledge find it easy to manipulate. Microsoft Word features a text editor, font and paragraph formatting, grammar and spell check, HTML, and image support. It also enriches content with features like a thesaurus, ant…",
           "author": "X builder",
           "handle": null,
-          "original_text": "We are running an experiment called the World Cup Agent Arena, where more than 40 independent AI agents predict 2026 World Cup matches on Polymarket with real money. We score them on two things:... 1.7K1.7K user avatar Jennifer quinn Jun 27 Gm CT ☕️ Gettt tf up from bed and touch some grass and go to bed again cause it's a weekend. And well btw, every green candle isn't bullish. Sometimes it's just liquidity before the next move. Smart traders don't chase candles. They read the story behind them. Join this user avatar Jun 26 [...] ## AI Agents Log inSign up ## AI Agents # AI Agents Discover news and projects related to AI agents user avatar user avatar user avatar user avatar 15K Members Don't miss what's happening People on X are the first to know. Log inSign up user avatar atypica.AI @atypica\\_AI Jun 22 Most user research has a shelf life. You run a study, get a report, then start from scratch again. That's why we built Panels at @atypica\\_AI , where you can assemble AI agents simulating your target audience to give you insights. 00:00 88K88K user avatar atypica.AI @atypica\\_AI Jun 15 [...] 437437 user avatar The ADHD Programmer @ADHDProgrammer1 Jul 6 Hello! I'm curious how fellow builders ship AI agents to production as when I was building a Lovable competitor startup (I tried ), I mostly tested my agents manually with print statements which is iffy lol. How are you guys testing and validating agents before deploying to 156156 user avatar Stair AI @Stair\\_AI Jul 3 40+ independent agents made 1,500 predictions during the World Cup group stage. We've started sharing what we've learned with builders working on prediction agents. Would love to hear your thoughts :) user avatar Stair AI @Stair\\_AI Jul 3 What 1500 World Cup Bets Taught Us - Lesson 1: The Favorite Trap",
+          "original_text": "You can also use this tool to design graphics. Although it isn’t as powerful as a graphic tool, most people with little or no graphic design knowledge find it easy to manipulate. Microsoft Word features a text editor, font and paragraph formatting, grammar and spell check, HTML, and image support. It also enriches content with features like a thesaurus, antonyms, synonyms, Word Art, and other effects. The spell and grammar check functions let you check content for errors. Utilize colors, styles, and font styles to embellish your writing. Open, create, and read your text easily using this application. Besides Windows, this application is also available for iOS, Android, and Mac operating systems. [...] ### 17. Google Chrome ### 17. Google Chrome Google Chrome lets you browse the internet, social media platforms, and send/receive emails. As with other web browsers, you can search for information on any topic, including technology, travel, politics, medicine, and much more. Google Chrome lets you retrieve data across the web. It is a fast and easy-to-use web application software from Google. It also is a platform for browser app extensions. Its popularity keeps growing due to its security and speedy and efficient execution of commands. The app works well on Windows, iOS, Android, and Mac operating systems. With Chrome, you can browse through websites privately (incognito) without disclosing your details like your IP address and browsing history. [...] Rigorous Themes Rigorous Themes # 20 Examples Of Application Software Popular Examples of Application Softwares Application softwares are mostly productivity programs that help you to complete different tasks effectively. Some are used to create and manipulate documents, and others will help you streamline processes and communicate professionally. These tools are specific to the tasks they’re designed for. Most are used in combination, while others work independently. Choosing the best application software can significantly impact your bottom line. These software programs can improve efficiency, function, and productivity for businesses, making your business scalable to a wide extent.",
+          "publisher": {
+            "name": "rigorousthemes.com",
+            "home_url": "https://rigorousthemes.com/"
+          },
+          "collected_via": {
+            "name": "Tavily X builder search fallback",
+            "url": "https://api.tavily.com/search"
+          },
+          "source_group": "x_updates",
+          "content_tags": [
+            "analysis_opinion"
+          ],
+          "credibility_tag": "pending_review",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_050a453c2f3a762e8cabc1ea",
+          "cluster_id": "cluster_bcc22278ccd899d272d0edc1",
+          "title": "X builder: Medicalbillingcodigs (@Medicalbillingz) / X",
+          "url": "https://x.com/Medicalbillingz",
+          "summary": "user avatar Get the full app experience Unlock more features and see what people are talking about right now. ## New to X? Sign up now to get your own personalized timeline! By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use. ## @Medicalbillingz hasn’t posted When they do, their posts will show up here.",
+          "author": "X builder",
+          "handle": null,
+          "original_text": "user avatar Get the full app experience Unlock more features and see what people are talking about right now. ## New to X? Sign up now to get your own personalized timeline! By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use. ## @Medicalbillingz hasn’t posted When they do, their posts will show up here.",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -857,21 +884,21 @@
           "credibility_tag": "pending_review",
           "event_date": "2026-07-15",
           "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
+          "collected_at": "2026-07-15T03:34:30.755Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "indirect"
         },
         {
-          "id": "occ_45ea2e81c3411227b92615a8",
-          "cluster_id": "cluster_562c47761aca78e592640499",
-          "title": "X builder: ່ (@AIagents) / Posts / X",
-          "url": "https://x.com/AIagents",
-          "summary": "Log inSign up ່ 1,170posts user avatar ່ @AIagents Now you have your answer to \"You and what army?\" gatesnotes.com/AI-agents Joined May 2012 2,716 Following18K Followers Don't miss what's happening People on X are the first to know. Log inSign up ## @AIagents hasn’t posted When they do, their posts will show up here.",
+          "id": "occ_0c286fea9b29c62369a97d65",
+          "cluster_id": "cluster_cf361c377a19de3c472701d4",
+          "title": "X builder: Creating effective AI software teams | Kfir Gollan ...",
+          "url": "https://x.com/kfirgollan/article/2032859506045051112",
+          "summary": "An agent is essentially an LLM taking actions by following a set of instructions and guardlies which are defined for it to complete a task.",
           "author": "X builder",
           "handle": null,
-          "original_text": "Log inSign up ່ 1,170posts user avatar ່ @AIagents Now you have your answer to \"You and what army?\" gatesnotes.com/AI-agents Joined May 2012 2,716 Following18K Followers Don't miss what's happening People on X are the first to know. Log inSign up ## @AIagents hasn’t posted When they do, their posts will show up here.",
+          "original_text": "An agent is essentially an LLM taking actions by following a set of instructions and guardlies which are defined for it to complete a task.",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -887,21 +914,21 @@
           "credibility_tag": "pending_review",
           "event_date": "2026-07-15",
           "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
+          "collected_at": "2026-07-15T03:34:30.755Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "indirect"
         },
         {
-          "id": "occ_77f50641fd62ac2fa51ff1b1",
-          "cluster_id": "cluster_7ab89f2420c0eb297ae7c992",
-          "title": "X builder: How I'd make $10 million with AI agents",
-          "url": "https://x.com/gregisenberg/article/2076733920834371585",
-          "summary": "every app can be AI-first. 1. Find things people pay for and hate using Check Sensor Tower. Let the agents build the app",
+          "id": "occ_0d0ce5a562922ab517cfba4c",
+          "cluster_id": "cluster_e01a7b48dc550ec3eb804073",
+          "title": "X builder: Pablo Bermejo (@peibolsang) / X",
+          "url": "https://x.com/peibolsang",
+          "summary": "Log inSign up Pablo Bermejo 6,170posts user avatar Pablo Bermejo @peibolsang Build to think. Scale to impact. berme.io Asturias, Spain Joined December 2007 630 Following592 Followers Don't miss what's happening People on X are the first to know. Log inSign up ## @peibolsang hasn’t posted When they do, their posts will show up here.",
           "author": "X builder",
           "handle": null,
-          "original_text": "every app can be AI-first. 1. Find things people pay for and hate using Check Sensor Tower. Let the agents build the app",
+          "original_text": "Log inSign up Pablo Bermejo 6,170posts user avatar Pablo Bermejo @peibolsang Build to think. Scale to impact. berme.io Asturias, Spain Joined December 2007 630 Following592 Followers Don't miss what's happening People on X are the first to know. Log inSign up ## @peibolsang hasn’t posted When they do, their posts will show up here.",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -917,51 +944,21 @@
           "credibility_tag": "pending_review",
           "event_date": "2026-07-15",
           "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
+          "collected_at": "2026-07-15T03:34:30.755Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "indirect"
         },
         {
-          "id": "occ_83813a33066b536e35bd8fbb",
-          "cluster_id": "cluster_d61969db5807cafdf3ff63ab",
-          "title": "X builder: Agent Resources - X",
-          "url": "https://docs.x.com/tools/ai",
-          "summary": "## Documentation Index Fetch the complete documentation index at: Use this file to discover all available pages before exploring further. light logo dark logo light logo dark logo ### Getting Started ### Products ### Fundamentals ### Partners & Customers ### Resources # Agent Resources Resources for AI agents using the X API, including llms.txt, skill.md, M…",
+          "id": "occ_0fc69c2eecf5369669a40643",
+          "cluster_id": "cluster_6f8c5f0013620c1a1d3205c8",
+          "title": "X builder: I Tested Every Claude Code Feature, These 12 Are the Best",
+          "url": "https://x.com/nateherk/article/2062210719416742053",
+          "summary": "A slash command. Claude improves its own memory in the background without you prompting it. s the recipe and follows the steps.",
           "author": "X builder",
           "handle": null,
-          "original_text": "## Documentation Index Fetch the complete documentation index at: Use this file to discover all available pages before exploring further. light logo dark logo light logo dark logo ### Getting Started ### Products ### Fundamentals ### Partners & Customers ### Resources # Agent Resources Resources for AI agents using the X API, including llms.txt, skill.md, MCP servers, OpenAPI specs, and integration guides for Grok, Cursor, and Windsurf. ## ​ Use the X API from AI tools | Resource | What it does | URL | --- | X MCP | Hosted MCP server — agents can search, look up users, manage bookmarks, and more | docs.x.com/tools/mcp | | OpenAPI Spec | Machine-readable API definition for code generation and agent tooling | api.x.com/2/openapi.json | [...] ## ​ Read X API docs from AI tools | Resource | What it does | URL | --- | llms.txt | Documentation index — page titles, URLs, and descriptions | docs.x.com/llms.txt | | llms-full.txt | Complete docs in a single file for full-context loading | docs.x.com/llms-full.txt | | skill.md | Capability summary — actions, inputs, and constraints | docs.x.com/skill.md | | Docs MCP | MCP server — agents can search and read doc pages on the fly | docs.x.com/mcp | ## On this page light logo dark logo Resources Legal",
-          "publisher": {
-            "name": "docs.x.com",
-            "home_url": "https://docs.x.com/"
-          },
-          "collected_via": {
-            "name": "Tavily X builder search fallback",
-            "url": "https://api.tavily.com/search"
-          },
-          "source_group": "x_updates",
-          "content_tags": [
-            "analysis_opinion"
-          ],
-          "credibility_tag": "pending_review",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_b0928bd4a08caff0341b2a6e",
-          "cluster_id": "cluster_c22fbb8d7166488a7aabf974",
-          "title": "X builder: Gil Allouche (@gilallouche) / X",
-          "url": "https://x.com/gilallouche",
-          "summary": "Log inSign up Gil Allouche GetPixel.AI 3,390posts user avatar Gil Allouche GetPixel.AI @gilallouche Building AI that launches full ad campaigns across every major ad platform from a single brief. Founder & CEO @metadataio Visit 👉🏻 metadataone.com Joined July 2008 3,787 Following1,321 Followers4 Subscriptions Don't miss what's happening People on X are the…",
-          "author": "X builder",
-          "handle": null,
-          "original_text": "Log inSign up Gil Allouche GetPixel.AI 3,390posts user avatar Gil Allouche GetPixel.AI @gilallouche Building AI that launches full ad campaigns across every major ad platform from a single brief. Founder & CEO @metadataio Visit 👉🏻 metadataone.com Joined July 2008 3,787 Following1,321 Followers4 Subscriptions Don't miss what's happening People on X are the first to know. Log inSign up ## @gilallouche hasn’t posted When they do, their posts will show up here.",
+          "original_text": "A slash command. Claude improves its own memory in the background without you prompting it. s the recipe and follows the steps.",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -977,24 +974,24 @@
           "credibility_tag": "pending_review",
           "event_date": "2026-07-15",
           "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
+          "collected_at": "2026-07-15T03:34:30.755Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "indirect"
         },
         {
-          "id": "occ_e48cdd2802979f0ef19d6585",
-          "cluster_id": "cluster_e1635f4f57c2c88e4f24389c",
-          "title": "X builder: Ai Agent for Replies - Rules and Policies",
-          "url": "https://devcommunity.x.com/t/ai-agent-for-replies/260912",
-          "summary": "# Ai Agent for Replies I am looking for approval I am running an AI character account (@9livesSolana) that replies only to direct @mentions, not unsolicited. You’re free to do so as long as it align with our developer terms and rules around automation. You can view our recently published guidelines here: ### Developer Guidelines - X A practical guide to wha…",
+          "id": "occ_0fd95b607295b41f8c3e558a",
+          "cluster_id": "cluster_76f22dad2d9d3edfe3b00ab7",
+          "title": "X builder: 10 Lessons for Writing a Good AGENTS.md: Get Codex ...",
+          "url": "https://x.com/Voxyz_ai/article/2060753730643837205",
+          "summary": "Codex and Claude Code both run commands, edit files, and ask for permissions on their own. In Codex's default Auto preset, local work is usually",
           "author": "X builder",
           "handle": null,
-          "original_text": "# Ai Agent for Replies I am looking for approval I am running an AI character account (@9livesSolana) that replies only to direct @mentions, not unsolicited. You’re free to do so as long as it align with our developer terms and rules around automation. You can view our recently published guidelines here: ### Developer Guidelines - X A practical guide to what's allowed and what's not when building with the X API. Please note, we recently made changes to the way replies work via the API: ### Related topics [...] ### Related topics | Topic | | Replies | Views | Activity | --- --- | Approval request: AI-powered automated reply Rules and Policies | 1 | 60 | May 1, 2026 | | Approval request: AI-powered mention-triggered reply bot (@AskAxion) Rules and Policies bots | 2 | 68 | June 18, 2026 | | Help me find the endpoint I'm looking for. (if its exist) X API api | 0 | 13 | March 16, 2026 | | Xchat-playground: local replay/debug lab for X Activity / XChat webhooks X API v2 api | 0 | 58 | April 20, 2026 | | App Builder bot shadowban X API | 1 | 51 | July 29, 2025 | Powered by Discourse, best viewed with JavaScript enabled",
+          "original_text": "Codex and Claude Code both run commands, edit files, and ask for permissions on their own. In Codex's default Auto preset, local work is usually",
           "publisher": {
-            "name": "devcommunity.x.com",
-            "home_url": "https://devcommunity.x.com/"
+            "name": "x.com",
+            "home_url": "https://x.com/"
           },
           "collected_via": {
             "name": "Tavily X builder search fallback",
@@ -1007,51 +1004,274 @@
           "credibility_tag": "pending_review",
           "event_date": "2026-07-15",
           "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
+          "collected_at": "2026-07-15T03:34:30.755Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "indirect"
         },
         {
-          "id": "occ_048d1cbe4da4556722a9c05c",
-          "cluster_id": "cluster_c78ebfd002edc08d73a158fe",
-          "title": "Sam Altman: still sorta breaks my brain to see our models be good at design finally",
-          "url": "https://x.com/sama/status/2076823209589313910",
-          "summary": "still sorta breaks my brain to see our models be good at design finally",
-          "author": "Sam Altman",
-          "handle": "sama",
-          "original_text": "still sorta breaks my brain to see our models be good at design finally",
+          "id": "occ_1046c9f5c908b525c8b5b2c4",
+          "cluster_id": "cluster_6f8c5f0013620c1a1d3205c8",
+          "title": "X builder: I Tested Every Claude Code Feature, These 12 Are the Best",
+          "url": "https://x.com/nateherk/article/2062210719416742053",
+          "summary": "9️⃣ Auto memory. Claude improves its own memory in the background without you prompting it. Every interval it searches what you did and updates",
+          "author": "X builder",
+          "handle": null,
+          "original_text": "9️⃣ Auto memory. Claude improves its own memory in the background without you prompting it. Every interval it searches what you did and updates",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
           },
           "collected_via": {
-            "name": "follow-builders X feed",
-            "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json"
+            "name": "Tavily X builder search fallback",
+            "url": "https://api.tavily.com/search"
           },
           "source_group": "x_updates",
           "content_tags": [
             "analysis_opinion"
           ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-14",
+          "credibility_tag": "pending_review",
+          "event_date": "2026-07-15",
           "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
+          "collected_at": "2026-07-15T03:34:30.755Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
-          "access_state": "direct"
+          "access_state": "indirect"
         }
       ]
     },
     {
       "id": "news_newsletters",
       "label": "新闻 / Newsletter",
-      "count": 7154,
+      "count": 7198,
       "page_count": 144,
       "first_page_url": "signals/news_newsletters/page-001.json",
       "preview": [
+        {
+          "id": "occ_16402ce9d652afcabe8a5683",
+          "cluster_id": "cluster_4d9293f91adee77070e7969f",
+          "title": "WordPress 7.0 发布：内置 AI 基础能力、改进管理后台与设计套件",
+          "url": "https://www.infoq.cn/article/VAUIReF3N4Z4SkcosaYN",
+          "summary": "点击查看原文>。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "infoq.cn",
+            "home_url": "https://www.infoq.cn/"
+          },
+          "collected_via": {
+            "name": "InfoQ CN",
+            "url": "https://www.infoq.cn/feed"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_328de2fa3ebd641c957a8583",
+          "cluster_id": "cluster_7c88fcbb249c1b89257f43f2",
+          "title": "A股三大指数午间休盘集体下跌，半导体板块走弱",
+          "url": "https://36kr.com/newsflashes/3896350680090246?f=rss",
+          "summary": "36氪获悉，A股三大指数午间休盘集体下跌，沪指跌0.08%，深成指跌0.38%，创业板指跌0.36%；制药板块大涨，昭衍新药、博瑞医药、众生药业等涨停，康龙化成、美迪西涨超10%；白酒股走强，金种子酒涨停，古井贡酒涨超8%；半导体板块走弱，德明利、华天科技跌停，沐曦股份、佰维存储跌超10%。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "36kr.com",
+            "home_url": "https://36kr.com/"
+          },
+          "collected_via": {
+            "name": "36Kr",
+            "url": "https://36kr.com/feed"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_49d6adb78d3761698ad9c764",
+          "cluster_id": "cluster_88a67706124ccd78485d9059",
+          "title": "恒生科技指数涨幅扩大至2%",
+          "url": "https://36kr.com/newsflashes/3896333760218752?f=rss",
+          "summary": "36氪获悉，恒生科技指数涨幅扩大至2%，恒生指数现涨1.75%。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "36kr.com",
+            "home_url": "https://36kr.com/"
+          },
+          "collected_via": {
+            "name": "36Kr",
+            "url": "https://36kr.com/feed"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_af22a256e0f7240e8a82c332",
+          "cluster_id": "cluster_11639a7f90e1242e49768172",
+          "title": "“灵巧智能”完成数亿元A轮融资，上海电气战略入股",
+          "url": "https://36kr.com/newsflashes/3896356363814530?f=rss",
+          "summary": "近日，具身智能企业“灵巧智能”（DexRobot）宣布完成数亿元A轮融资，本轮由上海电气战略投资，产业资本与财务资本持续加码。2026年内，公司已先后完成天使轮及A轮两轮融资，融资资金将重点用于灵巧操作全栈技术研发、核心产品迭代、教育/电力/工业三大场景落地及产业生态建设。此外，上海电气旗下上海机电与灵巧智能同步成立两家合资公司——灵机壹动与灵机智联，总注册资本超亿元，分别聚焦核心零部件量产与工业场景解决方案，标志着公司从技术研发迈入产业规模化交付阶段。This is an intermediary/self-media lead; trace it to a primary source before treating it a...",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "36kr.com",
+            "home_url": "https://36kr.com/"
+          },
+          "collected_via": {
+            "name": "36Kr",
+            "url": "https://36kr.com/feed"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_c3788e8a5aa1a452bd0869a1",
+          "cluster_id": "cluster_7b57dea270a4d9bf92ddd87d",
+          "title": "8点1氪丨LV起诉国家知识产权局；DeepSeek梁文锋成全球AI公司领域新首富；戴比尔斯将暂停南非最大钻石矿生产",
+          "url": "https://36kr.com/p/3896138695706497?f=rss",
+          "summary": "今日热点导览 小米机器人首次实现汽车工厂柔性工件的长时作业 SK海力士加速Y1工厂建设，现已开始订购DRAM制造设备 国际金价持续回调，后市关注美联储政策路径 海关总署：中国出口连续11季度保持增长，贸易增量集中于AI领域 韩国政府四部门将于周四召开会议，就单股杠杆ETF对股市冲击研究应对方案 TOP 3大新闻 LV起诉国家知识产权局，案件定于16日开庭审理 人民法院公告网显示，北京知识产权法院将于2026年7月16日公开审理一起涉及路易威登的商标行政纠纷案。该案案号为（20。This is an intermediary/self-media lead; trace it to a primary source before t...",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "36kr.com",
+            "home_url": "https://36kr.com/"
+          },
+          "collected_via": {
+            "name": "36Kr",
+            "url": "https://36kr.com/feed"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_c5f36faf9978c9f8601d042d",
+          "cluster_id": "cluster_9e293e358ef9415a5205d658",
+          "title": "Google and Epic give up fighting — third-party Android app stores are coming next week",
+          "url": "https://www.theverge.com/policy/965792/google-epic-withdraw-injunction-third-party-app-stores-coming-google-play",
+          "summary": "Epic Games and Google have just jointly withdrawn their attempt to retroactively settle the lawsuit that's changing how Android app stores work in the United States - and that means Google will be forced to carry rival app stores inside of。This is an intermediary/self-media lead; trace it to a primary source before tr...",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "theverge.com",
+            "home_url": "https://www.theverge.com/"
+          },
+          "collected_via": {
+            "name": "The Verge",
+            "url": "https://www.theverge.com/rss/index.xml"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_caa8af19fa124143a2a4de36",
+          "cluster_id": "cluster_64ba1526867fd3248baaf300",
+          "title": "国家统计局：经济新动能不断成长壮大，日益挑起中国经济的大梁",
+          "url": "https://36kr.com/newsflashes/3896335854978693?f=rss",
+          "summary": "7月15日，国家统计局副局长毛盛勇在国新办新闻发布会上表示，初步测算，今年上半年，以高端制造、数字经济、现代服务为代表的新动能对上半年经济增长的贡献率超过了四成，经济向新向优的特点非常鲜明，而且总的发展趋势在加快。如上半年规模以上高技术制造业增加值同比增长13.3%，其中航空航天器及设备制造、电子及通信设备行业增加值分别增长16.3%、17%，与人工智能相关的集成电路制造、智能车载设备制造等行业都保持30%以上的高增长。同时，绿色转型步伐加快，上半年新能源汽车零售渗透率连续三。This is an intermediary/self-media lead; trace it to a primary source before t...",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "36kr.com",
+            "home_url": "https://36kr.com/"
+          },
+          "collected_via": {
+            "name": "36Kr",
+            "url": "https://36kr.com/feed"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-15",
+          "published_at": null,
+          "collected_at": "2026-07-15T03:34:30.755Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
         {
           "id": "occ_00a8fc9e5a76362be3231897",
           "cluster_id": "cluster_863e4f6f6269a6713433c8ac",
@@ -1085,252 +1305,14 @@
           "image_url": null,
           "source_health": "available",
           "access_state": "indirect"
-        },
-        {
-          "id": "occ_0190462b53903276fb8bf511",
-          "cluster_id": "cluster_2f81233b218d67b04b243b8a",
-          "title": "Privacy Policy",
-          "url": "https://about.crunchbase.com/privacy-policy/",
-          "summary": "Privacy Policy。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "about.crunchbase.com",
-            "home_url": "https://about.crunchbase.com/"
-          },
-          "collected_via": {
-            "name": "Crunchbase News AI",
-            "url": "https://news.crunchbase.com/sections/ai/"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "product_update",
-            "funding",
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_019a0e0110b6bb48b74d2523",
-          "cluster_id": "cluster_5e6bbe370f9f7175fb28a427",
-          "title": "Labelbox",
-          "url": "https://www.crunchbase.com/organization/labelbox",
-          "summary": "Labelbox。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "crunchbase.com",
-            "home_url": "https://www.crunchbase.com/"
-          },
-          "collected_via": {
-            "name": "Crunchbase News AI",
-            "url": "https://news.crunchbase.com/sections/ai/"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "product_update",
-            "funding",
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_01f318a5fd53a1a848ea52a2",
-          "cluster_id": "cluster_ac4aa4513347b74c2e136a98",
-          "title": "Cybersecurity",
-          "url": "https://news.crunchbase.com/sections/cybersecurity/",
-          "summary": "Cybersecurity。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "news.crunchbase.com",
-            "home_url": "https://news.crunchbase.com/"
-          },
-          "collected_via": {
-            "name": "Crunchbase News AI",
-            "url": "https://news.crunchbase.com/sections/ai/"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "product_update",
-            "funding",
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_02d2b6bf92b0b502085789da",
-          "cluster_id": "cluster_2680bfaa3207367d67e18b86",
-          "title": "HeyGen",
-          "url": "https://www.crunchbase.com/organization/heygen",
-          "summary": "HeyGen。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "crunchbase.com",
-            "home_url": "https://www.crunchbase.com/"
-          },
-          "collected_via": {
-            "name": "Crunchbase News AI",
-            "url": "https://news.crunchbase.com/sections/ai/"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "product_update",
-            "funding",
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_03200eb18cfacd7047120093",
-          "cluster_id": "cluster_4a1313b0713a0eaf87744796",
-          "title": "Synthesia",
-          "url": "https://www.crunchbase.com/organization/synthesia",
-          "summary": "Synthesia。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "crunchbase.com",
-            "home_url": "https://www.crunchbase.com/"
-          },
-          "collected_via": {
-            "name": "Crunchbase News AI",
-            "url": "https://news.crunchbase.com/sections/ai/"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "product_update",
-            "funding",
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_044b163fe15223113cd6e1ea",
-          "cluster_id": "cluster_ce024ede761a38cfdae2d416",
-          "title": "Seed funding",
-          "url": "https://news.crunchbase.com/sections/seed/",
-          "summary": "Seed funding。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "news.crunchbase.com",
-            "home_url": "https://news.crunchbase.com/"
-          },
-          "collected_via": {
-            "name": "Crunchbase News AI",
-            "url": "https://news.crunchbase.com/sections/ai/"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "product_update",
-            "funding",
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_0581cd9c494c78fda8859df4",
-          "cluster_id": "cluster_c6bc31b5ced5f59fa944df83",
-          "title": "Intel",
-          "url": "https://www.crunchbase.com/organization/intel",
-          "summary": "Intel。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "crunchbase.com",
-            "home_url": "https://www.crunchbase.com/"
-          },
-          "collected_via": {
-            "name": "Crunchbase News AI",
-            "url": "https://news.crunchbase.com/sections/ai/"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "product_update",
-            "funding",
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-15",
-          "published_at": null,
-          "collected_at": "2026-07-15T03:02:17.127Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
         }
       ]
     },
     {
       "id": "papers_models",
       "label": "论文 / 模型",
-      "count": 3933,
-      "page_count": 79,
+      "count": 3961,
+      "page_count": 80,
       "first_page_url": "signals/papers_models/page-001.json",
       "preview": [
         {
