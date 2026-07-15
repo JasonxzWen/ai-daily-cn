@@ -1,8 +1,24 @@
 #!/usr/bin/env node
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const root = process.cwd();
+const migrationManifestPath = path.join(root, '.harness-hub', 'manifest.json');
+if (fs.existsSync(migrationManifestPath)) {
+  const migrationFailures = await validateRepositoryMigration(root, migrationManifestPath);
+  if (migrationFailures.length > 0) {
+    console.error('Harness validation failed:');
+    for (const failure of migrationFailures) {
+      console.error(`- ${failure}`);
+    }
+    process.exit(1);
+  }
+  console.log('Harness validation passed.');
+  process.exit(0);
+}
+
 const requiredFiles = [
   'AGENTS.md',
   'feature_list.json',
@@ -102,6 +118,19 @@ const requiredMarkers = {
   'evaluator-rubric.md': ['Correctness', 'Verification', 'Scope discipline', 'Runtime reliability', 'Browser acceptance', 'Agentic loops', 'Finish closeout', 'Insight recommendations', 'Handoff readiness', 'Verdict'],
   'quality-document.md': ['Quality Snapshot', 'Rating Standard', 'Product Areas', 'P0/P1/P2 validation status', 'Browser acceptance status', 'Architecture Layers', 'Change History'],
 };
+const agentContractPath = path.join(root, 'AGENTS.md');
+const usesRepositoryFirstContract = fs.existsSync(agentContractPath)
+  && fs.readFileSync(agentContractPath, 'utf8').includes('# Project Agent Contract');
+if (usesRepositoryFirstContract) {
+  requiredMarkers['AGENTS.md'] = [
+    'Project Agent Contract',
+    'Native Host execution',
+    'Harness Hub updates',
+    'Project knowledge (Google OKF v0.1)',
+    'Use concise Chinese by default',
+  ];
+  requiredMarkers['.harness-hub/.gitignore'] = ['state/'];
+}
 const agentArchitectureMarkers = [
   'worktree_policy',
   'parallel_write_policy',
@@ -395,4 +424,100 @@ function isValidFeatureRecord(value) {
     && Object.prototype.hasOwnProperty.call(value, 'acceptance')
     && Object.prototype.hasOwnProperty.call(value, 'validation')
     && Object.prototype.hasOwnProperty.call(value, 'evidence');
+}
+
+async function validateRepositoryMigration(targetRoot, manifestPath) {
+  const failures = [];
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  } catch {
+    return ['.harness-hub/manifest.json: must be valid JSON'];
+  }
+
+  if (manifest.schemaVersion !== 1) {
+    failures.push('.harness-hub/manifest.json: schemaVersion must be 1');
+  }
+  if (manifest.source?.url !== 'https://github.com/JasonxzWen/harness-hub.git') {
+    failures.push('.harness-hub/manifest.json: source URL must be the canonical Harness Hub repository');
+  }
+  if (!/^[0-9a-f]{40}$/.test(manifest.source?.commit || '')) {
+    failures.push('.harness-hub/manifest.json: source commit must be a full Git SHA');
+  }
+  if (JSON.stringify(manifest.hosts) !== JSON.stringify(['codex']) || manifest.primaryHost !== 'codex') {
+    failures.push('.harness-hub/manifest.json: this repository must use Codex as its only and primary Host');
+  }
+  if (!Array.isArray(manifest.files) || manifest.files.length === 0) {
+    failures.push('.harness-hub/manifest.json: files must be a non-empty array');
+  }
+
+  const claudePath = path.join(targetRoot, 'CLAUDE.md');
+  if (!fs.existsSync(claudePath) || fs.readFileSync(claudePath, 'utf8') !== '@AGENTS.md\n') {
+    failures.push('CLAUDE.md: must contain exactly @AGENTS.md followed by one newline');
+  }
+
+  const seen = new Set();
+  for (const file of Array.isArray(manifest.files) ? manifest.files : []) {
+    const relativePath = typeof file?.path === 'string' ? file.path : '';
+    if (!relativePath || relativePath.includes('\\') || path.posix.isAbsolute(relativePath)
+      || relativePath.split('/').some((segment) => segment === '' || segment === '.' || segment === '..')) {
+      failures.push(`.harness-hub/manifest.json: unsafe managed path '${relativePath}'`);
+      continue;
+    }
+    if (seen.has(relativePath)) {
+      failures.push(`.harness-hub/manifest.json: duplicate managed path '${relativePath}'`);
+      continue;
+    }
+    seen.add(relativePath);
+
+    const absolutePath = path.resolve(targetRoot, ...relativePath.split('/'));
+    const relativeFromRoot = path.relative(targetRoot, absolutePath);
+    if (relativeFromRoot.startsWith('..') || path.isAbsolute(relativeFromRoot)) {
+      failures.push(`.harness-hub/manifest.json: managed path escapes repository '${relativePath}'`);
+      continue;
+    }
+    if (hasLinkedPath(targetRoot, absolutePath)) {
+      failures.push(`${relativePath}: symlinks and junctions are not allowed in managed paths`);
+      continue;
+    }
+    const stat = fs.lstatSync(absolutePath, { throwIfNoEntry: false });
+    if (!stat?.isFile()) {
+      failures.push(`${relativePath}: missing managed file`);
+      continue;
+    }
+    const digest = crypto.createHash('sha256').update(fs.readFileSync(absolutePath)).digest('hex');
+    if (digest !== file.sha256) {
+      failures.push(`${relativePath}: SHA-256 differs from the migration manifest`);
+    }
+  }
+
+  const validatorPath = path.join(targetRoot, '.harness-hub', 'okf-validate.mjs');
+  if (fs.existsSync(validatorPath)) {
+    try {
+      const { validateOkf } = await import(`${pathToFileURL(validatorPath).href}?validate=${Date.now()}`);
+      const result = validateOkf({ targetDir: targetRoot });
+      for (const finding of result.findings || []) {
+        failures.push(`knowledge/${finding.path}: ${finding.message}`);
+      }
+    } catch (error) {
+      failures.push(`.harness-hub/okf-validate.mjs: ${error.message}`);
+    }
+  } else {
+    failures.push('.harness-hub/okf-validate.mjs: missing managed validator');
+  }
+
+  return failures;
+}
+
+function hasLinkedPath(targetRoot, filePath) {
+  const relativePath = path.relative(targetRoot, filePath);
+  let current = targetRoot;
+  for (const segment of relativePath.split(path.sep)) {
+    current = path.join(current, segment);
+    const stat = fs.lstatSync(current, { throwIfNoEntry: false });
+    if (stat?.isSymbolicLink()) {
+      return true;
+    }
+  }
+  return false;
 }

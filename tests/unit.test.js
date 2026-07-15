@@ -29874,8 +29874,6 @@ test("project recovery uses one tracked five-layer issue ledger", async () => {
     assert(ledger.includes(marker), "recovery ledger must include " + marker);
   }
 
-  const agents = await fs.readFile(path.join(rootDir, "AGENTS.md"), "utf8");
-  assert(agents.includes(ledgerPath));
   const featureList = JSON.parse(await fs.readFile(path.join(rootDir, "feature_list.json"), "utf8"));
   const feature = featureList.features.find((item) => item.id === "project-recovery-ledger");
   assert(feature);
