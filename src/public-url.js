@@ -49,6 +49,22 @@ export function canonicalPublicUrlIdentity(value) {
   return url.toString();
 }
 
+export function urlHostMatches(value, domain, options = {}) {
+  let host;
+  try {
+    host = new URL(String(value || "")).hostname.toLowerCase().replace(/^www\./, "").replace(/\.$/, "");
+  } catch {
+    return false;
+  }
+  const expected = String(domain || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^www\./, "")
+    .replace(/\.$/, "");
+  if (!expected || !/^[a-z0-9.-]+$/.test(expected)) return false;
+  return host === expected || (options.allowSubdomains !== false && host.endsWith(`.${expected}`));
+}
+
 export function isPublicNetworkHost(value) {
   const host = String(value || "")
     .trim()

@@ -5727,7 +5727,7 @@ test("content source discovery listens to every public registry source without a
 
   assert(collectedDefault.source_audit.content_sources.source_group_counts.official_blogs > 0);
   assert(collectedDefault.source_audit.content_sources.credibility_tag_counts.primary_material > 0);
-  assert(checkedUrls.some((url) => url.includes("machinelearning.apple.com")));
+  assert(checkedUrls.some((url) => new URL(url).hostname === "machinelearning.apple.com"));
   assert(checkedUrls.some((url) => url.includes("producthunt.com/feed")));
   assert(checkedUrls.some((url) => url.includes("ifanr.com/feed")));
 });
@@ -22756,9 +22756,10 @@ test("report:draft rejects low-value vendor availability PRs from main admission
   });
 
   const mainUrls = drafted.report.main_items.map((item) => item.url);
+  const mainUrlSet = new Set(mainUrls);
   const vendorPoolEntry = drafted.candidatePool.candidates.find((candidate) => candidate.id === "aws-bedrock-claude-availability-pr");
-  assert(mainUrls.includes(labDeepDiveUrl), "high-authority lab engineering deep-dive must enter the main stream");
-  assert.equal(mainUrls.includes(vendorAvailabilityUrl), false, "low-value vendor availability PR must not occupy main_items");
+  assert(mainUrlSet.has(labDeepDiveUrl), "high-authority lab engineering deep-dive must enter the main stream");
+  assert.equal(mainUrlSet.has(vendorAvailabilityUrl), false, "low-value vendor availability PR must not occupy main_items");
   assert.equal(vendorPoolEntry?.main_reject_reason, "low_value_vendor_availability_pr");
   assert.equal(vendorPoolEntry?.main_selection_stage || "", "");
 });
@@ -22818,7 +22819,7 @@ test("report:draft admission scoring preserves primary lab URL behind intermedia
   });
 
   const mainUrls = drafted.report.main_items.map((item) => item.url);
-  assert(mainUrls.includes(primaryLabUrl), `primary lab URL discovered through an intermediary should enter main stream: ${mainUrls.join(" | ")}`);
+  assert(new Set(mainUrls).has(primaryLabUrl), `primary lab URL discovered through an intermediary should enter main stream: ${mainUrls.join(" | ")}`);
   const selected = drafted.report.main_items.find((item) => item.url === primaryLabUrl);
   assert.notEqual(selected?.source_level, "intermediary", "primary lab URL must not be downgraded to intermediary");
 });
@@ -24085,11 +24086,12 @@ test("report:draft promotes original Anthropic Fable/Mythos launch over platform
   });
 
   const mainUrls = drafted.report.main_items.map((item) => item.url);
+  const mainUrlSet = new Set(mainUrls);
   const fableMain = drafted.report.main_items.find((item) => item.url === anthropicUrl);
   assert(fableMain, "Anthropic original Fable/Mythos launch should enter main_items");
-  assert.equal(mainUrls.includes(foundryUrl), false, "Foundry availability should not occupy a separate main slot");
-  assert.equal(mainUrls.includes(githubUrl), false, "GitHub availability should not occupy a separate main slot");
-  assert.equal(mainUrls.includes(bedrockUrl), false, "Bedrock availability should not occupy a separate main slot");
+  assert.equal(mainUrlSet.has(foundryUrl), false, "Foundry availability should not occupy a separate main slot");
+  assert.equal(mainUrlSet.has(githubUrl), false, "GitHub availability should not occupy a separate main slot");
+  assert.equal(mainUrlSet.has(bedrockUrl), false, "Bedrock availability should not occupy a separate main slot");
   assert(mainUrls.indexOf(anthropicUrl) <= 2, "Original Fable/Mythos launch should rank near the top");
   const fableText = `${fableMain.summary} ${(fableMain.bullets || []).join(" ")}`;
   assert.match(fableText, /Fable 5/);
@@ -26459,8 +26461,8 @@ test("public daily renders stories with source links and keeps GitHub Trending v
   const serialized = JSON.stringify(input.sections);
   const githubSection = input.sections.find((section) => /GitHub/i.test(section.title || ""));
 
-  assert(serialized.includes("https://example.com/story-render-primary"));
-  assert(serialized.includes("https://example.com/story-render-analysis"));
+  assert.match(serialized, /https:\/\/example\.com\/story-render-primary(?:\)|")/);
+  assert.match(serialized, /https:\/\/example\.com\/story-render-analysis(?:\)|")/);
   assert(!serialized.includes("source_audit"));
   assert(githubSection, "GitHub Trending section must stay directly visible");
   assert.notEqual(githubSection.appendix, true);

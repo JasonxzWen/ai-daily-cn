@@ -9,7 +9,7 @@ import {
   writeSourceStatusHistory
 } from "./source-status-history.js";
 import { normalizeUrlIdentity } from "./url.js";
-import { canonicalPublicUrlIdentity, sanitizePublicHttpUrl } from "./public-url.js";
+import { canonicalPublicUrlIdentity, sanitizePublicHttpUrl, urlHostMatches } from "./public-url.js";
 import {
   auditGroupForPlatform,
   isPlatformExemptCategory,
@@ -5040,8 +5040,11 @@ function communityLeadHasImage(candidate) {
 }
 
 function isStatuspageCandidate(candidate) {
-  const text = `${candidate.source_id || ""} ${candidate.source || ""} ${candidate.url || ""} ${candidate.title || ""}`.toLowerCase();
-  return text.includes("statuspage") || text.includes("status page") || text.includes("status.openai.com") || text.includes("status.claude.com") || /\bincident\b/.test(text);
+  const text = `${candidate.source_id || ""} ${candidate.source || ""} ${candidate.title || ""}`.toLowerCase();
+  const statusUrls = [candidate.url, candidate.source_url, candidate.primary_url, candidate.source];
+  return text.includes("statuspage") || text.includes("status page") || /\bincident\b/.test(text) || statusUrls.some((value) =>
+    urlHostMatches(value, "status.openai.com", { allowSubdomains: false }) ||
+    urlHostMatches(value, "status.claude.com", { allowSubdomains: false }));
 }
 
 function isResolvedStatusCandidate(candidate) {

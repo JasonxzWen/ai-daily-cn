@@ -28,6 +28,7 @@ import {
   sourceFirstPresentationRichIds
 } from "./source-effectiveness.js";
 import { isPublicSurfaceDietEnabled } from "./public-surface-policy.js";
+import { urlHostMatches } from "./public-url.js";
 
 const execFileAsync = promisify(execFile);
 const HUGGING_FACE_ICON =
@@ -1909,7 +1910,7 @@ function repoKeyFromProject(project) {
 function repoFromUrl(value) {
   try {
     const parsed = new URL(String(value || ""));
-    if (!parsed.hostname.toLowerCase().includes("github.com")) {
+    if (!urlHostMatches(parsed, "github.com", { allowSubdomains: false })) {
       return "";
     }
     const parts = parsed.pathname.split("/").filter(Boolean);
@@ -2449,7 +2450,7 @@ function dailyTrackingSourceLabel(item = {}) {
   const text = `${item.id || ""} ${item.name || ""} ${item.source || ""} ${item.url || ""}`.toLowerCase();
   if (text.includes("openrouter")) return "OpenRouter";
   if (text.includes("artificialanalysis") || text.includes("artificial analysis")) return "Artificial Analysis";
-  if (text.includes("swe-bench") || text.includes("swe bench") || text.includes("scale.com")) return "SWE-bench";
+  if (text.includes("swe-bench") || text.includes("swe bench") || urlHostMatches(item.url, "scale.com", { allowSubdomains: false })) return "SWE-bench";
   return dailyTrackingCategoryLabel(item.category);
 }
 
@@ -2850,8 +2851,11 @@ function sourceTrustLabel(item = {}) {
   if (sourceLevel === "platform_exempt_signal" || status === "platform_exempt_unverified") return "平台线索";
   if (status === "intermediary_only" || isThirdPartySourceLevel(sourceLevel)) return "第三方报道";
   if (status === "unverified" || sourceLevel === "community" || sourceLevel === "community_api") return "社区线索";
-  if (sourceText.includes("github.com") || sourceText.includes("github trending")) return "GitHub/仓库来源";
-  if (sourceText.includes("x.com/") || sourceText.includes("twitter.com/")) return "原始社交动态";
+  const sourceUrls = [item?.url, item?.source_url, item?.primary_url, item?.source];
+  if (sourceUrls.some((value) => urlHostMatches(value, "github.com", { allowSubdomains: false })) || sourceText.includes("github trending")) return "GitHub/仓库来源";
+  if (sourceUrls.some((value) =>
+    urlHostMatches(value, "x.com", { allowSubdomains: false }) ||
+    urlHostMatches(value, "twitter.com", { allowSubdomains: false }))) return "原始社交动态";
   return sourceLevelLabel(sourceLevel);
 }
 

@@ -1621,7 +1621,7 @@ function fakeGitHubFetch(options = {}) {
     if (url.endsWith("/git/refs/heads/main") && method === "PATCH") {
       return jsonResponse({ object: { sha: "commit-new" } });
     }
-    if (url.includes("github.io")) {
+    if (new URL(url).hostname === "jasonxzwen.github.io") {
       return {
         ok: true,
         status: 200,

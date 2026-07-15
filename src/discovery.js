@@ -7,7 +7,8 @@ import {
   summarizeGithubReadme
 } from "./github-readme.js";
 import { loadSourceRegistry } from "./source-registry.js";
-import { sanitizePublicHttpUrl } from "./public-url.js";
+import { sanitizePublicHttpUrl, urlHostMatches } from "./public-url.js";
+import { decodeXmlEntitiesOnce as decodeXml } from "./xml.js";
 import { loadWeChatArticleInput, WECHAT_ARTICLE_INPUT_SOURCE } from "./wechat-input.js";
 import {
   auditGroupForPlatform,
@@ -3935,8 +3936,8 @@ function shouldCrossCheckProductCandidate(sourceInfo, options = {}) {
   if (options.productCrossCheck === false) {
     return false;
   }
-  const sourceText = `${sourceInfo.name || ""} ${sourceInfo.url || ""} ${sourceInfo.signal || ""}`.toLowerCase();
-  return sourceInfo.signal === "product_hunt" || sourceText.includes("product hunt") || sourceText.includes("producthunt.com");
+  const sourceText = `${sourceInfo.name || ""} ${sourceInfo.signal || ""}`.toLowerCase();
+  return sourceInfo.signal === "product_hunt" || sourceText.includes("product hunt") || urlHostMatches(sourceInfo.url, "producthunt.com");
 }
 
 async function crossCheckProductCandidate({ candidate, productHuntUrl, feedLinks = [], fetchImpl }) {
@@ -7235,7 +7236,7 @@ function parseAtomEntry(block) {
     url,
     date: xmlText(block, "updated") || xmlText(block, "published"),
     summary,
-    image_url: extractFeedImageUrl(block, url) || extractHtmlImageUrl(summary, url),
+    image_url: extractFeedImageUrl(block, url) || extractHtmlImageUrl(summary, url, { attributesDecoded: true }),
     image_source: "feed"
   });
 }
@@ -7250,7 +7251,7 @@ function parseRssItem(block) {
     url,
     date: xmlText(block, "pubDate") || xmlText(block, "date") || xmlText(block, "updated"),
     summary,
-    image_url: extractFeedImageUrl(block, url) || extractHtmlImageUrl(summary, url),
+    image_url: extractFeedImageUrl(block, url) || extractHtmlImageUrl(summary, url, { attributesDecoded: true }),
     image_source: "feed"
   });
 }
@@ -7265,7 +7266,7 @@ function normalizeFeedEntry(entry) {
     url,
     event_date: dateOnly(entry.date),
     summary: cleanText(rawSummary),
-    links: extractHtmlLinks(rawSummary, url),
+    links: extractHtmlLinks(rawSummary, url, { attributesDecoded: true }),
     ...(imageUrl ? { image_url: imageUrl, image_source: entry.image_source || "feed" } : {})
   };
 }
@@ -7319,20 +7320,20 @@ function extractFeedImageUrl(block, baseUrl) {
   return normalizeImageUrl(direct || imageText, baseUrl);
 }
 
-function extractHtmlImageUrl(html, baseUrl) {
-  const decoded = decodeXml(html);
+function extractHtmlImageUrl(html, baseUrl, options = {}) {
+  const markup = String(html || "");
   const metaTag =
-    decoded.match(/<meta\b[^>]*(?:property|name)=["'](?:og:image|twitter:image|twitter:image:src)["'][^>]*>/i)?.[0] ||
-    decoded.match(/<meta\b[^>]*content=["'][^"']+["'][^>]*(?:property|name)=["'](?:og:image|twitter:image|twitter:image:src)["'][^>]*>/i)?.[0] ||
+    markup.match(/<meta\b[^>]*(?:property|name)=["'](?:og:image|twitter:image|twitter:image:src)["'][^>]*>/i)?.[0] ||
+    markup.match(/<meta\b[^>]*content=["'][^"']+["'][^>]*(?:property|name)=["'](?:og:image|twitter:image|twitter:image:src)["'][^>]*>/i)?.[0] ||
     "";
-  const metaImage = metaTag ? extractAttribute(metaTag, "content") : "";
+  const metaImage = metaTag ? extractAttribute(metaTag, "content", options) : "";
   if (metaImage) {
     return normalizeImageUrl(metaImage, baseUrl);
   }
 
-  for (const match of decoded.matchAll(/<(?:img|source)\b[^>]*>/gi)) {
+  for (const match of markup.matchAll(/<(?:img|source)\b[^>]*>/gi)) {
     const tag = match[0];
-    const src = extractAttribute(tag, "src") || firstSrcsetUrl(extractAttribute(tag, "srcset"));
+    const src = extractAttribute(tag, "src", options) || firstSrcsetUrl(extractAttribute(tag, "srcset", options));
     const imageUrl = normalizeImageUrl(src, baseUrl);
     if (imageUrl) {
       return imageUrl;
@@ -7366,19 +7367,21 @@ function firstSrcsetUrl(value) {
   return String(value || "").split(",")[0]?.trim().split(/\s+/)[0] || "";
 }
 
-function extractAttribute(tag, name) {
+function extractAttribute(tag, name, options = {}) {
   const pattern = new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]+)"|'([^']+)'|([^\\s>]+))`, "i");
   const match = String(tag || "").match(pattern);
-  return decodeXml(match?.[1] || match?.[2] || match?.[3] || "");
+  const value = match?.[1] || match?.[2] || match?.[3] || "";
+  return options.attributesDecoded ? value : decodeXml(value);
 }
 
-function extractHtmlLinks(html, baseUrl) {
+function extractHtmlLinks(html, baseUrl, options = {}) {
   const links = [];
   const seen = new Set();
-  const decoded = decodeXml(html);
+  const markup = String(html || "");
   const anchorPattern = /<a\b[^>]*href=(?:"([^"]+)"|'([^']+)'|([^'"\s>]+))[^>]*>/gi;
-  for (const match of decoded.matchAll(anchorPattern)) {
-    const url = absoluteUrl(decodeXml(match[1] || match[2] || match[3] || ""), baseUrl);
+  for (const match of markup.matchAll(anchorPattern)) {
+    const value = match[1] || match[2] || match[3] || "";
+    const url = absoluteUrl(options.attributesDecoded ? value : decodeXml(value), baseUrl);
     if (url && !seen.has(url)) {
       seen.add(url);
       links.push(url);
@@ -7404,21 +7407,6 @@ function atomLink(block) {
 
 function stripTags(value) {
   return String(value).replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]*(?:>|$)/g, " ");
-}
-
-function decodeXml(value) {
-  return String(value)
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number.parseInt(code, 10)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(Number.parseInt(code, 16)))
-    .replace(/&#x2F;/g, "/")
-    .replace(/&mdash;/g, "—")
-    .replace(/&ndash;/g, "–")
-    .replace(/&nbsp;/g, " ");
 }
 
 function cleanText(value) {
