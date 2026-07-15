@@ -14685,7 +14685,7 @@ test("official blog related report dates JSON projection is generated and planne
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
   await fs.mkdir(dataInputDir, { recursive: true });
-  await fs.cp(path.join(rootDir, "knowledge"), path.join(tmp, "knowledge"), { recursive: true });
+  await fs.cp(path.join(rootDir, "curated-data"), path.join(tmp, "curated-data"), { recursive: true });
   const base = JSON.parse(await readFixture("reports/good/structured-report.json"));
   const report = structuredReportForDate(base, "2026-05-14");
   report.hot_blogs = [

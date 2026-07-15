@@ -12,7 +12,7 @@ Stage 1 implements only the validated data layer:
 
 - `schemas/official-blog.schema.json`
 - `src/official-blog-knowledge.js`
-- curated seed records under `knowledge/official-blogs/openai/` and `knowledge/official-blogs/anthropic/`
+- curated seed records under `curated-data/official-blogs/openai/` and `curated-data/official-blogs/anthropic/`
 - unit tests in `tests/official-blog-knowledge.test.js`
 
 No homepage, report rendering, source discovery, or publish workflow behavior changes are included in this stage.

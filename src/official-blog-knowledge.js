@@ -5,7 +5,6 @@ import Ajv from "ajv/dist/2020.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_ROOT = path.resolve(__dirname, "..");
-const DEFAULT_KNOWLEDGE_DIR = path.join(DEFAULT_ROOT, "knowledge", "official-blogs");
 const SCHEMA_PATH = path.join(DEFAULT_ROOT, "schemas", "official-blog.schema.json");
 const SUPPORTED_COMPANIES = new Set(["openai", "anthropic"]);
 const MAX_DIGEST_LENGTH = 1200;
@@ -148,7 +147,7 @@ export const OFFICIAL_BLOG_ADMISSION_POLICY = {
 
 export async function loadOfficialBlogKnowledge(options = {}) {
   const rootDir = options.rootDir || DEFAULT_ROOT;
-  const knowledgeDir = options.knowledgeDir || path.join(rootDir, "knowledge", "official-blogs");
+  const knowledgeDir = options.knowledgeDir || path.join(rootDir, "curated-data", "official-blogs");
   const records = [];
   const files = await collectJsonFiles(knowledgeDir);
 

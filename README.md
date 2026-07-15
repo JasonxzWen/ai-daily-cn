@@ -94,6 +94,8 @@ corepack pnpm run validate
 | `docs/` | Static GitHub Pages output. |
 | `docs/reports/` | Published daily HTML pages. |
 | `docs/data/` | Public JSON for readers and lightweight integrations. |
+| `curated-data/` | Reviewed internal source records used to build reader-safe projections. |
+| `knowledge/` | Source-traceable Google OKF project knowledge in Markdown only. |
 | `reports-data/` | Full structured report records. |
 | `reports-source/` | Markdown compatibility input. |
 | `src/` | Build, report, source, quality, trend, and publish logic. |
@@ -104,7 +106,7 @@ corepack pnpm run validate
 
 ## Data contract
 
-Use `docs/data/**` if you want public report content. Use `reports-data/**` only when you need full maintenance data for rebuilding, audit, or quality review.
+Use `docs/data/**` if you want public report content. Use `reports-data/**` only when you need full maintenance data for rebuilding, audit, or quality review. `curated-data/**` is reviewed internal source material; `knowledge/**` is the Markdown-only project Wiki.
 
 Public data should not contain credentials, local paths, private source URLs, raw execution logs, or unpublished candidate pools.
 
