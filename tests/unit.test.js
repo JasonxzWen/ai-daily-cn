@@ -14685,7 +14685,7 @@ test("official blog related report dates JSON projection is generated and planne
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
   await fs.mkdir(dataInputDir, { recursive: true });
-  await fs.cp(path.join(rootDir, "knowledge"), path.join(tmp, "knowledge"), { recursive: true });
+  await fs.cp(path.join(rootDir, "curated-data"), path.join(tmp, "curated-data"), { recursive: true });
   const base = JSON.parse(await readFixture("reports/good/structured-report.json"));
   const report = structuredReportForDate(base, "2026-05-14");
   report.hot_blogs = [
@@ -29874,8 +29874,6 @@ test("project recovery uses one tracked five-layer issue ledger", async () => {
     assert(ledger.includes(marker), "recovery ledger must include " + marker);
   }
 
-  const agents = await fs.readFile(path.join(rootDir, "AGENTS.md"), "utf8");
-  assert(agents.includes(ledgerPath));
   const featureList = JSON.parse(await fs.readFile(path.join(rootDir, "feature_list.json"), "utf8"));
   const feature = featureList.features.find((item) => item.id === "project-recovery-ledger");
   assert(feature);

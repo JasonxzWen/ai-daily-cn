@@ -15,12 +15,12 @@ const skillPath = path.join(skillDir, "SKILL.md");
 const createReportScript = path.join(skillDir, "scripts", "create-interaction.mjs");
 const validateReportScript = path.join(skillDir, "scripts", "validate-interaction.mjs");
 
-test("repo has Chinese agent instructions and effective-interact routing", async () => {
+test("repo has Chinese defaults and effective-interact delivery routing", async () => {
   const agents = await fsp.readFile(path.join(rootDir, "AGENTS.md"), "utf8");
 
-  assert.match(agents, /始终使用中文回复用户/);
-  assert.match(agents, /\.codex\/skills\/effective-interact/);
-  assert.match(agents, /corepack pnpm run validate/);
+  assert.match(agents, /Use concise Chinese by default/);
+  assert.match(agents, /load `effective-interact`/);
+  assert.match(agents, /rerun proportionate deterministic validation/);
 });
 
 test("effective-interact skill is installed with generator, validator, schema, and templates", async () => {

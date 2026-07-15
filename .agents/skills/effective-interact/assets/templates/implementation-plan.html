@@ -1,0 +1,74 @@
+<!doctype html>
+<!-- Use case: implementation planning with milestones, dependencies, acceptance gates, risks, owners, and open questions. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Implementation Plan</title>
+  <style>
+    :root { color-scheme:light; --bg:#FAF9F5; --panel:#fff; --soft:#F0EEE6; --ink:#3D3D3A; --muted:#87867F; --line:#D1CFC5; --accent:#D97757; --ok:#788C5D; --warn:#A67C52; --danger:#B04A3F; --shadow:0 14px 40px rgba(61,61,58,.12); }
+    * { box-sizing:border-box; min-width:0; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    .shell { width:min(1180px,calc(100vw - 28px)); margin:0 auto; padding:24px 0 44px; }
+    header,.panel,.card { border:1px solid var(--line); border-radius:8px; background:var(--panel); padding:16px; }
+    h1,h2,h3,p { margin-top:0; } h1 { font-size:clamp(28px,4vw,42px); line-height:1.06; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+    .layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,.75fr); gap:12px; margin-top:12px; }
+    .chip { display:inline-flex; min-height:26px; align-items:center; padding:3px 8px; border:1px solid var(--line); border-radius:999px; background:var(--soft); font-weight:700; }
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .danger{color:var(--danger)} .muted{color:var(--muted)}
+    .milestones { display:grid; gap:10px; }
+    .milestone { display:grid; grid-template-columns:110px minmax(0,1fr); gap:10px; padding:10px; border-left:3px solid var(--accent); border-radius:6px; background:var(--soft); }
+    table { width:100%; border-collapse:collapse; } th,td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; } th { background:var(--soft); color:#8A3B1E; }
+    svg { width:100%; height:auto; } button { min-height:34px; border:1px solid var(--line); border-radius:8px; background:#fff; padding:6px 10px; font:inherit; cursor:pointer; }
+    button:hover,button:focus-visible { border-color:var(--accent); box-shadow:0 0 0 3px rgba(217,119,87,.18); }
+    @media (max-width:840px){.shell{width:min(100vw - 18px,1180px)}.layout,.milestone{grid-template-columns:1fr}}
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <span class="chip warn">Plan</span>
+      <h1>Replace with implementation plan</h1>
+      <p class="muted">Lead with the recommended sequence, then expose dependencies, gates, risks, and open questions.</p>
+    </header>
+    <section class="grid" style="margin-top:12px">
+      <article class="card"><h2>Goal</h2><p>Outcome and scope boundary.</p></article>
+      <article class="card"><h2>Gate</h2><p><span class="chip ok">pass</span> Acceptance condition.</p></article>
+      <article class="card"><h2>Risk</h2><p><span class="chip danger">watch</span> Highest unresolved risk.</p></article>
+    </section>
+    <section class="layout">
+      <article class="panel">
+        <h2>Milestones</h2>
+        <div class="milestones">
+          <div class="milestone"><strong>M1</strong><span>Foundation, fixture, and validation path.</span></div>
+          <div class="milestone"><strong>M2</strong><span>Implementation slice with tests.</span></div>
+          <div class="milestone"><strong>M3</strong><span>Acceptance and handoff.</span></div>
+        </div>
+      </article>
+      <article class="panel">
+        <h2>Dependency map</h2>
+        <svg viewBox="0 0 420 210" role="img" aria-label="Dependency map">
+          <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#D97757"/></marker></defs>
+          <rect x="20" y="35" width="110" height="54" rx="8" fill="#FBF1EC" stroke="#D97757"/><text x="75" y="66" text-anchor="middle">Input</text>
+          <rect x="160" y="35" width="110" height="54" rx="8" fill="#F0EEE6" stroke="#D1CFC5"/><text x="215" y="66" text-anchor="middle">Build</text>
+          <rect x="300" y="35" width="100" height="54" rx="8" fill="#E4E9DC" stroke="#788C5D"/><text x="350" y="66" text-anchor="middle">Gate</text>
+          <path d="M130 62 H160" stroke="#D97757" stroke-width="2" marker-end="url(#arrow)"/><path d="M270 62 H300" stroke="#D97757" stroke-width="2" marker-end="url(#arrow)"/>
+        </svg>
+      </article>
+    </section>
+    <section class="panel" style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><h2>Open questions</h2><button data-copy-from="#questions">Copy</button></div>
+      <table id="questions"><thead><tr><th>Question</th><th>Why it matters</th><th>Owner</th></tr></thead><tbody><tr><td>Decision needed</td><td>Blocks implementation path</td><td>Reviewer</td></tr></tbody></table>
+    </section>
+  </main>
+  <script>
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-copy-from]");
+      if (!button || !navigator.clipboard) return;
+      var source = document.querySelector(button.getAttribute("data-copy-from"));
+      if (source) navigator.clipboard.writeText(source.textContent.trim());
+    });
+  </script>
+</body>
+</html>

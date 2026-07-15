@@ -1,71 +1,106 @@
-always respond in Chinese unless the user explicitly asks for another language.
-始终使用中文回复用户。
+# Project Agent Contract
 
-## Project Local Rules
+This file is the shared contract for every repository-local coding agent. `CLAUDE.md` must contain only `@AGENTS.md`; Claude Code uses `.claude/`, while Codex discovers skills from `.agents/skills/` and reads hooks from `.codex/hooks.json`.
 
-- Route interaction-reporting and handoff artifact work through `.codex/skills/effective-interact`.
-- Follow `docs/desktop-only-support-policy.md`: the only supported UI/report viewport is `1280x900`; do not design, implement, test, or generate mobile, tablet, narrow-screen, or touch-only variants.
-- During development, run focused tests plus the affected suite; reserve full `corepack pnpm run validate` for slice PR preparation or final material delivery.
+## Operating principles
 
-# Codex Harness
+1. Facts first. Inspect current code, tests, Git state, and project knowledge before deciding. Do not invent APIs, paths, commands, configuration, or user acceptance.
+2. Simplicity first. Prefer the smallest complete design. Reuse existing mechanisms and avoid compatibility layers, duplicate registries, optional packs, speculative abstractions, or process for its own sake.
+3. Surgical scope. Preserve unrelated user changes. Expand scope only when required by accepted behavior or deterministic failure.
+4. Deterministic evidence wins. A failing test, validator, build, Git check, or security gate cannot be waived by Agent opinion.
+5. Autonomy within boundaries. Continue local, reversible, in-scope work without asking. Ask only for a choice that changes user-visible behavior, acceptance criteria, data ownership, security, material cost, remote mutation, or destructive scope.
+6. No unrequested remote mutation. Do not commit, push, publish, deploy, create or merge a PR, change credentials, or modify user/global configuration without the required authorization. Never merge without explicit authorization.
 
-This repository is prepared for Codex-driven development. Treat tracked harness files as the stable rules, and use ignored local state under `.harness-hub/state/` for the active task, progress, decisions, and handoff.
+## Native Host execution
 
-## Initialization Gate
+Claude Code or Codex is the only main-Agent runtime. The main Agent owns requirements alignment, planning, Subagent delegation, parallel work, conflict resolution, integration, validation, and the final user report.
 
-Do not start implementation until the harness is fully landed and the active task is goal-ready.
+Harness Hub supplies atomic Skills and project rules. It does not supply a Router, Workflow/Loop runtime, Producer/Verifier/Arbiter scheduler, retry or pause state machine, lease system, Agent dispatcher, or internal metrics backend.
 
-- Required files must exist: `AGENTS.md`, `feature_list.json`, `clean-state-checklist.md`, `definition-of-done.md`, `evaluator-rubric.md`, `quality-document.md`, `scripts/harness-validate.mjs`, `.harness-hub/state/{current-task.md,decisions.md,progress.md,session-handoff.md}`, and `.harness-hub/context/{AGENTS.md,README.md,llm-wiki-schema.md,wiki/index.md}`.
-- If any required file is missing, stop and run the approved harness init path before coding.
-- Run `harness-hub check . --json` as a read-only startup check when the command is available; if it is unavailable, use `npx @jasonwen/harness-hub@latest check . --json`. Treat CLI updates, target updates, missing locks, missing project-local Codex activation, and registry failures as advisory unless the current task explicitly requires updating.
-- If startup check recommends `harness-hub activate-codex`, run the dry-run first and then confirm only when local Codex skill activation is needed: `harness-hub activate-codex . --dry-run --json`, then `harness-hub activate-codex . --yes`.
-- Run `node scripts/harness-validate.mjs`; fix harness failures before changing product files.
-- Fill `.harness-hub/state/current-task.md` with goal, assumptions, non-goals, allowed paths, forbidden paths, acceptance criteria, validation tiers, runtime signals, standard startup path, and checkpoint policy before editing.
-- For feature, bug-fix, refactor, or product/spec change work, fill requirement intake, discovery/brainstorming, target spec, P0/P1/P2 test matrix, open questions, and alignment status before editing.
-- Review recent progress, decisions, handoff, feature state, quality snapshot, branch/worktree, and `git status --short`.
-- For current-state audits and write tasks, run `git fetch origin main --prune`, record `git rev-list --left-right --count HEAD...origin/main`, and run `corepack pnpm run preflight:worktree`. Do not implement against a stale local baseline.
+Skill selection and composition are native main-Agent decisions. No Hook selects or sequences Skills; the repository safety Hook remains a deterministic local guard only.
 
-## Operating Rules
+Do not create a Harness Hub Agent fallback.
 
-- Keep this file short. Move detailed or historical context to task files, docs, or archives.
-- Use `feature_list.json` as the stable feature and parallel-write policy inventory.
-- For ai-daily recovery work, use `tasks/project-recovery-ledger.md` as the only durable issue ledger; update stable REC IDs and five-layer evidence instead of creating another audit or TODO list.
-- Use the LLM Wiki under `.harness-hub/context/wiki/` as the stable knowledge middle layer. Raw sources remain authoritative; do not duplicate code facts or native agent memory. Follow `.harness-hub/context/AGENTS.md` and `.harness-hub/context/llm-wiki-schema.md`; write wiki knowledge only after human confirmation and record updates in `wiki/update-log.md`.
-- Treat Loop Control Plane rules as the top-level automation boundary. Prompt, context, harness, and tool capabilities may be `standalone`, `composable`, or `loop-participant`; do not force standalone capabilities into fixed workflows.
-- Keep workflow and Loop separate: workflow stages define how development moves from requirement intake to handoff; Loop only decides whether concrete capability actions continue or interrupt and records auditable decisions.
-- Follow the Interrupt Policy in `.harness-hub/loop/policies/interrupt-policy.md`: continue low-risk local work when scope and validation are clear, but interrupt when risk signals require human review.
-- Record auditable loop decisions in `.harness-hub/state/interrupt-decisions.jsonl`, loop runs in `.harness-hub/state/loop-runs.jsonl`, and capability events in `.harness-hub/state/capability-events.jsonl`.
-- Use a separate git worktree or branch for each write task.
-- Before the first write, fetch `origin/main` and create the task branch directly from the latest `origin/main`; verify that the branch includes that commit. Do not start changes from another feature branch or an out-of-date main baseline.
-- Every PR must target `main` directly. Stacked PRs, feature-branch bases, and merges that land only in an intermediate branch are not allowed.
-- Treat roadmap slices as PR units: open one main PR per slice and use multiple commits inside it instead of separate PRs for small audit, tag, or guard increments.
-- Start from `.harness-hub/state/current-task.md` before changing files.
-- Respect the task's allowed paths and forbidden paths.
-- Before slice implementation, review the 8-slice completion definition table in `docs/ai-daily-cross-agent-iteration-roadmap.md`, record what remains unsolved, and check whether the implementation path is still aligned.
-- Centralize repeated runtime, schema, and test contracts before expanding them; for example, do not duplicate main-stream stage vocabulary across schema/runtime/tests without a shared source or explicit synchronization point.
-- Treat Harness Hub source-repo packaging as non-target material: do not copy `.claude-plugin/`, root `openspec/`, `docs/`, `config/`, `package.json`, `README*`, source `AGENTS.md`, or this repo's source tree into target projects. Use the managed outputs from `harness-hub init-harness`, `install`, and `activate-codex` instead.
-- Do not run parallel writes against the same file, module, or feature state.
-- Run `pnpm` install/build/test commands serially inside one worktree; concurrent pnpm processes can corrupt or lock the shared virtual store state on Windows.
-- Use read-only parallel work only for research, review, log analysis, or validation.
-- Use agentic loops for material planning, implementation, acceptance, PR closeout, and workflow-learning work when they reduce risk: Producer -> Verifier -> Arbiter -> Main Agent Decision.
-- Keep loop roles host-neutral in repo state: `delegated-agent` may be a host-native subagent, isolated session, browser run, CI check, deterministic command, or bounded worker. Arbiters are read-only and must not edit files, resolve conflicts, push, publish, merge, or make final user-facing decisions.
-- Do not let hooks auto-dispatch delegated agents. Hooks and deterministic checks may only remind, validate evidence, or interrupt for human review.
-- Use P0/P1/P2 validation priorities for implementation tasks: P0 must pass before handoff, P1 is run or risk-assessed for affected boundaries, and P2 is hardening that may be deferred with a reason.
-- Treat lightweight brainstorming as part of SDD: inspect repo evidence, compare 2-3 viable directions, recommend one, record rejected alternatives, and ask only blocking open questions before implementation.
-- For Web user-visible changes, record and run agent-run browser acceptance against the local app before handoff, including URL, scenario, viewport, console or network findings, and screenshot or trace evidence when useful.
-- Design templates are authoring aids, not shipped evidence. A design gate passes only with a non-template candidate/accepted record or an explicit scoped skip decision, plus browser evidence for accepted Web changes.
-- Scheduled automation calls one production entrypoint. The repository-owned entrypoint must own bounded repair/resume transitions and write the terminal summary; automation prompts must not reimplement stage business logic or claim an unconsumed artifact handoff.
-- After creating or updating a PR, treat PR status as a delivery gate: check mergeability, CI/check-run status, conflicts, and branch-protection blockers before declaring done; resolve in-scope blockers, rerun validation, and push updates unless a user decision, credential, permission, reviewer action, protected-branch override, or external outage is required.
-- After required checks pass, merge every PR into `main`; an open PR or a PR merged only into a non-main branch is not a completed delivery. This repository-level user directive is standing merge authorization, unless the user explicitly pauses merge for a specific task; permission, branch-protection, or external-service blockers must be reported rather than bypassed.
-- Before final handoff for material changes, run finish closeout: use a subagent or independent review pass when scope-safe to look for technical debt, first-principles implementation fit, project-rule drift, and refactor or warning recommendations; expose findings instead of burying them.
-- During finish closeout, run or explicitly skip `insight` to review tool-calling quality, repeated low-value lookup loops, misleading evidence, code/docs conflicts, AI infrastructure lessons, and whether this workflow should become a skill, source record, eval case, or change to an existing workflow.
-- Use verified checkpoint commits for completed atomic work units when the task permits commits. Do not commit failing, unrelated, or half-done work. Record each checkpoint commit hash, or the reason commits were skipped, in progress and handoff state.
-- Promote repeated review feedback into a harness rule, validation command, or documented follow-up instead of relying on memory.
-- After creating or updating a PR, record the PR URL or number, branch, base, commit, validation status, skipped checks, residual risk, and next action in progress and handoff state.
-- Keep harness state writes low-frequency during implementation: record decision-level changes as they happen, then write complete progress, validation evidence, and restart notes during final handoff.
-- Record decision-level changes in `.harness-hub/state/decisions.md`.
-- Run `node scripts/harness-validate.mjs` before handoff.
+- Select the narrowest atomic Skill that adds domain value; explicit user invocation remains supported.
+- Skills may request bounded, independent, read-only native Subagents. The main Agent performs mutations and keeps final decisions, safety boundaries, integration, and user communication.
+- Prefer independent read-only review for material changes. Deterministic failures outrank every review verdict.
+- Compose `tdd`, `codebase-design`, `to-tickets`, `code-review`, and `verification` only when their narrow trigger fits. They are optional prompt capabilities, not a fixed lifecycle.
+- Low-risk implementation details remain autonomous. Use `decision-ui` on Codex only for genuinely blocking, high-impact, or external-authorization choices; if native structured input is unavailable, fall back honestly to concise text.
+- Do not modify Host trust. Codex project hooks run only when the user already trusts the project.
 
-## Required Handoff
+## Development and delivery
 
-Before ending a session, update `.harness-hub/state/session-handoff.md` with the current status, changed files, validation evidence, agentic loop records, finish closeout findings, insight recommendations, PR status and PR handoff details when a PR was created or updated, blockers, and the next concrete action. Update `.harness-hub/state/decisions.md` when assumptions, acceptance criteria, allowed paths, validation, user-visible behavior, or risk changed.
+Run one `grill-me` alignment pass for every repository mutation task. A fully aligned task exits with zero user questions. For durable contracts, specifications, ADRs, architecture, or OKF changes, use `grill-with-docs`, which reuses the same decision graph and replaces a separate interview.
+
+For non-trivial mutation work:
+
+1. Inspect Git freshness, the nearest implementation, tests, project rules, and `knowledge/`.
+2. Record the goal, accepted behavior, non-goals, scope, acceptance criteria, validation, and unresolved decisions before broad edits.
+3. Use the native Host main Agent to plan, implement, test, review, and close out. Use `ponytail` to check YAGNI, minimum change, and entity count. Use `to-tickets` only when accepted work needs multiple independently verifiable tracer-bullet tickets; follow the project's existing task, issue, or plan convention rather than creating a Harness task registry.
+4. Test public behavior and failure boundaries. Prove failures are caused by the missing behavior before changing production code when practical.
+5. Before handoff, review the final diff, rerun proportionate deterministic validation, and re-read task-critical files to avoid stale conclusions.
+6. Never claim cleanup, rollback, CI, PR, or delivery success without direct evidence.
+
+For complex delivery summaries,方案比较, or important handoffs, load `effective-interact` and use the lightest structure that reduces interpretation cost. Simple results return as plain text.
+
+Use `agent-interaction-audit` for failed, long-running, high-cost, tool-abnormal, or explicitly requested retrospectives. It may recommend changes to an existing Skill, project rule, Eval, SOP, or OKF page, but it must not create a new entity by default. Missing trace, duration, token, or cost evidence is `unknown`, never estimated.
+
+## Harness Hub updates
+
+When an update request includes `https://github.com/JasonxzWen/harness-hub`, clone it into a temporary standalone checkout outside this repository, use the source default branch current HEAD, keep this repository as the target, and read its existing `.harness-hub/manifest.json`. From the temporary Harness Hub checkout run:
+
+```text
+node bin/harness-hub.mjs migrate <current-repository> --yes
+```
+
+With a valid schemaVersion 1 manifest, omitted Host mode and primary inherit `hosts` and `primaryHost`; do not ask the user to repeat them. Explicit `--host` and `--primary` take priority. Without a manifest, first migration still requires `--host`, and first migration in `both` mode also requires `--primary`. Use the source default branch current HEAD and preserve the actual source commit recorded by the new manifest. Migration must not commit, push, publish, merge, or otherwise modify remote state.
+
+## Durable task state
+
+For non-trivial mutation work, maintain ignored project-local state under `.harness-hub/state/` when it materially improves restartability:
+
+- `current-task.md`: goal, non-goals, scope, accepted behavior, acceptance criteria, validation, and open questions.
+- `decisions.md`: accepted and rejected choices with reasons.
+- `progress.md`: completed work, current phase, evidence, blockers, and delivery state.
+- `session-handoff.md`: restart-ready status, changed files, validation, residual risk, and next action.
+
+Do not create `.harness-hub/state/runs/`, leases, integrations, Agent traces, or a parallel execution control plane. Task state is project-owned and is not proof of a tracked product change.
+
+## Git, filesystem, and security
+
+- Start by inspecting branch, upstream, `git status --short`, and relevant recent remote state. Fetching is read-only; remote writes are not implied.
+- A dirty or diverged worktree is evidence to preserve, not permission to reset, clean, overwrite, or discard.
+- Reject path traversal, symlinks, junctions, and writes outside declared ownership when managing repository content.
+- The repository-local safety hook is deterministic and must not dispatch Agents, write state, modify credentials, or perform remote actions.
+- Do not install global tools, change Host config, copy credentials, or reuse browser/login state on the user's behalf.
+- Agent Reach is only a prompt-level router to an already installed user-level CLI. Run its doctor first; if unavailable, report prerequisites honestly and do not install, configure, authenticate, or copy state.
+
+## Project knowledge (Google OKF v0.1)
+
+`knowledge/` is this project's source-traceable LLM-Wiki and belongs to this project.
+
+- Every Markdown document has parseable YAML frontmatter with a non-empty `type`.
+- `knowledge/index.md` declares OKF `0.1` and links every project concept.
+- `knowledge/log.md` records dated knowledge changes.
+- Concepts link to real repository sources with relative links and distinguish fact from inference.
+- Update an existing canonical owner page before adding another; deduplicate facts and synchronize related links, index, and log.
+- Run `node .harness-hub/okf-validate.mjs .` after knowledge changes.
+- If no durable project fact changed, leave the wiki byte-for-byte unchanged.
+- Repository migration may validate this tree but normal and force migration must preserve its complete path-and-byte set.
+- Project tasks, sessions, Eval cases, product facts, and private preferences remain in this repository. Never copy another project's knowledge or examples here.
+
+## Real-task evaluation
+
+Keep Eval task cards and results in this project, derived from this project's own sessions, audits, and failures. Measure:
+
+1. primary: real-task first-attempt success rate;
+2. guardrails: human interventions, Agent/CLI calls, elapsed time, token usage, cost, migration safety, and project-knowledge protection.
+
+Do not improve the primary metric by hiding retries, weakening deterministic gates, moving work to the user, or excluding failures. Unknown cost evidence stays `unknown`.
+
+## Communication
+
+- Lead with the result, decision, blocker, or current status.
+- Use concise Chinese by default unless the project or user requests another language.
+- Surface premise corrections, tradeoffs, residual risks, and evidence directly.
+- A handoff includes outcome, changed behavior, validation, unresolved risk, and next action without dumping raw Agent context.

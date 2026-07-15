@@ -137,20 +137,20 @@ Use stable dated filenames so the artifacts can be reviewed and replayed.
 10. Validate final record writes without mutation.
 
    ```powershell
-   node src/cli.js official-blog:author-records --dry-run --input <internal-dir>/07-reviewed-authoring.json --output-dir knowledge/official-blogs --output <internal-dir>/08-author-records-dry-run.json
+   node src/cli.js official-blog:author-records --dry-run --input <internal-dir>/07-reviewed-authoring.json --output-dir curated-data/official-blogs --output <internal-dir>/08-author-records-dry-run.json
    ```
 
    Expected output includes `official_blog_knowledge_drafts`, `records_planned`, and `records_written: []`. Dry-run does not create directories or record files. Review the planned ids, companies, canonical URLs, topics, related ids, and output paths before writing anything to the curated knowledge directory.
 
 11. Write curated records only after dry-run review.
 
-   Step marker: `official-blog:author-records --output-dir knowledge/official-blogs`.
+   Step marker: `official-blog:author-records --output-dir curated-data/official-blogs`.
 
    ```powershell
-   node src/cli.js official-blog:author-records --input <internal-dir>/07-reviewed-authoring.json --output-dir knowledge/official-blogs --output <internal-dir>/09-author-records-written.json
+   node src/cli.js official-blog:author-records --input <internal-dir>/07-reviewed-authoring.json --output-dir curated-data/official-blogs --output <internal-dir>/09-author-records-written.json
    ```
 
-   This is the only step that writes curated record JSON under `knowledge/official-blogs`. Do not run it until step 10 has been reviewed.
+   This is the only step that writes curated record JSON under `curated-data/official-blogs`. Do not run it until step 10 has been reviewed.
 
 12. Build and validate the public projection separately.
 

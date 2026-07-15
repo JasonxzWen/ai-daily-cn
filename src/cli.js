@@ -328,7 +328,7 @@ try {
     const dryRun = Boolean(args["dry-run"]);
     const outputDir = args["output-dir"];
     if (!outputDir && !dryRun) {
-      throw new PublisherError("official_blog_author_records_output_dir_required", "official-blog:author-records requires --output-dir <knowledge/official-blogs>.");
+      throw new PublisherError("official_blog_author_records_output_dir_required", "official-blog:author-records requires --output-dir <curated-data/official-blogs>.");
     }
     const rootDir = path.resolve(args["repo-root"] || process.cwd());
     const resolvedInputPath = path.resolve(inputPath);

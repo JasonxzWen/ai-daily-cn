@@ -2315,7 +2315,7 @@ test("official blog workflow runbook is executable and safety-backed", async () 
     "official-blog:authoring-brief",
     "official-blog:reviewed-authoring",
     "official-blog:author-records --dry-run",
-    "official-blog:author-records --output-dir knowledge/official-blogs"
+    "official-blog:author-records --output-dir curated-data/official-blogs"
   ];
   let previousIndex = -1;
   for (const command of orderedCommands) {
