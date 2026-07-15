@@ -311,6 +311,39 @@ test("real artifact content contract scans report directory and surfaces blockin
   assert(result.degraded.some((issue) => issue.code === "story_template_narrative"));
 });
 
+test("real artifact content contract ignores dated occurrence stores outside the legacy report layout", async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-content-contract-occurrences-"));
+  const reportDate = "2026-07-09";
+  const dataDir = path.join(tmp, "reports-data", "2026", "07");
+  const htmlDir = path.join(tmp, "docs", "reports", "2026", "07");
+  const occurrenceDir = path.join(tmp, "reports-data", "occurrences", "2026", "07");
+  fs.mkdirSync(dataDir, { recursive: true });
+  fs.mkdirSync(htmlDir, { recursive: true });
+  fs.mkdirSync(occurrenceDir, { recursive: true });
+  fs.copyFileSync(path.join(REPORTS_DIR, "2026", "07", `${reportDate}.json`), path.join(dataDir, `${reportDate}.json`));
+  fs.copyFileSync(
+    path.join(__dirname, "..", "docs", "reports", "2026", "07", `${reportDate}.html`),
+    path.join(htmlDir, `${reportDate}.html`)
+  );
+  fs.writeFileSync(
+    path.join(occurrenceDir, "2026-07-15.json"),
+    JSON.stringify({ schema_version: 1, report_date: "2026-07-15", occurrences: [] }),
+    "utf8"
+  );
+
+  const result = await evaluateRealArtifactContentContract({
+    rootDir: tmp,
+    dataInput: "reports-data",
+    htmlInput: path.join("docs", "reports"),
+    latest: 1
+  });
+
+  assert.equal(result.ok, true, JSON.stringify(result.issues));
+  assert.equal(result.summary.artifacts_checked, 1);
+  assert.equal(result.reports[0].report_date, reportDate);
+  assert.equal(result.reports[0].report_path, `reports-data/2026/07/${reportDate}.json`);
+});
+
 test("real artifact content contract blocks missing matching public HTML", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ai-daily-content-contract-missing-html-"));
   const dataDir = path.join(tmp, "reports-data", "2026", "06");
