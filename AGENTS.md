@@ -36,6 +36,8 @@ Do not start implementation until the harness is fully landed and the active tas
 - Follow the Interrupt Policy in `.harness-hub/loop/policies/interrupt-policy.md`: continue low-risk local work when scope and validation are clear, but interrupt when risk signals require human review.
 - Record auditable loop decisions in `.harness-hub/state/interrupt-decisions.jsonl`, loop runs in `.harness-hub/state/loop-runs.jsonl`, and capability events in `.harness-hub/state/capability-events.jsonl`.
 - Use a separate git worktree or branch for each write task.
+- Before the first write, fetch `origin/main` and create the task branch directly from the latest `origin/main`; verify that the branch includes that commit. Do not start changes from another feature branch or an out-of-date main baseline.
+- Every PR must target `main` directly. Stacked PRs, feature-branch bases, and merges that land only in an intermediate branch are not allowed.
 - Treat roadmap slices as PR units: open one main PR per slice and use multiple commits inside it instead of separate PRs for small audit, tag, or guard increments.
 - Start from `.harness-hub/state/current-task.md` before changing files.
 - Respect the task's allowed paths and forbidden paths.
@@ -54,7 +56,7 @@ Do not start implementation until the harness is fully landed and the active tas
 - Design templates are authoring aids, not shipped evidence. A design gate passes only with a non-template candidate/accepted record or an explicit scoped skip decision, plus browser evidence for accepted Web changes.
 - Scheduled automation calls one production entrypoint. The repository-owned entrypoint must own bounded repair/resume transitions and write the terminal summary; automation prompts must not reimplement stage business logic or claim an unconsumed artifact handoff.
 - After creating or updating a PR, treat PR status as a delivery gate: check mergeability, CI/check-run status, conflicts, and branch-protection blockers before declaring done; resolve in-scope blockers, rerun validation, and push updates unless a user decision, credential, permission, reviewer action, protected-branch override, or external outage is required.
-- Do not merge a PR unless the user explicitly asks for that remote mutation.
+- After required checks pass, merge every PR into `main`; an open PR or a PR merged only into a non-main branch is not a completed delivery. This repository-level user directive is standing merge authorization, unless the user explicitly pauses merge for a specific task; permission, branch-protection, or external-service blockers must be reported rather than bypassed.
 - Before final handoff for material changes, run finish closeout: use a subagent or independent review pass when scope-safe to look for technical debt, first-principles implementation fit, project-rule drift, and refactor or warning recommendations; expose findings instead of burying them.
 - During finish closeout, run or explicitly skip `insight` to review tool-calling quality, repeated low-value lookup loops, misleading evidence, code/docs conflicts, AI infrastructure lessons, and whether this workflow should become a skill, source record, eval case, or change to an existing workflow.
 - Use verified checkpoint commits for completed atomic work units when the task permits commits. Do not commit failing, unrelated, or half-done work. Record each checkpoint commit hash, or the reason commits were skipped, in progress and handoff state.

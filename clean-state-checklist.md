@@ -3,6 +3,7 @@
 Use this checklist before handoff.
 
 - `git status --short` has been reviewed.
+- Before the first write, the task branch was created directly from the latest fetched `origin/main`, and its main ancestry was verified; it was not based on another feature branch.
 - Read-only Harness Hub startup check (`harness-hub check . --json`) has been run or explicitly skipped with a reason.
 - Standard startup path has been run or explicitly skipped with a reason.
 - Requirement intake, selected direction, rejected alternatives, target spec, open questions, and alignment status are recorded for change work.
@@ -19,6 +20,7 @@ Use this checklist before handoff.
 - Web browser acceptance records local URL, scenario, viewport, console/network findings, and screenshot or trace evidence when the task touches Web user-visible behavior.
 - Web evidence uses only the canonical `1280x900` desktop viewport and no project-owned mobile, tablet, narrow-screen, or touch-only branch/artifact was introduced.
 - PR status is checked and recorded after any PR creation or update, including mergeability, CI/check-run status, conflicts, branch-protection blockers, fixes pushed, validation reruns, and any user/external blocker.
+- Every PR targets `main` directly and, after required checks pass, is merged into `main`; an open or intermediate-branch-only PR is not handed off as complete unless a concrete merge blocker is recorded.
 - Agentic loop records are captured for material work: loop type, producer, verifier, read-only arbiter, evidence, main-agent decision, and follow-up or explicit skip reason.
 - Finish closeout is recorded for material changes: final independent review findings or skip reason, technical-debt/drift warnings, PR/merge readiness, conflict decisions surfaced to the user, and `insight` recommendations or skip reason.
 - Review Feedback To Rules entries are updated when a repeated comment should become a durable harness rule.
