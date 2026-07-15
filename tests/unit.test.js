@@ -39,7 +39,6 @@ import {
 } from "../src/source-status-history.js";
 import { mergeSourceAuditIntoReport } from "../src/source-audit.js";
 import { loadSourceRegistry, normalizeSourceRegistry } from "../src/source-registry.js";
-import { renderIndexHtml, renderOfficialBlogsHtml, renderReportHtml } from "../src/render.js";
 import { reportToInteractionInput } from "../src/interaction-report.js";
 import { buildSourceInventoryRows } from "../src/source-effectiveness.js";
 import { generateReportDraft, writeDiscoveryOccurrenceStore, canPromoteToBuilderObservation } from "../src/draft.js";
@@ -1427,16 +1426,6 @@ function sweBenchProSnapshotFixture(rows = 10) {
   };
 }
 
-test("HTML renders main item bold and highlight markers", async () => {
-  const markdown = await readFixture("reports/good/official-release.md");
-  const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
-  report.main_items[0].bullets = ["**Cost attribution** enters ==regular tracking==."];
-  const html = renderReportHtml(report);
-
-  assert(html.includes("<strong>Cost attribution</strong>"));
-  assert(html.includes('<strong class="text-keyword">regular tracking</strong>'));
-});
-
 test("解析 good fixture 并生成完整 report.json", async () => {
   const markdown = await readFixture("reports/good/official-release.md");
   const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
@@ -1690,135 +1679,6 @@ test("相同日报重建时 feed 更新时间保持稳定", async () => {
   const feed = mergeFeed(existing, [report], { siteUrl, updatedAt: "2026-05-13T03:00:00+08:00" });
   assert.equal(feed.updated_at, "2026-05-13T02:35:00+08:00");
   assert.equal(validateFeed(feed).valid, true);
-});
-
-test("HTML 渲染会转义日报正文并保留外链 rel", async () => {
-  const markdown = await readFixture("reports/good/html-escaping.md");
-  const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
-  const html = renderReportHtml(report);
-
-  assert(!html.includes("<script>alert"));
-  assert(html.includes("&lt;script&gt;alert"));
-  assert(html.includes('rel="noopener noreferrer"'));
-});
-
-test("HTML 渲染会展示自检中的提示词和规则迭代建议", async () => {
-  const markdown = await readFixture("reports/good/official-release.md");
-  const report = parseDailyMarkdown(markdown, { siteUrl, generatedAt: fixedGeneratedAt });
-  report.self_check.optimization_suggestions = [
-    {
-      issue: "48 小时窗口仍不足时缺少扩窗规则",
-      evidence: "主体信息不足 5 条。",
-      module: "date-scope",
-      suggestion: "允许扩展到 72 小时并记录原因。",
-      expected_benefit: "避免低质量硬凑。",
-      requires_user_confirmation: true
-    }
-  ];
-  const html = renderReportHtml(report);
-
-  assert(html.includes("提示词与规则迭代建议"));
-  assert(html.includes("48 小时窗口仍不足时缺少扩窗规则"));
-  assert(html.includes("模块：date-scope"));
-  assert(html.includes("需要确认"));
-
-  const input = reportToInteractionInput(report, { includeInternalSections: true });
-  const selfCheckSection = input.sections.find((section) => section.title === "自检与产物");
-  assert(selfCheckSection.content.includes("为什么要改：避免低质量硬凑。"));
-  assert(!selfCheckSection.content.includes("。；为什么要改"));
-  assert(!/\n\s+- 为什么要改/.test(selfCheckSection.content));
-});
-
-test("HTML 渲染不会展示独立模型栏目但会展示热门博客", async () => {
-  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
-  const validation = validateReport(report);
-  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
-
-  const html = renderReportHtml(validation.value);
-
-  assert(!html.includes('id="model-releases"'));
-  assert(!html.includes("模型发布"));
-  assert(!html.includes("ExampleModel 2"));
-  assert(!html.includes("open_weights"));
-  assert(html.includes('id="hot-blogs"'));
-  assert(html.includes("热门博客"));
-  assert(html.includes("Harness Engineering for Long Running Agents"));
-  assert(html.includes('target="_blank" rel="noopener noreferrer"'));
-});
-
-test("HTML 渲染会展示 GitHub Trending 与 Builder 信源审计", async () => {
-  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
-  report.source_audit = sourceAuditFixture();
-  report.source_audit.builder_sources.blocked_reason = "fetch_failed";
-  report.source_audit.builder_sources.last_successful_feed_at = "2026-05-14T02:35:00+08:00";
-  report.github_trending = [
-    {
-      name: "example/trending-agent",
-      repo: "example/trending-agent",
-      description: "用于验证 GitHub trending 项目展示。",
-      url: "https://github.com/example/trending-agent",
-      event_date: "2026-05-15",
-      source: "GitHub Trending daily",
-      language: "TypeScript",
-      window: "daily",
-      rank: 2,
-      previous_rank: 9,
-      rank_delta: 7,
-      trend: "up",
-      evidence: "GitHub Trending daily rank #2, yesterday #9."
-    }
-  ];
-  report.projects = [
-    {
-      name: "Example Trending Agent",
-      description: "用于验证 GitHub trending 项目展示，在 GitHub Trending daily 中出现。",
-      url: "https://github.com/example/trending-agent",
-      event_date: "2026-05-15",
-      source: "GitHub Trending",
-      signal: "trending",
-      evidence: "GitHub Trending daily 显示 123 stars today，并有可运行 README。"
-    }
-  ];
-  report.builder_observations = [
-    {
-      author: "Example Builder",
-      handle: "examplebuilder",
-      role: "maintainer",
-      original_text: "I shipped a concrete agent harness workflow.",
-      translation: "我发布了一个具体的 agent harness 工作流。",
-      content: "我发布了一个具体的 agent harness 工作流。",
-      url: "https://example.com/builder-post",
-      event_date: "2026-05-15",
-      source: "follow-builders",
-      evidence: "原始帖子链接可访问。"
-    }
-  ];
-  report.self_check.builder_observations = 1;
-
-  const validation = validateReport(report);
-  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
-
-  const html = renderReportHtml(validation.value);
-  assert(html.includes('id="github-trending"'));
-  assert(html.includes("GitHub Trending"));
-  assert(html.includes("#2"));
-  assert(html.includes("↑ UP +7"));
-  assert(html.includes("example/trending-agent"));
-  assert(html.includes('id="source-audit"'));
-  assert(html.includes("信源审计"));
-  assert(html.includes("GitHub Trending"));
-  assert(html.includes("Builder 原始源"));
-  assert(html.includes("搜索 / 新闻影子源"));
-  assert(html.includes("信源健康检查"));
-  assert(html.includes("阻塞：fetch_failed"));
-  assert(html.includes("上次成功：2026-05-14T02:35:00+08:00"));
-  assert(html.includes("今日 +123 stars"));
-  assert(!html.includes("信号：trending"));
-  assert(!html.includes("GitHub Trending daily 显示 123 stars today"));
-  assert(!html.includes("在 GitHub Trending daily 中出现"));
-  assert(html.includes("我发布了一个具体的 agent harness 工作流"));
-  assert(!html.includes("I shipped a concrete agent harness workflow"));
-  assert(!html.includes("原始帖子链接可访问"));
 });
 
 test("日报可以转换为 effective-interact 输入", async () => {
@@ -2213,60 +2073,6 @@ test("project interaction content is only shown as GitHub Trending item tags", a
   assert(section.content.includes("领域：agent、workflow"));
   assert(!section.content.includes("Project Beta"));
   assert(!section.content.includes("eval dashboards"));
-});
-
-test("GitHub Trending project highlights deduplicate overlapping project text", async () => {
-  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
-  report.github_trending = [
-    {
-      name: "example/headroom",
-      repo: "example/headroom",
-      description: "压缩工具输出、日志、文件和 RAG chunks，在进入 LLM 前减少 token。",
-      readme_summary: "压缩工具输出、日志、文件和 RAG chunks，在进入 LLM 前减少 token。",
-      readme_fetch_status: "ok",
-      url: "https://github.com/example/headroom",
-      event_date: "2026-05-15",
-      source: "GitHub Trending daily",
-      language: "all",
-      window: "daily",
-      rank: 1,
-      previous_rank: 1,
-      rank_delta: 0,
-      trend: "same",
-      evidence: "GitHub Trending daily rank #1 with 1,265 stars today."
-    }
-  ];
-  report.projects = [
-    {
-      name: "example/headroom",
-      description: "在 LLM 前压缩工具输出、日志、文件和 RAG chunks，目标是减少 token 同时保持回答质量。",
-      url: "https://github.com/example/headroom",
-      domains: ["LLM 工具链", "RAG", "MCP"],
-      use_case: "把长日志、工具输出或检索片段送入模型前做压缩，降低上下文成本。",
-      event_date: "2026-05-15",
-      source: "GitHub",
-      signal: "trending",
-      evidence: "GitHub Trending daily appeared in discovery."
-    }
-  ];
-
-  const validation = validateReport(report);
-  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
-
-  const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
-  const section = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
-  assert(section.content.includes("压缩工具输出、日志、文件和 RAG chunks"));
-  assert(section.content.includes("领域：LLM 工具链、RAG、MCP"));
-  assert(!section.content.includes("项目 highlight"));
-  assert(!section.content.includes("目标是减少 token 同时保持回答质量"));
-  assert(!section.content.includes("把长日志、工具输出或检索片段"));
-
-  const html = renderReportHtml(validation.value);
-  const githubSection = html.slice(html.indexOf('id="github-trending"'), html.indexOf('id="builder-observations"'));
-  assert(githubSection.includes("压缩工具输出、日志、文件和 RAG chunks"));
-  assert(githubSection.includes("领域：LLM 工具链、RAG、MCP"));
-  assert(!githubSection.includes("目标是减少 token 同时保持回答质量"));
-  assert(!githubSection.includes("把长日志、工具输出或检索片段"));
 });
 
 test("GitHub Trending descriptions prefer concrete README or project context over ranking boilerplate", async () => {
@@ -2959,121 +2765,6 @@ test("effective-interact 输入不会渲染空的可选板块", async () => {
   assert(!JSON.stringify(input).includes("暂无热门博客"));
 });
 
-test("HTML renders GitHub Trending without noisy audit labels", async () => {
-  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
-  report.source_audit = sourceAuditFixture();
-  report.projects = [];
-  report.builder_observations = [];
-  report.github_trending = [
-    {
-      name: "hardikpandya/stop-slop",
-      repo: "hardikpandya/stop-slop",
-      description: "A skill file for removing AI tells from prose",
-      url: "https://github.com/hardikpandya/stop-slop",
-      event_date: "2026-05-15",
-      source: "GitHub Trending daily",
-      language: "all",
-      window: "daily",
-      rank: 3,
-      previous_rank: null,
-      rank_delta: null,
-      trend: "new",
-      evidence: "GitHub Trending daily rank #3."
-    }
-  ];
-
-  const validation = validateReport(report);
-  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
-
-  const html = renderReportHtml(validation.value);
-  const section = html.slice(html.indexOf('id="github-trending"'), html.indexOf('id="source-audit"'));
-  assert(section.includes("GitHub Trending"));
-  assert(!section.includes("GitHub Trending \u8d8b\u52bf"));
-  assert(section.includes("\u53bb\u9664"));
-  assert(!section.includes("A skill file for removing AI tells from prose"));
-  assert(!section.includes("\u6765\u6e90\uff1a"));
-  assert(!section.includes("\u8bed\u8a00\uff1a"));
-
-  const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
-  const trendingSection = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
-  assert(trendingSection);
-  assert(trendingSection.content.includes("3. **[![hardikpandya/stop-slop]"));
-  assert(trendingSection.content.includes("==trend-new|NEW=="));
-  assert(!trendingSection.content.includes("\u6765\u6e90\uff1a"));
-  assert(!trendingSection.content.includes("\u8bed\u8a00\uff1a"));
-});
-
-test("HTML and interaction input attach evidence assets to matching report items", async () => {
-  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
-  report.source_audit = sourceAuditFixture();
-  report.quality_status = {
-    status: "degraded",
-    reasons: ["content_sources_blocked", "builder_sources_low_coverage"],
-    affected_sections: ["hot_blogs", "builder_observations"],
-    public_note: "Some automated discovery sources failed; blog and Builder coverage is incomplete."
-  };
-  report.evidence_assets = [
-    {
-      type: "figure",
-      title: "Coding agent adoption by discipline",
-      source_url: report.main_items[0].url,
-      local_path: "assets/evidence/anthropic-coding-agents-social-sciences-figure-1.png",
-      caption: "Official figure from Anthropic.",
-      extraction_status: "source_image"
-    },
-    {
-      type: "table",
-      title: "Claude Opus 4.8 performance comparison",
-      source_url: report.main_items[0].url,
-      caption: "Transcribed from the official launch image.",
-      extraction_status: "extracted_from_image",
-      data: [
-        ["Task", "Opus 4.8", "Opus 4.7"],
-        ["Agentic coding", "69.2%", "64.3%"]
-      ]
-    },
-    {
-      type: "figure",
-      title: "Duplicate coding agent adoption figure",
-      source_url: report.main_items[0].url,
-      local_path: "assets/evidence/anthropic-coding-agents-social-sciences-figure-1.png",
-      caption: "Duplicate figure should not render twice.",
-      extraction_status: "source_image"
-    }
-  ];
-
-  const validation = validateReport(report);
-  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
-
-  const html = renderReportHtml(validation.value);
-  assert(html.includes('id="quality-status"'));
-  assert(html.includes("发布质量说明"));
-  assert(html.includes("Some automated discovery sources failed"));
-  assert(html.includes("hot_blogs"));
-  assert(!html.includes('id="evidence-assets"'));
-  assert(!html.includes('id="model-releases"'));
-  const mainHtml = html.slice(html.indexOf('id="main-items"'), html.indexOf('id="hot-blogs"'));
-  assert(mainHtml.includes("Coding agent adoption by discipline"));
-  assert(mainHtml.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
-  assert.equal((mainHtml.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
-  assert(mainHtml.includes("Claude Opus 4.8 performance comparison"));
-  assert(mainHtml.includes("Agentic coding"));
-
-  const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
-  const qualitySection = input.sections.find((section) => section.title === "发布质量说明");
-  assert(qualitySection);
-  assert(qualitySection.content.includes("hot_blogs"));
-  assert(qualitySection.content.includes("Some automated discovery sources failed"));
-  assert(!input.sections.some((section) => section.title === "证据图表"));
-  const mainContent = mainMarkdownContent(input);
-  assert(mainContent.includes("Coding agent adoption by discipline"));
-  assert(mainContent.includes("anthropic-coding-agents-social-sciences-figure-1.png"));
-  assert.equal((mainContent.match(/anthropic-coding-agents-social-sciences-figure-1\.png/g) || []).length, 1);
-  assert(mainContent.includes("Claude Opus 4.8 performance comparison"));
-  assert(mainContent.includes("Agentic coding"));
-  assert(mainContent.indexOf("Agentic coding") < mainContent.indexOf("Transcribed from the official launch image."));
-});
-
 test("interaction source icon cache covers high-frequency AI daily sources and source audit feeds", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.main_items = [
@@ -3716,74 +3407,6 @@ test("legacy report:draft keeps GitHub Top20 presentation without truncating the
     }
     assert(!section.content.includes("仓库名指向java weekly"));
   }
-});
-
-test("GitHub Trending public signal tags render structured metadata", async () => {
-  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
-  report.projects = [];
-  report.builder_observations = [];
-  report.github_trending = [
-    {
-      name: "example/browser-agent",
-      repo: "example/browser-agent",
-      description: "Browser Agent organizes browser automation tasks, replay, failure screenshots, local debugging hooks, and permission notes for agent workflows.",
-      readme_summary: "Browser Agent organizes browser automation tasks, replay, failure screenshots, local debugging hooks, and permission notes for agent workflows.",
-      readme_fetch_status: "ok",
-      url: "https://github.com/example/browser-agent",
-      event_date: "2026-06-17",
-      source: "GitHub Trending weekly",
-      language: "TypeScript",
-      window: "weekly",
-      rank: 1,
-      previous_rank: 4,
-      rank_delta: 3,
-      trend: "up",
-      stars_this_week: 678,
-      stargazers_total: 12345,
-      topics: ["agent", "browser-automation", "ai-hacking", "workflow"],
-      license: "MIT",
-      pushed_at: "2026-06-16T10:00:00Z",
-      evidence: "GitHub Trending weekly rank #1."
-    }
-  ];
-
-  const validation = validateReport(report);
-  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
-
-  const html = renderReportHtml(validation.value);
-  const section = html.slice(html.indexOf('id="github-trending"'), html.indexOf('id="source-audit"'));
-  assert(section.includes("TypeScript"));
-  assert(section.includes("agent"));
-  assert(section.includes("浏览器自动化"));
-  assert(section.includes("安全测试"));
-  assert(!section.includes("browser-automation"));
-  assert(!section.includes("ai-hacking"));
-  assert(section.includes("README OK"));
-  assert(section.includes("+678 stars"));
-  assert(!section.includes("GitHub Trending weekly rank #1."));
-
-  const input = reportToInteractionInput(validation.value, { includeInternalSections: true });
-  const trendingSection = input.sections.find((item) => item.title.startsWith("GitHub Trending"));
-  assert(trendingSection);
-  const serialized = JSON.stringify(trendingSection);
-  assert(serialized.includes("TypeScript"));
-  assert(serialized.includes("agent"));
-  assert(serialized.includes("浏览器自动化"));
-  assert(serialized.includes("安全测试"));
-  assert(!serialized.includes("browser-automation"));
-  assert(!serialized.includes("ai-hacking"));
-  assert(serialized.includes("README OK"));
-  assert(serialized.includes("+678 stars"));
-
-  report.github_trending[0].language = "all";
-  report.github_trending[0].window = "weekly";
-  const allLanguageInput = reportToInteractionInput(report, { includeInternalSections: true });
-  const allLanguageTrendingSection = allLanguageInput.sections.find((item) => item.title.startsWith("GitHub Trending"));
-  const allLanguageSerialized = JSON.stringify(allLanguageTrendingSection);
-  assert(!allLanguageSerialized.includes("all"));
-  assert(!allLanguageSerialized.includes("weekly"));
-  assert(allLanguageSerialized.includes("README OK"));
-  assert(allLanguageSerialized.includes("+678 stars"));
 });
 
 test("GitHub trending 发现器可以解析浏览器导出的 HTML", async () => {
@@ -6717,17 +6340,14 @@ test("shared pnpm invocation wraps corepack pnpm through cmd on Windows", () => 
 
 test("public artifact privacy scan blocks local machine path leakage", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-privacy-scan-"));
-  await fs.mkdir(path.join(tmp, "docs/reports"), { recursive: true });
   await fs.mkdir(path.join(tmp, "docs/data"), { recursive: true });
   await fs.mkdir(path.join(tmp, "reports-data"), { recursive: true });
-  await fs.writeFile(path.join(tmp, "docs/reports/report.html"), "<p>C:\\Users\\Admin\\.codex\\automations\\ai-daily</p>", "utf8");
   await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"ok\":true}", "utf8");
-  await fs.writeFile(path.join(tmp, "docs/index.html"), "<p>clean public index</p>", "utf8");
+  await fs.writeFile(path.join(tmp, "docs/index.html"), "<p>C:\\Users\\Admin\\.codex\\automations\\ai-daily</p>", "utf8");
   const blocked = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
   assert.equal(blocked.ok, false);
   assert(blocked.findings.some((finding) => finding.pattern === "windows_user_path"));
 
-  await fs.writeFile(path.join(tmp, "docs/reports/report.html"), "<p>https://mp.weixin.qq.com/s/example</p>", "utf8");
   await fs.writeFile(path.join(tmp, "docs/data/report.json"), "{\"wechat_items\":[],\"source_effectiveness\":[],\"code\":\"content_sources_blocked\"}", "utf8");
   await fs.writeFile(path.join(tmp, "docs/index.html"), "<p>Builder source coverage is degraded.</p>", "utf8");
   const publicDataBlocked = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
@@ -9387,7 +9007,6 @@ test("daily resilience policy validates current runner stages and workflow gates
     "discover_github_trending",
     "discover_builders",
     "report_write",
-    "quality_page_check",
     "content_contract",
     "publish_real",
     "pages_verify"
@@ -9642,7 +9261,6 @@ test("story-centered daily contract is implemented with generator and rendering 
   assert(item.scope.includes("src/draft.js"));
   assert(item.scope.includes("src/report.js"));
   assert(item.scope.includes("src/interaction-report.js"));
-  assert(item.scope.includes("src/page-checklist.js"));
   assert(item.scope.includes("tests/e2e/site.e2e.js"));
   assert.equal(item.validation.command, "node --test tests/unit.test.js");
   assert.equal(item.validation.test_name, "story-centered daily contract is implemented with generator and rendering gates");
@@ -11456,44 +11074,6 @@ test("daily runner keeps the hard block when a non-editorial blocking issue has 
   assert.equal(result.summary.legacy_report.status, "blocked");
 });
 
-test("daily runner degrades and re-renders (not block) on editorial-weak page-check failures", async () => {
-  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-pagecheck-degrade-"));
-  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
-  let buildRuns = 0;
-  const result = await runDailyWorkflow({
-    launcherRoot,
-    reportDate: "2026-06-04",
-    publish: false,
-    prepareCleanWorktree: async () => ({
-      ok: true,
-      next_cwd: cleanRoot,
-      remote_main_sha: "8888888888888888888888888888888888888888"
-    }),
-    runStage: async (stage) => {
-      if (stage.id === "build" || stage.id === "build_disclosure") {
-        buildRuns += 1;
-        return { ok: true, output: { stage: stage.id } };
-      }
-      if (stage.id === "quality_review") {
-        return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
-      }
-      if (stage.id === "quality_page_check") {
-        return { ok: true, output: { ok: true, degraded_checks: ["community_cards_reader_facing"], degraded_sections: ["community_leads"] } };
-      }
-      return { ok: true, output: { stage: stage.id } };
-    }
-  });
-
-  // Publishes (not blocked) AND is consistently labeled degraded, with docs
-  // re-rendered so the artifact can carry the disclosure.
-  assert.notEqual(result.summary.final_status, "blocked");
-  assert.equal(result.summary.final_status, "generated_degraded");
-  const pageStage = result.summary.stages.find((stage) => stage.id === "quality_page_check");
-  assert.equal(pageStage.status, "degraded");
-  assert(result.summary.stages.some((stage) => stage.id === "build_disclosure"), "docs must be re-rendered for disclosure");
-  assert.equal(buildRuns, 2, "build runs once normally and once to re-render with disclosure");
-});
-
 test("daily runner still blocks when residual issues are not low-risk editorial", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-nonedit-block-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
@@ -11599,7 +11179,6 @@ test("daily runner resumes from AI repair contract and continues with optimized 
     "quality_review",
     "report_write",
     "build",
-    "quality_page_check",
     "content_contract",
     "validate",
     "sources_phase5_audit",
@@ -13997,7 +13576,7 @@ test("buildSite fails fast when trend config is absent from the build root", asy
   assert.equal(await exists(path.join(outDir, "trends.json")), false);
 });
 
-test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
+test("buildSite 写入公开 JSON 和 feed，并把 index 交给 Vite", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-build-"));
   const inputDir = path.join(tmp, "reports-source");
   const outDir = path.join(tmp, "docs");
@@ -14016,21 +13595,17 @@ test("buildSite 写入 docs/reports、docs/data、index 和 feed", async () => {
     trendConfigPath
   });
 
-  assert(result.writtenFiles.includes("reports/2026/05/2026-05-13.html"));
-  assert(result.writtenFiles.includes("reports/2026/05/2026-05-13.md"));
+  assert(!result.writtenFiles.includes("reports/2026/05/2026-05-13.html"));
+  assert(!result.writtenFiles.includes("reports/2026/05/2026-05-13.md"));
   assert(result.writtenFiles.includes("data/2026/05/2026-05-13.json"));
   assert(result.writtenFiles.includes("trends.json"));
-  assert.equal(await exists(path.join(outDir, "index.html")), true);
+  assert.equal(await exists(path.join(outDir, "index.html")), false);
   assert.equal(await exists(path.join(outDir, "feed.json")), true);
   assert.equal(await exists(path.join(outDir, "trends.json")), true);
-  assert.equal(await exists(path.join(outDir, "assets/style.css")), true);
-  assert.equal(await exists(path.join(outDir, "assets/adc-theme.css")), true);
-  const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert.match(indexHtml, /<link rel="stylesheet" href="assets\/style\.css\?v=[a-f0-9]{12}">/);
-  const reportHtml = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-13.html"), "utf8");
-  assert.match(reportHtml, /<link rel="stylesheet" data-adc-public-theme href="\.\.\/\.\.\/\.\.\/assets\/adc-theme\.css\?v=[a-f0-9]{12}">/);
-  assert.doesNotMatch(reportHtml, /<style data-adc-public-theme>/);
-
+  assert.equal(await exists(path.join(outDir, "assets/adc-home.css")), false);
+  assert.equal(await exists(path.join(outDir, "assets/adc-home.js")), false);
+  assert.equal(await exists(path.join(outDir, "assets/style.css")), false);
+  assert.equal(await exists(path.join(outDir, "assets/adc-theme.css")), false);
   const trends = JSON.parse(await fs.readFile(path.join(outDir, "trends.json"), "utf8"));
   assert.equal(validateTrends(trends).valid, true);
 });
@@ -14063,7 +13638,7 @@ test("buildSite skips unchanged files and avoids legacy shared scratch path", as
   assert.equal(await exists(path.join(tmp, ".tmp", "effective-interact-daily")), false);
 });
 
-test("结构化 JSON 输入可以直接生成可发布 HTML，不要求 Markdown", async () => {
+test("结构化 JSON 输入可以直接生成公开 JSON，不要求 Markdown 或独立 HTML", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-json-build-"));
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
@@ -14115,33 +13690,9 @@ test("结构化 JSON 输入可以直接生成可发布 HTML，不要求 Markdown
     trendConfigPath
   });
 
-  assert(result.writtenFiles.includes("reports/2026/05/2026-05-15.html"));
+  assert(!result.writtenFiles.includes("reports/2026/05/2026-05-15.html"));
   assert(result.writtenFiles.includes("data/2026/05/2026-05-15.json"));
   assert(!result.writtenFiles.includes("reports/2026/05/2026-05-15.md"));
-
-  const html = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-15.html"), "utf8");
-  assert(html.includes("<style>"));
-  assert(html.includes("data-html-work-report"));
-  assert(html.includes('data-render-mode="pre-rendered"'));
-  assert(!html.includes("模型发布"));
-  assert(!html.includes("ExampleModel 2"));
-  assert(!html.includes("多平台可见"));
-  assert(!html.includes("官方可用性"));
-  assert(html.includes("订阅 RSS"));
-  assert(html.includes("Harness Engineering for Long Running Agents"));
-  assert(html.includes(">重大<"));
-  assert(html.includes(">值得关注<"));
-  assert(html.includes("今日 +321 stars"));
-  assert(!html.includes("项目 highlight"));
-  assert(!html.includes("备注："));
-  assert(!html.includes("信号：trending"));
-  assert(!html.includes("证据：GitHub Trending daily 显示 321 stars today"));
-  assert(!html.includes("在 GitHub Trending daily 中出现"));
-  assert(html.includes("https://jasonxzwen.github.io/ai-daily-cn/data/2026/05/2026-05-15.json"));
-  assert(html.includes('rel="noopener noreferrer"'));
-  assert(!html.includes('<span class="unsafe-link"'));
-  assert.match(html, /<link rel="stylesheet" data-adc-public-theme href="\.\.\/\.\.\/\.\.\/assets\/adc-theme\.css\?v=[a-f0-9]{12}">/);
-  assert(!html.includes("Markdown 原文"));
 
   const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-15.json"), "utf8"));
   assert.equal(data.kind, undefined);
@@ -14214,7 +13765,7 @@ test("buildSite preserves specific GitHub Trending descriptions in public data",
   assert.equal("readme_summary" in publicData.github_trending[0], false);
 });
 
-test("buildSite preserves explicit report quality status in docs data and homepage", async () => {
+test("buildSite preserves explicit report quality status in docs data", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-quality-status-build-"));
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
@@ -14261,12 +13812,8 @@ test("buildSite preserves explicit report quality status in docs data and homepa
 
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/07/2026-07-02.json"), "utf8"));
   assert.equal(publicData.quality_status.status, "degraded");
-  const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert.match(indexHtml, /data-index-style="effective-interact"/);
-  assert.doesNotMatch(indexHtml, /id="articleSearch"/);
-  const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
-  assert.match(opsHtml, /data-quality-status="degraded"/);
-  assert.doesNotMatch(indexHtml, /Report generation is blocked by validation failure/);
+  assert.equal(await exists(path.join(outDir, "index.html")), false);
+  assert.equal(await exists(path.join(outDir, "ops.html")), false);
 });
 
 test("buildSite ignores source status history metadata in reports-data", async () => {
@@ -14299,7 +13846,7 @@ test("buildSite ignores source status history metadata in reports-data", async (
   });
 
   assert.equal(result.reports.length, 1);
-  assert(result.writtenFiles.includes(`reports/${year}/${month}/${structuredReport.report_date}.html`));
+  assert(!result.writtenFiles.includes(`reports/${year}/${month}/${structuredReport.report_date}.html`));
   assert(result.writtenFiles.includes(`data/${year}/${month}/${structuredReport.report_date}.json`));
 });
 
@@ -14615,80 +14162,12 @@ test("public artifacts omit removed community sources", async () => {
     trendConfigPath
   });
 
-  const html = await fs.readFile(path.join(outDir, `reports/${year}/${month}/${report.report_date}.html`), "utf8");
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8"));
   const publicJson = JSON.stringify(publicData);
 
-  assert.doesNotMatch(html, /HelloGitHub|RuanYF|hellogithub|ruanyf/i);
   assert.doesNotMatch(publicJson, /HelloGitHub|RuanYF|hellogithub|ruanyf/i);
-  assert.doesNotMatch(html, /<article[^>]+community-card/);
-  assert.doesNotMatch(html, /id="section-other-sources"/);
   assert.equal(publicData.community_leads, undefined);
   assert.equal(publicData.source_effectiveness, undefined);
-});
-
-test("daily tracking renders multi-entity seven day trend lines", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-tracking-trend-curves-"));
-  const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
-  const outDir = path.join(tmp, "docs");
-  const baseReport = JSON.parse(await readFixture("reports/good/structured-report.json"));
-  const dates = ["2026-06-24", "2026-06-25", "2026-06-26", "2026-06-27", "2026-06-28", "2026-06-29", "2026-06-30"];
-  await fs.mkdir(dataInputDir, { recursive: true });
-
-  for (const [index, reportDate] of dates.entries()) {
-    const report = structuredReportForDate(baseReport, reportDate);
-    report.daily_tracking = trackingTrendCurveFixtureItems(reportDate, index);
-    await fs.writeFile(path.join(dataInputDir, `${reportDate}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
-  }
-
-  await buildSite({
-    rootDir: tmp,
-    inputDir: path.join(tmp, "reports-source"),
-    dataInputDir: path.join(tmp, "reports-data"),
-    outDir,
-    siteUrl,
-    generatedAt: fixedGeneratedAt,
-    trendConfigPath
-  });
-
-  const html = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-30.html"), "utf8");
-  const curveCount = (html.match(/data-tracking-trend-curve/g) || []).length;
-
-  assert.equal(curveCount, 3);
-  assert.match(html, /data-tracking-line-chart[^>]+data-tracking-source="openrouter-rankings"[^>]+data-trend-points="7"/);
-  assert.match(html, /data-tracking-line-chart[^>]+data-tracking-source="openrouter-rankings"[^>]+data-trend-lines="1[0-2]"/);
-  assert.match(html, /data-tracking-line-model="DeepSeek V4 Flash"/);
-  assert.match(html, /data-tracking-line-model="Legacy Llama 2"/);
-  assert.match(html, /data-tracking-line-label="DeepSeek V4 Flash"/);
-  assert.doesNotMatch(html, /tracking-line-legend-item/);
-  assert.match(html, /data-tracking-source="artificial-analysis-intelligence-index"[^>]+data-trend-points="7"/);
-  assert.match(html, /data-tracking-source="swe-bench-pro-public"[^>]+data-trend-points="7"/);
-  assert.match(html, /OpenRouter/);
-  assert.match(html, /Artificial Analysis/);
-  assert.match(html, /SWE-bench Pro/);
-
-  const trendSection = html.match(/<section[^>]+id="section-trend-tracking"[\s\S]*?<\/section>/)?.[0] || "";
-  assert.ok(trendSection, "trend tracking section should render with a stable public anchor");
-  const toolbar = trendSection.match(/<div class="toolbar"[\s\S]*?<\/div>/)?.[0] || "";
-  const buttons = toolbar.match(/<button\b[\s\S]*?<\/button>/g) || [];
-  const buttonValues = buttons.map((button) => button.match(/data-filter-value="([^"]+)"/)?.[1]);
-  const buttonTargets = buttons.map((button) => button.match(/data-filter-target="([^"]+)"/)?.[1]);
-  assert.deepEqual(buttonValues, ["OpenRouter", "Artificial Analysis", "SWE-bench"]);
-  assert.deepEqual(buttonTargets, ["section-trend-tracking", "section-trend-tracking", "section-trend-tracking"]);
-  assert.doesNotMatch(toolbar, /data-filter-value="all"/);
-  assert.doesNotMatch(toolbar, /data-filter-target="html-work-report"/);
-  assert.match(buttons[0], /data-filter-value="OpenRouter"[^>]+aria-pressed="true"/);
-  assert.match(buttons[1], /data-filter-value="Artificial Analysis"[^>]+aria-pressed="false"/);
-  assert.match(buttons[2], /data-filter-value="SWE-bench"[^>]+aria-pressed="false"/);
-  assert.doesNotMatch(trendSection, /公开榜单已解析|公开榜单部分解析|供应商分布|Top 10 榜单|覆盖<\/span>|最大变化|模型使用|值得关注/);
-
-  const trendCards = trendSection.match(/<article\b[\s\S]*?<\/article>/g) || [];
-  const cardOpenTagFor = (value) => (
-    trendCards.find((card) => card.includes(`data-filter-value="${value}"`))?.match(/^<article[^>]+>/)?.[0] || ""
-  );
-  assert.doesNotMatch(cardOpenTagFor("OpenRouter"), /\shidden(?=[\s>])/);
-  assert.match(cardOpenTagFor("Artificial Analysis"), /\shidden(?=[\s>])/);
-  assert.match(cardOpenTagFor("SWE-bench"), /\shidden(?=[\s>])/);
 });
 
 test("public report projection preserves sanitized public quality events", async () => {
@@ -14843,7 +14322,7 @@ test("public report projection removes retired platform data and degraded events
   assert(!serialized.includes("content_sources_blocked"));
 });
 
-test("production daily does not enable PromptLayer-inspired theme or ticket grids", async () => {
+test("production build serves only the React public surface and retires legacy themes", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-promptlayer-theme-"));
   const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
   const outDir = path.join(tmp, "docs");
@@ -14864,28 +14343,13 @@ test("production daily does not enable PromptLayer-inspired theme or ticket grid
     trendConfigPath
   });
 
-  const html = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-17.html"), "utf8");
-  assert.doesNotMatch(html, /data-ai-daily-theme="promptlayer-inspired"/);
-  assert.doesNotMatch(html, /data-ai-daily-theme-style="promptlayer-inspired"/);
-  assert.doesNotMatch(html, /main-ticket-card-grid|github-trending-card-grid|main-ticket-card/);
-  assert.match(html, /prefers-reduced-motion:\s*reduce/);
-  assert.match(html, /effective-interact create-interaction\.mjs/);
-  assert.match(html, /data-render-mode="pre-rendered"/);
-  assert.match(html, /id="section-track-/);
-  assert.doesNotMatch(html, /id="section-story-list"|id="section-today-judgment"|id="section-trend-themes"/);
-  assert.match(html, /<link rel="stylesheet" data-adc-public-theme href="\.\.\/\.\.\/\.\.\/assets\/adc-theme\.css\?v=[a-f0-9]{12}">/);
-  assert.doesNotMatch(html, /<style data-adc-public-theme>/);
-  assert.doesNotMatch(html, /https:\/\/www\.promptlayer\.com|_next\/static|dashboard\.promptlayer\.com/);
-
-  const historicalHtml = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-15.html"), "utf8");
-  assert.doesNotMatch(historicalHtml, /data-ai-daily-theme="promptlayer-inspired"/);
-  assert.doesNotMatch(historicalHtml, /data-ai-daily-theme-style="promptlayer-inspired"/);
-  assert.doesNotMatch(historicalHtml, /main-ticket-card-grid|github-trending-card-grid/);
-  assert.match(historicalHtml, /<link rel="stylesheet" data-adc-public-theme href="\.\.\/\.\.\/\.\.\/assets\/adc-theme\.css\?v=[a-f0-9]{12}">/);
-  assert.doesNotMatch(historicalHtml, /<style data-adc-public-theme>/);
+  assert.equal(await exists(path.join(outDir, "index.html")), false);
+  assert.equal(await exists(path.join(outDir, "reports/2026/06/2026-06-17.html")), false);
+  assert.equal(await exists(path.join(outDir, "reports/2026/06/2026-06-15.html")), false);
+  assert.equal(await exists(path.join(outDir, "assets/adc-theme.css")), false);
 });
 
-test("buildSite writes effective-interact report html for 2026-06-15 without internal leakage", async () => {
+test("buildSite writes reader-safe public JSON for 2026-06-15 without internal leakage", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-effective-interact-build-"));
   const dataInputDir = path.join(tmp, "reports-data", "2026", "06");
   const outDir = path.join(tmp, "docs");
@@ -14916,36 +14380,15 @@ test("buildSite writes effective-interact report html for 2026-06-15 without int
     trendConfigPath
   });
 
-  assert(result.writtenFiles.includes("reports/2026/06/2026-06-15.html"));
+  assert(!result.writtenFiles.includes("reports/2026/06/2026-06-15.html"));
   assert(result.writtenFiles.includes("data/2026/06/2026-06-15.json"));
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/06/2026-06-15.json"), "utf8"));
-  const html = await fs.readFile(path.join(outDir, "reports/2026/06/2026-06-15.html"), "utf8");
   assert.equal(publicData.schema_version, 1);
   assert.equal(publicData.report_date, "2026-06-15");
   assert.equal(publicData.quality_status.status, "degraded");
   assert.equal(publicData.kind, undefined);
-  assert.match(html, /effective-interact create-interaction\.mjs/);
-  assert.match(html, /data-render-mode="pre-rendered"/);
-  assert.match(html, /data-status="degraded"/);
-  assert.match(html, /状态：降级/);
-  assert.doesNotMatch(html, /状态：完成/);
-  assert.match(html, /data-section-type="filterable-cards"/);
-  assert.doesNotMatch(html, /id="section-today-must-read"/);
-  assert.doesNotMatch(html, /id="section-compact-main-list"/);
-  assert.doesNotMatch(html, /id="section-today-judgment"/);
-  assert.doesNotMatch(html, /id="section-trend-themes"/);
-  assert.doesNotMatch(html, /id="section-story-list"/);
-  assert.match(html, /id="section-track-/);
-  assert.doesNotMatch(html, /id="section-story-\d+"/);
-  assert.doesNotMatch(html, /main-ticket-card|main-ticket-card-grid|section-main-signal-cards/);
-  assert.match(html, /image-lightbox/);
   for (const key of ["source_audit", "self_check", "candidate_id", "degraded_sections", "remediation"]) {
     assert(!collectJsonKeys(publicData).has(key), `${key} must not appear in public docs data`);
-    assert(!html.includes(key), `${key} must not appear in public HTML`);
-  }
-  assert(!html.includes("quality_status"), "quality_status must not appear as a raw public HTML field");
-  for (const forbidden of forbiddenPublicDailyText()) {
-    assert(!html.includes(forbidden), `public HTML must not include ${forbidden}`);
   }
 });
 
@@ -14996,21 +14439,9 @@ test("buildSite writes trend index and injects scoped trend tags without mutatin
   assert.equal(validateTrends(trends).valid, true);
   assert.equal(trends.topics.find((topic) => topic.id === "coding-agent").status, "hot");
 
-  const html = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-29.html"), "utf8");
-  assert(html.includes("coding agent: 7d"));
-  assert(html.includes("effective-interact create-interaction.mjs"));
-  assert(html.includes("日报导航"));
-
-  const indexHtml = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert(indexHtml.includes('data-index-style="effective-interact"'));
-  assert(!indexHtml.includes('id="articleSearch"'));
-  assert(!indexHtml.includes("articles.json"));
-  const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
-  assert(opsHtml.includes('id="topic-radar"'));
-  assert(opsHtml.includes('id="signal-heat-strip"'));
-  assert(!opsHtml.includes("近 7 日趋势"));
-  assert(!opsHtml.includes("按年月周导航"));
-  assert(opsHtml.includes("coding agent"));
+  assert.equal(await exists(path.join(outDir, "index.html")), false);
+  assert.equal(await exists(path.join(outDir, "ops.html")), false);
+  assert.equal(await exists(path.join(outDir, "reports/2026/05/2026-05-29.html")), false);
 
   const data = JSON.parse(await fs.readFile(path.join(outDir, "data/2026/05/2026-05-29.json"), "utf8"));
   assert.equal(data.annotations_by_date, undefined);
@@ -15129,227 +14560,6 @@ test("date index view model keeps chronological order and transparent signal str
   }).level, "medium");
 });
 
-test("date index treats more than twelve story-first main items as oversized", async () => {
-  const report = minimalDateIndexReport("2026-06-15", {
-    mainItems: 25,
-    majorItems: 5,
-    github: 10,
-    builder: 8,
-    hotBlogs: 4,
-    tracking: 1,
-    qualityStatus: { status: "ok" }
-  });
-  const feed = {
-    schema_version: 1,
-    site_title: "AI Daily",
-    site_url: siteUrl,
-    updated_at: fixedGeneratedAt,
-    reports: [feedEntryFor(report)]
-  };
-
-  const dateIndex = buildDateIndex(feed, [report], null);
-  const html = renderIndexHtml(feed, null, dateIndex);
-
-  assert.equal(dateIndex.items[0].main_stream.status, "oversized");
-  assert.equal(dateIndex.items[0].main_stream.count, 25);
-  assert.equal(dateIndex.items[0].main_stream.target_min, 5);
-  assert.equal(dateIndex.items[0].main_stream.target_max, 12);
-  assert.equal(dateIndex.items[0].flags.main_stream_target_met, false);
-  assert(html.includes('data-main-stream-status="oversized"'));
-});
-
-test("calendar index homepage renders controls and independent quality channel", async () => {
-  const okReport = minimalDateIndexReport("2026-05-13", {
-    mainItems: 2,
-    github: 0,
-    builder: 1,
-    hotBlogs: 0,
-    tracking: 0,
-    qualityStatus: { status: "ok" }
-  });
-  const strongDegradedReport = minimalDateIndexReport("2026-05-14", {
-    mainItems: 10,
-    majorItems: 3,
-    github: 10,
-    builder: 8,
-    hotBlogs: 4,
-    tracking: 2,
-    evidence: 1,
-    qualityStatus: {
-      status: "degraded",
-      public_note: "Some source lanes degraded.",
-      affected_sections: ["source_coverage"]
-    }
-  });
-  const feed = {
-    schema_version: 1,
-    site_title: "AI 日报",
-    site_url: siteUrl,
-    updated_at: fixedGeneratedAt,
-    reports: [feedEntryFor(strongDegradedReport), feedEntryFor(okReport)]
-  };
-  const dateIndex = buildDateIndex(feed, [strongDegradedReport, okReport], null);
-
-  const html = renderIndexHtml(feed, null, dateIndex);
-
-  assert(html.includes('id="date-research-index"'));
-  assert(html.includes('data-date-card="2026-05-13"'));
-  assert(html.includes('data-date-card="2026-05-14"'));
-  assert(html.indexOf('data-date-card="2026-05-13"') < html.indexOf('data-date-card="2026-05-14"'));
-  assert(html.includes('data-strength-level="strong"'));
-  assert(html.includes('data-quality-status="degraded"'));
-  assert(html.includes('data-quality-channel="degraded"'));
-  assert(html.includes('data-main-stream-status="target"'));
-  assert(html.includes("主体达标"));
-  assert(html.includes('id="date-filter-strength"'));
-  assert(html.includes('id="date-filter-quality"'));
-  assert(html.includes('id="date-filter-github"'));
-  assert(html.includes('id="selected-date-panel"'));
-  assert(html.includes("data-date-index-script"));
-  assert(html.includes("主线"));
-  assert(html.includes("强度原因"));
-  assert(html.includes("降级影响"));
-});
-
-test("index rewrite renders signal console from stored data", async () => {
-  const quietReport = minimalDateIndexReport("2026-05-13", {
-    mainItems: 2,
-    github: 0,
-    builder: 1,
-    hotBlogs: 0,
-    tracking: 0,
-    qualityStatus: { status: "ok" }
-  });
-  const strongBlockedReport = minimalDateIndexReport("2026-05-14", {
-    mainItems: 10,
-    majorItems: 3,
-    github: 10,
-    builder: 8,
-    hotBlogs: 5,
-    tracking: 2,
-    evidence: 1,
-    qualityStatus: {
-      status: "blocked",
-      public_note: "Report generation is blocked by validation failure.",
-      affected_sections: ["hot_blogs", "daily_tracking"]
-    }
-  });
-  const feed = {
-    schema_version: 1,
-    site_title: "AI 日报",
-    site_url: siteUrl,
-    updated_at: fixedGeneratedAt,
-    reports: [feedEntryFor(strongBlockedReport), feedEntryFor(quietReport)]
-  };
-  const trends = {
-    topics: [
-      {
-        id: "coding-agent",
-        label: "coding agent",
-        status: "hot",
-        occurrences: 8,
-        active_days: 2,
-        sections: ["main_items", "builder_observations"],
-        entities: ["OpenAI", "Anthropic"],
-        dates: ["2026-05-13", "2026-05-14"],
-        related_reports: ["2026-05-13", "2026-05-14"]
-      }
-    ]
-  };
-  const dateIndex = buildDateIndex(feed, [quietReport, strongBlockedReport], trends);
-
-  const html = renderIndexHtml(feed, trends, dateIndex);
-
-  assert(html.includes('id="index-console"'));
-  assert(html.includes('id="latest-briefing"'));
-  assert(html.includes('id="signal-heat-strip"'));
-  assert(html.includes('id="source-lane-board"'));
-  assert(html.includes('id="topic-radar"'));
-  assert(html.includes('data-signal-day="2026-05-13"'));
-  assert(html.includes('data-signal-day="2026-05-14"'));
-  assert(html.indexOf('data-signal-day="2026-05-13"') < html.indexOf('data-signal-day="2026-05-14"'));
-  assert(html.includes('data-source-lane="main_items"'));
-  assert(html.includes('data-source-lane="github_trending"'));
-  assert(html.includes('data-source-lane="builder_observations"'));
-  assert(html.includes('data-topic-id="coding-agent"'));
-  assert(html.includes('data-quality-channel="blocked"'));
-  assert(html.includes('<ul class="compact-list latest-highlights"'));
-  assert(!html.includes('<ol class="compact-list latest-highlights"'));
-  assert(!html.includes("<ol class=\"compact-list\">"));
-  assert(!html.includes("GitHub Pages 静态归档"));
-  assert(!html.includes('id="date-navigation"'));
-  assert(!html.includes("<h2>历史日报</h2>"));
-});
-
-test("official blog knowledge homepage renders curated blog graph entrypoint", async () => {
-  const report = minimalDateIndexReport("2026-05-14", {
-    mainItems: 6,
-    majorItems: 2,
-    github: 4,
-    builder: 3,
-    hotBlogs: 2,
-    tracking: 1,
-    qualityStatus: { status: "ok" }
-  });
-  const feed = {
-    schema_version: 1,
-    site_title: "AI 鏃ユ姤",
-    site_url: siteUrl,
-    updated_at: fixedGeneratedAt,
-    reports: [feedEntryFor(report)]
-  };
-  const dateIndex = buildDateIndex(feed, [report], null);
-  const officialBlogKnowledge = await loadOfficialBlogKnowledge({ rootDir });
-
-  const html = renderIndexHtml(feed, null, dateIndex, { officialBlogKnowledge });
-
-  assert(html.includes('id="official-blog-knowledge"'));
-  assert(html.includes('href="#official-blog-knowledge"'));
-  assert((html.match(/data-official-blog-card=/g) || []).length >= 6);
-  assert(html.includes('data-official-blog-company="openai"'));
-  assert(html.includes('data-official-blog-company="anthropic"'));
-  assert(html.includes('href="official-blogs/"'));
-  assert(html.includes("Introducing Structured Outputs in the API"));
-  assert(html.includes("Building effective agents"));
-  const hrefs = new Set([...html.matchAll(/\shref="([^"]+)"/g)].map((match) => match[1]));
-  assert(hrefs.has("https://openai.com/index/introducing-structured-outputs-in-the-api/"));
-  assert(hrefs.has("https://www.anthropic.com/research/building-effective-agents"));
-  assert(!html.includes("admission_policy"));
-  assert(!html.includes("source_audit"));
-  assert(!html.includes("self_check"));
-});
-
-test("official blog excerpt page renders reader safe graph links", async () => {
-  const rawKnowledge = await loadOfficialBlogKnowledge({ rootDir });
-  const officialBlogKnowledge = toPublicOfficialBlogKnowledge(rawKnowledge, { generatedAt: fixedGeneratedAt });
-
-  const html = renderOfficialBlogsHtml(officialBlogKnowledge, {
-    styleHref: "../assets/style.css"
-  });
-
-  assert(html.includes('id="official-blog-excerpts"'));
-  assert(html.includes('href="../index.html"'));
-  assert(html.includes('href="../data/official-blogs.json"'));
-  assert((html.match(/data-official-blog-excerpt-card=/g) || []).length >= 6);
-  assert((html.match(/data-related-report-links=/g) || []).length >= 6);
-  assert((html.match(/data-related-blog-link=/g) || []).length >= 4);
-  assert(html.includes('data-official-blog-company="openai"'));
-  assert(html.includes('data-official-blog-company="anthropic"'));
-  assert(html.includes("Introducing Structured Outputs in the API"));
-  assert(html.includes("Building effective agents"));
-  assert(html.includes("official-blog-practices"));
-  const hrefs = new Set([...html.matchAll(/\shref="([^"]+)"/g)].map((match) => match[1]));
-  assert(hrefs.has("https://openai.com/index/introducing-structured-outputs-in-the-api/"));
-  assert(hrefs.has("#blog-anthropic-model-context-protocol-2024-11-25"));
-  assert(hrefs.has("#blog-openai-new-tools-building-agents-2025-03-11"));
-  assert(!html.includes("admission"));
-  assert(!html.includes("admission_policy"));
-  assert(!html.includes("rationale"));
-  assert(!html.includes("source_audit"));
-  assert(!html.includes("self_check"));
-  assert(!html.includes("candidate_id"));
-});
-
 test("official blog related report dates are inferred from report item URLs", async () => {
   const rawKnowledge = structuredClone(await loadOfficialBlogKnowledge({ rootDir }));
   const openAiRecord = rawKnowledge.records.find((record) => record.id === "openai-new-tools-building-agents-2025-03-11");
@@ -15400,7 +14610,7 @@ test("official blog related report dates are inferred from report item URLs", as
   assert.deepEqual(codex.related_report_dates, []);
 });
 
-test("official blog related report dates generated file public projection is generated and planned", async () => {
+test("official blog related report dates JSON projection is generated and planned", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-official-blog-public-"));
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
@@ -15432,7 +14642,7 @@ test("official blog related report dates generated file public projection is gen
   });
 
   assert(result.writtenFiles.includes("data/official-blogs.json"));
-  assert(result.writtenFiles.includes("official-blogs/index.html"));
+  assert(!result.writtenFiles.includes("official-blogs/index.html"));
   assert.equal(result.officialBlogKnowledge.stats.total_records, 6);
   const publicData = JSON.parse(await fs.readFile(path.join(outDir, "data", "official-blogs.json"), "utf8"));
   assert.equal(publicData.records.length, 6);
@@ -15447,18 +14657,8 @@ test("official blog related report dates generated file public projection is gen
   assert(!serialized.includes("rationale"));
   assert(!serialized.includes("source_audit"));
   assert(!serialized.includes("self_check"));
-  const html = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
-  assert(html.includes('id="official-blog-knowledge"'));
-  assert(html.includes('href="data/official-blogs.json"'));
-  assert(html.includes('href="official-blogs/"'));
-  const excerptHtml = await fs.readFile(path.join(outDir, "official-blogs", "index.html"), "utf8");
-  assert(excerptHtml.includes('id="official-blog-excerpts"'));
-  assert((excerptHtml.match(/data-official-blog-excerpt-card=/g) || []).length >= 6);
-  assert(excerptHtml.includes('data-related-report-link="2026-05-14"'));
-  assert(excerptHtml.includes('href="../reports/2026/05/2026-05-14.html"'));
-  assert(!excerptHtml.includes("admission_policy"));
-  assert(!excerptHtml.includes("source_audit"));
-  assert(!excerptHtml.includes("self_check"));
+  assert.equal(await exists(path.join(outDir, "ops.html")), false);
+  assert.equal(await exists(path.join(outDir, "official-blogs", "index.html")), false);
 
   const generated = await planGeneratedFiles({
     rootDir: tmp,
@@ -15469,85 +14669,12 @@ test("official blog related report dates generated file public projection is gen
     generatedAt: fixedGeneratedAt
   });
   assert(generated.files.includes("articles.json"));
-  assert(generated.files.includes("ops.html"));
+  assert(!generated.files.includes("ops.html"));
   assert(generated.files.includes("data/official-blogs.json"));
-  assert(generated.files.includes("official-blogs/index.html"));
+  assert(!generated.files.includes("official-blogs/index.html"));
 });
 
-test("effective interact index style uses report primitives", async () => {
-  const baseReport = JSON.parse(await readFixture("reports/good/structured-report.json"));
-  const strongBlockedReport = structuredReportForDate(baseReport, "2026-05-14", {
-    report: {
-      main_items: Array.from({ length: 8 }, (_unused, index) => ({
-        ...baseReport.main_items[0],
-        title: `Strong signal ${index + 1}`,
-        url: `https://example.com/effective-index-main-${index + 1}`,
-        importance: index < 3 ? "major" : "notable"
-      })),
-      github_trending: (baseReport.github_trending || []).slice(0, 2),
-      builder_observations: (baseReport.builder_observations || []).slice(0, 2),
-      quality_status: {
-        status: "degraded",
-        blocking_issues: [],
-        degraded_sections: [{ section: "builder_observations", message: "Builder lane degraded." }],
-        affected_sections: ["builder_observations"],
-        notes: "测试降级质量通道。"
-      }
-    }
-  });
-  const quietReport = structuredReportForDate(baseReport, "2026-05-13", {
-    report: {
-      main_items: baseReport.main_items.slice(0, 2),
-      github_trending: [],
-      builder_observations: [],
-      hot_blogs: [],
-      daily_tracking: []
-    }
-  });
-  const feed = {
-    schema_version: 1,
-    site_title: "AI 日报",
-    site_url: siteUrl,
-    updated_at: fixedGeneratedAt,
-    reports: [feedEntryFor(strongBlockedReport), feedEntryFor(quietReport)]
-  };
-  const trends = {
-    topics: [
-      {
-        id: "effective-interact-style",
-        label: "effective-interact style",
-        status: "hot",
-        occurrences: 4,
-        active_days: 2,
-        entities: ["AI 日报"],
-        dates: ["2026-05-13", "2026-05-14"],
-        related_reports: ["2026-05-13", "2026-05-14"]
-      }
-    ]
-  };
-  const dateIndex = buildDateIndex(feed, [quietReport, strongBlockedReport], trends);
-
-  const html = renderIndexHtml(feed, trends, dateIndex);
-
-  assert(html.includes('data-index-style="effective-interact"'));
-  assert(html.includes('class="report-shell index-page"'));
-  assert(html.includes('class="report-hero report-hero-index"'));
-  assert(html.includes("hero-brief"));
-  assert(html.includes("hero-summary-text"));
-  assert(html.includes("hero-stat-grid"));
-  assert(html.includes("hero-stat"));
-  assert(html.includes('class="report-nav"'));
-  assert(html.includes('data-nav-link'));
-  assert(html.includes('class="panel latest-briefing"'));
-  assert(html.includes('class="panel source-lane-board"'));
-  assert(html.includes("report-data-table"));
-  assert(html.includes("chip"));
-  assert(html.includes("status-warn"));
-  assert(!html.includes("class=\"index-console-stats\""));
-  assert(!html.includes("class=\"source-lane-grid\""));
-});
-
-test("buildSite writes date index homepage without exposing private report fields", async () => {
+test("buildSite keeps date index data internal while React homepage excludes private report fields", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-date-index-build-"));
   const dataInputDir = path.join(tmp, "reports-data");
   const outDir = path.join(tmp, "docs");
@@ -15606,24 +14733,17 @@ test("buildSite writes date index homepage without exposing private report field
     trendConfigPath
   });
 
-  assert(result.writtenFiles.includes("index.html"));
-  assert(result.writtenFiles.includes("ops.html"));
+  assert(!result.writtenFiles.includes("index.html"));
+  assert(!result.writtenFiles.includes("ops.html"));
   assert.equal(result.dateIndex.items.length, 2);
-  const html = await fs.readFile(path.join(outDir, "index.html"), "utf8");
-  assert(html.includes('data-index-style="effective-interact"'));
-  assert(!html.includes('id="articleSearch"'));
-  const opsHtml = await fs.readFile(path.join(outDir, "ops.html"), "utf8");
-  assert(opsHtml.includes('id="date-research-index"'));
-  assert(opsHtml.includes('data-date-card="2026-05-13"'));
-  assert(opsHtml.includes('data-date-card="2026-05-14"'));
-  assert(opsHtml.indexOf('data-date-card="2026-05-13"') < opsHtml.indexOf('data-date-card="2026-05-14"'));
-  assert(opsHtml.includes('data-strength-level="strong"'));
-  assert(opsHtml.includes("透明统计"));
-  assert(!html.includes("source_audit"));
-  assert(!html.includes("self_check"));
-  assert(!html.includes("candidate_pool"));
-  assert(!html.includes("Internal audit"));
-  assert(!html.includes("Internal self-check"));
+  assert.equal(await exists(path.join(outDir, "index.html")), false);
+  assert.equal(await exists(path.join(outDir, "ops.html")), false);
+  const serializedDateIndex = JSON.stringify(result.dateIndex);
+  assert(!serializedDateIndex.includes("source_audit"));
+  assert(!serializedDateIndex.includes("self_check"));
+  assert(!serializedDateIndex.includes("candidate_pool"));
+  assert(!serializedDateIndex.includes("Internal audit"));
+  assert(!serializedDateIndex.includes("Internal self-check"));
 });
 
 test("旧结构化 JSON 缺少模型发布和热门博客字段时仍可 build", async () => {
@@ -15654,10 +14774,7 @@ test("旧结构化 JSON 缺少模型发布和热门博客字段时仍可 build",
   assert.equal(data.schema_version, 1);
   assert.deepEqual(data.model_releases || [], []);
   assert.deepEqual(data.hot_blogs || [], []);
-
-  const html = await fs.readFile(path.join(outDir, "reports/2026/05/2026-05-15.html"), "utf8");
-  assert(!html.includes('id="model-releases"'));
-  assert(!html.includes('id="hot-blogs"'));
+  assert.equal(await exists(path.join(outDir, "reports/2026/05/2026-05-15.html")), false);
 });
 
 test("report:write 标准化结构化草稿并写入 reports-data", async () => {
@@ -21324,36 +20441,6 @@ test("public daily followups use reader-facing story title and limit disclosure 
   assert((storyText.match(/披露/g) || []).length <= 1);
 });
 
-test("public daily followups open external report links in new tabs", async () => {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-external-link-target-"));
-  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
-  const [year, month] = report.report_date.split("-");
-  const dataInputDir = path.join(tmp, "reports-data", year, month);
-  const outDir = path.join(tmp, "docs");
-  await fs.mkdir(dataInputDir, { recursive: true });
-  await fs.writeFile(path.join(dataInputDir, `${report.report_date}.json`), `${JSON.stringify(report, null, 2)}\n`, "utf8");
-
-  await buildSite({
-    rootDir: tmp,
-    inputDir: path.join(tmp, "reports-source"),
-    dataInputDir: path.join(tmp, "reports-data"),
-    outDir,
-    siteUrl,
-    generatedAt: fixedGeneratedAt,
-    trendConfigPath,
-    fetchImpl: async () => new Response("", { status: 404 })
-  });
-
-  const html = await fs.readFile(path.join(outDir, `reports/${year}/${month}/${report.report_date}.html`), "utf8");
-  const anchors = [...html.matchAll(/<a\b[^>]*href="https?:[^"]+"[^>]*>/g)].map((match) => match[0]);
-
-  assert(anchors.length > 0);
-  for (const anchor of anchors) {
-    assert.match(anchor, /\starget="_blank"/, anchor);
-    assert.match(anchor, /\srel="[^"]*\bnoopener\b[^"]*\bnoreferrer\b[^"]*"/, anchor);
-  }
-});
-
 test("public daily followups reject generic GitHub Trending README summaries", async () => {
   const badTemplate = "codebase-memory-mcp README 主要围绕Agent 构建、评测与回归、记忆或知识检索，提供可复用包、测试或评估资产。阅读时先看快速开始和运行前提、测试或评测资产。";
   const badPattern = /README 主要围绕|阅读时先看|提供README 说明和使用入口|适合评估[^。]*README/;
@@ -21421,10 +20508,9 @@ test("public daily followups reject generic GitHub Trending README summaries", a
     fetchImpl: async () => new Response("", { status: 404 })
   });
 
-  const html = await fs.readFile(path.join(outDir, `reports/${year}/${month}/${report.report_date}.html`), "utf8");
   const publicJson = await fs.readFile(path.join(outDir, `data/${year}/${month}/${report.report_date}.json`), "utf8");
-  assert.doesNotMatch(`${html}\n${publicJson}`, badPattern);
-  assert.match(`${html}\n${publicJson}`, /codebase-memory-mcp|7,560|GitHub Trending weekly/);
+  assert.doesNotMatch(publicJson, badPattern);
+  assert.match(publicJson, /codebase-memory-mcp|7,560|GitHub Trending weekly/);
 });
 
 test("buildSite writes reader-safe GitHub Trending fallback copy when README context is missing", async () => {
@@ -24663,33 +23749,6 @@ test("report:write allows explicit network-outage empty reports only", async () 
   assert(invalidValidation.errors.some((error) => error.path === "/main_items"));
 });
 
-test("report:write importance labels are schema-validated and rendered", async () => {
-  const draft = JSON.parse(await readFixture("reports/good/structured-draft.json"));
-  const candidatePool = JSON.parse(await readFixture("reports/good/structured-draft.candidates.json"));
-  const report = normalizeReportDraft(draft, {
-    siteUrl,
-    generatedAt: fixedGeneratedAt,
-    candidatePool
-  });
-
-  assert.equal(report.main_items[0].importance, "major");
-
-  const validation = validateReport(report);
-  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
-
-  const invalid = structuredClone(report);
-  invalid.main_items[0].importance = "urgent";
-  const invalidValidation = validateReport(invalid);
-  assert.equal(invalidValidation.valid, false);
-  assert(invalidValidation.errors.some((error) => error.path.includes("/main_items/0/importance")));
-
-  const html = renderReportHtml(report);
-  assert(html.includes(">重大<"));
-
-  const interaction = reportToInteractionInput(report);
-  assert(interaction.sections.some((section) => String(section.content || "").includes("==tag-major|重大==")));
-});
-
 test("schema rejects arbitrary optimization_suggestions objects", async () => {
   const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
   report.self_check.optimization_suggestions = [{ foo: "bar" }];
@@ -27885,7 +26944,7 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
     generatedAt: fixedGeneratedAt
   });
 
-  assert(prompt.includes("最终发布产物是自包含、可读性好的静态 HTML，不是 Markdown"));
+  assert(prompt.includes("最终公开主产物是 `docs/signals/index.json`、分组分页 JSON 与 React 公共信号页"));
   assert(prompt.includes(".codex/skills/effective-interact"));
   assert(!prompt.includes("public_daily_v2"));
   assert(!prompt.includes("src/public-daily-renderer.js"));
@@ -27903,7 +26962,7 @@ test("prompt:build 组装 repo 内分模块提示词", async () => {
   assert(prompt.includes("plain_language_failed"));
   assert(prompt.includes("候选池"));
   assert(prompt.includes("candidate_id"));
-  assert(prompt.includes("真实发布后必须验证当日 GitHub Pages URL 返回 HTTP 200"));
+  assert(prompt.includes("真实发布后必须验证 GitHub Pages 首页和当日公开 JSON 返回 HTTP 200"));
   assert(prompt.includes("反思与自动化迭代建议"));
   assert(prompt.includes("GitHub Trending"));
   assert(prompt.includes("github_trending"));

@@ -38,11 +38,10 @@ test("public copy replay catches confirmed GitHub momentum machine wording in re
   assert(result.issues.every((issue) => issue.path.endsWith("docs/data/2026/07/2026-07-08.json")));
 });
 
-test("public copy replay scans docs data, reports data, and rendered HTML inside the 14-day window", async () => {
+test("public copy replay scans docs data and reports data inside the 14-day window", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "public-copy-replay-window-"));
   await writeText(tmp, "docs/data/2026/07/2026-07-08.json", JSON.stringify({ report_date: "2026-07-08", summary: "阅读时先看 README。" }));
   await writeText(tmp, "reports-data/2026/07/2026-07-07.json", JSON.stringify({ report_date: "2026-07-07", summary: "这个项目存在复现门槛。" }));
-  await writeText(tmp, "docs/reports/2026/07/2026-07-06.html", "<main>优先核对许可证和维护状态。</main>");
   await writeText(tmp, "docs/data/2026/06/2026-06-10.json", JSON.stringify({ report_date: "2026-06-10", summary: "阅读时先看旧文。" }));
 
   const result = await evaluatePublicCopyReplay({
@@ -51,17 +50,15 @@ test("public copy replay scans docs data, reports data, and rendered HTML inside
     latestDays: 14
   });
 
-  assert.equal(result.summary.artifacts_checked, 3);
-  assert.deepEqual(new Set(result.issues.map((issue) => issue.term)), new Set(["阅读时先看", "复现门槛", "优先核对"]));
+  assert.equal(result.summary.artifacts_checked, 2);
+  assert.deepEqual(new Set(result.issues.map((issue) => issue.term)), new Set(["阅读时先看", "复现门槛"]));
   assert(result.issues.every((issue) => !issue.path.includes("2026-06-10")));
 });
 
-test("public copy replay ignores script and style content with loose end tags", async () => {
+test("public copy replay ignores retired report HTML roots", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "public-copy-replay-html-"));
   await writeText(tmp, "docs/reports/2026/07/2026-07-08.html", `
-    <main>这是一段读者可见摘要，详情以仓库主页为准。</main>
-    <script >当前只能确认榜单动量</script >
-    <style >.note::before { content: "优先核对"; }</style >
+    <main>阅读时先看 README，当前只能确认榜单动量。</main>
   `);
 
   const result = await evaluatePublicCopyReplay({
@@ -71,7 +68,7 @@ test("public copy replay ignores script and style content with loose end tags", 
   });
 
   assert.equal(result.ok, true);
-  assert.equal(result.summary.artifacts_checked, 1);
+  assert.equal(result.summary.artifacts_checked, 0);
   assert.deepEqual(result.issues, []);
 });
 
