@@ -9,7 +9,9 @@ import {
   candidatePoolRelativePaths,
   internalCandidatePoolRelativePath,
   REPORTS_DATA_INTERNAL_DIR,
-  REPORTS_DATA_OCCURRENCES_DIR
+  REPORTS_DATA_OCCURRENCES_DIR,
+  REPORTS_DATA_OBSERVATIONS_DIR,
+  REPORTS_DATA_SOURCE_FUNNEL_DIR
 } from "./reports-data-layout.js";
 import { defaultGeneratedAt } from "./time.js";
 import { validateArticles, validateFeed, validateHome, validateReport, validateTrends } from "./schema.js";
@@ -486,6 +488,8 @@ export async function collectJsonFiles(inputDir) {
     .filter((file) => file.toLowerCase().endsWith(".json"))
     .filter((file) => !toPosixRelative(inputDir, file).split("/").includes(REPORTS_DATA_INTERNAL_DIR))
     .filter((file) => !toPosixRelative(inputDir, file).split("/").includes(REPORTS_DATA_OCCURRENCES_DIR))
+    .filter((file) => !toPosixRelative(inputDir, file).split("/").includes(REPORTS_DATA_OBSERVATIONS_DIR))
+    .filter((file) => !toPosixRelative(inputDir, file).split("/").includes(REPORTS_DATA_SOURCE_FUNNEL_DIR))
     .filter((file) => !file.toLowerCase().endsWith(".candidates.json"))
     .filter((file) => !REPORT_DATA_AUXILIARY_JSON.has(path.basename(file).toLowerCase()))
     .sort();

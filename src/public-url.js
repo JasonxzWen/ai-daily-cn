@@ -39,6 +39,19 @@ export function isSafePublicHttpUrl(value) {
   }
 }
 
+export function hasUnsafePublicHttpUrlMaterial(value) {
+  try {
+    const url = new URL(String(value || ""));
+    if (url.protocol !== "http:" && url.protocol !== "https:") return true;
+    if (!isPublicNetworkHost(url.hostname)) return true;
+    if (url.username || url.password) return true;
+    if (url.hash) return true;
+    return [...url.searchParams.keys()].some((key) => SENSITIVE_QUERY_RE.test(key));
+  } catch {
+    return true;
+  }
+}
+
 export function canonicalPublicUrlIdentity(value) {
   const sanitized = sanitizePublicHttpUrl(value);
   if (!sanitized) return "";

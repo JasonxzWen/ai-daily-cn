@@ -538,15 +538,15 @@ repo-scoped 历史交互审计只证明当前可读取 trace 中显式出现的�
 
 **目标所有者**：
 
-- 以现有 registry、display contract、source-order review 和 REC-315/316 生成第 8.3 节的派生 source asset reconciliation；不新建第二套 source registry；
-- 新增 `schemas/raw-observations.schema.json`、`schemas/source-funnel.schema.json` 与最小 raw/funnel 模块；扩展 `src/discovery.js`、`src/source-effectiveness.js`、`src/reports-data-layout.js`、`src/privacy.js`、`src/cli.js`、DAG/runner/workflow/resilience、`scripts/scan-public-artifacts.mjs` 和集中回放测试；
+- 以现有 registry、display contract、source-order review 和 REC-315/316 生成第 8.3 节的派生 source asset reconciliation；不新建第二套 source registry；发布前必须复用同一 validator 对当前 registry 与 REC-315/316 重新做 exact reconciliation，不能只验 schema；
+- 新增 `schemas/raw-observations.schema.json`、`schemas/source-funnel.schema.json` 与最小 raw/funnel 模块；扩展 `src/discovery.js`、`src/source-effectiveness.js`、`src/reports-data-layout.js`、`src/privacy.js`、`src/cli.js`、DAG/runner/workflow/resilience、`scripts/scan-public-artifacts.mjs` 和集中回放测试；signal-only publish 只允许把同日、已验证的两份内部 receipt 作为可选 companion 一并持久化，缺失时旧发布仍可继续，且不得扩大任何 Pages 输出；`src/site.js` 只增加内部 receipt 目录隔离，防止旧 builder 把它们误读为日报，不改变任何公开 projection；
 - 新增 Aify 专用 `src/aify-today-picks.js`（或同职责模块）与 `aify_today_html` source kind。shadow adapter 复用当前 `config/source-watchlist.json` 的 Aify 首页 URL，分别产生 `aify_today_picks` content receipt 与 `site-aify-news` health receipt；
 - **保持 `config/sources/aify-news.json` 及其他会改变旧 public listener 输入的 active endpoint 字节不变**。Aify active 路径从全量 archive 翻到 Today Picks 只在 PR6/Phase 4 原子切换时发生；
 - 统一 tracer fixture 至少含一条 Aify Today Pick、一篇 Anthropic 类工程实践、一条 follow-builders 白名单 X status、一条 GitHub daily repo、一个 Paper/Model 或 Benchmark 变化，以及 Pika email-protection/合作稿/TEST 负例。
 
-**不得做**：执行 admission/summary/edition；改当前公共 schema、默认首页、`docs/signals/**`、active Aify 内容源；增加公开 route、第二 registry 或生产依赖。
+**不得做**：执行 admission/summary/edition；改当前公共 schema、默认首页、`docs/signals/**`、active Aify 内容源或公开 site/build 行为；增加公开 route、第二 registry 或生产依赖。
 
-**退出门**：186 个当前 collection entries、REC-315 的 24 个历史 ID与 REC-316 的 24 个 promotion proposal 都有证据状态/终态或诚实 `unknown`；Aify 首页裁剪 fixture 的唯一 `ARTICLES_TODAY` 有序 payload 能被安全、保真地解析，首页 shell、全量 archive、旧 cache 与坏结构不成为 raw content item；所有 priority source receipts 终态化；相同输入下旧公共 generation 字节不变；shadow 成功/失败都不阻断旧 publisher；repo-safe raw/receipt privacy scan 为零 finding。
+**退出门**：186 个当前 collection entries、REC-315 的 24 个历史 ID与 REC-316 的 24 个 promotion proposal 都有证据状态/终态或诚实 `unknown`；Aify 首页裁剪 fixture 的唯一 `ARTICLES_TODAY` 有序 payload 能被安全、保真地解析，首页 shell、全量 archive、旧 cache 与坏结构不成为 raw content item；所有 priority source receipts 终态化；相同输入下旧公共 generation 字节不变；采集、解析、schema 或原子 pair transaction 失败只降级且不阻断旧 publisher，原子回滚/清理失败必须保留严格命名的 recovery evidence 并由旧 publisher 忽略该失败 transaction；无 recovery evidence 的孤立 receipt、canonical reconciliation 漂移、lineage/privacy 损坏属于仓库完整性失败，仍须 fail closed；repo-safe raw/receipt privacy scan 为零 finding。
 
 **回滚**：停用/移除 shadow DAG 节点与模块；旧采集、旧 public projection 和 active source config 完全不变。
 
@@ -684,7 +684,7 @@ Phase 0–5 是依赖阶段，不是 PR 数量。所有 PR 都直接基于前一
 ### 13.1 全局执行不变量
 
 - PR3–PR5 的 shadow 路径必须进入真实定时 DAG 并产生 repo-safe receipts，不能只在测试或 dormant CLI 中存在；相同 fixture 下旧 `docs/index.html`、旧 `docs/signals/**`、当前 Web bundle 与 active Aify source 必须字节不变。
-- PR3–PR5 的 shadow failure 必须终态化并可诊断，但 PR6 前不得阻断旧 publisher。`reports-data/**` 可持久化 shadow receipts，但不得提前生成 Pages route。
+- PR3–PR5 的正常 shadow failure 必须终态化并可诊断，但 PR6 前不得阻断旧 publisher；原子事务恢复态须有确定性 recovery evidence 并从旧 publish plan 排除。无恢复证据的 receipt 损坏、canonical/lineage/privacy 漂移是仓库完整性失败而非可忽略的 lane failure，继续 fail closed。`reports-data/**` 可持久化 shadow receipts，但不得提前生成 Pages route。
 - PR3–PR5 复用一个纵向 tracer fixture 和一个集中测试 owner `tests/curated-pipeline.test.js`；不要为每个实体制造一套测试框架，也不要继续把全部合同塞进 `tests/unit.test.js`。
 - 每张票引用本文 Phase、PC ID、允许/禁止路径、RED fixture、退出命令和回滚边界。P0 fixture 先红后改生产逻辑；无法直接红测时记录 deterministic substitute。
 - 每个替换 PR 更新第 10 节 route/component/data/asset/test survival inventory；决定列只使用 `keep / move / retire`，不能让行为默默消失。
@@ -697,7 +697,7 @@ Phase 0–5 是依赖阶段，不是 PR 数量。所有 PR 都直接基于前一
 | --- | --- | --- | --- |
 | **PR1 规格、历史审计与回放基线** | 无依赖；公开行为不变 | 只改本文、roadmap/reconciliation、既有 source/design 引用、feedback/recovery/feature/test/retrospective、`apps/web/README.md` 与 `packages/design/README.md` 的 current/target 边界 banner，以及 ignored state；禁止 `src/**`、`apps/web/src/**`、`packages/design/src/**`、schemas、active sources、生成 Pages 与 `knowledge/**` | 初始 11 点、八工作流、source reconciliation、五层 survival、七 PR 均有唯一 owner；docs/feedback/OKF/harness/合同测试与 diff gate 绿；整体回滚文档和合同测试 |
 | **PR2 Harness Hub 独立迁移** | PR1 合入；读者无变化 | 在 clean standalone target 从 Harness Hub 默认分支实际 HEAD 执行 manifest migration；只动 manifest 管理路径，禁止产品源码、配置、依赖、docs/design 与 knowledge | `harness:validate`、skills、OKF、docs/full validate；证明产品和 knowledge 未被迁移改写；整体 revert managed diff，禁止手工移植临时 clone 片段 |
-| **PR3 信源资产、Raw 与 Funnel shadow** | PR2 合入；旧公开 generation 不变 | source audit、raw/funnel schema/module、Aify homepage parser、source/discovery/effectiveness/privacy、DAG/runner 与统一 fixture；禁止 admission/edition/frontend/site/build/publish、active Aify config 与公开 route | PC-005/016 的 transport 子集；186 entries、历史 24 IDs/24 proposals 与用户明确链接有证据状态；Aify payload 保真，旧输出字节不变；停用 shadow 即完整回滚 |
+| **PR3 信源资产、Raw 与 Funnel shadow** | PR2 合入；旧公开 generation 不变 | source audit、raw/funnel schema/module、Aify homepage parser、source/discovery/effectiveness/privacy、DAG/runner、同日内部 receipt 的可选 signal publish allowlist、publisher canonical 复核、旧 builder 的内部目录隔离与统一 fixture；禁止 admission/edition/frontend、公开 site/build/publish 行为、active Aify config 与公开 route | PC-005/016 的 transport 子集；186 entries、历史 24 IDs/24 proposals 与用户明确链接有证据状态；Aify payload 保真，旧输出字节不变；receipt 缺失或有证据的事务恢复态不阻断旧 signal publish；停用 shadow 即完整回滚 |
 | **PR4 低门槛池、摘要与来源身份 shadow** | PR3 合入且 fixture replay 成功；旧公开页面不变 | admission/pool/quarantine/public-ready/copy receipts、普通 summary、Aify ready passthrough、provenance/icon DTO；禁止 edition、frontend、site/build/publish、active source 翻转和当前 `docs/signals/**` | PC-001/002/005/010/012/016 的 pool/copy 子集；普通失败 pending/failed、Aify 二次语义调用 0、privacy/determinism 绿；回滚 pool shadow，raw/funnel 保留 |
 | **PR5 Edition 与专项 DTO shadow** | PR4 合入且 pool fixture 稳定；旧公开页面不变 | edition/selection、GitHub/X/Paper/Model/Benchmark DTO、主动 X 白名单、budget/dedupe/revision 与 shadow DAG；禁止 frontend/site/build/publish、active Aify config 和四公开入口 | PC-003/004/006/007/009/012/015/016；10–14/5–9/0–4、同 scope Top10、健康空日、last-good 与稳定排序通过；回滚 edition，pool/raw 保留 |
 | **PR6 Reader UI、视觉、能力恢复与生产原子切换** | PR2/PR5 完成、PR3–5 至少一次完整 replay、全部 P0 绿；唯一一次公开行为切换 | 同一分支完成 Phase 3 UI/四入口/token/icon/typed cards/survival，再完成 Phase 4 runner/publish/active Aify 与已审计 source 翻转/legacy manifest；禁止第二 renderer、feature flag、dormant preview、Router/组件库/依赖、全文搜索、移动端、旧 lead/Today Five | typecheck、web build、dry-run publish、privacy、PC-008/010/011/013/016、四入口 `1280x900` E2E、console/network/overflow、完整 validate；只回滚整个站点 generation，禁止只回滚 UI/config/route 一部分 |

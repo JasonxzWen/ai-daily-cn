@@ -4,17 +4,26 @@ import fs from "node:fs/promises";
 import { isDeepStrictEqual, promisify } from "node:util";
 import path from "node:path";
 import { DEFAULT_SITE } from "./config.js";
+import {
+  assertOwnedPath,
+  inspectCuratedShadowLineage,
+  loadCuratedShadowCanonicalOwners,
+  validateCuratedShadowArtifacts
+} from "./curated-source-shadow.js";
 import { PublisherError } from "./errors.js";
 import { canonicalReportDataUrl, reportRelativePaths } from "./paths.js";
 import { classifyPublishQuality, requirePublishableQuality } from "./quality-status.js";
 import { planGeneratedFiles, reportManagedAssetPaths, validatePublicSignalsOutput } from "./site.js";
 import { buildAutomationRevision } from "./automation-revision.js";
 import { buildPublicSignalArtifacts, loadOccurrenceStores } from "./public-signals.js";
-import { validateOccurrenceStore } from "./schema.js";
+import { scanPublicArtifactsForLocalInfo } from "./privacy.js";
+import { validateOccurrenceStore, validateRawObservations, validateSourceFunnel } from "./schema.js";
 import { mergeCommandEnv, pnpmCommandText, pnpmInvocationForArgs } from "./process-runner.js";
 import {
   candidatePoolRelativePaths,
   occurrenceStoreRelativePath,
+  rawObservationsRelativePath,
+  sourceFunnelRelativePath,
   sourceStatusHistoryRelativePaths,
   toRepoPath
 } from "./reports-data-layout.js";
@@ -50,7 +59,14 @@ export async function checkPublishPreflight(options = {}) {
   });
 
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
-  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
+  const curatedShadow = options.reportDate
+    ? await requireOptionalCuratedShadowReceipts(repoRoot, options.reportDate)
+    : { present: false, ignored_paths: [] };
+  const effectiveStatusEntries = withoutIgnoredStatusEntries(
+    statusEntries,
+    curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths
+  );
+  const unrelated = effectiveStatusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，发布预检已停止。", {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
@@ -347,7 +363,14 @@ export async function createPublishPlan(options = {}) {
   }
 
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
-  const unrelated = statusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
+  const curatedShadow = options.reportDate
+    ? await requireOptionalCuratedShadowReceipts(repoRoot, options.reportDate)
+    : { present: false, ignored_paths: [] };
+  const effectiveStatusEntries = withoutIgnoredStatusEntries(
+    statusEntries,
+    curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths
+  );
+  const unrelated = effectiveStatusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，dry-run 已停止。", {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
@@ -384,22 +407,22 @@ export async function createPublishPlan(options = {}) {
     options.reportDate,
     generated.reports
   );
-  const dirtyGeneratedFiles = generatedPublisherDirtyFiles(statusEntries, generatedRepoFiles);
+  const dirtyGeneratedFiles = generatedPublisherDirtyFiles(effectiveStatusEntries, generatedRepoFiles);
   const dirtyDateScopedEvidenceFiles = dateScopedEvidenceAssetDirtyFiles(
-    statusEntries,
+    effectiveStatusEntries,
     options.outDir || "docs",
     options.reportDate
   );
   const stageFiles = uniqueSorted([
     ...repoFiles,
     ...dirtyGeneratedFiles,
-    ...statusEntries.map((entry) => entry.path).filter((file) => file.startsWith("docs/signals/")),
+    ...effectiveStatusEntries.map((entry) => entry.path).filter((file) => file.startsWith("docs/signals/")),
     ...dirtyDateScopedEvidenceFiles,
     ...(await plannedReportsDataFiles(repoRoot, dates)),
     ...(await plannedRetrospectiveFiles(repoRoot, dates)),
-    ...dirtyRetrospectiveFiles(statusEntries, dates)
+    ...dirtyRetrospectiveFiles(effectiveStatusEntries, dates)
   ]);
-  assertDirtyPublisherFilesCovered(statusEntries, stageFiles);
+  assertDirtyPublisherFilesCovered(effectiveStatusEntries, stageFiles);
   const commitMessage =
     dates.length === 1
       ? `chore: publish AI daily report ${dates[0]}`
@@ -448,16 +471,17 @@ export async function createSignalPublishPlan(options = {}) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续发布。`, remote);
   }
 
-  await requireSignalArtifacts(repoRoot, reportDate, options);
+  const artifacts = await requireSignalArtifacts(repoRoot, reportDate, options);
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
-  const unrelated = statusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, "signals", reportDate));
+  const effectiveStatusEntries = withoutIgnoredStatusEntries(statusEntries, artifacts.curatedShadow.ignored_paths);
+  const unrelated = effectiveStatusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, "signals", reportDate));
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在 signal scope 之外的未提交改动，信号发布预演已停止。", {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
     });
   }
-  const stageFiles = dirtyPublisherFilesForPublish(statusEntries, reportDate, "signals");
-  assertDirtyPublisherFilesCovered(statusEntries, stageFiles, "signals", reportDate);
+  const stageFiles = dirtyPublisherFilesForPublish(effectiveStatusEntries, reportDate, "signals");
+  assertDirtyPublisherFilesCovered(effectiveStatusEntries, stageFiles, "signals", reportDate);
   return {
     mode: "signals-dry-run",
     scope: "signals",
@@ -512,9 +536,19 @@ export async function publishGeneratedArtifacts(options = {}) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续发布。`, remote);
   }
 
+  const signalArtifacts = scope === "signals"
+    ? await requireSignalArtifacts(repoRoot, requireDailyReportDate(options.reportDate), options)
+    : null;
+  const curatedShadow = signalArtifacts?.curatedShadow || (options.reportDate
+    ? await requireOptionalCuratedShadowReceipts(repoRoot, options.reportDate)
+    : { present: false, ignored_paths: [] });
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
-  const publishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate, scope);
-  const unrelated = statusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, scope, options.reportDate));
+  const effectiveStatusEntries = withoutIgnoredStatusEntries(
+    statusEntries,
+    scope === "signals" ? curatedShadow.ignored_paths : (curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths)
+  );
+  const publishFiles = dirtyPublisherFilesForPublish(effectiveStatusEntries, options.reportDate, scope);
+  const unrelated = effectiveStatusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, scope, options.reportDate));
 
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，已停止发布。", {
@@ -522,7 +556,7 @@ export async function publishGeneratedArtifacts(options = {}) {
     });
   }
 
-  assertDirtyPublisherFilesCovered(statusEntries, publishFiles, scope, options.reportDate);
+  assertDirtyPublisherFilesCovered(effectiveStatusEntries, publishFiles, scope, options.reportDate);
 
   if (publishFiles.length === 0) {
     return publishResultEnvelope({
@@ -536,9 +570,7 @@ export async function publishGeneratedArtifacts(options = {}) {
     });
   }
 
-  if (scope === "signals") {
-    await requireSignalArtifacts(repoRoot, requireDailyReportDate(options.reportDate), options);
-  } else {
+  if (scope !== "signals") {
     await requirePublishableReportDate(repoRoot, options.reportDate, {
       currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
     });
@@ -615,30 +647,39 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   const git = options.git || createGitAdapter(repoRoot);
   const sourceBranch = await git.branch();
 
+  const signalArtifacts = scope === "signals"
+    ? await requireSignalArtifacts(repoRoot, requireDailyReportDate(options.reportDate), options)
+    : null;
+  const curatedShadow = signalArtifacts?.curatedShadow || (options.reportDate
+    ? await requireOptionalCuratedShadowReceipts(repoRoot, options.reportDate)
+    : { present: false, ignored_paths: [] });
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
-  const hasPublisherDirtyFiles = statusEntries.some((entry) => isPublisherOwnedPath(entry.path, scope, options.reportDate));
-  const dirtyPublishFiles = dirtyPublisherFilesForPublish(statusEntries, options.reportDate, scope);
-  const unrelated = statusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, scope, options.reportDate));
+  const effectiveStatusEntries = withoutIgnoredStatusEntries(
+    statusEntries,
+    scope === "signals" ? curatedShadow.ignored_paths : (curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths)
+  );
+  const hasPublisherDirtyFiles = effectiveStatusEntries.some((entry) => isPublisherOwnedPath(entry.path, scope, options.reportDate));
+  const dirtyPublishFiles = dirtyPublisherFilesForPublish(effectiveStatusEntries, options.reportDate, scope);
+  const unrelated = effectiveStatusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, scope, options.reportDate));
 
   if (unrelated.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树存在非发布器管理的未提交改动，GitHub API 发布已停止。", {
       status: unrelated.map((entry) => `${entry.code} ${entry.path}`)
     });
   }
-  if (scope === "signals") {
-    await requireSignalArtifacts(repoRoot, requireDailyReportDate(options.reportDate), options);
-  } else {
+  if (scope !== "signals") {
     await requirePublishableReportDate(repoRoot, options.reportDate, {
       currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
     });
   }
-  assertDirtyPublisherFilesCovered(statusEntries, dirtyPublishFiles, scope, options.reportDate);
+  assertDirtyPublisherFilesCovered(effectiveStatusEntries, dirtyPublishFiles, scope, options.reportDate);
 
-  const publishFiles = uniqueSorted(
-    hasPublisherDirtyFiles
+  const publishFiles = uniqueSorted([
+    ...(hasPublisherDirtyFiles
       ? dirtyPublishFiles
-      : await plannedPublisherFiles(repoRoot, { ...options, scope })
-  );
+      : await plannedPublisherFiles(repoRoot, { ...options, scope, curatedShadow })),
+    ...(scope === "signals" && curatedShadow.present ? curatedShadow.paths : [])
+  ]);
 
   if (publishFiles.length === 0) {
     return publishResultEnvelope({
@@ -698,13 +739,25 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
       .filter((entry) => entry.type === "blob")
       .map((entry) => [entry.path, entry.sha])
   );
+  if (scope === "signals") {
+    const remoteReceiptPaths = [
+      toRepoPath("reports-data", rawObservationsRelativePath(options.reportDate)),
+      toRepoPath("reports-data", sourceFunnelRelativePath(options.reportDate))
+    ];
+    const remoteReceiptPresence = remoteReceiptPaths.map((file) => remoteBlobShas.has(file));
+    const localPairWillRepair = remoteReceiptPaths.every((file) => publishFiles.includes(file));
+    if (remoteReceiptPresence[0] !== remoteReceiptPresence[1] && !localPairWillRepair) {
+      throw new PublisherError(
+        "curated_shadow_remote_receipt_pair_incomplete",
+        "Remote curated shadow receipts are orphaned; publish must repair or remove the pair together.",
+        { receipt_paths: remoteReceiptPaths }
+      );
+    }
+  }
   const remoteSignalFiles = [...remoteBlobShas.keys()].filter((file) => file.startsWith("docs/signals/") && file.endsWith(".json"));
   const effectivePublishFiles = uniqueSorted([
     ...publishFiles,
-    ...remoteSignalFiles,
-    ...(scope === "signals"
-      ? [...remoteBlobShas.keys()].filter((file) => isPublisherOwnedPath(file, "signals", options.reportDate))
-      : [])
+    ...remoteSignalFiles
   ]);
   const treeEntries = await createChangedTreeEntries(repoRoot, effectivePublishFiles, remoteBlobShas);
 
@@ -792,10 +845,20 @@ export async function resumePublishPush(options = {}) {
     });
   }
 
+  const signalArtifacts = scope === "signals"
+    ? await requireSignalArtifacts(repoRoot, requireDailyReportDate(options.reportDate), options)
+    : null;
+  const curatedShadow = signalArtifacts?.curatedShadow || (options.reportDate
+    ? await requireOptionalCuratedShadowReceipts(repoRoot, options.reportDate)
+    : { present: false, ignored_paths: [] });
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
+  const effectiveStatusEntries = withoutIgnoredStatusEntries(
+    statusEntries,
+    scope === "signals" ? curatedShadow.ignored_paths : (curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths)
+  );
   const blockingStatusEntries = scope === "signals"
-    ? statusEntries.filter((entry) => isPublisherOwnedPath(entry.path, "signals", options.reportDate))
-    : statusEntries;
+    ? effectiveStatusEntries.filter((entry) => isPublisherOwnedPath(entry.path, "signals", options.reportDate))
+    : effectiveStatusEntries;
   if (blockingStatusEntries.length > 0) {
     throw new PublisherError("dirty_worktree", "工作树仍有未提交改动，不能直接续推已有发布提交。", {
       status: blockingStatusEntries.map((entry) => `${entry.code} ${entry.path}`)
@@ -807,9 +870,7 @@ export async function resumePublishPush(options = {}) {
   if (remote.remoteAhead > 0) {
     throw new PublisherError("remote_ahead", `远端 ${remote.upstream} 领先 ${remote.remoteAhead} 个提交，不能继续推送。`, remote);
   }
-  if (scope === "signals") {
-    await requireSignalArtifacts(repoRoot, requireDailyReportDate(options.reportDate), options);
-  } else {
+  if (scope !== "signals") {
     await requirePublishableReportDate(repoRoot, options.reportDate, {
       currentAutomationRevision: await resolveCurrentAutomationRevision(options, repoRoot)
     });
@@ -996,7 +1057,7 @@ function filterDocsForReportDate(files, outDir, reportDate, reports = []) {
 
 async function plannedPublisherFiles(repoRoot, options = {}) {
   if (normalizePublishScope(options.scope) === "signals") {
-    return plannedSignalPublisherFiles(repoRoot, requireDailyReportDate(options.reportDate));
+    return plannedSignalPublisherFiles(repoRoot, requireDailyReportDate(options.reportDate), options.curatedShadow);
   }
   const generated = await planGeneratedFiles({
     rootDir: repoRoot,
@@ -1030,7 +1091,7 @@ async function plannedPublisherFiles(repoRoot, options = {}) {
   return existing;
 }
 
-async function plannedSignalPublisherFiles(repoRoot, reportDate) {
+async function plannedSignalPublisherFiles(repoRoot, reportDate, curatedShadow = {}) {
   const files = [];
   const signalsRoot = path.join(repoRoot, "docs", "signals");
   async function visit(currentDir) {
@@ -1053,6 +1114,7 @@ async function plannedSignalPublisherFiles(repoRoot, reportDate) {
   await visit(signalsRoot);
   const occurrencePath = toRepoPath("reports-data", occurrenceStoreRelativePath(reportDate));
   if (await exists(path.join(repoRoot, ...occurrencePath.split("/")))) files.push(occurrencePath);
+  if (curatedShadow.present) files.push(...curatedShadow.paths);
   return uniqueSorted(files);
 }
 
@@ -1078,6 +1140,9 @@ async function requireSignalArtifacts(repoRoot, reportDate, options = {}) {
       errors: occurrenceValidation.errors
     });
   }
+  const curatedShadow = await requireOptionalCuratedShadowReceipts(repoRoot, reportDate, {
+    expectedGeneratedAt: occurrenceValidation.value.generated_at
+  });
   const validation = await validatePublicSignalsOutput({
     rootDir: repoRoot,
     outDir: "docs"
@@ -1117,7 +1182,157 @@ async function requireSignalArtifacts(repoRoot, reportDate, options = {}) {
       }
     );
   }
-  return { occurrencePath, occurrence: occurrenceValidation.value, validation };
+  return { occurrencePath, occurrence: occurrenceValidation.value, validation, curatedShadow };
+}
+
+async function requireOptionalCuratedShadowReceipts(repoRoot, reportDate, options = {}) {
+  const rawRelativePath = toRepoPath("reports-data", rawObservationsRelativePath(reportDate));
+  const funnelRelativePath = toRepoPath("reports-data", sourceFunnelRelativePath(reportDate));
+  const paths = [rawRelativePath, funnelRelativePath];
+  const [rawPath, funnelPath] = await Promise.all([
+    assertOwnedPath(repoRoot, rawRelativePath, "curated_shadow_receipt_path_unsafe"),
+    assertOwnedPath(repoRoot, funnelRelativePath, "curated_shadow_receipt_path_unsafe")
+  ]);
+  const recoveryPaths = await findCuratedShadowRecoveryPaths(repoRoot, paths);
+  if (recoveryPaths.length > 0) {
+    return {
+      present: false,
+      stale: false,
+      recovery: true,
+      paths: [],
+      ignored_paths: uniqueSorted([...paths, ...recoveryPaths])
+    };
+  }
+  const [hasRaw, hasFunnel] = await Promise.all([exists(rawPath), exists(funnelPath)]);
+  if (!hasRaw && !hasFunnel) return { present: false, stale: false, paths: [], ignored_paths: [] };
+  if (hasRaw !== hasFunnel) {
+    throw new PublisherError(
+      "curated_shadow_receipt_pair_incomplete",
+      "Curated shadow receipts must be absent together or present as one verified pair.",
+      { raw_path: rawRelativePath, funnel_path: funnelRelativePath }
+    );
+  }
+
+  let raw;
+  let funnel;
+  try {
+    [raw, funnel] = await Promise.all([
+      fs.readFile(rawPath, "utf8").then(JSON.parse),
+      fs.readFile(funnelPath, "utf8").then(JSON.parse)
+    ]);
+  } catch {
+    throw new PublisherError("curated_shadow_receipt_invalid", "Curated shadow receipts must be valid JSON.", {
+      raw_path: rawRelativePath,
+      funnel_path: funnelRelativePath
+    });
+  }
+  const rawValidation = validateRawObservations(raw);
+  const funnelValidation = validateSourceFunnel(funnel);
+  if (
+    !rawValidation.valid ||
+    !funnelValidation.valid ||
+    rawValidation.value.report_date !== reportDate ||
+    funnelValidation.value.report_date !== reportDate ||
+    rawValidation.value.generated_at !== funnelValidation.value.generated_at
+  ) {
+    throw new PublisherError("curated_shadow_receipt_invalid", "Curated shadow receipts failed schema, date, or generation validation.", {
+      raw_path: rawRelativePath,
+      funnel_path: funnelRelativePath,
+      raw_errors: rawValidation.errors,
+      funnel_errors: funnelValidation.errors
+    });
+  }
+
+  const aifyContentLanes = funnelValidation.value.lanes.filter((lane) => lane.lane_id === "aify_today_picks");
+  const aifyHealthLanes = funnelValidation.value.lanes.filter((lane) => lane.lane_id === "site-aify-news");
+  const lineage = inspectCuratedShadowLineage(rawValidation.value, funnelValidation.value);
+  if (
+    aifyContentLanes.length !== 1 ||
+    aifyHealthLanes.length !== 1 ||
+    !lineage.valid
+  ) {
+    throw new PublisherError("curated_shadow_receipt_invalid", "Curated shadow receipts failed cross-artifact lineage validation.", {
+      raw_path: rawRelativePath,
+      funnel_path: funnelRelativePath,
+      missing_raw_ids: lineage.missing_raw_ids,
+      unknown_raw_ids: lineage.unknown_raw_ids,
+      misbound_raw_ids: lineage.misbound_raw_ids,
+      collector_mismatch_ids: lineage.collector_mismatch_ids,
+      missing_aify_ids: lineage.missing_aify_ids,
+      extra_aify_ids: lineage.extra_aify_ids
+    });
+  }
+  try {
+    const canonicalOwners = await loadCuratedShadowCanonicalOwners({ rootDir: repoRoot });
+    validateCuratedShadowArtifacts({
+      rawObservations: rawValidation.value,
+      sourceFunnel: funnelValidation.value,
+      ...canonicalOwners
+    });
+  } catch (error) {
+    throw new PublisherError(
+      "curated_shadow_receipt_invalid",
+      "Curated shadow receipts no longer match the canonical source registry and REC-315/316 owners.",
+      {
+        raw_path: rawRelativePath,
+        funnel_path: funnelRelativePath,
+        cause_code: error?.code || "canonical_reconciliation_failed"
+      }
+    );
+  }
+  const privacy = await scanPublicArtifactsForLocalInfo({
+    rootDir: repoRoot,
+    targets: [rawRelativePath, funnelRelativePath]
+  });
+  if (!privacy.ok) {
+    throw new PublisherError("curated_shadow_receipt_invalid", "Curated shadow receipts failed the repo-safe privacy gate.", {
+      raw_path: rawRelativePath,
+      funnel_path: funnelRelativePath,
+      finding_patterns: uniqueSorted(privacy.findings.map((item) => item.pattern))
+    });
+  }
+  if (options.expectedGeneratedAt && rawValidation.value.generated_at !== options.expectedGeneratedAt) {
+    return {
+      present: false,
+      stale: true,
+      paths: [],
+      ignored_paths: paths,
+      receipt_generated_at: rawValidation.value.generated_at,
+      expected_generated_at: options.expectedGeneratedAt
+    };
+  }
+  return {
+    present: true,
+    stale: false,
+    paths,
+    ignored_paths: [],
+    raw: rawValidation.value,
+    funnel: funnelValidation.value
+  };
+}
+
+async function findCuratedShadowRecoveryPaths(repoRoot, receiptPaths) {
+  const recoveryPaths = [];
+  for (const receiptPath of receiptPaths) {
+    const absolutePath = path.join(repoRoot, ...receiptPath.split("/"));
+    const directory = path.dirname(absolutePath);
+    const basename = path.basename(absolutePath).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const recoveryPattern = new RegExp(`^${basename}\\.\\d+\\.[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\.(?:tmp|backup)$`, "i");
+    let entries = [];
+    try {
+      entries = await fs.readdir(directory, { withFileTypes: true });
+    } catch (error) {
+      if (error?.code === "ENOENT") continue;
+      throw error;
+    }
+    for (const entry of entries) {
+      if (!entry.isFile() || !recoveryPattern.test(entry.name)) continue;
+      const recoveryPath = toRepoPath(path.dirname(receiptPath), entry.name);
+      await assertOwnedPath(repoRoot, recoveryPath, "curated_shadow_receipt_path_unsafe");
+      recoveryPaths.push(recoveryPath);
+    }
+  }
+  return uniqueSorted(recoveryPaths);
 }
 
 function assertDefaultSignalArtifactRoots(options) {
@@ -1447,7 +1662,11 @@ function publishResultEnvelope({ mode, scope, publishMode, branch, reportDate, .
 function isSignalPublisherOwnedPath(filePath, reportDate) {
   if (filePath.startsWith("docs/signals/") && filePath.endsWith(".json")) return true;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(reportDate || ""))) return false;
-  return filePath === toRepoPath("reports-data", occurrenceStoreRelativePath(reportDate));
+  return [
+    occurrenceStoreRelativePath(reportDate),
+    rawObservationsRelativePath(reportDate),
+    sourceFunnelRelativePath(reportDate)
+  ].some((relativePath) => filePath === toRepoPath("reports-data", relativePath));
 }
 
 function isPublishRetrospectiveRecordPath(filePath) {
@@ -1462,6 +1681,11 @@ function dirtyPublisherFilesForPublish(statusEntries, reportDate, scope = "daily
     return uniqueSorted(files);
   }
   return uniqueSorted(files.filter((file) => isPublishFileForReportDate(file, reportDate)));
+}
+
+function withoutIgnoredStatusEntries(statusEntries, ignoredPaths = []) {
+  const ignored = new Set(Array.isArray(ignoredPaths) ? ignoredPaths : []);
+  return statusEntries.filter((entry) => !ignored.has(entry.path));
 }
 
 function isPublishFileForReportDate(filePath, reportDate) {

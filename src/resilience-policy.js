@@ -54,10 +54,12 @@ const SHARED_PREFLIGHT_STAGE_IDS = new Set([
   "prompt_build",
   "sources_validate"
 ]);
+const INTERNAL_SHADOW_STAGE_IDS = new Set(["curated_source_shadow"]);
 const STAGE_SCOPES = new Set([
   "shared_preflight",
   "public_signal_input",
   "public_signals",
+  "internal_shadow",
   "diagnostic_after_signals",
   "legacy_report_only"
 ]);
@@ -253,6 +255,7 @@ function validatePolicyDocument({ policy, failures, requiredStageIds }) {
 function expectedStageScope(stageId) {
   if (SHARED_PREFLIGHT_STAGE_IDS.has(stageId)) return "shared_preflight";
   if (PUBLIC_SIGNAL_DISCOVERY_STAGE_IDS.has(stageId)) return "public_signal_input";
+  if (INTERNAL_SHADOW_STAGE_IDS.has(stageId)) return "internal_shadow";
   if (String(stageId).startsWith("signals_")) return "public_signals";
   if (stageId === "sources_health") return "diagnostic_after_signals";
   return "legacy_report_only";

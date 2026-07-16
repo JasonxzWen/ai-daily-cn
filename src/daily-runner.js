@@ -1179,6 +1179,23 @@ function buildInitialWorkflowStages({ reportDate, publish = false, generatedAt =
       "--output",
       tmp("search-news")
     ]),
+    nodeCliStage("curated_source_shadow", [
+      "sources:curated-shadow",
+      "--date",
+      reportDate,
+      "--generated-at",
+      generatedAt,
+      "--input",
+      signalDiscoveryInputs,
+      "--sources",
+      "config/sources",
+      "--source-watch-config",
+      "config/source-watchlist.json",
+      "--out",
+      "reports-data",
+      "--output",
+      tmp("curated-source-shadow")
+    ]),
     nodeCliStage("signals_write", [
       "signals:write",
       "--date",
@@ -1947,6 +1964,9 @@ async function applyDegradedStageFallback({ stage, context, stagePolicy, normali
 }
 
 function stageFailureMatchesBlockReason({ stagePolicy, normalized, error }) {
+  if (stagePolicy?.block?.allowed !== true) {
+    return false;
+  }
   const blockReasons = Array.isArray(stagePolicy?.block?.reasons) ? stagePolicy.block.reasons : [];
   if (blockReasons.length === 0) {
     return false;

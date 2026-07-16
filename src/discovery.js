@@ -6,6 +6,7 @@ import {
   githubReadmeCacheKey,
   summarizeGithubReadme
 } from "./github-readme.js";
+import { collectAifyTodayPicks, createAifyTodayPicksFailure } from "./aify-today-picks.js";
 import { loadSourceRegistry } from "./source-registry.js";
 import { sanitizePublicHttpUrl, urlHostMatches } from "./public-url.js";
 import { decodeXmlEntitiesOnce as decodeXml } from "./xml.js";
@@ -771,6 +772,26 @@ export async function collectSourceWatch(options = {}) {
       }
     }
   };
+}
+
+export async function collectAifyTodayPicksFromWatchlist(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const reportDate = requireReportDate(options.reportDate);
+  const watchlist = await loadSourceWatchlist(options, rootDir);
+  const targets = watchlist.targets.filter((target) => target.id === "site-aify-news");
+  if (targets.length !== 1) {
+    return createAifyTodayPicksFailure(
+      targets[0]?.url || "https://aify-news.pages.dev/",
+      targets.length === 0 ? "aify_watch_target_missing" : "aify_watch_target_duplicate"
+    );
+  }
+  return collectAifyTodayPicks({
+    fetchImpl: createDiscoveryFetch(options.fetchImpl || globalThis.fetch, options),
+    reportDate,
+    sourceUrl: targets[0].url,
+    maxResponseBytes: options.maxResponseBytes,
+    maxRedirects: options.maxRedirects
+  });
 }
 
 export async function createSourceWatchFixtureFetch(fixtureDir) {

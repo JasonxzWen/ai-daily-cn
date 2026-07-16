@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-import { isPublicNetworkHost, isSensitivePrivateNetworkHost } from "./public-url.js";
+import { isPublicNetworkHost } from "./public-url.js";
 
 export const PUBLIC_ARTIFACT_PATHS = [
   "docs/data",
@@ -26,6 +26,19 @@ const LOCAL_INFO_PATTERNS = [
 const PUBLIC_URL_FORBIDDEN_PATTERNS = [
   { name: "public_url_credentials", pattern: /https?:\/\/[^\s/?:#]+:[^\s/@]+@/i },
   { name: "public_url_secret_query", pattern: /[?&](?:access[_-]?token|api[_-]?key|auth(?:orization)?|client[_-]?secret|credential|key|pass(?:word|wd)?|secret|sig(?:nature)?|token|x-amz-(?:credential|security-token|signature)|x-goog-(?:credential|signature))=/i }
+];
+const STRUCTURED_SECRET_FIELD_PATTERN = /^(?:access[_-]?token|api[_-]?key|auth(?:orization)?|client[_-]?secret|cookie|credential|pass(?:word|wd)?|secret|signature|token|x-amz-(?:credential|security-token|signature)|x-goog-(?:credential|signature))$/i;
+const STRUCTURED_SECRET_FIELD_TEXT_PATTERN = /"(?:access[_-]?token|api[_-]?key|auth(?:orization)?|client[_-]?secret|cookie|credential|pass(?:word|wd)?|secret|signature|token|x-amz-(?:credential|security-token|signature)|x-goog-(?:credential|signature))"\s*:/i;
+const SECRET_VALUE_PATTERNS = [
+  { name: "secret_authorization_value", pattern: /\bauthorization\s*:\s*(?:bearer|basic)\s+[A-Za-z0-9._~+\/-]{8,}={0,2}/i },
+  { name: "secret_bearer_value", pattern: /\bbearer\s+[A-Za-z0-9._~+\/-]{16,}={0,2}/i },
+  { name: "secret_known_token_value", pattern: /\b(?:gh[pousr]_[A-Za-z0-9]{16,}|github_pat_[A-Za-z0-9_]{16,}|sk-(?:proj-[A-Za-z0-9_-]{24,}|[A-Za-z0-9]{48})|xox[baprs]-[A-Za-z0-9-]{16,}|AKIA[0-9A-Z]{16})\b/i },
+  { name: "secret_private_key_value", pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/i }
+];
+const REPO_SAFE_INTERNAL_RECEIPT_PREFIXES = [
+  "reports-data/occurrences/",
+  "reports-data/observations/",
+  "reports-data/source-funnel/"
 ];
 const PUBLIC_URL_RE = /https?:\/\/[^\s"'<>\\]+/gi;
 const HTML_PUBLIC_URL_ATTRIBUTE_RE = /\b(?:href|src|action)\s*=\s*["'](https?:\/\/[^"'<>]+)["']/gi;
@@ -55,6 +68,46 @@ export function containsInternalSourceField(value) {
     || INTERNAL_NOTES_FIELD_PATTERNS.some((pattern) => pattern.test(text));
 }
 
+export function containsSecretLikeText(value) {
+  const text = String(value || "");
+  return SECRET_VALUE_PATTERNS.some(({ pattern }) => pattern.test(text));
+}
+
+export function findRepoSafeReceiptPrivacyFindings(value, options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const relativeFile = String(options.relativeFile || "reports-data/observations/in-memory.json").replace(/\\/g, "/");
+  const text = typeof value === "string" ? value : JSON.stringify(value);
+  const decodedStrings = typeof value === "string" ? [value] : collectJsonStringValues(value);
+  const searchableValues = [text, ...decodedStrings];
+  const patterns = [
+    ...LOCAL_INFO_PATTERNS,
+    ...localEnvironmentPathPatterns(rootDir),
+    ...PUBLIC_URL_FORBIDDEN_PATTERNS,
+    ...SECRET_VALUE_PATTERNS
+  ];
+  const findings = [];
+  for (const { name, pattern } of patterns) {
+    if (searchableValues.some((candidate) => patternMatches(pattern, candidate))) {
+      findings.push({ file: relativeFile, pattern: name });
+    }
+  }
+  const structuredValue = typeof value === "string" ? parseJsonValue(value) : value;
+  if (
+    structuredValue === undefined
+      ? STRUCTURED_SECRET_FIELD_TEXT_PATTERN.test(text)
+      : hasStructuredSecretField(structuredValue)
+  ) {
+    findings.push({ file: relativeFile, pattern: "structured_secret_field" });
+  }
+  if (unsafeCredentialUrlInStrings(decodedStrings)) {
+    findings.push({ file: relativeFile, pattern: "public_url_credentials" });
+  }
+  if (findPrivatePublicUrlIndex(text, relativeFile) >= 0) {
+    findings.push({ file: relativeFile, pattern: "public_url_private_host" });
+  }
+  return findings;
+}
+
 export async function scanPublicArtifactsForLocalInfo(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const targets = options.targets || PUBLIC_ARTIFACT_PATHS;
@@ -80,22 +133,48 @@ export async function scanPublicArtifactsForLocalInfo(options = {}) {
   for (const filePath of files) {
     const text = await fs.readFile(filePath, "utf8");
     const relativeFile = path.relative(rootDir, filePath).replace(/\\/g, "/");
+    const parsedJson = path.extname(relativeFile).toLowerCase() === ".json" ? parseJsonValue(text) : undefined;
+    const decodedStrings = parsedJson === undefined ? [text] : collectJsonStringValues(parsedJson);
+    const searchableValues = [text, ...decodedStrings];
+    const isInternalReceipt = REPO_SAFE_INTERNAL_RECEIPT_PREFIXES.some((prefix) => relativeFile.startsWith(prefix));
     const filePatterns = relativeFile.startsWith("docs/")
       ? [...patterns, ...PUBLIC_URL_FORBIDDEN_PATTERNS, ...PUBLIC_DOCS_FORBIDDEN_PATTERNS]
-      : relativeFile.startsWith("reports-data/occurrences/")
-        ? [...patterns, ...PUBLIC_URL_FORBIDDEN_PATTERNS]
+      : isInternalReceipt
+        ? [...patterns, ...PUBLIC_URL_FORBIDDEN_PATTERNS, ...SECRET_VALUE_PATTERNS]
         : patterns;
     for (const { name, pattern } of filePatterns) {
-      const match = pattern.exec(text);
-      if (match) {
+      const matchedText = searchableValues.find((candidate) => patternMatches(pattern, candidate));
+      if (matchedText != null) {
+        pattern.lastIndex = 0;
+        const match = pattern.exec(matchedText);
         findings.push({
           file: relativeFile,
           pattern: name,
-          excerpt: redactExcerpt(text, match.index)
+          excerpt: name.startsWith("secret_") || matchedText !== text
+            ? "[redacted]"
+            : redactExcerpt(text, match?.index || 0)
         });
       }
     }
-    if (relativeFile.startsWith("docs/") || relativeFile.startsWith("reports-data/occurrences/")) {
+    if (isInternalReceipt && (
+      parsedJson === undefined
+        ? STRUCTURED_SECRET_FIELD_TEXT_PATTERN.test(text)
+        : hasStructuredSecretField(parsedJson)
+    )) {
+      findings.push({
+        file: relativeFile,
+        pattern: "structured_secret_field",
+        excerpt: "[redacted]"
+      });
+    }
+    if ((relativeFile.startsWith("docs/") || isInternalReceipt) && unsafeCredentialUrlInStrings(decodedStrings)) {
+      findings.push({
+        file: relativeFile,
+        pattern: "public_url_credentials",
+        excerpt: "[redacted]"
+      });
+    }
+    if (relativeFile.startsWith("docs/") || isInternalReceipt) {
       const privateUrlIndex = findPrivatePublicUrlIndex(text, relativeFile);
       if (privateUrlIndex >= 0) {
         findings.push({
@@ -112,6 +191,56 @@ export async function scanPublicArtifactsForLocalInfo(options = {}) {
     files_checked: files.length,
     findings
   };
+}
+
+function parseJsonValue(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
+}
+
+function hasStructuredSecretField(value) {
+  if (Array.isArray(value)) return value.some(hasStructuredSecretField);
+  if (!value || typeof value !== "object") return false;
+  return Object.entries(value).some(([key, nested]) => (
+    STRUCTURED_SECRET_FIELD_PATTERN.test(key) || hasStructuredSecretField(nested)
+  ));
+}
+
+function collectJsonStringValues(value, output = []) {
+  if (typeof value === "string") {
+    output.push(value);
+    return output;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) collectJsonStringValues(item, output);
+    return output;
+  }
+  if (value && typeof value === "object") {
+    for (const item of Object.values(value)) collectJsonStringValues(item, output);
+  }
+  return output;
+}
+
+function patternMatches(pattern, value) {
+  pattern.lastIndex = 0;
+  return pattern.test(String(value || ""));
+}
+
+function unsafeCredentialUrlInStrings(values) {
+  for (const value of values) {
+    for (const match of String(value || "").matchAll(PUBLIC_URL_RE)) {
+      try {
+        const url = new URL(match[0]);
+        if (url.username || url.password) return true;
+      } catch {
+        // Structured URL validators own malformed URL rejection.
+      }
+    }
+  }
+  return false;
 }
 
 function localEnvironmentPathPatterns(rootDir) {
@@ -193,7 +322,7 @@ function sensitivePrivateUrlInJsonValue(value) {
   if (typeof value === "string") {
     for (const match of value.matchAll(PUBLIC_URL_RE)) {
       try {
-        if (isSensitivePrivateNetworkHost(new URL(match[0]).hostname)) return match[0];
+        if (!isPublicNetworkHost(new URL(match[0]).hostname)) return match[0];
       } catch {
         // Ignore malformed prose fragments; URL/schema validators own structured fields.
       }

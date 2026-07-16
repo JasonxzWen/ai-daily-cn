@@ -24,10 +24,12 @@ import {
   collectContentSources,
   collectGitHubTrending,
   collectHuggingFaceTrending,
+  collectAifyTodayPicksFromWatchlist,
   collectSourceWatch,
   createSourceWatchFixtureFetch,
   collectStatuspageIncidents
 } from "./discovery.js";
+import { runCuratedSourceShadow } from "./curated-source-shadow.js";
 import { collectSearchNews } from "./search-news.js";
 import { checkSourcesHealth } from "./source-health.js";
 import { auditSourceRunHistory } from "./source-phase5.js";
@@ -943,6 +945,29 @@ try {
       ok: true,
       ...result
     });
+  } else if (command === "sources:curated-shadow") {
+    const args = parseArgs(argv);
+    const rootDir = path.resolve(args["repo-root"] || process.cwd());
+    const reportDate = args.date || firstPositionalDate(argv);
+    const generatedAt = args["generated-at"] || firstPositionalDateTime(argv);
+    const fixtureDir = args["fixture-dir"] || "";
+    const fetchImpl = fixtureDir ? await createSourceWatchFixtureFetch(fixtureDir) : undefined;
+    const aifyResult = await collectAifyTodayPicksFromWatchlist({
+      rootDir,
+      reportDate,
+      watchlistPath: args["source-watch-config"] || "config/source-watchlist.json",
+      fetchImpl
+    });
+    const result = await runCuratedSourceShadow({
+      rootDir,
+      reportDate,
+      generatedAt,
+      inputPaths: splitInputPathToken(args.input || args.inputs || ""),
+      aifyResult,
+      sourcesPath: args.sources || "config/sources",
+      outputDir: args.out || "reports-data"
+    });
+    printJson(result, args.output || "");
   } else if (command === "sources:health") {
     const args = parseArgs(argv);
     const result = await checkSourcesHealth({

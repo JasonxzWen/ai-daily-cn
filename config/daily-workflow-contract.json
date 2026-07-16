@@ -86,6 +86,30 @@
         "zero_observations_still_consumed": true
       }
     },
+    "curated_source_shadow": {
+      "stage_id": "curated_source_shadow",
+      "script": "sources:curated-shadow",
+      "scope": "internal_shadow",
+      "runs_after": "discover_search_news",
+      "runs_before": "signals_write",
+      "public_behavior_changes": false,
+      "failure_blocks_legacy_publisher": false,
+      "raw_observations_path_template": "reports-data/observations/YYYY/MM/YYYY-MM-DD.json",
+      "source_funnel_path_template": "reports-data/source-funnel/YYYY/MM/YYYY-MM-DD.json",
+      "signal_publish_companion": "optional_same_day",
+      "phase_1a_terminal_stages": {
+        "registered": "run",
+        "fetched": "run",
+        "parsed": "run",
+        "admitted": "not_run",
+        "displayed": "not_run"
+      },
+      "aify_receipts": [
+        "aify_today_picks",
+        "site-aify-news"
+      ],
+      "active_aify_archive_unchanged": true
+    },
     "legacy_report": {
       "optional_derivative": true,
       "cannot_change_signal_membership": true,
@@ -148,6 +172,7 @@
     "signals:migrate-baseline": "node scripts/migrate-public-signal-baseline.mjs",
     "signals:build": "node src/cli.js signals:build --data-input reports-data --out docs",
     "signals:validate": "node src/cli.js signals:validate --out docs",
+    "sources:curated-shadow": "node src/cli.js sources:curated-shadow",
     "status:self-check": "node src/cli.js status:self-check --data-input reports-data --input reports-source --out docs",
     "workflow:validate": "node scripts/validate-daily-workflow-contract.mjs",
     "resilience:validate": "node scripts/validate-daily-resilience-policy.mjs",

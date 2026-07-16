@@ -1504,7 +1504,8 @@ test("curated migration plan preserves full product scope and atomic delivery bo
   const pr3Row = prRows.find((line) => line.startsWith("| **PR3 "));
   const pr6Row = prRows.find((line) => line.startsWith("| **PR6 "));
   assert(pr3Row.includes("旧公开 generation 不变"));
-  assert(pr3Row.includes("禁止 admission/edition/frontend/site/build/publish、active Aify config 与公开 route"));
+  assert(pr3Row.includes("同日内部 receipt 的可选 signal publish allowlist"));
+  assert(pr3Row.includes("禁止 admission/edition/frontend、公开 site/build/publish 行为、active Aify config 与公开 route"));
   assert(!pr3Row.includes("唯一一次公开行为切换"));
   assert(!pr3Row.includes("翻转"));
   assert(pr6Row.includes("唯一一次公开行为切换"));
