@@ -403,7 +403,7 @@
     {
       "id": "aify-news-logical-source",
       "status": "observing",
-      "summary": "Govern Aify News as an observable logical source, publish every safe observation, and reserve primary-evidence requirements for the optional legacy editorial report.",
+      "summary": "Track the current Aify logical source while the accepted target replaces its full-archive community-lead path with a highest-priority homepage Today Picks trusted-editorial passthrough.",
       "commands": [
         "corepack pnpm run sources:validate",
         "corepack pnpm run sources:display-contract",
@@ -420,19 +420,22 @@
       ],
       "acceptance": [
         "The Aify content feed and site-watch entry resolve to the stable aify-news logical source.",
-        "Aify candidates preserve the original publisher and aggregator/intermediary metadata; those values remain public labels, while primary-source verification applies only when the optional legacy editorial report makes a factual claim.",
+        "The target parses only the ordered homepage Today Picks payload, preserves title, description, link, publisher label and native tags, and records Aify separately as editorial source and collector.",
         "The production runner explicitly requests aify-news Phase5 evidence and preserves the structured result in the terminal run summary.",
         "Every observed day contains separate persisted candidates and terminal dispositions for content-aify-news and site-aify-news; a site-only window fails closed.",
-        "Three consecutive persisted production days each prove collection, lossless occurrence persistence, public signal projection, and a separately closed legacy editorial disposition.",
-        "Every safely normalized Aify observation appears in the public signal artifacts; legacy non-inclusion reasons and edited-report matches remain internal evidence and cannot govern that projection."
+        "Until cutover, three consecutive persisted production days continue to prove the current lossless occurrence behavior without being mistaken for the target.",
+        "PR3 through PR5 exercise the homepage Today Picks adapter only in shadow and keep config/sources/aify-news.json plus the old public generation byte-identical; the active source flip occurs only inside the atomic PR6 cutover.",
+        "After cutover, every structurally safe Today Pick enters the ready pool and prequalified edition candidate set unchanged; the homepage shell, full articles.json archive, stale snapshots and TEST rows never enter that set.",
+        "Aify Today Picks trigger zero secondary summary, translation, editor, critic, semantic-verifier or scoring calls; final edition capacity, dedupe, company, diversity and specialized-lane caps remain deterministic."
       ],
       "stop_conditions": [
-        "The optional legacy editorial report treats Aify as primary factual authority or bypasses primary-source confirmation for a factual claim.",
+        "The target reuses the generic search_api/community_lead path, appends primary-source warning text, loses native tags or fetches the full archive instead of the homepage Today Picks payload.",
         "Replay or fixture evidence is reported as production verification.",
         "The production stage omits aify-news or either required observation entry can be absent while production_verified is true.",
-        "A safe Aify observation is absent from the public signal artifacts because it failed editorial admission, verification, quality, or selection."
+        "The active Aify content path changes before the PR6 frontend/routes/publisher/legacy cutover can be validated and rolled back as one generation.",
+        "A structurally safe Today Pick is absent from the ready pool, its upstream payload is rewritten, or an invalid/stale snapshot silently falls back to articles.json."
       ],
-      "behavior": "Aify News is first-class for governance and public monitoring. Its safe observations always enter the signal stream; primary evidence is required only before the optional legacy editorial report restates a lead as a factual story.",
+      "behavior": "Current runtime still observes the content feed and site-watch entry losslessly. The accepted target makes the homepage Today Picks an explicit trusted_upstream_passthrough: safe upstream items enter ready/editorial-ready unchanged and bypass secondary semantic processing, while the full archive and homepage shell stay outside the new pool. This feature remains implementation-pending until the canonical PC-016 gate passes.",
       "validation": {
         "commands": [
           "corepack pnpm run sources:validate",
@@ -616,8 +619,8 @@
         "The homepage consumes a bounded, schema-validated home.json projection whose edition membership and order come from report_date and report stories, not article event dates.",
         "The shared multi-size favicon is published at docs/favicon.ico and linked relatively from every public surface.",
         "The public article index includes privacy-safe Source Watch records with original-source backrefs while the build receipt remains private and fixed to one report date.",
-        "The current lack of a search/filter renderer is a PR1 migration state, not a target contract; PR3 adds same-page source/content/credibility filtering over the complete signal stream.",
-        "Official-blog curated JSON remains useful structured information; the standalone rendered page survives only until PR3 migrates its information and deletes the obsolete route."
+        "The former PR3 full-stream source/content/credibility search target is superseded by the 2026-07-15 curated-edition contract. The target homepage filters only its current 10–14 items through a hierarchical topic/format rail; /signals keeps source/date/history browsing and progressive loading without full-text search.",
+        "Official-blog curated JSON remains useful structured information; the standalone rendered page survives as current runtime until PR6. PR3 only runs source/raw/funnel shadow work, while PR6 atomically migrates the useful information and retires the obsolete route together with the reader UI, active source configuration and publisher cutover."
       ],
       "stop_conditions": [
         "The report renderer falls back to a hand-written daily template.",
@@ -731,16 +734,20 @@
         "Taste-skill is adopted through the local design-taste-frontend skill with its dashboard and data-table boundary preserved.",
         "Impeccable is adopted as optional external design audit evidence, not as a production runtime or CI network dependency.",
         "Material frontend PRs record design read, visual dials, source/tool evidence, audit or skip reason, and browser acceptance.",
-        "The existing paper/ink and edition-first contracts are verified legacy migration inputs, not the accepted final product. PR3 replaces every public page atomically with scheme C at the canonical 1280x900 viewport and deletes obsolete theme/routes/tests instead of keeping a compatibility stack.",
-        "The accepted homepage is source-first: a 48-hour grouped preview, same-page lazy loading, complete history, and source/content/credibility filters over docs/signals; internal audit and quality scores are not rendered.",
-        "Replacement builds preserve official-blog and historical report JSON assets while retired daily, ops, official-blog HTML, and public-search UI do not return.",
-        "Source Watch headings remain visibly paper-colored on the ink panel at the canonical 1280x900 desktop viewport, with an automated CSS contrast contract preventing black-on-black regressions.",
+        "The accepted target preserves the current warm-paper topbar/rail/two-column card language at the canonical 1280x900 viewport. The older lead/secondary, rough black-and-white and light-gray/white-panel/indigo proposals remain historical evidence, not target authority.",
+        "The accepted homepage is a globally importance-ranked 10–14-item edition with honest 5–9 short and 0–4 delayed behavior. Its hierarchical topic/format rail filters only the current edition, GitHub Top10 stays independent, and internal audit, scores, core/supporting levels and constant credibility pills are not rendered.",
+        "Replacement builds preserve official-blog and historical report JSON assets through a read-only legacy/unverified adapter while retired daily, ops, official-blog HTML and public full-history search do not return. /signals retains source/date/history browsing and progressive loading without full-text search.",
+        "Every historical capability has an explicit route/component/data/asset/test terminal decision of keep, move or retire; no frontend rewrite may infer survival from screenshots or drop an unlisted data path.",
+        "The accepted visual contract keeps the current warm-paper palette, first-viewport ranked content, summary text at least 15px, metadata at least 12px, 14px story cards, 8px controls, 6px rounded source icons and 999px pills, with Aify descriptions fully accessible and unclamped.",
+        "Reader UI, typed components, routes, active source configuration, legacy freeze and publish generation switch land together in PR6; its Phase 3 and Phase 4 checkpoints are test boundaries, not separately mergeable public states.",
+        "The Source Watch paper/ink contrast check remains a pre-cutover runtime regression only; the curated target does not restore a public Source Watch dashboard or its black panel.",
         "The product is desktop-only: mobile, tablet, narrow-screen, touch-only, viewport-meta, and width-breakpoint variants are excluded from implementation, generated artifacts, and acceptance; historical/source evidence and generic third-party compatibility are non-support exceptions.",
         "The page gate rejects retired model/project sections by exact section label or structural selector without blocking legitimate news-card titles that merely mention model releases."
       ],
       "stop_conditions": [
         "Generated or external UI code is committed directly into production paths.",
         "A dense ADC data-product surface is replaced by a landing-page template.",
+        "A frontend PR drops a route, component, data projection, static asset or regression check without a keep/move/retire decision, or splits the PR6 public cutover into incompatible generations.",
         "External design tools become unpinned production or CI dependencies without a migration record."
       ],
       "behavior": "Projectize taste-skill and Impeccable as ADC frontend design-read, audit, and browser-acceptance quality gates.",

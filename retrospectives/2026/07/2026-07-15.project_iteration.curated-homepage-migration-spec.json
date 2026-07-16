@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "id": "2026-07-15.project_iteration.curated-homepage-migration-spec",
+  "run_type": "project_iteration",
+  "date": "2026-07-15",
+  "title": "Curated homepage three-layer migration specification",
+  "slug": "curated-homepage-migration-spec",
+  "status": "completed",
+  "summary": "This documentation iteration records the fully aligned three-layer target across eight product workstreams, the minimum seven-PR delivery plan, final frontend/source semantics, Aify Today Picks trusted-upstream passthrough, phased migration and production-derived acceptance gates without claiming product implementation. It preserves the current warm-paper frontend language while replacing source-group membership with a globally ranked 10–14/5–9/0–4 edition, and retains the landed occurrence system as current-runtime, raw-lineage and immutable legacy evidence.",
+  "evidence": {
+    "summary_path": "tasks/current-task.md",
+    "validation_commands": [
+      "node --test tests/public-signals.test.js",
+      "node --test --test-name-pattern \"(ai daily requirements reconciliation|cross-agent iteration roadmap)\" tests/unit.test.js",
+      "node scripts/validate-feedback-contract.mjs",
+      "node scripts/validate-retrospectives.mjs",
+      "corepack pnpm run validate:docs",
+      "git diff --check"
+    ]
+  },
+  "blockers": [
+    {
+      "code": "harness_hub_linked_worktree",
+      "section": "frontend_tooling",
+      "message": "Harness Hub PR #106 is verified at c88d8a9717a8d5d515413f1a7de1849ba4de31f3, but the required migration rejects this dirty linked worktree. Rerun only in the clean standalone implementation target; do not transplant migration output.",
+      "error_code": "E_LINKED_WORKTREE"
+    }
+  ],
+  "degraded_sections": [],
+  "lessons": [
+    {
+      "lesson": "Collection coverage, persistent signal quality and homepage editorial value require separate membership boundaries.",
+      "evidence": "The 2026-07-15 public production artifacts contain useful source lineage alongside non-content endpoints, test rows, internal instruction copy and specialized records flattened into generic cards.",
+      "scope": "product_data_lifecycle",
+      "persistence": "implemented",
+      "recommended_action": "Use the accepted raw_observation to admitted_signal to edition_item sequence and do not switch routes before each phase exit gate passes."
+    },
+    {
+      "lesson": "A frontend replacement must carry a feature-survival matrix and real production fixtures, not only visual screenshots or example.com cards.",
+      "evidence": "Existing E2E checks prove card count and links but do not assert summary semantics, X identity, GitHub ranking/trend or typed paper/model/benchmark content.",
+      "scope": "frontend_acceptance",
+      "persistence": "implemented",
+      "recommended_action": "Preserve the current warm-paper topbar/rail/two-column language, build the 2026-07-15 production-regression fixture before PR3 / Phase 1A, and bind every replacement phase to PC acceptance IDs."
+    },
+    {
+      "lesson": "Publisher and collector are item-level roles, not a global credibility hierarchy.",
+      "evidence": "Aify, newsletters and digests may publish a substantive article that is itself useful, or may only discover an external material; forcing every card to the underlying news URL would erase valid sources while conflating provenance.",
+      "scope": "source_identity",
+      "persistence": "implemented",
+      "recommended_action": "Show the content publisher/author role and public collector lineage separately, linking each collector only when a safe stable URL exists."
+    },
+    {
+      "lesson": "A high-quality upstream edition must be integrated at its editorial projection boundary, not through a generic full-archive collector.",
+      "evidence": "Aify's current generic search_api path consumes the full articles.json archive, drops native tags and appends community-lead warning text, while the homepage exposes a finished ordered ARTICLES_TODAY payload with usable titles, descriptions, links and taxonomy.",
+      "scope": "trusted_upstream_editorial",
+      "persistence": "implemented",
+      "recommended_action": "Use a dedicated fail-closed Today Picks adapter, preserve the upstream payload and provenance, invoke no secondary semantic processing, and keep edition capacity/dedupe constraints separate from content review."
+    },
+    {
+      "lesson": "A correct data lifecycle can still be an incomplete product plan when the original request spans frontend information architecture, visual design, feature recovery, source assets and operational acceptance.",
+      "evidence": "The first summary reduced 11 user concerns to a data-heavy six-PR outline and omitted explicit owners for visual tokens, the five-layer capability-survival audit and historical source reconciliation.",
+      "scope": "planning_scope_integrity",
+      "persistence": "implemented",
+      "recommended_action": "Keep the eight-workstream coverage map, seven-PR atomic plan and deterministic contract assertions synchronized; phase count must never be used as a substitute for product scope or merge packaging."
+    }
+  ],
+  "suggestions": [],
+  "ledger_links": [
+    "feedback/p1-curated-three-layer-homepage",
+    "feedback/p1-ai-daily-requirements-reconciliation"
+  ],
+  "followups": [
+    {
+      "status": "accepted",
+      "action": "Implement PR3 / Phase 1A as source-asset reconciliation plus raw/funnel shadow in the real scheduled DAG, without changing active Aify configuration or old public generation.",
+      "owner": "project"
+    },
+    {
+      "status": "accepted",
+      "action": "Implement PR4 / Phase 1B as deterministic admission, clean pool, grounded summaries, publisher/collector identity and source-icon shadow while keeping the old publisher non-blocking.",
+      "owner": "project"
+    },
+    {
+      "status": "accepted",
+      "action": "Implement PR5 as edition and GitHub/X/Paper/Model/Benchmark shadow, including the dedicated Aify Today Picks passthrough and PC-016 evidence, without an active source flip.",
+      "owner": "project"
+    },
+    {
+      "status": "accepted",
+      "action": "Land reader UI, routes, typed components, active source configuration, legacy freeze and publisher switch as one atomic PR6 cutover; do not merge its Phase 3/4 checkpoints separately.",
+      "owner": "project"
+    },
+    {
+      "status": "accepted",
+      "action": "Before Phase 3, rerun Harness Hub migration in a clean standalone target and resolve .codex/.agents same-name frontend Skill authority.",
+      "owner": "project"
+    }
+  ]
+}

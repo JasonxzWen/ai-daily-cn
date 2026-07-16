@@ -1218,9 +1218,9 @@ test("repository contract keeps public signal membership lossless and labels non
   assert(feature.acceptance.some((item) => item.includes("must not change membership or default chronology")));
   assert(feature.acceptance.some((item) => item.includes("persistent observation_id")));
   assert(feature.acceptance.some((item) => item.includes("raw_record_count/coalesced_record_count")));
-  assert(feedback, "feedback ledger must own the no-admission public contract");
-  assert.equal(feedback.status, "implemented");
-  assert.equal(feedback.validation.test_name, "repository contract keeps public signal membership lossless and labels non-gating");
+  assert(feedback, "feedback ledger must retain the no-admission runtime history");
+  assert.equal(feedback.status, "closed");
+  assert.match(feedback.expected_behavior, /raw lineage|legacy archive/i);
 
   const legacyScopedFeedbackIds = [
     "feedback/p1-domestic-dynamics-public-visibility",
@@ -1272,6 +1272,357 @@ test("repository contract keeps public signal membership lossless and labels non
   assert(recoveryLedger.includes("safe Aify observations are present in the occurrence store"));
   assert(recoveryLedger.includes("legacy candidate dispositions, persisted edited reports, and the legacy public article index remain diagnostic evidence only"));
   assert(qualityDocument.includes("every safe Aify observation belongs in the public signal projection"));
+});
+
+test("repository contract separates listener evidence from curated public surfaces", async () => {
+  const [
+    feedbackLedger,
+    roadmap,
+    reconciliation,
+    handbook,
+    quickReference,
+    recoveryLedger,
+    targetSpec,
+    sourceExpansion,
+    sourceIntegration,
+    design,
+    featureList,
+    visualSystem,
+    modernization,
+    prototypeDecision,
+    prototypeDesign
+  ] = await Promise.all([
+    readJson("config/feedback-ledger.json"),
+    readText("docs/ai-daily-cross-agent-iteration-roadmap.md"),
+    readText("docs/ai-daily-requirements-reconciliation.md"),
+    readText("docs/source-first-ia-handbook.md"),
+    readText("docs/feedback-buglist-quick-reference.md"),
+    readText("tasks/project-recovery-ledger.md"),
+    readText("docs/ai-daily-curated-homepage-migration-spec.md"),
+    readText("docs/ai-daily-source-expansion-spec.md"),
+    readText("docs/ai-daily-source-integration-plan.md"),
+    readText("DESIGN.md"),
+    readJson("feature_list.json"),
+    readText("design/adc-visual-system.md"),
+    readText("docs/adc-modernization-roadmap.md"),
+    readText("design/prototypes/adc-public-surfaces.decision.md"),
+    readJson("design/prototypes/adc-public-surfaces.design.json")
+  ]);
+  const oldFeedback = feedbackLedger.items.find((item) => item.id === "feedback/p1-lossless-public-signal-stream");
+  const targetFeedback = feedbackLedger.items.find((item) => item.id === "feedback/p1-curated-three-layer-homepage");
+
+  assert(oldFeedback, "the landed lossless contract must remain as historical/runtime evidence");
+  assert.equal(oldFeedback.status, "closed");
+  assert(targetFeedback, "the accepted curated target must have a durable feedback owner");
+  assert.equal(targetFeedback.status, "confirmed");
+  assert.equal(targetFeedback.validation.command, "corepack pnpm run test");
+  assert.equal(targetFeedback.validation.test_name, "repository contract separates listener evidence from curated public surfaces");
+  for (const scopedPath of [
+    "docs/ai-daily-curated-homepage-migration-spec.md",
+    "docs/ai-daily-source-expansion-spec.md",
+    "docs/ai-daily-source-integration-plan.md",
+    "docs/ai-daily-main-stream-generation-repair-spec.md",
+    "docs/ai-daily-story-contract.md",
+    "DESIGN.md",
+    "feature_list.json",
+    "design/adc-visual-system.md",
+    "docs/adc-modernization-roadmap.md",
+    "design/prototypes/adc-public-surfaces.prompt.md",
+    "apps/web/README.md",
+    "packages/design/README.md"
+  ]) {
+    assert(targetFeedback.scope.includes(scopedPath), `target feedback scope must include ${scopedPath}`);
+  }
+
+  assert(targetSpec.includes("curated-edition-contract:v1"));
+  assert(!targetSpec.includes("<!-- curated-edition-contract-ref:v1 -->"));
+  for (const document of [roadmap, reconciliation, handbook, sourceExpansion, sourceIntegration, design, visualSystem, modernization, prototypeDecision]) {
+    assert(document.includes("curated-edition-contract-ref:v1"));
+    assert(!document.includes("<!-- curated-edition-contract:v1 -->"));
+    assert(document.includes("ai-daily-curated-homepage-migration-spec.md"));
+  }
+
+  for (const phrase of [
+    "accepted-target / implementation-pending",
+    "raw_observation",
+    "admitted_signal",
+    "edition_item",
+    "`/signals`",
+    "`/legacy`",
+    "`/editions/?date=YYYY-MM-DD`",
+    "docs/editions/index.html",
+    "static routes load directly and preserve membership boundaries",
+    "10–14",
+    "5–9",
+    "0–4",
+    "supporting",
+    "GitHub Top10",
+    "new | up | down | same",
+    "registered -> fetched -> parsed -> admitted -> displayed",
+    "source_summary",
+    "one_line_summary",
+    "selection_reason",
+    "source_role",
+    "topic_path",
+    "content_format",
+    "aify_today_passthrough_v1",
+    "trusted_editorial",
+    "upstream_snapshot_hash",
+    "summary_origin",
+    "claim → source span",
+    "Asia/Shanghai",
+    "A.D.C.",
+    "`@adc/design`",
+    "E_LINKED_WORKTREE",
+    "repo-safe",
+    "schemas/signal-quarantine.schema.json",
+    ".tmp/ai-daily/quarantine/<run-id>.json",
+    "24 小时",
+    "raw quarantine artifacts are repo-safe and bounded",
+    "historical engineering fixture never backfills the clean pool",
+    "public signal projection requires grounded source summary",
+    "PC-001",
+    "PC-014",
+    "PC-015",
+    "PC-016",
+    "Phase 5 — 七次自然运行后清理"
+  ]) {
+    assert(targetSpec.includes(phrase), `curated target spec must include ${phrase}`);
+  }
+  assert(!targetSpec.includes("精选主编区总计 **12–18"));
+  assert(!targetSpec.includes("X 动态占主编区 **3–5"));
+  assert(!targetSpec.includes("“今日五件事”最多"));
+  assert(!targetSpec.includes("浅灰画布、白色大面板、克制阴影和靛蓝强调"));
+  assert.match(targetSpec, /Aify、Smol AI News、Latent Space[\s\S]+可以直接成为内容发布者\/材料来源/);
+  assert.match(targetSpec, /source_summary[\s\S]+可以原样复用为 `one_line_summary`/);
+  assert.match(targetSpec, /ARTICLES_TODAY[\s\S]+严禁静默回退到 `articles\.json`/);
+  assert.match(targetSpec, /Aify「今日精选」[\s\S]+editor\/critic\/semantic verifier[\s\S]+调用数必须为 0/);
+  const aifyFeature = featureList.features.find((item) => item.id === "aify-news-logical-source");
+  assert(aifyFeature);
+  assert.match(aifyFeature.behavior, /trusted_upstream_passthrough/);
+  assert(aifyFeature.acceptance.some((item) => item.includes("zero secondary summary")));
+  assert(aifyFeature.stop_conditions.some((item) => item.includes("silently falls back to articles.json")));
+  const frontendFeature = featureList.features.find((item) => item.id === "frontend-quality-workflow");
+  assert(frontendFeature.acceptance.some((item) => item.includes("globally importance-ranked 10–14-item edition")));
+  assert(frontendFeature.acceptance.some((item) => item.includes("without full-text search")));
+  assert(visualSystem.includes("`@adc/design` as the sole `--adc-*` token owner"));
+  assert(modernization.includes("historical-replacement-plan / target-superseded"));
+  assert.match(prototypeDesign.evidence.notes, /supersedes that hierarchy/);
+
+  for (const id of Array.from({ length: 7 }, (_, index) => `REQ-${String(index + 15).padStart(3, "0")}`)) {
+    assert(reconciliation.includes(`| ${id} |`), `${id} must be recorded in the active target matrix`);
+  }
+  assert(roadmap.includes("2026-07-15 Current Product Direction"));
+  assert(roadmap.includes("Source assets, raw observation and funnel shadow"));
+  assert(roadmap.includes("Deterministic admission, low-threshold pool and summary shadow"));
+  assert(!reconciliation.includes("Its current authority is PR1 occurrence persistence"));
+  assert(sourceExpansion.includes("Pre-cutover Public Listener Rules（Target Superseded）"));
+  assert(!sourceExpansion.includes("项目默认迭代方向是丰富、开放、可追溯"));
+  assert(quickReference.includes("feedback/p1-curated-three-layer-homepage"));
+  assert.match(quickReference, /closed as the default public target/i);
+  const serializedFeedback = JSON.stringify(feedbackLedger);
+  assert(!serializedFeedback.includes("until PR3"));
+  assert(!/PR3 (?:deletes|removes)/.test(serializedFeedback));
+  assert(!quickReference.includes("scheme-C"));
+  assert(!/PR3 (?:deletes|removes)/.test(quickReference));
+  assert(!quickReference.includes("PR3 deletion"));
+  assert(recoveryLedger.includes("REC-333 - Separate raw listening, the clean signal pool, and the curated edition"));
+  assert(recoveryLedger.includes("State: confirmed; implementation pending"));
+});
+
+test("curated migration plan preserves full product scope and atomic delivery boundaries", async () => {
+  const [
+    targetSpec,
+    roadmap,
+    reconciliation,
+    recoveryLedger,
+    design,
+    visualSystem,
+    appReadme,
+    designReadme,
+    historicalPrototype,
+    sourceOrderReview,
+    legacyMainSpec,
+    legacyStoryContract,
+    sourceExpansionTiming,
+    featureList
+  ] = await Promise.all([
+    readText("docs/ai-daily-curated-homepage-migration-spec.md"),
+    readText("docs/ai-daily-cross-agent-iteration-roadmap.md"),
+    readText("docs/ai-daily-requirements-reconciliation.md"),
+    readText("tasks/project-recovery-ledger.md"),
+    readText("DESIGN.md"),
+    readText("design/adc-visual-system.md"),
+    readText("apps/web/README.md"),
+    readText("packages/design/README.md"),
+    readText("design/prototypes/adc-public-surfaces.prompt.md"),
+    readText("docs/source-order-tuning-review.md"),
+    readText("docs/ai-daily-main-stream-generation-repair-spec.md"),
+    readText("docs/ai-daily-story-contract.md"),
+    readText("docs/ai-daily-source-expansion-spec.md"),
+    readJson("feature_list.json")
+  ]);
+
+  const workstreamSection = targetSpec.slice(
+    targetSpec.indexOf("### 1.1 完整产品工作流与原始 11 点覆盖"),
+    targetSpec.indexOf("\n## 2. 产品范围")
+  );
+  const workstreamRows = workstreamSection
+    .split(/\r?\n/)
+    .filter((line) => line.startsWith("|"))
+    .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()))
+    .filter((cells) => cells.length === 4 && cells[0] !== "工作流" && !cells[0].startsWith("---"));
+  assert.deepEqual(workstreamRows.map((row) => row[0]), [
+    "编辑产品模型",
+    "信源资产与效果",
+    "专项采集与语义",
+    "前端信息架构",
+    "视觉系统",
+    "历史能力存续",
+    "发布与迁移",
+    "质量与真实验收"
+  ]);
+  const coveredOriginalConcerns = new Set();
+  for (const [, coverage] of workstreamRows) {
+    if (coverage === "全部") {
+      for (let id = 1; id <= 11; id += 1) coveredOriginalConcerns.add(id);
+      continue;
+    }
+    for (const match of coverage.matchAll(/\d+/g)) coveredOriginalConcerns.add(Number(match[0]));
+  }
+  assert.deepEqual([...coveredOriginalConcerns].sort((left, right) => left - right), Array.from({ length: 11 }, (_, index) => index + 1));
+
+  const prSection = targetSpec.slice(
+    targetSpec.indexOf("### 13.2 七个最小合并与回滚域"),
+    targetSpec.indexOf("### 13.3 为什么不能再少或再碎")
+  );
+  const prRows = prSection
+    .split(/\r?\n/)
+    .filter((line) => /^\| \*\*PR[1-7]\b/.test(line));
+  const prIds = prRows.map((line) => Number(line.match(/^\| \*\*PR([1-7])\b/)[1]));
+  assert.deepEqual(prIds, [1, 2, 3, 4, 5, 6, 7]);
+  const pr3Row = prRows.find((line) => line.startsWith("| **PR3 "));
+  const pr6Row = prRows.find((line) => line.startsWith("| **PR6 "));
+  assert(pr3Row.includes("旧公开 generation 不变"));
+  assert(pr3Row.includes("禁止 admission/edition/frontend/site/build/publish、active Aify config 与公开 route"));
+  assert(!pr3Row.includes("唯一一次公开行为切换"));
+  assert(!pr3Row.includes("翻转"));
+  assert(pr6Row.includes("唯一一次公开行为切换"));
+  assert(pr6Row.includes("active Aify"));
+  assert(pr6Row.includes("legacy manifest"));
+  assert.equal(prRows.filter((line) => line.includes("唯一一次公开行为切换")).length, 1);
+
+  for (const phrase of [
+    "八条同时交付、分别验收的产品工作流",
+    "route/component/data/asset/test 五层",
+    "八条工作流是范围视图，Phase 0–5 是依赖视图，PR1–PR7 是合并与回滚视图",
+    "### 8.3 信源资产对账与证据边界",
+    "Phase 1A — 信源资产、Raw 与 Funnel shadow（PR3）",
+    "Phase 1B — 低门槛池、摘要与来源身份 shadow（PR4）",
+    "Phase 3 — Reader-intent React 前端（PR6 内部检查点，不单独合入）",
+    "保持 `config/sources/aify-news.json`",
+    "PR3–PR5 的 shadow 路径必须进入真实定时 DAG",
+    "tests/curated-pipeline.test.js",
+    "`apps/web/README.md` 与 `packages/design/README.md` 的 current/target 边界 banner",
+    "source asset reconciliation preserves explicit terminal decisions",
+    "**PR7 七次自然运行后清理**"
+  ]) {
+    assert(targetSpec.includes(phrase), `full-scope migration contract must retain ${phrase}`);
+  }
+
+  for (const phrase of [
+    "### Active Merge Packaging",
+    "| PR3 | Source asset audit plus raw/funnel shadow in the scheduled DAG | unchanged |",
+    "| PR6 | Reader UI, visual/token/icon work, historical capability recovery, routes, runner/publish, active source flip and legacy freeze | one atomic cutover |",
+    "PR3–PR5 must prove the old public generation is unchanged",
+    "PR6 cannot be split"
+  ]) {
+    assert(roadmap.includes(phrase), `roadmap must retain ${phrase}`);
+  }
+
+  const historicalSourceIds = [
+    "content-ai-news-buttondown",
+    "content-hn-frontpage",
+    "content-papers-with-code-api",
+    "content-themagnifier-ai",
+    "content-crunchbase-news-ai",
+    "platform-wechat-ai-feed",
+    "wechat-industry-whitelist-manual",
+    "wechat-rsshub-newrank-template",
+    "wechat-wechat2rss-feed",
+    "content-adobe-ai-blog",
+    "content-fastcompany-creator-economy",
+    "content-reddit-machinelearning",
+    "community-reddit-artificial",
+    "community-reddit-localllama",
+    "community-reddit-machinelearning",
+    "community-reddit-singularity",
+    "content-bens-bites",
+    "content-hellogithub",
+    "content-ruanyf-weekly",
+    "platform-jike-rsshub-ai-topic",
+    "platform-zhihu-ai-feed",
+    "platform-zhihu-rsshub-hotlist",
+    "platform-reddit-local-llama-feed",
+    "content-rctv-generative-video"
+  ];
+  for (const sourceId of historicalSourceIds) {
+    assert(recoveryLedger.includes(`\`${sourceId}\``), `REC-315 must terminalize ${sourceId}`);
+  }
+  assert.match(targetSpec, /得到 \*\*186\*\* 个配置项，其中 `rss=110`、`html_index=54`、`search_api=7`/);
+  assert.match(targetSpec, /REC-316 的 24 个 promotion proposal 必须保留 9 promote \/ 12 defer \/ 3 retire/);
+  assert(targetSpec.includes("unknown / unavailable_evidence"));
+  const promotionSection = sourceOrderReview.slice(
+    sourceOrderReview.indexOf("## Promotion Candidate Review"),
+    sourceOrderReview.indexOf("### User-directed promotion after the original 24-source review")
+  );
+  const promotionRows = promotionSection
+    .split(/\r?\n/)
+    .filter((line) => /^\| `[^`]+` \|/.test(line));
+  const promotionActions = promotionRows.map((line) => line.match(/\| `(promoted|defer|retire)` \|/)[1]);
+  assert.equal(promotionRows.length, 24);
+  assert.deepEqual(
+    promotionActions.reduce((counts, action) => ({ ...counts, [action]: counts[action] + 1 }), { promoted: 0, defer: 0, retire: 0 }),
+    { promoted: 9, defer: 12, retire: 3 }
+  );
+  assert(recoveryLedger.includes("S-84"));
+  assert(reconciliation.includes("eight product workstreams"));
+  assert(reconciliation.includes("PR1–PR7 is the merge/rollback view"));
+  assert(reconciliation.includes("PR3–PR5 run their shadow stages in the real scheduled DAG"));
+
+  for (const phrase of [
+    "metadata_font_size_min: 12px",
+    "story_card: 14px",
+    "control: 8px",
+    "source_icon: 6px",
+    "pill: 999px",
+    "source_icon_border_radius: 6px"
+  ]) {
+    assert(design.includes(phrase), `design contract must retain ${phrase}`);
+  }
+  assert(visualSystem.includes("Story summaries render at no less than 15px and metadata at no less than 12px"));
+  assert(visualSystem.includes("Aify descriptions remain fully accessible without an irreversible line clamp"));
+  assert(appReadme.includes("Current runtime boundary"));
+  assert(designReadme.includes("Transition boundary"));
+  assert(historicalPrototype.includes("Historical evidence only — target superseded"));
+  for (const historicalContract of [legacyMainSpec, legacyStoryContract]) {
+    assert(historicalContract.includes("ai-daily-curated-homepage-migration-spec.md"));
+    assert(historicalContract.includes("保留到 PR6 原子切换"));
+    assert(historicalContract.includes("PR3 只运行 source/raw/funnel shadow"));
+    assert(!historicalContract.includes("PR3 将删除"));
+  }
+  assert(sourceExpansionTiming.includes("当前权威计划保留该运行面到 PR6 原子切换"));
+  assert(sourceExpansionTiming.includes("PR3 只运行 source/raw/funnel shadow"));
+  assert(!sourceExpansionTiming.includes("PR3 删除旧单日报公开页面"));
+
+  const aifyFeature = featureList.features.find((item) => item.id === "aify-news-logical-source");
+  const frontendFeature = featureList.features.find((item) => item.id === "frontend-quality-workflow");
+  const staticBuildFeature = featureList.features.find((item) => item.id === "static-html-build");
+  assert(aifyFeature.acceptance.some((item) => item.includes("active source flip occurs only inside the atomic PR6 cutover")));
+  assert(frontendFeature.acceptance.some((item) => item.includes("route/component/data/asset/test terminal decision")));
+  assert(frontendFeature.acceptance.some((item) => item.includes("land together in PR6")));
+  assert(staticBuildFeature.acceptance.some((item) => item.includes("standalone rendered page survives as current runtime until PR6")));
+  assert(!staticBuildFeature.acceptance.some((item) => item.includes("PR3 migrates its information")));
 });
 
 test("site build writes and plans every signal page while safely removing stale managed pages", async () => {

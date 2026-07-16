@@ -1,12 +1,16 @@
 # ADC public surfaces recovery
 
+<!-- curated-edition-contract-ref:v1 -->
+
+> Historical accepted evidence only. The 2026-07-15 target in [`docs/ai-daily-curated-homepage-migration-spec.md`](../../docs/ai-daily-curated-homepage-migration-spec.md) supersedes the lead + three-secondary layout and large character emphasis. Preserve the current warm-paper visual language, but use a globally ranked two-column edition, hierarchical current-edition rail and `A.D.C.`-only masthead.
+
 ## Accepted
 
 - Keep the React/Astryx homepage and the effective-interact report renderer.
 - Establish one repository-owned ADC token and public-surface skin shared by React and static output.
 - Make status badges monochrome and communicate state with text and shape.
 - Add keyboard-focus, loading, and error acceptance to the real React surface at the canonical `1280x900` desktop viewport.
-- Organize the homepage by report edition and editorial story order: one lead, three secondary stories, then compact rows; event dates remain metadata instead of deciding edition membership.
+- Historical decision: organize that prototype as one lead, three secondary stories, then compact rows. This hierarchy is target-superseded and must not be restored; only its edition/date semantics remain useful evidence.
 - Bootstrap the homepage from a bounded `home.json` reader projection while retaining `articles.json` as an optional public data artifact.
 - Keep Source Watch after the edition content and omit internal quality scores from reader-facing cards.
 

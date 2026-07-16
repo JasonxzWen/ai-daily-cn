@@ -225,20 +225,34 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Fact evidence: 189 source IDs existed across reachable refs and snapshots; 165 remain; 24 are absent from the current registry.
 - State: discovered, with the per-source terminal decisions below treated as authoritative until new evidence changes them.
 
-| Decision | Historical source | Current disposition |
+| Historical source ID | Terminal decision | Replacement / durable reason |
 | --- | --- | --- |
-| replaced | content-ai-news-buttondown | content-smol-ai-news |
-| replaced | content-hn-frontpage | community-hn-frontpage-100 and community-hn-ai-newest |
-| replaced | content-papers-with-code-api | Hugging Face Daily Papers API |
-| replaced | content-themagnifier-ai / content-crunchbase-news-ai | corrected current Magnifier and Crunchbase IDs |
-| replaced | generic wechat-wechat2rss-feed and old WeChat platform inputs | 12 curated public Wechat2RSS feeds plus date-scoped input |
-| retired-broken | Adobe AI blog, FastCompany creator economy, Reddit MachineLearning, four community Reddit feeds | repeated 404/403/blocked evidence |
-| historical-default-removal | Bens Bites, HelloGitHub, RuanYF Weekly | removed from an earlier edited-report default; breadth/noise is now expressed by source/content/credibility tags and is not a categorical listener ban |
-| historical-retirement | Earlier default-only Zhihu/Jike/RSSHub collectors | no longer governed by a categorical source-reset ban; any future public/legal collector enters as a tagged listener source and is judged only by transport/safety validity |
-| deferred-collector | platform-reddit-local-llama-feed | the old authenticated/platform-specific collector remains absent, but a public/legal feed may re-enter as a tagged listener without a trust/noise admission review |
-| investigate-then-decide | content-rctv-generative-video | existed only in snapshot d63ebd8 and never landed on main |
+| `content-ai-news-buttondown` | replace | `content-smol-ai-news` |
+| `content-hn-frontpage` | replace | `community-hn-frontpage-100` and `community-hn-ai-newest` |
+| `content-papers-with-code-api` | replace | `content-huggingface-daily-papers` |
+| `content-themagnifier-ai` | replace | corrected ID `content-the-magnifier-ai` |
+| `content-crunchbase-news-ai` | replace | corrected ID `content-crunchbase-ai-news` |
+| `platform-wechat-ai-feed` | replace | 12 curated public Wechat2RSS feeds plus the date-scoped input |
+| `wechat-industry-whitelist-manual` | replace | same curated Wechat2RSS/date-scoped input family |
+| `wechat-rsshub-newrank-template` | replace | same curated Wechat2RSS/date-scoped input family |
+| `wechat-wechat2rss-feed` | replace | same curated Wechat2RSS/date-scoped input family |
+| `content-adobe-ai-blog` | retire | historical broken endpoint evidence |
+| `content-fastcompany-creator-economy` | retire | historical broken endpoint evidence |
+| `content-reddit-machinelearning` | retire | historical blocked endpoint evidence |
+| `community-reddit-artificial` | retire | historical blocked endpoint evidence |
+| `community-reddit-localllama` | retire | historical blocked endpoint evidence |
+| `community-reddit-machinelearning` | retire | historical blocked endpoint evidence |
+| `community-reddit-singularity` | retire | historical blocked endpoint evidence |
+| `content-bens-bites` | retire | removed from the earlier edited-report default; no automatic restoration |
+| `content-hellogithub` | retire | removed from the earlier edited-report default; no automatic restoration |
+| `content-ruanyf-weekly` | retire | removed from the earlier edited-report default; no automatic restoration |
+| `platform-jike-rsshub-ai-topic` | retire | old default-only platform collector; future legal collector needs a new explicit decision |
+| `platform-zhihu-ai-feed` | retire | old default-only platform collector; future legal collector needs a new explicit decision |
+| `platform-zhihu-rsshub-hotlist` | retire | old default-only platform collector; future legal collector needs a new explicit decision |
+| `platform-reddit-local-llama-feed` | defer | wait for a reliable public/legal endpoint; do not silently revive authenticated collector assumptions |
+| `content-rctv-generative-video` | investigate | existed only in snapshot `d63ebd8` and never landed on main |
 
-- Acceptance: registry/docs preserve replace/retire/investigate state so later sessions do not blindly restore removed IDs.
+- Acceptance: all 24 IDs have one explicit row; registry/docs preserve replace/retire/defer/investigate state so later sessions do not blindly restore removed IDs. These are missing historical collection IDs, not the separate 24 logical-source promotion proposals in REC-316.
 
 ### REC-316 - Decide 24 unexecuted logical-source promotion proposals
 
@@ -301,9 +315,9 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Type: product decision conflict.
 - Fact evidence: README still promises a searchable archive; commit 3172371 implemented search, domain/channel/source/min-score filters and full history. The modernization roadmap later declared search/comparison/favorites non-goals. Current React shows today/yesterday/history and truncates history with `slice(0, 60)`; the legacy search renderer remains unreachable because Vite overwrites the page.
 - Historical action: D1 selected deliberate no-search and removed an unreachable Vite-overwritten static renderer. That deletion remains correct; the dead renderer must not return.
-- State: implementing under the 2026-07-14 scheme-C decision.
-- Current action: PR3 adds same-page reader filtering/search over source groups, content tags, credibility tags, and complete lazy-loaded history. `discover:search-news` remains a separate internal collection capability.
-- Acceptance: one reachable React surface filters the complete occurrence dataset without changing its default membership or chronology; no parallel legacy renderer, truncated history, mobile variant, or hidden search implementation remains.
+- State: superseded by REC-333 final target; implementation pending.
+- Current action: do not build full-history search in this migration. The homepage hierarchical rail filters only its current 10–14-item edition and preserves rank; `/signals` retains source/date/topic/format browsing plus progressive history loading. `discover:search-news` remains a separate internal collection capability.
+- Acceptance: no legacy/parallel search renderer or “search loaded six items” control returns; current-edition rail state is shareable, and `/signals` browsing does not claim cross-shard full-text search.
 
 ### REC-323 - Finish admission/scoring as one production Slice
 
@@ -348,14 +362,14 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 
 ### REC-328 - Make the public product a lossless source-first signal listener
 
-- Type: current product-direction replacement.
+- Type: implemented runtime baseline / target superseded by REC-333.
 - Historical phase: this stable REC originally recorded the 2026-06-30 rollback from machine-log source dashboards to a story-first public page. That rollback remains valid evidence against exposing raw audit panels, but its story-first conclusion was explicitly superseded by the user's 2026-07-14 reader-safe source-listener decision.
 - Fact evidence: the 2026-06-30 source-first attempt failed because it exposed machine audit inventory, not because readers should see only selected stories. The user clarified on 2026-07-14 that richness and monitoring coverage are the product: official, GitHub, community, X, news/newsletter, paper/model, and unknown signals should remain discoverable with content and credibility labels instead of qualification gates.
 - Root cause: the repository conflated three different layers—raw observations, internal source operations, and an edited story summary—then let story quotas, authority, verification, dedupe, quality gates, and source-runtime diagnostics decide the public member set.
-- State: implementing through PR1/PR2/PR3.
-- Current action: PR1 assigns observed `observation_id` before selection, preserves publisher/time/group/content metadata through discovery merge, persists merged observations with transparent repeated-row counts, uses open metadata plus visible fallbacks, publishes paginated reader-safe signal data, and retains historical structured records with explicit origin. PR2 expands public/legal inputs and makes signal publication independent from legacy editorial blocking. PR3 migrates every public page to scheme C and deletes obsolete rendered pages and compatibility paths while preserving useful structured information.
-- Acceptance: no content-admission gate; labels and filters never change membership/default chronology; same-URL observations from distinct collectors or observation IDs remain distinct; repeated input rows for one observation are counted instead of acquiring order-dependent IDs; unknown values fall back; raw audit/private/editorial fields stay internal; the public page groups by source attributes and supports complete history beyond its 48-hour preview.
-- Guardrail: do not restore a machine audit dashboard, but do not use that ban to hide reader-safe source, content, credibility, health, access, or attribution metadata. Do not reintroduce story-first, qualified/capped, authority-ranked, or report-quality-dependent public membership.
+- State: `implemented-runtime / target-superseded by REC-333` on 2026-07-15.
+- Implemented-runtime evidence: PR1 assigns observed `observation_id` before selection, preserves publisher/time/group/content metadata through discovery merge, persists merged observations with transparent repeated-row counts, uses open metadata plus visible fallbacks, publishes paginated reader-safe signal data, and retains historical structured records with explicit origin. PR2 expanded public/legal inputs and made signal publication independent from legacy editorial blocking. PR3 migrated the public page to scheme C and removed obsolete rendered pages and compatibility paths while preserving useful structured information.
+- Acceptance boundary: before the REC-333 cutover, the current occurrence stream still has no content-admission gate; labels and filters do not change its membership/default chronology; same-URL observations from distinct collectors or observation IDs remain distinct; repeated input rows for one observation are counted; unknown values fall back; and raw audit/private/editorial fields stay internal. After cutover, these rules protect internal repo-safe raw lineage and the immutable `/legacy` archive only. They do not govern membership, dedupe, budgets, ordering or IA in the new `/signals` admitted pool or curated edition.
+- Guardrail: do not restore a machine audit dashboard or lose reader-safe source identity, attribution, privacy, stable observation identity or exact legacy history. The former bans on qualified/capped membership, canonical/event dedupe and editorial selection are explicitly limited to the pre-cutover runtime occurrence projection; REC-333 owns the post-cutover pool and homepage.
 
 ### REC-329 - Preserve explicit retirement of superseded frontend directions
 
@@ -363,7 +377,7 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Fact evidence: PromptLayer, dark/glass, old shadcn/no-daily-HTML directions, empty workspace packages, unused Astryx CLI, and dead daily-theme were replaced or unused. Astryx runtime components remain genuinely used.
 - State: locally_verified.
 - Current-Slice action: dead theme, unused CLI dependency, and three empty packages were removed; ADC shared visual contract replaced duplicate dated rollout behavior.
-- Guardrail: do not restore the deleted legacy search renderer. Implement the user-approved scheme-C filtering/search once in the current React occurrence surface, with complete lazy-loaded history and no compatibility UI stack.
+- Guardrail: do not restore the deleted legacy search renderer, scheme-C visual proposal or source-group homepage. Preserve the current warm-paper visual language; implement only current-edition rail filtering and `/signals` source/date/history browsing, with no compatibility UI stack.
 
 ### REC-330 - Retire mobile and narrow-screen support
 
@@ -396,12 +410,27 @@ This is the single durable issue ledger for the ai-daily-cn recovery program. Do
 - Acceptance: three consecutive merged-main runs show Top10 language on every API/HTML-supported repository, same-scope trend math only, non-unknown README SHA for every successful README, truthful miss/hit semantics, failed README items retaining rank/star/trend/error without invented descriptions, and GitHub first-pass prose passing the existing quality gates.
 - Recurrence prevention: feature inventory and deterministic fixtures bind scope, source rank, repository language, cache key/hit/SHA, candidate schema, report, render, and interaction behavior.
 
+### REC-333 - Separate raw listening, the clean signal pool, and the curated edition
+
+- Type: accepted product-direction replacement / content-quality recovery.
+- Fact evidence: the 2026-07-15 public index contains 27,038 records and 2,790 recent records, but the default surface also exposes non-content endpoints such as Pika email protection, Aify `TEST*` rows, internal AI/audit wording, anonymous or indirect X search results, repeated benchmark rows and generic cards that drop GitHub/X/Paper/Model-specific fields. Two Anthropic harness-engineering articles deep in historical official-blog pages prove the prior IA lost valuable engineering-practice semantics; they are regression fixtures, not authorization to backfill old content into the new pool.
+- Root cause: REC-328 correctly separated raw machine diagnostics from reader-safe cards, but then promoted collection completeness into public membership and homepage value. The runtime preserves observations well; it has no second low-threshold material gate, no high-threshold edition boundary, and no specialized public DTOs. Aify exposes the source-specific failure sharply: runtime reads the 4,501-row `articles.json` archive through generic `search_api/community_lead`, loses its native tags, appends primary-source warning text, and misses the homepage's finished ordered Today Picks payload.
+- State: confirmed; implementation pending.
+- Additional asset evidence: the 2026-07-15 registry snapshot has 186 collection entries (66 official-blog, 39 news/newsletter, 36 GitHub, 25 paper/model, 19 community and 1 X source group); 123/186 still use the broad `community_lead` candidate category. This is configuration breadth, not effectiveness. The current six-handle X config is tag-only prioritization, not active per-account monitoring. REC-315 preserves 24 missing historical collection IDs and REC-316 separately preserves 24 promotion proposals. New Today Picks/admitted/displayed evidence remains `unknown` until the new funnel runs.
+- Interaction-history evidence boundary: a repo-scoped 90-day trace audit could directly recover the explicit user URLs for Aify News, Wechat2RSS repository/subscription terms, Harness Hub and the negative Pika email-protection example. Harness Hub is tooling rather than a news source; Pika is a rejection fixture. Missing, sampled or non-repo-attributable conversations remain `unknown`, so this ledger does not claim that every historical user link has been recovered.
+- Decision: [AI Daily 精选首页三层迁移规格](../docs/ai-daily-curated-homepage-migration-spec.md) is the behavior and acceptance authority. The target is internal repo-safe `raw_observation` → deterministic low-threshold `admitted_signal` → high-threshold `edition_item`; `/` is a globally ranked comprehensive-AI edition, `/signals` is a clean post-cutover browsable pool without full-text search, and exact pre-cutover occurrences plus read-only `legacy/unverified` dated reports live under `/legacy`. Complete scope has eight product workstreams: editorial model, source assets/effectiveness, specialized semantics, frontend IA, visual system, feature survival, release migration and real acceptance.
+- Migration order and merge packaging: Phase 0–5 remain dependency checkpoints, while seven non-stacked PRs own rollback domains: specification; legal Harness migration; source/raw/funnel shadow; admission/pool/summary shadow; edition/specialized DTO shadow; one atomic Reader UI + source/config + route/publish/legacy cutover; cleanup after seven successful natural runs. Phase 3 and 4 may be separate checkpoints inside PR6 but may not merge separately because main participates immediately in the scheduled Web build.
+- Feature survival: keep the current warm-paper topbar/rail/two-column card style, collectors, source registry, observation lineage, GitHub enrichment, X identity fields, tracking data, link-icon cache and React/Astryx; move them behind pool/edition DTOs; make `@adc/design` the sole token owner; retire the one-size-fits-all card, old slogan/inventory hero, Today Five/old lead hierarchy, raw source-group homepage IA, summary-from-internal-evidence fallback, full-history search in this phase and any parallel legacy renderer. The owner matrix now covers route, component, data, asset and test layers rather than only high-level capability names.
+- Acceptance: Phase 0 proves only the accepted durable contract. Product acceptance requires PC-001 through PC-016, including production-derived Pika/Aify/X/GitHub/benchmark fixtures, publisher/editorial-source/collector role separation, ordinary claim-span summaries, Aify Today Picks ordered-payload passthrough with zero secondary semantic calls and no archive fallback, 10–14/5–9/0–4 edition behavior, fixed daily GitHub Top10, code-owned X whitelist, typed papers/models, aggregated benchmark change, lane terminalization, Asia/Shanghai revision history, exact legacy manifest and `1280x900` browser evidence.
+- Guardrail: do not rewrite or delete pre-cutover observations, do not let LLM decide low-threshold membership, and do not confuse internal artifacts with secret storage. Repository history may contain only repo-safe observation metadata; unclean material/quarantine is ignored and deleted within 24 hours, while credentials, signed/private URLs and secret text never persist. Do not claim a registered source is effective without `registered → fetched → parsed → admitted → displayed` evidence, and do not claim this REC implemented before the production cutover gates pass.
+
 ## Confirmed Surviving Value
 
-- Product/content: source-grouped public occurrences, concise safe summaries, direct links, publisher/collector attribution, content tags, credibility tags, and complete chronological history are the active target. The prior four-track story layout remains only until PR3 removes the legacy surface.
-- Visual: scheme C is the accepted target—light-gray canvas, white large rounded panels, restrained shadows, indigo accent, and a 1→2→3 density rhythm at the sole supported `1280x900` viewport. The prior black/white paper-and-ink system is migration input, not surviving public authority.
-- Source capability: GitHub Trending, Hugging Face Trending, central follow-builders X, HNRSS, 12 curated Wechat2RSS feeds, seven general-news sources, Smol AI News, Hugging Face Daily Papers, and corrected Magnifier/Crunchbase entries remain effective or correctly replaced.
-- Governance: raw source diagnostics remain internal, while reader-safe source-first cards are public. Useful official-blog/source JSON and typed production context survive; obsolete rendered official-blog/daily/archive/ops pages do not. Public knowledge_refs/backlinks remain explicitly open under REC-302.
+- Product/content: raw observation lineage, direct links, publisher/collector attribution and source coverage survive as inputs. The active accepted target is a grounded reader-intent edition plus a clean low-threshold `/signals` pool; the existing source-grouped occurrence stream survives only as current runtime and the future immutable `/legacy` archive.
+- Visual: the current warm-paper background, serif/sans hierarchy, thin rules, restrained orange/green accents, rounded cards, topbar/rail and two-column rhythm are the accepted target at `1280x900`. The older lead/secondary layout, black-heavy draft and light-gray/white-panel/indigo proposal are not surviving authorities; the target changes information and IA without replacing the current visual language.
+- Source capability: GitHub Trending/README/history, Hugging Face, central follow-builders parsing, project X handle config, HNRSS, curated Wechat2RSS feeds, general news, Aify/Smol AI News, Daily Papers and corrected source entries remain reusable. Aify homepage Today Picks becomes a dedicated highest-priority trusted editorial lane: all structurally safe upstream items enter the ready pool/prequalified set with title/description/link/tags preserved, while the full archive and homepage shell remain outside. Aify may separately be a direct publisher or collector; effectiveness must be re-proved through the new registered-to-displayed funnel.
+- Frontend tooling: Harness Hub PR #106 is merged at `c88d8a…`, but the required migration correctly failed with `E_LINKED_WORKTREE` in this dirty linked worktree. Do not transplant output; rerun in the clean standalone implementation target and resolve `.codex`/`.agents` same-name Skill authority before Phase 3.
+- Governance: raw source diagnostics, admission receipts, rubric and selection reasons remain internal. Public pool/edition cards expose only reader-safe content and attribution. Useful official-blog/source JSON and typed production context survive; obsolete rendered official-blog/daily/archive/ops pages do not. Public knowledge_refs/backlinks remain explicitly open under REC-302.
 - Deferred ideas: long-term topic/capability maps and evidence-driven financing remain recorded instead of being silently forgotten.
 
 ## This-Session Issue and Action Register
@@ -493,6 +522,7 @@ This table is part of the same ledger, not a second review. `fixed` means implem
 | S-81 | GitHub Trending exposed ranking scope as repository language, compared ranks across incompatible scopes/surfaces, and labelled first network README fetches as cache hits with unknown SHA | added `repository_language` without changing scope selection, keyed history by repo + source_scope and positive source_rank only, and made README cache keys content-SHA based with fail-closed miss/hit semantics | merged through PR #300 and locally_verified under REC-332; 905/903/0/2 final validation passes, fresh merged-main runs pending |
 | S-82 | GitHub Trending source effectiveness counted 50 canonical repositories as 70 candidates and 20 final included repositories as 30 because original/derived/project surfaces were added as raw rows | centralized canonical repo identity, deduped candidate facts, made final report sections own legacy inclusion only, and reused the counter for source audit without governing docs/signals membership | merged through PR #301 and locally_verified under REC-314; focused 14/14, real 50/20 replay and final 907/905/0/2 validation pass; fresh production proof pending |
 | S-83 | the 2026-07-14 non-publish run produced 32 candidates with four configured `source_level` values rejected by candidate/report schemas; registry validation ignored snake_case and let camelCase unknowns bypass the first fix, while three invalid candidates had already entered `community_leads`. Moving validation earlier also exposed three runtime story-audit fields missing from schema and eight legacy editorial aliases | historically added a strict synchronized registry/candidate/report vocabulary and producer validation; the later public-signal contract supersedes the closed classification behavior with open raw metadata and explicit public fallbacks, while retaining the replay as evidence for the optional legacy editorial artifact | historical fix locally verified under REC-401/REC-311; current public occurrences are no longer governed by vocabulary membership or editorial admission; exact 336-candidate SHA-bound replay remains provenance evidence |
+| S-84 | the first curated-homepage summary compressed the user's 11-point, multi-type request into a data-pipeline plan and six PRs, obscuring visual design, feature recovery, source-asset reconciliation and real frontend acceptance; several historical contracts also kept the superseded PR3/scheme-C route timing | restored eight explicit product workstreams, a route/component/data/asset/test survival matrix, a measurable visual contract, source-history evidence boundaries and the minimum seven-PR atomic delivery plan; normalized stale timing to PR3 shadow-only / PR6 atomic cutover and added structured repository assertions that fail when workstream, PR, source-history or cutover owners disappear | fixed at the planning-contract layer; product behavior remains implementation-pending under REC-333 |
 
 ## Production Acceptance
 

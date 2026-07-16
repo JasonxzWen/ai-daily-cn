@@ -470,7 +470,7 @@
       "status": "implemented",
       "title": "Keep X/Twitter discussion cards compact",
       "problem": "Builder and X/Twitter discussion cards could leave excessive whitespace, translate or paraphrase original posts into generic commentary, or expose internal source-bucket labels.",
-      "expected_behavior": "Public Builder/X signal cards keep author, handle, date, source link, and original post text when available; a concise reader-safe summary and source/content/credibility tags may accompany it. Do not replace the post with generic filler or expose internal fields. The old no-tag compact-card rule applies only to the legacy edited report until PR3 removes that surface.",
+      "expected_behavior": "The pre-cutover runtime keeps author, handle, date, source link, and original post text when available without exposing internal fields. The accepted target replaces generic Builder cards with the typed X contract in the atomic PR6 cutover; the old no-tag compact-card rule remains legacy-only until then. PR3 performs source/raw/funnel shadow work and does not remove a public surface.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -797,7 +797,7 @@
       "status": "implemented",
       "title": "Publish Chinese media dynamics",
       "problem": "Machine Heart, QbitAI, and SSPAI updates could be absent or reduced to a tiny slot, even when users wanted all in-window Chinese media dynamics summarized.",
-      "expected_behavior": "QbitAI and SSPAI use direct RSS and Machine Heart uses a non-RSS HTML/API-style entry; every safe in-window observation enters the source-grouped public signal stream with source status labels. The independent Chinese-media section and roughly 200-character summaries apply only to the optional legacy rendered report and are scheduled for removal with that renderer in PR3.",
+      "expected_behavior": "QbitAI and SSPAI use direct RSS and Machine Heart uses a non-RSS HTML/API-style entry; every safe in-window observation remains in the pre-cutover source-grouped runtime. The independent Chinese-media section and roughly 200-character summaries apply only to the optional legacy rendered report, which remains current runtime until the atomic PR6 cutover. PR3 performs shadow source work only.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -821,7 +821,7 @@
       "status": "implemented",
       "title": "Separate official organization updates",
       "problem": "Official lab/company/product updates could be mixed into Builder/X discussion, making official organization signals hard to scan.",
-      "expected_behavior": "Official organization observations enter the public official_blogs source group and remain distinct from personal X observations through source metadata. The old dedicated official-updates section applies only to the optional legacy rendered report and is scheduled for removal with that renderer in PR3.",
+      "expected_behavior": "Official organization observations enter the pre-cutover public official_blogs source group and remain distinct from personal X observations through source metadata. The old dedicated official-updates section applies only to the optional legacy rendered report and remains current runtime until its information is migrated and its route retired atomically in PR6; PR3 does not change public routes.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -891,7 +891,7 @@
       "status": "closed",
       "title": "Superseded must-read hero requirement",
       "problem": "The former three-card must-read contract is no longer the public daily target and would now force an obsolete first-screen layout.",
-      "expected_behavior": "Historical and closed: the 2026-06-23 hero contract was superseded again on 2026-07-14. PR3 deletes the obsolete single-report public surface and its hero/story compatibility shape; the replacement is the complete source-grouped scheme-C signal page.",
+      "expected_behavior": "Historical and closed: the 2026-06-23 hero contract and the 2026-07-14 source-group replacement plan are both superseded by the 2026-07-15 curated-edition target. The obsolete hero/report route remains current runtime until the atomic PR6 cutover, which replaces it with the globally ranked warm-paper edition; PR3 does not change public routes.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -914,7 +914,7 @@
       "status": "implemented",
       "title": "Keep public reader sections concrete and dense",
       "problem": "Public AI daily pages could duplicate the main stream with a `完整列表`, leave main details collapsed, show GitHub Trending rows with generic ranking/README boilerplate, render blank or broken X/Twitter cards when optional fields were missing, and reduce community leads to one-line blurbs.",
-      "expected_behavior": "This remains a legacy edited-report rendering contract until PR3 deletes that surface. The replacement public IA is source-first: GitHub, X, community, official, news/newsletter, paper/model, and fallback occurrence cards use safe title/body fallbacks and concrete source-grounded summaries without internal review notes or machine audit fields.",
+      "expected_behavior": "This remains a legacy edited-report rendering contract until the atomic PR6 cutover. The accepted replacement is a globally ranked curated edition plus typed GitHub/X/Paper/Model/Benchmark semantics and a separate clean /signals pool, all without internal review notes or machine audit fields. PR3 performs shadow source work only.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -963,7 +963,7 @@
       "status": "implemented",
       "title": "Keep production daily HTML on effective-interact",
       "problem": "A remediation attempted to remove public-page garbage by replacing the production daily report renderer with a bespoke public template that carried fake `data-html-work-report` and `data-render-mode` markers, losing effective-interact components and historical validation requirements.",
-      "expected_behavior": "Until PR3 deletes the old rendered daily pages, the optional legacy single-report HTML is generated through `.codex/skills/effective-interact/scripts/create-interaction.mjs` in `pre-rendered` mode and retains its historical renderer checks. This is a legacy compatibility contract, not the public signal-stream renderer or a constraint on the scheme-C React application.",
+      "expected_behavior": "Until the atomic PR6 cutover retires the old rendered daily pages, the optional legacy single-report HTML is generated through `.codex/skills/effective-interact/scripts/create-interaction.mjs` in `pre-rendered` mode and retains its historical renderer checks. This is a legacy compatibility contract, not authority for the accepted curated React application; PR3 performs shadow source work only.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1288,10 +1288,10 @@
     {
       "id": "feedback/p1-lossless-public-signal-stream",
       "severity": "P1",
-      "status": "implemented",
-      "title": "Keep the public source signal stream lossless and non-gating",
+      "status": "closed",
+      "title": "Preserve the lossless signal implementation as raw and legacy evidence",
       "problem": "The project repeatedly treated editorial selection, source authority, verification, qualification, quotas, dedupe, and quality review as public admission policy. That made the repository a small fact-summary page instead of the broad AI source listener the user requested, and old contracts could silently restore those gates even after the schema was relaxed.",
-      "expected_behavior": "Every safely normalizable discovery occurrence is persisted before editorial selection and remains publicly discoverable. No content-admission gate exists. Credibility, content, source, health, access, authority, verification, selection, quality, and rejection metadata are labels or internal diagnostics only; they never change membership or default chronology. New observed records use a persistent observation_id that is independent from candidate IDs and display metadata. Duplicate URLs from distinct collectors or observations remain distinct; repeated raw rows for one observation are transparently coalesced and counted. Unknown classification falls back to other/pending_review. Public artifacts expose only reader-safe attribution, summary, labels, time, health, and access fields and use pagination solely as transport, never as an item cap.",
+      "expected_behavior": "Closed as the default-homepage and new-pool target on 2026-07-15 by feedback/p1-curated-three-layer-homepage. Its implemented occurrence identity, raw lineage, URL safety, public-field privacy, atomic generation, baseline manifest and exact pre-cutover history remain required migration evidence. The phased migration must freeze that history as an immutable legacy archive and reuse raw observations as input, but it must not continue treating every safely normalized occurrence as new /signals or homepage membership.",
       "scope": [
         "config/feedback-ledger.json",
         "docs/feedback-buglist-quick-reference.md",
@@ -1306,7 +1306,44 @@
       ],
       "validation": {
         "command": "corepack pnpm run test",
-        "test_name": "repository contract keeps public signal membership lossless and labels non-gating",
+        "test_name": "repository contract separates listener evidence from curated public surfaces",
+        "gate": "pnpm run validate"
+      }
+    },
+    {
+      "id": "feedback/p1-curated-three-layer-homepage",
+      "severity": "P1",
+      "status": "confirmed",
+      "title": "Separate raw listening, the persistent signal pool, and the curated homepage",
+      "problem": "The lossless public occurrence stream made collection coverage equal public product value. The default homepage consequently exposed non-content endpoints, test rows, internal AI instructions, generic summaries, anonymous or indirect X search results, repeated benchmark rows, and specialized GitHub/paper/model data flattened into one generic card.",
+      "expected_behavior": "The accepted target has three membership boundaries: internal repo-safe raw_observation, deterministic low-threshold admitted_signal, and high-threshold edition_item. Unclean material/quarantine is ignored and deleted within 24 hours; secrets never enter repository history. The default homepage is a globally ranked comprehensive AI edition: normal 10–14, honest short 5–9, and 0–4 preserves dated last-good as delayed/degraded; GitHub same-day Top10 is independent, X and papers/models each cap at 3 and may be zero. Every public item has a real content publisher/author and role, topic + format, public collector lineage and rounded identity icon. Ordinary generated copy is claim-span verified. Aify homepage Today Picks use a dedicated highest-priority trusted-upstream passthrough: the ordered title/description/link/tags become ready editorial content without summary, translation, editor, critic, semantic-verifier or scoring calls; Aify remains a distinct editorial source/collector, while the homepage shell and full articles.json archive never become Today Picks and can never be a silent fallback. All valid Today Picks enter the ready pool and prequalified candidate set, while the final edition still applies deterministic canonical/event, company, specialized-lane, diversity and 10–14 capacity constraints. Aify/newsletters/digests may separately publish a linked substantive article or act as collectors. The current warm-paper topbar/rail/two-column card language survives with A.D.C. as the only masthead copy, a hierarchical current-edition rail, Astryx primitives and @adc/design as sole token owner; no old lead/Today Five, inventory hero, or full-history search returns. /signals starts a clean post-cutover browsable pool; exact pre-cutover occurrences plus read-only legacy/unverified reports stay under /legacy. Asia/Shanghai cutoffs, immutable revisions and append-only corrections apply. GitHub/X/Paper/Model/Benchmark use typed contracts; every priority lane terminalizes, AI never decides admission, and no quota forces filler.",
+      "scope": [
+        "config/feedback-ledger.json",
+        "docs/feedback-buglist-quick-reference.md",
+        "docs/ai-daily-curated-homepage-migration-spec.md",
+        "docs/ai-daily-requirements-reconciliation.md",
+        "docs/ai-daily-cross-agent-iteration-roadmap.md",
+      "docs/ai-daily-source-expansion-spec.md",
+      "docs/ai-daily-source-integration-plan.md",
+      "docs/ai-daily-main-stream-generation-repair-spec.md",
+      "docs/ai-daily-story-contract.md",
+        "docs/source-first-ia-handbook.md",
+        "DESIGN.md",
+        "feature_list.json",
+        "design/adc-visual-system.md",
+      "docs/adc-modernization-roadmap.md",
+      "design/prototypes/adc-public-surfaces.decision.md",
+      "design/prototypes/adc-public-surfaces.design.json",
+      "design/prototypes/adc-public-surfaces.prompt.md",
+      "apps/web/README.md",
+      "packages/design/README.md",
+      "tasks/project-recovery-ledger.md",
+        "tests/public-signals.test.js",
+        "tests/unit.test.js"
+      ],
+      "validation": {
+        "command": "corepack pnpm run test",
+        "test_name": "repository contract separates listener evidence from curated public surfaces",
         "gate": "pnpm run validate"
       }
     }

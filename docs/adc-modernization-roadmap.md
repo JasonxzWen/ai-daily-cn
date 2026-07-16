@@ -1,6 +1,10 @@
 # ADC Modernization Roadmap
 
-This document records the accepted replacement plan for the ADC frontend, tooling, and source pipeline. It supersedes the previous React/npm/shadcn-oriented PR stack (#249-#252).
+<!-- curated-edition-contract-ref:v1 -->
+
+Status: `historical-replacement-plan / target-superseded`
+
+This document records the historical ADC frontend/tooling replacement plan that superseded the React/npm/shadcn-oriented PR stack (#249-#252). Its workspace/Astryx evidence remains useful, but its black-and-white rough visual target and PR sequence no longer control the product. The accepted target is [AI Daily 精选首页三层迁移规格](ai-daily-curated-homepage-migration-spec.md): preserve the current warm-paper topbar/rail/two-column language, use `A.D.C.` as the public masthead, make `@adc/design` the sole token owner and restore information semantics without restoring the old lead layout.
 
 ## Current Baseline
 
@@ -35,12 +39,11 @@ This document records the accepted replacement plan for the ADC frontend, toolin
 - Do not introduce shadcn as a second primary component system.
 - Use local ADC domain components only for product-specific surfaces such as daily story cards, source strips, report status, and clustered sections.
 
-### Visual Identity
+### Historical Visual Identity（Target Superseded）
 
-- The brand character is `ADC.`, derived from the repository name `ai-daily-cn`.
-- The accepted visual language is light, black-and-white, hand-drawn, rough-lined, and restrained.
-- Remove previous Dracula, dark, glass, and multicolor visual directions from the new frontend.
-- `ADC.` assets should support empty states, workflow explanations, report status, and first-screen brand memory. They should not become per-news decorations.
+- The historical plan introduced the `ADC.` character direction and removed Dracula/dark/glass experiments.
+- The surviving target public mark is `A.D.C.`; the current warm-paper, thin-rule, restrained orange/green implementation wins over both the rough black-and-white proposal and the later light-gray/indigo proposal.
+- The character may support small empty/status states only. It must not become a large hero, first-screen slogan or per-news decoration.
 
 ### Design Workflow
 
