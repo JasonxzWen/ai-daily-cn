@@ -1,12 +1,16 @@
 # AI 日报信源扩展与内容呈现规格
 
-> **2026-07-14 适用范围：公共信号流。** 公共 occurrence 存储与 `docs/signals/**` 是 source-first listener，不是只陈述已复核事实的编辑摘要。凡能安全标准化的发现记录都应进入公共流；来源、内容、可信度、健康和访问属性只作标签、筛选与诊断，不作准入、配额、排序权重或发布门槛。
+<!-- curated-edition-contract-ref:v1 -->
+
+> **2026-07-15 状态：当前采集实现基线，目标已替换。** 本文的来源目录与传输、安全、lineage 规则继续有效；“所有安全 occurrence 直接公开”“不可准入/去重/限额”的产品条款只描述切换前 runtime。新目标由 [AI Daily 精选首页三层迁移规格](ai-daily-curated-homepage-migration-spec.md) 控制：仓库只持久化 repo-safe observation 元数据，低门槛持久池进入 `/signals`，高门槛 edition 进入首页，旧公开历史冻结为 `/legacy`。Aify、Smol AI News、Latent Space 与 newsletter/digest 的具体内容页既可直接成为材料来源，也可在发现外部材料时作为公开采集器；角色逐 item 记录。Aify 首页「今日精选」另有专用可信上游直通合同：只解析首页内嵌有序集合并原样复用标题/描述/链接/tags，禁止把 `articles.json` 全量 archive 或首页 shell 当成精选，禁止二次摘要/复核/评分。迁移完成前不得把目标写成已实现。
+
+> **2026-07-14 current-runtime / target-superseded baseline.** 切换前的 occurrence 存储与 `docs/signals/**` 是 source-first listener，不是只陈述已复核事实的编辑摘要。凡能安全标准化的发现记录进入该旧公共流；来源、内容、可信度、健康和访问属性只作旧 runtime 的标签、筛选与诊断。
 >
-> 本文末尾保留少量 **legacy edited report** 内容规则，仅用于下游可选编辑报告。legacy 的核验、选题、篇幅、时间窗口、去重和质量门不得删除、延迟、降级或重排公共 occurrence，也不得阻塞公共信号发布。
+> 这些 no-admission/no-dedupe/no-quota 条款不治理 post-cutover `/signals` 或 edition。切换后不可回退的只有 raw lineage、privacy、publisher/collector attribution、stable observation identity 和 immutable legacy integrity。本文末尾的 **legacy edited report** 规则也只保留为历史实现证据。
 
-## 目标
+## 2026-07-14 Runtime Baseline Goal（Target Superseded）
 
-项目默认迭代方向是丰富、开放、可追溯：
+该阶段的已落地迭代方向是丰富、开放、可追溯；它描述当前 runtime，不是未来 pool/edition 成员资格：
 
 - 激进扩展公开、合法、技术可访问的来源，不先设观察期或升格流程。
 - 先保存观察，再补充摘要和标签；未知或未核验不等于不可公开。
@@ -16,9 +20,9 @@
 
 三层接入细节见 [AI 日报三层信源接入开发计划](ai-daily-source-integration-plan.md)。
 
-## 不可回退的公共监听原则
+## Pre-cutover Public Listener Rules（Target Superseded）
 
-公共路径不得引入或恢复以下机制：
+在 Phase 4 切换完成前，旧 occurrence 公共投影不得引入以下机制。切换后，这些禁令只保护 raw/legacy，不限制 admitted pool、edition、canonical/event 去重、栏目预算或精选：
 
 - `core` / `optional` / `manual` 来源准入或“显式开启才监听”；
 - authority/tier/verification 级别控制成员资格；
@@ -27,11 +31,11 @@
 - “影子运行后再升格”、人工复核后再记录、事实性栏目资格前置到 occurrence；
 - 因低可信度、中介来源、缺少原始链接、重复 URL 或低重要性静默丢弃可安全记录。
 
-技术访问限制与内容准入必须分开：缺 API key、缺自托管地址、ToS/robots 限制、网络阻断或解析失败可以导致当次无法取得内容，但只能形成 access/health 状态，不能被包装成来源“不够格”。
+技术访问限制与内容准入仍需分开记录：缺 API key、缺自托管地址、ToS/robots 限制、网络阻断或解析失败形成 access/health 状态。新目标是否进入 pool/edition 由 canonical admission/selection contract 决定，本文旧规则不得覆盖它。
 
 ## 来源板块
 
-下列板块是前端一级分类和来源盘点方式，不是优先级。所有板块内可访问来源都参与公共监听。
+下列板块是当前采集 inventory 与旧 source-group UI 的盘点方式，不是 post-cutover 首页 IA 或成员资格。来源继续参与 raw discovery，但其有效性由新 funnel 证明。
 
 ### 官方博客与发布
 
@@ -180,4 +184,4 @@ input_record_count
 
 legacy 报告可以为有限篇幅的编辑故事使用：一手/多源核验、相关性判断、事实与观点区分、摘要质量、故事合并与去重、时间窗口、栏目容量和 HTML 文案规则。
 
-这些规则只能作用于 legacy 报告自身，并且必须在 occurrence 持久化之后运行。legacy 候选未入选、质量检查失败或整份报告未生成，都不能回写或阻断公共信号流。PR3 删除旧单日报公开页面后，此附录只保留为兼容历史数据和可选衍生物的说明。
+这些规则只能作用于 legacy 报告自身，并且必须在 occurrence 持久化之后运行。legacy 候选未入选、质量检查失败或整份报告未生成，都不能回写或阻断公共信号流。2026-07-14 旧方案曾把页面删除放在 PR3；当前权威计划保留该运行面到 PR6 原子切换，PR3 只运行 source/raw/funnel shadow。PR6 后此附录只保留为兼容历史数据和可选衍生物的说明。

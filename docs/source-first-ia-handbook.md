@@ -1,10 +1,14 @@
 # Source-First IA Handbook
 
+<!-- curated-edition-contract-ref:v1 -->
+
+> **2026-07-15 target transition.** This file documents the currently implemented lossless source-first surface and the internal source inventory. Its public membership, chronology, source-group-default, broad search/filter and credibility-pill clauses are superseded as the accepted target by [AI Daily 精选首页三层迁移规格](ai-daily-curated-homepage-migration-spec.md). The target homepage is a globally ranked edition with a hierarchical current-edition topic/format rail; `/signals` keeps source/date/history browsing without full-text search. Until that phased migration passes, the behavior below remains runtime fact; afterward it survives only as raw/legacy lineage and internal governance.
+
 <!-- source-display-governance:v1 -->
 
 <!-- public-signal-stream-contract:v1 -->
 
-Status: `public-source-first-current / internal-inventory-retained`
+Status: `current-runtime / target-superseded / internal-inventory-retained`
 
 Public machine contracts: `config/public-signal-taxonomy.json`, `schemas/occurrence-store.schema.json`, `schemas/public-signals.schema.json`
 
@@ -16,9 +20,9 @@ Maintenance owner: `user-reviewed-fixed-source-order`
 
 This handbook is the human-facing maintenance guide for source-first governance and optional diagnostics. The JSON contract is the executable authority; this document explains how to change the fixed source order without making the public daily report expose internal audit panels by default.
 
-## Current Public IA Authority
+## Current Implemented Public IA (Migration Baseline)
 
-The public product is a high-coverage source listener, not a source-health dashboard and not an edited-story admission surface.
+The deployed public product is a high-coverage source listener, not a source-health dashboard and not an edited-story admission surface. These bullets describe current code and the exact history to preserve; they do not override the 2026-07-15 target.
 
 - No content-admission gate exists. Every safely normalizable source occurrence with an HTTP(S) material URL enters the public stream; missing title text uses a deterministic publisher/source/URL fallback, and malformed individual records are isolated only for technical safety.
 - New observed records receive a persistent `observation_id` before selection from explicit native provenance or stable collector/material/event provenance. Candidate IDs, titles, summaries, tags, classification values, ranks, and input order are not observation identity. Repeated rows for one observation are coalesced with explicit counts; distinct collectors or observation IDs keep same-URL occurrences separate.
@@ -33,7 +37,7 @@ The public product is a high-coverage source listener, not a source-health dashb
 
 Iteration rule: add public/legal sources directly when collection is technically safe; do not require observation periods, qualification proofs, selection paths, new tier matrices, or compatibility gates. Prefer one direct mapping plus an explicit fallback, and delete superseded public paths in the migration PR rather than maintaining parallel products.
 
-The older fixed-order and runtime sections below are retained as the internal source inventory appendix. Where they say public pages are story-first or source-first is internal-only, this Current Public IA Authority supersedes them.
+The older fixed-order and runtime sections below are retained as the internal source inventory appendix. The 2026-07-15 curated-edition contract owns the future public IA; this handbook continues to own only current-runtime explanation and internal source governance.
 
 ## 目标
 
@@ -144,7 +148,7 @@ Section rank 使用 10 点间隔。Source rank 默认也使用 10 点间隔；�
 | 30 | `mit-technology-review` | MIT Technology Review |
 | 40 | `ars-technica` | Ars Technica |
 | 50 | `venturebeat-ai` | VentureBeat AI |
-| 60 | `aify-news` | First-class aggregator governance; every factual claim still requires a primary-source backtrace. |
+| 60 | `aify-news` | **Current-runtime inventory order only; target-superseded.** The target promotes Aify homepage Today Picks to a dedicated highest-priority `trusted_upstream_passthrough` lane, preserves the upstream ordered title/description/link/tags without secondary semantic processing, and keeps the full archive and homepage shell out. For external material, record the external publisher, Aify editorial source and Aify collector separately. |
 
 ## 新增信源插入规则
 
@@ -240,7 +244,7 @@ corepack pnpm run test:e2e
 
 Status: `historical-internal-runtime-contract`
 
-This section describes the historical internal source-runtime dashboard. Raw source operations remain internal, but the reader-safe public occurrence stream is source-first by default under the Current Public IA Authority above. Story selection and this runtime dashboard cannot gate that stream.
+This section describes the historical internal source-runtime dashboard. Raw source operations remain internal, and the reader-safe source-first occurrence stream remains the pre-cutover runtime baseline only. The canonical curated-edition target above supersedes it for future public membership and IA; this dashboard cannot govern the new pool or edition.
 
 <!-- source-first-v2-layering -->
 

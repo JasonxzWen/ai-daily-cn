@@ -21,7 +21,7 @@
       "design/prototypes/adc-public-surfaces.png"
     ],
     "decision_record": "design/prototypes/adc-public-surfaces.decision.md",
-    "notes": "The accepted 2026-07-13 evidence is edition-first: one lead, three secondary stories, compact continuation, and Source Watch after the main edition. The homepage consumes bounded home.json data and omits internal quality scores. Acceptance covers the homepage, operations page, official-blog index, and generated report at the canonical 1280x900 desktop viewport only."
+    "notes": "Historical accepted evidence from 2026-07-13: one lead, three secondary stories, compact continuation, and Source Watch after the main edition. The 2026-07-15 curated-edition contract supersedes that hierarchy and the large character treatment; only edition/date semantics, omission of internal scores and canonical 1280x900 evidence remain reusable. The target preserves the current warm-paper visual language with a globally ranked two-column edition, hierarchical current-edition rail and A.D.C.-only masthead."
   },
   "production_boundary": {
     "generated_code_policy": "translated",
@@ -39,6 +39,6 @@
   },
   "handoff": {
     "target_surface": "apps/web plus generated public report and operations shells",
-    "translation_notes": "Keep content engines separate, project report_date-owned editorial order into home.json, and converge only on a repository-owned ADC visual contract."
+    "translation_notes": "Historical translation only. Keep content engines separate and preserve report_date semantics, but follow docs/ai-daily-curated-homepage-migration-spec.md for the globally ranked edition, current warm-paper visual language and sole @adc/design token ownership."
   }
 }

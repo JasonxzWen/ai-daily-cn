@@ -2,13 +2,58 @@
 
 This document is the durable repository home for the 2026-06-26 cross-agent diagnosis. It consolidates Codex and Claude Code session analysis, PR/commit history, scheduled-run retrospectives, automation summaries, and user intent into an implementation order. It is a planning and acceptance contract, not proof that downstream behavior is fixed.
 
+<!-- curated-edition-contract-ref:v1 -->
+
+## 2026-07-15 Current Product Direction
+
+Status: `accepted-target / implementation-pending`.
+
+The controlling behavior and acceptance authority is [AI Daily 精选首页三层迁移规格](ai-daily-curated-homepage-migration-spec.md). The current lossless source-listener implementation remains the migration baseline, but it no longer controls default-homepage membership, ordering or information architecture.
+
+### Active Dependency Order
+
+| Order | Phase | Depends on | Completion boundary |
+| ---: | --- | --- | --- |
+| 0 | Contract and real regression baseline | none | One target authority, initial 11-point/eight-workstream coverage, source asset reconciliation, five-layer feature survival, production-derived fixture design, no implementation claim. |
+| 1A | Source assets, raw observation and funnel shadow | 0 | Current registry/historical links have fact/unknown states; `registered→fetched→parsed` receipts and Aify Today Picks extraction run in the real DAG without changing active Aify config or any current public output. |
+| 1B | Deterministic admission, low-threshold pool and summary shadow | 1A | Admission/quarantine/pool/public-ready replay passes; ordinary grounded summaries and Aify `ready + editorial_ready` passthrough are distinct; current public site remains byte-identical. |
+| 2 | Edition backend and specialized DTO shadow | 1B | Ordinary-source claim-span summaries and editor/critic receipts, Aify zero-secondary-processing receipts, 10–14/5–9/0–4 budgets, lane terminalization, GitHub/X/Paper/Model/Benchmark contracts and last-good failure behavior pass. |
+| 3 | Reader-intent React frontend | 2 plus legal Harness Hub migration in a clean standalone target | PR6 internal checkpoint only: latest/dated revision, clean pool and legacy fixtures pass direct-load/refresh, membership isolation and `1280x900` acceptance while preserving the current warm-paper style. It may not merge separately or ship as dormant/flagged UI. |
+| 4 | Production orchestration, atomic cutover and legacy freeze | 1A, 1B, 2, 3 | In the same PR6 and site generation as Phase 3, active Aify/source config flips, `/` serves edition, `/signals` serves the new clean pool, `/legacy` is immutable, and pool remains independent from edition failure. |
+| 5 | Stable-run cleanup | 4 plus seven natural runs | Conflicting active contracts/prompts/render paths retire; legacy data and validators remain. |
+
+### Active Merge Packaging
+
+Phase count is not PR count. The minimal complete delivery has seven direct-to-main, non-stacked merge/revert domains; each starts only after its predecessor merges and freshness returns `0 0`.
+
+| PR | Outcome | Public behavior |
+| --- | --- | --- |
+| PR1 | Specification, interaction/source history evidence, full feature-survival and regression baseline | unchanged |
+| PR2 | Legal Harness Hub migration from the source default-branch current HEAD in a clean standalone target | unchanged |
+| PR3 | Source asset audit plus raw/funnel shadow in the scheduled DAG | unchanged |
+| PR4 | Admission/pool/summary/provenance/icon shadow | unchanged |
+| PR5 | Edition plus GitHub/X/Paper/Model/Benchmark shadow | unchanged |
+| PR6 | Reader UI, visual/token/icon work, historical capability recovery, routes, runner/publish, active source flip and legacy freeze | one atomic cutover |
+| PR7 | Cleanup after seven natural successful runs | no intended product change |
+
+PR3–PR5 must prove the old public generation is unchanged and shadow failures do not block the old publisher. PR6 cannot be split: main merge immediately participates in the scheduled Web build, so a separate frontend merge would either change production early, create dormant code, or require a second renderer/feature flag. The canonical specification Section 13 owns detailed paths, gates and rollback boundaries.
+
+### Roadmap Ownership Boundary
+
+- This roadmap owns phase order, dependencies and completion boundaries.
+- The curated-edition specification owns entities, fields, admission/selection behavior, section budgets, feature-survival decisions and PC acceptance IDs.
+- The curated-edition specification also owns the seven-PR merge packaging. This roadmap summarizes dependencies only and must not invent another PR sequence.
+- Requirements reconciliation owns current status and evidence mapping.
+- `tasks/project-recovery-ledger.md` owns the stable recovery issue ID; do not create another issue list.
+- No phase may switch the default route or delete old data before its predecessor exit gate passes.
+
 <!-- public-signal-stream-contract:v1 -->
 
-## 2026-07-14 Current Product Direction
+## 2026-07-14 Product Direction (Current Runtime Baseline)
 
-Status: `current-authority / implementation-in-progress`.
+Status: `implemented-runtime / target-superseded`.
 
-The product is now a broad, source-first AI signal listener. This section supersedes every later story-first, qualification, quota, admission, authority-ranking, source-diagnostic-only, and frontend-last statement where they conflict. The older eight-slice roadmap remains below only as historical evidence for the legacy edited-report subsystem.
+The repository currently runs a broad, source-first AI signal listener. This section remains factual evidence for occurrence identity, raw lineage, source expansion, privacy and the pre-cutover archive. Its no-admission, no-dedupe, chronology and default-homepage clauses were superseded as the target by the accepted 2026-07-15 direction above.
 
 - No content-admission gate exists in the public signal path. Every safely normalizable occurrence with a usable title and HTTP(S) material URL remains publicly discoverable.
 - Credibility, content, source, health, and access metadata are labels and filters only. They cannot change membership or default chronology.
@@ -17,7 +62,7 @@ The product is now a broad, source-first AI signal listener. This section supers
 - Raw `source_audit`, candidate scores, selection/rejection reasons, repair state, private paths, and machine logs remain internal. Reader-safe source group, publisher, collection channel, content tag, credibility tag, health, access, summary, and time fields are public.
 - Pagination and the 48-hour homepage preview are transport and presentation devices, never total-count limits.
 
-### Active PR Sequence
+### Landed / Historical PR Sequence
 
 | PR | Product slice | Completion boundary |
 |---|---|---|
@@ -26,7 +71,7 @@ The product is now a broad, source-first AI signal listener. This section supers
 | PR3 | Complete scheme-C public frontend migration | Replace every public page at the sole supported `1280x900` viewport with the source-grouped light-gray/white-panel/indigo system, 48-hour grouped preview, same-page lazy loading, and full history; delete obsolete daily/archive/ops/official-blog rendered pages and compatibility code while preserving useful structured information. |
 | PR4 | Evidence-driven hardening only if needed | Add performance or observability work only after real runtime evidence identifies a concrete problem; do not pre-build another control plane. |
 
-### Current Iteration Style
+### Historical Iteration Style
 
 - Prefer listening coverage and explicit uncertainty labels over proving content worthy of entry.
 - Prefer a direct data contract and one fallback over observation periods, tier matrices, compatibility gates, duplicated vocabularies, or speculative abstractions.
@@ -34,7 +79,7 @@ The product is now a broad, source-first AI signal listener. This section supers
 - Delete superseded paths when the migration PR reaches them; do not keep parallel public surfaces merely to avoid making a decision.
 - Preserve historical evidence without letting historical rules remain active authority.
 
-The remaining sections document the prior eight-slice plan. They are not the active implementation order after 2026-07-14.
+The remaining sections document prior plans. They are not the active implementation order after 2026-07-15.
 
 ## Historical Highest Priority
 

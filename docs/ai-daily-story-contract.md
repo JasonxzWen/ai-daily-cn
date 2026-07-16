@@ -1,6 +1,6 @@
 # AI 日报 Story-Centered 生成合同
 
-> **2026-07-14 适用范围变更：仅保留为可选遗留编辑报告合同。** 本文中的 story 资格、8–12 条数量、来源合并、URL/跨期去重、GitHub Top10、质量门和所有“公开”措辞都不治理 `docs/signals/**`。公共产品的成员集合与默认时序只由 `public-signal-stream-contract:v1` 约束：无内容准入门槛，分类与可信度仅作标签和筛选。PR3 将删除本文对应的遗留公开渲染面；结构化历史数据仍可保留。
+> **2026-07-14 适用范围变更：仅保留为可选遗留编辑报告合同。** 本文中的 story 资格、8–12 条数量、来源合并、URL/跨期去重、GitHub Top10、质量门和所有“公开”措辞都不治理 `docs/signals/**`（PR6 前当前公开面）或新 pool/edition。PR6 前现状仍由 `public-signal-stream-contract:v1` 描述；2026-07-14 方案曾把公开渲染面删除排在旧 PR3，该时序已被 [精选首页三层迁移规格](ai-daily-curated-homepage-migration-spec.md) 取代：当前渲染面保留到 PR6 原子切换，PR3 只运行 source/raw/funnel shadow；结构化历史数据继续保留。
 
 状态：`implemented-for-optional-legacy-edited-report / publish-run-validation-pending`
 

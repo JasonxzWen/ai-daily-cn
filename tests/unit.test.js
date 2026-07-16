@@ -9237,6 +9237,7 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
   const ledger = JSON.parse(await fs.readFile(path.join(rootDir, "config", "feedback-ledger.json"), "utf8"));
   const quickReference = await fs.readFile(path.join(rootDir, "docs", "feedback-buglist-quick-reference.md"), "utf8");
   const reconciliation = await fs.readFile(path.join(rootDir, "docs", "ai-daily-requirements-reconciliation.md"), "utf8");
+  const curatedTarget = await fs.readFile(path.join(rootDir, "docs", "ai-daily-curated-homepage-migration-spec.md"), "utf8");
   const item = ledger.items.find((entry) => entry.id === "feedback/p1-ai-daily-requirements-reconciliation");
 
   assert(item, "feedback/p1-ai-daily-requirements-reconciliation must be recorded in the feedback ledger");
@@ -9249,7 +9250,7 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
   assert(quickReference.includes("feedback/p1-ai-daily-requirements-reconciliation"));
 
   const rows = reconciliation.split(/\r?\n/).filter((line) => /^\| REQ-\d{3} \|/.test(line));
-  const expectedRequirementIds = Array.from({ length: 14 }, (_, index) => `REQ-${String(index + 1).padStart(3, "0")}`);
+  const expectedRequirementIds = Array.from({ length: 21 }, (_, index) => `REQ-${String(index + 1).padStart(3, "0")}`);
   assert.equal(rows.length, expectedRequirementIds.length);
   for (const id of expectedRequirementIds) {
     const row = rows.find((line) => line.includes(`| ${id} |`));
@@ -9273,10 +9274,42 @@ test("ai daily requirements reconciliation maps user requirements to ledger test
     "semantic assets",
     "Cross-Agent Iteration Roadmap Addendum",
     "docs/ai-daily-cross-agent-iteration-roadmap.md",
+    "2026-07-15 Curated Edition Target",
+    "REQ-015",
+    "REQ-021",
+    "raw_observation",
+    "admitted_signal",
+    "edition_item",
+    "feedback/p1-curated-three-layer-homepage",
     "Runtime Evidence Boundary"
   ]) {
     assert(reconciliation.includes(phrase), `reconciliation must include ${phrase}`);
   }
+  assert(curatedTarget.includes("curated-edition-contract:v1"));
+  assert(curatedTarget.includes("accepted-target / implementation-pending"));
+  assert(curatedTarget.includes("## 11. 分阶段迁移计划"));
+  assert(curatedTarget.includes("## 12. 验收清单"));
+  for (const phrase of [
+    "10–14",
+    "5–9",
+    "0–4",
+    "A.D.C.",
+    "Asia/Shanghai",
+    "PC-015",
+    "PC-016",
+    "aify_today_passthrough_v1",
+    "ARTICLES_TODAY",
+    "E_LINKED_WORKTREE",
+    "八条同时交付、分别验收的产品工作流",
+    "PR1–PR7 是合并与回滚视图",
+    "Phase 1A",
+    "Phase 1B",
+    "PR6 内部检查点，不单独合入"
+  ]) {
+    assert(curatedTarget.includes(phrase), `curated target must retain final decision ${phrase}`);
+  }
+  assert(!curatedTarget.includes("精选主编区总计 **12–18"));
+  assert(!curatedTarget.includes("“今日五件事”最多"));
   assert(reconciliation.includes("| partial |"));
   assert(reconciliation.includes("Do not write \"fixed\", \"stable\", or \"implemented\""));
 });

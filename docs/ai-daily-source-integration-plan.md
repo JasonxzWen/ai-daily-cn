@@ -1,5 +1,9 @@
 # AI 日报三层信源接入开发计划
 
+<!-- curated-edition-contract-ref:v1 -->
+
+> **术语与状态说明（2026-07-15）：** 本文“三层”是 RSS/公开页面、API/搜索、RSS 生成/聚合三类采集传输，不是新的三层数据生命周期。采集适配器与安全规则继续作为当前实现输入；公共成员资格目标已由 [AI Daily 精选首页三层迁移规格](ai-daily-curated-homepage-migration-spec.md) 替换为 `raw_observation → admitted_signal → edition_item`。聚合/newsletter 的具体内容页可以直接成为材料，发现外部材料时则与真实发布者分开记为采集器。Aify 首页「今日精选」必须迁到专用 HTML adapter，原样解析上游有序 title/description/link/tag payload 并绕过二次语义处理；当前全量 `articles.json/search_api/community_lead` 路径只属于待替换 runtime，不能定义目标行为。本文余下的无准入公共流规则是迁移基线，不是未来首页权威。
+
 > **2026-07-14 适用范围：公共监听优先。** 公共 occurrence 存储和 `docs/signals/**` 受 `public-signal-stream-contract:v1` 约束：凡能安全标准化的发现记录都应持久化并公开，不设来源等级、内容类别、可信度、健康状态、访问方式、新鲜度、观察期或人工复核准入门槛，也不设单源配额或总量上限。来源、内容、可信度、健康和访问状态只用于标签、筛选与诊断。
 >
 > 本文提到的事实核验、选题、合并、去重和篇幅规则，只能用于下游可选的 **legacy edited report**。它不能删除、延迟、降级、重排公共 occurrence，也不能成为公共监听 authority。需要账号、密钥或自托管地址的来源若暂时不可访问，应记录访问/健康状态；这是技术可达性，不是内容准入。
