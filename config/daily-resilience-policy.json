@@ -246,6 +246,17 @@
       "replay_fixtures": ["curated-shadow-schema-failure"]
     },
     {
+      "id": "signal_pool_shadow",
+      "scope": "internal_shadow",
+      "description": "Apply deterministic low-threshold admission and persist internal admitted/public-ready shadow pools without changing public outputs.",
+      "retry": { "max_attempts": 1, "backoff_ms": [0], "on": [] },
+      "fallback": { "kind": "summary_only_degraded_audit", "action": "record_shadow_failure_and_continue_legacy_publisher" },
+      "degrade": { "allowed": true, "action": "continue_without_new_pool_receipts" },
+      "block": { "allowed": false, "reasons": ["unrecoverable_schema"] },
+      "summary_fields": ["stage_id", "status", "attempts", "signal_count", "public_ready_count", "rejected_count", "needs_review_count", "degraded_reason"],
+      "replay_fixtures": ["signal-pool-schema-failure"]
+    },
+    {
       "id": "sources_health",
       "scope": "diagnostic_after_signals",
       "description": "Run post-signal source health diagnostics and expose local outages without changing signal membership or publication.",

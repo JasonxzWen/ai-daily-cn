@@ -30,6 +30,7 @@ import {
   collectStatuspageIncidents
 } from "./discovery.js";
 import { runCuratedSourceShadow } from "./curated-source-shadow.js";
+import { runSignalPoolShadow } from "./signal-pool.js";
 import { collectSearchNews } from "./search-news.js";
 import { checkSourcesHealth } from "./source-health.js";
 import { auditSourceRunHistory } from "./source-phase5.js";
@@ -966,6 +967,17 @@ try {
       aifyResult,
       sourcesPath: args.sources || "config/sources",
       outputDir: args.out || "reports-data"
+    });
+    printJson(result, args.output || "");
+  } else if (command === "signals:pool-shadow") {
+    const args = parseArgs(argv);
+    const result = await runSignalPoolShadow({
+      rootDir: path.resolve(args["repo-root"] || process.cwd()),
+      reportDate: args.date || firstPositionalDate(argv),
+      generatedAt: args["generated-at"] || firstPositionalDateTime(argv),
+      inputDir: args.input || args["data-input"] || "reports-data",
+      outputDir: args.out || "reports-data",
+      contractPath: args.contract || "config/signal-admission-contract.json"
     });
     printJson(result, args.output || "");
   } else if (command === "sources:health") {

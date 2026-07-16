@@ -89,6 +89,7 @@ function validateContractSemantics({ contract, failures }) {
     validateSignalBaselineSemantics({ baseline: publicSignals.history_baseline, prefix, failures });
     validateSourceWatchSemantics({ sourceWatch: publicSignals.source_watch, prefix, failures });
   }
+  validateSignalPoolShadowSemantics({ value: dailyRunner.signal_pool_shadow, prefix, failures });
 
   if (dailyRunner.source_watch !== undefined) {
     failures.push(`${prefix}: daily_runner.source_watch is retired; Source Watch must live under daily_runner.public_signals.`);
@@ -140,6 +141,31 @@ function validateContractSemantics({ contract, failures }) {
     `${prefix}: daily_runner.modes.publish.allowed_terminal_statuses`,
     failures
   );
+}
+
+function validateSignalPoolShadowSemantics({ value, prefix, failures }) {
+  const shadow = plainObject(value);
+  const label = `${prefix}: daily_runner.signal_pool_shadow`;
+  if (!shadow) {
+    failures.push(`${label} must be an object.`);
+    return;
+  }
+  const expected = {
+    stage_id: "signal_pool_shadow",
+    script: "signals:pool-shadow",
+    scope: "internal_shadow",
+    runs_after: "curated_source_shadow",
+    runs_before: "signals_write",
+    public_behavior_changes: false,
+    failure_blocks_legacy_publisher: false,
+    signal_pool_path_template: "reports-data/signals/YYYY/MM/YYYY-MM-DD.json",
+    public_ready_path_template: "reports-data/public-signal-pool/YYYY/MM/YYYY-MM-DD.json",
+    summary_readiness_fail_closed: true,
+    aify_today_picks_passthrough: true
+  };
+  for (const [field, expectedValue] of Object.entries(expected)) {
+    expectExact(shadow[field], expectedValue, `${label}.${field}`, failures);
+  }
 }
 
 function validatePublicSignalDiscoveryLanes({ lanes, prefix, failures }) {

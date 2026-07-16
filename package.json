@@ -8,6 +8,7 @@
     "prompt:build": "node src/cli.js prompt:build",
     "report:draft": "node src/cli.js report:draft",
     "signals:write": "node src/cli.js signals:write",
+    "signals:pool-shadow": "node src/cli.js signals:pool-shadow",
     "signals:migrate-baseline": "node scripts/migrate-public-signal-baseline.mjs",
     "signals:build": "node src/cli.js signals:build --data-input reports-data --out docs",
     "signals:validate": "node src/cli.js signals:validate --out docs",

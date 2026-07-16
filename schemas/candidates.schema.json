@@ -488,6 +488,14 @@
         "summary": {
           "type": "string"
         },
+        "source_synopsis": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 360
+        },
+        "source_synopsis_origin": {
+          "enum": ["source_feed", "source_metadata", "structured_source"]
+        },
         "description": {
           "type": "string"
         },
@@ -681,6 +689,10 @@
         "source_watch": {
           "$ref": "#/$defs/source_watch"
         }
+      },
+      "dependentRequired": {
+        "source_synopsis": ["source_synopsis_origin"],
+        "source_synopsis_origin": ["source_synopsis"]
       },
       "allOf": [
         {

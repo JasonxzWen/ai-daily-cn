@@ -91,7 +91,7 @@
       "script": "sources:curated-shadow",
       "scope": "internal_shadow",
       "runs_after": "discover_search_news",
-      "runs_before": "signals_write",
+      "runs_before": "signal_pool_shadow",
       "public_behavior_changes": false,
       "failure_blocks_legacy_publisher": false,
       "raw_observations_path_template": "reports-data/observations/YYYY/MM/YYYY-MM-DD.json",
@@ -109,6 +109,19 @@
         "site-aify-news"
       ],
       "active_aify_archive_unchanged": true
+    },
+    "signal_pool_shadow": {
+      "stage_id": "signal_pool_shadow",
+      "script": "signals:pool-shadow",
+      "scope": "internal_shadow",
+      "runs_after": "curated_source_shadow",
+      "runs_before": "signals_write",
+      "public_behavior_changes": false,
+      "failure_blocks_legacy_publisher": false,
+      "signal_pool_path_template": "reports-data/signals/YYYY/MM/YYYY-MM-DD.json",
+      "public_ready_path_template": "reports-data/public-signal-pool/YYYY/MM/YYYY-MM-DD.json",
+      "summary_readiness_fail_closed": true,
+      "aify_today_picks_passthrough": true
     },
     "legacy_report": {
       "optional_derivative": true,
@@ -169,6 +182,7 @@
     "daily:codex-dag:contract-run": "node scripts/run-daily-codex-dag.mjs --contract-run --json",
     "daily:run": "node src/cli.js daily:run",
     "signals:write": "node src/cli.js signals:write",
+    "signals:pool-shadow": "node src/cli.js signals:pool-shadow",
     "signals:migrate-baseline": "node scripts/migrate-public-signal-baseline.mjs",
     "signals:build": "node src/cli.js signals:build --data-input reports-data --out docs",
     "signals:validate": "node src/cli.js signals:validate --out docs",

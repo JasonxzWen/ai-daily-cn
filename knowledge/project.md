@@ -11,6 +11,8 @@ title: AI Daily CN 项目概览
 - `reports-data/` 保存完整报告数据，`docs/` 保存面向读者的静态页面、公开 JSON、Feed 与趋势数据。
 - `curated-data/` 保存用于生成公开投影的已审阅内部来源记录，`knowledge/` 只保存 Markdown 格式的项目 Wiki。
 - 日更 runner 在旧公开信号持久化前运行一个不改变公开页面的 Phase 1A 影子阶段：按日保存 repo-safe 原始观察与 `registered → fetched → parsed` 信源漏斗；正常影子失败及有确定性 recovery evidence 的原子事务失败只记录降级，不阻断旧发布器。无恢复证据的 receipt 损坏、canonical reconciliation、lineage 或 privacy 漂移继续按仓库完整性失败阻断。
+- Phase 1B 在 Phase 1A 后运行不阻断旧发布器的确定性准入影子阶段：逐项记录 `admitted / rejected / needs_review` 回执，将跨日去重后的信号保存到内部 signal pool，并生成同代、可校验但不进入当前站点发现与公开信号 schema 的 public-ready 伴随投影。
+- Aify“今日精选”在 URL、安全、时效、去重等机械门通过后，原样复用其标题、描述、链接与标签；普通来源必须提供由原文证据约束的一句话事实摘要，不能把入选理由写成读者摘要。
 - Aify 首页“今日精选”由独立严格适配器解析，内容回执 `aify_today_picks` 与站点健康回执 `site-aify-news` 分离；既有 `content-aify-news` archive 配置仍保持原样。
 - 根包使用 Node.js ESM，并通过 Corepack 管理的 pnpm workspace 执行构建、测试与发布前验证。
 
@@ -25,4 +27,8 @@ title: AI Daily CN 项目概览
 - [命令行入口](../src/cli.js)
 - [日更工作流合同](../config/daily-workflow-contract.json)
 - [影子信源编排](../src/curated-source-shadow.js)
+- [信号准入合同](../config/signal-admission-contract.json)
+- [信号准入规则](../src/signal-admission.js)
+- [信号池原子编排与验证](../src/signal-pool.js)
+- [一句话摘要约束](../src/signal-summary.js)
 - [Aify 今日精选适配器](../src/aify-today-picks.js)

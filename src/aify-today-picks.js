@@ -28,7 +28,10 @@ const MAX_TITLE_LENGTH = 300;
 const MAX_SUMMARY_LENGTH = 3_000;
 const MAX_SOURCE_LENGTH = 200;
 const MAX_TAG_LENGTH = 160;
-const PLACEHOLDER_PATTERN = /(?:^|[^a-z0-9])(?:test(?:ing|[0-9]+|[_-][a-z0-9]+)?|placeholder|lorem ipsum)(?=$|[^a-z0-9])|测试占位/i;
+const ENCODED_TEST_SENTINEL_PATTERN = /^test(?:\d+|_[a-z0-9]+)\b/i;
+const TEST_HYPHEN_SENTINEL_PATTERN = /^test-(?:only|placeholder|fixture|row|content)\b/i;
+const PLACEHOLDER_SEMANTIC_PATTERN = /^(?:test|placeholder|fixture)(?:\s+(?:only|placeholder|fixture|row|content))*$/i;
+const OTHER_PLACEHOLDER_SENTINEL_PATTERN = /^(?:lorem\s+ipsum\b|测试占位(?:内容)?$|占位内容$)/i;
 const INTERNAL_INSTRUCTION_PATTERN = /ignore (?:all |the )?(?:previous|prior) instructions|system prompt|selection_reason|入选标准|给\s*AI\s*看的|treat\s+this\s+as\s+(?:an?\s+)?priority\s+lead|trace\s+it\s+to\s+(?:the\s+)?original\s+source|优先核查/i;
 const HTML_OR_CONTROL_PATTERN = /<\/?[A-Za-z][^>]*(?:>|$)|[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/i;
 const NON_CONTENT_SEGMENTS = new Set([
@@ -255,6 +258,55 @@ export function parseAifyTodayPicksHtml(html, options = {}) {
   return { ...resultBase, ...counts, status: "success_with_items", failure_reason: "" };
 }
 
+export function validatePersistedAifyTodayItem(item, options = {}) {
+  const reportDate = String(options.reportDate || "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(reportDate)) return { valid: false, reason: "report_date_invalid" };
+  if (item?.upstream_selection_date !== reportDate) return { valid: false, reason: "snapshot_stale" };
+  const normalized = normalizeUpstreamItem(item, {
+    upstreamPosition: item?.upstream_position,
+    selectionDate: item?.upstream_selection_date,
+    snapshotHash: item?.upstream_snapshot_hash,
+    allowedDates: new Set([reportDate, previousDate(reportDate)])
+  });
+  if (normalized.error) return { valid: false, reason: normalized.error };
+  const projected = normalized.item;
+  for (const key of [
+    "title",
+    "url",
+    "summary",
+    "date",
+    "source",
+    "quality_score",
+    "flavors",
+    "domain",
+    "channels_l1",
+    "channels_l2",
+    "companies",
+    "products",
+    "upstream_tags",
+    "upstream_selection_date",
+    "upstream_position",
+    "upstream_payload_hash",
+    "upstream_snapshot_hash"
+  ]) {
+    if (stableJson(item?.[key]) !== stableJson(projected[key])) {
+      return { valid: false, reason: "persisted_payload_mismatch" };
+    }
+  }
+  const positions = item?.upstream_positions;
+  if (
+    !Array.isArray(positions) ||
+    positions.length === 0 ||
+    positions[0] !== item.upstream_position ||
+    positions.some((position) => !Number.isInteger(position) || position < 1) ||
+    new Set(positions).size !== positions.length ||
+    positions.some((position, index) => index > 0 && position <= positions[index - 1])
+  ) {
+    return { valid: false, reason: "upstream_positions_invalid" };
+  }
+  return { valid: true, reason: null };
+}
+
 function validateTransportEnvelope({ sourceUrl, responseUrl, contentType, body, maxResponseBytes }) {
   let source;
   let response;
@@ -476,7 +528,9 @@ function normalizeUpstreamItem(row, context) {
   if (source.length > MAX_SOURCE_LENGTH) return { error: "source_too_long" };
   if ([title, summary, source].some((value) => HTML_OR_CONTROL_PATTERN.test(value))) return { error: "unsafe_text" };
   if ([title, summary, source].some(containsSecretLikeText)) return { error: "secret_text" };
-  if (PLACEHOLDER_PATTERN.test(`${title} ${summary}`)) return { error: "placeholder_content" };
+  if ([title, summary].some(isPlaceholderSentinelText)) {
+    return { error: "placeholder_content" };
+  }
   if (INTERNAL_INSTRUCTION_PATTERN.test(`${title} ${summary}`)) return { error: "internal_instruction_content" };
   if (!context.allowedDates.has(date)) return { error: "date_out_of_window" };
 
@@ -508,7 +562,7 @@ function normalizeUpstreamItem(row, context) {
     return { error: "quality_score_invalid" };
   }
 
-  const payload = {
+  const payload = aifyCanonicalPayloadProjection({
     title,
     url,
     summary,
@@ -521,7 +575,7 @@ function normalizeUpstreamItem(row, context) {
     channels_l2: channelsL2,
     companies,
     products
-  };
+  });
   return {
     item: {
       ...payload,
@@ -529,10 +583,55 @@ function normalizeUpstreamItem(row, context) {
       upstream_selection_date: context.selectionDate,
       upstream_position: context.upstreamPosition,
       upstream_positions: [context.upstreamPosition],
-      upstream_payload_hash: sha256(stableJson(row)),
+      upstream_payload_hash: aifyCanonicalPayloadHash(payload),
       upstream_snapshot_hash: context.snapshotHash
     }
   };
+}
+
+export function aifyCanonicalPayloadProjection(item) {
+  return {
+    title: item?.title,
+    url: item?.url,
+    summary: item?.summary,
+    date: item?.date,
+    source: item?.source,
+    ...(item?.quality_score == null ? {} : { quality_score: item.quality_score }),
+    flavors: item?.flavors,
+    domain: item?.domain,
+    channels_l1: item?.channels_l1,
+    channels_l2: item?.channels_l2,
+    companies: item?.companies,
+    products: item?.products
+  };
+}
+
+export function aifyCanonicalPayloadHash(item) {
+  return sha256(stableJson(aifyCanonicalPayloadProjection(item)));
+}
+
+export function aifyPayloadSequenceHash(items) {
+  const sequence = (Array.isArray(items) ? items : [])
+    .flatMap((item) => (Array.isArray(item?.upstream_positions) ? item.upstream_positions : [])
+      .map((position) => ({
+        position,
+        payload_hash: item?.upstream_payload_hash
+      })))
+    .sort((left, right) => left.position - right.position || String(left.payload_hash).localeCompare(String(right.payload_hash)));
+  return sha256(stableJson(sequence));
+}
+
+export function isPlaceholderSentinelText(value) {
+  const text = String(value || "")
+    .trim()
+    .replace(/[.!。！？?]+$/g, "")
+    .trim();
+  return Boolean(text && (
+    ENCODED_TEST_SENTINEL_PATTERN.test(text) ||
+    TEST_HYPHEN_SENTINEL_PATTERN.test(text) ||
+    PLACEHOLDER_SEMANTIC_PATTERN.test(text) ||
+    OTHER_PLACEHOLDER_SENTINEL_PATTERN.test(text)
+  ));
 }
 
 function dedupeCanonicalItems(items, rejected) {

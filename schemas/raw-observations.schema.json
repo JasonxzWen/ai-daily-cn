@@ -49,6 +49,12 @@
   },
   "$defs": {
     "hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "nullable_hash": {
+      "oneOf": [
+        { "$ref": "#/$defs/hash" },
+        { "type": "null" }
+      ]
+    },
     "nullable_text": { "type": ["string", "null"] },
     "nullable_datetime": {
       "oneOf": [
@@ -147,8 +153,29 @@
             "required": ["source_id"]
           },
           "then": {
-            "properties": { "upstream": { "$ref": "#/$defs/upstream" } },
+            "properties": {
+              "upstream": { "$ref": "#/$defs/upstream" },
+              "excerpt": {
+                "oneOf": [
+                  { "type": "string", "maxLength": 3000 },
+                  { "type": "null" }
+                ]
+              },
+              "excerpt_origin": { "const": "upstream_editorial" }
+            },
             "required": ["upstream"]
+          },
+          "else": {
+            "properties": {
+              "upstream": false,
+              "excerpt": {
+                "oneOf": [
+                  { "type": "string", "maxLength": 360 },
+                  { "type": "null" }
+                ]
+              },
+              "excerpt_origin": { "not": { "const": "upstream_editorial" } }
+            }
           }
         }
       ],
@@ -161,6 +188,8 @@
         "material_url_hash",
         "title",
         "excerpt",
+        "excerpt_origin",
+        "excerpt_hash",
         "publisher_hint",
         "collector",
         "author",
@@ -183,17 +212,35 @@
         "material_url_hash": { "$ref": "#/$defs/hash" },
         "title": { "type": "string", "minLength": 1 },
         "excerpt": { "$ref": "#/$defs/nullable_text" },
+        "excerpt_origin": {
+          "enum": [
+            "upstream_editorial",
+            "source_feed",
+            "source_metadata",
+            "source_original_text",
+            "structured_source",
+            "legacy_candidate_copy",
+            "none"
+          ]
+        },
+        "excerpt_hash": { "$ref": "#/$defs/nullable_hash" },
         "publisher_hint": { "type": "string", "minLength": 1 },
         "collector": { "$ref": "#/$defs/collector" },
         "author": { "$ref": "#/$defs/nullable_text" },
         "handle": { "$ref": "#/$defs/nullable_text" },
         "event_date": { "type": "string", "format": "date" },
+        "event_date_origin": {
+          "enum": ["source", "published_at", "upstream_editorial", "report_date_fallback"]
+        },
         "published_at": { "$ref": "#/$defs/nullable_datetime" },
         "collected_at": { "type": "string", "format": "date-time" },
         "fetch_status": { "const": "fetched" },
         "parse_status": { "const": "parsed" },
         "content_hash": { "$ref": "#/$defs/hash" },
         "source_group": { "$ref": "#/$defs/nullable_text" },
+        "content_format_hint": { "type": "string", "minLength": 1 },
+        "access_state": { "enum": ["direct", "indirect", "unknown"] },
+        "source_health": { "enum": ["available", "degraded", "unknown"] },
         "content_tags": {
           "type": "array",
           "uniqueItems": true,

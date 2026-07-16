@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/public-signal-pool.schema.json",
+  "title": "AI Daily Public-ready Signal Pool Shadow",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "pipeline_phase",
+    "report_date",
+    "generated_at",
+    "source_pool_hash",
+    "item_count",
+    "items"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "public_signal_pool_shadow" },
+    "pipeline_phase": { "const": "phase_1b_shadow" },
+    "report_date": { "type": "string", "format": "date" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "source_pool_hash": { "$ref": "#/$defs/hash" },
+    "item_count": { "type": "integer", "minimum": 0 },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "nullable_hash": {
+      "oneOf": [
+        { "$ref": "#/$defs/hash" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_text": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "null" }
+      ]
+    },
+    "nullable_uri": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_date": {
+      "oneOf": [
+        { "type": "string", "format": "date" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_datetime": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_integer": {
+      "oneOf": [
+        { "type": "integer", "minimum": 1 },
+        { "type": "null" }
+      ]
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "home_url"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "home_url": { "type": "string", "format": "uri" }
+      }
+    },
+    "editorial_source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "name", "url"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "name": { "type": "string", "minLength": 1 },
+            "url": { "type": "string", "format": "uri" }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "collector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "url", "source_kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "$ref": "#/$defs/nullable_uri" },
+        "source_kind": { "type": "string", "minLength": 1 }
+      }
+    },
+    "source_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "icon_url", "icon_kind", "fallback", "fallback_reason", "cache_key"],
+      "properties": {
+        "host": { "type": "string", "minLength": 1 },
+        "icon_url": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?:data:image/(?:png|jpeg|svg[+]xml);base64,[A-Za-z0-9+/=]+|https?://)"
+        },
+        "icon_kind": { "enum": ["explicit", "source-cache", "domain-cache", "generated", "none"] },
+        "fallback": { "type": "boolean" },
+        "fallback_reason": { "$ref": "#/$defs/nullable_text" },
+        "cache_key": { "type": "string", "minLength": 1 }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signal_id",
+        "canonical_url",
+        "material_url",
+        "title",
+        "source_summary",
+        "publisher",
+        "editorial_source",
+        "author",
+        "handle",
+        "source_role",
+        "collected_via",
+        "event_date",
+        "published_at",
+        "summary_origin",
+        "topic_path",
+        "content_format",
+        "access_state",
+        "source_health",
+        "source_identity",
+        "observation_refs",
+        "editorial_ready",
+        "review_policy",
+        "upstream_selection_date",
+        "upstream_position",
+        "upstream_positions",
+        "upstream_tags",
+        "upstream_payload_hash",
+        "upstream_snapshot_hash"
+      ],
+      "properties": {
+        "signal_id": { "type": "string", "pattern": "^sig_[a-f0-9]{24}$" },
+        "canonical_url": { "type": "string", "format": "uri" },
+        "material_url": { "type": "string", "format": "uri" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "source_summary": { "type": "string", "minLength": 1 },
+        "publisher": { "$ref": "#/$defs/publisher" },
+        "editorial_source": { "$ref": "#/$defs/editorial_source" },
+        "author": { "$ref": "#/$defs/nullable_text" },
+        "handle": { "$ref": "#/$defs/nullable_text" },
+        "source_role": { "type": "string", "minLength": 1 },
+        "collected_via": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/collector" }
+        },
+        "event_date": { "type": "string", "format": "date" },
+        "published_at": { "$ref": "#/$defs/nullable_datetime" },
+        "summary_origin": { "enum": ["upstream_editorial", "source_synopsis", "model_generated"] },
+        "topic_path": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "content_format": { "type": "string", "minLength": 1 },
+        "access_state": { "enum": ["direct", "indirect", "unknown"] },
+        "source_health": { "enum": ["available", "degraded", "unknown"] },
+        "source_identity": { "$ref": "#/$defs/source_identity" },
+        "observation_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "editorial_ready": { "type": "boolean" },
+        "review_policy": { "$ref": "#/$defs/nullable_text" },
+        "upstream_selection_date": { "$ref": "#/$defs/nullable_date" },
+        "upstream_position": { "$ref": "#/$defs/nullable_integer" },
+        "upstream_positions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "upstream_tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "upstream_payload_hash": { "$ref": "#/$defs/nullable_hash" },
+        "upstream_snapshot_hash": { "$ref": "#/$defs/nullable_hash" }
+      }
+    }
+  }
+}

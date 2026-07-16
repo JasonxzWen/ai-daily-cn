@@ -38,6 +38,8 @@ const SECRET_VALUE_PATTERNS = [
 const REPO_SAFE_INTERNAL_RECEIPT_PREFIXES = [
   "reports-data/occurrences/",
   "reports-data/observations/",
+  "reports-data/signals/",
+  "reports-data/public-signal-pool/",
   "reports-data/source-funnel/"
 ];
 const PUBLIC_URL_RE = /https?:\/\/[^\s"'<>\\]+/gi;

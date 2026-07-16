@@ -178,6 +178,7 @@
         "parsed_count": { "type": "integer", "minimum": 0 },
         "upstream_snapshot_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
         "upstream_selection_date": { "type": "string" },
+        "upstream_payload_sequence_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
         "input_count": { "type": "integer", "minimum": 0 },
         "represented_input_count": { "type": "integer", "minimum": 0 },
         "item_count": { "type": "integer", "minimum": 0 },

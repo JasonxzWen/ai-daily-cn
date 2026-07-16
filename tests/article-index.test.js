@@ -23,12 +23,18 @@ const AIFY_DOMAINS = new Set([
   "多模态与具身等前沿"
 ]);
 
-test("legacy report scan ignores the public signal baseline manifest", async () => {
+test("legacy report scan ignores baseline and internal shadow signal trees", async () => {
   const dataInputDir = await fs.mkdtemp(path.join(os.tmpdir(), "adc-report-scan-"));
   const reportDir = path.join(dataInputDir, "2026", "07");
+  const signalPoolDir = path.join(dataInputDir, "signals", "2026", "07");
+  const publicSignalPoolDir = path.join(dataInputDir, "public-signal-pool", "2026", "07");
   await fs.mkdir(reportDir, { recursive: true });
+  await fs.mkdir(signalPoolDir, { recursive: true });
+  await fs.mkdir(publicSignalPoolDir, { recursive: true });
   await fs.writeFile(path.join(reportDir, "2026-07-14.json"), "{}", "utf8");
   await fs.writeFile(path.join(dataInputDir, "occurrence-baseline-manifest.json"), "{}", "utf8");
+  await fs.writeFile(path.join(signalPoolDir, "2026-07-14.json"), "{}", "utf8");
+  await fs.writeFile(path.join(publicSignalPoolDir, "2026-07-14.json"), "{}", "utf8");
 
   const files = await collectJsonFiles(dataInputDir);
 

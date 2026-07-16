@@ -2,12 +2,18 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { AIFY_TODAY_LANE_ID, AIFY_SITE_WATCH_ID, createAifyTodayPicksFailure } from "./aify-today-picks.js";
+import {
+  AIFY_TODAY_LANE_ID,
+  AIFY_SITE_WATCH_ID,
+  aifyPayloadSequenceHash,
+  createAifyTodayPicksFailure
+} from "./aify-today-picks.js";
 import { PublisherError } from "./errors.js";
 import { buildOccurrenceStore } from "./occurrence-store.js";
 import { findRepoSafeReceiptPrivacyFindings } from "./privacy.js";
 import { rawObservationsRelativePath, sourceFunnelRelativePath } from "./reports-data-layout.js";
-import { canonicalPublicUrlIdentity } from "./public-url.js";
+import { canonicalPublicUrlIdentity, sanitizePublicHttpUrl } from "./public-url.js";
+import { rawMaterialUrlHash, rawObservationContentHash } from "./raw-observation-integrity.js";
 import { validateRawObservations, validateSourceFunnel } from "./schema.js";
 import {
   CORE_SOURCE_CONTRACTS,
@@ -359,6 +365,17 @@ export function validateCuratedShadowArtifacts(options = {}) {
   if (lineage.missing_aify_ids.length > 0 || lineage.extra_aify_ids.length > 0) {
     throw new PublisherError("curated_shadow_aify_lineage_invalid", "Aify parsed items must map exactly to persisted raw observations.");
   }
+  if (
+    lineage.aify_snapshot_mismatch_ids.length > 0 ||
+    lineage.aify_selection_date_mismatch_ids.length > 0 ||
+    lineage.aify_payload_sequence_mismatch_ids.length > 0
+  ) {
+    throw new PublisherError("curated_shadow_aify_receipt_mismatch", "Aify raw observations must match the collector snapshot and selection date.", {
+      snapshot_mismatch_ids: lineage.aify_snapshot_mismatch_ids,
+      selection_date_mismatch_ids: lineage.aify_selection_date_mismatch_ids,
+      payload_sequence_mismatch_ids: lineage.aify_payload_sequence_mismatch_ids
+    });
+  }
   if (!lineage.valid) {
     throw new PublisherError("curated_shadow_raw_lineage_incomplete", "Every persisted raw observation must close at least one parsed funnel lane.", {
       missing_raw_ids: lineage.missing_raw_ids,
@@ -424,19 +441,41 @@ export function inspectCuratedShadowLineage(rawObservations, sourceFunnel) {
   const parsedAifyIds = new Set(aifyContentLanes[0]?.stages?.parsed?.item_ids || []);
   const missingAifyIds = [...rawAifyIds].filter((id) => !parsedAifyIds.has(id));
   const extraAifyIds = [...parsedAifyIds].filter((id) => !rawAifyIds.has(id));
+  const aifyCollectorReceipt = aifyContentLanes[0]?.collector_receipt || {};
+  const aifySnapshotMismatchIds = observations
+    .filter((item) => item.source_id === AIFY_TODAY_LANE_ID)
+    .filter((item) => item.upstream?.upstream_snapshot_hash !== aifyCollectorReceipt.upstream_snapshot_hash)
+    .map((item) => item.id);
+  const aifySelectionDateMismatchIds = observations
+    .filter((item) => item.source_id === AIFY_TODAY_LANE_ID)
+    .filter((item) => item.upstream?.upstream_selection_date !== aifyCollectorReceipt.upstream_selection_date)
+    .map((item) => item.id);
+  const aifyPayloadSequenceMismatchIds = aifyPayloadSequenceHash(
+    observations
+      .filter((item) => item.source_id === AIFY_TODAY_LANE_ID)
+      .map((item) => item.upstream)
+  ) === aifyCollectorReceipt.upstream_payload_sequence_hash
+    ? []
+    : [...rawAifyIds];
   return {
     valid: missingRawIds.length === 0 &&
       unknownRawIds.length === 0 &&
       misboundRawIds.length === 0 &&
       collectorMismatchIds.length === 0 &&
       missingAifyIds.length === 0 &&
-      extraAifyIds.length === 0,
+      extraAifyIds.length === 0 &&
+      aifySnapshotMismatchIds.length === 0 &&
+      aifySelectionDateMismatchIds.length === 0 &&
+      aifyPayloadSequenceMismatchIds.length === 0,
     missing_raw_ids: missingRawIds,
     unknown_raw_ids: unknownRawIds,
     misbound_raw_ids: misboundRawIds,
     collector_mismatch_ids: collectorMismatchIds,
     missing_aify_ids: missingAifyIds,
-    extra_aify_ids: extraAifyIds
+    extra_aify_ids: extraAifyIds,
+    aify_snapshot_mismatch_ids: aifySnapshotMismatchIds,
+    aify_selection_date_mismatch_ids: aifySelectionDateMismatchIds,
+    aify_payload_sequence_mismatch_ids: aifyPayloadSequenceMismatchIds
   };
 }
 
@@ -504,15 +543,15 @@ function validateAifyCollectorReceipt(aifyResult) {
 }
 
 function buildRawObservations({ occurrenceStore, candidates, sources, aifyResult }) {
-  const candidateByOccurrenceId = new Map();
+  const candidatesByOccurrenceId = new Map();
   for (const candidate of candidates) {
     const sourceId = normalizeIdentity(candidate?.source_id, "source");
     const observationId = normalizeIdentity(candidate?.observation_id, "obs");
     if (!sourceId || !observationId) continue;
-    candidateByOccurrenceId.set(occurrenceId(occurrenceStore.report_date, sourceId, observationId), {
-      candidate,
-      sourceId
-    });
+    const id = occurrenceId(occurrenceStore.report_date, sourceId, observationId);
+    const group = candidatesByOccurrenceId.get(id) || { candidates: [], sourceId };
+    group.candidates.push(candidate);
+    candidatesByOccurrenceId.set(id, group);
   }
   const sourceById = new Map(sources.map((source) => [String(source?.id || ""), source]));
   const upstreamByObservationId = new Map((aifyResult?.content_lane?.items || []).map((item) => [
@@ -520,49 +559,72 @@ function buildRawObservations({ occurrenceStore, candidates, sources, aifyResult
     item
   ]));
   const observations = occurrenceStore.occurrences.map((occurrence) => {
-    const matched = candidateByOccurrenceId.get(occurrence.id) || {};
+    const matched = candidatesByOccurrenceId.get(occurrence.id) || {};
+    const matchedCandidates = matched.candidates || [];
+    const representativeCandidate = deterministicCandidate(matchedCandidates);
     const sourceId = matched.sourceId || "unknown-source";
     const source = sourceById.get(sourceId) || {};
-    const upstream = upstreamByObservationId.get(occurrence.observation_id);
-    const materialUrlHash = sha256(occurrence.url);
+    const upstream = sourceId === AIFY_TODAY_LANE_ID
+      ? upstreamByObservationId.get(occurrence.observation_id)
+      : null;
+    const material = upstream
+      ? { url: upstream.url, accessState: "direct" }
+      : deterministicMaterialProjection(matchedCandidates, occurrence);
+    const materialUrlHash = rawMaterialUrlHash(material.url);
     const title = upstream?.title ?? occurrence.title;
-    const excerpt = upstream?.summary ?? occurrence.summary;
+    const excerptProjection = rawExcerptProjection({
+      upstream,
+      candidates: matchedCandidates,
+      occurrence
+    });
+    const excerpt = excerptProjection.excerpt;
     const eventDate = upstream?.date ?? occurrence.event_date;
+    const hasExplicitEventDate = candidateHasEventDate(matchedCandidates, eventDate);
+    const hasPublishedDate = candidateHasPublishedDate(matchedCandidates, eventDate);
+    const eventDateOrigin = upstream
+      ? "upstream_editorial"
+      : hasExplicitEventDate
+        ? "source"
+        : hasPublishedDate
+          ? "published_at"
+          : "report_date_fallback";
     const raw = {
       id: `raw_${occurrence.id.slice(4)}`,
       observation_id: occurrence.observation_id,
       source_id: sourceId,
       raw_record_count: occurrence.raw_record_count,
-      material_url: occurrence.url,
+      material_url: material.url,
       material_url_hash: materialUrlHash,
       title,
       excerpt,
+      excerpt_origin: excerptProjection.origin,
+      excerpt_hash: excerptProjection.hash,
       publisher_hint: occurrence.publisher_hint,
       collector: {
         id: sourceId,
         name: occurrence.collector.name,
-        url: occurrence.collector.url || null,
-        source_kind: String(source.source_kind || source.format || matched.candidate?.category || "unknown")
+        url: explicitCollectorUrl(matchedCandidates, source),
+        source_kind: String(source.source_kind || source.format || representativeCandidate?.category || "unknown")
       },
       author: occurrence.author,
       handle: occurrence.handle,
       event_date: eventDate,
+      event_date_origin: eventDateOrigin,
       published_at: occurrence.published_at,
       collected_at: occurrence.collected_at,
       fetch_status: "fetched",
       parse_status: "parsed",
-      content_hash: sha256(stableJson({
-        title,
-        excerpt,
-        material_url_hash: materialUrlHash,
-        event_date: eventDate,
-        author: occurrence.author,
-        handle: occurrence.handle
-      })),
+      content_hash: null,
       source_group: occurrence.raw_source_group,
-      content_tags: occurrence.raw_tags
+      content_format_hint: String(occurrence.raw_content_kind || representativeCandidate?.category || "other"),
+      access_state: material.accessState,
+      source_health: String(occurrence.collector?.health || "unknown"),
+      content_tags: upstream
+        ? upstream.upstream_tags
+        : deterministicContentTags(matchedCandidates, occurrence.raw_tags)
     };
     if (upstream) raw.upstream = aifyUpstreamReceipt(upstream);
+    raw.content_hash = rawObservationContentHash(raw);
     return raw;
   });
   const rejections = (aifyResult?.content_lane?.rejected_items || []).map((item) => ({
@@ -592,6 +654,143 @@ function buildRawObservations({ occurrenceStore, candidates, sources, aifyResult
     rejections,
     observations
   };
+}
+
+function candidateHasEventDate(candidates, eventDate) {
+  return candidates.some((candidate) => [candidate?.event_date, candidate?.date].some((value) => {
+    const text = String(value || "").slice(0, 10);
+    return isValidDateString(text) && text === eventDate;
+  }));
+}
+
+function rawExcerptProjection({ upstream, candidates, occurrence }) {
+  if (upstream) {
+    const excerpt = String(upstream.summary || "");
+    return { excerpt, origin: "upstream_editorial", hash: sha256(excerpt) };
+  }
+  const originalText = normalizeShortExcerpt(occurrence?.original_text);
+  if (originalText) return excerptProjection(originalText, "source_original_text");
+  const explicit = deterministicSourceSynopsis(candidates);
+  if (explicit) return excerptProjection(explicit.synopsis, explicit.origin);
+  const legacyCopy = normalizeShortExcerpt(occurrence?.summary);
+  if (legacyCopy) return excerptProjection(legacyCopy, "legacy_candidate_copy");
+  return { excerpt: null, origin: "none", hash: null };
+}
+
+function excerptProjection(value, origin) {
+  const excerpt = normalizeShortExcerpt(value);
+  return excerpt
+    ? { excerpt, origin, hash: sha256(excerpt) }
+    : { excerpt: null, origin: "none", hash: null };
+}
+
+function candidateHasPublishedDate(candidates, eventDate) {
+  return candidates.some((candidate) => {
+    const value = String(candidate?.published_at || "");
+    return isValidDateTimeString(value) && value.slice(0, 10) === eventDate;
+  });
+}
+
+function explicitCollectorUrl(candidates, source) {
+  const candidateUrls = candidates
+    .flatMap((candidate) => [candidate?.source_url, candidate?.collector?.url])
+    .map(sanitizePublicHttpUrl)
+    .filter(Boolean)
+    .sort((left, right) => left.localeCompare(right));
+  for (const value of [...candidateUrls, source?.url]) {
+    const safe = sanitizePublicHttpUrl(value);
+    if (safe) return safe;
+  }
+  return null;
+}
+
+function deterministicMaterialProjection(candidates, occurrence) {
+  const accessOrder = new Map([
+    ["direct", 0],
+    ["indirect", 1],
+    ["unknown", 2]
+  ]);
+  const projections = candidates
+    .map(candidateMaterialProjection)
+    .filter(Boolean)
+    .sort((left, right) => (
+      (accessOrder.get(left.accessState) ?? 3) - (accessOrder.get(right.accessState) ?? 3) ||
+      canonicalPublicUrlIdentity(left.url).localeCompare(canonicalPublicUrlIdentity(right.url)) ||
+      left.url.localeCompare(right.url)
+    ));
+  if (projections[0]) return projections[0];
+  return {
+    url: sanitizePublicHttpUrl(occurrence?.url),
+    accessState: ["direct", "indirect", "unknown"].includes(occurrence?.access_state)
+      ? occurrence.access_state
+      : "unknown"
+  };
+}
+
+function candidateMaterialProjection(candidate) {
+  for (const field of ["primary_url", "original_url"]) {
+    const url = sanitizePublicHttpUrl(candidate?.[field]);
+    if (url) return { url, accessState: "direct" };
+  }
+  const materialUrl = sanitizePublicHttpUrl(candidate?.url);
+  const intermediaryUrl = sanitizePublicHttpUrl(candidate?.intermediary_url);
+  if (materialUrl) {
+    return {
+      url: materialUrl,
+      accessState: candidate?.access_state === "indirect" || (
+        intermediaryUrl && canonicalPublicUrlIdentity(materialUrl) === canonicalPublicUrlIdentity(intermediaryUrl)
+      ) ? "indirect" : "direct"
+    };
+  }
+  return intermediaryUrl ? { url: intermediaryUrl, accessState: "indirect" } : null;
+}
+
+function deterministicContentTags(candidates, fallback = []) {
+  const tags = candidates
+    .flatMap((candidate) => [
+      ...(Array.isArray(candidate?.content_tags) ? candidate.content_tags : []),
+      ...(Array.isArray(candidate?.tags) ? candidate.tags : [])
+    ])
+    .map(normalizeShortExcerpt)
+    .map((value) => value.length <= 100 ? value : `${value.slice(0, 99).trimEnd()}…`)
+    .filter(Boolean);
+  const values = tags.length > 0 ? tags : (Array.isArray(fallback) ? fallback : []);
+  return [...new Set(values)].sort((left, right) => left.localeCompare(right)).slice(0, 32);
+}
+
+function deterministicCandidate(candidates) {
+  return [...candidates].sort((left, right) => stableJson(left).localeCompare(stableJson(right)))[0] || null;
+}
+
+function deterministicSourceSynopsis(candidates) {
+  const originPriority = new Map([
+    ["source_feed", 0],
+    ["structured_source", 1],
+    ["source_metadata", 2]
+  ]);
+  const values = candidates.flatMap((candidate) => {
+    const origin = String(candidate?.source_synopsis_origin || "");
+    const synopsis = normalizeShortExcerpt(candidate?.source_synopsis);
+    return synopsis && originPriority.has(origin) ? [{ origin, synopsis }] : [];
+  });
+  values.sort((left, right) => (
+    originPriority.get(left.origin) - originPriority.get(right.origin) ||
+    right.synopsis.length - left.synopsis.length ||
+    left.synopsis.localeCompare(right.synopsis)
+  ));
+  return values[0] || null;
+}
+
+function normalizeShortExcerpt(value) {
+  const text = String(value || "")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return "";
+  return text.length <= 360 ? text : `${text.slice(0, 359).trimEnd()}…`;
 }
 
 export function buildCuratedSourceAssetReconciliation({ registry, sources, auditRows, rawObservations, historicalDecisions, promotionProposals, sourcesPath }) {
@@ -945,6 +1144,7 @@ function buildAifyContentLane(aifyResult, observations) {
       parsed_count: Number(content.parsed_count || 0),
       upstream_snapshot_hash: String(content.upstream_snapshot_hash || ""),
       upstream_selection_date: String(content.upstream_selection_date || ""),
+      upstream_payload_sequence_hash: aifyPayloadSequenceHash(content.items),
       input_count: Number(content.input_count || 0),
       represented_input_count: (content.items || []).reduce((sum, item) => sum + Number(item?.upstream_positions?.length || 0), 0),
       item_count: Number(content.item_count || 0),

@@ -1196,6 +1196,19 @@ function buildInitialWorkflowStages({ reportDate, publish = false, generatedAt =
       "--output",
       tmp("curated-source-shadow")
     ]),
+    nodeCliStage("signal_pool_shadow", [
+      "signals:pool-shadow",
+      "--date",
+      reportDate,
+      "--generated-at",
+      generatedAt,
+      "--input",
+      "reports-data",
+      "--out",
+      "reports-data",
+      "--output",
+      tmp("signal-pool-shadow")
+    ]),
     nodeCliStage("signals_write", [
       "signals:write",
       "--date",

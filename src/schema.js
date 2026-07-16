@@ -1,8 +1,11 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import Ajv from "ajv/dist/2020.js";
 import { fileURLToPath } from "node:url";
+import { validatePersistedAifyTodayItem } from "./aify-today-picks.js";
 import { canonicalPublicUrlIdentity, hasUnsafePublicHttpUrlMaterial, isSafePublicHttpUrl } from "./public-url.js";
+import { rawMaterialUrlHash, rawObservationContentHash } from "./raw-observation-integrity.js";
 import { classifyOccurrenceDateAnomaly, isOccurrenceChronologySorted } from "./signal-chronology.js";
 import { isValidDateString, isValidDateTimeString } from "./time.js";
 
@@ -58,6 +61,9 @@ export const schemas = {
   occurrenceStore: loadSchema("occurrence-store.schema.json"),
   rawObservations: loadSchema("raw-observations.schema.json"),
   sourceFunnel: loadSchema("source-funnel.schema.json"),
+  signalQuarantine: loadSchema("signal-quarantine.schema.json"),
+  signalPool: loadSchema("signal-pool.schema.json"),
+  publicSignalPool: loadSchema("public-signal-pool.schema.json"),
   publicSignals: loadSchema("public-signals.schema.json"),
   sourceRegistry: loadSchema("sources.schema.json"),
   trends: loadSchema("trends.schema.json")
@@ -74,6 +80,9 @@ const validateCandidatePoolSchema = ajv.compile(schemas.candidatePool);
 const validateOccurrenceStoreSchema = ajv.compile(schemas.occurrenceStore);
 const validateRawObservationsSchema = ajv.compile(schemas.rawObservations);
 const validateSourceFunnelSchema = ajv.compile(schemas.sourceFunnel);
+const validateSignalQuarantineSchema = ajv.compile(schemas.signalQuarantine);
+const validateSignalPoolSchema = ajv.compile(schemas.signalPool);
+const validatePublicSignalPoolSchema = ajv.compile(schemas.publicSignalPool);
 const validatePublicSignalsSchema = ajv.compile(schemas.publicSignals);
 const validateSourceRegistrySchema = ajv.compile(schemas.sourceRegistry);
 const validateTrendsSchema = ajv.compile(schemas.trends);
@@ -161,6 +170,39 @@ export function validateSourceFunnel(funnel) {
   };
 }
 
+export function validateSignalQuarantine(quarantine) {
+  const candidate = structuredClone(quarantine);
+  const schemaValid = validateSignalQuarantineSchema(candidate);
+  const semanticErrors = schemaValid ? collectSignalQuarantineSemanticErrors(candidate) : [];
+  return {
+    valid: schemaValid && semanticErrors.length === 0,
+    value: candidate,
+    errors: schemaValid ? semanticErrors : normalizeAjvErrors(validateSignalQuarantineSchema.errors)
+  };
+}
+
+export function validateSignalPool(pool) {
+  const candidate = structuredClone(pool);
+  const schemaValid = validateSignalPoolSchema(candidate);
+  const semanticErrors = schemaValid ? collectSignalPoolSemanticErrors(candidate) : [];
+  return {
+    valid: schemaValid && semanticErrors.length === 0,
+    value: candidate,
+    errors: schemaValid ? semanticErrors : normalizeAjvErrors(validateSignalPoolSchema.errors)
+  };
+}
+
+export function validatePublicSignalPool(pool) {
+  const candidate = structuredClone(pool);
+  const schemaValid = validatePublicSignalPoolSchema(candidate);
+  const semanticErrors = schemaValid ? collectPublicSignalPoolSemanticErrors(candidate) : [];
+  return {
+    valid: schemaValid && semanticErrors.length === 0,
+    value: candidate,
+    errors: schemaValid ? semanticErrors : normalizeAjvErrors(validatePublicSignalPoolSchema.errors)
+  };
+}
+
 export function validatePublicSignals(value) {
   const candidate = structuredClone(value);
   const schemaValid = validatePublicSignalsSchema(candidate);
@@ -200,6 +242,105 @@ function normalizeAjvErrors(errors = []) {
     message: error.message || "schema validation failed",
     keyword: error.keyword
   }));
+}
+
+function collectSignalQuarantineSemanticErrors(value) {
+  const errors = [];
+  const items = Array.isArray(value.items) ? value.items : [];
+  if (value.item_count !== items.length) {
+    errors.push(semanticError("/item_count", "item_count must equal items.length"));
+  }
+  if (!hasUniqueValues(items.map((item) => item.raw_observation_id))) {
+    errors.push(semanticError("/items", "quarantine raw observation ids must be unique"));
+  }
+  if (Date.parse(value.expires_at) <= Date.parse(value.generated_at)) {
+    errors.push(semanticError("/expires_at", "expires_at must be later than generated_at"));
+  }
+  return errors;
+}
+
+function collectSignalPoolSemanticErrors(value) {
+  const errors = [];
+  const preAdmissionReceipts = Array.isArray(value.pre_admission_receipts) ? value.pre_admission_receipts : [];
+  const receipts = Array.isArray(value.admission_receipts) ? value.admission_receipts : [];
+  const summaries = Array.isArray(value.summary_receipts) ? value.summary_receipts : [];
+  const signals = Array.isArray(value.signals) ? value.signals : [];
+  if (value.input_observation_count !== receipts.length) {
+    errors.push(semanticError("/input_observation_count", "input_observation_count must equal admission_receipts.length"));
+  }
+  const expectedPreAdmissionCount = Number(value.pre_admission_counts?.normalization_errors || 0) +
+    Number(value.pre_admission_counts?.parser_rejections || 0);
+  if (preAdmissionReceipts.length !== expectedPreAdmissionCount) {
+    errors.push(semanticError("/pre_admission_receipts", "pre-admission receipts must conserve normalization and parser rejects"));
+  }
+  if (value.input_record_count !== receipts.reduce((sum, item) => sum + Number(item.represented_input_count || 0), 0) + preAdmissionReceipts.length) {
+    errors.push(semanticError("/input_record_count", "input_record_count must equal represented observations plus pre-admission receipts"));
+  }
+  const dispositionCounts = countEnum(receipts.map((item) => item.disposition), ["admitted", "rejected", "needs_review"]);
+  const dispositionInputCounts = receipts.reduce((counts, item) => {
+    counts[item.disposition] += Number(item.represented_input_count || 0);
+    return counts;
+  }, { admitted: 0, rejected: 0, needs_review: 0 });
+  for (const key of Object.keys(dispositionCounts)) {
+    if (value.disposition_counts?.[key] !== dispositionCounts[key]) {
+      errors.push(semanticError(`/disposition_counts/${key}`, "disposition count must match admission receipts"));
+    }
+    if (value.disposition_input_counts?.[key] !== dispositionInputCounts[key]) {
+      errors.push(semanticError(`/disposition_input_counts/${key}`, "represented input count must match admission receipts"));
+    }
+  }
+  if (value.signal_count !== signals.length) {
+    errors.push(semanticError("/signal_count", "signal_count must equal signals.length"));
+  }
+  if (summaries.length !== signals.length) {
+    errors.push(semanticError("/summary_receipts", "every signal must have exactly one summary receipt"));
+  }
+  const summaryCounts = countEnum(signals.map((item) => item.summary_status), ["ready", "pending", "failed"]);
+  for (const key of Object.keys(summaryCounts)) {
+    if (value.summary_counts?.[key] !== summaryCounts[key]) {
+      errors.push(semanticError(`/summary_counts/${key}`, "summary count must match signal status"));
+    }
+  }
+  for (const [collectionPath, values] of [
+    ["/pre_admission_receipts", preAdmissionReceipts.map((item) => item.receipt_id)],
+    ["/admission_receipts", receipts.map((item) => item.receipt_id)],
+    ["/admission_receipts", receipts.map((item) => item.raw_observation_id)],
+    ["/summary_receipts", summaries.map((item) => item.receipt_id)],
+    ["/summary_receipts", summaries.map((item) => item.signal_id)],
+    ["/signals", signals.map((item) => item.signal_id)],
+    ["/signals", signals.map((item) => item.canonical_url)]
+  ]) {
+    if (!hasUniqueValues(values)) errors.push(semanticError(collectionPath, "identity values must be unique"));
+  }
+  for (const [index, signal] of signals.entries()) {
+    if (signal.summary_status === "ready" && (!signal.source_summary || signal.summary_origin === "none")) {
+      errors.push(semanticError(`/signals/${index}/source_summary`, "ready signals require a source summary and origin"));
+    }
+    if (signal.summary_status !== "ready" && signal.source_summary !== null) {
+      errors.push(semanticError(`/signals/${index}/source_summary`, "non-ready signals cannot expose a source summary"));
+    }
+  }
+  return errors;
+}
+
+function collectPublicSignalPoolSemanticErrors(value) {
+  const errors = [];
+  const items = Array.isArray(value.items) ? value.items : [];
+  if (value.item_count !== items.length) {
+    errors.push(semanticError("/item_count", "item_count must equal items.length"));
+  }
+  if (!hasUniqueValues(items.map((item) => item.signal_id)) || !hasUniqueValues(items.map((item) => item.canonical_url))) {
+    errors.push(semanticError("/items", "public-ready signal and canonical URL identities must be unique"));
+  }
+  return errors;
+}
+
+function countEnum(values, keys) {
+  const counts = Object.fromEntries(keys.map((key) => [key, 0]));
+  for (const value of values) {
+    if (Object.hasOwn(counts, value)) counts[value] += 1;
+  }
+  return counts;
 }
 
 function collectPublicSignalTaxonomyErrors(value) {
@@ -323,10 +464,29 @@ function collectRawObservationSemanticErrors(value) {
     if (!isSafePublicHttpUrl(item.material_url)) {
       errors.push(semanticError(`/observations/${index}/material_url`, "material_url must be a repo-safe public HTTP(S) URL"));
     }
+    if (item.material_url_hash !== rawMaterialUrlHash(item.material_url)) {
+      errors.push(semanticError(`/observations/${index}/material_url_hash`, "material_url_hash must match the persisted material URL"));
+    }
     if (item.collector?.url != null && !isSafePublicHttpUrl(item.collector.url)) {
       errors.push(semanticError(`/observations/${index}/collector/url`, "collector URL must be a repo-safe public HTTP(S) URL"));
     }
+    const expectedExcerptHash = item.excerpt == null ? null : sha256(item.excerpt);
+    if (
+      item.excerpt_hash !== expectedExcerptHash ||
+      (item.excerpt == null) !== (item.excerpt_origin === "none")
+    ) {
+      errors.push(semanticError(`/observations/${index}/excerpt_hash`, "excerpt text, origin, and hash must form one deterministic projection"));
+    }
+    if (item.source_id !== "aify_today_picks" && item.excerpt != null && item.excerpt !== item.excerpt.trim()) {
+      errors.push(semanticError(`/observations/${index}/excerpt`, "ordinary excerpts must use canonical trimmed text"));
+    }
+    if (item.content_hash !== rawObservationContentHash(item)) {
+      errors.push(semanticError(`/observations/${index}/content_hash`, "content_hash must match the canonical raw observation projection"));
+    }
     if (item.upstream) {
+      if (item.source_id !== "aify_today_picks" || item.excerpt_origin !== "upstream_editorial") {
+        errors.push(semanticError(`/observations/${index}/upstream`, "only Aify observations may carry trusted upstream editorial payloads"));
+      }
       if (hasUnsafePublicHttpUrlMaterial(item.upstream.url)) {
         errors.push(semanticError(`/observations/${index}/upstream/url`, "upstream URL must preserve a safe public HTTP(S) value"));
       }
@@ -337,6 +497,10 @@ function collectRawObservationSemanticErrors(value) {
         item.upstream.date !== item.event_date
       ) {
         errors.push(semanticError(`/observations/${index}/upstream`, "Aify upstream fields must match the persisted safe material projection"));
+      }
+      const persistedValidation = validatePersistedAifyTodayItem(item.upstream, { reportDate: value.report_date });
+      if (!persistedValidation.valid) {
+        errors.push(semanticError(`/observations/${index}/upstream`, `Aify persisted payload failed mechanical validation: ${persistedValidation.reason}`));
       }
     }
   }
@@ -431,6 +595,7 @@ function collectSourceFunnelSemanticErrors(value) {
       const receipt = lane.collector_receipt;
       if (
         lane.lane_id !== "aify_today_picks" ||
+        !/^sha256:[a-f0-9]{64}$/.test(String(receipt.upstream_payload_sequence_hash || "")) ||
         receipt.item_count !== receipt.parsed_count ||
         receipt.item_count !== lane.stages?.parsed?.count ||
         receipt.input_count !== receipt.represented_input_count + receipt.rejection_count
@@ -576,6 +741,10 @@ function collectOccurrenceSafetyErrors(items, basePath, options = {}) {
 function isUniqueOccurrenceList(items = []) {
   const ids = items.map((item) => item.id);
   return new Set(ids).size === ids.length;
+}
+
+function sha256(value) {
+  return `sha256:${createHash("sha256").update(String(value || "")).digest("hex")}`;
 }
 
 function taxonomyError(pathname, value) {

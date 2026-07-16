@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/signal-quarantine.schema.json",
+  "title": "AI Daily Signal Admission Quarantine",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "report_date",
+    "generated_at",
+    "expires_at",
+    "item_count",
+    "items"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "signal_quarantine" },
+    "report_date": { "type": "string", "format": "date" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "item_count": { "type": "integer", "minimum": 0 },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "raw_observation_id",
+          "observation_id",
+          "source_id",
+          "disposition",
+          "reason_code",
+          "represented_input_count",
+          "material_host",
+          "material_url_hash",
+          "safe_excerpt"
+        ],
+        "properties": {
+          "raw_observation_id": { "type": "string", "pattern": "^raw_[a-f0-9]{24}$" },
+          "observation_id": { "type": "string", "minLength": 1 },
+          "source_id": { "type": "string", "minLength": 1 },
+          "disposition": { "enum": ["rejected", "needs_review"] },
+          "reason_code": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+          "represented_input_count": { "type": "integer", "minimum": 1 },
+          "material_host": {
+            "oneOf": [
+              { "type": "string", "minLength": 1, "maxLength": 253 },
+              { "type": "null" }
+            ]
+          },
+          "material_url_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "safe_excerpt": {
+            "oneOf": [
+              { "type": "string", "minLength": 1, "maxLength": 160 },
+              { "type": "null" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
