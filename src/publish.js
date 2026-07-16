@@ -18,11 +18,15 @@ import { buildAutomationRevision } from "./automation-revision.js";
 import { buildPublicSignalArtifacts, loadOccurrenceStores } from "./public-signals.js";
 import { scanPublicArtifactsForLocalInfo } from "./privacy.js";
 import { validateOccurrenceStore, validateRawObservations, validateSourceFunnel } from "./schema.js";
+import { loadSignalAdmissionContract } from "./signal-admission.js";
+import { loadPriorSignalState, validateSignalPoolArtifacts } from "./signal-pool.js";
 import { mergeCommandEnv, pnpmCommandText, pnpmInvocationForArgs } from "./process-runner.js";
 import {
   candidatePoolRelativePaths,
   occurrenceStoreRelativePath,
+  publicSignalPoolRelativePath,
   rawObservationsRelativePath,
+  signalPoolRelativePath,
   sourceFunnelRelativePath,
   sourceStatusHistoryRelativePaths,
   toRepoPath
@@ -64,7 +68,7 @@ export async function checkPublishPreflight(options = {}) {
     : { present: false, ignored_paths: [] };
   const effectiveStatusEntries = withoutIgnoredStatusEntries(
     statusEntries,
-    curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths
+    shadowStatusExemptPaths(curatedShadow)
   );
   const unrelated = effectiveStatusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
   if (unrelated.length > 0) {
@@ -368,7 +372,7 @@ export async function createPublishPlan(options = {}) {
     : { present: false, ignored_paths: [] };
   const effectiveStatusEntries = withoutIgnoredStatusEntries(
     statusEntries,
-    curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths
+    shadowStatusExemptPaths(curatedShadow)
   );
   const unrelated = effectiveStatusEntries.filter((entry) => !isPublisherOwnedPath(entry.path));
   if (unrelated.length > 0) {
@@ -545,7 +549,7 @@ export async function publishGeneratedArtifacts(options = {}) {
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const effectiveStatusEntries = withoutIgnoredStatusEntries(
     statusEntries,
-    scope === "signals" ? curatedShadow.ignored_paths : (curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths)
+    scope === "signals" ? curatedShadow.ignored_paths : shadowStatusExemptPaths(curatedShadow)
   );
   const publishFiles = dirtyPublisherFilesForPublish(effectiveStatusEntries, options.reportDate, scope);
   const unrelated = effectiveStatusEntries.filter((entry) => !isPublishWorktreePathAllowed(entry.path, scope, options.reportDate));
@@ -656,7 +660,7 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const effectiveStatusEntries = withoutIgnoredStatusEntries(
     statusEntries,
-    scope === "signals" ? curatedShadow.ignored_paths : (curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths)
+    scope === "signals" ? curatedShadow.ignored_paths : shadowStatusExemptPaths(curatedShadow)
   );
   const hasPublisherDirtyFiles = effectiveStatusEntries.some((entry) => isPublisherOwnedPath(entry.path, scope, options.reportDate));
   const dirtyPublishFiles = dirtyPublisherFilesForPublish(effectiveStatusEntries, options.reportDate, scope);
@@ -740,18 +744,34 @@ export async function publishGeneratedArtifactsViaGitHubApi(options = {}) {
       .map((entry) => [entry.path, entry.sha])
   );
   if (scope === "signals") {
-    const remoteReceiptPaths = [
-      toRepoPath("reports-data", rawObservationsRelativePath(options.reportDate)),
-      toRepoPath("reports-data", sourceFunnelRelativePath(options.reportDate))
+    const remoteReceiptPairs = [
+      {
+        code: "curated_shadow_remote_receipt_pair_incomplete",
+        label: "Curated shadow",
+        paths: [
+          toRepoPath("reports-data", rawObservationsRelativePath(options.reportDate)),
+          toRepoPath("reports-data", sourceFunnelRelativePath(options.reportDate))
+        ]
+      },
+      {
+        code: "signal_pool_remote_receipt_pair_incomplete",
+        label: "Signal pool shadow",
+        paths: [
+          toRepoPath("reports-data", signalPoolRelativePath(options.reportDate)),
+          toRepoPath("reports-data", publicSignalPoolRelativePath(options.reportDate))
+        ]
+      }
     ];
-    const remoteReceiptPresence = remoteReceiptPaths.map((file) => remoteBlobShas.has(file));
-    const localPairWillRepair = remoteReceiptPaths.every((file) => publishFiles.includes(file));
-    if (remoteReceiptPresence[0] !== remoteReceiptPresence[1] && !localPairWillRepair) {
-      throw new PublisherError(
-        "curated_shadow_remote_receipt_pair_incomplete",
-        "Remote curated shadow receipts are orphaned; publish must repair or remove the pair together.",
-        { receipt_paths: remoteReceiptPaths }
-      );
+    for (const pair of remoteReceiptPairs) {
+      const remotePresence = pair.paths.map((file) => remoteBlobShas.has(file));
+      const localPairWillRepair = pair.paths.every((file) => publishFiles.includes(file));
+      if (remotePresence[0] !== remotePresence[1] && !localPairWillRepair) {
+        throw new PublisherError(
+          pair.code,
+          `${pair.label} receipts are orphaned on the remote; publish must repair the pair together.`,
+          { receipt_paths: pair.paths }
+        );
+      }
     }
   }
   const remoteSignalFiles = [...remoteBlobShas.keys()].filter((file) => file.startsWith("docs/signals/") && file.endsWith(".json"));
@@ -854,7 +874,7 @@ export async function resumePublishPush(options = {}) {
   const statusEntries = await expandedStatusEntries(repoRoot, parsePorcelain(await git.status()));
   const effectiveStatusEntries = withoutIgnoredStatusEntries(
     statusEntries,
-    scope === "signals" ? curatedShadow.ignored_paths : (curatedShadow.present ? curatedShadow.paths : curatedShadow.ignored_paths)
+    scope === "signals" ? curatedShadow.ignored_paths : shadowStatusExemptPaths(curatedShadow)
   );
   const blockingStatusEntries = scope === "signals"
     ? effectiveStatusEntries.filter((entry) => isPublisherOwnedPath(entry.path, "signals", options.reportDate))
@@ -1188,28 +1208,58 @@ async function requireSignalArtifacts(repoRoot, reportDate, options = {}) {
 async function requireOptionalCuratedShadowReceipts(repoRoot, reportDate, options = {}) {
   const rawRelativePath = toRepoPath("reports-data", rawObservationsRelativePath(reportDate));
   const funnelRelativePath = toRepoPath("reports-data", sourceFunnelRelativePath(reportDate));
-  const paths = [rawRelativePath, funnelRelativePath];
-  const [rawPath, funnelPath] = await Promise.all([
+  const signalRelativePath = toRepoPath("reports-data", signalPoolRelativePath(reportDate));
+  const publicSignalRelativePath = toRepoPath("reports-data", publicSignalPoolRelativePath(reportDate));
+  const phaseOnePaths = [rawRelativePath, funnelRelativePath];
+  const poolPaths = [signalRelativePath, publicSignalRelativePath];
+  const allPaths = [...phaseOnePaths, ...poolPaths];
+  const [rawPath, funnelPath, signalPath, publicSignalPath] = await Promise.all([
     assertOwnedPath(repoRoot, rawRelativePath, "curated_shadow_receipt_path_unsafe"),
-    assertOwnedPath(repoRoot, funnelRelativePath, "curated_shadow_receipt_path_unsafe")
+    assertOwnedPath(repoRoot, funnelRelativePath, "curated_shadow_receipt_path_unsafe"),
+    assertOwnedPath(repoRoot, signalRelativePath, "signal_pool_receipt_path_unsafe"),
+    assertOwnedPath(repoRoot, publicSignalRelativePath, "signal_pool_receipt_path_unsafe")
   ]);
-  const recoveryPaths = await findCuratedShadowRecoveryPaths(repoRoot, paths);
-  if (recoveryPaths.length > 0) {
+  const [phaseOneRecoveryPaths, poolRecoveryPaths] = await Promise.all([
+    findCuratedShadowRecoveryPaths(repoRoot, phaseOnePaths),
+    findCuratedShadowRecoveryPaths(repoRoot, poolPaths)
+  ]);
+  if (phaseOneRecoveryPaths.length > 0) {
     return {
       present: false,
       stale: false,
       recovery: true,
       paths: [],
-      ignored_paths: uniqueSorted([...paths, ...recoveryPaths])
+      ignored_paths: uniqueSorted([...allPaths, ...phaseOneRecoveryPaths, ...poolRecoveryPaths])
     };
   }
-  const [hasRaw, hasFunnel] = await Promise.all([exists(rawPath), exists(funnelPath)]);
-  if (!hasRaw && !hasFunnel) return { present: false, stale: false, paths: [], ignored_paths: [] };
+  const [hasRaw, hasFunnel, hasSignal, hasPublicSignal] = await Promise.all([
+    exists(rawPath),
+    exists(funnelPath),
+    exists(signalPath),
+    exists(publicSignalPath)
+  ]);
+  if (!hasRaw && !hasFunnel && !hasSignal && !hasPublicSignal) {
+    return { present: false, stale: false, paths: [], ignored_paths: [] };
+  }
   if (hasRaw !== hasFunnel) {
     throw new PublisherError(
       "curated_shadow_receipt_pair_incomplete",
       "Curated shadow receipts must be absent together or present as one verified pair.",
       { raw_path: rawRelativePath, funnel_path: funnelRelativePath }
+    );
+  }
+  if (poolRecoveryPaths.length === 0 && hasSignal !== hasPublicSignal) {
+    throw new PublisherError(
+      "signal_pool_receipt_pair_incomplete",
+      "Signal pool shadow receipts must be absent together or present as one verified pair.",
+      { signal_pool_path: signalRelativePath, public_signal_pool_path: publicSignalRelativePath }
+    );
+  }
+  if (!hasRaw && hasSignal && poolRecoveryPaths.length === 0) {
+    throw new PublisherError(
+      "signal_pool_receipt_orphaned",
+      "Signal pool shadow receipts require their same-generation Phase 1A receipt pair.",
+      { signal_pool_path: signalRelativePath, public_signal_pool_path: publicSignalRelativePath }
     );
   }
 
@@ -1259,7 +1309,10 @@ async function requireOptionalCuratedShadowReceipts(repoRoot, reportDate, option
       misbound_raw_ids: lineage.misbound_raw_ids,
       collector_mismatch_ids: lineage.collector_mismatch_ids,
       missing_aify_ids: lineage.missing_aify_ids,
-      extra_aify_ids: lineage.extra_aify_ids
+      extra_aify_ids: lineage.extra_aify_ids,
+      aify_snapshot_mismatch_ids: lineage.aify_snapshot_mismatch_ids,
+      aify_selection_date_mismatch_ids: lineage.aify_selection_date_mismatch_ids,
+      aify_payload_sequence_mismatch_ids: lineage.aify_payload_sequence_mismatch_ids
     });
   }
   try {
@@ -1280,14 +1333,54 @@ async function requireOptionalCuratedShadowReceipts(repoRoot, reportDate, option
       }
     );
   }
+
+  let validatedPool = null;
+  const hasVerifiedPoolPair = poolRecoveryPaths.length === 0 && hasSignal && hasPublicSignal;
+  if (hasVerifiedPoolPair) {
+    let signalPool;
+    let publicSignalPool;
+    try {
+      [signalPool, publicSignalPool] = await Promise.all([
+        fs.readFile(signalPath, "utf8").then(JSON.parse),
+        fs.readFile(publicSignalPath, "utf8").then(JSON.parse)
+      ]);
+      const contract = await loadSignalAdmissionContract({ rootDir: repoRoot });
+      const existingSignals = await loadPriorSignalState({ rootDir: repoRoot, reportDate });
+      validatedPool = validateSignalPoolArtifacts({
+        rootDir: repoRoot,
+        signalPool,
+        publicSignalPool,
+        rawObservations: rawValidation.value,
+        sourceFunnel: funnelValidation.value,
+        contract,
+        existingSignals
+      });
+    } catch (error) {
+      throw new PublisherError(
+        "signal_pool_receipt_invalid",
+        "Signal pool shadow receipts failed JSON, schema, contract, lineage, or public-projection validation.",
+        {
+          signal_pool_path: signalRelativePath,
+          public_signal_pool_path: publicSignalRelativePath,
+          cause_code: error?.code || "signal_pool_validation_failed"
+        }
+      );
+    }
+  }
+  const persistedPaths = hasVerifiedPoolPair ? allPaths : phaseOnePaths;
+  const ignoredPaths = poolRecoveryPaths.length > 0
+    ? uniqueSorted([...poolPaths, ...poolRecoveryPaths])
+    : [];
   const privacy = await scanPublicArtifactsForLocalInfo({
     rootDir: repoRoot,
-    targets: [rawRelativePath, funnelRelativePath]
+    targets: persistedPaths
   });
   if (!privacy.ok) {
     throw new PublisherError("curated_shadow_receipt_invalid", "Curated shadow receipts failed the repo-safe privacy gate.", {
       raw_path: rawRelativePath,
       funnel_path: funnelRelativePath,
+      signal_pool_path: hasVerifiedPoolPair ? signalRelativePath : null,
+      public_signal_pool_path: hasVerifiedPoolPair ? publicSignalRelativePath : null,
       finding_patterns: uniqueSorted(privacy.findings.map((item) => item.pattern))
     });
   }
@@ -1296,7 +1389,7 @@ async function requireOptionalCuratedShadowReceipts(repoRoot, reportDate, option
       present: false,
       stale: true,
       paths: [],
-      ignored_paths: paths,
+      ignored_paths: uniqueSorted([...persistedPaths, ...ignoredPaths]),
       receipt_generated_at: rawValidation.value.generated_at,
       expected_generated_at: options.expectedGeneratedAt
     };
@@ -1304,10 +1397,13 @@ async function requireOptionalCuratedShadowReceipts(repoRoot, reportDate, option
   return {
     present: true,
     stale: false,
-    paths,
-    ignored_paths: [],
+    paths: persistedPaths,
+    ignored_paths: ignoredPaths,
     raw: rawValidation.value,
-    funnel: funnelValidation.value
+    funnel: funnelValidation.value,
+    recovery: poolRecoveryPaths.length > 0,
+    signal_pool: validatedPool?.signalPool || null,
+    public_signal_pool: validatedPool?.publicSignalPool || null
   };
 }
 
@@ -1665,6 +1761,8 @@ function isSignalPublisherOwnedPath(filePath, reportDate) {
   return [
     occurrenceStoreRelativePath(reportDate),
     rawObservationsRelativePath(reportDate),
+    signalPoolRelativePath(reportDate),
+    publicSignalPoolRelativePath(reportDate),
     sourceFunnelRelativePath(reportDate)
   ].some((relativePath) => filePath === toRepoPath("reports-data", relativePath));
 }
@@ -1686,6 +1784,13 @@ function dirtyPublisherFilesForPublish(statusEntries, reportDate, scope = "daily
 function withoutIgnoredStatusEntries(statusEntries, ignoredPaths = []) {
   const ignored = new Set(Array.isArray(ignoredPaths) ? ignoredPaths : []);
   return statusEntries.filter((entry) => !ignored.has(entry.path));
+}
+
+function shadowStatusExemptPaths(curatedShadow = {}) {
+  return uniqueSorted([
+    ...(Array.isArray(curatedShadow.paths) ? curatedShadow.paths : []),
+    ...(Array.isArray(curatedShadow.ignored_paths) ? curatedShadow.ignored_paths : [])
+  ]);
 }
 
 function isPublishFileForReportDate(filePath, reportDate) {

@@ -54,7 +54,7 @@ const SHARED_PREFLIGHT_STAGE_IDS = new Set([
   "prompt_build",
   "sources_validate"
 ]);
-const INTERNAL_SHADOW_STAGE_IDS = new Set(["curated_source_shadow"]);
+const INTERNAL_SHADOW_STAGE_IDS = new Set(["curated_source_shadow", "signal_pool_shadow"]);
 const STAGE_SCOPES = new Set([
   "shared_preflight",
   "public_signal_input",

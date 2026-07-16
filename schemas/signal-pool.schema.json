@@ -1,0 +1,444 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/signal-pool.schema.json",
+  "title": "AI Daily Admitted Signal Pool Shadow",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "pipeline_phase",
+    "report_date",
+    "generated_at",
+    "source_raw_generated_at",
+    "source_funnel_generated_at",
+    "admission_contract_version",
+    "input_record_count",
+    "input_observation_count",
+    "pre_admission_counts",
+    "disposition_counts",
+    "disposition_input_counts",
+    "signal_count",
+    "summary_counts",
+    "pre_admission_receipts",
+    "admission_receipts",
+    "summary_receipts",
+    "signals"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "signal_pool_shadow" },
+    "pipeline_phase": { "const": "phase_1b_shadow" },
+    "report_date": { "type": "string", "format": "date" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "source_raw_generated_at": { "type": "string", "format": "date-time" },
+    "source_funnel_generated_at": { "type": "string", "format": "date-time" },
+    "admission_contract_version": { "type": "string", "minLength": 1 },
+    "input_record_count": { "type": "integer", "minimum": 0 },
+    "input_observation_count": { "type": "integer", "minimum": 0 },
+    "pre_admission_counts": { "$ref": "#/$defs/pre_admission_counts" },
+    "disposition_counts": { "$ref": "#/$defs/disposition_counts" },
+    "disposition_input_counts": { "$ref": "#/$defs/disposition_counts" },
+    "signal_count": { "type": "integer", "minimum": 0 },
+    "summary_counts": { "$ref": "#/$defs/summary_counts" },
+    "pre_admission_receipts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/pre_admission_receipt" }
+    },
+    "admission_receipts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/admission_receipt" }
+    },
+    "summary_receipts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/summary_receipt" }
+    },
+    "signals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/signal" }
+    }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "nullable_hash": {
+      "oneOf": [
+        { "$ref": "#/$defs/hash" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_text": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "null" }
+      ]
+    },
+    "nullable_uri": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_date": {
+      "oneOf": [
+        { "type": "string", "format": "date" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_datetime": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_integer": {
+      "oneOf": [
+        { "type": "integer", "minimum": 1 },
+        { "type": "null" }
+      ]
+    },
+    "nullable_number": {
+      "oneOf": [
+        { "type": "number" },
+        { "type": "null" }
+      ]
+    },
+    "pre_admission_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["normalization_errors", "parser_rejections"],
+      "properties": {
+        "normalization_errors": { "type": "integer", "minimum": 0 },
+        "parser_rejections": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "disposition_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["admitted", "rejected", "needs_review"],
+      "properties": {
+        "admitted": { "type": "integer", "minimum": 0 },
+        "rejected": { "type": "integer", "minimum": 0 },
+        "needs_review": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "summary_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ready", "pending", "failed"],
+      "properties": {
+        "ready": { "type": "integer", "minimum": 0 },
+        "pending": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "pre_admission_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_id",
+        "kind",
+        "source_id",
+        "input_index",
+        "upstream_position",
+        "source_reason",
+        "reason_code",
+        "represented_input_count",
+        "upstream_payload_hash"
+      ],
+      "properties": {
+        "receipt_id": { "type": "string", "pattern": "^pre_[a-f0-9]{24}$" },
+        "kind": { "enum": ["normalization_error", "parser_rejection"] },
+        "source_id": { "$ref": "#/$defs/nullable_text" },
+        "input_index": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "upstream_position": { "$ref": "#/$defs/nullable_integer" },
+        "source_reason": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+        "reason_code": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+        "represented_input_count": { "const": 1 },
+        "upstream_payload_hash": { "$ref": "#/$defs/nullable_hash" }
+      }
+    },
+    "admission_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_id",
+        "raw_observation_id",
+        "observation_id",
+        "source_id",
+        "disposition",
+        "reason_code",
+        "represented_input_count",
+        "canonical_url_hash",
+        "signal_id"
+      ],
+      "properties": {
+        "receipt_id": { "type": "string", "pattern": "^adm_[a-f0-9]{24}$" },
+        "raw_observation_id": { "type": "string", "pattern": "^raw_[a-f0-9]{24}$" },
+        "observation_id": { "type": "string", "minLength": 1 },
+        "source_id": { "type": "string", "minLength": 1 },
+        "disposition": { "enum": ["admitted", "rejected", "needs_review"] },
+        "reason_code": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+        "represented_input_count": { "type": "integer", "minimum": 1 },
+        "canonical_url_hash": { "$ref": "#/$defs/hash" },
+        "signal_id": {
+          "oneOf": [
+            { "type": "string", "pattern": "^sig_[a-f0-9]{24}$" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "semantic_calls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "translation", "critic", "semantic_verifier", "scoring"],
+      "properties": {
+        "summary": { "type": "integer", "minimum": 0 },
+        "translation": { "type": "integer", "minimum": 0 },
+        "critic": { "type": "integer", "minimum": 0 },
+        "semantic_verifier": { "type": "integer", "minimum": 0 },
+        "scoring": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "claim_span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observation_id", "content_hash", "field", "start", "end", "text_hash"],
+      "properties": {
+        "observation_id": { "type": "string", "minLength": 1 },
+        "content_hash": { "$ref": "#/$defs/hash" },
+        "field": { "const": "excerpt" },
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 1 },
+        "text_hash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "review_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason_code"],
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "passed_exact_span",
+            "not_required_source_synopsis",
+            "not_required_trusted_upstream",
+            "failed",
+            "not_run"
+          ]
+        },
+        "reason_code": { "$ref": "#/$defs/nullable_text" }
+      }
+    },
+    "summary_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_id",
+        "signal_id",
+        "status",
+        "origin",
+        "source_summary_hash",
+        "material_content_hashes",
+        "claim_spans",
+        "critic",
+        "semantic_verifier",
+        "semantic_calls",
+        "failure_code"
+      ],
+      "properties": {
+        "receipt_id": { "type": "string", "pattern": "^sum_[a-f0-9]{24}$" },
+        "signal_id": { "type": "string", "pattern": "^sig_[a-f0-9]{24}$" },
+        "status": { "enum": ["ready", "pending", "failed"] },
+        "origin": { "enum": ["upstream_editorial", "source_synopsis", "model_generated", "none"] },
+        "source_summary_hash": { "$ref": "#/$defs/nullable_hash" },
+        "material_content_hashes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/hash" }
+        },
+        "claim_spans": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/claim_span" }
+        },
+        "critic": { "$ref": "#/$defs/review_receipt" },
+        "semantic_verifier": { "$ref": "#/$defs/review_receipt" },
+        "semantic_calls": { "$ref": "#/$defs/semantic_calls" },
+        "failure_code": { "$ref": "#/$defs/nullable_text" }
+      }
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "home_url"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "home_url": { "type": "string", "format": "uri" }
+      }
+    },
+    "editorial_source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "name", "url"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "name": { "type": "string", "minLength": 1 },
+            "url": { "type": "string", "format": "uri" }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "collector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "url", "source_kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "$ref": "#/$defs/nullable_uri" },
+        "source_kind": { "type": "string", "minLength": 1 }
+      }
+    },
+    "source_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "icon_url", "icon_kind", "fallback", "fallback_reason", "cache_key"],
+      "properties": {
+        "host": { "type": "string", "minLength": 1 },
+        "icon_url": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?:data:image/(?:png|jpeg|svg[+]xml);base64,[A-Za-z0-9+/=]+|https?://)"
+        },
+        "icon_kind": { "enum": ["explicit", "source-cache", "domain-cache", "generated", "none"] },
+        "fallback": { "type": "boolean" },
+        "fallback_reason": { "$ref": "#/$defs/nullable_text" },
+        "cache_key": { "type": "string", "minLength": 1 }
+      }
+    },
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signal_id",
+        "canonical_url",
+        "material_url",
+        "event_cluster_id",
+        "title",
+        "publisher",
+        "editorial_source",
+        "author",
+        "handle",
+        "source_role",
+        "collected_via",
+        "event_date",
+        "published_at",
+        "summary_status",
+        "source_summary",
+        "summary_origin",
+        "summary_failure_code",
+        "topic_path",
+        "content_format",
+        "access_state",
+        "source_health",
+        "source_identity",
+        "observation_refs",
+        "admission_receipt_refs",
+        "content_hash",
+        "observation_content_hashes",
+        "editorial_ready",
+        "review_policy",
+        "upstream_selection_date",
+        "upstream_position",
+        "upstream_positions",
+        "upstream_tags",
+        "upstream_payload_hash",
+        "upstream_snapshot_hash",
+        "upstream_quality_score"
+      ],
+      "properties": {
+        "signal_id": { "type": "string", "pattern": "^sig_[a-f0-9]{24}$" },
+        "canonical_url": { "type": "string", "format": "uri" },
+        "material_url": { "type": "string", "format": "uri" },
+        "event_cluster_id": {
+          "oneOf": [
+            { "type": "string", "pattern": "^evt_[a-f0-9]{24}$" },
+            { "type": "null" }
+          ]
+        },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "publisher": { "$ref": "#/$defs/publisher" },
+        "editorial_source": { "$ref": "#/$defs/editorial_source" },
+        "author": { "$ref": "#/$defs/nullable_text" },
+        "handle": { "$ref": "#/$defs/nullable_text" },
+        "source_role": { "type": "string", "minLength": 1 },
+        "collected_via": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/collector" }
+        },
+        "event_date": { "type": "string", "format": "date" },
+        "published_at": { "$ref": "#/$defs/nullable_datetime" },
+        "summary_status": { "enum": ["ready", "pending", "failed"] },
+        "source_summary": { "$ref": "#/$defs/nullable_text" },
+        "summary_origin": { "enum": ["upstream_editorial", "source_synopsis", "model_generated", "none"] },
+        "summary_failure_code": { "$ref": "#/$defs/nullable_text" },
+        "topic_path": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "content_format": { "type": "string", "minLength": 1 },
+        "access_state": { "enum": ["direct", "indirect", "unknown"] },
+        "source_health": { "enum": ["available", "degraded", "unknown"] },
+        "source_identity": { "$ref": "#/$defs/source_identity" },
+        "observation_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "admission_receipt_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^adm_[a-f0-9]{24}$" }
+        },
+        "content_hash": { "$ref": "#/$defs/hash" },
+        "observation_content_hashes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/hash" }
+        },
+        "editorial_ready": { "type": "boolean" },
+        "review_policy": { "$ref": "#/$defs/nullable_text" },
+        "upstream_selection_date": { "$ref": "#/$defs/nullable_date" },
+        "upstream_position": { "$ref": "#/$defs/nullable_integer" },
+        "upstream_positions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "upstream_tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "upstream_payload_hash": { "$ref": "#/$defs/nullable_hash" },
+        "upstream_snapshot_hash": { "$ref": "#/$defs/nullable_hash" },
+        "upstream_quality_score": { "$ref": "#/$defs/nullable_number" }
+      }
+    }
+  }
+}

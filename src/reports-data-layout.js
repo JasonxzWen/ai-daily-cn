@@ -5,6 +5,8 @@ export const REPORTS_DATA_INTERNAL_DIR = "internal";
 export const REPORTS_DATA_OCCURRENCES_DIR = "occurrences";
 export const REPORTS_DATA_OBSERVATIONS_DIR = "observations";
 export const REPORTS_DATA_SOURCE_FUNNEL_DIR = "source-funnel";
+export const REPORTS_DATA_SIGNALS_DIR = "signals";
+export const REPORTS_DATA_PUBLIC_SIGNAL_POOL_DIR = "public-signal-pool";
 export const SOURCE_STATUS_HISTORY_FILE = "source-status-history.json";
 
 export function occurrenceStoreRelativePath(reportDate) {
@@ -20,6 +22,16 @@ export function rawObservationsRelativePath(reportDate) {
 export function sourceFunnelRelativePath(reportDate) {
   const { year, month } = dateParts(reportDate);
   return path.join(REPORTS_DATA_SOURCE_FUNNEL_DIR, year, month, `${reportDate}.json`);
+}
+
+export function signalPoolRelativePath(reportDate) {
+  const { year, month } = dateParts(reportDate);
+  return path.join(REPORTS_DATA_SIGNALS_DIR, year, month, `${reportDate}.json`);
+}
+
+export function publicSignalPoolRelativePath(reportDate) {
+  const { year, month } = dateParts(reportDate);
+  return path.join(REPORTS_DATA_PUBLIC_SIGNAL_POOL_DIR, year, month, `${reportDate}.json`);
 }
 
 export function internalCandidatePoolRelativePath(reportDate) {

@@ -10,6 +10,8 @@ import {
   buildCuratedSourceAssetReconciliation,
   loadCuratedShadowCanonicalOwners
 } from "../src/curated-source-shadow.js";
+import { loadSignalAdmissionContract } from "../src/signal-admission.js";
+import { buildSignalPoolArtifacts } from "../src/signal-pool.js";
 import {
   checkPublishPreflight,
   createDailyPublishPlan,
@@ -25,6 +27,7 @@ import {
   verifyPublishedUrl
 } from "../src/publish.js";
 import { buildOccurrenceStore, writeOccurrenceStore } from "../src/occurrence-store.js";
+import { rawMaterialUrlHash, rawObservationContentHash } from "../src/raw-observation-integrity.js";
 import { buildPublicSignals, buildSite } from "../src/site.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -110,7 +113,10 @@ test("signal dry-run stages only the dated occurrence store and public signal tr
   const occurrencePath = "reports-data/occurrences/2026/05/2026-05-13.json";
   const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
   const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  const signalPoolPath = "reports-data/signals/2026/05/2026-05-13.json";
+  const publicSignalPoolPath = "reports-data/public-signal-pool/2026/05/2026-05-13.json";
   await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13");
+  await writeSignalPoolReceiptFixture(repoRoot, "2026-05-13");
   const plan = await createSignalPublishPlan({
     repoRoot,
     reportDate: "2026-05-13",
@@ -120,7 +126,9 @@ test("signal dry-run stages only the dated occurrence store and public signal tr
         `?? docs/signals/community_discussions/page-001.json`,
         `?? ${occurrencePath}`,
         `?? ${observationsPath}`,
-        `?? ${funnelPath}`
+        `?? ${funnelPath}`,
+        `?? ${signalPoolPath}`,
+        `?? ${publicSignalPoolPath}`
       ].join("\n")
     })
   });
@@ -133,10 +141,46 @@ test("signal dry-run stages only the dated occurrence store and public signal tr
   assert(plan.will_stage_files.includes(occurrencePath));
   assert(plan.will_stage_files.includes(observationsPath));
   assert(plan.will_stage_files.includes(funnelPath));
+  assert(plan.will_stage_files.includes(signalPoolPath));
+  assert(plan.will_stage_files.includes(publicSignalPoolPath));
   assert(plan.will_stage_files.every((file) => (
     file.startsWith("docs/signals/") ||
-    [occurrencePath, observationsPath, funnelPath].includes(file)
+    [occurrencePath, observationsPath, funnelPath, signalPoolPath, publicSignalPoolPath].includes(file)
   )));
+});
+
+test("signal dry-run rejects an incomplete signal pool shadow receipt pair", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13");
+  await writeSignalPoolReceiptFixture(repoRoot, "2026-05-13", { omitPublicSignalPool: true });
+
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      git: fakeGit({ status: "?? reports-data/signals/2026/05/2026-05-13.json" })
+    }),
+    (error) => error instanceof PublisherError && error.code === "signal_pool_receipt_pair_incomplete"
+  );
+});
+
+test("signal dry-run rejects a signal pool whose public-ready projection was changed", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13");
+  await writeSignalPoolReceiptFixture(repoRoot, "2026-05-13", {
+    mutatePublicSignalPool: (payload) => {
+      payload.source_pool_hash = `sha256:${"f".repeat(64)}`;
+    }
+  });
+
+  await assert.rejects(
+    createSignalPublishPlan({ repoRoot, reportDate: "2026-05-13", git: fakeGit() }),
+    (error) => error instanceof PublisherError &&
+      error.code === "signal_pool_receipt_invalid" &&
+      error.details.cause_code === "signal_pool_public_projection_mismatch"
+  );
 });
 
 test("signal dry-run rejects an incomplete curated shadow receipt pair", async () => {
@@ -175,6 +219,34 @@ test("signal dry-run ignores an incomplete pair only when atomic rollback recove
   assert.equal(plan.mode, "signals-dry-run");
   assert.equal(plan.scope, "signals");
   assert.equal(plan.will_stage_files.includes(observationsPath), false);
+  assert.equal(plan.will_stage_files.includes(recoveryPath), false);
+});
+
+test("signal dry-run keeps a valid Phase 1A pair when only the pool pair has recovery evidence", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13");
+  await writeSignalPoolReceiptFixture(repoRoot, "2026-05-13");
+  const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
+  const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  const signalPoolPath = "reports-data/signals/2026/05/2026-05-13.json";
+  const publicSignalPoolPath = "reports-data/public-signal-pool/2026/05/2026-05-13.json";
+  const recoveryPath = `${signalPoolPath}.123.550e8400-e29b-41d4-a716-446655440000.backup`;
+  await fs.writeFile(path.join(repoRoot, ...recoveryPath.split("/")), "recoverable pool backup\n", "utf8");
+
+  const plan = await createSignalPublishPlan({
+    repoRoot,
+    reportDate: "2026-05-13",
+    git: fakeGit({
+      status: [observationsPath, funnelPath, signalPoolPath, publicSignalPoolPath, recoveryPath]
+        .map((file) => `?? ${file}`)
+        .join("\n")
+    })
+  });
+  assert(plan.will_stage_files.includes(observationsPath));
+  assert(plan.will_stage_files.includes(funnelPath));
+  assert.equal(plan.will_stage_files.includes(signalPoolPath), false);
+  assert.equal(plan.will_stage_files.includes(publicSignalPoolPath), false);
   assert.equal(plan.will_stage_files.includes(recoveryPath), false);
 });
 
@@ -298,6 +370,8 @@ test("signal dry-run ignores a valid stale receipt pair instead of claiming the 
   });
   const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
   const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  const signalPoolPath = "reports-data/signals/2026/05/2026-05-13.json";
+  const publicSignalPoolPath = "reports-data/public-signal-pool/2026/05/2026-05-13.json";
   const plan = await createSignalPublishPlan({
     repoRoot,
     reportDate: "2026-05-13",
@@ -607,6 +681,8 @@ test("signal GitHub API fallback preserves a remote receipt pair when the local 
   await writeSignalFixture(repoRoot, "2026-05-13");
   const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
   const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  const signalPoolPath = "reports-data/signals/2026/05/2026-05-13.json";
+  const publicSignalPoolPath = "reports-data/public-signal-pool/2026/05/2026-05-13.json";
   const calls = [];
   await publishGeneratedArtifactsViaGitHubApi({
     repoRoot,
@@ -621,12 +697,14 @@ test("signal GitHub API fallback preserves a remote receipt pair when the local 
       calls,
       remoteTree: [
         { path: observationsPath, type: "blob", sha: "remote-observations" },
-        { path: funnelPath, type: "blob", sha: "remote-funnel" }
+        { path: funnelPath, type: "blob", sha: "remote-funnel" },
+        { path: signalPoolPath, type: "blob", sha: "remote-signal-pool" },
+        { path: publicSignalPoolPath, type: "blob", sha: "remote-public-signal-pool" }
       ]
     })
   });
   const tree = calls.find((call) => call.url.endsWith("/git/trees") && call.method === "POST").body.tree;
-  assert.equal(tree.some((entry) => [observationsPath, funnelPath].includes(entry.path)), false);
+  assert.equal(tree.some((entry) => [observationsPath, funnelPath, signalPoolPath, publicSignalPoolPath].includes(entry.path)), false);
   assert.equal(tree.some((entry) => entry.sha === null), false);
 });
 
@@ -652,12 +730,37 @@ test("signal GitHub API fallback rejects an orphaned remote receipt", async () =
   );
 });
 
+test("signal GitHub API fallback rejects an orphaned remote signal pool receipt", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const signalPoolPath = "reports-data/signals/2026/05/2026-05-13.json";
+  await assert.rejects(
+    publishGeneratedArtifactsViaGitHubApi({
+      repoRoot,
+      reportDate: "2026-05-13",
+      scope: "signals",
+      confirmPush: true,
+      token: "test-token",
+      repository: "owner/repo",
+      verifyPages: false,
+      git: fakeGit({ status: " M docs/signals/index.json" }),
+      fetchImpl: fakeGitHubFetch({
+        remoteTree: [{ path: signalPoolPath, type: "blob", sha: "remote-signal-pool" }]
+      })
+    }),
+    (error) => error instanceof PublisherError && error.code === "signal_pool_remote_receipt_pair_incomplete"
+  );
+});
+
 test("signal GitHub API fallback uploads a verified clean local receipt pair", async () => {
   const repoRoot = await tempRepoWithFixture();
   await writeSignalFixture(repoRoot, "2026-05-13");
   await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13");
+  await writeSignalPoolReceiptFixture(repoRoot, "2026-05-13");
   const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
   const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  const signalPoolPath = "reports-data/signals/2026/05/2026-05-13.json";
+  const publicSignalPoolPath = "reports-data/public-signal-pool/2026/05/2026-05-13.json";
   const calls = [];
   await publishGeneratedArtifactsViaGitHubApi({
     repoRoot,
@@ -673,6 +776,8 @@ test("signal GitHub API fallback uploads a verified clean local receipt pair", a
   const tree = calls.find((call) => call.url.endsWith("/git/trees") && call.method === "POST").body.tree;
   assert(tree.some((entry) => entry.path === observationsPath && typeof entry.content === "string"));
   assert(tree.some((entry) => entry.path === funnelPath && typeof entry.content === "string"));
+  assert(tree.some((entry) => entry.path === signalPoolPath && typeof entry.content === "string"));
+  assert(tree.some((entry) => entry.path === publicSignalPoolPath && typeof entry.content === "string"));
 });
 
 test("daily dry-run stages sanitized retrospective records for the selected date", async () => {
@@ -2085,15 +2190,18 @@ async function writeCuratedShadowReceiptFixture(repoRoot, reportDate, options = 
   const observationsPath = path.join(repoRoot, "reports-data", "observations", year, month, `${reportDate}.json`);
   const funnelPath = path.join(repoRoot, "reports-data", "source-funnel", year, month, `${reportDate}.json`);
   const rawId = "raw_0123456789abcdef01234567";
-  const observations = options.observation ? [{
+  const excerpt = options.excerpt || "A safe runtime observation.";
+  const observation = {
     id: rawId,
     observation_id: "runtime-observation",
     source_id: "runtime-source",
     raw_record_count: 1,
     material_url: "https://example.com/item",
-    material_url_hash: `sha256:${"1".repeat(64)}`,
+    material_url_hash: rawMaterialUrlHash("https://example.com/item"),
     title: "Runtime observation",
-    excerpt: options.excerpt || "A safe runtime observation.",
+    excerpt,
+    excerpt_origin: "source_feed",
+    excerpt_hash: `sha256:${crypto.createHash("sha256").update(excerpt).digest("hex")}`,
     publisher_hint: "Example",
     collector: {
       id: "runtime-source",
@@ -2108,10 +2216,12 @@ async function writeCuratedShadowReceiptFixture(repoRoot, reportDate, options = 
     collected_at: generatedAt,
     fetch_status: "fetched",
     parse_status: "parsed",
-    content_hash: `sha256:${"2".repeat(64)}`,
+    content_hash: null,
     source_group: "news_newsletters",
     content_tags: []
-  }] : [];
+  };
+  observation.content_hash = rawObservationContentHash(observation);
+  const observations = options.observation ? [observation] : [];
   const stage = (unit, status = "not_run", itemIds = []) => ({
     status,
     unit,
@@ -2179,6 +2289,44 @@ async function writeCuratedShadowReceiptFixture(repoRoot, reportDate, options = 
       ]
     }, null, 2)}\n`, "utf8")
   ]);
+}
+
+async function writeSignalPoolReceiptFixture(repoRoot, reportDate, options = {}) {
+  const [year, month] = reportDate.split("-");
+  const rawPath = path.join(repoRoot, "reports-data", "observations", year, month, `${reportDate}.json`);
+  const funnelPath = path.join(repoRoot, "reports-data", "source-funnel", year, month, `${reportDate}.json`);
+  const [rawObservations, sourceFunnel, contract] = await Promise.all([
+    fs.readFile(rawPath, "utf8").then(JSON.parse),
+    fs.readFile(funnelPath, "utf8").then(JSON.parse),
+    loadSignalAdmissionContract({ rootDir })
+  ]);
+  const contractPath = path.join(repoRoot, "config", "signal-admission-contract.json");
+  await fs.mkdir(path.dirname(contractPath), { recursive: true });
+  await fs.writeFile(contractPath, `${JSON.stringify(contract, null, 2)}\n`, "utf8");
+  const artifacts = await buildSignalPoolArtifacts({
+    rootDir: repoRoot,
+    reportDate,
+    generatedAt: rawObservations.generated_at,
+    rawObservations,
+    sourceFunnel,
+    contract
+  });
+  options.mutateSignalPool?.(artifacts.signalPool);
+  options.mutatePublicSignalPool?.(artifacts.publicSignalPool);
+  const signalPath = path.join(repoRoot, "reports-data", "signals", year, month, `${reportDate}.json`);
+  const publicSignalPath = path.join(repoRoot, "reports-data", "public-signal-pool", year, month, `${reportDate}.json`);
+  await Promise.all([
+    fs.mkdir(path.dirname(signalPath), { recursive: true }),
+    fs.mkdir(path.dirname(publicSignalPath), { recursive: true })
+  ]);
+  const writes = [];
+  if (!options.omitSignalPool) {
+    writes.push(fs.writeFile(signalPath, `${JSON.stringify(artifacts.signalPool, null, 2)}\n`, "utf8"));
+  }
+  if (!options.omitPublicSignalPool) {
+    writes.push(fs.writeFile(publicSignalPath, `${JSON.stringify(artifacts.publicSignalPool, null, 2)}\n`, "utf8"));
+  }
+  await Promise.all(writes);
 }
 
 async function ensureCuratedShadowCanonicalOwners(repoRoot) {

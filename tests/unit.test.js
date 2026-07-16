@@ -8829,6 +8829,19 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert(sourceWatch.connected_requires.includes("signals_write_passed"));
   assert(sourceWatch.connected_requires.includes("public_signal_index_schema_valid"));
   assert.equal(sourceWatch.zero_observations_still_consumed, true);
+  assert.deepEqual(contract.daily_runner.signal_pool_shadow, {
+    stage_id: "signal_pool_shadow",
+    script: "signals:pool-shadow",
+    scope: "internal_shadow",
+    runs_after: "curated_source_shadow",
+    runs_before: "signals_write",
+    public_behavior_changes: false,
+    failure_blocks_legacy_publisher: false,
+    signal_pool_path_template: "reports-data/signals/YYYY/MM/YYYY-MM-DD.json",
+    public_ready_path_template: "reports-data/public-signal-pool/YYYY/MM/YYYY-MM-DD.json",
+    summary_readiness_fail_closed: true,
+    aify_today_picks_passthrough: true
+  });
   assert.equal(contract.daily_runner.legacy_report.optional_derivative, true);
   assert.equal(contract.daily_runner.legacy_report.cannot_change_signal_membership, true);
   assert.equal(contract.daily_runner.legacy_report.runs_after_public_signal_publish, true);
@@ -8933,6 +8946,7 @@ test("daily workflow contract rejects admission gates or legacy lineage in the p
   contract.daily_runner.public_signals.content_admission_gate = true;
   contract.daily_runner.public_signals.source_watch.persistence_stage = "report_write";
   contract.daily_runner.public_signals.history_baseline.production_reads_legacy_artifacts = true;
+  contract.daily_runner.signal_pool_shadow.public_behavior_changes = true;
   contract.daily_runner.legacy_report.optional_derivative = false;
   await fs.writeFile(contractPath, `${JSON.stringify(contract, null, 2)}\n`, "utf8");
 
@@ -8962,6 +8976,7 @@ test("daily workflow contract rejects admission gates or legacy lineage in the p
   assert(result.failures.some((failure) => failure.includes("content_admission_gate must be false")), result.failures.join("\n"));
   assert(result.failures.some((failure) => failure.includes("persistence_stage must be \"signals_write\"")), result.failures.join("\n"));
   assert(result.failures.some((failure) => failure.includes("history_baseline.production_reads_legacy_artifacts must be false")), result.failures.join("\n"));
+  assert(result.failures.some((failure) => failure.includes("signal_pool_shadow.public_behavior_changes must be false")), result.failures.join("\n"));
   assert(result.failures.some((failure) => failure.includes("optional_derivative must be true")), result.failures.join("\n"));
 });
 

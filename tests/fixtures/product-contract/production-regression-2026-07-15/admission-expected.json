@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-07-16",
+  "expected_by_observation_id": {
+    "anthropic-harness-engineering-2026-07-16": { "disposition": "admitted" },
+    "x-simonw-2077545830802976796": { "disposition": "admitted" },
+    "github-trending-vshulcz-deja-vu-2026-07-16": { "disposition": "admitted" },
+    "swe-bench-pro-2026-07-16-state-8f4c": { "disposition": "admitted" },
+    "pika-email-protection-2026-07-16": { "disposition": "rejected", "reason_code": "non_content_endpoint" },
+    "pika-partnership-2026-07-16": { "disposition": "rejected", "reason_code": "corporate_pr_without_substance" },
+    "pika-test-row-2026-07-16": { "disposition": "rejected", "reason_code": "test_or_placeholder" },
+    "anthropic-harness-manual-2026-07-16": { "disposition": "admitted" },
+    "example-internal-instruction-2026-07-16": { "disposition": "rejected", "reason_code": "internal_instruction_copy" },
+    "example-hiring-event-2026-07-16": { "disposition": "rejected", "reason_code": "promotion_or_hiring" },
+    "example-summary-gate-failure-2026-07-16": { "disposition": "admitted" },
+    "example-undated-model-note-2026-07-16": { "disposition": "needs_review", "reason_code": "event_date_unverified" }
+  },
+  "expected_aify": {
+    "source_id": "aify_today_picks",
+    "disposition": "admitted",
+    "summary_status": "ready",
+    "editorial_ready": true
+  }
+}

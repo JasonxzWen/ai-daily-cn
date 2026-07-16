@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "contract_id": "signal-admission-contract",
+  "version": "signal-admission-v1",
+  "retention_hours": 24,
+  "freshness": {
+    "max_age_days": 2
+  },
+  "trusted_upstream": {
+    "source_id": "aify_today_picks",
+    "review_policy": "aify_today_passthrough_v1",
+    "editorial_source": {
+      "id": "aify-news",
+      "name": "Aify News",
+      "url": "https://aify-news.pages.dev/"
+    }
+  },
+  "non_content_exact_paths": [
+    "/",
+    "/blog",
+    "/news",
+    "/contact",
+    "/contact-us",
+    "/login",
+    "/log-in",
+    "/signin",
+    "/sign-in",
+    "/signup",
+    "/sign-up",
+    "/pricing",
+    "/cdn-cgi/l/email-protection"
+  ],
+  "promotion_path_segments": [
+    "career",
+    "careers",
+    "job",
+    "jobs",
+    "event",
+    "events",
+    "hiring",
+    "recruiting",
+    "sale",
+    "discount"
+  ],
+  "ai_relevance_terms": [
+    "ai",
+    "agent",
+    "llm",
+    "model",
+    "machine learning",
+    "deep learning",
+    "inference",
+    "benchmark",
+    "grok",
+    "人工智能",
+    "智能体",
+    "大模型",
+    "机器学习",
+    "推理",
+    "评测"
+  ],
+  "relevance_content_hints": [
+    "builder_observation",
+    "paper",
+    "model",
+    "benchmark",
+    "leaderboard"
+  ],
+  "relevance_content_tags": [
+    "engineering_practice",
+    "agent_engineering",
+    "model_release",
+    "ai_research"
+  ],
+  "corporate_technical_substance_terms": [
+    "architecture",
+    "implementation",
+    "evaluation",
+    "benchmark",
+    "dataset",
+    "open source",
+    "source code",
+    "api specification",
+    "system design",
+    "technical detail",
+    "架构",
+    "实现",
+    "评估",
+    "评测",
+    "基准",
+    "数据集",
+    "开源",
+    "源码",
+    "接口规范",
+    "系统设计",
+    "技术细节",
+    "工程方法"
+  ],
+  "rejection_codes": [
+    "unsafe_url",
+    "non_content_endpoint",
+    "empty_or_unparsed",
+    "test_or_placeholder",
+    "internal_instruction_copy",
+    "corporate_pr_without_substance",
+    "promotion_or_hiring",
+    "off_topic",
+    "duplicate_no_new_state",
+    "stale_without_update"
+  ],
+  "needs_review_codes": [
+    "event_date_unverified",
+    "publisher_unresolved"
+  ],
+  "summary": {
+    "min_length": 20,
+    "max_length": 280
+  }
+}

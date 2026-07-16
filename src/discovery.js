@@ -2843,6 +2843,7 @@ export async function collectBuilderFallbacks(options = {}) {
           source: currentSource.name,
           event_date: entry.event_date,
           status: "excluded",
+          ...sourceSynopsisFields(entry.summary, "source_feed"),
           evidence: summarizeEvidence(entry.summary, `${currentSource.author || currentSource.name} published this original feed entry.`)
         });
       }
@@ -3216,6 +3217,7 @@ function parseFollowBuildersPodcastFeed(payload, { sourceItem, reportDate }) {
         source: sourceItem.name,
         event_date: eventDate,
         status: "excluded",
+        ...sourceSynopsisFields(episode.summary || episode.description, "source_metadata"),
         evidence: summarizeEvidence(episode.summary || episode.description || episode.transcript, "follow-builders podcast episode.")
       };
     })
@@ -3240,6 +3242,7 @@ function parseFollowBuildersBlogFeed(payload, { sourceItem, reportDate }) {
         source: post.source || post.publisher || sourceItem.name,
         event_date: eventDate,
         status: "excluded",
+        ...sourceSynopsisFields(post.summary || post.description, "source_metadata"),
         evidence: summarizeEvidence(post.summary || post.description || post.content, "follow-builders blog entry.")
       };
     })
@@ -3387,6 +3390,7 @@ export async function collectContentSources(options = {}) {
             source: currentSource.name,
             event_date: entry.event_date,
             status: "excluded",
+            ...contentSourceSynopsisFields(entry, currentSource),
             evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
             notes: [contentCandidateNotes(entry, currentSource, ""), `source_report_url=${sanitizeNoteValue(entry.source_report_url || currentSource.url)}`].filter(Boolean).join("; "),
             ...contentVerificationFields({ ...entry, url: entry.source_report_url || entry.url }, currentSource, ""),
@@ -3517,6 +3521,7 @@ export async function collectContentSources(options = {}) {
           source: contentCandidateSource(entry, currentSource),
           event_date: entry.event_date,
           status: "excluded",
+          ...contentSourceSynopsisFields(entry, currentSource),
           evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
           notes: contentCandidateNotes(entry, currentSource, originalUrl),
           ...contentVerificationFields(entry, currentSource, originalUrl),
@@ -3608,6 +3613,7 @@ export async function collectContentSources(options = {}) {
           source: contentCandidateSource(entry, currentSource),
           event_date: entry.event_date,
           status: "excluded",
+          ...contentSourceSynopsisFields(entry, currentSource),
           evidence: contentCandidateEvidence(entry, currentSource, candidateCategory, entryLabel),
           notes: contentCandidateNotes(entry, currentSource, originalUrl),
           ...contentVerificationFields(entry, currentSource, originalUrl),
@@ -3672,6 +3678,7 @@ function rankingSnapshotCandidates(snapshot, sourceInfo, reportDate, generatedAt
     const provider = cleanText(row.provider || "");
     const metric = cleanText(row.tokens || row.score || row.value || "");
     const idSeed = `${sourceInfo.id}-${reportDate}-${rank}-${model}`;
+    const synopsis = [provider, metric].filter(Boolean).join(" · ") || `${model} appeared in the public ranking snapshot.`;
     return {
       id: uniqueCandidateId(existingCandidates, idSeed),
       observation_id: `ranking:${slugId(sourceInfo.id)}:${reportDate}:${rank}:${slugId(model)}`,
@@ -3686,7 +3693,9 @@ function rankingSnapshotCandidates(snapshot, sourceInfo, reportDate, generatedAt
       event_date: reportDate,
       collected_at: generatedAt,
       status: "excluded",
-      summary: [provider, metric].filter(Boolean).join(" · ") || `${model} appeared in the public ranking snapshot.`,
+      summary: synopsis,
+      source_synopsis: synopsis,
+      source_synopsis_origin: "structured_source",
       evidence: `${model} appeared at rank ${rank} in ${sourceInfo.name}${metric ? ` with ${metric}` : ""}.`,
       source_level: "community_api",
       ...(sourceInfo.credibility_tag ? { credibility_tag: sourceInfo.credibility_tag } : {}),
@@ -3871,6 +3880,27 @@ function isOriginalXUrl(value) {
   } catch {
     return false;
   }
+}
+
+function contentSourceSynopsisFields(entry, sourceInfo) {
+  if (String(sourceInfo?.source_kind || "") === "search_api") return {};
+  const sourceKind = String(sourceInfo?.source_kind || "").toLowerCase();
+  const origin = /(?:rss|atom|feed)/.test(sourceKind)
+    ? "source_feed"
+    : /(?:api|playwright|ranking)/.test(sourceKind)
+      ? "structured_source"
+      : "source_metadata";
+  return sourceSynopsisFields(entry?.summary, origin);
+}
+
+function sourceSynopsisFields(value, origin) {
+  const text = cleanText(value);
+  const synopsis = text.length <= 360 ? text : `${text.slice(0, 359).trimEnd()}…`;
+  if (!synopsis) return {};
+  return {
+    source_synopsis: synopsis,
+    source_synopsis_origin: origin
+  };
 }
 
 function contentCandidateEvidence(entry, sourceInfo, candidateCategory, entryLabel) {
@@ -4365,6 +4395,7 @@ function extractGitHubRepositoryLanguage(block) {
 function enrichProjectCandidate(candidate, sourceInfo, reportDate) {
   return {
     ...candidate,
+    ...(!candidate.source_synopsis ? sourceSynopsisFields(candidate.description, "source_metadata") : {}),
     id: candidate.id || `project-${slugId(candidate.repo || candidate.url || candidate.source || "repo")}`,
     source_id: candidate.source_id || `github-${slugId(sourceInfo.name || sourceInfo.url || "trending")}`,
     category: candidate.category || "project",

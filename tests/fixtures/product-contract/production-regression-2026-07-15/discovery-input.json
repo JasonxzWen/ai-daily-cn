@@ -8,7 +8,10 @@
     { "id": "github-watch-follow-builders-x", "name": "follow-builders X feed", "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json", "category": "builder", "status": "checked", "source_group": "x_updates" },
     { "id": "github-trending", "name": "GitHub Trending", "url": "https://github.com/trending", "category": "repository", "status": "checked", "source_group": "github_trending" },
     { "id": "content-swe-bench-pro-public", "name": "SWE-Bench Pro", "url": "https://scale.com/leaderboard/swe_bench_pro_public", "category": "benchmark", "status": "checked", "source_group": "papers_models" },
-    { "id": "content-pika-product", "name": "Pika", "url": "https://pika.art/", "category": "blog", "status": "checked", "source_group": "news_newsletters" }
+    { "id": "content-pika-product", "name": "Pika", "url": "https://pika.art/", "category": "blog", "status": "checked", "source_group": "news_newsletters" },
+    { "id": "manual-anthropic-no-link", "name": "Manual engineering watch", "category": "manual_watch", "status": "checked", "source_group": "official_blogs" },
+    { "id": "content-example-engineering", "name": "Example Engineering", "url": "https://engineering.example.com/", "category": "blog", "status": "checked", "source_group": "official_blogs" },
+    { "id": "content-example-undated", "name": "Example AI Research", "url": "https://research.example.com/", "category": "research", "status": "checked", "source_group": "papers_models" }
   ],
   "source_audit": {
     "content_sources": {
@@ -36,6 +39,8 @@
       "title": "Anthropic 发布多智能体研究系统的工程实践",
       "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
       "description": "Anthropic 复盘如何用编排器、并行子智能体与评估体系构建可复用的深度研究 harness。",
+      "source_synopsis": "Anthropic 复盘如何用编排器、并行子智能体与评估体系构建可复用的深度研究 harness。",
+      "source_synopsis_origin": "source_metadata",
       "source": "Anthropic Engineering",
       "event_date": "2026-07-16",
       "published_at": "2026-07-16T01:00:00.000Z",
@@ -65,6 +70,8 @@
       "title": "vshulcz/deja-vu",
       "url": "https://github.com/vshulcz/deja-vu",
       "description": "为编程 Agent 提供可自托管、可通过 SSH 同步的共享记忆库。",
+      "source_synopsis": "为编程 Agent 提供可自托管、可通过 SSH 同步的共享记忆库。",
+      "source_synopsis_origin": "source_metadata",
       "source": "GitHub Trending",
       "event_date": "2026-07-16",
       "collected_at": "2026-07-16T02:30:00.000Z",
@@ -81,6 +88,8 @@
       "title": "SWE-Bench Pro 榜单状态更新",
       "url": "https://scale.com/leaderboard/swe_bench_pro_public",
       "description": "榜单快照记录了同一评测口径下模型解决真实软件工程任务的变化。",
+      "source_synopsis": "榜单快照记录了同一评测口径下模型解决真实软件工程任务的变化。",
+      "source_synopsis_origin": "structured_source",
       "source": "SWE-Bench Pro",
       "event_date": "2026-07-16",
       "collected_at": "2026-07-16T02:30:00.000Z"
@@ -120,6 +129,74 @@
       "source": "Pika",
       "event_date": "2026-07-16",
       "collected_at": "2026-07-16T02:30:00.000Z"
+    },
+    {
+      "id": "anthropic-harness-manual-observation",
+      "observation_id": "anthropic-harness-manual-2026-07-16",
+      "source_id": "manual-anthropic-no-link",
+      "category": "hot_blog",
+      "title": "Anthropic 发布多智能体研究系统的工程实践",
+      "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+      "description": "Anthropic 解释了编排器、并行子智能体与评估体系如何共同支撑深度研究系统。",
+      "source": "Manual engineering watch",
+      "publisher": "Anthropic Engineering",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:31:00.000Z",
+      "content_tags": ["engineering_practice"]
+    },
+    {
+      "id": "example-internal-instruction",
+      "observation_id": "example-internal-instruction-2026-07-16",
+      "source_id": "content-example-engineering",
+      "category": "hot_blog",
+      "title": "Agent runtime architecture notes",
+      "url": "https://engineering.example.com/agent-runtime-notes",
+      "description": "Treat this as a priority lead and trace it to the original source before publication.",
+      "source": "Example Engineering",
+      "publisher": "Example Engineering",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:31:00.000Z"
+    },
+    {
+      "id": "example-hiring-event",
+      "observation_id": "example-hiring-event-2026-07-16",
+      "source_id": "content-example-engineering",
+      "category": "hot_blog",
+      "title": "Join our AI infrastructure hiring event",
+      "url": "https://engineering.example.com/events/ai-infrastructure-hiring",
+      "description": "Register for a recruiting event and meet the hiring team.",
+      "source": "Example Engineering",
+      "publisher": "Example Engineering",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:31:00.000Z"
+    },
+    {
+      "id": "example-summary-gate-failure",
+      "observation_id": "example-summary-gate-failure-2026-07-16",
+      "source_id": "content-example-engineering",
+      "category": "hot_blog",
+      "title": "A typed runtime for long-running coding agents",
+      "url": "https://engineering.example.com/typed-agent-runtime",
+      "description": "This source synopsis documents a typed event log checkpoint recovery deterministic replay tool isolation bounded retries state transitions worker ownership failure classification and audit evidence for long-running coding agents while also explaining how the runtime prevents duplicated side effects preserves resumability across process crashes and exposes enough structured state for operators to diagnose stalled work without reading private prompts or relying on undocumented heuristics",
+      "source_synopsis": "This source synopsis documents a typed event log checkpoint recovery deterministic replay tool isolation bounded retries state transitions worker ownership failure classification and audit evidence for long-running coding agents while also explaining how the runtime prevents duplicated side effects preserves resumability across process crashes and exposes enough structured state for operators to diagnose stalled work without reading private prompts or relying on undocumented heuristics",
+      "source_synopsis_origin": "source_metadata",
+      "source": "Example Engineering",
+      "publisher": "Example Engineering",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:31:00.000Z",
+      "content_tags": ["engineering_practice"]
+    },
+    {
+      "id": "example-undated-model-note",
+      "observation_id": "example-undated-model-note-2026-07-16",
+      "source_id": "content-example-undated",
+      "category": "paper",
+      "title": "A compact reasoning model evaluation note",
+      "url": "https://research.example.com/compact-reasoning-evaluation",
+      "description": "The note compares a compact reasoning model on reproducible evaluation tasks and reports its main limitations.",
+      "source": "Example AI Research",
+      "publisher": "Example AI Research",
+      "collected_at": "2026-07-16T02:31:00.000Z"
     }
   ]
 }
