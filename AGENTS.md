@@ -55,6 +55,8 @@ node bin/harness-hub.mjs migrate <current-repository> --yes
 
 With a valid schemaVersion 1 manifest, omitted Host mode and primary inherit `hosts` and `primaryHost`; do not ask the user to repeat them. Explicit `--host` and `--primary` take priority. Without a manifest, first migration still requires `--host`, and first migration in `both` mode also requires `--primary`. Use the source default branch current HEAD and preserve the actual source commit recorded by the new manifest. Migration must not commit, push, publish, merge, or otherwise modify remote state.
 
+Recognized HTTPS and SSH spellings of the official remote record the canonical source URL `https://github.com/JasonxzWen/harness-hub`; normalization performs no remote call or mutation. Use this repository as target only when it is clean, has `HEAD`, and its `.git` is a real directory. If it is a linked worktree or submodule worktree, stop with `E_LINKED_WORKTREE` and rerun from a clean standalone clone. Do not migrate a replacement target and copy its result or Git metadata back.
+
 ## Durable task state
 
 For non-trivial mutation work, maintain ignored project-local state under `.harness-hub/state/` when it materially improves restartability:
