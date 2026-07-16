@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "kind": "content_candidates",
+  "report_date": "2026-07-16",
+  "generated_at": "2026-07-16T02:30:00.000Z",
+  "sources": [
+    { "id": "content-anthropic-engineering", "name": "Anthropic Engineering", "url": "https://www.anthropic.com/engineering", "category": "blog", "status": "checked", "source_group": "official_blogs" },
+    { "id": "github-watch-follow-builders-x", "name": "follow-builders X feed", "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json", "category": "builder", "status": "checked", "source_group": "x_updates" },
+    { "id": "github-trending", "name": "GitHub Trending", "url": "https://github.com/trending", "category": "repository", "status": "checked", "source_group": "github_trending" },
+    { "id": "content-swe-bench-pro-public", "name": "SWE-Bench Pro", "url": "https://scale.com/leaderboard/swe_bench_pro_public", "category": "benchmark", "status": "checked", "source_group": "papers_models" },
+    { "id": "content-pika-product", "name": "Pika", "url": "https://pika.art/", "category": "blog", "status": "checked", "source_group": "news_newsletters" }
+  ],
+  "source_audit": {
+    "content_sources": {
+      "checked": true,
+      "sources": [
+        { "id": "content-anthropic-engineering", "name": "Anthropic Engineering", "url": "https://www.anthropic.com/engineering", "status": "checked", "parsed_count": 1 },
+        { "id": "github-watch-follow-builders-x", "name": "follow-builders X feed", "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json", "status": "checked", "parsed_count": 1 },
+        { "name": "GitHub Trending", "url": "https://github.com/trending", "status": "checked", "parsed_count": 1 },
+        { "id": "content-arxiv-cs-ai", "name": "arXiv CS.AI", "url": "https://export.arxiv.org/api/query?search_query=cat:cs.AI", "status": "no_signal", "parsed_count": 0 },
+        { "id": "content-huggingface-daily-papers", "name": "Hugging Face Daily Papers", "url": "https://huggingface.co/api/daily_papers", "status": "no_signal", "parsed_count": 0 },
+        { "id": "intermediary-qbitai", "name": "QbitAI", "url": "https://www.qbitai.com/feed", "status": "no_signal", "parsed_count": 0 },
+        { "id": "content-swe-bench-pro-public", "name": "SWE-Bench Pro", "url": "https://scale.com/leaderboard/swe_bench_pro_public", "status": "checked", "parsed_count": 1 },
+        { "id": "content-pika-product", "name": "Pika", "url": "https://pika.art/", "status": "checked", "parsed_count": 3 }
+      ],
+      "candidates_found": 7,
+      "included": 0
+    }
+  },
+  "candidates": [
+    {
+      "id": "anthropic-harness-engineering",
+      "observation_id": "anthropic-harness-engineering-2026-07-16",
+      "source_id": "content-anthropic-engineering",
+      "category": "hot_blog",
+      "title": "Anthropic 发布多智能体研究系统的工程实践",
+      "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+      "description": "Anthropic 复盘如何用编排器、并行子智能体与评估体系构建可复用的深度研究 harness。",
+      "source": "Anthropic Engineering",
+      "event_date": "2026-07-16",
+      "published_at": "2026-07-16T01:00:00.000Z",
+      "collected_at": "2026-07-16T02:30:00.000Z",
+      "content_tags": ["engineering_practice"]
+    },
+    {
+      "id": "follow-builders-simonw",
+      "observation_id": "x-simonw-2077545830802976796",
+      "source_id": "github-watch-follow-builders-x",
+      "category": "builder_observation",
+      "title": "Simon Willison 解析 Grok Build CLI 的 Mermaid 终端渲染器",
+      "url": "https://x.com/simonw/status/2077545830802976796",
+      "description": "Simon Willison 从开源代码中定位了一个可独立运行的终端 Mermaid 渲染器。",
+      "source": "follow-builders X feed",
+      "author": "Simon Willison",
+      "handle": "@simonw",
+      "original_text": "The self-contained terminal Mermaid renderer is a fascinating part of the repository.",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:30:00.000Z"
+    },
+    {
+      "id": "github-trending-deja-vu",
+      "observation_id": "github-trending-vshulcz-deja-vu-2026-07-16",
+      "source_id": "github-trending",
+      "category": "project",
+      "title": "vshulcz/deja-vu",
+      "url": "https://github.com/vshulcz/deja-vu",
+      "description": "为编程 Agent 提供可自托管、可通过 SSH 同步的共享记忆库。",
+      "source": "GitHub Trending",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:30:00.000Z",
+      "rank": 4,
+      "stars_today": 812,
+      "stars": 6400,
+      "trend": "new"
+    },
+    {
+      "id": "swe-bench-pro-snapshot",
+      "observation_id": "swe-bench-pro-2026-07-16-state-8f4c",
+      "source_id": "content-swe-bench-pro-public",
+      "category": "benchmark",
+      "title": "SWE-Bench Pro 榜单状态更新",
+      "url": "https://scale.com/leaderboard/swe_bench_pro_public",
+      "description": "榜单快照记录了同一评测口径下模型解决真实软件工程任务的变化。",
+      "source": "SWE-Bench Pro",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:30:00.000Z"
+    },
+    {
+      "id": "pika-email-protection",
+      "observation_id": "pika-email-protection-2026-07-16",
+      "source_id": "content-pika-product",
+      "category": "community_lead",
+      "title": "Email Protection",
+      "url": "https://pika.art/cdn-cgi/l/email-protection",
+      "description": "Cloudflare email protection endpoint.",
+      "source": "Pika",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:30:00.000Z"
+    },
+    {
+      "id": "pika-partnership",
+      "observation_id": "pika-partnership-2026-07-16",
+      "source_id": "content-pika-product",
+      "category": "community_lead",
+      "title": "Pika announces a routine brand partnership",
+      "url": "https://pika.art/blog/brand-partnership",
+      "description": "A short partnership announcement without reusable technical detail.",
+      "source": "Pika",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:30:00.000Z"
+    },
+    {
+      "id": "pika-test-row",
+      "observation_id": "pika-test-row-2026-07-16",
+      "source_id": "content-pika-product",
+      "category": "community_lead",
+      "title": "TEST placeholder row",
+      "url": "https://pika.art/blog/test-placeholder",
+      "description": "TEST only.",
+      "source": "Pika",
+      "event_date": "2026-07-16",
+      "collected_at": "2026-07-16T02:30:00.000Z"
+    }
+  ]
+}

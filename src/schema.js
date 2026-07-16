@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import Ajv from "ajv/dist/2020.js";
 import { fileURLToPath } from "node:url";
-import { isSafePublicHttpUrl } from "./public-url.js";
+import { canonicalPublicUrlIdentity, hasUnsafePublicHttpUrlMaterial, isSafePublicHttpUrl } from "./public-url.js";
 import { classifyOccurrenceDateAnomaly, isOccurrenceChronologySorted } from "./signal-chronology.js";
 import { isValidDateString, isValidDateTimeString } from "./time.js";
 
@@ -56,6 +56,8 @@ export const schemas = {
   home: loadSchema("home.schema.json"),
   candidatePool: loadSchema("candidates.schema.json"),
   occurrenceStore: loadSchema("occurrence-store.schema.json"),
+  rawObservations: loadSchema("raw-observations.schema.json"),
+  sourceFunnel: loadSchema("source-funnel.schema.json"),
   publicSignals: loadSchema("public-signals.schema.json"),
   sourceRegistry: loadSchema("sources.schema.json"),
   trends: loadSchema("trends.schema.json")
@@ -70,6 +72,8 @@ const validateArticlesSchema = ajv.compile(schemas.articles);
 const validateHomeSchema = ajv.compile(schemas.home);
 const validateCandidatePoolSchema = ajv.compile(schemas.candidatePool);
 const validateOccurrenceStoreSchema = ajv.compile(schemas.occurrenceStore);
+const validateRawObservationsSchema = ajv.compile(schemas.rawObservations);
+const validateSourceFunnelSchema = ajv.compile(schemas.sourceFunnel);
 const validatePublicSignalsSchema = ajv.compile(schemas.publicSignals);
 const validateSourceRegistrySchema = ajv.compile(schemas.sourceRegistry);
 const validateTrendsSchema = ajv.compile(schemas.trends);
@@ -132,6 +136,28 @@ export function validateOccurrenceStore(store) {
     valid: schemaValid && semanticErrors.length === 0,
     value: candidate,
     errors: schemaValid ? semanticErrors : normalizeAjvErrors(validateOccurrenceStoreSchema.errors)
+  };
+}
+
+export function validateRawObservations(store) {
+  const candidate = structuredClone(store);
+  const schemaValid = validateRawObservationsSchema(candidate);
+  const semanticErrors = schemaValid ? collectRawObservationSemanticErrors(candidate) : [];
+  return {
+    valid: schemaValid && semanticErrors.length === 0,
+    value: candidate,
+    errors: schemaValid ? semanticErrors : normalizeAjvErrors(validateRawObservationsSchema.errors)
+  };
+}
+
+export function validateSourceFunnel(funnel) {
+  const candidate = structuredClone(funnel);
+  const schemaValid = validateSourceFunnelSchema(candidate);
+  const semanticErrors = schemaValid ? collectSourceFunnelSemanticErrors(candidate) : [];
+  return {
+    valid: schemaValid && semanticErrors.length === 0,
+    value: candidate,
+    errors: schemaValid ? semanticErrors : normalizeAjvErrors(validateSourceFunnelSchema.errors)
   };
 }
 
@@ -255,6 +281,182 @@ function collectOccurrenceStoreSemanticErrors(value) {
   }
   errors.push(...collectOccurrenceSafetyErrors(occurrences, "/occurrences", { stored: true }));
   return errors;
+}
+
+function collectRawObservationSemanticErrors(value) {
+  const errors = [];
+  const observations = Array.isArray(value.observations) ? value.observations : [];
+  const normalizationErrors = Array.isArray(value.normalization_errors) ? value.normalization_errors : [];
+  const rejections = Array.isArray(value.rejections) ? value.rejections : [];
+  if (value.observation_count !== observations.length) {
+    errors.push(semanticError("/observation_count", "observation_count must equal observations.length"));
+  }
+  if (value.normalization_error_count !== normalizationErrors.length) {
+    errors.push(semanticError("/normalization_error_count", "normalization_error_count must equal normalization_errors.length"));
+  }
+  if (value.rejection_count !== rejections.length) {
+    errors.push(semanticError("/rejection_count", "rejection_count must equal rejections.length"));
+  }
+  const represented = observations.reduce((sum, item) => sum + (
+    item?.source_id === "aify_today_picks"
+      ? Number(item?.upstream?.upstream_positions?.length || 0)
+      : Number(item?.raw_record_count || 0)
+  ), 0);
+  if (value.input_record_count !== represented + normalizationErrors.length + rejections.length) {
+    errors.push(semanticError("/input_record_count", "input_record_count must conserve represented, isolated, and rejected input records"));
+  }
+  if (!hasUniqueValues(observations.map((item) => item.id))) {
+    errors.push(semanticError("/observations", "raw observation ids must be unique"));
+  }
+  const errorIndexes = normalizationErrors.map((item) => item.index);
+  if (!hasUniqueValues(errorIndexes) || errorIndexes.some((index) => index >= value.input_record_count)) {
+    errors.push(semanticError("/normalization_errors", "normalization error indexes must be unique and within the input range"));
+  }
+  const rejectionKeys = rejections.map((item) => `${item?.source_id}:${item?.upstream_position}`);
+  if (!hasUniqueValues(rejectionKeys)) {
+    errors.push(semanticError("/rejections", "rejected upstream positions must be unique per source"));
+  }
+  for (const [index, item] of observations.entries()) {
+    if (item.collector?.id !== item.source_id) {
+      errors.push(semanticError(`/observations/${index}/collector/id`, "collector id must equal the raw observation source_id"));
+    }
+    if (!isSafePublicHttpUrl(item.material_url)) {
+      errors.push(semanticError(`/observations/${index}/material_url`, "material_url must be a repo-safe public HTTP(S) URL"));
+    }
+    if (item.collector?.url != null && !isSafePublicHttpUrl(item.collector.url)) {
+      errors.push(semanticError(`/observations/${index}/collector/url`, "collector URL must be a repo-safe public HTTP(S) URL"));
+    }
+    if (item.upstream) {
+      if (hasUnsafePublicHttpUrlMaterial(item.upstream.url)) {
+        errors.push(semanticError(`/observations/${index}/upstream/url`, "upstream URL must preserve a safe public HTTP(S) value"));
+      }
+      if (
+        item.upstream.title !== item.title ||
+        item.upstream.summary !== item.excerpt ||
+        canonicalPublicUrlIdentity(item.upstream.url) !== canonicalPublicUrlIdentity(item.material_url) ||
+        item.upstream.date !== item.event_date
+      ) {
+        errors.push(semanticError(`/observations/${index}/upstream`, "Aify upstream fields must match the persisted safe material projection"));
+      }
+    }
+  }
+  const aifyPositions = [
+    ...observations
+      .filter((item) => item?.source_id === "aify_today_picks")
+      .flatMap((item) => item?.upstream?.upstream_positions || []),
+    ...rejections
+      .filter((item) => item?.source_id === "aify_today_picks")
+      .map((item) => item.upstream_position)
+  ].sort((left, right) => left - right);
+  if (aifyPositions.length > 0 && (
+    !hasUniqueValues(aifyPositions) ||
+    aifyPositions.some((position, index) => position !== index + 1)
+  )) {
+    errors.push(semanticError("/rejections", "Aify accepted and rejected positions must conserve one contiguous upstream input"));
+  }
+  return errors;
+}
+
+function collectSourceFunnelSemanticErrors(value) {
+  const errors = [];
+  const reconciliation = value.asset_reconciliation || {};
+  const uniqueCollections = [
+    ["/asset_reconciliation/current_entries", reconciliation.current_entries, "source_id"],
+    ["/asset_reconciliation/historical_decisions", reconciliation.historical_decisions, "source_id"],
+    ["/asset_reconciliation/promotion_proposals", reconciliation.promotion_proposals, "source_id"],
+    ["/asset_reconciliation/logical_sources", reconciliation.logical_sources, "logical_source_id"],
+    ["/lanes", value.lanes, "lane_id"]
+  ];
+  for (const [pathname, rows, key] of uniqueCollections) {
+    if (!hasUniqueValues((Array.isArray(rows) ? rows : []).map((item) => item?.[key]))) {
+      errors.push(semanticError(pathname, `${key} values must be unique`));
+    }
+  }
+  const actionCounts = { promoted: 0, defer: 0, retire: 0 };
+  for (const proposal of Array.isArray(reconciliation.promotion_proposals) ? reconciliation.promotion_proposals : []) {
+    actionCounts[proposal.action] += 1;
+  }
+  for (const action of Object.keys(actionCounts)) {
+    if (reconciliation.promotion_action_counts?.[action] !== actionCounts[action]) {
+      errors.push(semanticError(`/asset_reconciliation/promotion_action_counts/${action}`, "promotion action count must match proposal rows"));
+    }
+  }
+  for (const [laneIndex, lane] of (Array.isArray(value.lanes) ? value.lanes : []).entries()) {
+    const expectedUnits = {
+      registered: "source_entry",
+      fetched: "fetch_attempt",
+      parsed: "observation",
+      admitted: "signal",
+      displayed: "edition_item"
+    };
+    for (const [stageName, stage] of Object.entries(lane.stages || {})) {
+      if (stage.unit !== expectedUnits[stageName]) {
+        errors.push(semanticError(`/lanes/${laneIndex}/stages/${stageName}/unit`, `stage unit must be ${expectedUnits[stageName]}`));
+      }
+      if (stage.count !== (Array.isArray(stage.item_ids) ? stage.item_ids.length : 0)) {
+        errors.push(semanticError(`/lanes/${laneIndex}/stages/${stageName}/count`, "stage count must equal item_ids.length"));
+      }
+      if (stage.status === "not_run" && (stage.count !== 0 || stage.failure_reason)) {
+        errors.push(semanticError(`/lanes/${laneIndex}/stages/${stageName}`, "not_run stages cannot claim items or failures"));
+      }
+      if (["success_with_items", "healthy_empty"].includes(stage.status) && stage.failure_reason) {
+        errors.push(semanticError(`/lanes/${laneIndex}/stages/${stageName}/failure_reason`, "successful stages cannot carry a failure reason"));
+      }
+      if (stage.status === "success_with_items" && stage.count === 0) {
+        errors.push(semanticError(`/lanes/${laneIndex}/stages/${stageName}`, "success_with_items stages must carry at least one receipt"));
+      }
+    }
+    const registeredStatus = lane.stages?.registered?.status;
+    const fetchedStatus = lane.stages?.fetched?.status;
+    const parsedStatus = lane.stages?.parsed?.status;
+    if (registeredStatus === "not_run" && (fetchedStatus !== "not_run" || parsedStatus !== "not_run")) {
+      errors.push(semanticError(`/lanes/${laneIndex}/stages`, "unregistered lanes cannot claim fetched or parsed receipts"));
+    }
+    if (fetchedStatus === "not_run" && parsedStatus !== "not_run") {
+      errors.push(semanticError(`/lanes/${laneIndex}/stages`, "parsed stage cannot run before the fetched stage"));
+    }
+    if (parsedStatus === "success_with_items" && fetchedStatus !== "success_with_items") {
+      errors.push(semanticError(`/lanes/${laneIndex}/stages`, "parsed items require a successful fetched stage"));
+    }
+    if (parsedStatus === "healthy_empty" && lane.stages?.parsed?.count !== 0) {
+      errors.push(semanticError(`/lanes/${laneIndex}/stages/parsed`, "healthy_empty parsed stages cannot carry observations"));
+    }
+    if (lane.terminal_status !== lane.stages?.parsed?.status) {
+      errors.push(semanticError(`/lanes/${laneIndex}/terminal_status`, "terminal_status must mirror the parsed shadow stage"));
+    }
+    if (lane.failure_reason !== lane.stages?.parsed?.failure_reason) {
+      errors.push(semanticError(`/lanes/${laneIndex}/failure_reason`, "lane failure_reason must mirror the parsed shadow stage"));
+    }
+    if (lane.collector_receipt?.receipt_kind === "aify_today_picks") {
+      const receipt = lane.collector_receipt;
+      if (
+        lane.lane_id !== "aify_today_picks" ||
+        receipt.item_count !== receipt.parsed_count ||
+        receipt.item_count !== lane.stages?.parsed?.count ||
+        receipt.input_count !== receipt.represented_input_count + receipt.rejection_count
+      ) {
+        errors.push(semanticError(`/lanes/${laneIndex}/collector_receipt`, "Aify content receipt counts must conserve the persisted parsed and rejected input"));
+      }
+    }
+    if (lane.collector_receipt?.receipt_kind === "aify_site_health" && lane.lane_id !== "site-aify-news") {
+      errors.push(semanticError(`/lanes/${laneIndex}/collector_receipt`, "Aify site-health receipt must belong to the site-aify-news lane"));
+    }
+    if (value.pipeline_phase === "phase_1a_shadow" && (
+      lane.stages?.admitted?.status !== "not_run" ||
+      lane.stages?.displayed?.status !== "not_run"
+    )) {
+      errors.push(semanticError(`/lanes/${laneIndex}/stages`, "Phase 1A cannot run admitted or displayed stages"));
+    }
+  }
+  const serialized = JSON.stringify(value);
+  if (/https?:\/\//i.test(serialized) || /(?:OPENAI_API_KEY|ANTHROPIC_API_KEY|GITHUB_TOKEN|GH_TOKEN|Authorization\s*:|Bearer\s+)/i.test(serialized)) {
+    errors.push(semanticError("/", "source funnel must not persist raw URLs or secret-looking values"));
+  }
+  return errors;
+}
+
+function hasUniqueValues(values = []) {
+  return new Set(values).size === values.length;
 }
 
 function collectPublicSignalSemanticErrors(value) {

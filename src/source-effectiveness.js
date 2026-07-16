@@ -290,7 +290,7 @@ export const CORE_SOURCE_CONTRACTS = [
     name: "Community Hotspots",
     role: "community_rss",
     notes: "Bottom-of-report community pulse requested by the user. HNRSS is usable; Reddit RSS failures stay internal diagnostics unless selected content affects readers.",
-    aliases: ["community-hn-frontpage-100", "community-hn-ai-newest", "community-reddit-machinelearning", "community-reddit-localllama", "community-reddit-singularity", "community-reddit-artificial", "hnrss.org/frontpage?points=100", "hnrss.org/newest?q=ai", "reddit.com/r/machinelearning", "reddit.com/r/localllama", "reddit.com/r/singularity", "reddit.com/r/artificial"]
+    aliases: ["community-hn-frontpage-100", "community-hn-ai-newest", "hnrss.org/frontpage?points=100", "hnrss.org/newest?q=ai", "reddit.com/r/machinelearning", "reddit.com/r/localllama", "reddit.com/r/singularity", "reddit.com/r/artificial"]
   },
   {
     id: "chinese-direct-rss",
@@ -534,6 +534,49 @@ export function buildSourceInventoryRows(options = {}) {
   return registry.sources
     .map((source, index) => sourceInventoryRow(source, index))
     .sort(compareSourceInventoryRows);
+}
+
+export function logicalSourceIdsForRegisteredSource(source = {}) {
+  return CORE_SOURCE_CONTRACTS
+    .filter((contract) => sourceMatchesContract(source, contract))
+    .map((contract) => contract.id);
+}
+
+export function parseSourcePromotionReview(markdown = "") {
+  const review = String(markdown || "");
+  const afterMarker = review.split(/<!--\s*promotion-candidate-review\s*-->/)[1] || "";
+  const section = afterMarker.split(/^###\s/m)[0] || "";
+  const candidates = [];
+  const pattern = /^\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|\s*(\d+)\s*\|\s*`([^`]+)`\s*\|\s*([^|]+?)\s*\|\s*$/gm;
+  let match;
+  while ((match = pattern.exec(section))) {
+    candidates.push({
+      sourceId: match[1],
+      logicalSourceId: match[2],
+      sectionId: match[3],
+      rank: Number(match[4]),
+      action: match[5],
+      reason: match[6].trim()
+    });
+  }
+  return candidates;
+}
+
+export function parseHistoricalSourceDecisions(markdown = "") {
+  const ledger = String(markdown || "");
+  const section = ledger.match(/^### REC-315\b[^\n]*\n([\s\S]*?)(?=^### REC-316\b)/m)?.[1] || "";
+  const decisions = [];
+  const pattern = /^\|\s*`([^`]+)`\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/gm;
+  let match;
+  while ((match = pattern.exec(section))) {
+    const sourceId = match[1].trim();
+    const action = match[2].trim();
+    const reason = match[3].trim();
+    if (sourceId && ["replace", "retire", "defer", "investigate"].includes(action)) {
+      decisions.push({ sourceId, action, reason });
+    }
+  }
+  return decisions;
 }
 
 export function sourceFirstPresentationContract(override) {

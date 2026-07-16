@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/raw-observations.schema.json",
+  "title": "AI Daily Curated Shadow Raw Observations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "report_date",
+    "generated_at",
+    "input_record_count",
+    "observation_count",
+    "normalization_error_count",
+    "normalization_errors",
+    "rejection_count",
+    "rejections",
+    "observations"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "raw_observations" },
+    "report_date": { "type": "string", "format": "date" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "input_record_count": { "type": "integer", "minimum": 0 },
+    "observation_count": { "type": "integer", "minimum": 0 },
+    "normalization_error_count": { "type": "integer", "minimum": 0 },
+    "normalization_errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["index", "reason"],
+        "properties": {
+          "index": { "type": "integer", "minimum": 0 },
+          "reason": { "enum": ["record_invalid", "url_unsafe", "date_invalid", "observation_id_missing"] }
+        }
+      }
+    },
+    "rejection_count": { "type": "integer", "minimum": 0 },
+    "rejections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/rejection" }
+    },
+    "observations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/observation" }
+    }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "nullable_text": { "type": ["string", "null"] },
+    "nullable_datetime": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "nullable_uri": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "type": "null" }
+      ]
+    },
+    "collector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "url", "source_kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "$ref": "#/$defs/nullable_uri" },
+        "source_kind": { "type": "string", "minLength": 1 }
+      }
+    },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "summary",
+        "url",
+        "date",
+        "upstream_selection_date",
+        "upstream_position",
+        "upstream_positions",
+        "upstream_payload_hash",
+        "upstream_snapshot_hash",
+        "upstream_tags",
+        "source",
+        "flavors",
+        "domain",
+        "channels_l1",
+        "channels_l2",
+        "companies",
+        "products"
+      ],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" },
+        "date": { "type": "string", "format": "date" },
+        "upstream_selection_date": { "type": "string", "format": "date" },
+        "upstream_position": { "type": "integer", "minimum": 1 },
+        "upstream_positions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "upstream_payload_hash": { "$ref": "#/$defs/hash" },
+        "upstream_snapshot_hash": { "$ref": "#/$defs/hash" },
+        "upstream_tags": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "source": { "type": "string", "minLength": 1 },
+        "quality_score": { "type": "number" },
+        "flavors": { "type": "array", "items": { "type": "string" } },
+        "domain": { "type": "string" },
+        "channels_l1": { "type": "array", "items": { "type": "string" } },
+        "channels_l2": { "type": "array", "items": { "type": "string" } },
+        "companies": { "type": "array", "items": { "type": "string" } },
+        "products": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "rejection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "upstream_position", "reason", "upstream_payload_hash"],
+      "properties": {
+        "source_id": { "type": "string", "minLength": 1 },
+        "upstream_position": { "type": "integer", "minimum": 1 },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 120, "pattern": "^[a-z0-9]+(?:[._:-][a-z0-9]+)*$" },
+        "upstream_payload_hash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": { "source_id": { "const": "aify_today_picks" } },
+            "required": ["source_id"]
+          },
+          "then": {
+            "properties": { "upstream": { "$ref": "#/$defs/upstream" } },
+            "required": ["upstream"]
+          }
+        }
+      ],
+      "required": [
+        "id",
+        "observation_id",
+        "source_id",
+        "raw_record_count",
+        "material_url",
+        "material_url_hash",
+        "title",
+        "excerpt",
+        "publisher_hint",
+        "collector",
+        "author",
+        "handle",
+        "event_date",
+        "published_at",
+        "collected_at",
+        "fetch_status",
+        "parse_status",
+        "content_hash",
+        "source_group",
+        "content_tags"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^raw_[a-f0-9]{24}$" },
+        "observation_id": { "type": "string", "minLength": 1 },
+        "source_id": { "type": "string", "minLength": 1 },
+        "raw_record_count": { "type": "integer", "minimum": 1 },
+        "material_url": { "type": "string", "format": "uri" },
+        "material_url_hash": { "$ref": "#/$defs/hash" },
+        "title": { "type": "string", "minLength": 1 },
+        "excerpt": { "$ref": "#/$defs/nullable_text" },
+        "publisher_hint": { "type": "string", "minLength": 1 },
+        "collector": { "$ref": "#/$defs/collector" },
+        "author": { "$ref": "#/$defs/nullable_text" },
+        "handle": { "$ref": "#/$defs/nullable_text" },
+        "event_date": { "type": "string", "format": "date" },
+        "published_at": { "$ref": "#/$defs/nullable_datetime" },
+        "collected_at": { "type": "string", "format": "date-time" },
+        "fetch_status": { "const": "fetched" },
+        "parse_status": { "const": "parsed" },
+        "content_hash": { "$ref": "#/$defs/hash" },
+        "source_group": { "$ref": "#/$defs/nullable_text" },
+        "content_tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "upstream": { "$ref": "#/$defs/upstream" }
+      }
+    }
+  }
+}

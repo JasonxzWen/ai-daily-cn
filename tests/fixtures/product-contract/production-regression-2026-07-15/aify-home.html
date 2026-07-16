@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>AIFY</title>
+</head>
+<body>
+  <main id="app"></main>
+  <script>
+    const ARTICLES_TODAY = [{"title":"Anthropic 发布多智能体研究系统的工程实践","url":"https://www.anthropic.com/engineering/multi-agent-research-system","summary":"Anthropic 复盘如何用编排器、并行子智能体与评估体系构建可复用的深度研究 harness。","date":"2026-07-16","month":"2026-07","source":"Anthropic Engineering","quality_score":90,"flavors":["拆解","实战"],"domain":"基础模型与算力技术栈","channels_l1":["AI 工程栈"],"channels_l2":["Agent 工程实践"],"companies":["Anthropic"],"products":["Claude"]}];
+    let ARTICLES = ARTICLES_TODAY;
+    const SITE = {"site_name":"AIFY","tagline":"AI feed for you","last_updated":"2026-07-16","build_time":"2026-07-16 02:33 UTC","count":4668};
+    const tabs = [{ id: "today", name: "⭐ 今日精选", n: ARTICLES_TODAY.length }];
+    function mastheadHTML() {
+      return `<div class="np-title">今日精选</div>`;
+    }
+  </script>
+</body>
+</html>

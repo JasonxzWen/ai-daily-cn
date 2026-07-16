@@ -7,6 +7,10 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
 import {
+  buildCuratedSourceAssetReconciliation,
+  loadCuratedShadowCanonicalOwners
+} from "../src/curated-source-shadow.js";
+import {
   checkPublishPreflight,
   createDailyPublishPlan,
   createPublishPlan,
@@ -26,6 +30,7 @@ import { buildPublicSignals, buildSite } from "../src/site.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
+let curatedShadowCanonicalFixturePromise;
 
 function withoutGitHubTokenEnv() {
   return {
@@ -103,11 +108,20 @@ test("signal dry-run stages only the dated occurrence store and public signal tr
   const repoRoot = await tempRepoWithFixture();
   await writeSignalFixture(repoRoot, "2026-05-13");
   const occurrencePath = "reports-data/occurrences/2026/05/2026-05-13.json";
+  const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
+  const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13");
   const plan = await createSignalPublishPlan({
     repoRoot,
     reportDate: "2026-05-13",
     git: fakeGit({
-      status: [` M docs/signals/index.json`, `?? docs/signals/community_discussions/page-001.json`, `?? ${occurrencePath}`].join("\n")
+      status: [
+        ` M docs/signals/index.json`,
+        `?? docs/signals/community_discussions/page-001.json`,
+        `?? ${occurrencePath}`,
+        `?? ${observationsPath}`,
+        `?? ${funnelPath}`
+      ].join("\n")
     })
   });
 
@@ -117,7 +131,242 @@ test("signal dry-run stages only the dated occurrence store and public signal tr
   assert(plan.will_stage_files.includes("docs/signals/index.json"));
   assert(plan.will_stage_files.includes("docs/signals/community_discussions/page-001.json"));
   assert(plan.will_stage_files.includes(occurrencePath));
-  assert(plan.will_stage_files.every((file) => file.startsWith("docs/signals/") || file === occurrencePath));
+  assert(plan.will_stage_files.includes(observationsPath));
+  assert(plan.will_stage_files.includes(funnelPath));
+  assert(plan.will_stage_files.every((file) => (
+    file.startsWith("docs/signals/") ||
+    [occurrencePath, observationsPath, funnelPath].includes(file)
+  )));
+});
+
+test("signal dry-run rejects an incomplete curated shadow receipt pair", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const observationsPath = path.join(repoRoot, "reports-data", "observations", "2026", "05", "2026-05-13.json");
+  await fs.mkdir(path.dirname(observationsPath), { recursive: true });
+  await fs.writeFile(observationsPath, "{}\n", "utf8");
+
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      git: fakeGit({ status: "?? reports-data/observations/2026/05/2026-05-13.json" })
+    }),
+    (error) => error instanceof PublisherError && error.code === "curated_shadow_receipt_pair_incomplete"
+  );
+});
+
+test("signal dry-run ignores an incomplete pair only when atomic rollback recovery evidence exists", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
+  const recoveryPath = `${observationsPath}.123.550e8400-e29b-41d4-a716-446655440000.backup`;
+  await fs.mkdir(path.dirname(path.join(repoRoot, ...observationsPath.split("/"))), { recursive: true });
+  await Promise.all([
+    fs.writeFile(path.join(repoRoot, ...observationsPath.split("/")), "new partial raw\n", "utf8"),
+    fs.writeFile(path.join(repoRoot, ...recoveryPath.split("/")), "previous raw\n", "utf8")
+  ]);
+
+  const plan = await createSignalPublishPlan({
+    repoRoot,
+    reportDate: "2026-05-13",
+    git: fakeGit({ status: `?? ${observationsPath}\n?? ${recoveryPath}` })
+  });
+  assert.equal(plan.mode, "signals-dry-run");
+  assert.equal(plan.scope, "signals");
+  assert.equal(plan.will_stage_files.includes(observationsPath), false);
+  assert.equal(plan.will_stage_files.includes(recoveryPath), false);
+});
+
+test("signal dry-run revalidates curated shadow receipt schema before staging", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const observationsPath = path.join(repoRoot, "reports-data", "observations", "2026", "05", "2026-05-13.json");
+  const funnelPath = path.join(repoRoot, "reports-data", "source-funnel", "2026", "05", "2026-05-13.json");
+  await fs.mkdir(path.dirname(observationsPath), { recursive: true });
+  await fs.mkdir(path.dirname(funnelPath), { recursive: true });
+  await Promise.all([
+    fs.writeFile(observationsPath, "{}\n", "utf8"),
+    fs.writeFile(funnelPath, "{}\n", "utf8")
+  ]);
+
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: [
+          "?? reports-data/observations/2026/05/2026-05-13.json",
+          "?? reports-data/source-funnel/2026/05/2026-05-13.json"
+        ].join("\n")
+      })
+    }),
+    (error) => error instanceof PublisherError && error.code === "curated_shadow_receipt_invalid"
+  );
+});
+
+test("signal dry-run rejects schema-valid curated receipts with broken raw-to-funnel lineage", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13", { observation: true, omitObservationLane: true });
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: [
+          "?? reports-data/observations/2026/05/2026-05-13.json",
+          "?? reports-data/source-funnel/2026/05/2026-05-13.json"
+        ].join("\n")
+      })
+    }),
+    (error) => error instanceof PublisherError && error.code === "curated_shadow_receipt_invalid"
+  );
+});
+
+test("signal dry-run rejects schema-valid receipts with incomplete canonical reconciliation", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13", {
+    mutateReconciliation: (reconciliation) => reconciliation.current_entries.pop()
+  });
+  await assert.rejects(
+    createSignalPublishPlan({ repoRoot, reportDate: "2026-05-13", git: fakeGit() }),
+    (error) => error instanceof PublisherError &&
+      error.code === "curated_shadow_receipt_invalid" &&
+      error.details.cause_code === "curated_shadow_current_registry_mismatch"
+  );
+});
+
+test("signal dry-run rejects a parsed raw observation bound to the wrong source entry", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13", {
+    observation: true,
+    observationLaneSourceIds: ["different-runtime-source"]
+  });
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: [
+          "?? reports-data/observations/2026/05/2026-05-13.json",
+          "?? reports-data/source-funnel/2026/05/2026-05-13.json"
+        ].join("\n")
+      })
+    }),
+    (error) => error instanceof PublisherError &&
+      error.code === "curated_shadow_receipt_invalid" &&
+      error.details.misbound_raw_ids.length === 1
+  );
+});
+
+test("signal dry-run rejects curated receipt paths that traverse a directory link", async (t) => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13");
+  const observationsDir = path.join(repoRoot, "reports-data", "observations");
+  const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "adc-publish-linked-receipt-"));
+  t.after(() => fs.rm(outsideDir, { recursive: true, force: true }));
+  await fs.rename(observationsDir, path.join(outsideDir, "observations"));
+  try {
+    await fs.symlink(
+      path.join(outsideDir, "observations"),
+      observationsDir,
+      process.platform === "win32" ? "junction" : "dir"
+    );
+  } catch (error) {
+    if (["EPERM", "EACCES", "ENOSYS"].includes(error?.code)) {
+      t.skip(`directory links are unavailable in this environment: ${error.code}`);
+      return;
+    }
+    throw error;
+  }
+
+  await assert.rejects(
+    createSignalPublishPlan({ repoRoot, reportDate: "2026-05-13", git: fakeGit() }),
+    (error) => error instanceof PublisherError && error.code === "curated_shadow_receipt_path_unsafe"
+  );
+});
+
+test("signal dry-run ignores a valid stale receipt pair instead of claiming the current run", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13", {
+    generatedAt: "2026-05-13T07:00:00.000Z"
+  });
+  const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
+  const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  const plan = await createSignalPublishPlan({
+    repoRoot,
+    reportDate: "2026-05-13",
+    git: fakeGit({ status: ` M docs/signals/index.json\n M ${observationsPath}\n M ${funnelPath}` })
+  });
+  assert(plan.current_dirty_files.includes(observationsPath));
+  assert.equal(plan.will_stage_files.includes(observationsPath), false);
+  assert.equal(plan.will_stage_files.includes(funnelPath), false);
+  assert(plan.will_stage_files.includes("docs/signals/index.json"));
+});
+
+test("daily dry-run leaves a verified same-day shadow pair to the signal publisher", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13");
+  const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
+  const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  const plan = await createDailyPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate: "2026-05-13",
+    git: fakeGit({ status: `?? ${observationsPath}\n?? ${funnelPath}` })
+  });
+  assert(plan.current_dirty_files.includes(observationsPath));
+  assert.equal(plan.will_stage_files.includes(observationsPath), false);
+  assert.equal(plan.will_stage_files.includes(funnelPath), false);
+});
+
+test("signal dry-run rejects secret text inside otherwise schema-valid curated receipts", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13", {
+    observation: true,
+    excerpt: "Authorization: Bearer ghp_FAKESECRET0123456789"
+  });
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: [
+          "?? reports-data/observations/2026/05/2026-05-13.json",
+          "?? reports-data/source-funnel/2026/05/2026-05-13.json"
+        ].join("\n")
+      })
+    }),
+    (error) => error instanceof PublisherError && error.code === "curated_shadow_receipt_invalid"
+  );
+});
+
+test("signal dry-run rejects curated receipts whose payload date differs from the selected date", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13", { payloadReportDate: "2026-05-12" });
+  await assert.rejects(
+    createSignalPublishPlan({
+      repoRoot,
+      reportDate: "2026-05-13",
+      git: fakeGit({
+        status: [
+          "?? reports-data/observations/2026/05/2026-05-13.json",
+          "?? reports-data/source-funnel/2026/05/2026-05-13.json"
+        ].join("\n")
+      })
+    }),
+    (error) => error instanceof PublisherError && error.code === "curated_shadow_receipt_invalid"
+  );
 });
 
 test("signal dry-run tolerates same-day discovery evidence without widening the signal commit", async () => {
@@ -351,6 +600,79 @@ test("signal GitHub API fallback leaves same-day discovery evidence out of the s
 
   assert.equal(result.published_files.includes("docs/signals/index.json"), true);
   assert.equal(result.published_files.includes(evidencePath), false);
+});
+
+test("signal GitHub API fallback preserves a remote receipt pair when the local optional pair is absent", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
+  const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  const calls = [];
+  await publishGeneratedArtifactsViaGitHubApi({
+    repoRoot,
+    reportDate: "2026-05-13",
+    scope: "signals",
+    confirmPush: true,
+    token: "test-token",
+    repository: "owner/repo",
+    verifyPages: false,
+    git: fakeGit({ status: " M docs/signals/index.json" }),
+    fetchImpl: fakeGitHubFetch({
+      calls,
+      remoteTree: [
+        { path: observationsPath, type: "blob", sha: "remote-observations" },
+        { path: funnelPath, type: "blob", sha: "remote-funnel" }
+      ]
+    })
+  });
+  const tree = calls.find((call) => call.url.endsWith("/git/trees") && call.method === "POST").body.tree;
+  assert.equal(tree.some((entry) => [observationsPath, funnelPath].includes(entry.path)), false);
+  assert.equal(tree.some((entry) => entry.sha === null), false);
+});
+
+test("signal GitHub API fallback rejects an orphaned remote receipt", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
+  await assert.rejects(
+    publishGeneratedArtifactsViaGitHubApi({
+      repoRoot,
+      reportDate: "2026-05-13",
+      scope: "signals",
+      confirmPush: true,
+      token: "test-token",
+      repository: "owner/repo",
+      verifyPages: false,
+      git: fakeGit({ status: " M docs/signals/index.json" }),
+      fetchImpl: fakeGitHubFetch({
+        remoteTree: [{ path: observationsPath, type: "blob", sha: "remote-observations" }]
+      })
+    }),
+    (error) => error instanceof PublisherError && error.code === "curated_shadow_remote_receipt_pair_incomplete"
+  );
+});
+
+test("signal GitHub API fallback uploads a verified clean local receipt pair", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  await writeSignalFixture(repoRoot, "2026-05-13");
+  await writeCuratedShadowReceiptFixture(repoRoot, "2026-05-13");
+  const observationsPath = "reports-data/observations/2026/05/2026-05-13.json";
+  const funnelPath = "reports-data/source-funnel/2026/05/2026-05-13.json";
+  const calls = [];
+  await publishGeneratedArtifactsViaGitHubApi({
+    repoRoot,
+    reportDate: "2026-05-13",
+    scope: "signals",
+    confirmPush: true,
+    token: "test-token",
+    repository: "owner/repo",
+    verifyPages: false,
+    git: fakeGit({ status: "" }),
+    fetchImpl: fakeGitHubFetch({ calls })
+  });
+  const tree = calls.find((call) => call.url.endsWith("/git/trees") && call.method === "POST").body.tree;
+  assert(tree.some((entry) => entry.path === observationsPath && typeof entry.content === "string"));
+  assert(tree.some((entry) => entry.path === funnelPath && typeof entry.content === "string"));
 });
 
 test("daily dry-run stages sanitized retrospective records for the selected date", async () => {
@@ -1752,6 +2074,134 @@ async function writeSignalFixture(repoRoot, reportDate) {
     outDir: "docs",
     generatedAt
   });
+}
+
+async function writeCuratedShadowReceiptFixture(repoRoot, reportDate, options = {}) {
+  await ensureCuratedShadowCanonicalOwners(repoRoot);
+  const canonicalOwners = await loadCuratedShadowCanonicalOwners({ rootDir: repoRoot });
+  const [year, month] = reportDate.split("-");
+  const payloadReportDate = options.payloadReportDate || reportDate;
+  const generatedAt = options.generatedAt || `${payloadReportDate}T08:00:00.000Z`;
+  const observationsPath = path.join(repoRoot, "reports-data", "observations", year, month, `${reportDate}.json`);
+  const funnelPath = path.join(repoRoot, "reports-data", "source-funnel", year, month, `${reportDate}.json`);
+  const rawId = "raw_0123456789abcdef01234567";
+  const observations = options.observation ? [{
+    id: rawId,
+    observation_id: "runtime-observation",
+    source_id: "runtime-source",
+    raw_record_count: 1,
+    material_url: "https://example.com/item",
+    material_url_hash: `sha256:${"1".repeat(64)}`,
+    title: "Runtime observation",
+    excerpt: options.excerpt || "A safe runtime observation.",
+    publisher_hint: "Example",
+    collector: {
+      id: "runtime-source",
+      name: "Runtime source",
+      url: "https://example.com/feed",
+      source_kind: "runtime_fixture"
+    },
+    author: null,
+    handle: null,
+    event_date: payloadReportDate,
+    published_at: null,
+    collected_at: generatedAt,
+    fetch_status: "fetched",
+    parse_status: "parsed",
+    content_hash: `sha256:${"2".repeat(64)}`,
+    source_group: "news_newsletters",
+    content_tags: []
+  }] : [];
+  const stage = (unit, status = "not_run", itemIds = []) => ({
+    status,
+    unit,
+    count: itemIds.length,
+    item_ids: itemIds,
+    failure_reason: ""
+  });
+  const lane = (laneId, logicalSourceId = "aify-news", parsedIds = [], sourceEntryIds = [laneId]) => ({
+    lane_id: laneId,
+    logical_source_id: logicalSourceId,
+    source_entry_ids: sourceEntryIds,
+    priority: true,
+    terminal_status: parsedIds.length > 0 ? "success_with_items" : "not_run",
+    failure_reason: "",
+    stages: {
+      registered: stage("source_entry", "success_with_items", [laneId]),
+      fetched: parsedIds.length > 0 ? stage("fetch_attempt", "success_with_items", [`fetch:${laneId}:1`]) : stage("fetch_attempt"),
+      parsed: parsedIds.length > 0 ? stage("observation", "success_with_items", parsedIds) : stage("observation"),
+      admitted: stage("signal"),
+      displayed: stage("edition_item")
+    }
+  });
+  const assetReconciliation = buildCuratedSourceAssetReconciliation({
+    ...canonicalOwners,
+    sources: canonicalOwners.registry.sources,
+    auditRows: new Map(),
+    rawObservations: { generated_at: generatedAt, observations },
+    sourcesPath: canonicalOwners.sourcesAnchor
+  });
+  options.mutateReconciliation?.(assetReconciliation);
+  await fs.mkdir(path.dirname(observationsPath), { recursive: true });
+  await fs.mkdir(path.dirname(funnelPath), { recursive: true });
+  await Promise.all([
+    fs.writeFile(observationsPath, `${JSON.stringify({
+      schema_version: 1,
+      kind: "raw_observations",
+      report_date: payloadReportDate,
+      generated_at: generatedAt,
+      input_record_count: observations.length,
+      observation_count: observations.length,
+      normalization_error_count: 0,
+      normalization_errors: [],
+      rejection_count: 0,
+      rejections: [],
+      observations
+    }, null, 2)}\n`, "utf8"),
+    fs.writeFile(funnelPath, `${JSON.stringify({
+      schema_version: 1,
+      kind: "source_funnel",
+      pipeline_phase: "phase_1a_shadow",
+      report_date: payloadReportDate,
+      generated_at: generatedAt,
+       asset_reconciliation: assetReconciliation,
+      lanes: [
+        lane("aify_today_picks"),
+        lane("site-aify-news"),
+        ...(options.observation && !options.omitObservationLane)
+          ? [lane(
+              "runtime-source",
+              "runtime-source",
+              [rawId],
+              options.observationLaneSourceIds || ["runtime-source"]
+            )]
+          : []
+      ]
+    }, null, 2)}\n`, "utf8")
+  ]);
+}
+
+async function ensureCuratedShadowCanonicalOwners(repoRoot) {
+  curatedShadowCanonicalFixturePromise ||= loadCuratedShadowCanonicalOwners({ rootDir }).then((owners) => ({
+    registrySource: owners.registry.sources[0],
+    promotionReview: "# Fixture promotion review\n\n<!-- promotion-candidate-review -->\n\n### End\n",
+    recoveryLedger: "# Fixture recovery ledger\n\n### REC-315\n\n### REC-316\n"
+  }));
+  const fixture = await curatedShadowCanonicalFixturePromise;
+  await Promise.all([
+    fs.mkdir(path.join(repoRoot, "config", "sources"), { recursive: true }),
+    fs.mkdir(path.join(repoRoot, "docs"), { recursive: true }),
+    fs.mkdir(path.join(repoRoot, "tasks"), { recursive: true })
+  ]);
+  await Promise.all([
+    fs.writeFile(
+      path.join(repoRoot, "config", "sources", "registry.json"),
+      `${JSON.stringify({ schema_version: 1, sources: [fixture.registrySource] }, null, 2)}\n`,
+      "utf8"
+    ),
+    fs.writeFile(path.join(repoRoot, "docs", "source-order-tuning-review.md"), fixture.promotionReview, "utf8"),
+    fs.writeFile(path.join(repoRoot, "tasks", "project-recovery-ledger.md"), fixture.recoveryLedger, "utf8")
+  ]);
 }
 
 async function ensurePublishBaselineManifest(repoRoot) {

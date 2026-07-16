@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jasonxzwen.github.io/ai-daily-cn/schemas/source-funnel.schema.json",
+  "title": "AI Daily Curated Source Funnel",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "pipeline_phase", "report_date", "generated_at", "asset_reconciliation", "lanes"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "source_funnel" },
+    "pipeline_phase": { "const": "phase_1a_shadow" },
+    "report_date": { "type": "string", "format": "date" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "asset_reconciliation": { "$ref": "#/$defs/asset_reconciliation" },
+    "lanes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/lane" }
+    }
+  },
+  "$defs": {
+    "string_list": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "current_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "name",
+        "source_kind",
+        "source_group",
+        "logical_source_ids",
+        "config_state",
+        "transport_state",
+        "content_state",
+        "decision",
+        "decision_reason",
+        "evidence_origin",
+        "roles",
+        "owner_pr",
+        "anchors"
+      ],
+      "properties": {
+        "source_id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "source_kind": { "type": "string", "minLength": 1 },
+        "source_group": { "type": "string", "minLength": 1 },
+        "logical_source_ids": { "$ref": "#/$defs/string_list" },
+        "config_state": { "enum": ["configured", "manual", "configuration_needed", "placeholder"] },
+        "transport_state": { "enum": ["success_with_items", "healthy_empty", "blocked", "failed", "not_run"] },
+        "content_state": { "enum": ["success_with_items", "healthy_empty", "blocked", "failed", "not_run"] },
+        "decision": { "enum": ["active", "observe", "defer", "retire", "replace", "investigate"] },
+        "decision_reason": { "type": "string", "minLength": 1 },
+        "evidence_origin": { "$ref": "#/$defs/string_list" },
+        "roles": { "$ref": "#/$defs/string_list" },
+        "owner_pr": { "type": "string", "minLength": 1 },
+        "anchors": { "$ref": "#/$defs/string_list" }
+      }
+    },
+    "historical_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "logical_source_id", "action", "reason", "evidence_origin", "anchors"],
+      "properties": {
+        "source_id": { "type": "string", "minLength": 1 },
+        "logical_source_id": { "type": "string", "minLength": 1 },
+        "action": { "enum": ["replace", "retire", "defer", "investigate"] },
+        "reason": { "type": "string", "minLength": 1 },
+        "evidence_origin": { "$ref": "#/$defs/string_list" },
+        "anchors": { "$ref": "#/$defs/string_list" }
+      }
+    },
+    "promotion_proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "logical_source_id", "section_id", "rank", "action", "reason", "evidence_origin", "anchors"],
+      "properties": {
+        "source_id": { "type": "string", "minLength": 1 },
+        "logical_source_id": { "type": "string", "minLength": 1 },
+        "section_id": { "type": "string", "minLength": 1 },
+        "rank": { "type": "integer", "minimum": 1 },
+        "action": { "enum": ["promoted", "defer", "retire"] },
+        "reason": { "type": "string", "minLength": 1 },
+        "evidence_origin": { "$ref": "#/$defs/string_list" },
+        "anchors": { "$ref": "#/$defs/string_list" }
+      }
+    },
+    "logical_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logical_source_id",
+        "name",
+        "aliases",
+        "source_entry_ids",
+        "required_observation_entries",
+        "current_config_state",
+        "transport_state",
+        "content_state",
+        "decision",
+        "decision_reason",
+        "evidence_origin",
+        "roles",
+        "owner_pr",
+        "anchors"
+      ],
+      "properties": {
+        "logical_source_id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "aliases": { "$ref": "#/$defs/string_list" },
+        "source_entry_ids": { "$ref": "#/$defs/string_list" },
+        "required_observation_entries": { "$ref": "#/$defs/string_list" },
+        "current_config_state": { "enum": ["active", "shadow-only", "collection-only", "absent", "retired"] },
+        "transport_state": { "enum": ["fetched", "healthy-empty", "blocked", "failed", "not-run", "unknown"] },
+        "content_state": { "$ref": "#/$defs/logical_content_state" },
+        "decision": { "enum": ["keep-active", "repair-in-shadow", "collection-only", "cutover-add", "retire", "unknown"] },
+        "decision_reason": { "type": "string", "minLength": 1 },
+        "evidence_origin": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["user_explicit", "registry", "historical_ref", "runtime_artifact", "external_reference"] }
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["publisher", "editorial_source", "collector", "site_watch"] }
+        },
+        "owner_pr": { "type": "string", "minLength": 1 },
+        "anchors": { "$ref": "#/$defs/string_list" }
+      }
+    },
+    "logical_stage_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "count", "observed_at", "receipt"],
+      "properties": {
+        "status": { "enum": ["success_with_items", "healthy_empty", "blocked", "failed", "not_run", "unknown"] },
+        "count": { "type": "integer", "minimum": 0 },
+        "observed_at": { "type": ["string", "null"], "format": "date-time" },
+        "receipt": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "logical_content_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parsed", "admitted", "displayed"],
+      "properties": {
+        "parsed": { "$ref": "#/$defs/logical_stage_receipt" },
+        "admitted": { "$ref": "#/$defs/logical_stage_receipt" },
+        "displayed": { "$ref": "#/$defs/logical_stage_receipt" }
+      }
+    },
+    "collector_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_kind",
+        "source_url_hash",
+        "response_url_hash",
+        "http_status",
+        "response_bytes",
+        "redirect_count",
+        "fetched_count",
+        "parsed_count"
+      ],
+      "properties": {
+        "receipt_kind": { "enum": ["aify_today_picks", "aify_site_health"] },
+        "source_url_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "response_url_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "http_status": { "type": "integer", "minimum": 0, "maximum": 599 },
+        "response_bytes": { "type": "integer", "minimum": 0 },
+        "redirect_count": { "type": "integer", "minimum": 0 },
+        "fetched_count": { "type": "integer", "minimum": 0 },
+        "parsed_count": { "type": "integer", "minimum": 0 },
+        "upstream_snapshot_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "upstream_selection_date": { "type": "string" },
+        "input_count": { "type": "integer", "minimum": 0 },
+        "represented_input_count": { "type": "integer", "minimum": 0 },
+        "item_count": { "type": "integer", "minimum": 0 },
+        "rejection_count": { "type": "integer", "minimum": 0 },
+        "cache_fallback_used": { "const": false }
+      }
+    },
+    "asset_reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current_entries", "historical_decisions", "promotion_proposals", "promotion_action_counts", "logical_sources"],
+      "properties": {
+        "current_entries": { "type": "array", "items": { "$ref": "#/$defs/current_entry" } },
+        "historical_decisions": { "type": "array", "items": { "$ref": "#/$defs/historical_decision" } },
+        "promotion_proposals": { "type": "array", "items": { "$ref": "#/$defs/promotion_proposal" } },
+        "promotion_action_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["promoted", "defer", "retire"],
+          "properties": {
+            "promoted": { "type": "integer", "minimum": 0 },
+            "defer": { "type": "integer", "minimum": 0 },
+            "retire": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "logical_sources": { "type": "array", "items": { "$ref": "#/$defs/logical_source" } }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "unit", "count", "item_ids", "failure_reason"],
+      "properties": {
+        "status": { "enum": ["success_with_items", "healthy_empty", "blocked", "failed", "not_run"] },
+        "unit": { "enum": ["source_entry", "fetch_attempt", "observation", "signal", "edition_item"] },
+        "count": { "type": "integer", "minimum": 0 },
+        "item_ids": { "$ref": "#/$defs/string_list" },
+        "failure_reason": { "type": "string", "maxLength": 120, "pattern": "^(?:[a-z0-9]+(?:[._:-][a-z0-9]+)*)?$" }
+      }
+    },
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lane_id", "logical_source_id", "source_entry_ids", "priority", "terminal_status", "failure_reason", "stages"],
+      "properties": {
+        "lane_id": { "type": "string", "minLength": 1 },
+        "logical_source_id": { "type": "string", "minLength": 1 },
+        "source_entry_ids": { "$ref": "#/$defs/string_list" },
+        "priority": { "type": "boolean" },
+        "terminal_status": { "enum": ["success_with_items", "healthy_empty", "blocked", "failed", "not_run"] },
+        "failure_reason": { "type": "string", "maxLength": 120, "pattern": "^(?:[a-z0-9]+(?:[._:-][a-z0-9]+)*)?$" },
+        "collector_receipt": { "$ref": "#/$defs/collector_receipt" },
+        "stages": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["registered", "fetched", "parsed", "admitted", "displayed"],
+          "properties": {
+            "registered": { "$ref": "#/$defs/stage" },
+            "fetched": { "$ref": "#/$defs/stage" },
+            "parsed": { "$ref": "#/$defs/stage" },
+            "admitted": { "$ref": "#/$defs/stage" },
+            "displayed": { "$ref": "#/$defs/stage" }
+          }
+        }
+      }
+    }
+  }
+}

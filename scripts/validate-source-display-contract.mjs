@@ -3,7 +3,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { containsInternalSourceField } from "../src/privacy.js";
-import { buildSourceInventoryRows, CORE_SOURCE_CONTRACTS } from "../src/source-effectiveness.js";
+import {
+  buildSourceInventoryRows,
+  CORE_SOURCE_CONTRACTS,
+  parseSourcePromotionReview
+} from "../src/source-effectiveness.js";
 
 const REQUIRED_STATUS_LABELS = [
   "included",
@@ -526,7 +530,7 @@ function validateOrderTuningReview(review, inventoryRows, contract, maintenance,
   const inventoryById = new Map(inventoryRows.map((row) => [row.id, row]));
   const seenSourceIds = new Set();
   const seenLogicalIds = new Set();
-  const candidates = extractPromotionCandidates(review);
+  const candidates = parseSourcePromotionReview(review);
   if (candidates.length !== 24) {
     failures.push(`order tuning review must list exactly 24 promotion decisions, found ${candidates.length}`);
   }
@@ -615,22 +619,6 @@ function extractOrderTuningUnmappedCounts(review) {
 function extractOrderTuningTotalUnmapped(review) {
   const match = review.match(/<!--\s*order-tuning-total-unmapped:(\d+)\s*-->/);
   return match ? Number(match[1]) : null;
-}
-
-function extractPromotionCandidates(review) {
-  const candidates = [];
-  const pattern = /^\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|\s*(\d+)\s*\|\s*`([^`]+)`\s*\|/gm;
-  let match;
-  while ((match = pattern.exec(review))) {
-    candidates.push({
-      sourceId: match[1],
-      logicalSourceId: match[2],
-      sectionId: match[3],
-      rank: Number(match[4]),
-      action: match[5]
-    });
-  }
-  return candidates;
 }
 
 function extractInventorySectionCounts(reference) {
