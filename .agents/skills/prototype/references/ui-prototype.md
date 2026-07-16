@@ -2,36 +2,40 @@
 
 Use a UI prototype when the question is about visual structure, interaction flow, density, or information hierarchy.
 
-Prefer an existing page:
+Choose the cheapest evidence that can answer the current question:
 
-- keep existing data fetching, auth, params, and route context
-- switch only the rendered subtree by query parameter, such as `?variant=A`
+- visual brief when words can resolve the direction
+- Host-native image when the open question is static appearance
+- runnable UI when state, input, continuity, responsiveness, or accessibility must be experienced
 
-Use a new prototype route only when the idea has no natural host page.
+Image-assisted prototypes:
 
-Variant rules:
+- Use Host-native image generation when a visual reference answers the design question faster than code alone.
+- Prompt only from public or generated material, or assets the user supplied or explicitly approved for this generation. Reduce private context to de-identified visual descriptors; never send source code, secrets, internal routes, customer or account data, private screenshots, or private copy.
+- Compare the result against accepted design direction and constraints rather than treating it as the specification.
+- Static images do not verify interaction, responsiveness, or accessibility.
+- Do not add an SDK, API key, provider adapter, or pinned model name to the target project.
+- When native generation or safe context is unavailable, return a visual brief instead of building another image runtime.
+- Delete unselected images with the losing variants unless the user explicitly asks to preserve them.
 
-- default to 3 variants
-- cap at 5 variants
+Alternative rules:
+
+- Generate only enough alternatives to distinguish unresolved choices; one is enough for a single hypothesis.
 - make variants structurally different
 - keep real data and app chrome when available
 - avoid real mutations unless the question requires them
+- Change only the affected direction while preserving accepted constraints.
 
-Switcher rules:
+Comparison aid:
 
-- fixed bottom bar or similarly obvious control
-- previous and next controls
-- URL updates so variants are shareable
-- keyboard shortcuts when practical
-- do not intercept shortcuts while an input, textarea, or contenteditable element is focused
-- visually distinct enough that it cannot be mistaken for production UI
-- hidden or removed before production
+- Reuse an existing page when runnable variants need its data, auth, params, or app chrome.
+- Add a temporary switcher only when comparing multiple runnable variants in the same context materially reduces decision cost.
+- Keep the control visibly prototype-only and remove it with losing variants.
 
 Cleanup:
 
 - keep the winning design decision
 - delete losing variants
-- delete the switcher
 - harden the chosen implementation through normal feature workflow
 
 Anti-patterns:
