@@ -234,6 +234,11 @@ export async function runDailyWorkflow(options = {}) {
       now
     });
     summary.final_status = "blocked";
+    summary.legacy_report = {
+      status: "blocked",
+      failed_stage_id: "prepare_clean_worktree",
+      error_code: String(error.code || "prepare_clean_worktree_failed")
+    };
     summary.next_action = blockedNextAction(error);
     await writeSummary(summaryPath, summary);
     return { summary, summaryPath };

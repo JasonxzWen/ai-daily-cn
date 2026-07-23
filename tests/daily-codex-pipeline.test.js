@@ -589,6 +589,49 @@ test("daily Codex production summary reports the latest unresolved failed stage"
   assert.equal(summary.error, "candidate coverage failed");
 });
 
+test("daily Codex production summary does not invent a clean root after preparation fails", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-prepare-failure-"));
+  const reportDate = "2026-07-22";
+  await writeMinimalRepoFiles(rootDir);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: false,
+    codexBin: "codex.cmd"
+  });
+  const workflowRunner = async ({ summaryPath }) => {
+    const legacySummary = {
+      report_date: reportDate,
+      mode: "dry-run",
+      final_status: "blocked",
+      next_action: { kind: "inspect_blocker" },
+      clean_repo_root: "",
+      legacy_report: {
+        status: "blocked",
+        failed_stage_id: "prepare_clean_worktree",
+        error_code: "git_fetch_unavailable"
+      },
+      stages: [
+        {
+          id: "prepare_clean_worktree",
+          status: "failed",
+          error: "Unable to read the current remote main commit.",
+          error_code: "git_fetch_unavailable"
+        }
+      ]
+    };
+    await fs.writeFile(summaryPath, `${JSON.stringify(legacySummary, null, 2)}\n`, "utf8");
+    return { summary: legacySummary, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, { workflowRunner });
+
+  assert.equal(summary.final_status, "blocked");
+  assert.equal(summary.clean_repo_root, "");
+  assert.equal(summary.legacy_report.status, "blocked");
+});
+
 test("daily Codex blocked summary projects semantic review failures into stable terminal evidence", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-semantic-failure-"));
   const reportDate = "2026-07-06";

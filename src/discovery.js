@@ -3450,6 +3450,7 @@ export async function collectContentSources(options = {}) {
           rootDir: options.rootDir || process.cwd(),
           sourceInfo: currentSource,
           maxAgeDays: options.cacheTtlDays || currentSource.cache_ttl_days || DEFAULT_SOURCE_CACHE_TTL_DAYS,
+          asOf: generatedAt,
           enabled: options.cacheFallback !== false
         });
         if (!cached) {
@@ -3577,6 +3578,7 @@ export async function collectContentSources(options = {}) {
         rootDir: options.rootDir || process.cwd(),
         sourceInfo: currentSource,
         maxAgeDays: options.cacheTtlDays || currentSource.cache_ttl_days || DEFAULT_SOURCE_CACHE_TTL_DAYS,
+        asOf: generatedAt,
         enabled: options.cacheFallback !== false
       });
       if (!cached) {
@@ -6879,7 +6881,7 @@ async function writeContentSourceCache({ rootDir, sourceInfo, content, fetchedAt
   })}\n`, "utf8");
 }
 
-async function readContentSourceCache({ rootDir, sourceInfo, maxAgeDays, enabled }) {
+async function readContentSourceCache({ rootDir, sourceInfo, maxAgeDays, asOf, enabled }) {
   if (!enabled || !isCacheFallbackSource(sourceInfo)) {
     return null;
   }
@@ -6888,7 +6890,7 @@ async function readContentSourceCache({ rootDir, sourceInfo, maxAgeDays, enabled
     if (!payload || payload.source_id !== sourceInfo.id || typeof payload.content !== "string") {
       return null;
     }
-    if (isCacheExpired(payload.fetched_at, maxAgeDays)) {
+    if (isCacheExpired(payload.fetched_at, maxAgeDays, asOf)) {
       return null;
     }
     return payload;
@@ -6905,13 +6907,14 @@ function isCacheFallbackSource(sourceInfo = {}) {
   return /aify|arxiv|reddit/i.test(`${sourceInfo.id || ""} ${sourceInfo.name || ""} ${sourceInfo.url || ""}`);
 }
 
-function isCacheExpired(fetchedAt, maxAgeDays) {
+function isCacheExpired(fetchedAt, maxAgeDays, asOf) {
   const ttlDays = Number.isFinite(Number(maxAgeDays)) && Number(maxAgeDays) > 0 ? Number(maxAgeDays) : DEFAULT_SOURCE_CACHE_TTL_DAYS;
   const date = new Date(fetchedAt);
-  if (Number.isNaN(date.getTime())) {
+  const reference = asOf ? new Date(asOf) : new Date();
+  if (Number.isNaN(date.getTime()) || Number.isNaN(reference.getTime())) {
     return true;
   }
-  return Date.now() - date.getTime() > ttlDays * 24 * 60 * 60 * 1000;
+  return reference.getTime() - date.getTime() > ttlDays * 24 * 60 * 60 * 1000;
 }
 
 function withTrailingSlash(value) {

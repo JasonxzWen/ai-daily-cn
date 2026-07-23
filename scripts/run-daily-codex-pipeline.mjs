@@ -686,8 +686,10 @@ async function writeValidatedAiRepairContract({ plan, nextAction, contract }) {
 async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePlanPath, orchestration }) {
   const legacyFinalStatus = legacySummary.final_status || "blocked";
   const finalStatus = normalizeProductionFinalStatus(legacyFinalStatus);
-  const cleanRoot = path.resolve(legacySummary.clean_repo_root || plan.root_dir);
-  const artifactPaths = buildDailyReportArtifactPaths({ cleanRoot, reportDate: plan.report_date });
+  const cleanRootValue = String(legacySummary.clean_repo_root || "").trim();
+  const cleanRoot = cleanRootValue ? path.resolve(cleanRootValue) : "";
+  const artifactRoot = cleanRoot || path.resolve(plan.root_dir);
+  const artifactPaths = buildDailyReportArtifactPaths({ cleanRoot: artifactRoot, reportDate: plan.report_date });
   const artifactSizes = await collectArtifactSizes({
     pipeline_plan_path: pipelinePlanPath,
     ...artifactPaths
@@ -698,7 +700,7 @@ async function normalizeSingleScriptRunSummary({ plan, legacySummary, pipelinePl
     : {};
   const completedStages = normalizeCompletedStages(legacySummary.stages || legacySummary.completed_stages || []);
   const sourceWatch = await deriveProductionSourceWatchSummary({
-    cleanRoot,
+    cleanRoot: artifactRoot,
     reportDate: plan.report_date,
     completedStages
   });

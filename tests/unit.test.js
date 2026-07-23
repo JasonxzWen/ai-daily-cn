@@ -139,6 +139,27 @@ test("report schema preserves source transport diagnostics without turning them 
       "https://example.com/content-feed.xml?page=4"
     ]
   });
+  Object.assign(report.source_audit.search_sources, {
+    provider_transport_status: {
+      gdelt: "degraded",
+      openalex: "complete"
+    },
+    provider_transport_limitations: {
+      gdelt: ["runtime_time_budget_exhausted"],
+      openalex: []
+    },
+    provider_pages_fetched: {
+      gdelt: 0,
+      openalex: 2
+    },
+    transport_budget: {
+      requests_used: 2,
+      request_budget: 120,
+      runtime_ms: 180000,
+      runtime_budget_ms: 180000,
+      exhausted: true
+    }
+  });
 
   const validation = validateReport(report);
 
@@ -149,6 +170,10 @@ test("report schema preserves source transport diagnostics without turning them 
   assert.equal(source.pages_fetched, 2);
   assert.equal(source.continuation_url, "https://example.com/content-feed.xml?page=3");
   assert.equal(source.continuation_urls.length, 2);
+  assert.equal(validation.value.source_audit.search_sources.provider_transport_status.gdelt, "degraded");
+  assert.deepEqual(validation.value.source_audit.search_sources.provider_transport_limitations.openalex, []);
+  assert.equal(validation.value.source_audit.search_sources.provider_pages_fetched.openalex, 2);
+  assert.equal(validation.value.source_audit.search_sources.transport_budget.exhausted, true);
 });
 
 test("candidate pool schema accepts curated first-party builder candidates", () => {
@@ -10105,6 +10130,35 @@ test("daily runner retries clean worktree preparation according to resilience po
   assert.deepEqual(stage.output.retry_attempts.map((attempt) => attempt.ok), [false, true]);
 });
 
+test("daily runner marks clean worktree preparation failures as terminal", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-prepare-terminal-"));
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-22",
+    publish: false,
+    retryDelayMs: 0,
+    prepareCleanWorktree: async () => {
+      const error = new Error("Unable to read the current remote main commit.");
+      error.code = "git_fetch_unavailable";
+      throw error;
+    },
+    runStage: async () => {
+      throw new Error("stages after clean worktree preparation must not run");
+    }
+  });
+
+  assert.equal(result.summary.final_status, "blocked");
+  assert.equal(result.summary.clean_repo_root, "");
+  assert.deepEqual(result.summary.legacy_report, {
+    status: "blocked",
+    failed_stage_id: "prepare_clean_worktree",
+    error_code: "git_fetch_unavailable"
+  });
+  const saved = JSON.parse(await fs.readFile(result.summaryPath, "utf8"));
+  assert.deepEqual(saved.legacy_report, result.summary.legacy_report);
+});
+
 test("daily runner retries transient stage failures according to resilience policy", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-retry-policy-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
@@ -12607,6 +12661,46 @@ test("quality review blocks expanded main items that would fail report write as 
   assert(review.issues.some((issue) => issue.path === "main_items[0].summary"));
   assert(review.ai_review_tasks.some((task) => task.kind === "main_item_editorial_rewrite"));
   assert.equal(review.checklist.find((item) => item.id === "main_item_editorial_quality").status, "failed");
+});
+
+test("quality review repairs expanded main items before report write when emphasis is missing", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const base = report.main_items[0];
+  report.main_items = Array.from({ length: 8 }, (_unused, index) => ({
+    ...base,
+    candidate_id: `main-highlight-${index + 1}`,
+    title: `企业 AI 部署指南更新 ${index + 1}`,
+    url: `https://example.com/main-highlight-${index + 1}`,
+    summary: "微软在企业 AI 部署指南中补充了数据治理、权限配置和上线复盘要求，面向准备扩大试点范围的团队。",
+    bullets: [
+      "指南要求团队在扩大使用范围前记录数据来源、访问权限、失败回退方式与人工接管条件。",
+      "上线评估需要同时核对响应质量、风险责任、持续运维成本和真实业务指标。"
+    ]
+  }));
+
+  const missingReview = reviewReportQuality(report);
+  const missingIssue = missingReview.issues.find((issue) =>
+    issue.code === "highlight_missing" && issue.path === "main_items[0].bullets"
+  );
+
+  assert.equal(missingIssue?.severity, "error");
+  assert.equal(missingIssue?.repairable, true);
+  assert(missingReview.ai_review_tasks.some((task) =>
+    task.kind === "main_item_editorial_rewrite" &&
+    task.path === "main_items[0].bullets[0]"
+  ));
+  assert.equal(missingReview.checklist.find((item) => item.id === "highlight_density").status, "failed");
+
+  report.main_items[0].bullets[0] =
+    "**数据治理与接管条件**：指南要求团队在扩大使用范围前记录数据来源、访问权限、失败回退方式与人工接管条件。";
+  const emphasizedReview = reviewReportQuality(report);
+
+  assert.equal(
+    emphasizedReview.issues.some((issue) =>
+      issue.code === "highlight_missing" && issue.path === "main_items[0].bullets"
+    ),
+    false
+  );
 });
 
 test("quality review flags mixed English changelog excerpts in main item body", async () => {
@@ -16357,6 +16451,57 @@ test("report:draft dedupes duplicate community topics and keeps reader-facing su
   const climateLead = drafted.report.community_leads.find((item) => /气象|气候/u.test(item.content));
   assert(climateLead);
   assert.doesNotMatch(climateLead.content, /公开信息主要落在/u);
+});
+
+test("report:draft limits community background items outside the 72-hour window to one", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-community-freshness-"));
+  const reportDate = "2026-07-22";
+  const discoveryPath = path.join(tmp, "discovery.json");
+  const discovery = autodraftDiscoveryFixture(reportDate);
+  const communityCandidate = (id, eventDate, topic) => ({
+    id,
+    source_id: `content-community-${id}`,
+    category: "community_lead",
+    title: `${topic} 的 AI 行业观察`,
+    url: `https://example.com/community/${id}`,
+    source: "Example Industry Analysis",
+    event_date: eventDate,
+    status: "excluded",
+    evidence: `${topic} 报告梳理企业采用人工智能时的数据治理、成本责任、风险控制和组织协作，结合实际部署案例说明预算审批、人工接管与效果复盘如何影响项目能否持续运行，并列出团队在扩大使用范围前需要核对的责任边界。`,
+    verification_status: "intermediary_only",
+    source_level: "intermediary"
+  });
+  discovery.candidates = [
+    communityCandidate("old-governance", "2026-07-01", "数据治理"),
+    communityCandidate("old-procurement", "2026-07-05", "企业采购"),
+    communityCandidate("old-policy", "2026-07-10", "政策责任"),
+    communityCandidate("old-workforce", "2026-07-15", "组织协作"),
+    communityCandidate("fresh-evaluation", "2026-07-22", "智能体评估"),
+    communityCandidate("fresh-cost", "2026-07-21", "推理成本")
+  ];
+  await fs.writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`, "utf8");
+
+  const drafted = await generateReportDraft({
+    rootDir: tmp,
+    reportDate,
+    generatedAt: fixedGeneratedAt,
+    inputPaths: [discoveryPath],
+    cacheEvidence: false
+  });
+  const oldCommunityLeads = drafted.report.community_leads.filter((item) => item.event_date < "2026-07-19");
+  const oldIncludedCandidates = drafted.candidatePool.candidates.filter((candidate) =>
+    candidate.status === "included" &&
+    candidate.included_in === "community_leads" &&
+    candidate.event_date < "2026-07-19"
+  );
+
+  assert.equal(oldCommunityLeads.length, 1);
+  assert.equal(oldIncludedCandidates.length, 1);
+  assert.equal(
+    findFreshnessIssues(drafted.report, [], drafted.candidatePool)
+      .some((issue) => issue.code === "too_many_old_background_items"),
+    false
+  );
 });
 
 test("report:draft limits paper and GitHub overflow in community leads while keeping reader-facing news leads", async () => {

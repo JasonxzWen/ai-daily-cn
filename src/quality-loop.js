@@ -884,22 +884,34 @@ function collectMainItemDensityIssues(report, issues, aiReviewTasks = []) {
   items.forEach((item, index) => {
     const bullets = Array.isArray(item?.bullets) ? item.bullets : [];
     const summary = String(item?.summary || "").trim();
-    const text = bullets.join("\n").trim();
     const factLines = [summary, ...bullets]
       .map((line) => String(line || "").trim())
       .filter(Boolean);
+    const text = bullets.join("\n").trim();
+    const factText = factLines.join("\n");
     const plainFactLines = factLines
       .map((line) => stripMarkup(line).replace(/\s+/g, " ").trim())
       .filter(Boolean);
     const totalChars = factLines.reduce((sum, line) => sum + line.length, 0);
-    if (bullets.length > 0 && !/==[^=\n]+==/.test(text)) {
+    if (
+      bullets.length > 0 &&
+      !/\*\*[^*\n]+\*\*/.test(factText) &&
+      !/==[^=\n]+==/.test(factText)
+    ) {
       issues.push({
         code: "highlight_missing",
-        severity: "warning",
+        severity: expandedMainItems ? "error" : "warning",
         path: `main_items[${index}].bullets`,
         message: "Main item has no inline highlight marker.",
-        repairable: false
+        repairable: expandedMainItems
       });
+      if (expandedMainItems) {
+        aiReviewTasks.push({
+          kind: "main_item_editorial_rewrite",
+          path: `main_items[${index}].bullets[0]`,
+          instruction: "Rewrite this source-grounded bullet in Chinese and add one short inline emphasis marker (**...** or ==...==) around at most 32 visible characters. Preserve the existing facts and do not add templated labels."
+        });
+      }
     }
     if (bullets.length > 0 && stripMarkup(text).length < 80) {
       issues.push({
@@ -1436,8 +1448,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "highlight_density",
-      ok: !failedCodes.has("highlight_too_large") && !failedCodes.has("highlight_overused"),
-      status: failedCodes.has("highlight_too_large") || failedCodes.has("highlight_overused") ? "failed" : warningCodes.has("highlight_missing") ? "warning" : "passed"
+      ok: !failedCodes.has("highlight_too_large") && !failedCodes.has("highlight_overused") && !failedCodes.has("highlight_missing"),
+      status: failedCodes.has("highlight_too_large") || failedCodes.has("highlight_overused") || failedCodes.has("highlight_missing") ? "failed" : warningCodes.has("highlight_missing") ? "warning" : "passed"
     },
     {
       id: "builder_translation",
