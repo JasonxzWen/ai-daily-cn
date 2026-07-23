@@ -5436,6 +5436,7 @@ test("content source discovery listens to every public registry source without a
     rootDir,
     reportDate: "2026-05-26",
     generatedAt: fixedGeneratedAt,
+    cacheFallback: false,
     fetchImpl: async (url) => {
       checkedUrls.push(String(url));
       return textResponse(emptyRssFixture());
