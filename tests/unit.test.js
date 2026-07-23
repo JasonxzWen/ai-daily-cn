@@ -5430,13 +5430,17 @@ test("source registry schema taxonomy enums stay synchronized with the public ta
   );
 });
 
-test("content source discovery listens to every public registry source without admission selectors", async () => {
+test("content source discovery listens to every public registry source without admission selectors", async (t) => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-registry-listen-"));
+  t.after(() => fs.rm(tmp, { recursive: true, force: true }));
+  const registry = await loadSourceRegistry({ rootDir });
   const checkedUrls = [];
   const collectedDefault = await collectContentSources({
-    rootDir,
+    rootDir: tmp,
+    sources: registry.sources,
     reportDate: "2026-05-26",
     generatedAt: fixedGeneratedAt,
-    cacheFallback: false,
+    providerThrottleMs: 0,
     fetchImpl: async (url) => {
       checkedUrls.push(String(url));
       return textResponse(emptyRssFixture());
@@ -5448,6 +5452,7 @@ test("content source discovery listens to every public registry source without a
   assert(checkedUrls.some((url) => new URL(url).hostname === "machinelearning.apple.com"));
   assert(checkedUrls.some((url) => url.includes("producthunt.com/feed")));
   assert(checkedUrls.some((url) => url.includes("ifanr.com/feed")));
+  await fs.access(path.join(tmp, ".tmp", "source-cache", "content", "content-arxiv-cs-lg.json"));
 });
 
 test("manual source kind is a collection channel and is not skipped", () => {
