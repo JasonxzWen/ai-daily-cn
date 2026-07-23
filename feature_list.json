@@ -13,7 +13,7 @@
         ".tmp/daily-codex-pipeline/YYYY-MM-DD/pipeline-plan.json",
         ".tmp/daily-codex-mvp/YYYY-MM-DD/artifacts/ai-repair-contract-attempt-*.json",
         ".tmp/source-watch-YYYY-MM-DD.json",
-        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json.gz"
       ],
       "acceptance": [
         "A needs_ai_repair handoff is preflighted for kind, clean-root evidence realpaths, and direct launcher .tmp destination before Codex authors a contract and the same entrypoint resumes.",
@@ -322,7 +322,7 @@
         ".tmp/source-watch-YYYY-MM-DD.json",
         ".tmp/official-blog-context-YYYY-MM-DD.json",
         "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json",
-        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json.gz"
       ],
       "acceptance": [
         "Candidate sources record successful, failed, and empty checks.",
@@ -373,7 +373,7 @@
           ".tmp/daily-report.json",
           ".tmp/source-watch-YYYY-MM-DD.json",
           ".tmp/official-blog-context-YYYY-MM-DD.json",
-          "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+          "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json.gz",
           "src/discovery.js",
           "src/github-readme.js",
           "src/daily-runner.js",
@@ -413,7 +413,7 @@
       "artifacts": [
         "config/sources/aify-news.json",
         "config/source-display-contract.json",
-        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json.gz",
         "reports-data/YYYY-MM-DD.json",
         "docs/articles.json",
         ".tmp/run-summary-YYYY-MM-DD.json"
@@ -512,7 +512,7 @@
       ],
       "artifacts": [
         "reports-data/YYYY/MM/YYYY-MM-DD.json",
-        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json"
+        "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json.gz"
       ],
       "acceptance": [
         "`report:write` succeeds without candidate-pool, freshness, or duplicate wrapping errors.",
@@ -535,7 +535,7 @@
       "evidence": {
         "artifacts": [
           "reports-data/YYYY/MM/YYYY-MM-DD.json",
-          "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json",
+          "reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json.gz",
           "src/draft.js",
           "src/cli.js",
           "schemas/candidates.schema.json",

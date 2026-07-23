@@ -40,6 +40,35 @@ test("repo size audit ignores tracked files deleted by the pending change", asyn
   assert.equal(audit.notable_paths.docs_assets.files, 2);
 });
 
+test("repo size audit includes untracked publish payloads before commit", async () => {
+  const rootDir = await createFixtureRepo();
+  const pendingCandidatePath = path.join(
+    rootDir,
+    "reports-data",
+    "internal",
+    "candidates",
+    "2026",
+    "07",
+    "2026-07-10.candidates.json.gz"
+  );
+  await fs.writeFile(pendingCandidatePath, JSON.stringify({ candidates: ["pending"] }), "utf8");
+
+  const audit = await auditRepoSize({ rootDir });
+  const budget = evaluateRepoSizeBudget(audit, {
+    thresholds: {
+      tracked_total_bytes: {
+        error: audit.tracked.total_bytes
+      }
+    }
+  });
+
+  assert.equal(audit.notable_paths.reports_data_candidates_json.files, 2);
+  assert(audit.notable_paths.reports_data_candidates_json.bytes > Buffer.byteLength("{\"items\":[]}\n"));
+  assert.equal(audit.pending_untracked.file_count, 1);
+  assert.equal(budget.ok, false);
+  assert.equal(budget.errors[0].metric, "tracked_total_bytes");
+});
+
 test("repo size budget reports warnings separately from blocking errors", async () => {
   const rootDir = await createFixtureRepo();
   const audit = await auditRepoSize({ rootDir });

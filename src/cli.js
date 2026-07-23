@@ -2,6 +2,7 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { decodeJsonArtifact } from "./compressed-json.js";
 import { DEFAULT_SITE } from "./config.js";
 import { PublisherError, toPublishError } from "./errors.js";
 import {
@@ -406,7 +407,7 @@ try {
     }, outputPath);
   } else if (command === "official-blog:context") {
     const args = parseArgs(argv);
-    const inputPath = args.input || firstJsonPath(argv);
+    const inputPath = args.input || firstJsonArtifactPath(argv);
     if (!inputPath) {
       throw new PublisherError("official_blog_context_input_required", "official-blog:context requires --input <local-report-or-candidates.json>.");
     }
@@ -414,8 +415,8 @@ try {
     const resolvedInputPath = path.resolve(inputPath);
     const outputPath = typeof args.output === "string" ? args.output : "";
     assertOfficialBlogContextOutputPath({ outputPath, rootDir });
-    const inputRaw = fs.readFileSync(resolvedInputPath, "utf8");
-    const input = JSON.parse(inputRaw);
+    const inputRaw = fs.readFileSync(resolvedInputPath);
+    const input = decodeJsonArtifact(inputRaw);
     const existingIndex = await loadOfficialBlogKnowledge({
       rootDir,
       knowledgeDir: args["knowledge-dir"] ? path.resolve(args["knowledge-dir"]) : undefined
@@ -744,7 +745,7 @@ try {
     }
     const report = JSON.parse(fs.readFileSync(path.resolve(inputPath), "utf8"));
     const candidatePool = candidatePoolPath
-      ? JSON.parse(fs.readFileSync(path.resolve(candidatePoolPath), "utf8"))
+      ? decodeJsonArtifact(fs.readFileSync(path.resolve(candidatePoolPath)))
       : null;
     const review = reviewReportQuality(report, { candidatePool });
     printJson({
@@ -768,7 +769,7 @@ try {
     }
     const qualityRepairPaths = resolveQualityRepairExtras(args, positional.slice(3));
     const candidatePool = qualityRepairPaths.candidatePoolPath
-      ? JSON.parse(fs.readFileSync(path.resolve(qualityRepairPaths.candidatePoolPath), "utf8"))
+      ? decodeJsonArtifact(fs.readFileSync(path.resolve(qualityRepairPaths.candidatePoolPath)))
       : null;
     const report = JSON.parse(fs.readFileSync(path.resolve(inputPath), "utf8"));
     const safeRepair = repairReportQuality(report, null, { candidatePool });
@@ -831,7 +832,9 @@ try {
       fetchRetries: Number.parseInt(args["fetch-retries"] || "1", 10),
       retryDelayMs: Number.parseInt(args["retry-delay-ms"] || "1500", 10),
       endpointLimit: Number.parseInt(args["endpoint-limit"] || "5", 10),
-      transportStatePath: args["transport-state"] || path.join(".tmp", "search-pagination-state.json"),
+      transportStatePath: args["transport-state"] || (fixtureDir
+        ? ""
+        : path.join(".tmp", "search-pagination-state.json")),
       transportRequestBudget: Number.parseInt(args["transport-request-budget"] || "120", 10),
       transportRuntimeMs: Number.parseInt(args["transport-runtime-ms"] || "180000", 10),
       env: process.env
@@ -1241,6 +1244,10 @@ function firstJsonPath(args) {
   return positionalArgs(args).find((token) => /\.json$/i.test(token));
 }
 
+function firstJsonArtifactPath(args) {
+  return positionalArgs(args).find((token) => /\.json(?:\.gz)?$/i.test(token));
+}
+
 function firstSourcePath(args) {
   return positionalArgs(args).find((token) => /\.json$/i.test(token) || /(^|[\\/])sources([\\/]|$)/i.test(token));
 }
@@ -1294,7 +1301,7 @@ function resolveQualityRepairExtras(parsed, extraPositionals) {
   let contractPath = parsed["repair-contract"] || parsed.repair || "";
   let candidatePoolPath = parsed["candidate-pool"] || "";
   for (const item of extraPositionals) {
-    if (!candidatePoolPath && /(?:source-candidates|\.candidates\.json$)/i.test(String(item))) {
+    if (!candidatePoolPath && /(?:source-candidates|\.candidates\.json(?:\.gz)?$)/i.test(String(item))) {
       candidatePoolPath = item;
       continue;
     }

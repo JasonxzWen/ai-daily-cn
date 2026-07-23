@@ -8,6 +8,7 @@ import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import {
   candidatePoolRelativePaths,
   internalCandidatePoolRelativePath,
+  legacyInternalCandidatePoolRelativePath,
   REPORTS_DATA_INTERNAL_DIR,
   REPORTS_DATA_OCCURRENCES_DIR,
   REPORTS_DATA_OBSERVATIONS_DIR,
@@ -17,7 +18,7 @@ import {
 } from "./reports-data-layout.js";
 import { defaultGeneratedAt } from "./time.js";
 import { validateArticles, validateFeed, validateHome, validateReport, validateTrends } from "./schema.js";
-import { normalizeCandidatePool } from "./candidates.js";
+import { normalizeCandidatePool, readPersistedCandidatePool } from "./candidates.js";
 import { compareOccurrenceChronology } from "./occurrence-store.js";
 import { deriveQualityStatus, normalizeQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
@@ -751,21 +752,29 @@ async function loadSourceWatchCandidatePools(dataInputDir, reports = []) {
     .filter(Boolean))].sort();
   const records = [];
   for (const reportDate of reportDates) {
-    const candidatePoolPath = path.join(
-      dataInputDir,
-      ...internalCandidatePoolRelativePath(reportDate).split(path.sep)
-    );
-    if (!await exists(candidatePoolPath)) {
+    const candidatePoolPath = await firstExistingCandidatePoolPath(dataInputDir, reportDate);
+    if (!candidatePoolPath) {
       continue;
     }
-    const raw = await fs.readFile(candidatePoolPath, "utf8");
+    const { raw, candidatePool } = await readPersistedCandidatePool(candidatePoolPath, reportDate);
     records.push({
       path: candidatePoolPath,
       sha256: createHash("sha256").update(raw).digest("hex"),
-      candidatePool: normalizeCandidatePool(JSON.parse(raw), reportDate)
+      candidatePool
     });
   }
   return records;
+}
+
+async function firstExistingCandidatePoolPath(dataInputDir, reportDate) {
+  for (const relativePath of [
+    internalCandidatePoolRelativePath(reportDate),
+    legacyInternalCandidatePoolRelativePath(reportDate)
+  ]) {
+    const candidatePath = path.join(dataInputDir, ...relativePath.split(path.sep));
+    if (await exists(candidatePath)) return candidatePath;
+  }
+  return "";
 }
 
 function buildSourceWatchConsumption(records, articles, requestedReportDate) {
@@ -2435,7 +2444,7 @@ async function copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writte
     });
   }
 
-  const candidatePool = normalizeCandidatePool(JSON.parse(await fs.readFile(candidatePath, "utf8")), report.report_date);
+  const { candidatePool } = await readPersistedCandidatePool(candidatePath, report.report_date);
   await writeJsonTracked(outDir, reportRelativePaths(report.report_date).candidateDataPath, candidatePool, writtenFiles);
 }
 

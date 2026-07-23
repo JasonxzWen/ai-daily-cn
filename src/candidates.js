@@ -1,8 +1,15 @@
+import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { decodeJsonArtifact, encodeJsonArtifact } from "./compressed-json.js";
 import { PublisherError } from "./errors.js";
 import { reportRelativePaths } from "./paths.js";
-import { internalCandidatePoolRelativePath } from "./reports-data-layout.js";
+import {
+  compressedLegacyCandidatePoolRelativePath,
+  internalCandidatePoolRelativePath,
+  legacyCandidatePoolRelativePath,
+  legacyInternalCandidatePoolRelativePath
+} from "./reports-data-layout.js";
 import { validateCandidatePool } from "./schema.js";
 import {
   isPlatformExemptCategory,
@@ -37,9 +44,12 @@ export async function readCandidatePool(options = {}) {
     options.inputPath || path.join(".tmp", `source-candidates-${reportDate}.json`);
   const candidatePath = path.resolve(rootDir, inputPath);
 
-  let raw = "";
   try {
-    raw = await fs.readFile(candidatePath, "utf8");
+    const persisted = await readPersistedCandidatePool(candidatePath, reportDate);
+    return {
+      path: candidatePath,
+      candidatePool: persisted.candidatePool
+    };
   } catch (error) {
     if (error.code === "ENOENT") {
       throw new PublisherError("candidate_pool_missing", `缺少候选池文件：${candidatePath}`, {
@@ -48,11 +58,6 @@ export async function readCandidatePool(options = {}) {
     }
     throw error;
   }
-
-  return {
-    path: candidatePath,
-    candidatePool: normalizeCandidatePool(JSON.parse(raw), reportDate)
-  };
 }
 
 export function normalizeCandidatePool(candidatePool, reportDate) {
@@ -353,9 +358,35 @@ function hasNonPrimaryDisclosure(candidate, item = {}) {
 
 export async function writeCandidatePool(outputDir, reportDate, candidatePool) {
   const target = path.join(outputDir, ...internalCandidatePoolRelativePath(reportDate).split(path.sep));
+  const persistedCandidatePool = normalizeCandidatePool(candidatePool, reportDate);
+  const compressed = encodeJsonArtifact(persistedCandidatePool, target);
   await fs.mkdir(path.dirname(target), { recursive: true });
-  await fs.writeFile(target, `${JSON.stringify(candidatePool, null, 2)}\n`, "utf8");
+  const temporary = `${target}.${process.pid}.${randomUUID()}.tmp`;
+  try {
+    await fs.writeFile(temporary, compressed);
+    await fs.rename(temporary, target);
+    for (const relativePath of [
+      legacyInternalCandidatePoolRelativePath(reportDate),
+      compressedLegacyCandidatePoolRelativePath(reportDate),
+      legacyCandidatePoolRelativePath(reportDate)
+    ]) {
+      await fs.rm(path.join(outputDir, ...relativePath.split(path.sep)), { force: true });
+    }
+  } catch (error) {
+    await fs.rm(temporary, { force: true }).catch(() => {});
+    throw error;
+  }
   return target;
+}
+
+export async function readPersistedCandidatePool(filePath, reportDate = "") {
+  const raw = await fs.readFile(filePath);
+  const parsed = decodeJsonArtifact(raw);
+  return {
+    path: filePath,
+    raw,
+    candidatePool: normalizeCandidatePool(parsed, reportDate || parsed.report_date)
+  };
 }
 
 export function candidatePoolOutputPath(reportDate) {

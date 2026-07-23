@@ -6,6 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
+import { writeCandidatePool } from "../src/candidates.js";
 import {
   buildCuratedSourceAssetReconciliation,
   loadCuratedShadowCanonicalOwners
@@ -27,6 +28,10 @@ import {
   verifyPublishedUrl
 } from "../src/publish.js";
 import { buildOccurrenceStore, writeOccurrenceStore } from "../src/occurrence-store.js";
+import {
+  internalCandidatePoolRelativePath,
+  legacyInternalCandidatePoolRelativePath
+} from "../src/reports-data-layout.js";
 import { rawMaterialUrlHash, rawObservationContentHash } from "../src/raw-observation-integrity.js";
 import { buildPublicSignals, buildSite } from "../src/site.js";
 
@@ -105,6 +110,48 @@ test("daily dry-run requires an explicit report date and stays date-scoped", asy
   assert(!plan.will_stage_files.includes("docs/official-blogs/index.html"));
   assert(plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.json"));
   assert(!plan.will_stage_files.includes("docs/data/2026/05/2026-05-13.candidates.json"));
+});
+
+test("daily dry-run stages the deleted legacy candidate pool beside its gzip replacement", async () => {
+  const repoRoot = await tempRepoWithFixture();
+  const reportDate = "2026-05-13";
+  const outputDir = path.join(repoRoot, "reports-data");
+  const legacyRelativePath = `reports-data/${legacyInternalCandidatePoolRelativePath(reportDate).replaceAll("\\", "/")}`;
+  const compressedRelativePath = `reports-data/${internalCandidatePoolRelativePath(reportDate).replaceAll("\\", "/")}`;
+  const legacyPath = path.join(repoRoot, ...legacyRelativePath.split("/"));
+  await fs.mkdir(path.dirname(legacyPath), { recursive: true });
+  await fs.writeFile(legacyPath, "{}\n", "utf8");
+  await writeCandidatePool(outputDir, reportDate, {
+    schema_version: 1,
+    report_date: reportDate,
+    generated_at: fixedGeneratedAt,
+    sources: [{
+      id: "fixture-source",
+      name: "Fixture source",
+      url: "https://example.com/feed",
+      category: "builder",
+      status: "checked"
+    }],
+    candidates: []
+  });
+
+  const plan = await createDailyPublishPlan({
+    repoRoot,
+    inputDir: "reports-source",
+    dataInputDir: "reports-data",
+    outDir: "docs",
+    generatedAt: fixedGeneratedAt,
+    reportDate,
+    git: fakeGit({
+      status: [
+        ` D ${legacyRelativePath}`,
+        `?? ${compressedRelativePath}`
+      ].join("\n")
+    })
+  });
+
+  assert(plan.will_stage_files.includes(legacyRelativePath));
+  assert(plan.will_stage_files.includes(compressedRelativePath));
 });
 
 test("signal dry-run stages only the dated occurrence store and public signal tree", async () => {

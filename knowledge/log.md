@@ -4,6 +4,10 @@ title: AI Daily CN 知识更新日志
 ---
 # AI Daily CN 知识更新日志
 
+## 2026-07-23
+
+- 记录遗留编辑候选池的内部无损 gzip 持久化路径、旧 JSON 迁移兼容及默认不公开边界。
+
 ## 2026-07-16
 
 - 记录 Phase 1A 信源影子链路：新增按日 raw observations 与 source funnel，失败不阻断旧发布器。
@@ -20,6 +24,8 @@ title: AI Daily CN 知识更新日志
 
 - [项目 README](../README.md)
 - [项目包定义](../package.json)
+- [候选池持久化](../src/candidates.js)
+- [候选池路径布局](../src/reports-data-layout.js)
 - [日更工作流合同](../config/daily-workflow-contract.json)
 - [影子信源编排](../src/curated-source-shadow.js)
 - [信号准入合同](../config/signal-admission-contract.json)

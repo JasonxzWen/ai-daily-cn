@@ -23,6 +23,8 @@ import {
 import { createOfficialComponentSnapshot } from "./official-component-snapshot.js";
 import { candidatePoolRelativePaths } from "./reports-data-layout.js";
 import { transportCompletenessTags } from "./public-signal-lanes.js";
+import { redactLocalEnvironmentPaths } from "./privacy.js";
+import { readJsonArtifact } from "./compressed-json.js";
 
 const GITHUB_BASE_URL = "https://github.com";
 const FETCH_RETRY_NOTES = new WeakMap();
@@ -579,7 +581,7 @@ export function formatDiscoveryErrorNote(error) {
     if (cause.syscall) parts.push(`syscall=${cause.syscall}`);
     if (cause.hostname) parts.push(`hostname=${cause.hostname}`);
   }
-  return parts.join("; ");
+  return redactLocalEnvironmentPaths(parts.join("; "));
 }
 
 function sleep(ms) {
@@ -4216,7 +4218,7 @@ function isUsefulProductConfirmationSummary(summary) {
 }
 
 function sanitizeNoteValue(value) {
-  return String(value || "")
+  return redactLocalEnvironmentPaths(value)
     .replace(/[\r\n;]+/g, " ")
     .replace(/\s+/g, "_")
     .slice(0, 160);
@@ -4566,16 +4568,27 @@ async function loadGitHubTrendingHistoryRecordsFromRoot(historyRoot, reportDate,
       path.join(historyRoot, ...relativePath.split(path.sep))
     );
     const reportPath = path.join(historyRoot, year, month, `${date}.json`);
-    for (const filePath of [...candidatePaths, reportPath]) {
+    for (const filePath of candidatePaths) {
       try {
         records.push({
           date,
-          payload: JSON.parse(await fs.readFile(filePath, "utf8"))
+          payload: await readJsonArtifact(filePath)
         });
+        break;
       } catch (error) {
         if (error.code !== "ENOENT") {
           errors.push(`${filePath}: ${error.message}`);
         }
+      }
+    }
+    try {
+      records.push({
+        date,
+        payload: JSON.parse(await fs.readFile(reportPath, "utf8"))
+      });
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        errors.push(`${reportPath}: ${error.message}`);
       }
     }
   }

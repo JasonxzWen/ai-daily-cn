@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { readJsonArtifact } from "./compressed-json.js";
 import {
   isMeaningfulImageCandidate,
   meaningfulImageKind,
@@ -225,7 +226,7 @@ function candidateImageScore(candidate) {
 
 async function readCandidatePoolCandidates(rootDir, candidatePoolPath, reportDate) {
   const inputPath = candidatePoolPath || path.join(".tmp", `source-candidates-${reportDate}.json`);
-  const payload = JSON.parse(await fs.readFile(path.resolve(rootDir, inputPath), "utf8"));
+  const payload = await readJsonArtifact(path.resolve(rootDir, inputPath));
   return Array.isArray(payload.candidates) ? payload.candidates : [];
 }
 

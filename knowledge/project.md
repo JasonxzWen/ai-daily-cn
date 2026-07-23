@@ -9,6 +9,7 @@ title: AI Daily CN 项目概览
 - AI Daily CN 是一个把结构化报告生成可审计、可归档 GitHub Pages 站点的中文 AI 日报发布器。
 - 站点是静态产物，不依赖后端、数据库、队列或托管运行时。
 - `reports-data/` 保存完整报告数据，`docs/` 保存面向读者的静态页面、公开 JSON、Feed 与趋势数据。
+- 遗留编辑报告的完整候选池以无损 gzip JSON 保存在 `reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json.gz`；默认站点构建不公开候选池，读取层只为迁移兼容旧 JSON 路径。
 - `curated-data/` 保存用于生成公开投影的已审阅内部来源记录，`knowledge/` 只保存 Markdown 格式的项目 Wiki。
 - 日更 runner 在旧公开信号持久化前运行一个不改变公开页面的 Phase 1A 影子阶段：按日保存 repo-safe 原始观察与 `registered → fetched → parsed` 信源漏斗；正常影子失败及有确定性 recovery evidence 的原子事务失败只记录降级，不阻断旧发布器。无恢复证据的 receipt 损坏、canonical reconciliation、lineage 或 privacy 漂移继续按仓库完整性失败阻断。
 - Phase 1B 在 Phase 1A 后运行不阻断旧发布器的确定性准入影子阶段：逐项记录 `admitted / rejected / needs_review` 回执，将跨日去重后的信号保存到内部 signal pool，并生成同代、可校验但不进入当前站点发现与公开信号 schema 的 public-ready 伴随投影。
@@ -25,6 +26,8 @@ title: AI Daily CN 项目概览
 - [项目 README](../README.md)
 - [项目包定义](../package.json)
 - [命令行入口](../src/cli.js)
+- [候选池持久化](../src/candidates.js)
+- [候选池路径布局](../src/reports-data-layout.js)
 - [日更工作流合同](../config/daily-workflow-contract.json)
 - [影子信源编排](../src/curated-source-shadow.js)
 - [信号准入合同](../config/signal-admission-contract.json)

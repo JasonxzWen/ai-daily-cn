@@ -423,6 +423,7 @@ export async function createPublishPlan(options = {}) {
     ...effectiveStatusEntries.map((entry) => entry.path).filter((file) => file.startsWith("docs/signals/")),
     ...dirtyDateScopedEvidenceFiles,
     ...(await plannedReportsDataFiles(repoRoot, dates)),
+    ...dirtyDateScopedCandidatePoolFiles(effectiveStatusEntries, dates),
     ...(await plannedRetrospectiveFiles(repoRoot, dates)),
     ...dirtyRetrospectiveFiles(effectiveStatusEntries, dates)
   ]);
@@ -1528,6 +1529,15 @@ async function plannedRetrospectiveFiles(repoRoot, dates) {
     }
   }
   return uniqueSorted(files);
+}
+
+function dirtyDateScopedCandidatePoolFiles(statusEntries, dates) {
+  const candidatePaths = new Set(dates.flatMap((date) =>
+    candidatePoolRelativePaths(date).map((relativePath) => toRepoPath("reports-data", relativePath))
+  ));
+  return statusEntries
+    .map((entry) => entry.path)
+    .filter((file) => candidatePaths.has(file));
 }
 
 function dirtyRetrospectiveFiles(statusEntries, dates) {
