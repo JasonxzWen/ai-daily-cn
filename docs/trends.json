@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-14T11:18:49.433Z",
+  "generated_at": "2026-07-23T09:51:59.458Z",
   "window_days": 7,
   "source": {
-    "report_count": 49,
-    "date_from": "2026-07-03",
-    "date_to": "2026-07-09"
+    "report_count": 50,
+    "date_from": "2026-07-16",
+    "date_to": "2026-07-22"
   },
   "thresholds": {
     "watching": {
@@ -28,310 +28,166 @@
       ]
     }
   },
-  "topics": [
-    {
-      "id": "coding-agent",
-      "label": "coding agent",
-      "status": "hot",
-      "occurrences": 22,
-      "active_days": 6,
-      "sections": [
-        "builder_observations",
-        "github_trending",
-        "hot_blogs",
-        "main_items",
-        "projects"
-      ],
-      "entities": [
-        "Anthropic",
-        "AWS",
-        "Claude Code",
-        "Codex",
-        "GitHub",
-        "Google",
-        "OpenAI"
-      ],
-      "dates": [
-        "2026-07-03",
-        "2026-07-04",
-        "2026-07-05",
-        "2026-07-06",
-        "2026-07-08",
-        "2026-07-09"
-      ],
-      "related_reports": [
-        "2026-07-03",
-        "2026-07-04",
-        "2026-07-05",
-        "2026-07-06",
-        "2026-07-08",
-        "2026-07-09"
-      ]
-    },
-    {
-      "id": "mcp",
-      "label": "MCP",
-      "status": "hot",
-      "occurrences": 9,
-      "active_days": 5,
-      "sections": [
-        "builder_observations",
-        "github_trending",
-        "main_items",
-        "projects"
-      ],
-      "entities": [
-        "Claude Code",
-        "GitHub"
-      ],
-      "dates": [
-        "2026-07-03",
-        "2026-07-04",
-        "2026-07-05",
-        "2026-07-06",
-        "2026-07-09"
-      ],
-      "related_reports": [
-        "2026-07-03",
-        "2026-07-04",
-        "2026-07-05",
-        "2026-07-06",
-        "2026-07-09"
-      ]
-    }
-  ],
-  "internal_topics": [
-    {
-      "id": "coding-agent",
-      "label": "coding agent",
-      "status": "hot",
-      "occurrences": 22,
-      "active_days": 6,
-      "sections": [
-        "builder_observations",
-        "github_trending",
-        "hot_blogs",
-        "main_items",
-        "projects"
-      ],
-      "entities": [
-        "Anthropic",
-        "AWS",
-        "Claude Code",
-        "Codex",
-        "GitHub",
-        "Google",
-        "OpenAI"
-      ],
-      "dates": [
-        "2026-07-03",
-        "2026-07-04",
-        "2026-07-05",
-        "2026-07-06",
-        "2026-07-08",
-        "2026-07-09"
-      ],
-      "related_reports": [
-        "2026-07-03",
-        "2026-07-04",
-        "2026-07-05",
-        "2026-07-06",
-        "2026-07-08",
-        "2026-07-09"
-      ],
-      "public_visibility": "public"
-    },
-    {
-      "id": "mcp",
-      "label": "MCP",
-      "status": "hot",
-      "occurrences": 9,
-      "active_days": 5,
-      "sections": [
-        "builder_observations",
-        "github_trending",
-        "main_items",
-        "projects"
-      ],
-      "entities": [
-        "Claude Code",
-        "GitHub"
-      ],
-      "dates": [
-        "2026-07-03",
-        "2026-07-04",
-        "2026-07-05",
-        "2026-07-06",
-        "2026-07-09"
-      ],
-      "related_reports": [
-        "2026-07-03",
-        "2026-07-04",
-        "2026-07-05",
-        "2026-07-06",
-        "2026-07-09"
-      ],
-      "public_visibility": "public"
-    }
-  ],
+  "topics": [],
+  "internal_topics": [],
   "candidate_topics": [
-    {
-      "term": "this",
-      "status": "candidate",
-      "occurrences": 192,
-      "active_days": 6,
-      "public_visibility": "internal",
-      "display": false
-    },
     {
       "term": "with",
       "status": "candidate",
-      "occurrences": 191,
-      "active_days": 6,
+      "occurrences": 37,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
-      "term": "github",
+      "term": "this",
       "status": "candidate",
-      "occurrences": 188,
-      "active_days": 6,
+      "occurrences": 34,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
       "term": "week",
       "status": "candidate",
-      "occurrences": 184,
-      "active_days": 6,
+      "occurrences": 31,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
-      "term": "this week",
+      "term": "许可证",
       "status": "candidate",
-      "occurrences": 181,
-      "active_days": 6,
-      "public_visibility": "internal",
-      "display": false
-    },
-    {
-      "term": "trending",
-      "status": "candidate",
-      "occurrences": 181,
-      "active_days": 6,
+      "occurrences": 31,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
       "term": "appeared",
       "status": "candidate",
-      "occurrences": 180,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
       "term": "appeared github",
       "status": "candidate",
-      "occurrences": 180,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
+      "public_visibility": "internal",
+      "display": false
+    },
+    {
+      "term": "github",
+      "status": "candidate",
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
       "term": "github trending",
       "status": "candidate",
-      "occurrences": 180,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
       "term": "stars",
       "status": "candidate",
-      "occurrences": 180,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
       "term": "stars this",
       "status": "candidate",
-      "occurrences": 180,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
+      "public_visibility": "internal",
+      "display": false
+    },
+    {
+      "term": "this week",
+      "status": "candidate",
+      "occurrences": 30,
+      "active_days": 1,
+      "public_visibility": "internal",
+      "display": false
+    },
+    {
+      "term": "trending",
+      "status": "candidate",
+      "occurrences": 30,
+      "active_days": 1,
+      "public_visibility": "internal",
+      "display": false
+    },
+    {
+      "term": "trending 前列的项目优先核查",
+      "status": "candidate",
+      "occurrences": 30,
+      "active_days": 1,
+      "public_visibility": "internal",
+      "display": false
+    },
+    {
+      "term": "week 天本地记录未见该仓库",
+      "status": "candidate",
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
       "term": "weekly",
       "status": "candidate",
-      "occurrences": 180,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
       "term": "weekly with",
       "status": "candidate",
-      "occurrences": 180,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
       "term": "with stars",
       "status": "candidate",
-      "occurrences": 180,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
-      "term": "今日需要复核它是否仍在",
+      "term": "前列的项目优先核查",
       "status": "candidate",
-      "occurrences": 132,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
-      "term": "今日需要复核它是否仍在 github",
+      "term": "天本地记录未见该仓库",
       "status": "candidate",
-      "occurrences": 132,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     },
     {
-      "term": "是否有",
+      "term": "天本地记录未见该仓库 按新进入",
       "status": "candidate",
-      "occurrences": 132,
-      "active_days": 6,
-      "public_visibility": "internal",
-      "display": false
-    },
-    {
-      "term": "是否有 release",
-      "status": "candidate",
-      "occurrences": 132,
-      "active_days": 6,
-      "public_visibility": "internal",
-      "display": false
-    },
-    {
-      "term": "天本地记录曾在",
-      "status": "candidate",
-      "occurrences": 132,
-      "active_days": 6,
-      "public_visibility": "internal",
-      "display": false
-    },
-    {
-      "term": "天本地记录曾在 今日需要复核它是否仍在",
-      "status": "candidate",
-      "occurrences": 132,
-      "active_days": 6,
+      "occurrences": 30,
+      "active_days": 1,
       "public_visibility": "internal",
       "display": false
     }
@@ -2673,6 +2529,10 @@
           ]
         }
       ]
+    },
+    "2026-07-22": {
+      "main_items": [],
+      "github_trending": []
     }
   }
 }
