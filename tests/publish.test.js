@@ -1579,7 +1579,7 @@ test("publish prepare-clean-worktree refreshes existing dependencies with the co
     commandRunner: fakeCommandRunner({ calls })
   });
 
-  const pnpmCall = calls.find((call) => call.file === "corepack" || call.file === "corepack.cmd" || call.file === "cmd.exe");
+  const pnpmCall = calls.find((call) => call.file === "pnpm" || call.file === "corepack.cmd" || call.file === "cmd.exe");
   assert.ok(pnpmCall, "expected pnpm install to run");
   if (os.platform() === "win32") {
     assert.equal(pnpmCall.file, "cmd.exe");
@@ -1587,7 +1587,8 @@ test("publish prepare-clean-worktree refreshes existing dependencies with the co
     assert.match(pnpmCall.args[3], /^corepack pnpm install --frozen-lockfile --store-dir /);
     assert.match(pnpmCall.args[3], /pnpm-store/);
   } else {
-    assert.deepEqual(pnpmCall.args, ["pnpm", "install", "--frozen-lockfile", "--store-dir", pnpmStoreDir]);
+    assert.equal(pnpmCall.file, "pnpm");
+    assert.deepEqual(pnpmCall.args, ["install", "--frozen-lockfile", "--store-dir", pnpmStoreDir]);
   }
   assert.equal(pnpmCall.env.PNPM_STORE_DIR, pnpmStoreDir);
   assert.equal(pnpmCall.env.pnpm_store_dir, undefined);

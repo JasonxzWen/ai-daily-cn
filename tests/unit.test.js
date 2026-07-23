@@ -6419,7 +6419,7 @@ test("shared URL identity normalizes tracking parameters for dedupe gates", () =
   );
 });
 
-test("shared pnpm invocation wraps corepack pnpm through cmd on Windows", () => {
+test("shared pnpm invocation uses the platform pnpm executable safely", () => {
   const windows = pnpmInvocationForArgs(["install", "--frozen-lockfile", "--store-dir", "C:\\tmp\\pnpm store"], { platform: "win32" });
   assert.equal(windows.file, "cmd.exe");
   assert.deepEqual(windows.args.slice(0, 3), ["/d", "/s", "/c"]);
@@ -6427,8 +6427,8 @@ test("shared pnpm invocation wraps corepack pnpm through cmd on Windows", () => 
   assert.match(windows.args[3], /pnpm store/);
 
   const linux = pnpmInvocationForArgs(["install", "--frozen-lockfile"], { platform: "linux" });
-  assert.equal(linux.file, "corepack");
-  assert.deepEqual(linux.args, ["pnpm", "install", "--frozen-lockfile"]);
+  assert.equal(linux.file, "pnpm");
+  assert.deepEqual(linux.args, ["install", "--frozen-lockfile"]);
 });
 
 test("public artifact privacy scan blocks local machine path leakage", async () => {

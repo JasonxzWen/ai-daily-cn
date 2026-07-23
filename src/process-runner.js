@@ -20,7 +20,7 @@ export function mergeCommandEnv(overrides = {}, options = {}) {
 
 export function pnpmExecutable(options = {}) {
   const platform = options.platform || os.platform();
-  return platform === "win32" ? "corepack.cmd" : "corepack";
+  return platform === "win32" ? "corepack.cmd" : "pnpm";
 }
 
 export function pnpmInvocationForArgs(args, options = {}) {
@@ -28,7 +28,7 @@ export function pnpmInvocationForArgs(args, options = {}) {
   if (platform !== "win32") {
     return {
       file: pnpmExecutable({ platform }),
-      args: ["pnpm", ...args]
+      args: [...args]
     };
   }
 
