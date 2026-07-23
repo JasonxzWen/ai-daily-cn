@@ -22,6 +22,7 @@ import { normalizeCandidatePool, readPersistedCandidatePool } from "./candidates
 import { compareOccurrenceChronology } from "./occurrence-store.js";
 import { deriveQualityStatus, normalizeQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
+import { compareStableChineseText, compareStableText } from "./stable-order.js";
 import { withDefaultImportance } from "./importance.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { isPublishableOfficialComponentFragment } from "./official-component-snapshot.js";
@@ -579,7 +580,7 @@ export function mergeFeed(existingFeed, reports, options = {}) {
     byDate.set(report.report_date, entry);
   }
 
-  const mergedReports = [...byDate.values()].sort((a, b) => b.report_date.localeCompare(a.report_date));
+  const mergedReports = [...byDate.values()].sort((a, b) => compareStableText(b.report_date, a.report_date));
   const updatedAt =
     existingFeed?.updated_at && reportsAreEqual(existingFeed.reports || [], mergedReports)
       ? existingFeed.updated_at
@@ -598,7 +599,7 @@ export function buildArticleIndex(reports = [], options = {}) {
   const byUrl = new Map();
   const orderedReports = [...(Array.isArray(reports) ? reports : [])]
     .filter((report) => report?.report_date)
-    .sort((a, b) => String(b.report_date || "").localeCompare(String(a.report_date || "")));
+    .sort((a, b) => compareStableText(b.report_date, a.report_date));
 
   for (const report of orderedReports) {
     for (const section of ARTICLE_SECTIONS) {
@@ -630,9 +631,9 @@ export function buildArticleIndex(reports = [], options = {}) {
   }
 
   return [...byUrl.values()].sort((a, b) =>
-    String(b.date).localeCompare(String(a.date)) ||
+    compareStableText(b.date, a.date) ||
     Number(b.quality_score || 0) - Number(a.quality_score || 0) ||
-    String(a.title).localeCompare(String(b.title), "zh-Hans-CN")
+    compareStableChineseText(a.title, b.title)
   );
 }
 
@@ -641,7 +642,7 @@ export function buildHomeData(reports = [], options = {}) {
   const articles = Array.isArray(options.articles) ? options.articles : [];
   const orderedReports = [...(Array.isArray(reports) ? reports : [])]
     .filter((report) => report?.report_date)
-    .sort((a, b) => String(b.report_date).localeCompare(String(a.report_date)));
+    .sort((a, b) => compareStableText(b.report_date, a.report_date));
   const feedByDate = new Map((Array.isArray(feed.reports) ? feed.reports : [])
     .map((report) => [String(report?.report_date || ""), report]));
   const home = {
@@ -1426,7 +1427,7 @@ export function buildDateIndex(feed = {}, reports = [], trends = null) {
   );
   const topicByDate = topicLookupByDate(trends);
   const items = [...feedReports]
-    .sort((a, b) => String(a.report_date || "").localeCompare(String(b.report_date || "")))
+    .sort((a, b) => compareStableText(a.report_date, b.report_date))
     .map((feedReport) => {
       const report = reportByDate.get(feedReport.report_date) || {};
       const metrics = dateSignalMetrics(feedReport, report);
@@ -1790,7 +1791,7 @@ function monthKey(dateString) {
 }
 
 function reportsAreEqual(left, right) {
-  const normalize = (items) => [...items].sort((a, b) => b.report_date.localeCompare(a.report_date));
+  const normalize = (items) => [...items].sort((a, b) => compareStableText(b.report_date, a.report_date));
   const normalizedLeft = normalize(left);
   const normalizedRight = normalize(right);
   if (normalizedLeft.length !== normalizedRight.length) {
@@ -2419,7 +2420,7 @@ async function writeJsonTracked(outDir, relativePath, value, writtenFiles) {
 }
 
 function uniqueSorted(items) {
-  return [...new Set(items)].sort((a, b) => String(a).localeCompare(String(b)));
+  return [...new Set(items)].sort(compareStableText);
 }
 
 export function reportManagedAssetPaths(report) {

@@ -83,6 +83,7 @@ import {
 import { qualityRepairFeedback, runDailyWorkflow } from "../src/daily-runner.js";
 import { runStatusSelfCheck } from "../src/status-self-check.js";
 import { pnpmInvocationForArgs } from "../src/process-runner.js";
+import { compareStableText } from "../src/stable-order.js";
 import { normalizeUrlIdentity } from "../src/url.js";
 import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { checkWorktreePreflight } from "../src/worktree-preflight.js";
@@ -6417,6 +6418,17 @@ test("shared URL identity normalizes tracking parameters for dedupe gates", () =
     normalizeUrlIdentity("https://example.com/news/item?ref=feed&utm_campaign=daily"),
     "https://example.com/news/item?ref=feed"
   );
+});
+
+test("public site indexes use locale-independent text ordering", async () => {
+  assert.deepEqual(
+    ["阿", "a", "中", "A"].sort(compareStableText),
+    ["a", "A", "中", "阿"]
+  );
+  for (const relativePath of ["src/site.js", "src/trends.js"]) {
+    const source = await fs.readFile(path.join(rootDir, relativePath), "utf8");
+    assert.doesNotMatch(source, /\.localeCompare\(/, `${relativePath} must not depend on host locale collation`);
+  }
 });
 
 test("shared pnpm invocation prefers Corepack and falls back to pnpm on Unix", () => {
