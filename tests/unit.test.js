@@ -95,7 +95,7 @@ import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 import { writeDailyPublishRetrospective } from "../src/retrospectives.js";
 import { evaluateDailyContentContract } from "../scripts/check-daily-content-contract.mjs";
 import { readPersistedCandidatePool, writeCandidatePool } from "../src/candidates.js";
-import { encodeJsonArtifact } from "../src/compressed-json.js";
+import { encodeJsonArtifact, readJsonArtifact } from "../src/compressed-json.js";
 import {
   compressedLegacyCandidatePoolRelativePath,
   internalCandidatePoolRelativePath,
@@ -23855,7 +23855,11 @@ test("report:draft does not apply launch facts to a same-domain Fable policy art
 
 test("published 2026-07-08 Alberta story stays aligned with its official source", async () => {
   const report = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data", "2026", "07", "2026-07-08.json"), "utf8"));
-  const candidatePool = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data", "2026", "07", "2026-07-08.candidates.json"), "utf8"));
+  const candidatePool = await readJsonArtifact(path.join(
+    rootDir,
+    "reports-data",
+    ...compressedLegacyCandidatePoolRelativePath("2026-07-08").split(path.sep)
+  ));
   const albertaUrl = "https://www.anthropic.com/news/alberta-government-claude-cybersecurity";
   const albertaMain = report.main_items.find((item) => item.url === albertaUrl);
   const albertaStory = report.stories.find((story) => story.sources?.some((source) => source.url === albertaUrl));
