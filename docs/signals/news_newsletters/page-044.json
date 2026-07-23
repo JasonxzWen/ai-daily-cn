@@ -2,42 +2,44 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-15T03:34:30.755Z",
+  "generated_at": "2026-07-23T09:08:21.838Z",
   "group": {
     "id": "news_newsletters",
     "label": "新闻 / Newsletter"
   },
   "page": 44,
-  "page_count": 144,
+  "page_count": 296,
   "page_size": 50,
-  "total_count": 7198,
+  "total_count": 14787,
   "next_url": "signals/news_newsletters/page-045.json",
   "items": [
     {
-      "id": "occ_cdd740578fd583026e105edc",
-      "cluster_id": "cluster_891291cd1100f0503f6f8c0f",
-      "title": "Claude Code 用户报告工作区实例间会话与缓存疑似串号，Anthropic 工程师跟进",
-      "url": "https://github.com/anthropics/claude-code/issues/74066",
-      "summary": "Anthropic 官方仓库 anthropics/claude-code 收到 issue #74066，用户反馈同一设备多个工作区实例、乃至消费级账号之间的会话与缓存可能相互泄漏，Anthropic 工程师已在 issue 内跟进复现。对企业接入 Claude Code 的团队而言直接关系到多租户隔离边界。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_8f436b4050ce0003292bb9e1",
+      "cluster_id": "cluster_8d140fcf4975ebce28f28a6b",
+      "title": "SaaS",
+      "url": "https://news.crunchbase.com/sections/saas/",
+      "summary": "SaaS。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "GitHub",
-        "home_url": "https://github.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -46,30 +48,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_d477a4616dec60377a43c8e4",
-      "cluster_id": "cluster_cd8695b53a2caf00b2cc0932",
-      "title": "Gemini 核心贡献者演讲：LLM 将成通用智能底层基质，Hinton 赞其精彩绝伦",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw%3D%3D&idx=2&mid=2651042656&sn=2885f8989495d491dc8b0fdc51b17aac",
-      "summary": "Gemini 大模型核心贡献者、DeepMind Blueshift 团队负责人在圆周理论物理研究所发表演讲《Training Sand to Think》，判断 LLM 已具备完成理论物理学家全部工作流程的潜力，很可能成为通用人工智能的底层基质，并称主流大模型几年前就已悄然通过图灵测试。他推演若 AI 能以工业规模产出知识，物理学研究方式将被彻底重塑，演讲获 Geoffrey Hinton 公开推荐并盛赞「精彩绝伦」。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_8f6235c5784419df4db5ea8b",
+      "cluster_id": "cluster_8700e2c3e7e3b4eae7abb445",
+      "title": "Q1 2023 Global",
+      "url": "https://news.crunchbase.com/venture/global-vc-funding-falls-q1-2023/",
+      "summary": "Q1 2023 Global。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "机器之心",
-        "home_url": "https://mp.weixin.qq.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -78,144 +82,16 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_d5117055448f26261097b8cb",
-      "cluster_id": "cluster_8c5d3f60ded278a36a1b3a65",
-      "title": "OpenAI Kaplan 2020 scaling laws 被指藏 bug：训练数据统一卡在 1300 亿 token，业界据此多年误训大模型",
-      "url": "https://www.completeskeptic.com/p/scaling-laws-honestly",
-      "summary": "OpenAI Kaplan 团队 2020 年那篇 scaling laws 被 Substack 博主 Diogo Almeida 重新拆解出方法论漏洞：所有规模的模型都被固定跑到约 1300 亿 token 就停，学习率还按目标步数自然衰减，曲线因此过早收敛、看似饱和。业界据此几年一直训练远大于最优比例的模型，直到 DeepMind Chinchilla 才把参数与数据量比例纠正过来。作者认为，普遍把差异归因于参数计数并未触及问题本质。This is an intermediary/self-media lead; trace it to a primary source before treating it as a rep...",
+      "id": "occ_8fa6a06fd3d8a04a125df832",
+      "cluster_id": "cluster_cf2882cfb45db446f41f219f",
+      "title": "Bindu Reddy 预告下一波模型：Opus 5、Gemini 3.5 Pro、DeepSeek v4、Kimi 3",
+      "url": "https://x.com/bindureddy/status/2077187288644387292",
+      "summary": "Abacus AI 创始人 Bindu Reddy 在 X 放出下一波模型档期：Anthropic Opus 5、Google Gemini 3.5 Pro（内测 checkpoint 更强）、DeepSeek v4、Moonshot Kimi 3 将陆续开放；她判断自家 Fable 5 在编程场景至少还能领跑一个月。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Complete Skeptic",
-        "home_url": "https://www.completeskeptic.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_d8e9ac98d3a30bbdbc6a1335",
-      "cluster_id": "cluster_86c274e93a35d2115164f618",
-      "title": "推理芯片五路围攻 GPU，NVIDIA 市场份额仍达 74%",
-      "url": "https://www.huxiu.com/article/4872597.html",
-      "summary": "Cerebras WSE-3 打造 46225mm² 晶圆级芯片，Groq 被 NVIDIA 以 200 亿美元收购后推出 LPX，Google 首次分离训练与推理 TPU。五条反 GPU 路径涵盖晶圆级、确定性数据流、存算一体等方向，但 NVIDIA 凭借 CUDA 生态和系统级优势仍占推理市场 74%。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huxiu.com",
-        "home_url": "https://www.huxiu.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_d8fd42f0f2101f954bff6f90",
-      "cluster_id": "cluster_557181f225a934129afb879e",
-      "title": "华为何庭波在 ChinaXiv 发布“韬定律”V2 版 补充 3D 芯片工程细节与量产实测",
-      "url": "https://36kr.com/newsflashes/3880931591254019?f=rss",
-      "summary": "华为半导体负责人何庭波 7 月 3 日在 ChinaXiv 发布《面向多层级电子系统的时间缩微理论》V2 版,相比 5 月 25 日 V1 补充了 LogicFolding 的齿比概念、混合键合工艺细节与量产实测表,并给出 Kirin2026 相对 Kirin9030 Pro 的电压、频率、归一化功耗与功率密度参数。 对后摩尔时代 AI 芯片路径判断有直接参考价值。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "36氪",
-        "home_url": "https://36kr.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_e3ab448a0e83bedd6cd99173",
-      "cluster_id": "cluster_42e5e5c9044dc579ac22c58e",
-      "title": "Google 为 Workspace 用户测试 Gemini App 内置任务收件箱,用 AI 做智能分流",
-      "url": "https://www.testingcatalog.com/google-tests-new-gemini-inbox-section-for-workspace-triage/",
-      "summary": "Google 正为 Workspace 用户测试 Gemini App 内置的专属收件箱,配备智能筛选器,可借助 AI 对任务做分流、跟踪与复盘,把类邮件式的收件箱交互引入 Gemini 工作流。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "TestingCatalog",
-        "home_url": "https://www.testingcatalog.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_ef924b39c07b8f4d46ee5a8d",
-      "cluster_id": "cluster_cdf4d1fb8aa5a5ecbacb280a",
-      "title": "Hugging Face CEO Clément Delangue:中美 AI 支出差近 8 倍,靠开源共担算力弥合",
-      "url": "https://x.com/ClementDelangue/status/2073387290856955955",
-      "summary": "Hugging Face CEO Clément Delangue 回应美国 2027 年将花 1 万亿美元、中国仅 1230 亿美元却仍能推出前沿模型的反差,把原因归到开源科学与开源 AI 让各方共担训练与算力成本;而闭源前沿实验室在秘密和孤岛里重复同一批 training run,效率会低一个数量级。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "X：Clément Delangue",
+        "name": "X：Bindu Reddy",
         "home_url": "https://x.com/"
       },
       "collected_via": {
@@ -229,7 +105,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -238,30 +114,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_f4bb558c425d3655158a758e",
-      "cluster_id": "cluster_d8ea565801623af09f6dfd1d",
-      "title": "Dan Luu 长文复盘：一年重度使用编码 Agent 的经验",
-      "url": "https://danluu.com/ai-coding/",
-      "summary": "Dan Luu 记录去年中开始重度依赖 Codex、GPT 等编码 Agent 的实践。文章覆盖测试范式、Agent 编造 bisect 结论与伪造复现视频的失败案例、LLM 输出方差与 Caveman 使用技巧，以及围绕 Agentic loop 长期投入所产生的工程习惯变化。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_90351535fea7f57040faea51",
+      "cluster_id": "cluster_182ce443244ee084b5fe0599",
+      "title": "OpenAI",
+      "url": "https://www.crunchbase.com/organization/openai",
+      "summary": "OpenAI。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Dan Luu",
-        "home_url": "https://danluu.com/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -270,180 +148,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_85ba896ddd932d290ed8f060",
-      "cluster_id": "cluster_67c4bd1d9a6e6ccbee0d4bfc",
-      "title": "Building a World Map with only 500 bytes",
-      "url": "https://simonwillison.net/2026/Jul/4/building-a-world-map-with-only-500-bytes/",
-      "summary": "Building a World Map with only 500 bytes Iwo Kadziela (assisted by Codex) figured out a way to generate a credible ASCII world map using 445 bytes of data: The key trick is to use deflate compression, which is then wired together using this",
+      "id": "occ_9051619d16f9a4c700216e0d",
+      "cluster_id": "cluster_4ba5b5f7de50d5fe709b357d",
+      "title": "Hugging Face",
+      "url": "https://www.crunchbase.com/organization/hugging-face",
+      "summary": "Hugging Face。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "simonwillison.net",
-        "home_url": "https://simonwillison.net/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Simon Willison's Weblog",
-        "url": "https://simonwillison.net/atom/everything/"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
-        "engineering"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": "https://static.simonwillison.net/static/2026/world-map-ascii.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1d6c2ce59da27fae73c9ca99",
-      "cluster_id": "cluster_67c4bd1d9a6e6ccbee0d4bfc",
-      "title": "Simon Willison 用 500 字节构建世界地图",
-      "url": "https://simonwillison.net/2026/Jul/4/building-a-world-map-with-only-500-bytes/",
-      "summary": "Simon Willison 展示如何用极小体积的数据和代码生成世界地图，重点拆解坐标表达、压缩方法、浏览器渲染路径和体积限制。原文用可复现代码说明为什么简单结构能压低成本；前端工具和文档产品团队可参考这种取舍，在资源受限页面中先确认数据结构、计算步骤和渲染稳定性。",
-      "author": "Simon Willison Weblog",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Simon Willison Weblog",
-        "home_url": "https://simonwillison.net/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Simon Willison Weblog",
-        "url": "https://simonwillison.net/2026/Jul/4/building-a-world-map-with-only-500-bytes/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_21e158dc210bbdae7adac573",
-      "cluster_id": "cluster_df80d6a1f2b3f4fe0c680955",
-      "title": "Better Models: Worse Tools",
-      "url": "https://simonwillison.net/2026/Jul/4/better-models-worse-tools/",
-      "summary": "Better Models: Worse Tools Armin reports on a weird problem he ran into while hacking on Pi: The short version is that newer Claude models sometimes call Pi’s edit tool with extra, invented fields in the nested edits[] array. And not Haiku",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "simonwillison.net",
-        "home_url": "https://simonwillison.net/"
-      },
-      "collected_via": {
-        "name": "Simon Willison's Weblog",
-        "url": "https://simonwillison.net/atom/everything/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_75e131d31f9c0b450a02f022",
-      "cluster_id": "cluster_67c4bd1d9a6e6ccbee0d4bfc",
-      "title": "Building a World Map with only 500 bytes",
-      "url": "https://simonwillison.net/2026/Jul/4/building-a-world-map-with-only-500-bytes/",
-      "summary": "Building a World Map with only 500 bytes Iwo Kadziela (assisted by Codex) figured out a way to generate a credible ASCII world map using 445 bytes of data: The key trick is to use deflate compression, which is then wired together using this",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "simonwillison.net",
-        "home_url": "https://simonwillison.net/"
-      },
-      "collected_via": {
-        "name": "Simon Willison's Weblog",
-        "url": "https://simonwillison.net/atom/everything/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "engineering"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": "https://static.simonwillison.net/static/2026/world-map-ascii.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_cc27b10ef8c0d901b811376a",
-      "cluster_id": "cluster_a0ba9185c95b5aa3480b34ba",
-      "title": "光象科技累计完成数亿元天使轮融资，布局物理原生基座模型",
-      "url": "https://www.qbitai.com/2026/07/442958.html",
-      "summary": "QbitAI 报道光象科技累计完成数亿元天使轮融资，方向指向物理原生基座模型。",
-      "author": "QbitAI",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "QbitAI",
-        "home_url": "https://www.qbitai.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · QbitAI",
-        "url": "https://www.qbitai.com/2026/07/442958.html"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "other"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_013a7b11f47b8abe48be8fdc",
-      "cluster_id": "cluster_f406b7a7fbebba20e635d1d6",
-      "title": "生数科技发布 Vidu S1 实时交互视频模型，540P 25FPS、可语音打断改剧情",
-      "url": "https://mp.weixin.qq.com/s/RuukpnoOA2tI0ERCNrLgtQ",
-      "summary": "生数科技在 2026 全球数字经济大会发布 Vidu S1 实时交互视频模型，走自回归扩散路线，基于已生成画面与语音指令持续预测后续画面，实现无限时长连续互动、可实时视频通话与语音改剧情，一张图即可创建角色并自定义音色。540P 分辨率下达 25FPS、最高 42FPS，通过 TurboDiffusion 等技术压低计算成本，目前已开启内测。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "生数科技",
-        "home_url": "https://mp.weixin.qq.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -452,30 +182,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_024b4dc74fbf62f49c035ea8",
-      "cluster_id": "cluster_7a2574c5a263301b9dab9862",
-      "title": "OpenCode 搭配 Ollama：15 分钟起一套离线 AI 编程环境，数据不出本机",
-      "url": "https://developer.aliyun.com/article/1745197",
-      "summary": "OpenCode 是一个开源 AI 编程终端，已接入 75 个以上大模型服务商，配合 Ollama 本地模型框架可实现完全离线、零 API 密钥的编码环境，整套部署 15 分钟内完成，支持 Qwen、Llama、CodeLlama 等开源模型，主要面向涉密代码和内网开发场景。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_91e108bcd57d474d6e03765f",
+      "cluster_id": "cluster_f887b3e07dd2c3344ee2e807",
+      "title": "MosaicML",
+      "url": "https://www.crunchbase.com/organization/mosaic-ml",
+      "summary": "MosaicML。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "aliyun",
-        "home_url": "https://developer.aliyun.com/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -484,30 +216,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_037983319c3263db40134854",
-      "cluster_id": "cluster_8af804d7de7a5593e2f963a6",
-      "title": "阿里达摩院联合中国人大发布超导材料 Agent ElementsClaw：28 GPU 小时筛出 6.8 万候选，实测新增 4 种未知超导体",
-      "url": "https://www.qbitai.com/2026/07/442452.html",
-      "summary": "阿里达摩院联合中国人民大学高瓴人工智能学院、中国科学院大学发布首个专攻超导材料发现的 AI Agent ElementsClaw（元素虾），只用 28 个 GPU 小时把已知的 240 万种稳定晶体全部海选一遍，预测其中 6.8 万种可能具备超导性。研究团队挑了几个易合成的候选做实验，直接确认 4 种是人类此前完全未知的全新超导体。作为对照，人类在 100 多年里累计发现的超导材料只有 2000 多种，收录进 SuperCon 数据库。团队已把这 240 万种材料的预测结果（。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_921ecdc3981ff3ef12aa9d16",
+      "cluster_id": "cluster_078569c93589ba6fec231d64",
+      "title": "Emerging Unicorn Board",
+      "url": "https://news.crunchbase.com/emerging-unicorn-list/",
+      "summary": "Emerging Unicorn Board。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "量子位",
-        "home_url": "https://www.qbitai.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -516,30 +250,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_043eae69b0abc081bfc8a113",
-      "cluster_id": "cluster_fad76713102d20801184363b",
-      "title": "国家网信办再次征求意见，首设「智能信息服务」专章，要求 AI 公示技术原理与训练数据来源",
-      "url": "https://www.ithome.com/0/972/341.htm",
-      "summary": "7 月 3 日，国家互联网信息办公室就《互联网信息服务管理办法（修订草案征求意见稿）》再次公开征求意见，首次为 AI 单设「智能信息服务」专章。草案要求 AI 服务提供者公示技术基本原理与训练数据来源，对生成合成内容进行标识，禁止强制用户使用智能服务或利用算法扰乱网络舆论。 草案同时强化账号治理，超 6 个月未登录账号可依约注销；要求平台建立网络暴力信息特征库，提供屏蔽、禁止转载等防护选项。意见反馈截止 8 月 2 日。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_92cbb5e9f954f44fe55642c9",
+      "cluster_id": "cluster_a849d4f1c224851c67183790",
+      "title": "Q3 2023",
+      "url": "https://news.crunchbase.com/sections/ai/",
+      "summary": "Q3 2023。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "IT之家",
-        "home_url": "https://www.ithome.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -548,61 +284,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_048b4d70c6ff4f6e1e7c3ea3",
-      "cluster_id": "cluster_4512b99df01e1a58dc96f816",
-      "title": "Vercel's Andrew Qu on why agents are a new kind of software",
-      "url": "https://www.latent.space/p/vercel-agents-new-software",
-      "summary": "The Vercel Chief of Software explains how its agent framework, eve, was created — and why skills, sandboxes and agent-readable websites now matter. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_92fbc944a4df32b493955526",
+      "cluster_id": "cluster_43259bb52c6bf5ee44732e8d",
+      "title": "Nuro",
+      "url": "https://www.crunchbase.com/organization/nuro-2",
+      "summary": "Nuro。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "latent.space",
-        "home_url": "https://www.latent.space/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Latent.Space",
-        "url": "https://www.latent.space/feed"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://substack-post-media.s3.amazonaws.com/public/images/5d05f30e-e2cc-4895-b84a-d0cdd9835db8_1280x720.jpeg",
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_0542f95f1a25aa8b3ca2e58b",
-      "cluster_id": "cluster_aa0bfc553f78a38b2b355402",
-      "title": "ResearchAndMarkets：生成式 AI 采购市场 2026 年达 2.6 亿美元，2030 年冲到 6.1 亿",
-      "url": "https://www.globenewswire.com/news-release/2026/07/03/3321694/28124/en/exponential-growth-generative-ai-in-procurement-market-to-hit-0-61-billion-by-2030.html",
-      "summary": "ResearchAndMarkets 最新数据显示，生成式 AI 采购赛道 2026 年将达 2.6 亿美元，同比增长 28.8%；到 2030 年按 24.1% 的年复合增速冲到 6.1 亿美元。驱动力是供应链复杂度攀升和数字化采购转型，ERP 集成、合规自动化、AI 供应商评估被列为核心场景。Google、SAP、Coupa 等厂商正在卡位，北美市场规模最大，亚太增速最快。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "GlobeNewswire",
-        "home_url": "https://www.globenewswire.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -611,30 +318,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_0635d64f3d871a3a61b6187e",
-      "cluster_id": "cluster_2a9dd32afb40e79375fb18ae",
-      "title": "阿里、腾讯、字节、Kimi、MiniMax、智谱齐推对标 Claude Code 与 Cowork 的 Agent 产品",
-      "url": "https://36kr.com/p/3878580738158852",
-      "summary": "阿里、腾讯、字节、Kimi、MiniMax、智谱六家均已推出对标 Claude Code 与 Cowork 的 Agent 产品。腾讯 CodeBuddy 已覆盖公司超 95% 工程师,WorkBuddy 打通腾讯文档、会议、ima 与微信生态;Kimi Code 进入 CLI 与 IDE,Kimi Work 支持挂载本地环境,可跑 Python 定时任务并接入 A 股、港股、美股数据。国产 Agent 编程赛道正快速追赶头部产品的形态。This is an intermediary/self-media lead; trace it to a primary source before treating it as a repo...",
+      "id": "occ_9397cb85329bad72b6921704",
+      "cluster_id": "cluster_53795bb54965acd3dbe3869c",
+      "title": "Saas Isn’t Coming Back. Something Much Bigger Is Replacing It",
+      "url": "https://news.crunchbase.com/saas/growing-agentic-ai-market-desilva-lateral/",
+      "summary": "Saas Isn’t Coming Back. Something Much Bigger Is Replacing It。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "36氪",
-        "home_url": "https://36kr.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -643,30 +352,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_09cd7b6979aacfcb84dbe622",
-      "cluster_id": "cluster_76befe61985dc319c50b9648",
-      "title": "京东 JoyAI App 上线 UGC 数字人，用户上传一张照片即可生成分身并绑定本人声音",
-      "url": "https://mp.weixin.qq.com/s/XfpxdblzNWa5HxahRoT9pg",
-      "summary": "京东 JoyAI App 上线 UGC 数字人功能，用户上传一张照片即可生成写实或卡通风格的专属数字分身，并绑定自己的语音。功能复用「万能博士」技术底座，集成 JoyAI 的语言、语音与数字人大模型，支持全双工对话、随时打断与自然接话，同时打通点外卖、金融咨询、学英语、规划行程等场景，把陪伴属性与生活服务合流。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_94ecd8899caeff7530fb2cd5",
+      "cluster_id": "cluster_08c4bc0cbb5285025118b575",
+      "title": "Q3 2025 Latin America",
+      "url": "https://news.crunchbase.com/venture/latin-america-funding-brazil-leads-q3-2025-data/",
+      "summary": "Q3 2025 Latin America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "京东JoyAI",
-        "home_url": "https://mp.weixin.qq.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -675,30 +386,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_0a3787aeb67b04f254db9de7",
-      "cluster_id": "cluster_ef6030fb56ccfbb9c9fec270",
-      "title": "得州 FSD 致命车祸：司机嫌 FSD 太保守，加速踏板踩到 100%",
-      "url": "https://www.ithome.com/0/971/971.htm",
-      "summary": "44 岁男性司机驾驶特斯拉 Model 3 冲入得州住宅，致 76 岁女性房主死亡，事发时开启 FSD。警方从其手机取出 2026 年 5 月多条 Google 搜索记录，关键词包括 FSD 不够激进、特斯拉 FSD 过于保守。特斯拉 AI 负责人称约 6 秒内加速踏板被踩到 100%，车速升至 117 公里每小时，超住宅街道限速两倍，制动踏板全程未触发。 家属已起诉特斯拉，NHTSA 与 NTSB 均已介入。这是驾驶员主动覆盖 FSD 致人死亡的首宗典型案例。This is an intermediary/self-media lead; trace it to a primary source before treating ...",
+      "id": "occ_954135f2853ab968589c2884",
+      "cluster_id": "cluster_2b021009aeb3c93928f79ed9",
+      "title": "Qualcomm",
+      "url": "https://www.crunchbase.com/organization/qualcomm",
+      "summary": "Qualcomm。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "IT之家",
-        "home_url": "https://www.ithome.com/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -707,30 +420,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_0b0d6d01cf321ee8b0055e4c",
-      "cluster_id": "cluster_151f1af8c3f47a029c27c065",
-      "title": "AI 工厂重塑电力设备市场格局，2000 亿美元赛道正逼迫厂商重构产品线",
-      "url": "https://www.bloomberg.com/news/articles/2026-07-03/ai-factories-create-winners-and-losers-in-power-equipment-market",
-      "summary": "面向下一代 AI 数据中心的电力设备市场规模预计将超过每年 2000 亿美元，正迫使传统电力设备厂商重新审视产品组合，从变压器到高压开关都要为高密度算力集群做适配。这一轮变革被 Bloomberg 视为 AI 工厂周期中最直接受益的实体环节之一，也把上游电力硬件重新拉回 AI 主题投资的中心。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_956601b088c6454fe06ccbb1",
+      "cluster_id": "cluster_929c69a8c05fbb1d2c3e94dc",
+      "title": "Weaviate",
+      "url": "https://www.crunchbase.com/organization/weaviate",
+      "summary": "Weaviate。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Bloomberg",
-        "home_url": "https://www.bloomberg.com/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -739,30 +454,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_0ea40515b57d13a7e4bd659f",
-      "cluster_id": "cluster_0370a8223539d90e39a6414e",
-      "title": "Salesforce 暂停 MFA 强制执行，7 月 20 日恢复",
-      "url": "https://www.salesforceben.com/salesforce-halts-mfa-enforcement-until-further-notice",
-      "summary": "因已有安全密钥用户被错误要求重新注册，该公司已暂停面向全部员工用户的多因素认证强制要求。新时间表为：沙盒环境 7 月 6 日起执行，生产环境 7 月 20 日起执行。受影响用户需在恢复后重新完成钓鱼抵抗式认证注册流程。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_957fa91604ca4598074c9510",
+      "cluster_id": "cluster_2d98ae12e8bc617a5aa2877e",
+      "title": "Q1 2025 Latin America",
+      "url": "https://news.crunchbase.com/venture/latin-america-startup-funding-fell-q1-2025/",
+      "summary": "Q1 2025 Latin America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "salesforceben.com",
-        "home_url": "https://www.salesforceben.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -771,30 +488,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_10163cf84042f6519178f2f3",
-      "cluster_id": "cluster_bb4feffcc9c854e4e317429b",
-      "title": "纷享销客发布蜂巢智能体平台 ShareHive AgentOS,把 CRM 推向 Agentic 行动系统",
-      "url": "https://www.pingwest.com/a/315266",
-      "summary": "纷享销客发布蜂巢智能体平台 ShareHive AgentOS 与 ShareAgent 产品家族,试图把 CRM 从记录系统推向行动系统。平台采用三层架构,已与中化国际等 20 余家灯塔客户共创验证。据其披露,关键销售周期缩短 45%。Agentic CRM 正在成为国内 SaaS 厂商重构 CRM 心智的新叙事。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_95cdfc0c961f27645ff911c4",
+      "cluster_id": "cluster_c23ac75d806ff97366671a69",
+      "title": "Grammarly",
+      "url": "https://www.crunchbase.com/organization/grammarly",
+      "summary": "Grammarly。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "品玩",
-        "home_url": "https://www.pingwest.com/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -803,30 +522,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_104cd0d5a95134068453abab",
-      "cluster_id": "cluster_439b0eeb20dfb0a46d475a4c",
-      "title": "SGLang 团队把 CUDA 调优、内核集成、性能分析写进 SKILL.md 形态的 Agent 工作流",
-      "url": "https://www.lmsys.org/blog/2026-07-02-agent-assisted-sglang-development",
-      "summary": "SGLang 团队把 LLM 服务、分布式运行时、GPU 内核、扩散管道等日常工作全部编码为可执行的 SKILL.md 文件、脚本、基准合约与审查循环，覆盖 .claude/skills、扩散 skills、BBuf 跨框架 SOTA 循环、KDA 竞赛方案等场景。SOTA Performance Loop 把性能优化拆成公平基准、差距决策、profile、补丁、再验证五步，Codex Goal 与 Humanize/RLCR 承担评审。开发者角色从写代码转向定义问题与判断结。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_967c8fc4003923e8e57d1e21",
+      "cluster_id": "cluster_80c81ee49dd9ab942eecdc63",
+      "title": "Meta’",
+      "url": "https://www.crunchbase.com/organization/facebook",
+      "summary": "Meta’。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "LMSYS",
-        "home_url": "https://www.lmsys.org/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -835,62 +556,66 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_11f1810b500053cde3849e53",
-      "cluster_id": "cluster_364fb14351841751625879c4",
-      "title": "韩国联合三星 SK 等推 312 万亿韩元投资，重仓半导体与 AI",
-      "url": "https://36kr.com/newsflashes/3879604388573446?f=rss",
-      "summary": "韩国副总理宣布推动大企业在东南部投资超 312 万亿韩元（约 2040 亿美元）发展先进制造与 AI；SK、三星、韩华、现代分别注入约 140、60、55、42 万亿韩元，LG 与斗山也将跟进，重点布局半导体、AI 与航天。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_96de1cca91499e6506ae973b",
+      "cluster_id": "cluster_81da548ff7d79e2449b4b3ae",
+      "title": "Crunchbase News",
+      "url": "https://news.crunchbase.com/",
+      "summary": "Data-driven reporting on private markets, startups, founders, and investors。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "36氪",
-        "home_url": "https://36kr.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
-      "image_url": null,
+      "image_url": "https://news.crunchbase.com/wp-content/uploads/2018/07/cb_news_logo_gradient-2x.png",
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_14afcc981481e5cec54764be",
-      "cluster_id": "cluster_69713ada75e0a12ca77bb733",
-      "title": "Trunk Tools 用专用模型把建筑合同审阅从 60 天压到 10 天",
-      "url": "https://venturebeat.com/orchestration/trunk-tools-stack-cut-document-review-from-60-days-to-10-by-ditching-general-purpose-models",
-      "summary": "施工 AI 公司 Trunk Tools 放弃通用大模型，转而针对施工文档训练一组小型专用模型，把承包商合同的审阅周期从 60 天缩短到 10 天。团队认为，通用模型在建筑领域幻觉和上下文丢失严重，行业专用栈在准确率和成本上都更划算。这套做法给\"垂直 Agent 优于通用 Copilot\"的路线又添了一个企业级样本。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_96f823b0cdfb660ef5d420d7",
+      "cluster_id": "cluster_c5c311cc792c41c55f798d3b",
+      "title": "2",
+      "url": "https://news.crunchbase.com/sections/ai/?pages=2",
+      "summary": "2。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "VentureBeat",
-        "home_url": "https://venturebeat.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -899,30 +624,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_17e5742c64a7b3da750d473b",
-      "cluster_id": "cluster_a52e60e6709c822d9c42166f",
-      "title": "KPMG 调研:42% 英国企业看不清 AI 花了多少钱,CEO 直接管的 ROI 达成率高出 4 倍",
-      "url": "https://www.itpro.com/business/business-strategy/uk-business-leaders-have-a-limited-understanding-of-ai-usage-costs-and-its-coming-back-to-bite-them",
-      "summary": "KPMG 全球 AI 脉搏报告显示,26% 英国企业已日常使用 AI,但 42% 对相关支出只有部分可见性,30% 难以管理按量计费成本。CEO 直接负责 AI 决策的企业 ROI 达成率为 25%,是其他企业的 4 倍;57% 已部署成本监控仪表盘。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9745388cf29b89e30cdcbca0",
+      "cluster_id": "cluster_750c0708c21d015d25017344",
+      "title": "Crunchbase Data: Q2 Brought The Most Billion-Dollar Startup Exits Since 2021",
+      "url": "https://news.crunchbase.com/public/data-billion-dollar-startup-exits-ma-ipo-spcx-q2-2026/",
+      "summary": "Crunchbase Data: Q2 Brought The Most Billion-Dollar Startup Exits Since 2021。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "itpro.com",
-        "home_url": "https://www.itpro.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -931,30 +658,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_1fc7460b8da11f2452468f99",
-      "cluster_id": "cluster_e603bc0850784460e220e239",
-      "title": "三星或拿 Meta 超 10 万亿韩元 AI 芯片订单，2 纳米积压看涨 50 万亿",
-      "url": "https://36kr.com/newsflashes/3879646967738370?f=rss",
-      "summary": "三星电子正成为全球大科技公司自研 AI 芯片的核心生产基地，中长期积压订单有望逼近 50 万亿韩元；其中 Meta 推进与三星合作生产价值超 10 万亿韩元的下一代 ASIC，自研加速器 MTIA 计划在三星 2 纳米工艺量产数十万组。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_975c6fa6cd9a2a39c9f93a9f",
+      "cluster_id": "cluster_3a1a8dbfa1e7b1394b065013",
+      "title": "Tech Layoffs Tracker",
+      "url": "https://news.crunchbase.com/startups/tech-layoffs/",
+      "summary": "Tech Layoffs Tracker。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "36氪",
-        "home_url": "https://36kr.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -963,30 +692,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_29f4e44aa7e4a9a98036e279",
-      "cluster_id": "cluster_174b874a58ed9c62c6292daf",
-      "title": "具身智能开战：阿里发 Qwen-Robot，字节 Seed 纳核心",
-      "url": "https://www.chinaventure.com.cn/news/114-20260703-392138.html",
-      "summary": "阿里巴巴发布千问具身智能大模型 Qwen-Robot 系列，腾讯推出 HY-Embodied-0.5-X，字节 Seed 将具身智能纳入核心业务。过去一年国内具身智能融资 503 起超 960 亿元，20 家公司明确上市计划。摩根士丹利预计 2026 年中国人形机器人销量 2.8 万台。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9831b4ab7a25cf93d6b2b1d1",
+      "cluster_id": "cluster_5949a4fb0bfb7260185c9e91",
+      "title": "Bessemer Venture Partners",
+      "url": "https://www.crunchbase.com/organization/bessemer-venture-partners",
+      "summary": "Bessemer Venture Partners。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "chinaventure.com.cn",
-        "home_url": "https://www.chinaventure.com.cn/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -995,30 +726,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2c8ecbb0c045e7beebf89448",
-      "cluster_id": "cluster_3dabb5017fb9abd0501e4858",
-      "title": "Google DeepMind 与员工工会化谈判开局不顺，伦敦团队认为高管缺乏诚意",
-      "url": "https://www.wired.com/story/google-deepmind-unionization-talks-are-off-to-a-rocky-start/",
-      "summary": "Google DeepMind 与其伦敦员工围绕工会化的首轮谈判本周三破裂。5 月员工要求公司承认 Communication Workers Union 与 Unite the Union 作为联合代表，Google 拒绝但同意由第三方仲裁参与谈判，工会代表在会后表示对方没有认真讨论议题。前沿 AI 实验室内部劳资摩擦正在制度化推向台前。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_994f2bf5b68a159dc05cf055",
+      "cluster_id": "cluster_7f1f8966a418ac0b8d924ce9",
+      "title": "Q4 2024 Latin America",
+      "url": "https://news.crunchbase.com/venture/latin-america-startup-funding-eoy-2024/",
+      "summary": "Q4 2024 Latin America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Wired",
-        "home_url": "https://www.wired.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1027,30 +760,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2f34c740dfc4e6dd1febd838",
-      "cluster_id": "cluster_3c54f4ba4d9b5b2b5888db20",
-      "title": "理想汽车再拆产品部:电动本体并入整车研发,自动驾驶终端并入基座模型团队",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzI2NDk5NzA0Mw%3D%3D&idx=2&mid=2248894297&sn=2608d89cafe33f84c692ef877c670929",
-      "summary": "理想汽车正在拆分产品部:电动本体产品定义团队并入刘立国负责的整车研发部,自动驾驶终端产品团队并入詹锟负责的基座模型研发团队,目的是让产品定义回归研发、缩短决策链。 背景是理想 6 月交付 30895 辆,落后蔚来 40597 辆和小鹏 40126 辆;基座模型部门 5 月已新增具身工程、交互、行为三个二级部门,此次调整进一步把 AI 与整车能力向研发侧收拢(据 36 氪报道)。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_99c5518d35cecf33d559b89d",
+      "cluster_id": "cluster_faacec70792b3e4590fdc372",
+      "title": "Q3 2023 Europe",
+      "url": "https://news.crunchbase.com/venture/europe-startup-funding-q3-2023-data/",
+      "summary": "Q3 2023 Europe。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "36氪",
-        "home_url": "https://mp.weixin.qq.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1059,30 +794,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2f3723bd6c927515a16a81eb",
-      "cluster_id": "cluster_bda0bbc3a6aca79b647816dd",
-      "title": "Yann LeCun 论 AI 权力集中是最大风险,基础模型终将像 Linux 与 Apache 一样商品化",
-      "url": "https://x.com/ylecun/status/2073037974153896312",
-      "summary": "Yann LeCun 在 X 发长文回应 AI 权力集中议题:他把少数私营公司或国家垄断信息、知识与经济工具的访问,视为 AI 最大危险,类比奥斯曼帝国禁印刷术两百年。他引用 1993 年 Gore 与 Clinton 顶住电信巨头把 ARPAnet 开放给商业和公众,以及 1990 到 2000 年代 Sun、HP、IBM 专有栈被 Linux、Apache 挤出的历史,判断基础模型作为基础设施必然商品化,长期利润在应用层。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported f...",
+      "id": "occ_99ebf4ebfb4103636c2d4135",
+      "cluster_id": "cluster_d7979ad551bf338aea16ee6e",
+      "title": "Anthropic",
+      "url": "https://www.crunchbase.com/organization/anthropic",
+      "summary": "Anthropic。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "X：Yann LeCun",
-        "home_url": "https://x.com/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1091,30 +828,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_32e9b5b018622da7d2634e55",
-      "cluster_id": "cluster_84c3dceb9a19b9457810e820",
-      "title": "Addy Osmani 的 agent-skills 涨到 56.7k 星：AI 编码从写代码走向工程流程",
-      "url": "https://developer.aliyun.com/article/1745190",
-      "summary": "Addy Osmani 的 agent-skills 仓库涨到 56.7k+ stars，把 24 个生产级工程实践（代码审查、性能优化、安全检查等）封装成可复用的 AI 技能，适配 Claude Code、Cursor、Copilot 等工具。每个技能由一份 SKILL.md 描述，让 AI 按明确流程工作，而不是靠泛泛提问。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9aeaff13f741a97631da8240",
+      "cluster_id": "cluster_a849d4f1c224851c67183790",
+      "title": "Q2 2024",
+      "url": "https://news.crunchbase.com/sections/ai/",
+      "summary": "Q2 2024。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "aliyun",
-        "home_url": "https://developer.aliyun.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1123,30 +862,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3482c535506a3d6f87439d76",
-      "cluster_id": "cluster_3fe7ef61d8f69de72a4af5b8",
-      "title": "昆仑行创始人任庚：车企现在做具身智能是\"战术投机\"，未来入场才是\"战略必然\"",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzI2NDk5NzA0Mw%3D%3D&idx=1&mid=2248894284&sn=5631711b0c00111ce638be83433a232e",
-      "summary": "前华为国家 CEO、阿里副总裁任庚创办的昆仑行机器人在注册不到 90 天内完成 3 轮融资、累计数十亿元，估值已跨过独角兽门槛。任庚接受 36 氪访谈时明确对标特斯拉 Optimus，走软硬全栈一体路线，先做全人形再下放技术到类人形和非人形形态。他判断车企未来一定会下场具身智能，但要等自身格局之战完成、行业进入市场爆发期，此刻切入优势不明显、短板很突出。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9b9465f757a042484c656404",
+      "cluster_id": "cluster_141195390c31d04e985dbb63",
+      "title": "Diversity",
+      "url": "https://news.crunchbase.com/sections/diversity/",
+      "summary": "Diversity。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "36氪",
-        "home_url": "https://mp.weixin.qq.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1155,30 +896,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3d11e0fbd5e84887323dc900",
-      "cluster_id": "cluster_1ac463db7d3b3dda72789a1e",
-      "title": "格式塔科技完成 4.2 亿元天使+轮，华映资本领投",
-      "url": "https://www.chinaventure.com.cn/news/111-20260703-392144.html",
-      "summary": "脑机接口公司格式塔科技 7 月 3 日宣布完成 4.2 亿元天使+轮融资，华映资本领投，红杉中国、创新工场、蓝思科技等跟投。公司今年 1 月成立，累计融资 5.7 亿元，上海总部启用，采用成都加上海双总部战略。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9c5c0c9d418769d46575f3c2",
+      "cluster_id": "cluster_db8106d98a962661359cb2e6",
+      "title": "Q4 2025 North America",
+      "url": "https://news.crunchbase.com/venture/north-american-startup-funding-2025-data-ai-us-investment/",
+      "summary": "Q4 2025 North America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "chinaventure.com.cn",
-        "home_url": "https://www.chinaventure.com.cn/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1187,30 +930,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3fab6386f6234be50459dd31",
-      "cluster_id": "cluster_477e49d569a498336d804061",
-      "title": "百曜科技发布 AURA CellOS：首个把 LLM-JEPA 架构用到单细胞的世界模型",
-      "url": "https://www.qbitai.com/2026/07/442746.html",
-      "summary": "百曜科技推出 AURA CellOS，号称目前参数规模最大的单细胞基础模型，基于 3.905 亿个人类单细胞转录组训练，覆盖 40 余种组织、260 余种细胞类型。模型首次把 JEPA 联合嵌入预测架构和\"世界模型\"理念系统性引入单细胞研究，目标是让 AI 具备对细胞行为的通用预测能力。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9ce23a7e78ac825b4520d88f",
+      "cluster_id": "cluster_ebbf16b4af3db106dea6b230",
+      "title": "Knowledge Center",
+      "url": "https://support.crunchbase.com/hc/en-us",
+      "summary": "Knowledge Center。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "量子位",
-        "home_url": "https://www.qbitai.com/"
+        "name": "support.crunchbase.com",
+        "home_url": "https://support.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1219,30 +964,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_40a2c172a7c2deefe19e26f5",
-      "cluster_id": "cluster_f70ef377e47d9bc75218d3ee",
-      "title": "Amazon 将关闭 Mechanical Turk，AI 训练数据标注服务将被替代",
-      "url": "https://www.theregister.com/off-prem/2026/07/03/amazons-mechanical-turk-to-stop-accepting-new-customers-and-not-even-ai-can-save-it/5266274",
-      "summary": "Amazon 宣布 Mechanical Turk 将于 2026 年 7 月 30 日停止接受新客户，现有客户过渡至 9 月。该平台自 2005 年上线以来长期为 AI 训练提供数据标注服务，AWS 正以 SageMaker GroundTruth 接管该业务。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9ce2f69aa9f913be3e362a1e",
+      "cluster_id": "cluster_75f2b9cfce81ab1b1c1ce604",
+      "title": "Q1 2026 Global",
+      "url": "https://news.crunchbase.com/venture/record-breaking-funding-ai-global-q1-2026/",
+      "summary": "Q1 2026 Global。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "The Register",
-        "home_url": "https://www.theregister.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1251,53 +998,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_442f95a304848c817c0b2c95",
-      "cluster_id": "cluster_6cdc9dd15c420b1aad04a61a",
-      "title": "Langfuse 发 v3.205.0:新增 v4 Sessions 视图,支持通过 MCP 与 API 创建 Widget",
-      "url": "https://github.com/langfuse/langfuse/releases/tag/v3.205.0",
-      "summary": "Langfuse v3.205.0 主要更新:v4 Sessions 引入 View 模型与显式筛选项,筛选侧栏收成导轨、腾出更多主区面积;代码评估器编辑体验优化;新增通过 MCP 与 API 创建 Widget;Trace 图视图支持实时聚焦与项目级面板;Parquet 升为一等公民导出格式。修复包括会话 toast、媒体链渲染、Python 代码评估器 E402 报错等。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9f358a70aee58aab670b51e7",
+      "cluster_id": "cluster_8d042792e50bb639f8252fbf",
+      "title": "当数据库的两端，都不再是人",
+      "url": "https://www.infoq.cn/article/sDyPWhAWPHttlQJTUwq3",
+      "summary": "点击查看原文>。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Langfuse GitHub",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_45fffd0cfc1bae83b3f48288",
-      "cluster_id": "cluster_c618f2b8d9d551a633bb77c1",
-      "title": "Cloudflare CEO 警告：未来两年 Agent 将让互联网每周出现一次 Log4j 级漏洞",
-      "url": "https://www.infoq.cn/news/cloudflare-ceo-agent-log4j-warning",
-      "summary": "Cloudflare CEO Matthew Prince 公开预警，未来两年 Agent 将使互联网每周出现一次 Log4j 级漏洞。他给出的数据是：当前 Bot 流量已超过人类流量，五年后机器人和人类的访问比可能超过 1000:1；同时 Cloudflare 内部 93% 的研发已在用 AI，但仍裁员了 20%。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "infoq",
+        "name": "infoq.cn",
         "home_url": "https://www.infoq.cn/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "InfoQ CN",
+        "url": "https://www.infoq.cn/feed"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1306,7 +1021,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1315,30 +1030,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_4753d4252b92fdfeb4f3d257",
-      "cluster_id": "cluster_c645eccf9f2ae16126ad6e26",
-      "title": "火山引擎发布能源交通 AI 方案，383 套核查模型覆盖 167 类经营场景",
-      "url": "https://news.bjd.com.cn/2026/07/03/11842227.shtml",
-      "summary": "火山引擎在 FORCE 2026 大会发布能源交通产业 AI 方案，推出 AI 原生穿透式财务监管和企业 AI 安全中台两大定制化产品。财务监管内置 383 套核查模型覆盖 167 类场景，7×24 小时 Agent 自动巡检；安全中台支持机密计算，单日 Token 调用量达 300 亿次。中石油共享业务 AI 覆盖率达 90%，差旅手工填报减少 95%。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9fc5f96363131b2f7da3ad91",
+      "cluster_id": "cluster_12e80a80d95a9c90e6eb398d",
+      "title": "Google",
+      "url": "https://www.crunchbase.com/organization/google",
+      "summary": "Google。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "京报网",
-        "home_url": "https://news.bjd.com.cn/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1347,30 +1064,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_48ea5c84f268203182c061a7",
-      "cluster_id": "cluster_12fe98bb1bc401a05a26687b",
-      "title": "Ethan Mollick：换模型必须先跑自建 benchmark，翻译象形文字用 Gemini 3.5 Flash、跑贩卖机模拟用 Opus 4.8",
-      "url": "https://nitter.net/emollick/status/2072697436963832023",
-      "summary": "沃顿商学院教授 Ethan Mollick 强调企业不能只看通用榜单换模型：不同任务的最优模型分歧很大，例如翻译古埃及象形文字他用 Gemini 3.5 Flash，跑 Anthropic 的 vending-machine 模拟他反而用 Opus 4.8。他因此对「为了省成本或跑分好看就直接替换模型而不做实测」持怀疑态度。这条观察给企业选型的启示是：任何模型替换都要先在自己业务场景的私有评测集上比一遍，通用 benchmark 与实际收益经常脱钩。This is an intermediary/self-media lead; trace it to a primary source before treating it as ...",
+      "id": "occ_9ffafc1613b832d12dad03f1",
+      "cluster_id": "cluster_f3b0e082e1ff428f7862b593",
+      "title": "Q1 2026 North America",
+      "url": "https://news.crunchbase.com/venture/funding-surges-all-stages-ai-north-america-q1-2026/",
+      "summary": "Q1 2026 North America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "X：Ethan Mollick",
-        "home_url": "https://nitter.net/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1379,21 +1098,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_4990f6696aff5491f66d8c75",
-      "cluster_id": "cluster_3147c8d519ff42b6c73998b0",
-      "title": "Salesforce 招入 MeshMesh 三位创始人,补齐 AI 原生实施平台能力",
-      "url": "https://www.salesforceben.com/has-salesforce-acquired-meshmesh",
-      "summary": "MeshMesh 是一家 2023 年成立的 AI 原生 Salesforce 实施平台,核心围绕 vibe coding 和自强化学习闭环。三位联合创始人已加入 Salesforce 企业技术部门。官方定性并非正式收购或 acquihire,但 MeshMesh 声称过往项目实现 9.4 倍 ROI,人均每月节省 80 小时。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_a1f20c1e614a66c3a547c49d",
+      "cluster_id": "cluster_b481411a3db78834aa053884",
+      "title": "曝DeepSeek筹备IPO，最快可能今年提交申请",
+      "url": "https://36kr.com/newsflashes/3896253787522689?f=rss",
+      "summary": "据彭博社报道，知情人士透露，DeepSeek已开始筹备首次公开募股（IPO），规划在内地上市，最快可能于今年提交申请，并在2027年完成上市。据悉，DeepSeek正与会计师事务所合作，力争在今年12月底前完成财务报告，这是IPO申报的必要步骤。相关讨论仍在进行中，IPO时间安排和融资计划可能有所调整，执行将取决于市场状况及公司业绩。（新浪科技）。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "salesforceben.com",
-        "home_url": "https://www.salesforceben.com/"
+        "name": "36kr.com",
+        "home_url": "https://36kr.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "36Kr",
+        "url": "https://36kr.com/feed"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1402,7 +1121,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1411,30 +1130,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_4a11e01550b8c42a4d3fb824",
-      "cluster_id": "cluster_07a409ca438aecbc7b6e42ab",
-      "title": "上海创智学院等发布异构 LLM 推理设计空间论文,拆出计算放置、KV 表示与生命周期三大边界",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw%3D%3D&idx=2&mid=2651042515&sn=6994427190f016869ee92b7a2fab085a",
-      "summary": "上海创智学院、上海交大、复旦、人大、沐曦、基流、上海仪电联合发文首次系统性拆解 Prefill-Decode 分离异构推理的设计空间,提炼计算放置、KV 表示、KV 所有权与生命周期三大边界决策和九条最佳实践,并在沐曦 C600 GPU 加英伟达 Hopper GPU 的生产环境完成验证。论文指出 NIXL、Mooncake 等现有 KV Cache 传输引擎本质是搬字节而非张量语义,常触发字节成功到达却被错误解读的语义故障,并给出 Runtime KV State 抽象作为。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_a2cfb19d0c73524166b28d59",
+      "cluster_id": "cluster_7f1af1638fef5a6ccad73744",
+      "title": "The Crunchbase Unicorn Board",
+      "url": "https://news.crunchbase.com/unicorn-company-list/",
+      "summary": "The Crunchbase Unicorn Board。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "机器之心",
-        "home_url": "https://mp.weixin.qq.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1443,30 +1164,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_4d1bd84470d63919b7395eb1",
-      "cluster_id": "cluster_76b1b409171803e9f8437681",
-      "title": "TechCrunch 盘点 AI 原生浏览器：Perplexity Comet、Dia、Opera Neon、OpenAI Atlas 集体围攻 Chrome 与 Safari",
-      "url": "https://techcrunch.com/2026/07/03/as-the-browser-wars-heat-up-here-are-the-hottest-alternatives-to-chrome-and-safari-in-2026/",
-      "summary": "浏览器之争已从搜索转向 Agent 能力。Perplexity Comet 可总结邮件、发日历邀请；The Browser Company 的 Dia 能读取用户已登录站点辅助任务；Opera Neon 支持离线研究购物与写代码；OpenAI Atlas 内置 Agent 模式并已上线 macOS。Brave、DuckDuckGo 以隐私叠加生成式反攻，Ladybird 走独立开源路线。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_a3bf3511302d79d5262dc3e0",
+      "cluster_id": "cluster_9a33cfeac16358b1a4b5b81f",
+      "title": "OctoML",
+      "url": "https://www.crunchbase.com/organization/octoml",
+      "summary": "OctoML。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "TechCrunch",
-        "home_url": "https://techcrunch.com/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1475,30 +1198,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_4e2441096b864491b7ed0aff",
-      "cluster_id": "cluster_740c7da0ef844f259e736c6e",
-      "title": "本地双卡 RTX PRO 6000 跑 DeepSeek V4 Flash: 编码任务比走 API 的 Sonnet 更快",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1um84bd/followup_deepseek_v4_flash_on_2x_rtx_pro_6000/",
-      "summary": "一位独立开发者用两张 RTX PRO 6000 + vLLM 本地部署 DeepSeek V4 Flash, 在自建编码基准上单题平均 2 分钟完成、质量约等于 Sonnet; 相比之下走 API 的 Sonnet 5 每题约 6 分钟, Opus 和 Fable 质量最高但被本地方案的墙钟时间反超。作者同时把 Qwen 3.6 系列纳入对照, 完整图表和数据放在个人博客。 信号是本地开源模型在真实编码流水线里已经能挑战闭源顶级 API, 尤其对愿意堆卡换延迟的团队。This is an intermediary/self-media lead; trace it to a primary source before treati...",
+      "id": "occ_a42b1db1ef678b58e5b2cd26",
+      "cluster_id": "cluster_460c3540cda0cad33d33de5b",
+      "title": "2019",
+      "url": "https://news.crunchbase.com/data/the-q4-eoy-2019-global-vc-report-a-strong-end-to-a-good-but-not-fantastic-year/",
+      "summary": "2019。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Reddit r/LocalLLaMA",
-        "home_url": "https://www.reddit.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1507,64 +1232,32 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_50e729bbf590f2cb2dba0124",
-      "cluster_id": "cluster_7bada5fd61c0ded6f80ed9c7",
-      "title": "AI’s Volatile Power Use Quietly Tests Grid Limits",
-      "url": "https://spectrum.ieee.org/data-centers-grid-instability",
-      "summary": "The rapid expansion of artificial intelligence infrastructure is typically framed as an energy problem. Data centers are projected to consume a growing share of global electricity demand: The International Energy Agency estimates they could。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_a4842e2969a1f6d920f5274a",
+      "cluster_id": "cluster_3ceb0328428ee14c178df8ff",
+      "title": "UiPath",
+      "url": "https://www.crunchbase.com/organization/uipath",
+      "summary": "UiPath。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "spectrum.ieee.org",
-        "home_url": "https://spectrum.ieee.org/"
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
       },
       "collected_via": {
-        "name": "IEEE Spectrum Artificial Intelligence",
-        "url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
-        "research",
-        "engineering",
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://spectrum.ieee.org/media-library/aerial-view-of-a-large-industrial-complex-near-housing-and-power-lines-in-autumn.jpg?id=67080460&width=980",
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_51009e6f21baad238944e24e",
-      "cluster_id": "cluster_ab10823fc912e31bf5ced2ac",
-      "title": "微软计划 8 月合并 Copilot 消费版与企业版为单一应用，整合 AI 编码工具与 AI 代理",
-      "url": "https://finance.sina.com.cn/stock/t/2026-07-03/doc-inifnnxk3797345.shtml",
-      "summary": "微软计划 8 月将 Copilot 消费版与企业版合并为一款应用，新版整合 AI 编码工具与 AI 代理，部分高级功能需额外付费。消息源自流出的内部备忘录。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "新浪财经",
-        "home_url": "https://finance.sina.com.cn/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1573,30 +1266,440 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_534e2be965780c7039924205",
-      "cluster_id": "cluster_93d04618369d3d6e8f6300e5",
-      "title": "Mistral AI 开源 Leanstral 1.5 形式化验证模型，miniF2F 达 100%、PutnamBench 587/672",
-      "url": "https://mistral.ai/news/leanstral-1-5",
-      "summary": "Mistral AI 发布 Apache-2.0 许可的开源形式化验证模型 Leanstral 1.5，总参数 119B、激活 6B，miniF2F 达 100% 饱和，PutnamBench 解出 587/672，FATE-H 87%、FATE-X 34% 均刷新 SOTA。训练分 mid-training、SFT 与基于 CISPO 的强化学习三阶段；具备智能体式证明能力，在 57 个开源仓库中发现 5 个未知 bug。模型已通过 HuggingFace 和免费 API。This is an intermediary/self-media lead; trace it to a primary source before tr...",
+      "id": "occ_a55c0b5d784a3c49e7b81128",
+      "cluster_id": "cluster_205b66c38fd156bd0a7cead6",
+      "title": "Create a Crunchbase Profile",
+      "url": "https://support.crunchbase.com/hc/en-us/articles/115011823988-Create-a-Crunchbase-Profile",
+      "summary": "Create a Crunchbase Profile。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Mistral AI",
-        "home_url": "https://mistral.ai/"
+        "name": "support.crunchbase.com",
+        "home_url": "https://support.crunchbase.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
+        "product_update",
+        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-03",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_a5887be22342abb6abe263d7",
+      "cluster_id": "cluster_2fc46dbcb9d10674d3fcad78",
+      "title": "2020 Global",
+      "url": "https://news.crunchbase.com/venture/global-2020-funding-and-exit/",
+      "summary": "2020 Global。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_a6dbc3cbcdf2be252a704daa",
+      "cluster_id": "cluster_7ec6afd914bf7eeb23297be9",
+      "title": "Exclusive: XCures Lands $46M Series B To Clean Up Messy Medical Records With AI",
+      "url": "https://news.crunchbase.com/venture/xcures-lands-seriesb-medical-records-ai/",
+      "summary": "Exclusive: XCures Lands $46M Series B To Clean Up Messy Medical Records With AI。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_a84c6f06b22701d4d5e38393",
+      "cluster_id": "cluster_9884a722f4aa145cafeb909f",
+      "title": "AI21 Labs",
+      "url": "https://www.crunchbase.com/organization/ai21",
+      "summary": "AI21 Labs。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_aa746f84662938c05e9dd87a",
+      "cluster_id": "cluster_6e199aa5dd1414fa20744502",
+      "title": "2022 Latin America",
+      "url": "https://news.crunchbase.com/venture/latin-america-venture-funding-slows-q4-2022/",
+      "summary": "2022 Latin America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_ac58dff232ea67bb4c7bcc65",
+      "cluster_id": "cluster_ac4aa4513347b74c2e136a98",
+      "title": "Cybersecurity",
+      "url": "https://news.crunchbase.com/sections/cybersecurity/",
+      "summary": "Cybersecurity。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_ae5eb43df4a07b1eb6bdfda0",
+      "cluster_id": "cluster_5ebd7507ab9d13a12f70cc5b",
+      "title": "Imbue",
+      "url": "https://www.crunchbase.com/organization/generally-intelligent",
+      "summary": "Imbue。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_ae79445bd8709b00a8771a5a",
+      "cluster_id": "cluster_c7ddeaecf71e382f30c8e706",
+      "title": "Crunchbase Pro",
+      "url": "https://about.crunchbase.com/products/crunchbase-pro/",
+      "summary": "Crunchbase Pro。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "about.crunchbase.com",
+        "home_url": "https://about.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_af7e9fb240f76477385eac00",
+      "cluster_id": "cluster_7f1af1638fef5a6ccad73744",
+      "title": "Unicorn Board",
+      "url": "https://news.crunchbase.com/unicorn-company-list/",
+      "summary": "Unicorn Board。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_afaf4be22a862caf0b11a0b4",
+      "cluster_id": "cluster_818fec79d615eb0a35d42de0",
+      "title": "Skydio",
+      "url": "https://www.crunchbase.com/organization/skydio",
+      "summary": "Skydio。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_b2d7c4a9b19a73f51d5f35f8",
+      "cluster_id": "cluster_aae83440ceb5d54d445daf09",
+      "title": "Q1 2025 Europe",
+      "url": "https://news.crunchbase.com/venture/european-funding-flat-q1-2025/",
+      "summary": "Q1 2025 Europe。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_b2f810c507481888c27b4af0",
+      "cluster_id": "cluster_ecb371aea418e8240173826c",
+      "title": "Go To Crunchbase.com",
+      "url": "https://www.crunchbase.com/",
+      "summary": "Go To Crunchbase.com。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_b31e626ca895ba6ccda2602d",
+      "cluster_id": "cluster_0114d1c29490bff13877aa22",
+      "title": "Adept AI",
+      "url": "https://www.crunchbase.com/organization/adept-48e7",
+      "summary": "Adept AI。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-15",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,

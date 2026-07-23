@@ -2,83 +2,23 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-15T03:34:30.755Z",
+  "generated_at": "2026-07-23T09:08:21.838Z",
   "group": {
     "id": "papers_models",
     "label": "论文 / 模型"
   },
   "page": 58,
-  "page_count": 80,
+  "page_count": 124,
   "page_size": 50,
-  "total_count": 3961,
+  "total_count": 6198,
   "next_url": "signals/papers_models/page-059.json",
   "items": [
     {
-      "id": "occ_541939ddad85ed96a42adb43",
-      "cluster_id": "cluster_27c541c731c01b119bfeb3cd",
-      "title": "Claude Opus 4.8 in GitHub Copilot",
-      "url": "https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/",
-      "summary": "GitHub 宣布 Claude Opus 4.8 在 GitHub Copilot 中 generally available，覆盖 Copilot Pro+、Business 和 Enterprise 等用户，管理员需要在策略中允许该模型。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.blog",
-        "home_url": "https://github.blog/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · GitHub Changelog",
-        "url": "https://github.blog/changelog/2026-05-28-claude-opus-4-8-is-generally-available-for-github-copilot/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-30T18:48:38.339Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_885886ff27f67931b066418d",
-      "cluster_id": "cluster_f84e12cbc99ffe930bfac725",
-      "title": "MONET: Lowering the bar for World-Class Image Generation research",
-      "url": "https://huggingface.co/blog/jasperai/monet",
-      "summary": "Jasper Research 在 Hugging Face 发布 MONET 和 nano-t2i，重点不是又一个图像模型，而是把训练数据、过滤流程和最小训练代码一起开放。文章给出从 2.9B URL 到 104.9M 样本的筛选路径：美学预过滤、安全过滤、去重、域名与水印治理、多 captioner 描述和有限合成数据混入。值得注意的是，团队用 4B 模型验证数据质量，并强调 100% 合成数据会明显劣化，13% synthetic ratio 反而处在可用区间。对开源图像模型团队，这篇提供的是数据治理与可复现实验模板。",
-      "author": "Benjamin Aubin, Gonzalo Quintana, Onur, sanjeev sreetharan, Czerwinska, Damien Henry, Clement Chadebec",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Hugging Face",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face",
-        "url": "https://huggingface.co/blog/jasperai/monet"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T18:48:09.023Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e98d6f9c049e581cf40e031e",
-      "cluster_id": "cluster_f84e12cbc99ffe930bfac725",
-      "title": "MONET: Lowering the bar for World-Class Image Generation research",
-      "url": "https://huggingface.co/blog/jasperai/monet",
-      "summary": "Jasper Research released MONET, nano-t2i, and validation details on Hugging Face.",
+      "id": "occ_82498cc851ed51cb9452e171",
+      "cluster_id": "cluster_5586d7de26a7825249b1e30e",
+      "title": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4662; downloads=1306206.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -87,900 +27,618 @@
         "home_url": "https://huggingface.co/"
       },
       "collected_via": {
-        "name": "Hugging Face Blog",
-        "url": "https://huggingface.co/blog/jasperai/monet"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T18:42:10.176Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_02ef77b22db2aba02c038726",
-      "cluster_id": "cluster_dc886f6a09059a83f495e2e1",
-      "title": "Genspark Claw: A Cloud‑Based AI Agent Orchestration Platform — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420257",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_2e021cbea709412e2aba2ff3",
-      "cluster_id": "cluster_35647447791cdbf70c1f35e2",
-      "title": "[FORGE] ## 1. From Abstract Algebra to Everyday Impact — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420232",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_3da1916e972fbcf8602261df",
-      "cluster_id": "cluster_69b3e06c96cac76dbd8689e5",
-      "title": "[FORGE] The Geometry of Thought: Moving Beyond the AI Mirror — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420241",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4921fbd91aba64d7a4ebcabd",
-      "cluster_id": "cluster_b2940ea3b0d171c426e02c99",
-      "title": "VPS Hardware Specification and Local LLM Recommendations — 12 May 2026 — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420211",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_6b44eceec41fae77d85a943a",
-      "cluster_id": "cluster_6aee8ecffb2f3914d8e43f5e",
-      "title": "[FORGE] # 1. From \"Just a Group\" to the Fabric of Intelligence — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420224",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_73cd9667a2e3bbe14b403c31",
-      "cluster_id": "cluster_f53c156d91e3dfd0af5964be",
-      "title": "Genspark Claw: A Cloud‑Based AI Agent Orchestration Platform — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420258",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_943dff0b413860c686c8b64c",
-      "cluster_id": "cluster_01fcd37d32a550143bd4eca0",
-      "title": "Design Principles for Non-Directive Conversational AI — A Structural Approach to Preserving Human Agency and Responsibility in Dialogue Systems —",
-      "url": "https://doi.org/10.5281/zenodo.20418656",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_a74fd4c1d29f367de536ed87",
-      "cluster_id": "cluster_9ee70a977eb28c4853f7df38",
-      "title": "[FORGE] # 1. From \"Just a Group\" to the Fabric of Intelligence — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420223",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_b4e066387175636e01d459e7",
-      "cluster_id": "cluster_85b722051804d3e221f23dc2",
-      "title": "[FORGE] The Geometry of Thought: Moving Beyond the AI Mirror — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420242",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_c9b888b7abfffb2b378818a7",
-      "cluster_id": "cluster_87120c5e4dc9da1c03c64942",
-      "title": "Design Principles for Non-Directive Conversational AI — A Structural Approach to Preserving Human Agency and Responsibility in Dialogue Systems —",
-      "url": "https://doi.org/10.5281/zenodo.19068109",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d07ec17686d4566c6bc44eac",
-      "cluster_id": "cluster_ab19a5fab831f5245fedf595",
-      "title": "VPS Hardware Specification and Local LLM Recommendations — 12 May 2026 — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420210",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f97ed08537b88003d4a01ac6",
-      "cluster_id": "cluster_a978d36388efddf7c5ad2aed",
-      "title": "[FORGE] ## 1. From Abstract Algebra to Everyday Impact — E8 Intelligence Research",
-      "url": "https://doi.org/10.5281/zenodo.20420233",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d3f604e911837330e2703125",
-      "cluster_id": "cluster_c6a7b34a0061f3e2d8c48cda",
-      "title": "ITBench-AA SRE benchmark",
-      "url": "https://huggingface.co/blog/ibm-research/itbench-aa",
-      "summary": "Artificial Analysis and IBM launched ITBench-AA SRE tasks; frontier models score below 50%.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Blog",
-        "url": "https://huggingface.co/blog/ibm-research/itbench-aa"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T18:42:10.176Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_07f012d8243b56d9c5a01cd6",
-      "cluster_id": "cluster_a595e3767a03040e007af665",
-      "title": "Code as a Weapon: A Consensus-Labeled Prompt Bank for Measuring Coding-Model Compliance with Malicious-Code Requests",
-      "url": "https://arxiv.org/abs/2605.28734v1",
-      "summary": "A general-purpose language model that answers a harmful question returns text; a coding model that complies with a malicious request can return a working weapon -- a keylogger, a ransomware stub, an exploit that runs as written. This asymme",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_093de99487fcbe7fe6e09dab",
-      "cluster_id": "cluster_c3c696b5bf6b4f8c7bbbd52e",
-      "title": "Reachy Mini goes fully local",
-      "url": "https://huggingface.co/blog/local-reachy-mini-conversation",
-      "summary": "文章把 Reachy Mini 的对话链路从托管后端迁到本地机器：VAD 检测说话片段，STT 转文本，LLM 生成回复，TTS 读出。对语音机器人和边缘 agent 团队，价值在于把隐私、成本、延迟和替换组件拆成可部署选项。",
-      "author": "Amir Mahla, Andres Marafioti",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Hugging Face",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face",
-        "url": "https://huggingface.co/blog/local-reachy-mini-conversation"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0d231d89980012d0bfda5cc2",
-      "cluster_id": "cluster_bcbc54d63fb791167353ce7a",
-      "title": "Calibrating Conservatism for Scalable Oversight",
-      "url": "https://arxiv.org/abs/2605.28807v1",
-      "summary": "Agentic AI systems capable of autonomous planning and extended environmental interaction pose a fundamental control problem: how can humans maintain meaningful oversight of systems that may exceed their own capabilities? Existing approaches",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1b947a7e512d3e806222a9ea",
-      "cluster_id": "cluster_8cc8439e4fd851d289ef5b3f",
-      "title": "Stance Detection in Prediction Markets: Addressing Imbalanced Trader Commentary via Counterfactual Augmentation and Market Context",
-      "url": "https://arxiv.org/abs/2605.28745v1",
-      "summary": "Prediction markets such as Polymarket aggregate crowd beliefs into real-time probability estimates, and the comments traders post beneath each market contain rich directional stance signals that prices alone cannot capture. This work introd",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1dcc1357acce1601b557a9e6",
-      "cluster_id": "cluster_ffdec3e4f0c05957365bd235",
-      "title": "Utility-Aware Multimodal Contrastive Learning for Product Image Generation",
-      "url": "https://arxiv.org/abs/2605.28733v1",
-      "summary": "Product images strongly influence consumer decision-making in online marketplaces. Empowered by multimodal contrastive learning, generative AI can output images that closely align with text prompts. Yet existing generative AI models do not",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_3c3d9832d8fea4bc37a505b9",
-      "cluster_id": "cluster_9e899a157ff8ca685d215ee4",
-      "title": "Shipping a Trillion Parameters With a Hub Bucket: Delta Weight Sync in TRL",
-      "url": "https://huggingface.co/blog/delta-weight-sync",
-      "summary": "Hugging Face Blog published this blog/interview entry.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Blog",
-        "url": "https://huggingface.co/blog/feed.xml"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4bc8c47169b61f665ca6f37d",
-      "cluster_id": "cluster_f5c0b8e562cbae96e8a12616",
-      "title": "OmniVerifier-M1: Multimodal Meta-Verifier with Explicit Structured Recalibration",
-      "url": "https://arxiv.org/abs/2605.28805v1",
-      "summary": "Visual outcomes are increasingly central to multimodal large language models, making reliable and fine-grained verification essential for scaling generalist foundation models. In this work, we investigate multimodal meta-verification, which",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_5221c2449a9fbf69c4494ad3",
-      "cluster_id": "cluster_69227e07a683311cce379690",
-      "title": "Do Agents Need Semantic Metadata? A Comparative Study in Agentic Data Retrieval",
-      "url": "https://arxiv.org/abs/2605.28787v1",
-      "summary": "In the era of autonomous agents, machine-actionable data is critical for data-driven workflows. For more than a decade, semantic metadata like schema.org has anchored the FAIR principles (Findable, Accessible, Interoperable, and Reusable) f",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_777ecb427568dd9f55c71154",
-      "cluster_id": "cluster_c8f9f410b0c8445487f01c53",
-      "title": "The Singer-Zauner gap for equiangular tight frames",
-      "url": "https://arxiv.org/abs/2605.28738v1",
-      "summary": "We show that there does not exist a complex $d\\times n$ equiangular tight frame with \\[ d^2-d+1<n<d^2. \\] The proof, which originated from an internal model at OpenAI, mimics the relationship between real equiangular tight frames and strong",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7883e3930c4636a01991b025",
-      "cluster_id": "cluster_c3c696b5bf6b4f8c7bbbd52e",
-      "title": "Reachy Mini goes fully local",
-      "url": "https://huggingface.co/blog/local-reachy-mini-conversation",
-      "summary": "Hugging Face Blog published this blog/interview entry.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Blog",
-        "url": "https://huggingface.co/blog/feed.xml"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_8d507ee05c024cd73159d052",
-      "cluster_id": "cluster_bc5041008d2e4f61e546fea6",
-      "title": "Personal Visual Memory from Explicit and Implicit Evidence",
-      "url": "https://arxiv.org/abs/2605.28806v1",
-      "summary": "Long-term memory is increasingly important for personalized AI agents, yet existing benchmarks and methods remain largely text-centric. Even when images are included, the user-specific information needed for later questions is typically rec",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d02e085a593a8e3634f7142e",
-      "cluster_id": "cluster_3011ba66435aaf99248078c2",
-      "title": "SwarmHarness: Skill-Based Task Routing via Decentralized Incentive-Aligned AI Agent Networks",
-      "url": "https://arxiv.org/abs/2605.28764v1",
-      "summary": "Vast quantities of compute (GPU cycles on personal workstations, idle inference servers, and edge devices between jobs) go unused because no incentive-aligned protocol exists for their owners to share them safely and profitably. Existing ap",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_de8f2c73bd17789ac15f13f7",
-      "cluster_id": "cluster_656e3626e8309f76e0213242",
-      "title": "Imitation Learning for Robot Assistance in Open Surgery: A Multi-Policy Evaluation on Suture Following",
-      "url": "https://arxiv.org/abs/2605.28736v1",
-      "summary": "This study presents the first evaluation of general-purpose imitation learning for surgeon-robot collaborative assistance in open surgery, targeting suture following: the grab-pull-release motion an assistant performs at every stitch. We co",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e4d709955a4c977f97fdfbf2",
-      "cluster_id": "cluster_c6a7b34a0061f3e2d8c48cda",
-      "title": "ITBench-AA: Frontier Models Score Below 50% on the First Benchmark for Agentic Enterprise IT Tasks — by Artificial Analysis and IBM",
-      "url": "https://huggingface.co/blog/ibm-research/itbench-aa",
-      "summary": "Hugging Face Blog published this blog/interview entry.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Blog",
-        "url": "https://huggingface.co/blog/feed.xml"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e5310a5bbd733cf734e2f7b5",
-      "cluster_id": "cluster_c6a7b34a0061f3e2d8c48cda",
-      "title": "ITBench-AA: Frontier Models Score Below 50% on the First Benchmark for Agentic Enterprise IT Tasks",
-      "url": "https://huggingface.co/blog/ibm-research/itbench-aa",
-      "summary": "这篇文章把 agent 能力放进企业 IT 任务评测，而不是只看代码题或聊天题。它给出的结论很直接：前沿模型在 ITBench-AA 上低于 50%，说明权限、工具调用、长流程和环境反馈仍是 enterprise agent 的硬问题。",
-      "author": "Artificial Analysis, IBM",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Hugging Face",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face",
-        "url": "https://huggingface.co/blog/ibm-research/itbench-aa"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-05-28T10:30:44.358Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_10952039d0478577d57bcf06",
-      "cluster_id": "cluster_d81de3d2358235b35e24130a",
-      "title": "BAGEL",
-      "url": "https://huggingface.co/spaces/ByteDance-Seed/BAGEL",
-      "summary": "Zero Agents Featured 222 BAGEL 🚀 Demo for BAGEL。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "ByteDance Seed Hugging Face Organization",
-        "url": "https://huggingface.co/ByteDance-Seed"
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
       },
       "source_group": "papers_models",
       "content_tags": [
         "model_release",
-        "research",
-        "community_discussion"
+        "open_source"
       ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-26",
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-02T09:00:49.015Z",
       "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/6535c9e88bde2fae19b6fb25/flkDUqd_YEuFsjeNET3r-.png",
+      "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_ba2e202a8ae87be74b479ebf",
-      "cluster_id": "cluster_c49aac26305c52454c0521d7",
-      "title": "microsoft/vermeer-XL-CA",
-      "url": "https://huggingface.co/microsoft/vermeer-XL-CA",
-      "summary": "microsoft/vermeer-XL-CA Updated May 26 • 1。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_83ddce7e1dd8f05c6cfb39c6",
+      "cluster_id": "cluster_f3aa7dbdb63c94657c178686",
+      "title": "CompVis/stable-diffusion-v1-4",
+      "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
+      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=7028; downloads=426835.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "creative_ai"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_87fe7746ffd6b980cd3825d0",
+      "cluster_id": "cluster_deede0538205756c838ef6e3",
+      "title": "meta-llama/Llama-3.1-8B-Instruct",
+      "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=6202; downloads=9688941.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8bdb055781ac5959ad9d55f9",
+      "cluster_id": "cluster_ae0dfa37fddcbcfcc70e3477",
+      "title": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "url": "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "summary": "Hugging Face ranked model entry; task=vllm; likes=4700; downloads=521138.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_930f7a9ca3a035633993930c",
+      "cluster_id": "cluster_82391dd078e3c4c2107b0dcd",
+      "title": "Gemini 2.5 Pro Capable of Winning Gold at IMO 2025.",
+      "url": "https://arxiv.org/abs/2507.15855",
+      "summary": "|[Gemini 2.5 Pro Capable of Winning Gold at IMO 2025.](https://arxiv.org/abs/2507.15855) |Solving IMO problems demands advanced reasoning and creativity, which most large language models find difficult. However, Google's Gemini 2.5 Pro succ。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9844f27ff075353e47d72d08",
+      "cluster_id": "cluster_19ee6af6e3d15e37dee57f6c",
+      "title": "meta-llama/Meta-Llama-3-8B",
+      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=6582; downloads=1237078.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a477397afc80c218b3ccac45",
+      "cluster_id": "cluster_3630fc138d59fae622043ea2",
+      "title": "openai/whisper-large-v3",
+      "url": "https://huggingface.co/openai/whisper-large-v3",
+      "summary": "whisper-large-v3 是多语种语音识别模型，适合会议转写、字幕、音频资料整理和语音数据预处理。真正投入生产前，要测试领域词、噪声场景、长音频切分和隐私处理。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/openai/whisper-large-v3"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a497641e99c0ee57ffa8a313",
+      "cluster_id": "cluster_c2763071083984684d0139a5",
+      "title": "One Token to Fool LLM-as-a-Judge.",
+      "url": "https://arxiv.org/abs/2507.08794",
+      "summary": "|[One Token to Fool LLM-as-a-Judge.](https://arxiv.org/abs/2507.08794) |This paper reveals the fragility of LLM-based reward models in RL with Verifiable Rewards (RLVR), showing that superficial tokens like “Solution” or even a colon can tr。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a9944460f17280705b6c9973",
+      "cluster_id": "cluster_7ecad021dde729bf1f3b6774",
+      "title": "stabilityai/stable-diffusion-3-medium",
+      "url": "https://huggingface.co/stabilityai/stable-diffusion-3-medium",
+      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=4985; downloads=3574.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "creative_ai"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_aad404eea165f96e9b06bcf5",
+      "cluster_id": "cluster_4d5e92d1978119e87a355706",
+      "title": "black-forest-labs/FLUX.1-dev",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
+      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=13440; downloads=1085982.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "creative_ai"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_ae9386abf55fb4f0d46f5f4d",
+      "cluster_id": "cluster_32e2db27eca9a8cc646f8aae",
+      "title": "sentence-transformers/all-MiniLM-L6-v2",
+      "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+      "summary": "Hugging Face ranked model entry; task=sentence-similarity; likes=5024; downloads=246427457.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b9fe41193baf293811336f0f",
+      "cluster_id": "cluster_82391dd078e3c4c2107b0dcd",
+      "title": "Gemini 2.5 Pro Capable of Winning Gold at IMO 2025.",
+      "url": "https://arxiv.org/abs/2507.15855",
+      "summary": "|[Gemini 2.5 Pro Capable of Winning Gold at IMO 2025.](https://arxiv.org/abs/2507.15855) |Solving IMO problems demands advanced reasoning and creativity, which most large language models find difficult. However, Google's Gemini 2.5 Pro succ。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "ML News of the Week README",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bca7f05912df777de6cf9482",
+      "cluster_id": "cluster_a0d5aaf3b3e59dfbb307c9cd",
+      "title": "deepseek-ai/DeepSeek-V4-Pro",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+      "summary": "DeepSeek-V4-Pro 是文本生成模型条目，适合先作为社区模型卡线索纳入观察，再用真实问答、代码和推理任务验证效果。采用前要核对来源、许可证、部署条件和与正式发布版本的关系。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c806d3808a359aa2ef883a03",
+      "cluster_id": "cluster_3ce63bb1cf5241de43c2cda1",
+      "title": "deepseek-ai/DeepSeek-R1",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
+      "summary": "DeepSeek-R1 是推理取向的文本生成模型，适合放进中文、英文复杂问答和代码推理评测里做基线。使用前要核对上下文长度、部署方式、许可证、蒸馏版本差异和真实任务上的稳定性。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_cc2d5e854667327777bcfbf2",
+      "cluster_id": "cluster_3630fc138d59fae622043ea2",
+      "title": "openai/whisper-large-v3",
+      "url": "https://huggingface.co/openai/whisper-large-v3",
+      "summary": "Hugging Face ranked model entry; task=automatic-speech-recognition; likes=5902; downloads=5797940.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_cd5976517f51bf7162e2f621",
+      "cluster_id": "cluster_f3aa7dbdb63c94657c178686",
+      "title": "CompVis/stable-diffusion-v1-4",
+      "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
+      "summary": "Stable Diffusion v1-4 是较早期但生态广泛的扩散模型，更适合作为兼容性、轻量工作流和历史基线参考。若追求最新画质，应同时比较 SDXL、FLUX 等更新模型。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_d59b21b76f7595304b29280b",
+      "cluster_id": "cluster_464e108a8a04d874daa0bf8c",
+      "title": "hexgrad/Kokoro-82M",
+      "url": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "summary": "Hugging Face ranked model entry; task=text-to-speech; likes=6421; downloads=14354455.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "creative_ai"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_e8a88f3d6d450cce990bf501",
+      "cluster_id": "cluster_19ee6af6e3d15e37dee57f6c",
+      "title": "meta-llama/Meta-Llama-3-8B",
+      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
+      "summary": "Meta-Llama-3-8B 是 8B 级文本生成基础模型，适合做轻量部署、微调实验和本地推理基线。评估时要把显存、量化效果、许可证和指令微调版本一起看。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_f1158be5fa98802e922ac90e",
+      "cluster_id": "cluster_a0d5aaf3b3e59dfbb307c9cd",
+      "title": "deepseek-ai/DeepSeek-V4-Pro",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=5130; downloads=1140384.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_f64e167e90ccbcbf1d80328e",
+      "cluster_id": "cluster_f85326ed9ab1c9be95a7804f",
+      "title": "openai/gpt-oss-120b",
+      "url": "https://huggingface.co/openai/gpt-oss-120b",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4938; downloads=4085780.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_37f892da68c4990ebcd224d9",
+      "cluster_id": "cluster_1542de5718db4e6493867b7d",
+      "title": "HARC A family of safety-aligned instruction models trained with HARC",
+      "url": "https://huggingface.co/collections/microsoft/harc",
+      "summary": "HARC A family of safety-aligned instruction models trained with HARC。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -999,7 +657,39 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-05-26",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_3b53a2b00c89758519a413c5",
+      "cluster_id": "cluster_7ac1d3d5c82b973ee76707af",
+      "title": "microsoft/HARC-Llama-3.1-8B-Instruct",
+      "url": "https://huggingface.co/microsoft/HARC-Llama-3.1-8B-Instruct",
+      "summary": "microsoft/HARC-Llama-3.1-8B-Instruct Text Generation • 8B • Updated 13 days ago • 341。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Microsoft Hugging Face Organization",
+        "url": "https://huggingface.co/microsoft"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1008,11 +698,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_cdd1680f47cb7e68bd3ceaa5",
-      "cluster_id": "cluster_a303ae08140a63620eaa1bc2",
-      "title": "microsoft/AVGen-Bench",
-      "url": "https://huggingface.co/datasets/microsoft/AVGen-Bench",
-      "summary": "microsoft/AVGen-Bench Viewer • Updated May 27 • 3.01k • 8.46k • 4。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_95c947b8079ac18d600d7649",
+      "cluster_id": "cluster_77ca4bb9df0ebe60f91925a5",
+      "title": "microsoft/HARC-Qwen2.5-7B-Instruct",
+      "url": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct",
+      "summary": "microsoft/HARC-Qwen2.5-7B-Instruct Text Generation • 8B • Updated 13 days ago • 352。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1031,103 +721,7 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-05-26",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e6282313ffee5e780127625d",
-      "cluster_id": "cluster_10d74b61f9dd4ec98aa81704",
-      "title": "Chat with DeepSeek-VL2-small",
-      "url": "https://huggingface.co/spaces/deepseek-ai/deepseek-vl2-small",
-      "summary": "Zero Agents Featured 609 Chat with DeepSeek-VL2-small 🌍 Chat with an AI using text and images for visual answers。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "DeepSeek Hugging Face Organization",
-        "url": "https://huggingface.co/deepseek-ai"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-26",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/6538815d1bdb3c40db94fbfa/xMBly9PUMphrFVMxLX4kq.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f411777488c002c8b2c635e0",
-      "cluster_id": "cluster_5b2bff6b0a91cf4be574ce93",
-      "title": "LongWriter",
-      "url": "https://huggingface.co/spaces/zai-org/LongWriter",
-      "summary": "Zero Agents Featured 163 LongWriter 💬 LLM for long context。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Z.ai Hugging Face Organization",
-        "url": "https://huggingface.co/zai-org"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-26",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/62dc173789b4cf157d36ebee/i_pxzM2ZDo3Ub-BEgIkE9.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f8849babf3a35c77717fd1b3",
-      "cluster_id": "cluster_18aab665bb10f9f901b4e0d8",
-      "title": "microsoft/GridSFM_Open",
-      "url": "https://huggingface.co/microsoft/GridSFM_Open",
-      "summary": "microsoft/GridSFM_Open Graph Machine Learning • Updated May 27 • 22。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Microsoft Hugging Face Organization",
-        "url": "https://huggingface.co/microsoft"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-26",
+      "event_date": "2026-07-01",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1136,11 +730,75 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_3b802511c2489f39186ebed2",
-      "cluster_id": "cluster_7e218d2b69fb01b1d8838275",
-      "title": "microsoft/GridSFM_US_power_grid",
-      "url": "https://huggingface.co/datasets/microsoft/GridSFM_US_power_grid",
-      "summary": "microsoft/GridSFM_US_power_grid Updated May 25 • 544 • 6。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_b1e17dfae09c9ff4fcac7a37",
+      "cluster_id": "cluster_b43e240f25d003e6ed0bce2d",
+      "title": "A deep learning framework for efficient pathology image analysis",
+      "url": "https://www.nature.com/articles/s41467-026-74918-9",
+      "summary": "Nature Machine Learning published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "nature.com",
+        "home_url": "https://www.nature.com/"
+      },
+      "collected_via": {
+        "name": "Nature Machine Learning",
+        "url": "https://www.nature.com/subjects/machine-learning.rss"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_b4f0e21e929a413cbed37a6d",
+      "cluster_id": "cluster_c2b44453717f8319a022123f",
+      "title": "Blood-based circular RNAs for early diagnosis of Alzheimer’s disease",
+      "url": "https://www.nature.com/articles/s41591-026-04485-5",
+      "summary": "Nature Machine Learning published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "nature.com",
+        "home_url": "https://www.nature.com/"
+      },
+      "collected_via": {
+        "name": "Nature Machine Learning",
+        "url": "https://www.nature.com/subjects/machine-learning.rss"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_cf09415fb5176834ce246708",
+      "cluster_id": "cluster_ac9a365c8ba84d7ee2dceade",
+      "title": "microsoft/HARC",
+      "url": "https://huggingface.co/microsoft/HARC",
+      "summary": "microsoft/HARC Text Generation • Updated 13 days ago • 9。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1159,315 +817,7 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-05-25",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_44696549c9825b9b40d329e2",
-      "cluster_id": "cluster_54b58833c71340c0c55830e6",
-      "title": "Harness, Scaffold, and the AI Agent Terms Worth Getting Right",
-      "url": "https://huggingface.co/blog/agent-glossary",
-      "summary": "这篇文章把 agent 相关术语拆成几个工程层次：model 是完成预测或生成的底层能力，scaffold 是围绕模型组织提示、状态和工具调用的脚手架，harness 则是让整个系统可运行、可观测、可评估的外层执行环境。作者进一步把 context engineering、tool use、skills、sub-agents 与 training 分开，指出很多争论来自把模型能力、产品体验和执行环境混在一起。对研发团队来说，这篇文章适合用来统一 coding agent 或研究 agent 的设计语言：先明确哪些问题属于模型，哪些属于上下文组织、工具权限、失败恢复和评估回放，再决定是换模型、改 harness，还是补技能和测试。",
-      "author": "Sergio Paniego, Aritra Roy Gosthipaty",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Hugging Face",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face",
-        "url": "https://huggingface.co/blog/agent-glossary"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-25",
-      "published_at": null,
-      "collected_at": "2026-05-27T04:35:00.000Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_c5a6bc1ecffa3ba6a5102b96",
-      "cluster_id": "cluster_464acd96e78444a4b01308a1",
-      "title": "Borealis-5B-IT",
-      "url": "https://huggingface.co/Vikhrmodels/Borealis-5b-it",
-      "summary": "Borealis-5B-IT 是 Apache-2.0 的 audio-language model：Whisper Large V3 作为冻结音频编码器，Qwen3-4B 作为语言模型，中间用 adapter 对齐音频嵌入，并提供 transformers 与 vLLM 插件路径。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Model Card",
-        "url": "https://huggingface.co/Vikhrmodels/Borealis-5b-it"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-25",
-      "published_at": null,
-      "collected_at": "2026-05-27T04:35:00.000Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_6927f759684d858742102dbb",
-      "cluster_id": "cluster_464acd96e78444a4b01308a1",
-      "title": "Borealis-5B-IT",
-      "url": "https://huggingface.co/Vikhrmodels/Borealis-5b-it",
-      "summary": "The model card lists Borealis-5B-IT as an Apache-2.0 audio-language model built with Whisper Large V3, Qwen3-4B and a trained adapter, with vLLM support.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Vikhrmodels/Borealis-5b-it model card",
-        "url": "https://huggingface.co/Vikhrmodels/Borealis-5b-it"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-25",
-      "published_at": null,
-      "collected_at": "2026-05-26T18:45:00.000Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_bd854f669ddb7138eb0ecaa5",
-      "cluster_id": "cluster_54b58833c71340c0c55830e6",
-      "title": "Harness, Scaffold, and the AI Agent Terms Worth Getting Right",
-      "url": "https://huggingface.co/blog/agent-glossary",
-      "summary": "The article was published on 2026-05-25 and gives working definitions for model, scaffold, harness, agent, context engineering, skills and related terms.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face agent glossary",
-        "url": "https://huggingface.co/blog/agent-glossary"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-25",
-      "published_at": null,
-      "collected_at": "2026-05-26T18:45:00.000Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_03c2d5369e8c0de7bed8ad9f",
-      "cluster_id": "cluster_b99c8ff8ed8e79a840c965bf",
-      "title": "Hugging Face 社区更新 PapersWithCode 复刻站",
-      "url": "https://huggingface.co/blog/nielsr/paperswithcode-launch",
-      "summary": "Hugging Face 开源团队成员 Niels Rogge 介绍 paperswithcode.co 的一轮更新，覆盖多指标 leaderboard、外部论文提交、paper lineage、method 页面、leaderboard 截图和约 3k evals。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Blog",
-        "url": "https://huggingface.co/blog/nielsr/paperswithcode-launch"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-24",
-      "published_at": null,
-      "collected_at": "2026-05-25T04:35:00.000Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0b8d06dcd3fc9f47c25bbadb",
-      "cluster_id": "cluster_b99c8ff8ed8e79a840c965bf",
-      "title": "Hugging Face 社区更新 PapersWithCode 复刻站",
-      "url": "https://huggingface.co/blog/nielsr/paperswithcode-launch",
-      "summary": "Article lists new benchmark metrics, external paper submission, lineage, method pages, leaderboard screenshotting and roughly 3k evals.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Blog",
-        "url": "https://huggingface.co/blog/nielsr/paperswithcode-launch"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "research"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-24",
-      "published_at": null,
-      "collected_at": "2026-05-25T04:35:00.000Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1bdb4c51150176b448230e23",
-      "cluster_id": "cluster_971c2a3e39da0d7a2b6ce42a",
-      "title": "CogVideoX-5B",
-      "url": "https://huggingface.co/spaces/zai-org/CogVideoX-5B-Space",
-      "summary": "Zero Agents 1.04k CogVideoX-5B 🎥 Text-to-Video。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Z.ai Hugging Face Organization",
-        "url": "https://huggingface.co/zai-org"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-22",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/62dc173789b4cf157d36ebee/i_pxzM2ZDo3Ub-BEgIkE9.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_46c9316731bfb6f6cd6ab48c",
-      "cluster_id": "cluster_656914d977eb63c5e1ea27e1",
-      "title": "NV-Generate Synthetic Medical Imaging",
-      "url": "https://huggingface.co/spaces/nvidia/nv-generate",
-      "summary": "pinned Running on Zero Agents 16 NV-Generate Synthetic Medical Imaging 🧠 Synthetic 3D CT and MR generation with NVIDIA NV-Generate. Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-22",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/65df9200dc3292a8983e5017/Vs5FPVCH-VZBipV3qKTuy.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_baaa790705624fcbe5cc32e4",
-      "cluster_id": "cluster_cf2c701f4b43a71808595d62",
-      "title": "Towards Speed-of-Light Text Generation with Nemotron-Labs Diffusion Language Models",
-      "url": "https://huggingface.co/blog/nvidia/nemotron-labs-diffusion",
-      "summary": "Towards Speed-of-Light Text Generation with Nemotron-Labs Diffusion Language Models May 23 • 35。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-22",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d44c379f4920acff355b55fe",
-      "cluster_id": "cluster_5eebf04264dd4455448b8fbd",
-      "title": "OmniParser V2",
-      "url": "https://huggingface.co/spaces/microsoft/OmniParser-v2",
-      "summary": "Zero Agents Featured 457 OmniParser V2 🏢 OmniParser, turn your LLM into GUI agent。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Microsoft Hugging Face Organization",
-        "url": "https://huggingface.co/microsoft"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-22",
+      "event_date": "2026-07-01",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1476,63 +826,748 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_b6f38c2ab501856da7853639",
-      "cluster_id": "cluster_beb7a067787456057f020543",
-      "title": "Qwen 3.7 Max on Vercel AI Gateway",
-      "url": "https://vercel.com/changelog",
-      "summary": "Vercel AI Gateway 增加 `alibaba/qwen-3.7-max`，面向 coding、office workflow automation 和 long-horizon tool-calling sessions。",
+      "id": "occ_d13c49fd9e1a2ef19b5e8317",
+      "cluster_id": "cluster_b3aa419ff01a66e75bf4120f",
+      "title": "microsoft/colipri",
+      "url": "https://huggingface.co/microsoft/colipri",
+      "summary": "microsoft/colipri Zero-Shot Image Classification • 0.3B • Updated 14 days ago • 6.34k • 52。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "vercel.com",
-        "home_url": "https://vercel.com/"
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
       },
       "collected_via": {
-        "name": "AI Daily legacy report · Vercel Changelog",
-        "url": "https://vercel.com/changelog"
+        "name": "Microsoft Hugging Face Organization",
+        "url": "https://huggingface.co/microsoft"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "model_release"
+        "model_release",
+        "research",
+        "community_discussion"
       ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-21",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
       "published_at": null,
-      "collected_at": "2026-05-21T18:40:13.114Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
+      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/1583646260758-5e64858c87403103f9f1055d.png",
+      "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_7a110db5cacfa99797787746",
-      "cluster_id": "cluster_beb7a067787456057f020543",
-      "title": "Grok Build 0.1 on Vercel AI Gateway",
-      "url": "https://vercel.com/changelog",
-      "summary": "Vercel AI Gateway 增加 early-access agentic coding model `xai/grok-build-0.1`，该模型用于 Grok Build CLI app。",
+      "id": "occ_c87dfcbb2741f2e12167ed70",
+      "cluster_id": "cluster_6f369192079cb48dfb58e115",
+      "title": "MG-RWKV: Multi-Grained Context-Aware RWKV for Temporal Forgery Localization",
+      "url": "https://arxiv.org/abs/2607.00902v1",
+      "summary": "Driven by Artificial Intelligence-Generated Content (AIGC), the authenticity of audio-visual content is facing severe challenges. Temporal Forgery Localization (TFL) aims to precisely identify manipulated segments within untrimmed sequences",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "vercel.com",
-        "home_url": "https://vercel.com/"
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "AI Daily legacy report · Vercel Changelog",
-        "url": "https://vercel.com/changelog"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "model_release"
+        "creative_ai",
+        "community_discussion"
       ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-20",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
       "published_at": null,
-      "collected_at": "2026-05-21T18:40:13.114Z",
+      "collected_at": "2026-07-06T07:37:48.868Z",
       "date_anomaly": null,
       "image_url": null,
-      "source_health": "unknown",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_69765a8eb2ec4d87b4d79a5c",
+      "cluster_id": "cluster_6f369192079cb48dfb58e115",
+      "title": "MG-RWKV: Multi-Grained Context-Aware RWKV for Temporal Forgery Localization",
+      "url": "https://arxiv.org/abs/2607.00902v1",
+      "summary": "Driven by Artificial Intelligence-Generated Content (AIGC), the authenticity of audio-visual content is facing severe challenges. Temporal Forgery Localization (TFL) aims to precisely identify manipulated segments within untrimmed sequences",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "creative_ai",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-06T07:16:26.939Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8dbe1d611bb0540e48725e5f",
+      "cluster_id": "cluster_6f369192079cb48dfb58e115",
+      "title": "MG-RWKV: Multi-Grained Context-Aware RWKV for Temporal Forgery Localization",
+      "url": "https://arxiv.org/abs/2607.00902v1",
+      "summary": "Driven by Artificial Intelligence-Generated Content (AIGC), the authenticity of audio-visual content is facing severe challenges. Temporal Forgery Localization (TFL) aims to precisely identify manipulated segments within untrimmed sequences",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "creative_ai",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0a48bda077ba4130ab00f67d",
+      "cluster_id": "cluster_65269fa6d4d7cb7244fac1dc",
+      "title": "Theoria: Rewrite-Acceptability Verification over Informal Reasoning States",
+      "url": "https://arxiv.org/abs/2607.01223v1",
+      "summary": "When should an AI system's answer be trusted? Formal proof assistants offer certainty but cannot reach most of the problem distribution; scalar LLM judges offer coverage but produce opaque scores that cannot be audited after the fact and ar。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_11bfd4652fb00d7a14eab73f",
+      "cluster_id": "cluster_959ef51af5065567390185c8",
+      "title": "From Personas to Plot: Character-Grounded Multi-Agent Story Generation for Long-Form Narratives",
+      "url": "https://arxiv.org/abs/2607.00918v1",
+      "summary": "Although large language models (LLMs) have demonstrated impressive creative fiction generation, they struggle to maintain narrative consistency and coherent plot lines in long-form stories. In this work, we introduce a unified framework for。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_14f861dd140e13f4c61203f8",
+      "cluster_id": "cluster_cb456d5bdc04ac94983f93d4",
+      "title": "Measuring the Gap Between Human and LLM Research Ideas",
+      "url": "https://arxiv.org/abs/2607.01233v1",
+      "summary": "LLMs are increasingly used to brainstorm research ideas, but existing evaluations mostly judge individual ideas by novelty, feasibility, or expert preference. We instead ask: how far are current LLM-generated ideas from human researchers? T。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_1f8744d843abb04872e11922",
+      "cluster_id": "cluster_b3aa419ff01a66e75bf4120f",
+      "title": "microsoft/colipri",
+      "url": "https://huggingface.co/microsoft/colipri",
+      "summary": "microsoft/colipri。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Microsoft Hugging Face Organization",
+        "url": "https://huggingface.co/microsoft"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "open_source",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/1583646260758-5e64858c87403103f9f1055d.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_20a78eaf99bb0e05fea1a6a3",
+      "cluster_id": "cluster_9fa1fc8e8d4537f59d98a52a",
+      "title": "Is One Layer Enough? Training A Single Transformer Layer Can Match Full-Parameter RL Training",
+      "url": "https://arxiv.org/abs/2607.01232v1",
+      "summary": "Reinforcement learning (RL) has become a central component of post-training large language models (LLMs), yet little is understood about how RL adaptation is distributed across transformer layers. Existing approaches typically update all mo。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.LG",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_261c1c8d3773c4b1bbba37b8",
+      "cluster_id": "cluster_d2c1bc3e434461e862139b40",
+      "title": "AutoMem: Automated Learning of Memory as a Cognitive Skill",
+      "url": "https://arxiv.org/abs/2607.01224v1",
+      "summary": "Memory expertise is a learned skill: knowing what to encode, when to retrieve, and how to organize knowledge--a capacity known in cognitive science as metamemory. We bring this perspective to LLMs by treating memory management as a trainabl。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_2b45724ec67da410c777369c",
+      "cluster_id": "cluster_d2c1bc3e434461e862139b40",
+      "title": "AutoMem: Automated Learning of Memory as a Cognitive Skill",
+      "url": "https://arxiv.org/abs/2607.01224v1",
+      "summary": "Memory expertise is a learned skill: knowing what to encode, when to retrieve, and how to organize knowledge--a capacity known in cognitive science as metamemory. We bring this perspective to LLMs by treating memory management as a trainabl。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_2ee6e443deca77ea1ea7a011",
+      "cluster_id": "cluster_65269fa6d4d7cb7244fac1dc",
+      "title": "Theoria: Rewrite-Acceptability Verification over Informal Reasoning States",
+      "url": "https://arxiv.org/abs/2607.01223v1",
+      "summary": "When should an AI system's answer be trusted? Formal proof assistants offer certainty but cannot reach most of the problem distribution; scalar LLM judges offer coverage but produce opaque scores that cannot be audited after the fact and ar",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_3b3d9be8bf546805362bea35",
+      "cluster_id": "cluster_78010a24b73ebd5334e67322",
+      "title": "M2Note: Continual Evolution of Vision Language Models via Mistake Notebook Learning",
+      "url": "https://arxiv.org/abs/2607.00685v1",
+      "summary": "Vision Language Models (VLMs) have demonstrated remarkable capabilities in multimodal reasoning tasks, yet they still suffer from recurring failures, such as skipping key visual checks, misapplying domain rules, and hallucinating unsupporte。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_41583372b76a85329832bb82",
+      "cluster_id": "cluster_5deb2ed4051808ad2c6eb3d2",
+      "title": "Deep Multitask Learning for Mixed-Type Outcomes with Shared Sparsity",
+      "url": "https://arxiv.org/abs/2607.00995v1",
+      "summary": "Most existing multitask learning approaches are limited by their reliance on task-specific loss functions tailored to the scale and type of each outcome. When outcomes differ across tasks, these losses are generally not directly comparable,。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv stat.ML",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "product_update",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_476af7a7045ba64a11c9f226",
+      "cluster_id": "cluster_cb456d5bdc04ac94983f93d4",
+      "title": "Measuring the Gap Between Human and LLM Research Ideas",
+      "url": "https://arxiv.org/abs/2607.01233v1",
+      "summary": "LLMs are increasingly used to brainstorm research ideas, but existing evaluations mostly judge individual ideas by novelty, feasibility, or expert preference. We instead ask: how far are current LLM-generated ideas from human researchers? T。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_4940dc678a4ae33b37e101e5",
+      "cluster_id": "cluster_65269fa6d4d7cb7244fac1dc",
+      "title": "Theoria: Rewrite-Acceptability Verification over Informal Reasoning States",
+      "url": "https://arxiv.org/abs/2607.01223v1",
+      "summary": "When should an AI system's answer be trusted? Formal proof assistants offer certainty but cannot reach most of the problem distribution; scalar LLM judges offer coverage but produce opaque scores that cannot be audited after the fact and ar。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.LG",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_4ba535d45f1aca9f8fd57146",
+      "cluster_id": "cluster_bc021bd2ddde34674f25e91a",
+      "title": "Hierarchical Variational Kalman Filtering",
+      "url": "https://arxiv.org/abs/2607.00877v1",
+      "summary": "Traditional variational Kalman filtering with unknown noise statistics suffers from inconsistent process covariance estimation and slow convergence speed, limiting its practical utility. To address these issues, we introduce a surrogate var。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv stat.ML",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_4e932db220a3221c66b3a82f",
+      "cluster_id": "cluster_ffb10872e7c363c0d96f4e34",
+      "title": "The State-Prediction Separation Hypothesis",
+      "url": "https://arxiv.org/abs/2607.01218v1",
+      "summary": "Transformers use the same forward computation stream to both predict the next token and store useful state for future token predictions. We formulate the \\emph{state-prediction separation hypothesis}: disentangling the two roles yields bett。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_505787488dbe75c32f72eda2",
+      "cluster_id": "cluster_c614a15ea54544d6681ae1bc",
+      "title": "Decision-Aware Training for Sample-Based Generative Models",
+      "url": "https://arxiv.org/abs/2607.01171v1",
+      "summary": "Sample-based generative models are increasingly used for probabilistic forecasting in high-stakes decision settings, yet their training objectives are blind to the decision maker's cost structure. These models are commonly trained with stri。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv stat.ML",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_520a3a7e47a9ffe418e0f14c",
+      "cluster_id": "cluster_0490c55de3a66fb064429d0a",
+      "title": "From Real-Time Planning to Reliable Execution:Scalable Coordination for Heterogeneous Multi-Robot Fleets in Industrial Environments",
+      "url": "https://arxiv.org/abs/2607.00591v1",
+      "summary": "With the increasing deployment of heterogeneous robot fleets in industrial environments, efficient coordination remains a critical challenge. Real-time path planning must simultaneously accommodate high robot densities and heterogeneous mot。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_537a847a947f6d2e521170ea",
+      "cluster_id": "cluster_77ca4bb9df0ebe60f91925a5",
+      "title": "microsoft/HARC-Qwen2.5-7B-Instruct",
+      "url": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct",
+      "summary": "microsoft/HARC-Qwen2.5-7B-Instruct。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Microsoft Hugging Face Organization",
+        "url": "https://huggingface.co/microsoft"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "open_source",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/1583646260758-5e64858c87403103f9f1055d.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_5ad95f567d3319c64f635caf",
+      "cluster_id": "cluster_65269fa6d4d7cb7244fac1dc",
+      "title": "Theoria: Rewrite-Acceptability Verification over Informal Reasoning States",
+      "url": "https://arxiv.org/abs/2607.01223v1",
+      "summary": "When should an AI system's answer be trusted? Formal proof assistants offer certainty but cannot reach most of the problem distribution; scalar LLM judges offer coverage but produce opaque scores that cannot be audited after the fact and ar。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_5aea661d205dcf0506077f59",
+      "cluster_id": "cluster_9fa1fc8e8d4537f59d98a52a",
+      "title": "Is One Layer Enough? Training A Single Transformer Layer Can Match Full-Parameter RL Training",
+      "url": "https://arxiv.org/abs/2607.01232v1",
+      "summary": "Reinforcement learning (RL) has become a central component of post-training large language models (LLMs), yet little is understood about how RL adaptation is distributed across transformer layers. Existing approaches typically update all mo。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_5efc3ef2bb79fb6b75f3d52d",
+      "cluster_id": "cluster_65269fa6d4d7cb7244fac1dc",
+      "title": "Theoria: Rewrite-Acceptability Verification over Informal Reasoning States",
+      "url": "https://arxiv.org/abs/2607.01223v1",
+      "summary": "When should an AI system's answer be trusted? Formal proof assistants offer certainty but cannot reach most of the problem distribution; scalar LLM judges offer coverage but produce opaque scores that cannot be audited after the fact and ar",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-01",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
       "access_state": "direct"
     }
   ]

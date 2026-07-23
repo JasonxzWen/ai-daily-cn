@@ -2,78 +2,42 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-15T03:34:30.755Z",
+  "generated_at": "2026-07-23T09:08:21.838Z",
   "group": {
     "id": "news_newsletters",
     "label": "新闻 / Newsletter"
   },
   "page": 134,
-  "page_count": 144,
+  "page_count": 296,
   "page_size": 50,
-  "total_count": 7198,
+  "total_count": 14787,
   "next_url": "signals/news_newsletters/page-135.json",
   "items": [
     {
-      "id": "occ_2e4bce53e788c9977933949c",
-      "cluster_id": "cluster_f891b8043d4f51e73c2e4de3",
-      "title": "https://news.crunchbase.com/venture/global-funding-data-analysis-ai-eoy-2024/",
-      "url": "https://news.crunchbase.com/venture/global-funding-data-analysis-ai-eoy-2024/",
-      "summary": "Crunchbase News AI published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_d21d6fcffe6b46c47a4ce704",
+      "cluster_id": "cluster_fef59d3405cf3e22d793aade",
+      "title": "中国信通院发布 AI Infra 运维领域首个评测基准 AISHPerf 3.0",
+      "url": "https://www.qbitai.com/2026/06/440454.html",
+      "summary": "中国信通院联合无问芯穹、清华团队发布 AISHPerf 3.0，新增「智算运维智能体」与「算子生成智能体」两项基准，覆盖 5 款主流国产芯片。基于近百亿条真实运维数据评估 agent 在生产环境的可部署性，是国内首次把 AI Infra 运维能力纳入官方评测框架。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
+        "name": "量子位",
+        "home_url": "https://www.qbitai.com/"
       },
       "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
-        "product_update",
-        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2025-01-07",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://news.crunchbase.com/wp-content/uploads/Quarterly-Cowboy-Global.jpg",
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_76659503ced894fc2c96ba35",
-      "cluster_id": "cluster_a849d4f1c224851c67183790",
-      "title": "Artificial intelligence",
-      "url": "https://news.crunchbase.com/sections/ai/",
-      "summary": "Artificial intelligence。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2025-01-07",
+      "event_date": "2026-06-30",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -82,123 +46,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_8d4fa53bcdf78dfc78de55da",
-      "cluster_id": "cluster_65ec99980e30e43be36da595",
-      "title": "Liquidity",
-      "url": "https://news.crunchbase.com/sections/liquidity/",
-      "summary": "Liquidity。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_d5853672ce0a69b3922f6be3",
+      "cluster_id": "cluster_164d83708c99660bfe9a5005",
+      "title": "社区在 Qwen3.6-35B-A3B 上跑出保范数 abliteration：拒答率压到 0%、基准基本无损",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1ujktg5/normpreserving_abliteration_on_qwen3635ba3b_0/",
+      "summary": "开源社区作者在 Qwen3.6-35B-A3B 上提出一种保范数版本的 abliteration 解审查方法，通过在权重正交化时显式约束行范数，使改造后模型的拒答率降到 0%，同时 MMLU / IFEval 等基准与原版几乎重合，训练所用数据集一并开源便于复现。 常规 abliteration 的痛点是激活分布漂移导致基准明显回退，这版方法把质量回退控制在可接受范围内，对开源模型分发的合规边界是又一次试探；企业用户在选用未审核派生模型时，需要继续把「是否经过此类去对齐改造」。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
+        "name": "Reddit r/LocalLLaMA",
+        "home_url": "https://www.reddit.com/"
       },
       "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2025-01-07",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_9110018c8c2baca3d596e4e0",
-      "cluster_id": "cluster_bdb06d2a7f65d89572d3530c",
-      "title": "Startups",
-      "url": "https://news.crunchbase.com/sections/startups/",
-      "summary": "Startups。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2025-01-07",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_a1b47d02a747d0ffe00a24f3",
-      "cluster_id": "cluster_f891b8043d4f51e73c2e4de3",
-      "title": "Startup Funding Regained Its Footing In 2024 As AI Became The Star Of The Show",
-      "url": "https://news.crunchbase.com/venture/global-funding-data-analysis-ai-eoy-2024/",
-      "summary": "Startup Funding Regained Its Footing In 2024 As AI Became The Star Of The Show。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2025-01-07",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_a84165f623e2003fd619bd48",
-      "cluster_id": "cluster_d47714b01f183b06def5a1b0",
-      "title": "PRIME: Process Reinforcement through Implicit Rewards",
-      "url": "https://news.smol.ai/issues/25-01-06-ainews-prime-process-reinforcement-through-implicit-rewards/",
-      "summary": "**Implicit Process Reward Models (PRIME)** have been highlighted as a significant advancement in online reinforcement learning, trained on a **7B model** with impressive results compared to **gpt-4o**. The approach builds on the importance。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -207,7 +69,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2025-01-07",
+      "event_date": "2026-06-30",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -216,55 +78,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_ad92b9bd5ec3de188fc496d0",
-      "cluster_id": "cluster_b86670517fd3fae26912eb2c",
-      "title": "Venture",
-      "url": "https://news.crunchbase.com/sections/venture/",
-      "summary": "Venture。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_d6c0e7b00336ce20b5168b7b",
+      "cluster_id": "cluster_be0fea6457ad5e299f1c440b",
+      "title": "Spellbook CEO 拆解 ACM 平台 agentic 架构：知识图谱贯穿全生命周期，Radar Q4 上线",
+      "url": "https://www.artificiallawyer.com/2026/06/30/scott-stevenson-interview-spellbook-acm/",
+      "summary": "Spellbook CEO Scott Stevenson 在访谈中拆解 ACM 平台的 agentic 架构：知识图谱贯穿合同全生命周期，并用 Moneyball for contracts 机制把历史谈判反馈灌回模型。配套的 Radar 法规监控覆盖 100 余个法律数据源，将于 Q4 上线，平台目前已集成 iManage。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
+        "name": "Artificial Lawyer",
+        "home_url": "https://www.artificiallawyer.com/"
       },
       "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2025-01-07",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_10ef144b2f099fab24a1579a",
-      "cluster_id": "cluster_5d0d33cdf6442dad8278f805",
-      "title": "not much happened today",
-      "url": "https://news.smol.ai/issues/25-01-03-ainews-not-much-happened-today/",
-      "summary": "**Olmo 2** released a detailed tech report showcasing full pre, mid, and post-training details for a frontier fully open model. **PRIME**, an open-source reasoning solution, achieved **26.7% pass@1**, surpassing **GPT-4o** in benchmarks. Pe。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -273,7 +101,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2025-01-04",
+      "event_date": "2026-06-30",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -282,21 +110,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2d7a0855e72eae79fa83b279",
-      "cluster_id": "cluster_eb509b1ed8d3920976b0e953",
-      "title": "not much happened today",
-      "url": "https://news.smol.ai/issues/24-12-30-ainews-not-much-happened-today/",
-      "summary": "**Sam Altman** publicly criticizes **DeepSeek** and **Qwen** models, sparking debate about **OpenAI**'s innovation claims and reliance on foundational research like the **Transformer architecture**. **Deepseek V3** shows significant overfit。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_d841f7e9fd2f4c0684b93926",
+      "cluster_id": "cluster_b971196c73891668eb656d49",
+      "title": "Glean 推出独立 Agent，首发 OnCall Assistant 自动接管 Slack 告警值班",
+      "url": "https://www.glean.com/blog/introducing-independent-agents",
+      "summary": "Glean 6 月 30 日推出独立 Agent，建立在其企业上下文层之上，宣称具备身份、记忆、主动性和可追溯性四大特征。首个产品 OnCall Assistant 接入 Slack，自动并行排查告警根因并起草修复方案，把工程师值班前 30 分钟的重复工作接过来。Agent 跨 Slack、Jira、Teams 协同，管理员保留一键停止权限。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "Glean",
+        "home_url": "https://www.glean.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -305,7 +133,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-31",
+      "event_date": "2026-06-30",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -314,21 +142,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_67af7a7e82457ca19b58ee1d",
-      "cluster_id": "cluster_e96863f779ff6421701400fd",
-      "title": "not much happened to end the year",
-      "url": "https://news.smol.ai/issues/24-12-31-ainews-not-much-happened-to-end-the-year/",
-      "summary": "**Reinforcement Fine-Tuning (RFT)** is introduced as a **data-efficient** method to improve **reasoning in LLMs** using minimal **training data** with strategies like **First-Correct Solutions (FCS)** and **Greedily Diverse Solutions (GDS)*。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_d8b09d319ed1890517f77055",
+      "cluster_id": "cluster_3217493bc65d0e3287051072",
+      "title": "Atlassian Rovo MCP 打通 Jira 工作流：在 Cursor 里建单、改代码、重部署",
+      "url": "https://www.atlassian.com/blog/development/fix-bugs-faster-with-rovo-mcp",
+      "summary": "Atlassian 发布 Rovo MCP 在 Cursor 中的实战演示：开发者可直接通过 MCP 创建 Jira 工单、修复代码、重新部署并同步工单状态，全程无需在 IDE 与 Jira 之间切换。方案的价值在于把「发现问题—处理问题」压到一个上下文里，缩短了排障链条上的每一次切换。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "atlassian.com",
+        "home_url": "https://www.atlassian.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -337,7 +165,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-31",
+      "event_date": "2026-06-30",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -346,21 +174,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_568efbb380c83503a9d43b1d",
-      "cluster_id": "cluster_bf57c039f096a32be8f7cbee",
-      "title": "not much happened today",
-      "url": "https://news.smol.ai/issues/24-12-27-ainews-not-much-happened-today/",
-      "summary": "**ChatGPT**, **Sora**, and the **OpenAI API** experienced a >5 hour outage but are now restored. Updates to **vLLM** enable **DeepSeek-V3** to run with enhanced **parallelism** and **CPU offloading**, improving **model deployment flexibilit。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_da988e097c8ae2a8d2c38f27",
+      "cluster_id": "cluster_5e7043632b87b0cca7a9bec5",
+      "title": "圣路易斯联储研究：年轻人失业主因是岗位短缺而非缺 AI 技能",
+      "url": "https://www.bloomberg.com/news/articles/2026-06-30/weak-hiring-is-hurting-young-workers-more-than-ai-study-says",
+      "summary": "圣路易斯联储新研究指出，当前美国年轻劳动力失业率走高，主要原因是雇主整体招聘节奏放慢，而非年轻人缺乏 AI 技能。这一结论与近期主流叙事即年轻人被 AI 抢走入门岗出现分歧，研究者认为把 AI 单独归因为青年失业上升的主因证据不足，更直接的因素仍是宏观招聘需求疲弱。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "Bloomberg",
+        "home_url": "https://www.bloomberg.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -369,7 +197,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-28",
+      "event_date": "2026-06-30",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -378,21 +206,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_ffa3fac7335dc197c4a8286a",
-      "cluster_id": "cluster_12326fec621a4c11711916e5",
-      "title": "DeepSeek v3: 671B finegrained MoE trained for $5.5m USD of compute on 15T tokens",
-      "url": "https://news.smol.ai/issues/24-12-26-ainews-deepseek-v3-671b-finegrained-moe-trained-for-dollar55m-usd-of-compute-on-15t-tokens/",
-      "summary": "**DeepSeek-V3** has launched with **671B MoE parameters** and trained on **14.8T tokens**, outperforming **GPT-4o** and **Claude-3.5-sonnet** in benchmarks. It was trained with only **2.788M H800 GPU hours**, significantly less than **Llama。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_dd2caaa92ba4094c04bd84db",
+      "cluster_id": "cluster_16c52f5ebaa7ce67a9e7d7b2",
+      "title": "Braintrust 推出创业公司计划：Agent 可观测性免费 6 到 12 个月",
+      "url": "https://braintrust.dev/blog/braintrust-for-startups",
+      "summary": "Braintrust 上线面向早期团队的创业公司计划：Pro 套餐免费使用 6 到 12 个月，每月 249 美元额度，附 5GB 数据处理量和 5 万次评分。已与 a16z、Accel 等顶级 VC 合作，Lovable、Browserbase 等公司已在使用。 Agent 可观测性正在从「大厂选配」下探到「早期团队默认装机」，Braintrust 用免费额度直接锁位。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "Braintrust",
+        "home_url": "https://braintrust.dev/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -401,7 +229,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-27",
+      "event_date": "2026-06-30",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -410,21 +238,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_40c6711433c06de2f262ebf6",
-      "cluster_id": "cluster_2238fbb1c6aadc3412ed94a9",
-      "title": "not much happened today",
-      "url": "https://news.smol.ai/issues/24-12-24-ainews-not-much-happened-today/",
-      "summary": "The **Qwen team** launched **QVQ**, a vision-enabled version of their experimental **QwQ o1 clone**, benchmarking comparably to **Claude 3.5 Sonnet**. Discussions include **Bret Taylor's** insights on autonomous software development distinc。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_ddf601606f3192b14097499b",
+      "cluster_id": "cluster_5a8ebcd3481f8ac9fdaf04ff",
+      "title": "AI 律所平台 Supio 聘请内华达最大伤害律所 COO Melissa Graham 出任首任行业 VP",
+      "url": "https://www.lawnext.com/2026/06/supio-hires-coo-of-nevadas-largest-pi-firm-as-its-first-vp-of-industry-to-help-drive-innovation-strategy.html",
+      "summary": "个人伤害律所 AI 平台 Supio（累计融资超 9000 万美元）聘请 Richard Harris Law Firm COO Melissa Graham 担任首任行业 VP。CEO Jerry Zhou 表示公司正从「人在环中的生成式 AI」切到「完全自主 AI」路线，Supio Agent 已于上月发布。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "LawSites",
+        "home_url": "https://www.lawnext.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -433,7 +261,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-25",
+      "event_date": "2026-06-30",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -442,21 +270,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_9899cbe46d4253d5094364ac",
-      "cluster_id": "cluster_eb9aa36545f094659932777e",
-      "title": "not much happened this weekend",
-      "url": "https://news.smol.ai/issues/24-12-23-ainews-not-much-happened-this-weekend/",
-      "summary": "**o3** model gains significant attention with discussions around its capabilities and implications, including an OpenAI board member referencing \"AGI.\" **LangChain** released their **State of AI 2024** survey. **Hume** announced **OCTAVE**,。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_de6ca780b18d9480ec04d3b1",
+      "cluster_id": "cluster_b3cd947737d7421e1bbe16f8",
+      "title": "跨维智能新一轮融资估值超百亿,押注物理 AI 与世界模型全栈自研路线",
+      "url": "https://www.qbitai.com/2026/06/440949.html",
+      "summary": "跨维智能宣布新一轮融资,国家级母基金、深创投、前海母基金等机构入局,估值进入百亿区间。公司锚定「世界模型 + 物理仿真 + 真机落地」的具身智能路线,其 DexWorldModel 此前登顶 WorldArena 评测榜首,是国内押注物理 AI 全栈自研的代表玩家。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "量子位",
+        "home_url": "https://www.qbitai.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -465,7 +293,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-24",
+      "event_date": "2026-06-30",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -474,763 +302,1210 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_be5c6e1b24e412362c5315f7",
-      "cluster_id": "cluster_730be17b3399c71d501386c8",
-      "title": "2024 Year in Review",
-      "url": "https://eugeneyan.com//writing/2024-review/",
-      "summary": "A peaceful year of steady progress on my craft and health. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_de9755568401a9ccea3070de",
+      "cluster_id": "cluster_bd350d6adac2832f0dab6ff8",
+      "title": "智谱 GLM 5.2 自托管实操：硬件选型与 vLLM 部署成本测算",
+      "url": "https://developer.aliyun.com/article/1744528",
+      "summary": "详细介绍智谱 GLM 5.2 模型的自托管部署方案，涵盖 GPU 硬件选型、vLLM 与 SGLang 两种推理框架的部署流程及成本测算，为企业私有化部署提供参考。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "eugeneyan.com",
-        "home_url": "https://eugeneyan.com/"
+        "name": "developer.aliyun.com",
+        "home_url": "https://developer.aliyun.com/"
       },
       "collected_via": {
-        "name": "Eugene Yan Blog",
-        "url": "https://eugeneyan.com/rss/"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
-        "model_release",
-        "research",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_df37ae4d263685b61469e294",
+      "cluster_id": "cluster_d7c6ae14b3ac54c59d26a441",
+      "title": "马斯克收购 Lightmatter 光模块资产,加码 AI 数据中心光互连基建",
+      "url": "https://mp.weixin.qq.com/s?__biz=MzI2NDk5NzA0Mw%3D%3D&idx=4&mid=2248893936&sn=29ef1904f246aad2196d3473fd68517b",
+      "summary": "马斯克通过收购 Lightmatter 的光模块相关资产,加码 AI 数据中心基建竞赛。光互连已经成为 AI 集群规模化部署的核心瓶颈与支点,硅谷巨头纷纷下注以解决 GPU 集群扩张带来的高速光通信需求,光模块赛道因此成为新一轮 AI 基建争夺的重点战场。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "36氪",
+        "home_url": "https://mp.weixin.qq.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e09961e8a2d812cc9c53a161",
+      "cluster_id": "cluster_e0c3385e2100e7bd7e5ac50d",
+      "title": "新型攻击揭示 AI 浏览器的护栏可以被 “催眠” 绕过：只要让 LLM 相信 2+2=5",
+      "url": "https://arstechnica.com/security/2026/06/ai-browsers-can-be-lulled-into-a-dream-world-where-guardrails-no-longer-apply",
+      "summary": "研究者披露一种针对 AI 浏览器的新攻击手法，只要在对话上下文里让 LLM 接受 “2+2=5” 之类的错误前提，就足以让它把整个安全护栏视为可以违背，从而执行本应被禁止的指令。这类 “叙事催眠” 攻击并不依赖 prompt 注入的花招，而是把模型带进一个内部一致但错误的 “梦境世界”，反映出目前 AI 浏览器把 agent 权限直接接到用户账户上的架构，在安全边界上仍存在系统性风险。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Ars Technica",
+        "home_url": "https://arstechnica.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e1234ccde7b83bb4dc798d5b",
+      "cluster_id": "cluster_a6d28eb90706ac1c710487cf",
+      "title": "OpenAI 推出 GeneBench-Pro：用真实基因组数据评估科研型 AI 代理",
+      "url": "https://x.com/OpenAI/status/2072004836674167294",
+      "summary": "OpenAI 发布 GeneBench-Pro，一项面向科研场景的代理评测基准，聚焦 AI 在基因组学与生物数据上的端到端表现：从导航杂乱原始数据、挑选合适分析路径，到做出真实计算研究依赖的判断。该基准被定位为更难一档的 AI 进展测度，强调多步判断而非单跑算法。 这延续了过去半年评测从刷分转向真实科研工作流的迁移，后续模型对比会更多以特定领域代理表现为口径。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "X：OpenAI",
+        "home_url": "https://x.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e460aa8263b1cfaba0daaf5d",
+      "cluster_id": "cluster_e04ef646def0cf7f067b589d",
+      "title": "Zapier 抛出 tokenmaxxing：企业 AI 用得越快，token 账单越失控",
+      "url": "https://zapier.com/blog/tokenmaxxing",
+      "summary": "Zapier 6 月 30 日提出 tokenmaxxing 这个说法，指企业在 AI token 消费上几乎没有管控，业务团队为追速度无节制堆调用，账单却没人盯。文章建议从预算分配、使用审计、成本归因三件事入手，先把 AI 支出的归属和上限定下来，再谈效率优化。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Zapier",
+        "home_url": "https://zapier.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e67ada66ca81749889117d94",
+      "cluster_id": "cluster_50eee12c1ee88935760d8dce",
+      "title": "Cursor iOS 上线后默改隐私设置：老用户「不存代码」选项被悄悄迁走且不可回退",
+      "url": "https://news.ycombinator.com/item?id=48737226",
+      "summary": "Cursor iOS 版上线后，长期勾选「Privacy Mode (Legacy)」（即「不要存储我的代码」）的老用户发现，旧设置被自动迁移到新版隐私模式且无法回退，新版条款对是否仍不存代码措辞模糊，相关投诉最早在 Hacker News 被集中讨论。 默认值悄悄前移会侵蚀企业用户对代码外泄边界的信任，是 AI 编程工具采购侧需要重新审视的合规风险点。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Hacker News",
+        "home_url": "https://news.ycombinator.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e9c0efdac61a047069b18939",
+      "cluster_id": "cluster_04374b1fb2b15ef5c98038ac",
+      "title": "Anthropic’s Claude Sonnet 5 system card says more about the future of AI than its benchmarks do",
+      "url": "https://thenewstack.io/ai-agent-infrastructure-reliability/",
+      "summary": "With the debut of Anthropic’s Claude Sonnet 5 on Tuesday came its benchmark charts, showing improvements across coding, reasoning, and The post Anthropic’s Claude Sonnet 5 system card says more about the future of AI than its benchmarks do。This is an intermediary/self-media lead; trace it to a primary source before tr...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "thenewstack.io",
+        "home_url": "https://thenewstack.io/"
+      },
+      "collected_via": {
+        "name": "The New Stack AI Feed",
+        "url": "https://thenewstack.io/category/ai/feed/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
         "engineering",
         "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_ed62f00dae4e776f6ca46df2",
+      "cluster_id": "cluster_1c4ae4604172939165bd0f7c",
+      "title": "7 Best Amazon Scrapers Ranked by Performance in 2026 - AIMultiple",
+      "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE95UXZPTVUwb3dzdDdLeFRqZHRWT0JhZ3JxWnB0LVpCX3FEbDBkckxCRWprR0pSNWFYY3dWemgtMzZfZUt1X0phSl9NV3Q4UQ?oc=5",
+      "summary": "7 Best Amazon Scrapers Ranked by Performance in 2026 AIMultiple。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.google.com",
+        "home_url": "https://news.google.com/"
+      },
+      "collected_via": {
+        "name": "Google News Big Tech Company Watch RSS",
+        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+Google+OR+Microsoft+OR+Apple+OR+Meta+OR+Amazon+OR+NVIDIA+OR+xAI%29+%28earnings+OR+layoffs+OR+reorganization+OR+regulation+OR+partnership+OR+product+OR+conference+OR+GitHub+OR+%22open+source%22%29"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_ee7af912fa0bd8c1e1cec24a",
+      "cluster_id": "cluster_032bc0d173b64fa6b397e960",
+      "title": "2026 上半年 AI 趋势:Agent 从实验走向生产,企业级首次超过消费级",
+      "url": "https://developer.aliyun.com/article/1744320",
+      "summary": "2026 年上半年 AI 行业出现明显转折点:Agent 部署量同比增长 300%,企业级应用首次超过消费级,RAG 与 Agent 融合成为主流架构。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "developer.aliyun.com",
+        "home_url": "https://developer.aliyun.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_ef4811d60946f3fc137274f8",
+      "cluster_id": "cluster_18c2bd035b4a7941fd742f68",
+      "title": "Fanatics、Whoop、Synopsys 分享 AI agent 落地经验，Gartner 预测 2026 年市场达 2065 亿美元",
+      "url": "https://www.zdnet.com/article/how-to-create-great-results-with-your-agentic-work-colleagues-in-the-autonomous-business",
+      "summary": "Snowflake Summit 2026 上 Fanatics、Whoop、Synopsys 三位高管分享 AI agent 落地经验，Whoop 数据团队称 agent 已处理 50%~60% 的临时业务问题并带来实际收入。Gartner 同步预测 AI agent 软件支出将从 2025 年的 864 亿美元增长至 2026 年的 2065 亿美元。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "ZDNET",
+        "home_url": "https://www.zdnet.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_ef572f17761da7e1a3f02ea3",
+      "cluster_id": "cluster_0c72fbbf7c4d9f092213fdd7",
+      "title": "黑石未来 3-5 年拟在日本 AI 数据中心投资 300 亿美元,联合阿波罗、博通成立 AI XPV 平台",
+      "url": "https://www.ithome.com/0/970/583.htm",
+      "summary": "黑石宣布未来 3-5 年在日本 AI 数据中心追加 300 亿美元投资,在此前 500MW 基础上新增逾 1GW 容量。黑石总裁认为 AI 投资仍处早期,真正风险是算力短缺而非基建泡沫,并把谷歌、亚马逊视为 NVIDIA 的潜在挑战者。同月,黑石联合阿波罗、博通成立 AI XPV 平台,目标 2028 年向 OpenAI、Anthropic 等提供逾 20GW 算力,首期 350 亿美元用于支持 Anthropic 在 Fluidstack 数据中心部署 1GW 基础设施。This is an intermediary/self-media lead; trace it to a primary source before tre...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "IT之家",
+        "home_url": "https://www.ithome.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f10114ce37ce901bbbb44651",
+      "cluster_id": "cluster_c6d94cb02d2e0c31abb923c2",
+      "title": "r/LocalLLaMA 开发者实测：改装 4090 上的本地 27B vs 廉价云端 LLM，跑同一个自动化开发管线",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1ujrtgf/i_built_an_autonomous_dev_pipeline_and_ran_the/",
+      "summary": "一位开发者在 r/LocalLLaMA 分享其自建的自主开发管线（autonomous dev pipeline），把同一个项目分别交给改装 4090 上的 27B 本地模型与廉价云端 LLM 各跑一遍，做端到端对比。 这种「本地大模型 vs 云端低价模型」的工程化对照实验逐渐增多，反映出本地推理在编码 Agent 这一具体场景下的性价比边界正被社区高频试探。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "r/LocalLLaMA",
+        "home_url": "https://www.reddit.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f217d291732838efca01e007",
+      "cluster_id": "cluster_8cc1837ba6892f6f01dc3818",
+      "title": "DeepMind 同时上线 Nano Banana 2 Lite 图像模型与 Gemini Omni Flash 视频模型",
+      "url": "https://deepmind.google/blog/start-building-with-nano-banana-2-lite-and-gemini-omni-flash/",
+      "summary": "DeepMind 一次发布两款生成模型:Nano Banana 2 Lite 主打最低单价图像生成,Gemini Omni Flash 首次把高质量视频生成与对话式视频编辑开放给开发者。两者已同步上线 Google AI Studio、Gemini API、Gemini Enterprise Agent Platform 与 Gemini App。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "DeepMind Blog",
+        "home_url": "https://deepmind.google/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f26d363576f8b8efa18d38b9",
+      "cluster_id": "cluster_9b07f7340412fddc4980427a",
+      "title": "GitHub Copilot 成为 JetBrains IDE 原生集成 agent，进入官方 agent 选择器",
+      "url": "https://blog.jetbrains.com/ai/2026/06/github-copilot-now-an-integrated-agent/",
+      "summary": "GitHub Copilot 6 月 30 日起作为原生 agent 集成进 JetBrains IDE，直接出现在 IDE 内的 agent 选择器中。此前 Copilot 仅能通过 ACP Registry 接入，本次原生集成提供更稳定的 IDE 内 agent 体验。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "JetBrains AI",
+        "home_url": "https://blog.jetbrains.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f2b5017e5e3a7c2c8e623df1",
+      "cluster_id": "cluster_c77a24302cfdc2241f55ee27",
+      "title": "X 上线托管版 X MCP：Agent 可直连 X API，个人价 0.01 美元/次",
+      "url": "https://x.com/op7418/status/2071816099986022650",
+      "summary": "X（原 Twitter）推出官方托管的 X MCP，Agent 可以通过 MCP 协议直接调用 X API 取实时数据，Grok、Cursor 等工具都能接。按量付费，个人优惠价 0.01 美元一次调用（即 1 美元 1000 次）；有用户实测拉取近三天书签只花了 0.1 美元。接入流程是先建 APP 并充值、拿到配置 ID，再交给 Codex 或 Claude 完成授权启动。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "X：歸藏 (@op7418)",
+        "home_url": "https://x.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f2f3baba16acd9b86705cbaf",
+      "cluster_id": "cluster_b9b64ef9482c360a62a8ac03",
+      "title": "Netflix 新片用 AI 复刻已故演员 Gene Wilder 声音",
+      "url": "https://www.theverge.com/streaming/959684/netflix-wonka-golden-ticket-gene-wilder",
+      "summary": "Netflix 将于 9 月 23 日上线《Wonka's The Golden Ticket》，片中采用 AI 生成技术复刻已故演员 Gene Wilder 的声音。这是流媒体平台在正片中规模化使用 AI 声音复刻的又一案例，也再次触及数字复活的版权与伦理边界。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "The Verge",
+        "home_url": "https://www.theverge.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f35754d8bd2bc51396211da9",
+      "cluster_id": "cluster_62219bb95b578b7cf60d84f3",
+      "title": "MarTech 警告：错误转化数据正训练 AI 竞价算法投向错误受众",
+      "url": "https://martech.org/bad-data-is-teaching-ai-to-waste-your-ad-budget/",
+      "summary": "在自动化广告投放中，不准确的转化数据不仅扭曲报告，更会训练竞价算法优化错误受众。文章指出错误事件、错误价值和无数据三种数据问题如何静默损害投放，并建议区分优化信号与报告指标。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "martech.org",
+        "home_url": "https://martech.org/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f54b371114bdb094097fb0a2",
+      "cluster_id": "cluster_6308355ed0b996c69bee02ee",
+      "title": "Claude Code 之父提出 AI 时代职场五分法，传统研发产品设计岗位被重排",
+      "url": "https://www.qbitai.com/2026/06/440599.html",
+      "summary": "Claude Code 之父在硅谷抛出 AI 时代职场五分法，把研发、产品、设计、数据科学家这些传统职能切掉，改成 Prototyper、Builder、Sweeper、Grower、Maintainer 五类岗位，组织节奏随产品所处阶段在五类之间动态切换。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "量子位",
+        "home_url": "https://www.qbitai.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f5ceecfcfa0a69bcf77a1d13",
+      "cluster_id": "cluster_5cbe7c78e89a06b87938bbfa",
+      "title": "多 Agent 时代 Skill 碎片化治理：Nacos Skill Sync 实操",
+      "url": "https://developer.aliyun.com/article/1744539",
+      "summary": "针对多 Agent 场景下 Skill 碎片化问题，介绍基于 Nacos Skill Sync 的治理方案与全流程实操，涵盖 Skill 注册、同步、版本管理等核心环节。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "developer.aliyun.com",
+        "home_url": "https://developer.aliyun.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f6bfcf446020c299116830ff",
+      "cluster_id": "cluster_b0a02f8f503bdbdba31613e8",
+      "title": "韩国为 AI 算力扩张提速核电:研究压缩建设周期,30 年来首批新机组招标在即",
+      "url": "https://www.bloomberg.com/news/articles/2026-06-30/south-korea-to-speed-nuclear-push-to-meet-surging-power-demand",
+      "summary": "韩国政府将研究压缩核电站建设周期,以应对 AI 算力扩张推高的电力需求。能源部长 Lee Eog-eun 在国会透露,约 30 年来首批新核电机组招标将在两年内启动;首尔计划 2038 年前新建至少 3 台机组,每台装机 1.4GW,前两台预计 2037 至 2038 年并网。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Bloomberg Technology",
+        "home_url": "https://www.bloomberg.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f99dc3a2a05298c8b3a7e42c",
+      "cluster_id": "cluster_9306f9e441e2a78fc74da958",
+      "title": "Sierra 推出 Experiments,为 Agent 行为变更引入 A/B 测试",
+      "url": "https://sierra.ai/blog/let-your-customers-shape-your-agents",
+      "summary": "Sierra 发布 Experiments 功能,团队可对 agent 的策略变更做 A/B 测试,自动衡量解决率、流失率等指标,并内置统计显著性判断和灰度发布控制。配套的 Ghostwriter 会从客户对话里自动提取模式,生成可测试的假设。让客户在真实交互中决定 agent 怎么演进,而不是凭运营人员拍板。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "sierra.ai",
+        "home_url": "https://sierra.ai/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fab52d453bce0a2721282204",
+      "cluster_id": "cluster_a3784c4fa7e9fda0ddf0352f",
+      "title": "Anthropic 拆解 Claude Code 智能体循环的四种形态:turn、goal、time、proactive",
+      "url": "https://claude.com/blog/getting-started-with-loops",
+      "summary": "Anthropic 在 Claude Code 官方博客把智能体循环定义为「agent 反复工作直至满足停止条件」,并拆出四类:turn-based(用户提示触发后由 Claude 自行判定完成)、goal-based(用 /goal 命令设定可验证的完成标准与最大轮次)、time-based(用 /loop 按时间间隔重复,可 /schedule 上云)、proactive(基于事件或计划自动运行,无人值守)。文章还示范用 SKILL.md 把人工验证步骤编码,让 Clau。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Claude：Blog",
+        "home_url": "https://claude.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fbf1ef8be1667401cf7c419a",
+      "cluster_id": "cluster_acdcb89e7ba7998d9d59975e",
+      "title": "Verizon DBIR：45% 员工日常在企业设备上用 AI，其中 67% 走的是个人账号",
+      "url": "https://www.spiceworks.com/ai/securing-the-ai-tools-your-users-have-already-adopted",
+      "summary": "Verizon 2026 数据泄露调查报告显示，45% 的员工已在企业设备上常态化使用 AI 工具，同比去年增长 3 倍，其中 67% 是通过未纳管的个人账号访问的影子 AI。IBM 同期数据显示，一起涉及影子 AI 的数据泄露平均要多花 67 万美元处置成本。 对企业的意义很直接：与其继续封禁个人账号，不如把员工已经在用的这批 AI 工具尽快切到有 SSO、审计和 DLP 的商业版本上。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "spiceworks.com",
+        "home_url": "https://www.spiceworks.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fd0de3b4bff9cc97fb0c766d",
+      "cluster_id": "cluster_16dd8460abe6782682df4f1e",
+      "title": "Forrester 新研究：Customer Zero 项目正成为企业 agentic AI 的新信任门槛",
+      "url": "https://www.forrester.com/blogs/customer-zero-programs-prove-that-ai-works-when-humans-change/",
+      "summary": "Forrester 分析师发布新研究 Customer Zero Programs Are A New Trust Test For Autonomous Execution，指出 ChatGPT 出现三年后大多数企业仍未真正使用过供应商的 AI agent，少数完成内部 Customer Zero 自用闭环的厂商正被买方当作可信度门槛筛选条件；研究援引 GeoLab 创始人 Kian Gohar 观点：agent 真正难的从来不是 AI，而是人类工作方式的可持续改造。 建议。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Forrester",
+        "home_url": "https://www.forrester.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_6acadbd9d22c0361bc360829",
+      "cluster_id": "cluster_09003992a429ebe53bdda998",
+      "title": "Introducing TabFM: A zero-shot foundation model for tabular data",
+      "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data/",
+      "summary": "Data Management",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "research.google",
+        "home_url": "https://research.google/"
+      },
+      "collected_via": {
+        "name": "Google Research Blog",
+        "url": "https://research.google/blog/rss/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-research2023-media/original_images/TabFM1_Hero.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8b89f7fd6030a281bb365af7",
+      "cluster_id": "cluster_aa1123efba66a9780b6a2cd4",
+      "title": "10 Years of Meta’s Commitment to Python",
+      "url": "https://engineering.fb.com/2026/06/30/open-source/10-years-of-metas-commitment-to-python/",
+      "summary": "This year marks Meta’s 10th consecutive year as a sponsor of the Python Software Foundation (PSF), the charitable organization dedicated to advancing, supporting, and protecting the open-source Python programming language and the community",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "engineering.fb.com",
+        "home_url": "https://engineering.fb.com/"
+      },
+      "collected_via": {
+        "name": "Meta Engineering",
+        "url": "https://engineering.fb.com/feed/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8f40f558733df3c9c0090035",
+      "cluster_id": "cluster_de27ff9504107bc2c53b01b1",
+      "title": "Quoting Anthropic",
+      "url": "https://simonwillison.net/2026/Jun/30/anthropic/",
+      "summary": "We’ve received notice that the Department of Commerce has lifted export controls on Claude Fable 5 and Mythos 5. We'll begin restoring access tomorrow, and will share an update soon. — Anthropic , on Twitter Tags: anthropic , claude , gener",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "simonwillison.net",
+        "home_url": "https://simonwillison.net/"
+      },
+      "collected_via": {
+        "name": "Simon Willison's Weblog",
+        "url": "https://simonwillison.net/atom/everything/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c41d9e606d26f02ecd8125b6",
+      "cluster_id": "cluster_b92dd0b94679a471d10e4f69",
+      "title": "Expanding our Heat Resilience data to 50+ global cities",
+      "url": "https://research.google/blog/expanding-our-heat-resilience-data-to-50-global-cities/",
+      "summary": "Climate & Sustainability",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "research.google",
+        "home_url": "https://research.google/"
+      },
+      "collected_via": {
+        "name": "Google Research Blog",
+        "url": "https://research.google/blog/rss/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-research2023-media/original_images/Heat-Resilience-1.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_e8877ed6828b0fedcce9ec5c",
+      "cluster_id": "cluster_9a7410fe93ec11d4be1da0e2",
+      "title": "What's new in Claude Sonnet 5",
+      "url": "https://simonwillison.net/2026/Jun/30/claude-sonnet-5/",
+      "summary": "What's new in Claude Sonnet 5 Claude Sonnet 5 came out this morning . I always head straight for the \"what's new\" developer docs because they tend to have more actionable information than the official announcement post. Anthropic say of Son",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "simonwillison.net",
+        "home_url": "https://simonwillison.net/"
+      },
+      "collected_via": {
+        "name": "Simon Willison's Weblog",
+        "url": "https://simonwillison.net/atom/everything/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": "https://static.simonwillison.net/static/2026/sonnet-5-pelican.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_fbfd7a0d94aa4df04c7dfafe",
+      "cluster_id": "cluster_ef9fa262c7eb65dabb6da208",
+      "title": "Nano Banana 2 Lite",
+      "url": "https://simonwillison.net/2026/Jun/30/nano-banana-2-lite/",
+      "summary": "Nano Banana 2 Lite Also known as Gemini 3.1 Flash Lite Image ( gemini-3.1-flash-lite-image in their API ), this is the \"fastest and cheapest Gemini image model, engineered for velocity and scale\". I used AI studio to run this prompt: Do a w",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "simonwillison.net",
+        "home_url": "https://simonwillison.net/"
+      },
+      "collected_via": {
+        "name": "Simon Willison's Weblog",
+        "url": "https://simonwillison.net/atom/everything/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": "https://static.simonwillison.net/static/2026/nano-banana-2-lite-raccoon.jpg",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_42384c23080cdd5f37abcbcb",
+      "cluster_id": "cluster_de27ff9504107bc2c53b01b1",
+      "title": "Quoting Anthropic",
+      "url": "https://simonwillison.net/2026/Jun/30/anthropic/",
+      "summary": "We’ve received notice that the Department of Commerce has lifted export controls on Claude Fable 5 and Mythos 5. We'll begin restoring access tomorrow, and will share an update soon. — Anthropic , on Twitter Tags: anthropic , claude , gener",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "simonwillison.net",
+        "home_url": "https://simonwillison.net/"
+      },
+      "collected_via": {
+        "name": "Simon Willison's Weblog",
+        "url": "https://simonwillison.net/atom/everything/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_73f82bab02214ef8c365d76e",
+      "cluster_id": "cluster_09003992a429ebe53bdda998",
+      "title": "Introducing TabFM: A zero-shot foundation model for tabular data",
+      "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data/",
+      "summary": "Data Management",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "research.google",
+        "home_url": "https://research.google/"
+      },
+      "collected_via": {
+        "name": "Google Research Blog",
+        "url": "https://research.google/blog/rss/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-research2023-media/original_images/TabFM1_Hero.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_92b3ae1b331ac2db6edb840d",
+      "cluster_id": "cluster_aa1123efba66a9780b6a2cd4",
+      "title": "10 Years of Meta’s Commitment to Python",
+      "url": "https://engineering.fb.com/2026/06/30/open-source/10-years-of-metas-commitment-to-python/",
+      "summary": "This year marks Meta’s 10th consecutive year as a sponsor of the Python Software Foundation (PSF), the charitable organization dedicated to advancing, supporting, and protecting the open-source Python programming language and the community",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "engineering.fb.com",
+        "home_url": "https://engineering.fb.com/"
+      },
+      "collected_via": {
+        "name": "Meta Engineering",
+        "url": "https://engineering.fb.com/feed/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9b734bc39caf8ae9fb5dc1ab",
+      "cluster_id": "cluster_b92dd0b94679a471d10e4f69",
+      "title": "Expanding our Heat Resilience data to 50+ global cities",
+      "url": "https://research.google/blog/expanding-our-heat-resilience-data-to-50-global-cities/",
+      "summary": "Climate & Sustainability",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "research.google",
+        "home_url": "https://research.google/"
+      },
+      "collected_via": {
+        "name": "Google Research Blog",
+        "url": "https://research.google/blog/rss/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": "https://storage.googleapis.com/gweb-research2023-media/original_images/Heat-Resilience-1.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_aee1d8a272d7313832fb8eb4",
+      "cluster_id": "cluster_09003992a429ebe53bdda998",
+      "title": "Google Research 发布表格基础模型 TabFM",
+      "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data/",
+      "summary": "Google Research 发布 TabFM，用上下文学习处理表格分类和回归，目标是减少特征工程、训练和调参。文章介绍行列交替注意力、行压缩、合成表预训练、TabArena 评测，以及模型和代码入口；后续还计划接入 BigQuery 的 AI.PREDICT。数据团队可以先用它试跑小样本表格任务，再决定是否投入专门建模、特征清洗和生产部署。",
+      "author": "Google Research Blog",
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Google Research Blog",
+        "home_url": "https://research.google/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Google Research Blog",
+        "url": "https://research.google/blog/introducing-tabfm-a-zero-shot-foundation-model-for-tabular-data/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
         "analysis_opinion"
       ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-22",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-01T04:16:02.817Z",
       "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
+      "image_url": "https://storage.googleapis.com/gweb-research2023-media/original_images/TabFM1_Hero.png",
+      "source_health": "unknown",
+      "access_state": "direct"
     },
     {
-      "id": "occ_df7b11b107cd4e8818f63081",
-      "cluster_id": "cluster_1705d2ba6e0e4d8b77c5448c",
-      "title": "o3 solves AIME, GPQA, Codeforces, makes 11 years of progress in ARC-AGI and 25% in FrontierMath",
-      "url": "https://news.smol.ai/issues/24-12-20-ainews-o3-solves-aime-gpqa-codeforces-makes-11-years-of-progress-in-arc-agi-and-25percent-in-frontiermath/",
-      "summary": "**OpenAI** announced the **o3** and **o3-mini** models with groundbreaking benchmark results, including a jump from **2% to 25%** on the **FrontierMath** benchmark and **87.5%** on the **ARC-AGI** reasoning benchmark, representing about **1。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
+      "id": "occ_b17ab9dc2535a198c9685a1f",
+      "cluster_id": "cluster_5ff450f1bd547f3e9e389e67",
+      "title": "GitHub Copilot 上线 Claude Sonnet 5",
+      "url": "https://github.blog/changelog/2026-06-30-claude-sonnet-5-is-generally-available-for-github-copilot",
+      "summary": "GitHub Changelog 宣布 Claude Sonnet 5 在 Copilot 中 GA，可在桌面 IDE、命令行、cloud agent、网页、移动端和多种编辑器入口逐步选择。企业和 Business 管理员需要在模型策略里开启，计费按 provider list pricing，并沿用 Zero Data Retention。对研发组织来说，这次变化会影响默认模型选择、成员权限、预算上限、代码审计口径和内部安全说明，也需要更新团队使用指引。",
+      "author": "GitHub Changelog",
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "GitHub Changelog",
+        "home_url": "https://github.blog/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-21",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_ce85a0280dad8e3475ae7579",
-      "cluster_id": "cluster_7f6a018f5c71ef92e1e6d177",
-      "title": "ModernBert: small new Retriever/Classifier workhorse, 8k context, 2T tokens,",
-      "url": "https://news.smol.ai/issues/24-12-19-ainews-modernbert-small-new-retrieverclassifier-workhorse-8k-context-2t-tokens/",
-      "summary": "**Answer.ai/LightOn** released **ModernBERT**, an updated encoder-only model with **8k token context**, trained on **2 trillion tokens** including code, with **139M/395M parameters** and state-of-the-art performance on retrieval, NLU, and c。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-20",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_21c7c4ae64812a83b4a665e6",
-      "cluster_id": "cluster_d038f4923a5e6f96a33f1acb",
-      "title": "Genesis: Generative Physics Engine for Robotics (o1-mini version)",
-      "url": "https://news.smol.ai/issues/24-12-18-ainews-genesis-generative-physics-engine-for-robotics-o1-mini-version/",
-      "summary": "**OpenAI** launched the **o1 model** API featuring function calling, structured outputs, vision support, and developer messages, achieving **60% fewer reasoning tokens** than its preview. The model excels in math and code with a **0.76 Live。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-19",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_c8f06c7aeac123b688ff2a5c",
-      "cluster_id": "cluster_8d6aab705cbf28e0ea1ca72e",
-      "title": "Genesis: Generative Physics Engine for Robotics (o1-2024-12-17)",
-      "url": "https://news.smol.ai/issues/24-12-18-ainews-genesis-generative-physics-engine-for-robotics-o1-2024-12-17/",
-      "summary": "**Genesis** is a newly announced **universal physics engine** developed by a large-scale collaboration led by **CMU PhD student Zhou Xian**. It integrates multiple state-of-the-art physics solvers to simulate diverse materials and physical。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-19",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_7f8041a3d0d955b5b9c2cc7b",
-      "cluster_id": "cluster_55cd7bb314ac9922f226525a",
-      "title": "o1 API, 4o/4o-mini in Realtime API + WebRTC, DPO Finetuning",
-      "url": "https://news.smol.ai/issues/24-12-17-ainews-o1-api-4o4o-mini-in-realtime-api-webrtc-dpo-finetuning/",
-      "summary": "**OpenAI** launched the **o1 API** with enhanced features including vision inputs, function calling, structured outputs, and a new `reasoning_effort` parameter, achieving **60% fewer reasoning tokens** on average. The **o1 pro** variant is。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-18",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_c34d59ade3891a344ee628fb",
-      "cluster_id": "cluster_df9dc6214234ae4e0bdcd1e8",
-      "title": "OpenAI Voice Mode Can See Now - After Gemini Does",
-      "url": "https://news.smol.ai/issues/24-12-18-ainews-openai-voice-mode-can-see-now-after-gemini-does/",
-      "summary": "**OpenAI** launched **Realtime Video** shortly after **Gemini**, which led to less impact due to Gemini's earlier arrival with lower cost and fewer rate limits. **Google DeepMind** released **Gemini 2.0 Flash** featuring enhanced multimodal。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-18",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_de7a3a2d9c2af9a3f3be9fb6",
-      "cluster_id": "cluster_c92015849e8ae706054aef60",
-      "title": "Is AI progress slowing down?",
-      "url": "https://www.normaltech.ai/p/is-ai-progress-slowing-down",
-      "summary": "Making sense of recent technology trends and claims。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "normaltech.ai",
-        "home_url": "https://www.normaltech.ai/"
-      },
-      "collected_via": {
-        "name": "Normal Technology",
-        "url": "https://www.normaltech.ai/feed"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "research",
-        "policy_infrastructure",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-18",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://substackcdn.com/image/fetch/$s_!0fDW!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fc348909d-140e-4e20-94d7-92a04e008bb2_1450x1270.png",
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_bce1530f3c2150deb38ef674",
-      "cluster_id": "cluster_a938e5389fc32e2fb1116f5c",
-      "title": "Meta Apollo - Video Understanding up to 1 hour, SOTA Open Weights",
-      "url": "https://news.smol.ai/issues/24-12-16-ainews-meta-apollo-video-understanding-up-to-1-hour-sota-open-weights/",
-      "summary": "**Meta** released **Apollo**, a new family of state-of-the-art video-language models available in **1B, 3B, and 7B** sizes, featuring \"Scaling Consistency\" for efficient scaling and introducing **ApolloBench**, which speeds up video underst。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-17",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_dff4c00b5f2aae7059576ea0",
-      "cluster_id": "cluster_3784984d7d086388830aad83",
-      "title": "Meta BLT: Tokenizer-free, Byte-level LLM",
-      "url": "https://news.smol.ai/issues/24-12-13-ainews-meta-blt-tokenizer-free-byte-level-llm/",
-      "summary": "**Meta AI** introduces the **Byte Latent Transformer (BLT)**, a tokenizer-free architecture that dynamically forms byte patches for efficient compute allocation, outperforming **Llama 3** on benchmarks including the CUTE benchmark. The mode。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_1ea4c228e6de5734dbc2f23d",
-      "cluster_id": "cluster_3441f9462ae2210746be4d58",
-      "title": "We Looked at 78 Election Deepfakes. Political Misinformation is not an AI Problem.",
-      "url": "https://www.normaltech.ai/p/we-looked-at-78-election-deepfakes",
-      "summary": "Technology Isn’t the Problem—or the Solution. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "normaltech.ai",
-        "home_url": "https://www.normaltech.ai/"
-      },
-      "collected_via": {
-        "name": "Normal Technology",
-        "url": "https://www.normaltech.ai/feed"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "research",
-        "policy_infrastructure",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-13",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://substackcdn.com/image/fetch/$s_!ezjw!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F29800e81-2362-430e-ada1-591a2d3a5228_910x1000.jpeg",
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_1ca3dc4ecee9ceac1a4eb9cd",
-      "cluster_id": "cluster_4eb60dc192e99bb7ae219680",
-      "title": "Google wakes up: Gemini 2.0 et al",
-      "url": "https://news.smol.ai/issues/24-12-11-ainews-google-wakes-up-gemini-20-et-al/",
-      "summary": "**Google DeepMind** launched **Gemini 2.0 Flash**, a new multimodal model outperforming Gemini 1.5 Pro and o1-preview, featuring vision and voice APIs, multilingual capabilities, and native tool use. It powers new AI agents like **Project A。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-12",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_1d3e0c62cb5da3c915e6697a",
-      "cluster_id": "cluster_90f3754d29afa473753c0bdd",
-      "title": "ChatGPT Canvas GA",
-      "url": "https://news.smol.ai/issues/24-12-10-ainews-chatgpt-canvas-ga/",
-      "summary": "**OpenAI** launched **ChatGPT Canvas** to all users, featuring **code execution** and **GPT integration**, effectively replacing Code Interpreter with a Google Docs-like interface. **Deepseek AI** announced their **V2.5-1210** update improv。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-11",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_a9977d4033a3bc504c06bd94",
-      "cluster_id": "cluster_e1566459b2af847ff9502f6c",
-      "title": "OpenAI Sora Turbo and Sora.com",
-      "url": "https://news.smol.ai/issues/24-12-09-ainews-openai-sora-turbo-and-soracom/",
-      "summary": "**OpenAI** launched **Sora Turbo**, enabling text-to-video generation for ChatGPT Plus and Pro users with monthly generation limits and regional restrictions in Europe and the UK. **Google** announced a quantum computing breakthrough with t。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-10",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_01e480abe514702b175a4597",
-      "cluster_id": "cluster_27d47880831c0de4460cddb7",
-      "title": "Meta Llama 3.3: 405B/Nova Pro performance at 70B price",
-      "url": "https://news.smol.ai/issues/24-12-06-ainews-meta-llama-33-405bnova-pro-performance-at-70b-price/",
-      "summary": "**Meta AI** released **Llama 3.3 70B**, matching the performance of the 405B model with improved efficiency using *\"a new alignment process and progress in online RL techniques\"*. **OpenAI** announced **Reinforcement Fine-Tuning (RFT)** for。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_9bec081351a0d69f243b7a59",
-      "cluster_id": "cluster_4685d9ea16871872230a61c7",
-      "title": "$200 ChatGPT Pro and o1-full/pro, with vision, without API, and mixed reviews",
-      "url": "https://news.smol.ai/issues/24-12-05-ainews-dollar200-chatgpt-pro-and-o1-fullpro-with-vision-without-api-and-mixed-reviews/",
-      "summary": "**OpenAI** launched the **o1** model with multimodal capabilities, faster reasoning, and image input support, marking it as a state-of-the-art model despite some bugs and mixed community reviews. The new **o1-pro** tier offers unlimited acc。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_67dccb704e514e410a3c4331",
-      "cluster_id": "cluster_0d9b415f0d292dcfde6ae8b7",
-      "title": "not much happened today",
-      "url": "https://news.smol.ai/issues/24-12-04-ainews-not-much-happened-today/",
-      "summary": "**OpenAI** announced their \"12 Days of OpenAI\" event with daily livestreams and potential releases including the **O1 full model**, **Sora video model**, and **GPT-4.5**. **Google DeepMind** released the **GenCast weather model** capable of。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-05",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_e76c0bc2a8ff9d9dc09996e1",
-      "cluster_id": "cluster_f22a0321f311cd03b81f6d81",
-      "title": "Olympus has dropped (aka, Amazon Nova Micro|Lite|Pro|Premier|Canvas|Reel)",
-      "url": "https://news.smol.ai/issues/24-12-03-ainews-olympus-has-dropped-aka-amazon-nova-microorliteorproorpremierorcanvasorreel/",
-      "summary": "**Amazon** announced the **Amazon Nova** family of multimodal foundation models at AWS Re:Invent, available immediately with no waitlist in configurations like Micro, Lite, Pro, Canvas, and Reel, with Premier and speech-to-speech coming nex。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_230281d826eb5a7a7738cb2b",
-      "cluster_id": "cluster_2d778c931e59d43d6851cc32",
-      "title": "not much happened today",
-      "url": "https://news.smol.ai/issues/24-12-02-ainews-not-much-happened-today/",
-      "summary": "**AI News for 11/29/2024-12/2/2024** highlights several developments: **Nvidia** introduced **Puzzle**, a distillation-based neural architecture search for inference-optimized large language models, enhancing efficiency. The **IC-Light V2**。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-02",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_838591ae0130ba04fb7a1675",
-      "cluster_id": "cluster_f92b3209f79868da782f3753",
-      "title": "Seemingly Paradoxical Rules of Writing",
-      "url": "https://eugeneyan.com//writing/paradox/",
-      "summary": "With regard to writing, there are many rules and also no rules at all. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "eugeneyan.com",
-        "home_url": "https://eugeneyan.com/"
-      },
-      "collected_via": {
-        "name": "Eugene Yan Blog",
-        "url": "https://eugeneyan.com/rss/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "model_release",
-        "research",
-        "engineering",
-        "industry_news",
-        "analysis_opinion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-12-01",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_fd7cfcccec0531edc5cc7e03",
-      "cluster_id": "cluster_31cd19bbe594c0d9a99d1ab6",
-      "title": "not much happened to end the week",
-      "url": "https://news.smol.ai/issues/24-11-29-ainews-not-much-happened-to-end-the-week/",
-      "summary": "**AI News for 11/29/2024-11/30/2024** covers key updates including the **Gemini multimodal model** advancing in musical structure understanding, a new **quantized SWE-Bench** for benchmarking at **1.3 bits per task**, and the launch of the。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-29",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_388fa3b4de8f5ffab0881890",
-      "cluster_id": "cluster_a1294ba8b4f75cf5cb80e101",
-      "title": "Qwen with Questions: 32B open weights reasoning model nears o1 in GPQA/AIME/Math500",
-      "url": "https://news.smol.ai/issues/24-11-27-ainews-qwen-with-questions-32b-open-weights-reasoning-model-nears-o1-in-gpqaaimemath500/",
-      "summary": "**DeepSeek r1** leads the race for \"open o1\" models but has yet to release weights, while **Justin Lin** released **QwQ**, a **32B open weight model** that outperforms **GPT-4o** and **Claude 3.5 Sonnet** on benchmarks. QwQ appears to be a。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-28",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_a4f3a292ab888a599e334e41",
-      "cluster_id": "cluster_209c9cf93fba015f97f6ee0b",
-      "title": "Reward Hacking in Reinforcement Learning",
-      "url": "https://lilianweng.github.io/posts/2024-11-28-reward-hacking/",
-      "summary": "Reward hacking occurs when a reinforcement learning (RL) agent exploits flaws or ambiguities in the reward function to achieve high rewards, without genuinely learning or completing the intended task. Reward hacking exists because RL enviro。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "lilianweng.github.io",
-        "home_url": "https://lilianweng.github.io/"
-      },
-      "collected_via": {
-        "name": "Lil'Log (Lilian Weng)",
-        "url": "https://lilianweng.github.io/index.xml"
+        "name": "AI Daily legacy report · GitHub Changelog",
+        "url": "https://github.blog/changelog/2026-06-30-claude-sonnet-5-is-generally-available-for-github-copilot"
       },
       "source_group": "news_newsletters",
       "content_tags": [
         "analysis_opinion"
       ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-28",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-06-30",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-01T04:16:02.817Z",
       "date_anomaly": null,
       "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
+      "source_health": "unknown",
+      "access_state": "direct"
     },
     {
-      "id": "occ_0e51a997a4aad7b57d125ae7",
-      "cluster_id": "cluster_ff6cd1c24b869ae8743955c1",
-      "title": "OLMo 2 - new SOTA Fully Open LLM",
-      "url": "https://news.smol.ai/issues/24-11-26-ainews-olmo-2-new-sota-fully-open-llm/",
-      "summary": "**AI2** has updated **OLMo-2** to roughly **Llama 3.1 8B** equivalent, training with **5T tokens** and using learning rate annealing and new high-quality data (Dolmino). They credit **Tülu 3** and its \"Reinforcement Learning with Verifiable。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_d6ace4347af5a7a05689c8fa",
+      "cluster_id": "cluster_9a7410fe93ec11d4be1da0e2",
+      "title": "What's new in Claude Sonnet 5",
+      "url": "https://simonwillison.net/2026/Jun/30/claude-sonnet-5/",
+      "summary": "What's new in Claude Sonnet 5 Claude Sonnet 5 came out this morning . I always head straight for the \"what's new\" developer docs because they tend to have more actionable information than the official announcement post. Anthropic say of Son",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "simonwillison.net",
+        "home_url": "https://simonwillison.net/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Simon Willison's Weblog",
+        "url": "https://simonwillison.net/atom/everything/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": "https://static.simonwillison.net/static/2026/sonnet-5-pelican.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_f92a89f0798e5e25d8a9118e",
+      "cluster_id": "cluster_ef9fa262c7eb65dabb6da208",
+      "title": "Nano Banana 2 Lite",
+      "url": "https://simonwillison.net/2026/Jun/30/nano-banana-2-lite/",
+      "summary": "Nano Banana 2 Lite Also known as Gemini 3.1 Flash Lite Image ( gemini-3.1-flash-lite-image in their API ), this is the \"fastest and cheapest Gemini image model, engineered for velocity and scale\". I used AI studio to run this prompt: Do a w",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "simonwillison.net",
+        "home_url": "https://simonwillison.net/"
+      },
+      "collected_via": {
+        "name": "Simon Willison's Weblog",
+        "url": "https://simonwillison.net/atom/everything/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-30",
+      "published_at": null,
+      "collected_at": "2026-07-01T04:16:02.817Z",
+      "date_anomaly": null,
+      "image_url": "https://static.simonwillison.net/static/2026/nano-banana-2-lite-raccoon.jpg",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_04c3b565aaa730baedbc17a6",
+      "cluster_id": "cluster_ec225e375ed5ba858725b779",
+      "title": "Cerebras 与 OpenAI 200 亿美元合约吃掉产能，其他 API 等候者被挤出",
+      "url": "https://www.reddit.com/r/MachineLearning/comments/1uiqhiv/cerebras_openai_deal_capacity_has_effectively/",
+      "summary": "一家做实时编程 Agent 的初创公司在 r/MachineLearning 反映，Cerebras IPO 之后产能基本被锁给 OpenAI 的 200 亿美元采购，API 等待名单事实上停摆。 1~2k tokens/s 的高吞吐 ASIC 推理是不少 Agent 产品的硬刚需，Cerebras 与 OpenAI 这层供给绑定正在让其他新玩家提前面临断供。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Reddit",
+        "home_url": "https://www.reddit.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1239,30 +1514,30 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-27",
+      "event_date": "2026-06-29",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_0ea3f34c3e8d8b1590224a97",
-      "cluster_id": "cluster_1885b19579d03c2e8a1d7486",
-      "title": "Anthropic launches the Model Context Protocol",
-      "url": "https://news.smol.ai/issues/24-11-25-ainews-anthropic-launches-the-model-context-protocol/",
-      "summary": "**Anthropic** has launched the **Model Context Protocol (MCP)**, an open protocol designed to enable seamless integration between large language model applications and external data sources and tools. MCP supports diverse resources such as。This is an intermediary/self-media lead; trace it to a primary source before tr...",
+      "id": "occ_04de85ac1f952a2206c137ba",
+      "cluster_id": "cluster_b22031f32679625e3e076c4b",
+      "title": "Moxy 摸喜发布首款 AI 陪伴机器人，主打离电型柔性电子皮肤、无摄像头无主动语音",
+      "url": "https://36kr.com/p/3874015941645570?f=rss",
+      "summary": "奥感微旗下情感陪伴品牌 Moxy 摸喜在深圳发布首款 AI 陪伴机器人，主打无对话、无摄像头、纯触觉交互。机身使用团队自研的离电型柔性传感系统，能在毛绒外覆盖下识别轻抚、揉捏、拍打等动作并区分力度，对应 12 类差异化情绪表达。产品不搭载摄像模块、不主动发声，所有情绪与成长数据本地加密存储，内置 16 套 MBTI 框架支持长期养成。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "36氪",
+        "home_url": "https://36kr.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1271,64 +1546,30 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-26",
+      "event_date": "2026-06-29",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_9113e980d3a466b5103c83ca",
-      "cluster_id": "cluster_1f551201fe7223d6f39ff52e",
-      "title": "How to Run a Weekly Paper Club (and Build a Learning Community)",
-      "url": "https://eugeneyan.com//writing/paper-club/",
-      "summary": "Benefits of running a weekly paper club, how to start one, and how to read and facilitate papers. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_05d0681e61b2cfc2d3477148",
+      "cluster_id": "cluster_cfd5bb079b8e1f94827110ed",
+      "title": "Wharton 教授 Ethan Mollick:企业 token 预算焦虑的根因不是价格,是管理层没决定 AI 怎么用",
+      "url": "https://x.com/emollick/status/2071695207566041389",
+      "summary": "Wharton 教授 Ethan Mollick 提出,组织里 token 成本之所以成为问题,根因不是单价,而是管理层没有决定 AI 怎么用、流程怎么改、多人协作怎么走,只能用「配额智能」这种粗暴方式管控。 AI 落地的瓶颈正在从模型能力转向组织决策。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "eugeneyan.com",
-        "home_url": "https://eugeneyan.com/"
+        "name": "X：Ethan Mollick",
+        "home_url": "https://x.com/"
       },
       "collected_via": {
-        "name": "Eugene Yan Blog",
-        "url": "https://eugeneyan.com/rss/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "model_release",
-        "research",
-        "engineering",
-        "industry_news",
-        "analysis_opinion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-24",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_aba6a25a4273cfb359a28caf",
-      "cluster_id": "cluster_f22f499c12464d3688122c45",
-      "title": "Vision Everywhere: Apple AIMv2 and Jina CLIP v2",
-      "url": "https://news.smol.ai/issues/24-11-22-ainews-vision-everywhere-apple-aimv2-and-jina-clip-v2/",
-      "summary": "**Apple** released **AIMv2**, a novel vision encoder pre-trained with autoregressive objectives that achieves **89.5% accuracy on ImageNet** and integrates joint visual and textual objectives. **Jina** launched **Jina CLIP v2**, a multimoda。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1337,299 +1578,9 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-22",
+      "event_date": "2026-06-29",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_cae896922a36ed5ffffe6f62",
-      "cluster_id": "cluster_9b9bc5d00392396cf2358864",
-      "title": "LMSys killed Model Versioning (gpt 4o 1120, gemini exp 1121)",
-      "url": "https://news.smol.ai/issues/24-11-21-ainews-lmsys-killed-model-versioning-gpt-4o-1120-gemini-exp-1121/",
-      "summary": "**AI News for 11/21/2024-11/22/2024** highlights the intense frontier lab race with **OpenAI's gpt-4o-2024-11-20** and **Google DeepMind's gemini-exp-1121** trading top spots on the Lmsys leaderboard. The trend of using date-based model ide。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-22",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_385d0311326d6265ffa15e6a",
-      "cluster_id": "cluster_3b58ff40468103e43721185b",
-      "title": "DeepSeek-R1 claims to beat o1-preview AND will be open sourced",
-      "url": "https://news.smol.ai/issues/24-11-20-ainews-deepseek-r1-claims-to-beat-o1-preview-and-will-be-open-sourced/",
-      "summary": "**DeepSeek** has released **DeepSeek-R1-Lite-Preview**, an open-source reasoning model achieving **o1-preview-level performance** on math benchmarks with transparent thought processes, showing promise in real-time problem-solving. **NVIDIA*。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-21",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_0d1e44e5f8bf083a1bc409b9",
-      "cluster_id": "cluster_5c9afbb8266c733cce08348a",
-      "title": "Perplexity starts Shopping for you",
-      "url": "https://news.smol.ai/issues/24-11-19-ainews-perplexity-starts-shopping-for-you/",
-      "summary": "**Stripe** launched their Agent SDK, enabling AI-native shopping experiences like **Perplexity Shopping** for US Pro members, featuring one-click checkout and free shipping via the **Perplexity Merchant Program**. **Mistral AI** released th。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-20",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_d16688b5fae303e421eca439",
-      "cluster_id": "cluster_8ecf61b534bd037880a9e492",
-      "title": "Pixtral Large (124B) beats Llama 3.2 90B with updated Mistral Large 24.11",
-      "url": "https://news.smol.ai/issues/24-11-18-ainews-pixtral-large-124b-beats-llama-32-90b-with-updated-mistral-large-2411/",
-      "summary": "**Mistral** has updated its **Pixtral Large** vision encoder to 1B parameters and released an update to the **123B parameter Mistral Large 24.11** model, though the update lacks major new features. **Pixtral Large** outperforms **Llama 3.2。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-19",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_d82413b3d05a16bf8780651e",
-      "cluster_id": "cluster_69ae304fe3ce27a7988bd0f6",
-      "title": "My Minimal MacBook Pro Setup Guide",
-      "url": "https://eugeneyan.com//writing/mac-setup/",
-      "summary": "Setting up my new MacBook Pro from scratch。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "eugeneyan.com",
-        "home_url": "https://eugeneyan.com/"
-      },
-      "collected_via": {
-        "name": "Eugene Yan Blog",
-        "url": "https://eugeneyan.com/rss/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "model_release",
-        "research",
-        "engineering",
-        "industry_news",
-        "analysis_opinion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-17",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_29ca3bc15cebebb621a39efe",
-      "cluster_id": "cluster_7c471ccec14621538d26ede0",
-      "title": "Stripe lets Agents spend money with StripeAgentToolkit",
-      "url": "https://news.smol.ai/issues/24-11-15-ainews-stripe-lets-agents-spend-money-with-stripeagenttoolkit/",
-      "summary": "**Stripe** has pioneered an AI SDK specifically designed for agents that handle payments, integrating with models like **gpt-4o** to enable financial transactions and token-based charging. The AI developer tooling trend emphasizes better \"A。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-16",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_0089a592f04154d1a9a80f00",
-      "cluster_id": "cluster_cc9e777d2ea7a7af2a95e23f",
-      "title": "Gemini (Experimental-1114) retakes #1 LLM rank with 1344 Elo",
-      "url": "https://news.smol.ai/issues/24-11-14-ainews-gemini-experimental-1114-retakes-1-llm-rank-with-1344-elo/",
-      "summary": "**Anthropic** released the **3.5 Sonnet** benchmark for jailbreak robustness, emphasizing adaptive defenses. **OpenAI** enhanced **GPT-4** with a new RAG technique for contiguous chunk retrieval. **LangChain** launched **Promptim** for prom。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_17ab50c9972225b9116e4c25",
-      "cluster_id": "cluster_f9a383ca033641ea0a881358",
-      "title": "Common Corpus: 2T Open Tokens with Provenance",
-      "url": "https://news.smol.ai/issues/24-11-13-ainews-common-corpus-2t-open-tokens-with-provenance/",
-      "summary": "**Pleais** via **Huggingface** released **Common Corpus**, the largest fully open multilingual dataset with over **2 trillion tokens** including detailed **provenance information**. They also introduced **OCRonos-Vintage**, a **124M-paramet。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_e68d8d72b54085bb26725e48",
-      "cluster_id": "cluster_d2108b0e89a8b9c2f20366ea",
-      "title": "BitNet was a lie?",
-      "url": "https://news.smol.ai/issues/24-11-12-ainews-bitnet-was-a-lie/",
-      "summary": "**Scaling laws for quantization** have been modified by a group led by Chris Re, analyzing over **465 pretraining runs** and finding benefits plateau at FP6 precision. Lead author **Tanishq Kumar** highlights that longer training and more d。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-11-13",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",

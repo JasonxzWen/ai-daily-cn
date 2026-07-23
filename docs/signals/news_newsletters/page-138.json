@@ -2,33 +2,33 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-15T03:34:30.755Z",
+  "generated_at": "2026-07-23T09:08:21.838Z",
   "group": {
     "id": "news_newsletters",
     "label": "新闻 / Newsletter"
   },
   "page": 138,
-  "page_count": 144,
+  "page_count": 296,
   "page_size": 50,
-  "total_count": 7198,
+  "total_count": 14787,
   "next_url": "signals/news_newsletters/page-139.json",
   "items": [
     {
-      "id": "occ_d5719db542b40f5c8352af07",
-      "cluster_id": "cluster_d420e6b635b41fd5dcb0745c",
-      "title": "Kolmogorov-Arnold Networks: MLP killers or just spicy MLPs?",
-      "url": "https://news.smol.ai/issues/24-05-07-ainews-kolmogorov-arnold-networks-mlp-killers-or-just-spicy-mlps/",
-      "summary": "**Ziming Liu**, a grad student of **Max Tegmark**, published a paper on **Kolmogorov-Arnold Networks (KANs)**, claiming they outperform **MLPs** in interpretability, inductive bias injection, function approximation accuracy, and scaling, de。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_d3b81acb182d4744acd31f74",
+      "cluster_id": "cluster_ad9ce95d03aae07fd4620529",
+      "title": "AMD 用闪存扩展服务器 DRAM 应对 AI 内存墙",
+      "url": "https://www.theregister.com/store/2026/06/29/amd-stretches-server-dram-with-flash-extended-memory/5263848",
+      "summary": "AMD 收购 MEXT 闪存扩展内存技术，可将单服务器 DRAM 容量推至 1.5TB 级别，应对 AI 推理负载带来的内存容量瓶颈。该方案以闪存作为 DRAM 扩展层，牺牲部分延迟换取容量，目标客户是受限于 DRAM 供应紧缺的云厂商。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "The Register",
+        "home_url": "https://www.theregister.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -37,30 +37,30 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-05-07",
+      "event_date": "2026-06-29",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_7060802cf309f05446959b12",
-      "cluster_id": "cluster_2c42466cff6b4a213fa06d94",
-      "title": "DeepSeek-V2 beats Mixtral 8x22B with >160 experts at HALF the cost",
-      "url": "https://news.smol.ai/issues/24-05-06-ainews-deepseek-v2-beats-mixtral-8x22b-with-greater160-experts-at-half-the-cost/",
-      "summary": "**DeepSeek V2** introduces a new state-of-the-art MoE model with **236B parameters** and a novel Multi-Head Latent Attention mechanism, achieving faster inference and surpassing GPT-4 on AlignBench. **Llama 3 120B** shows strong creative wr。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_d55deb199cec354f1ce27436",
+      "cluster_id": "cluster_2b526c055c93897096cdffbe",
+      "title": "Claude Code 打开恶意 GitHub 仓库即自动执行隐藏恶意代码,攻击者可拿完全控制",
+      "url": "https://the-decoder.com/claude-code-runs-a-github-repos-hidden-malware-without-verification-giving-attackers-full-control",
+      "summary": "看似正常的 GitHub 仓库里藏着一个 setup 脚本,脚本运行时再从 DNS 记录拉取并执行命令,恶意代码本身从未写入仓库,扫描器、人工 Code Review 和 AI 智能体都看不见;开发者用 Claude Code 打开仓库时,Claude Code 在处理常规报错时会自动跑这段脚本,直接打开反向 shell,攻击者随即可窃取 API 密钥、登录凭据并维持长期访问。 漏洞由 Mozilla 旗下 GenAI 漏洞赏金平台 0DIN 披露,研究人员建议 AI 编码工。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "The Decoder",
+        "home_url": "https://the-decoder.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -69,1110 +69,20 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-05-06",
+      "event_date": "2026-06-29",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_b48d115c5de1443f29c6e276",
-      "cluster_id": "cluster_fe3bc81d90a0a3472c513914",
-      "title": "$100k to predict LMSYS human preferences in a Kaggle contest",
-      "url": "https://news.smol.ai/issues/24-05-03-ainews-dollar100k-to-predict-lmsys-human-preferences-in-a-kaggle-contest/",
-      "summary": "**Llama 3 models** are making breakthroughs with Groq's 70B model achieving record low costs per million tokens. A new **Kaggle competition** offers a $100,000 prize to develop models predicting human preferences from a dataset of over 55,0。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-05-03",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3072a4e0a520f5c9218cba5e",
-      "cluster_id": "cluster_ec10a11b8a03eef5a04baa53",
-      "title": "Evals: The Next Generation",
-      "url": "https://news.smol.ai/issues/24-05-02-ainews-evals-the-next-generation/",
-      "summary": "**Scale AI** highlighted issues with data contamination in benchmarks like **MMLU** and **GSM8K**, proposing a new benchmark where **Mistral** overfits and **Phi-3** performs well. **Reka** released the **VibeEval** benchmark for multimodal。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-05-02",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_fb89fb0f1825eaabc2455f6e",
-      "cluster_id": "cluster_7a1ed958f9549d60b515cdb9",
-      "title": "Not much happened today",
-      "url": "https://news.smol.ai/issues/24-05-01-ainews-not-much-happened-today/",
-      "summary": "**Anthropic** released a team plan and iOS app about 4 months after **OpenAI**. The **Command-R 35B** model excels at creative writing, outperforming larger models like **Goliath-120** and **Miqu-120**. The **Llama-3 8B** model now supports。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-05-02",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_5e0b5787418141403dbb4fd3",
-      "cluster_id": "cluster_27796f6b834d3f0188b0e1c6",
-      "title": "LLMs-as-Juries",
-      "url": "https://news.smol.ai/issues/24-04-30-ainews-llms-as-juries/",
-      "summary": "**OpenAI** has rolled out the **memory feature** to all ChatGPT Plus users and partnered with the **Financial Times** to license content for AI training. Discussions on **OpenAI's profitability** arise due to paid training data licensing an。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-05-01",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_7704d1cdaf293af15ff77296",
-      "cluster_id": "cluster_18a3201f1c0bc9b7859b511e",
-      "title": "A quiet weekend",
-      "url": "https://news.smol.ai/issues/24-04-29-ainews-a-quiet-weekend/",
-      "summary": "**Yann LeCun** predicts a shift to **AR interfaces** with AI assistants in 10-15 years, moving away from smartphones. The **Dolphin-2.9 model** based on **Llama-3** was released, improving quality issues. **PixArt Sigma**, a **0.6B paramete。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-29",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_5a85739c8a8b9ef4422a3388",
-      "cluster_id": "cluster_beced3eda5fba779e7b521df",
-      "title": "Apple's OpenELM beats OLMo with 50% of its dataset, using DeLighT",
-      "url": "https://news.smol.ai/issues/24-04-26-ainews-apples-openelm-beats-olmo-with-50percent-of-its-dataset-using-delight/",
-      "summary": "**Apple** advances its AI presence with the release of **OpenELM**, its first relatively open large language model available in sizes from **270M to 3B** parameters, featuring a novel layer-wise scaling architecture inspired by the **DeLigh。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-26",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_c7781965fe1ace850ea4c731",
-      "cluster_id": "cluster_0a9986f3525d7664e0ab60f3",
-      "title": "Snowflake Arctic: Fully Open 10B+128x4B Dense-MoE Hybrid LLM",
-      "url": "https://news.smol.ai/issues/24-04-25-ainews-snowflake-arctic-fully-open-10b128x4b-dense-moe-hybrid-llm/",
-      "summary": "**Snowflake Arctic** is a notable new foundation language model released under Apache 2.0, claiming superiority over **Databricks** in data warehouse AI applications and adopting a mixture-of-experts architecture inspired by **DeepSeekMOE**。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-26",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_74c9fa1f2d07265bc9f51d71",
-      "cluster_id": "cluster_9280fe34219f0c169456b147",
-      "title": "OpenAI's Instruction Hierarchy for the LLM OS",
-      "url": "https://news.smol.ai/issues/24-04-24-ainews-openais-instruction-hierarchy-for-the-llm-os/",
-      "summary": "**OpenAI** published a paper introducing the concept of privilege levels for LLMs to address prompt injection vulnerabilities, improving defenses by 20-30%. **Microsoft** released the lightweight **Phi-3-mini** model with 4K and 128K contex。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-25",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_571cbfa825d568b4c69eaec7",
-      "cluster_id": "cluster_87114747e7260ea0728817b6",
-      "title": "FineWeb: 15T Tokens, 12 years of CommonCrawl (deduped and filtered, you're welcome)",
-      "url": "https://news.smol.ai/issues/24-04-22-ainews-fineweb-15t-tokens-12-years-of-commoncrawl-deduped-and-filtered-youre-welcome/",
-      "summary": "**2024** has seen a significant increase in dataset sizes for training large language models, with **Redpajama 2** offering up to **30T tokens**, **DBRX** at **12T tokens**, **Reka Core/Flash/Edge** with **5T tokens**, and **Llama 3** train。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-23",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_e04c33a6e2485b6f83d980cf",
-      "cluster_id": "cluster_4dd9489635243c226ce9f34c",
-      "title": "Perplexity, the newest AI unicorn",
-      "url": "https://news.smol.ai/issues/24-04-23-ainews-perplexity-the-newest-ai-unicorn/",
-      "summary": "**Perplexity** doubles its valuation shortly after its Series B with a Series B-1 funding round. Significant developments around **Llama 3** include context length extension to **16K tokens**, new multimodal **LLaVA models** outperforming L。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-23",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_5e745dbbca87732a0ed5b9c1",
-      "cluster_id": "cluster_4d8674b7b3499c0e19efffb8",
-      "title": "Llama-3-70b is GPT-4-level Open Model",
-      "url": "https://news.smol.ai/issues/24-04-19-ainews-llama-3-70b-is-gpt-4-level-open-model/",
-      "summary": "**Meta** has released **Llama 3**, their most capable open large language model with **8B and 70B parameter versions** supporting **8K context length** and outperforming previous models including **Llama 2** and **Mistral 7B**. **Groq** ser。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-20",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_98074bf3ad7952f6a574f1d0",
-      "cluster_id": "cluster_421e9b181e781f77d2669598",
-      "title": "Meta Llama 3 (8B, 70B)",
-      "url": "https://news.smol.ai/issues/24-04-18-ainews-meta-llama-3-8b-70b/",
-      "summary": "**Meta** partially released **Llama 3** models including **8B** and **70B** variants, with a **400B** variant still in training, touted as the first GPT-4 level open-source model. **Stability AI** launched **Stable Diffusion 3 API** with mo。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-19",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3102644716a355c1089bf7e1",
-      "cluster_id": "cluster_17f825c8365d76d742be6017",
-      "title": "Mixtral 8x22B Instruct sparks efficiency memes",
-      "url": "https://news.smol.ai/issues/24-04-17-ainews-mixtral-8x22b-instruct-sparks-efficiency-memes/",
-      "summary": "**Mistral** released an instruct-tuned version of their **Mixtral 8x22B** model, notable for using only **39B active parameters** during inference, outperforming larger models and supporting **5 languages** with **64k context window** and m。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-17",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_51c4fb5650b45cc17ec050c6",
-      "cluster_id": "cluster_84f281e62f238ea5ee9144a7",
-      "title": "Lilian Weng on Video Diffusion",
-      "url": "https://news.smol.ai/issues/24-04-16-ainews-lilian-weng-on-video-diffusion/",
-      "summary": "**OpenAI** expands with a launch in **Japan**, introduces a **Batch API**, and partners with **Adobe** to bring the **Sora video model** to Premiere Pro. **Reka AI** releases the **Reka Core multimodal language model**. **WizardLM-2** is re。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-17",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_723f93a35b8d797f856df2bc",
-      "cluster_id": "cluster_578eb4aea4fa8b7111269d3e",
-      "title": "Multi-modal, Multi-Aspect, Multi-Form-Factor AI",
-      "url": "https://news.smol.ai/issues/24-04-15-ainews-multi-modal-multi-aspect-multi-form-factor-ai/",
-      "summary": "Between April 12-15, **Reka Core** launched a new GPT4-class multimodal foundation model with a detailed technical report described as \"full Shazeer.\" **Cohere Compass** introduced a foundation embedding model for indexing and searching mul。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_1c9c3909566f94edba427228",
-      "cluster_id": "cluster_3fa812892533862b368a9b8d",
-      "title": "Diffusion Models for Video Generation",
-      "url": "https://lilianweng.github.io/posts/2024-04-12-diffusion-video/",
-      "summary": "Diffusion models have demonstrated strong results on image synthesis in past years. Now the research community has started working on a harder task—using it for video generation. The task itself is a superset of the image case, since an ima。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "lilianweng.github.io",
-        "home_url": "https://lilianweng.github.io/"
-      },
-      "collected_via": {
-        "name": "Lil'Log (Lilian Weng)",
-        "url": "https://lilianweng.github.io/index.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-12",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_95c03ae5e204c9b729f13c9c",
-      "cluster_id": "cluster_7c076a3b596a508bc6f73a08",
-      "title": "Zero to GPT in 1 Year",
-      "url": "https://news.smol.ai/issues/24-04-12-ainews-zero-to-gpt-in-1-year/",
-      "summary": "**GPT-4 Turbo** reclaimed the top leaderboard spot with significant improvements in coding, multilingual, and English-only tasks, now rolled out in paid **ChatGPT**. Despite this, **Claude Opus** remains superior in creativity and intellige。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-12",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_5037a5017eb283c4121a81db",
-      "cluster_id": "cluster_414da84ce2026b68c4354db1",
-      "title": "Mergestral, Meta MTIAv2, Cohere Rerank 3, Google Infini-Attention",
-      "url": "https://news.smol.ai/issues/24-04-11-ainews-mergestral-meta-mtiav2-cohere-rerank-3-google-infini-attention/",
-      "summary": "**Meta** announced their new **MTIAv2 chips** designed for training and inference acceleration with improved architecture and integration with PyTorch 2.0. **Mistral** released the **8x22B Mixtral** model, which was merged back into a dense。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-11",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_9476ec8c3a21d80ea4b7d942",
-      "cluster_id": "cluster_f34dbdc91812d4c1345cf86c",
-      "title": "Music's Dall-E moment",
-      "url": "https://news.smol.ai/issues/24-04-10-ainews-musics-dall-e-moment/",
-      "summary": "**Google's Griffin architecture** outperforms transformers with faster inference and lower memory usage on long contexts. **Command R+** climbs to 6th place on the LMSYS Chatbot Arena leaderboard, surpassing **GPT-4-0613** and **GPT-4-0314*。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-10",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_ec8c3e26b3826eb678eb3474",
-      "cluster_id": "cluster_2d139e6c20615fd2d98b5481",
-      "title": "Gemini Pro and GPT4T Vision go GA on the same day by complete coincidence",
-      "url": "https://news.smol.ai/issues/24-04-09-ainews-gemini-pro-and-gpt4t-vision-go-ga-on-the-same-day-by-complete-coincidence/",
-      "summary": "At **Google Cloud Next**, **Gemini 1.5 Pro** was released with a **million-token context window**, available in **180+ countries**, featuring **9.5 hours of audio understanding**, a new **File API** for nearly unlimited free uploads, and th。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-10",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_ac49d95eee1e4ed3e1dced56",
-      "cluster_id": "cluster_b327005be64e08ef40f25863",
-      "title": "Anime pfp anon eclipses $10k A::B prompting challenge",
-      "url": "https://news.smol.ai/issues/24-04-08-ainews-anime-pfp-anon-eclipses-dollar10k-ab-prompting-challenge/",
-      "summary": "**Victor Taelin** issued a $10k challenge to GPT models, initially achieving only **10% success** with state-of-the-art models, but community efforts surpassed **90% success** within 48 hours, highlighting GPT capabilities and common skill。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-09",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_9d5a211d4a477add8223f752",
-      "cluster_id": "cluster_49292c695e6ffca8f0c1605a",
-      "title": "Building an AI Coach to Help Tame My Monkey Mind",
-      "url": "https://eugeneyan.com//writing/ai-coach/",
-      "summary": "Building an AI coach with speech-to-text, text-to-speech, an LLM, and a virtual number. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "eugeneyan.com",
-        "home_url": "https://eugeneyan.com/"
-      },
-      "collected_via": {
-        "name": "Eugene Yan Blog",
-        "url": "https://eugeneyan.com/rss/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "model_release",
-        "research",
-        "engineering",
-        "industry_news",
-        "analysis_opinion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-07",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_90bbb515022bfa97f781d082",
-      "cluster_id": "cluster_6103d3f29f8d0d2e8a3e8261",
-      "title": "Mixture of Depths: Dynamically allocating compute in transformer-based language models",
-      "url": "https://news.smol.ai/issues/24-04-05-ainews-mixture-of-depths-dynamically-allocating-compute-in-transformer-based-language-models/",
-      "summary": "**DeepMind** introduces the Mixture-of-Depths (MoD) technique, dynamically allocating FLOPs across transformer layers to optimize compute usage, achieving over **50% faster** forward passes without training impact. MoD selectively processes。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-05",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_2915bcc0632a964afe57978b",
-      "cluster_id": "cluster_0c71fc754e0ec5ff5f0e74dc",
-      "title": "ReALM: Reference Resolution As Language Modeling",
-      "url": "https://news.smol.ai/issues/24-04-03-ainews-realm-reference-resolution-as-language-modeling/",
-      "summary": "**Apple** is advancing in AI with a new approach called **ReALM: Reference Resolution As Language Modeling**, which improves understanding of ambiguous references using three contexts and finetunes a smaller **FLAN-T5** model that outperfor。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_d526c031a1c5853cb84ae39b",
-      "cluster_id": "cluster_ff23b3511cbbb539ea7e6198",
-      "title": "Cohere Command R+, Anthropic Claude Tool Use, OpenAI Finetuning",
-      "url": "https://news.smol.ai/issues/24-04-04-ainews-cohere-command-r-anthropic-claude-tool-use-openai-finetuning/",
-      "summary": "**Cohere** launched **Command R+**, a **104B dense model** with **128k context length** focusing on **RAG**, **tool-use**, and **multilingual** capabilities across **10 key languages**. It supports **Multi-Step Tool use** and offers open we。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_a4c515dbf527970e9d2834d9",
-      "cluster_id": "cluster_52eced30dbe89e8e9d1a927c",
-      "title": "Not much happened today",
-      "url": "https://news.smol.ai/issues/24-04-02-ainews-not-much-happened-today/",
-      "summary": "**RAGFlow** open sourced, a deep document understanding RAG engine with **16.3k context length** and natural language instruction support. **Jamba v0.1**, a **52B parameter** MoE model by Lightblue, released but with mixed user feedback. **。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-02",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_4130a0fb484746c30d3d210a",
-      "cluster_id": "cluster_509ab46d64de384c13c60241",
-      "title": "AdamW -> AaronD?",
-      "url": "https://news.smol.ai/issues/24-04-01-ainews-adamw-greater-aarond/",
-      "summary": "**Aaron Defazio** is gaining attention for proposing a potential tuning-free replacement of the long-standing **Adam optimizer**, showing promising experimental results across classic machine learning benchmarks like ImageNet ResNet-50 and。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-04-01",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_5838a15915963a7baa61db03",
-      "cluster_id": "cluster_3cb8780f81e75d16cd0ac7c1",
-      "title": "Task-Specific LLM Evals that Do & Don't Work",
-      "url": "https://eugeneyan.com//writing/evals/",
-      "summary": "Evals for classification, summarization, translation, copyright regurgitation, and toxicity. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "eugeneyan.com",
-        "home_url": "https://eugeneyan.com/"
-      },
-      "collected_via": {
-        "name": "Eugene Yan Blog",
-        "url": "https://eugeneyan.com/rss/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "model_release",
-        "research",
-        "engineering",
-        "industry_news",
-        "analysis_opinion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-31",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_95a63e79af29ddf9a7c81037",
-      "cluster_id": "cluster_d9916a2ecb60140179a27655",
-      "title": "Evals-based AI Engineering",
-      "url": "https://news.smol.ai/issues/24-03-29-ainews-evals-based-ai-engineering/",
-      "summary": "**Hamel Husain** emphasizes the importance of comprehensive evals in AI product development, highlighting evaluation, debugging, and behavior change as key iterative steps. **OpenAI** released a voice engine demo showcasing advanced voice c。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-29",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_14005f5fa41b8e249a21cbd2",
-      "cluster_id": "cluster_92144b29b1512f8d8b7cedc1",
-      "title": "Jamba: Mixture of Architectures dethrones Mixtral",
-      "url": "https://news.smol.ai/issues/24-03-28-ainews-jamba-mixture-of-architectures-dethrones-mixtral/",
-      "summary": "**AI21 labs** released **Jamba**, a **52B parameter MoE model** with **256K context length** and open weights under Apache 2.0 license, optimized for single A100 GPU performance. It features a unique blocks-and-layers architecture combining。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-28",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_39de4eb076cd5db3577f1695",
-      "cluster_id": "cluster_dd87b22819c55231ad858eed",
-      "title": "Claude 3 is officially America's Next Top Model",
-      "url": "https://news.smol.ai/issues/24-03-26-ainews-claude-3-is-officially-americas-next-top-model/",
-      "summary": "**Claude 3 Opus** outperforms **GPT4T** and **Mistral Large** in blind Elo rankings, with **Claude 3 Haiku** marking a new cost-performance frontier. Fine-tuning techniques like **QLoRA** on **Mistral 7B** and evolutionary model merging on。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-27",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_9a8742083dffb303c36a2595",
-      "cluster_id": "cluster_09843c091d63043cdc1b5e2c",
-      "title": "DBRX: Best open model (just not most efficient)",
-      "url": "https://news.smol.ai/issues/24-03-27-ainews-dbrx-best-open-model-just-not-most-efficient/",
-      "summary": "**Databricks Mosaic** has released a new open-source model called **DBRX** that outperforms **Grok**, **Mixtral**, and **Llama2** on evaluations while being about **2x more efficient** than Llama2 and Grok. The model was trained on **12 tri。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-27",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_1efa446141d600a980b7ec7b",
-      "cluster_id": "cluster_3b976f70f57fc21c7cd5b893",
-      "title": "Andrew likes Agents",
-      "url": "https://news.smol.ai/issues/24-03-25-ainews-andrew-likes-agents/",
-      "summary": "**Andrew Ng's The Batch writeup on Agents** highlighted the significant improvement in coding benchmark performance when using an iterative agent workflow, with **GPT-3.5** wrapped in an agent loop achieving up to **95.1%** correctness on H。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-26",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_7fecbd85b17af3e1884ec13e",
-      "cluster_id": "cluster_22747a7fa3733e059d417e98",
-      "title": "Astro Nano",
-      "url": "https://news.smol.ai/projects/project-2/",
-      "summary": "Minimal portfolio and blog build with astro and no frameworks. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
-      },
-      "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-26",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_d920e164a8e87decee0aaa32",
-      "cluster_id": "cluster_a90a0622424c0e43285c1b53",
+      "id": "occ_d5b506f74711b0dbccb602a4",
+      "cluster_id": "cluster_64a0c7c2322b7424aba240d0",
       "title": "not much happened today",
-      "url": "https://news.smol.ai/issues/24-03-22-ainews-not-much-happened-today/",
-      "summary": "The Reddit community /r/LocalLlama discusses **fine-tuning and training LLMs**, including tutorials and questions on training models with specific data like dictionaries and synthetic datasets with **25B+ tokens**. Users explore **retrieval。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "url": "https://news.smol.ai/issues/26-06-29-not-much/",
+      "summary": "**Meta** announced **Brain2Qwerty v2**, a real-time non-invasive brain-to-text decoder achieving up to **78% word accuracy** with released training code and dataset. **Cursor** launched **Cursor for iOS** with remote AI agents and live acti。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1191,7 +101,937 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-22",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_d7d95f9512b277fae3b74ea1",
+      "cluster_id": "cluster_2acbef45cc23af11acc3cf98",
+      "title": "MIT 科技评论携手微软发布 Agentic AI 调查：技术团队对 Agent 信心高，业务上下文成最大瓶颈",
+      "url": "https://www.technologyreview.com/2026/06/29/1139635/agent-confidence-on-the-technical-frontier/",
+      "summary": "MIT Technology Review Insights 与微软联合发布的最新研究显示，全球技术团队对在 AI、数据与云计算任务中部署 Agent 已具备较高信心，认为 2026 年是 Agent 进入企业的拐点之年。Gartner 预测 IT 基础设施成本到 2030 年将翻 2 至 3 倍，但预算保持不变，是 Agent 落地的核心驱动力。 报告同时指出，Agent 准备度的主要短板不在模型能力，而是业务上下文供给不足；任务越复杂、对推理与上下文的依赖越高，缺乏行业知。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "MIT Technology Review",
+        "home_url": "https://www.technologyreview.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_d9fea5a563a906579216f926",
+      "cluster_id": "cluster_8fae72a7ebb1459fee3e22d7",
+      "title": "用 Google Gemini 零代码生成 Chrome 扩展，重塑三类日常工作流",
+      "url": "https://www.computerworld.com/article/4185219/oh-behave-how-gemini-can-reshape-the-web-for-the-way-you-work.html",
+      "summary": "Computerworld 介绍用 Google Gemini 零代码生成自定义 Chrome 扩展的实操方法，全程无需编程。覆盖三类场景：界面清理（精简 Google Docs 和 Trello）、功能创建（色值管理、时区转换）、浏览器增强（标签自动归档、研究面板）。生成过程约 15 分钟，安装时只需在 Chrome 开发者模式下加载文件夹。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Computerworld",
+        "home_url": "https://www.computerworld.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_da05176900ddffcaabf12182",
+      "cluster_id": "cluster_3e5d6bf0107283d207ae751a",
+      "title": "Salesforce 初级管理员占比回升至 4.6%，但市场饱和度已达 330%",
+      "url": "https://www.salesforceben.com/are-we-finally-seeing-more-junior-salesforce-admins/",
+      "summary": "SF Ben 年度调查显示，18–24 岁 Salesforce 管理员占比从 1.1% 升至 4.6%，但整体市场饱和度已达 330%。IBM 宣布三倍扩招初级岗位，Salesforce 招募 1,000 名毕业生聚焦 AI 与 Agentforce。PwC 数据则显示，AI 高暴露岗位的初级职位要求高级技能的概率高出 7 倍，初级管理员正面临供需双重挤压。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Salesforce Ben",
+        "home_url": "https://www.salesforceben.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_da0ddd6b516dfdcf45ab10f3",
+      "cluster_id": "cluster_26592f8a4421f3e169220f7c",
+      "title": "Hugging Face CEO Clem Delangue：监管把 Anthropic Mythos 贴上「危险」标签，反倒成了头部模型的免费营销",
+      "url": "https://www.bloomberg.com/news/videos/2026-06-29/delangue-on-anthropic-ai-model-s-dangerous-label-video",
+      "summary": "Hugging Face CEO Clem Delangue 在 Bloomberg Tech 节目中表示，监管把 Anthropic Mythos 模型贴上「过于危险」的标签，对前沿厂商来说反而是一次有效的能力背书。他借此回应了近期美国政府围绕国家安全审查、放大对前沿模型公开关注的整体态势。 监管与厂商的拉锯正在产生反向效应：「危险论」成了头部厂商隐性的能力广告，合规压力被部分转译为市场声量。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Bloomberg",
+        "home_url": "https://www.bloomberg.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_dbd1953102b5c837607088a3",
+      "cluster_id": "cluster_a566ddf4df08f0ada18f0f95",
+      "title": "Import AI 463：自我改进机器人、中国万卡 GPU 集群与一篇 AI 未来主义长文",
+      "url": "https://importai.substack.com/p/import-ai-463-self-improving-robots",
+      "summary": "Jack Clark 的 Import AI 第 463 期围绕三条主线展开：可自我改进的机器人系统、一组规模达 1 万张 GPU 的中国 AI 集群报道，以及 David Roberts 关于 AI 与人类未来的长文式专栏。 硬件规模、自主性与人文叙事三条线并置，是观察 frontier 节奏的常用周度入口。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Import AI",
+        "home_url": "https://importai.substack.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_dd01c8e3ee91c593e1a9f319",
+      "cluster_id": "cluster_c8700a318707c687582a0cf0",
+      "title": "AI Agent 生产环境失败的根因在执行层，不在模型",
+      "url": "https://www.informationweek.com/it-infrastructure/where-ai-agents-break-in-production",
+      "summary": "AI Agent 在生产环境失败的主因不是模型幻觉，而是执行层缺陷。Temporal CTO 提出四维成熟度矩阵：执行持久性、工作持续时间、托管隔离和服务质量，多数团队在托管隔离上较强、在执行可靠性上薄弱。建议在 Agent 框架下构建持久执行层，以保障故障恢复与状态持久化。（来源：InformationWeek）。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "InformationWeek",
+        "home_url": "https://www.informationweek.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_dec54b45ca2f0b7846f75219",
+      "cluster_id": "cluster_e0f6d3b6efe812888c2eb7db",
+      "title": "火山引擎把 VCloud 升级为 Agentic VCloud，转向 Agent 原生云",
+      "url": "https://www.leiphone.com/category/industrynews/WqCn3r8LHkqFKmhZ.html",
+      "summary": "火山引擎将 VCloud 升级为 Agentic VCloud，把云平台底座从面向应用切到面向 Agent。新架构支持 Agent 自主调度算力、维护长上下文记忆并调用外部工具，企业可在统一平台完成 Agent 开发、部署与运维全流程。 这一步实际上是在把云资源的调度权交给 Agent，跟 AWS Strands、Google Vertex Agent Builder 是同一类底座位卡位之争。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "雷锋网",
+        "home_url": "https://www.leiphone.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_df7b16305c2ffb42c94199ed",
+      "cluster_id": "cluster_6102e27b5f155813669669a7",
+      "title": "智谱 GLM-5.2 在 Claude Code 内被实测可替代 Opus 完成 45 分钟自主编码任务",
+      "url": "https://www.lennysnewsletter.com/p/how-i-ai-glm-52-review-and-how-gusto",
+      "summary": "Lenny's Newsletter 的 How I AI 单集中，产品经理 Claire 在自己的 ChatPRD 代码库里把 Claude Code 的后端模型从 Anthropic Opus 换成智谱 Z.ai 的开源 GLM-5.2，跑通代码库审计、UI 重构与一次 45 分钟自主任务，结论是 GLM-5.2 足以替代 Opus。 这是国产开源模型首次在主流编码 Agent 链路里被产品经理而非研究员公开背书，对企业自建 Coding Agent 选型直接可参考。This is an intermediary/self-media lead; trace it to a primary source before trea...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Lenny's Newsletter",
+        "home_url": "https://www.lennysnewsletter.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_dff37720c39c9a965e35a120",
+      "cluster_id": "cluster_1bddf312b71a8bf66d79265f",
+      "title": "Oracle 推出四款供应链 Agentic AI 应用",
+      "url": "https://www.prnewswire.com/news-releases/oracle-adds-new-fusion-agentic-applications-to-help-customers-improve-supply-chain-performance-302812443.html",
+      "summary": "6月29日，Oracle 发布四款 Fusion Cloud SCM Agentic 应用，覆盖库存规划指挥中心、供应商资质工作区、生产就绪工作区和看板管理工作区，帮助企业优化供应链绩效。新应用运行于 Oracle 云基础设施，集成大语言模型，新增多级库存优化和交互式可视化能力。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "PR Newswire",
+        "home_url": "https://www.prnewswire.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e140bdc40636617e9c1bc149",
+      "cluster_id": "cluster_d3286e931d2295bc15496dff",
+      "title": "Qwen 3.6 27B 本地推理:Macbook M5 Max 跑出 30 tokens/s,RTX 5090 可达 50 tokens/s",
+      "url": "https://quesma.com/blog/qwen-36-is-awesome",
+      "summary": "Qwen 3.6 27B 是一款密集参数本地大模型,原生支持 256k 上下文。Macbook M5 Max 上跑 llama.cpp Q8_0 量化版(含多 token 预测)实测约 30 tokens/s;社区用户反馈在 RTX 5090 上 Q6_K 量化可达 50 tokens/s。作者实测它能一句 prompt 写出创意诗歌、用 pnpm 生成六边形扫雷游戏等任务,称其为「首个真正具备通用智能的本地模型」。另有 35B A3B MoE 变体,但作者更推荐 27B 密。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Quesma",
+        "home_url": "https://quesma.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e369285e512eaabcae0caf4d",
+      "cluster_id": "cluster_adfce0ff1ee703f05c8fd45c",
+      "title": "Agent 营销工作流月烧 20 美元订阅,非 LLM 预过滤可砍 60% token 账单",
+      "url": "https://martech.org/agentic-ai-is-rewriting-martech-economics-and-infrastructure/",
+      "summary": "一条日常营销流水线单次消耗 4000-5000 tokens，月用量超 10 万 tokens，足以在月中耗尽 20 美元订阅。解决方案是把原始数据存入自有数据库，用关键词评分或向量相似度等非 LLM 过滤预处理，token 账单可降低 60% 以上。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "martech.org",
+        "home_url": "https://martech.org/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e5219d9e20638fbb95bd9f5d",
+      "cluster_id": "cluster_c60121328f55923ba002b06c",
+      "title": "Humanity's Last Exam 18 个月从不到 20% 飙到 50%+，MarTech 给出「每周 10 分钟」的 AI 跟进法",
+      "url": "https://martech.org/the-most-valuable-ai-skill-takes-10-minutes-a-week/",
+      "summary": "Humanity's Last Exam 基准测试在 18 个月内从不到 20% 提升到 50% 以上，AI 能力曲线明显跑赢多数从业者的学习节奏。MarTech 给出的应对方案是每周固定 10 分钟做一次进展检查，并把 AI 技能与具体 AI 工具刻意区分开——前者可迁移、后者会被产品迭代吃掉。 这一节奏的潜台词是：AI 素养正在变成需要常态维护的「带宽预算」，而不是一次性学完的课程。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "MarTech",
+        "home_url": "https://martech.org/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e5ff2c930711091d69cc19eb",
+      "cluster_id": "cluster_56a67b311b784d302a373e86",
+      "title": "r/LocalLLaMA 实测对比：AMD MI210 64GB 与海光 DCU K100 64GB 在本地 LLM 推理上的差距",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uil0w2/amd_mi210_64gb_vs_dcu_k100_64gb/",
+      "summary": "一位玩家在 r/LocalLLaMA 直接比较 AMD MI210 64GB 与海光 DCU K100 64GB 两张计算卡在本地大模型推理下的吞吐、显存利用率和软件栈成熟度，给想绕开 NVIDIA 价格的本地部署者一份横向数据。讨论里也指出，ROCm 与 DCU 自研工具链在常用框架上的适配差距，仍是这条路线最大的落地阻力。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "r/LocalLLaMA",
+        "home_url": "https://www.reddit.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e7ab9b1a3e9e284698f43638",
+      "cluster_id": "cluster_69ee7bea325ca1abbf1aa24f",
+      "title": "HackerRank 开源招聘 Agent 同份简历跑 100 次分数从 66 到 99",
+      "url": "https://danunparsed.com/p/hackerrank-open-source-ats",
+      "summary": "博主用同一份 PDF 简历对 HackerRank 刚开源的 hiring-agent 跑了 100 次，分数在 66 到 99 之间剧烈波动，若公司线设在 85 分会有 65% 概率被刷掉。该 Agent 默认走本地 gemma3:4b、temperature 0.1，流程是 PDF 解析后调用 LLM 六次抽结构化字段，再叠 GitHub 仓库上下文统一打分，总分 100 加 20 加分项。 这暴露了把 LLM 直接当招聘评分器的硬伤：低温度并不等于稳定输出，开源出来反而。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Dan Unparsed",
+        "home_url": "https://danunparsed.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_ec5afa14f4e3b7b63127b410",
+      "cluster_id": "cluster_4818de613fac492bd304ac95",
+      "title": "Ford AI 质检漏检过多，重新雇回 350 名资深工程师参与训练 AI 工具",
+      "url": "https://www.computerworld.com/article/4190728/ford-disappointed-with-ai-re-hires-veterans.html",
+      "summary": "Ford 用 AI 做自动化质检但无法检测到足够缺陷，重新雇佣 350 名资深工程师。硬件主管承认误判了 AI 能力，老工程师在补位质检的同时会参与训练 AI 工具。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Computerworld",
+        "home_url": "https://www.computerworld.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_eca4b801b118077d1214211b",
+      "cluster_id": "cluster_34146ff8b966ad4f59a7f27e",
+      "title": "Cursor 推出 iOS 公测版：手机也能起 cloud agent、远控本机 agent、合 PR",
+      "url": "https://www.cursor.com/blog/ios-mobile-app",
+      "summary": "Cursor 把 IDE 入口搬到 iPhone：原生 App 中选仓库、用语音描述需求、挑前沿模型起 cloud agent，跑完推送通知再回 App 审 diff、合 PR；本机 agent 通过 Remote Control 让手机直接驱动桌面端继续执行。 IDE 公司这两年都在做 IDE 出门，Cursor 这一版把 agent 起在云端 + 手机审 PR 凑齐了，把开发者上下班从开机关机变成通知与批准，agent 工作流逐步常态化。This is an intermediary/self-media lead; trace it to a primary source before treating it as a re...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Cursor",
+        "home_url": "https://www.cursor.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_ee6b67010e2f90cff79ff518",
+      "cluster_id": "cluster_41fd9d5039476726a8035392",
+      "title": "华盛顿州 7 月 1 日起收紧雇员犯罪背景调查义务",
+      "url": "https://www.natlawreview.com/article/sweeping-amendments-impose-new-obligations-employers-conducting-criminal-background",
+      "summary": "华盛顿州修订法案自 2026 年 7 月 1 日生效,要求雇主在进行犯罪背景调查前提供单独书面通知,并限制可考虑的犯罪记录范围,违规企业面临每次 1000 美元罚款。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "National Law Review",
+        "home_url": "https://www.natlawreview.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_eeca4db49291bb8bc5882d40",
+      "cluster_id": "cluster_434520ad369bda824b96dca0",
+      "title": "参数高效微调方法 MiCA 合入 Hugging Face PEFT 主干，可通过官方 API 直接调用",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uiln2k/mica_is_now_part_of_hugging_face_peft/",
+      "summary": "Hugging Face PEFT 仓库已合并 MiCA 这一参数高效微调方法，开发者后续可直接通过官方 PEFT API 调用，不再需要 fork 仓库或自行拼装代码。社区把这次合并视为 PEFT 持续吸纳社区方法的常态化信号，对希望在消费级硬件上轻量微调开源模型的团队是一条新选项。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "r/LocalLLaMA",
+        "home_url": "https://www.reddit.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f1289a0452cb6eedd803bf9e",
+      "cluster_id": "cluster_9f8557c4fb86a21cdc473a59",
+      "title": "韩国政企 1 万亿美元押注半导体与 AI：DRAM 产能 5 年翻倍、AI 数据中心 8.4 GW、Atlas 人形机器人 2028 量产",
+      "url": "https://arstechnica.com/ai/2026/06/south-korea-to-spend-1t-on-more-memory-chip-production-and-humanoid-robots/",
+      "summary": "韩国政府与三星、SK 海力士、SK 集团、GS、Naver、现代等头部企业联合宣布 1 万亿美元投资计划，其中 5850 亿美元由三星和 SK 海力士用于在西南部新建晶圆厂并扩建首尔都市圈产能，目标 5 年内将 DRAM 产量翻倍；SK 集团、GS、Naver 出资 3570 亿美元建设 AI 数据中心，初期规划 8.4 GW 算力，2028 年前开工；现代汽车另投 58 亿美元建设机器人工厂与配套数据中心，目标 2028 年量产 Atlas 系列人形机器人。 李在明政府将半。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Ars Technica",
+        "home_url": "https://arstechnica.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f2f6b02e36d854077f85b92b",
+      "cluster_id": "cluster_24086a0d02298da669e2e719",
+      "title": "Epoch AI 上线 AI 能力与基准数据库，覆盖前沿模型在高难度任务上的横评结果",
+      "url": "https://epoch.ai/benchmarks",
+      "summary": "Epoch AI 推出公开的基准结果数据库，收录主流前沿模型在多个高难度任务上的成绩，既包含 Epoch AI 自评结果，也整合外部权威评测。 相比单一榜单，这套数据库的价值在于把跨基准、跨厂商的成绩做归一化呈现，方便研究者和企业用同一把尺横评模型能力进展。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Epoch AI",
+        "home_url": "https://epoch.ai/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f3fcf531744f4bb078081152",
+      "cluster_id": "cluster_437d83f93f9ea92746bd263b",
+      "title": "Millennium 设立 AI 实验室,顶级对冲基金从外购模型转向自建",
+      "url": "https://www.bloomberg.com/news/articles/2026-06-29/millennium-builds-ai-lab-in-push-for-cutting-edge-products",
+      "summary": "对冲基金巨头 Millennium Management 正在筹建人工智能实验室,把前沿技术的开发与应用收归内部。这是大型量化基金从外采模型转向自建 AI 能力的又一案例,目标是把 LLM 与量化研究、风控、运营更深地耦合,应对同行在 AI 投研侧的加速布局。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Bloomberg",
+        "home_url": "https://www.bloomberg.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_f8855f54368c5e546f26f89f",
+      "cluster_id": "cluster_fc1189db79d8063a072ba5dc",
+      "title": "The Lab Mistake That Might Revolutionize Computing",
+      "url": "https://spectrum.ieee.org/artificial-neurons-on-silicon-chips",
+      "summary": "Today, you probably asked a question of a large language model, or accepted a connection suggestion on LinkedIn, or watched a recommended video on YouTube, or took a different route to work based on a traffic prediction from Google Maps. In。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "spectrum.ieee.org",
+        "home_url": "https://spectrum.ieee.org/"
+      },
+      "collected_via": {
+        "name": "IEEE Spectrum Artificial Intelligence",
+        "url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "research",
+        "engineering",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": "https://spectrum.ieee.org/media-library/illustration-of-a-microchip-under-a-microscope-with-probes-and-orange-wires-attached.jpg?id=66967576&width=980",
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fa1ce7f91c4680df234b2f85",
+      "cluster_id": "cluster_b9623347f4d75b81e345eda4",
+      "title": "实测 Qwen3.6-27B：3-critic harness 的增益超过模型本身",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uj9viw/been_running_qwen3627b_through_a_3critic_harness/",
+      "summary": "一位社区开发者公开了 Qwen3.6-27B 上的 3-critic harness 实验：让一个生成模型搭配三个独立 critic 分别评判正确性、可读性、回归风险，再回写到主模型做最终修订。在自家代码任务上整体通过率从单模型基线显著上升，作者结论是 harness 设计带来的边际收益已超过把基模从 27B 换到更大尺寸的收益，27B 量级在本地推理硬件上反而更划算。 这条经验和 Anthropic、Cursor 这一年公开的 agent harness 数据一致：在 27。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "r/LocalLLaMA",
+        "home_url": "https://www.reddit.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fb8704d4adbef127cc09602a",
+      "cluster_id": "cluster_4ceaff337afab66e4af0a8ed",
+      "title": "AI 就业冲击争论再升级:Walmart、Anthropic 已点名替代岗位,宏观数据仍无共识",
+      "url": "https://techcrunch.com/2026/06/29/the-ai-jobs-debate-just-got-messier/",
+      "summary": "Walmart、Anthropic 等公司已点名 AI 替代了具体职能,但也有研究称整体冲击尚不明显,AI 对就业的影响出现微观与宏观信号打架。是否已在宏观层面发生大规模替代,目前仍无定论。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "TechCrunch",
+        "home_url": "https://techcrunch.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fbcfd6cf88f2995483afca6f",
+      "cluster_id": "cluster_49c0ee4cf331d93a0f2d1408",
+      "title": "BetterCloud IT Agent 可秒级完成三项 IT 管理任务",
+      "url": "https://www.bettercloud.com/monitor/it-management-tasks-ai-can-do-in-seconds",
+      "summary": "BetterCloud 推出 IT Agent，可将三项 IT 管理任务从小时级压缩到秒级：用户权限审计（原需 2-3 小时）、员工离职流程（多步骤含人工审核与 Magic Undo 回滚）、跨群组批量设置更新。Agent 支持人在回路审批，确保操作安全。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "BetterCloud",
+        "home_url": "https://www.bettercloud.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fc6ed0a107ca57cb73eba135",
+      "cluster_id": "cluster_80a332f5f6294760a8071557",
+      "title": "Anthropic 工程师 Margot Van Laar 在 Code with Claude 分享提示词工程实战：评估是唯一严谨方式",
+      "url": "https://www.youtube.com/watch?v=G2B0YWuJUgI",
+      "summary": "Anthropic 应用 AI 工程师 Margot Van Laar 在 Code with Claude 分享生产级提示词工程实战。核心结论：大部分时间花在调试和维护已有生产提示词，而不是从零写新提示词，评估（Eval）是唯一严谨的方式，没有评估就是碰运气。 客服机器人维护中，她用 XML 标签结构化清理旧模型遗留的「禁止列表」指令，避免新模型过度拟合；零售排班 Agent 从零构建时，则拆成生成 - 评估 - 修复三个简单提示词，并选用推理更强的 Opus。This is an intermediary/self-media lead; trace it to a primary source before treating...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Anthropic（YouTube）",
+        "home_url": "https://www.youtube.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fca2a0430723fca98a61297a",
+      "cluster_id": "cluster_9ac13b1d8b75cadfcf4f7f73",
+      "title": "面试 30 余位 AI 工程师:LLM 推理服务降级、Token 成本等六大工程化挑战待解",
+      "url": "https://cloud.tencent.com/developer/article/2699559",
+      "summary": "作者面试 30 余位 AI 工程师后发现,超半数答不出 LLM 推理服务该如何优雅降级。文章系统梳理 AI 系统从 demo 到生产的六大工程化挑战:高并发延迟长尾、Token 成本工程、RAG 工程化、Agent 状态管理、可观测性和算力成本治理。 在模型层趋同的当下,工程化能力正成为 AI 团队真正的差异点。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "cloud.tencent.com",
+        "home_url": "https://cloud.tencent.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fda9639d05758198133a771d",
+      "cluster_id": "cluster_57f41493fc83579df6969edf",
+      "title": "私募股权为何几乎不打官司：13 万亿美元行业的非诉治理",
+      "url": "https://corpgov.law.harvard.edu/2026/06/29/opting-out-of-court-reputation-and-informal-norms-in-private-equity/",
+      "summary": "哈佛法学院论坛发表研究，分析私募股权行业近乎零诉讼现象。40 年数据中仅 4% 案件由基金投资者提起，LP 合同条款、声誉机制和 LPAC 协商构成替代性治理体系。2025 年底阿布扎比投资委员会在特拉华法院起诉 PE 公司，标志着这一非诉生态可能面临压力。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Harvard Law CorpGov",
+        "home_url": "https://corpgov.law.harvard.edu/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_0251b827a8dd876e6bf31297",
+      "cluster_id": "cluster_74250ee8cf64ad4690c5bd56",
+      "title": "Salesforce Flow 批量化最佳实践 循环集合与 Transform 协同",
+      "url": "https://www.salesforceben.com/why-loops-collections-and-the-transform-element-matter-in-salesforce-flow/",
+      "summary": "文章详解 Salesforce Flow 批量化模式：在循环内使用赋值元素收集变量，循环结束后执行单次更新，避免触发 150 次 DML 限制。Transform 元素可跨对象映射字段，在部分场景下替代循环赋值模式。核心原则是优先批量化处理，Transform 是补充工具而非循环集合的替代品。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "salesforceben.com",
+        "home_url": "https://www.salesforceben.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1200,21 +1040,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_87b1b14196393bd8c15f1f11",
-      "cluster_id": "cluster_6fc6e73bc9d91649e9b34deb",
-      "title": "Welcome /r/LocalLlama!",
-      "url": "https://news.smol.ai/issues/24-03-21-ainews-welcome-rlocalllama/",
-      "summary": "**Sakana** released a paper on evolutionary model merging. **OpenInterpreter** launched their **O1 devkit**. Discussions highlight **Claude Haiku**'s underrated performance with 10-shot examples. On **Reddit's IPO**, AINews introduces Reddi。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_02aa22bc400253fa305ac83a",
+      "cluster_id": "cluster_1c79d85d6e9b667b54ae37cc",
+      "title": "Cisco Talos 研究:安全微调让 Foundation-Sec-8B 更准 4.7%,却更容易被绕过",
+      "url": "https://blogs.cisco.com/security/inherited-circuits-learned-semantics-how-security-fine-tuning-can-create-hidden-evasion-risk",
+      "summary": "Cisco Talos 发布研究指出,Foundation-Sec-8B 在 PowerShell 恶意脚本分类上比 Llama-3.1-8B 准确率高 4.7%,但面对别名替换、命令重构、大小写突变等保持行为不变的变体反而更易漏判。机制分析显示,安全微调并未新建分类电路,而是沿用基础模型的电路骨架、只改后续层对信号的解读,导致原本的恶意证据被压制甚至反转——安全微调可能在堆出准确率的同时挖出隐蔽的规避漏洞。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "Cisco Blogs",
+        "home_url": "https://blogs.cisco.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1223,7 +1063,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-21",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1232,21 +1072,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_a7419a5f7a2026dad3f3a9c2",
-      "cluster_id": "cluster_3ccbf36ab10557c9d0fa794e",
-      "title": "Shipping and Dipping: Inflection + Stability edition",
-      "url": "https://news.smol.ai/issues/24-03-20-ainews-shipping-and-dipping-inflection-stability-edition/",
-      "summary": "**Inflection AI** and **Stability AI** recently shipped major updates (**Inflection AI 2.5** and **Stable Diffusion 3**) but are now experiencing significant executive departures, signaling potential consolidation in the GPU-rich startup sp。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_058c337a76a24ad35ec3cc7b",
+      "cluster_id": "cluster_1d710e9c30061c7173f6b782",
+      "title": "Gemini 应用扩区美国:Personal Intelligence 与 Nano Banana 个性化生图开放更多用户",
+      "url": "https://blog.google/innovation-and-ai/products/gemini-app/personal-intelligence-nano-banana-us-expansion/",
+      "summary": "Google 6 月 29 日把 Gemini 应用的 Personal Intelligence 与 Nano Banana 个性化图像创作扩展到更多美国用户。 经用户授权后,Gemini 可调取 Gmail、Google Photos、YouTube 和 Search 的数据,让回答和生图都贴合个人上下文——这是 Google 把自有数据中台往 Apple Intelligence 那条路推的一步,差异点在跨产品授权链路而不是设备端推理。This is an intermediary/self-media lead; trace it to a primary source before treating it as a re...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "Gemini (Google)",
+        "home_url": "https://blog.google/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1255,7 +1095,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-21",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1264,21 +1104,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_0eaed0d1ab87d06229199820",
-      "cluster_id": "cluster_75b7d6594e2cb1a8f9b9b74e",
-      "title": "World_sim.exe",
-      "url": "https://news.smol.ai/issues/24-03-19-ainews-worldsimexe/",
-      "summary": "**NVIDIA** announced **Project GR00T**, a foundation model for humanoid robot learning using multimodal instructions, built on their tech stack including Isaac Lab, OSMO, and Jetson Thor. They revealed the **DGX Grace-Blackwell GB200** with。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_061c04dd505eef50876b1668",
+      "cluster_id": "cluster_4fa2e886da1c77d2a55d0e2e",
+      "title": "Google 用 Agentic 同行评审跑 ICML 与 STOC 约 1 万篇投稿，论文正式公开",
+      "url": "https://arxiv.org/abs/2606.28277",
+      "summary": "Google 部署的 agentic AI 同行评审在 ICML 与 STOC 两个顶级 CS 会议上处理了约 1 万篇投稿，单篇周转约 30 分钟。 新论文显示其捕捉数学错误的能力比零样本提示高 34%，首次形成可引用的会议级 AI 自动评审证据，把这套链路从工程方案推进到学术建制层面。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "arXiv",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1287,7 +1127,39 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-20",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_087aa2364444eadc37600397",
+      "cluster_id": "cluster_c60121328f55923ba002b06c",
+      "title": "Humanity's Last Exam 18 个月从不到 20% 飙到 50%+，MarTech 给出「每周 10 分钟」的 AI 跟进法",
+      "url": "https://martech.org/the-most-valuable-ai-skill-takes-10-minutes-a-week/",
+      "summary": "Humanity's Last Exam 基准测试在 18 个月内从不到 20% 提升到 50% 以上，AI 能力曲线明显跑赢多数从业者的学习节奏。MarTech 给出的应对方案是每周固定 10 分钟做一次进展检查，并把 AI 技能与具体 AI 工具刻意区分开——前者可迁移、后者会被产品迭代吃掉。 这一节奏的潜台词是：AI 素养正在变成需要常态维护的「带宽预算」，而不是一次性学完的课程。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "MarTech",
+        "home_url": "https://martech.org/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1296,21 +1168,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_62f9553a5d8b4499246ec454",
-      "cluster_id": "cluster_2e0342ca4a3dea9ab3d850b4",
-      "title": "Grok-1 in Bio",
-      "url": "https://news.smol.ai/issues/24-03-18-ainews-grok-1-in-bio/",
-      "summary": "**Grok-1**, a **314B parameter Mixture-of-Experts (MoE) model** from **xAI**, has been released under an Apache 2.0 license, sparking discussions on its architecture, finetuning challenges, and performance compared to models like **Mixtral*。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_08cec89b5dd21572683b9043",
+      "cluster_id": "cluster_fb2e5a29d4db33f59b702c98",
+      "title": "Omen AI 完成 3100 万美元 A 轮融资用 AI 监控数据中心液冷防止细菌污染",
+      "url": "https://techcrunch.com/2026/06/29/omen-ais-plan-to-optimize-data-centers-is-all-wet/",
+      "summary": "Omen AI 完成 3100 万美元 A 轮融资，把 AI 模型用于实时分析数据中心液冷系统的冷却液成分，识别微生物污染并提前预警，避免因生物膜堵塞管路导致 GPU 集群停机。融资由现有投资人继续跟投。 AI 训练负载推高液冷渗透率后，冷却液运维已变成稀缺的细分品类，巨头数据中心的 reliability 缺口正在被新创业公司补位。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "TechCrunch",
+        "home_url": "https://techcrunch.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1319,7 +1191,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-19",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1328,21 +1200,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_cd80979c60f899bbbd1c0b48",
-      "cluster_id": "cluster_59c9aee6a7de6d441005b1c8",
-      "title": "Astro Sphere",
-      "url": "https://news.smol.ai/projects/project-1/",
-      "summary": "Portfolio and blog build with astro. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_08d261e79fe7ed01cd1c5b1f",
+      "cluster_id": "cluster_6f46fe604138ac090fb6f0ca",
+      "title": "Salesforce Flow 技能短板拖累 Agentforce 落地:仅 56.8% 管理员有信心",
+      "url": "https://www.salesforceben.com/why-salesforce-flow-is-the-skill-that-will-make-or-break-your-agentforce-journey/",
+      "summary": "超过 1100 名 Salesforce 专业人员的调查显示,仅 56.8% 管理员对 Flow Builder 有信心,初级管理员中更只有 20%。Agentforce 采用率从 12.6% 翻倍至 29.6%,但 Flow 作为 Agentforce 的底层编排引擎,技能差距直接限制 AI Agent 的部署效果。受访者把调试错误(34%)和复杂逻辑(32%)列为最大挑战。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "salesforceben.com",
+        "home_url": "https://www.salesforceben.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1351,7 +1223,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-18",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1360,21 +1232,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_576cb4fb0f6b86fcb1eebea6",
-      "cluster_id": "cluster_b4b4327c4e1d8d5879a62b56",
-      "title": "MM1: Apple's first Large Multimodal Model",
-      "url": "https://news.smol.ai/issues/24-03-15-ainews-mm1-apples-first-large-multimodal-model/",
-      "summary": "**Apple** announced the **MM1** multimodal LLM family with up to **30B parameters**, claiming performance comparable to **Gemini-1** and beating larger older models on VQA benchmarks. The paper targets researchers and hints at applications。This is an intermediary/self-media lead; trace it to a primary source before tr...",
+      "id": "occ_0950ecc169ce64593985c25e",
+      "cluster_id": "cluster_ebec7832d8795358172eaf6d",
+      "title": "具身智能 Q2 季报：世界模型投资升温，Figure AI 直播秀肌肉",
+      "url": "https://podcast.latepost.com/170",
+      "summary": "晚点聊 Episode 170 盘点 2026 年 Q2 具身智能进展：Figure AI 完成直播演示，中国灵巧手亮相 ICRA，英伟达 Cosmos 3 推动世界模型投资热潮。Generalist 和 Pi 的模型进展显示具身智能在企业场景的商业化路径正在拓宽。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "晚点 LatePost",
+        "home_url": "https://podcast.latepost.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1383,7 +1255,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-15",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1392,21 +1264,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_56bbc6203358e1e61ce92aac",
-      "cluster_id": "cluster_f997cccd36b336689e28bdd6",
-      "title": "Not much happened piday",
-      "url": "https://news.smol.ai/issues/24-03-14-ainews-not-much-happened-piday/",
-      "summary": "**DeepMind** announces **SIMA**, a generalist AI agent capable of following natural language instructions across diverse 3D environments and video games, advancing embodied AI agents. **Anthropic** releases **Claude 3 Haiku**, their fastest。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_10099886fca6507ddcb2a87d",
+      "cluster_id": "cluster_76ca95da0592815ae0347c78",
+      "title": "Bloomberg：AI 投资规模到底在反映真实需求还是恐慌跟进，两派观点同台",
+      "url": "https://www.bloomberg.com/news/videos/2026-06-29/dual-perspectives-on-ai-investment-costs-video",
+      "summary": "PSP Growth 董事总经理 Momei Qu 在节目中并列两种主流叙事：一派认为巨额 capex 与企业 AI 软件采购增长说明需求真实，另一派担心当前投入主要由几家巨头驱动、上下游订单循环放大了表观需求，一旦任一环节减速整个链条会回吐。 这正是当下机构的核心争论：AI 投资是否进入自我循环阶段。短期看 Q3 财报对资本开支指引会成为分水岭。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "Bloomberg",
+        "home_url": "https://www.bloomberg.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1415,7 +1287,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-14",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1424,21 +1296,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_dfbf243e452ab59be130d93c",
-      "cluster_id": "cluster_4636275863b96d067684862a",
-      "title": "DeepMind SIMA: one AI, 9 games, 600 tasks, vision+language ONLY",
-      "url": "https://news.smol.ai/issues/24-03-13-ainews-deepmind-sima-one-ai-9-games-600-tasks-visionlanguage-only/",
-      "summary": "**DeepMind SIMA** is a generalist AI agent for 3D virtual environments evaluated on **600 tasks** across **9 games** using only screengrabs and natural language instructions, achieving **34%** success compared to humans' **60%**. The model。This is an intermediary/self-media lead; trace it to a primary source before tr...",
+      "id": "occ_114947492cbc61d9e3fb13c5",
+      "cluster_id": "cluster_56a67b311b784d302a373e86",
+      "title": "r/LocalLLaMA 实测对比：AMD MI210 64GB 与海光 DCU K100 64GB 在本地 LLM 推理上的差距",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uil0w2/amd_mi210_64gb_vs_dcu_k100_64gb/",
+      "summary": "一位玩家在 r/LocalLLaMA 直接比较 AMD MI210 64GB 与海光 DCU K100 64GB 两张计算卡在本地大模型推理下的吞吐、显存利用率和软件栈成熟度，给想绕开 NVIDIA 价格的本地部署者一份横向数据。讨论里也指出，ROCm 与 DCU 自研工具链在常用框架上的适配差距，仍是这条路线最大的落地阻力。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "r/LocalLLaMA",
+        "home_url": "https://www.reddit.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1447,7 +1319,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-14",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1456,21 +1328,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2549a80234a95f9f999f7505",
-      "cluster_id": "cluster_38140a25dd1773f322a3ba4a",
-      "title": "The world's first fully autonomous AI Engineer",
-      "url": "https://news.smol.ai/issues/24-03-12-ainews-the-worlds-first-fully-autonomous-ai-engineer/",
-      "summary": "**Cognition Labs's Devin** is highlighted as a potentially groundbreaking AI software engineer agent capable of learning unfamiliar technologies, addressing bugs, deploying frontend apps, and fine-tuning its own AI models. It integrates **O。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_11ca10a41d05ff1894c16714",
+      "cluster_id": "cluster_61c0ffdc8e8cf036b43b665e",
+      "title": "美国悬赏 1000 万美元追捕加密通讯黑客",
+      "url": "https://www.bleepingcomputer.com/news/security/us-offers-10-million-for-hackers-targeting-whatsapp-signal-users/",
+      "summary": "美国国务院悬赏 1000 万美元追捕 UNC5792 和 UNC4221 两个俄罗斯黑客组织，其针对 Signal 和 WhatsApp 用户发动攻击，已入侵数千个账户。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "BleepingComputer",
+        "home_url": "https://www.bleepingcomputer.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1479,7 +1351,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-12",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1488,21 +1360,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_cdd5f213fa3ed4daa6302786",
-      "cluster_id": "cluster_4920df02d4f20448185c2f50",
-      "title": "Fixing Gemma",
-      "url": "https://news.smol.ai/issues/24-03-11-ainews-fixing-gemma/",
-      "summary": "**Google's Gemma model** was found unstable for finetuning until **Daniel Han from Unsloth AI** fixed 8 bugs, improving its implementation. **Yann LeCun** explained technical details of a pseudo-random bit sequence for adaptive equalizers,。This is an intermediary/self-media lead; trace it to a primary source before tr...",
+      "id": "occ_13173741cea61b875a6dd40c",
+      "cluster_id": "cluster_f789a3772ff3096710656d5e",
+      "title": "Ethan Mollick 吐槽 WSJ:GLM 在网络安全任务追平 Anthropic Mythos 的报道与证据对不上",
+      "url": "https://x.com/emollick/status/2071630972521705513",
+      "summary": "Ethan Mollick 公开吐槽,《华尔街日报》关于智谱 GLM 在网络安全任务上「追平」Anthropic Mythos 的报道与原始证据对不上,但相关结论已经在政策圈形成认知。 提醒模型对比类新闻在传播链路中容易被简化成误导性结论,进而影响政策讨论。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "X：Ethan Mollick",
+        "home_url": "https://x.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1511,7 +1383,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-12",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1520,21 +1392,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_0671dc0060500f41e313185c",
-      "cluster_id": "cluster_d8e34fed7a2518a320308c30",
-      "title": "Inflection-2.5 at 94% of GPT4, and Pi at 6m MAU",
-      "url": "https://news.smol.ai/issues/24-03-07-ainews-inflection-25-at-94percent-of-gpt4-and-pi-at-6m-mau/",
-      "summary": "**Mustafa Suleyman** announced **Inflection 2.5**, which achieves *more than 94% the average performance of GPT-4 despite using only 40% the training FLOPs*. **Pi**'s user base is growing about 10% weekly, with new features like realtime we。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_1396c63c812ce71faa33fa71",
+      "cluster_id": "cluster_21823b0b99c1107fe224765b",
+      "title": "法律行业 AI 采用率 2026 年近翻倍至 40%，但盲目推行可能损害团队信任",
+      "url": "https://www.legaltechnology.com/2026/06/29/guest-post-ai-by-default-or-by-design/",
+      "summary": "专业服务机构 AI 采用率在 2026 年近乎翻倍至 40%，但未来工作策略师 Sophie Tversky 警告：缺乏明确目标的强制推行将损害团队心理安全感和信任。研究显示参与共创的员工估值更高（IKEA 效应），企业需定义 AI 使用行为规范，避免 AI 生成反馈破坏同事间信任。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "Legal IT Insider",
+        "home_url": "https://www.legaltechnology.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1543,7 +1415,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-08",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1552,21 +1424,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3760d729b013f688ad7b03f0",
-      "cluster_id": "cluster_6abf08a8e6c489fdadfd760c",
-      "title": "FSDP+QLoRA: the Answer to 70b-scale AI for desktop class GPUs",
-      "url": "https://news.smol.ai/issues/24-03-08-ainews-fsdpqlora-the-answer-to-70b-scale-ai-for-desktop-class-gpus/",
-      "summary": "**Jeremy Howard** and collaborators released a new tool combining **FSDP**, **QLoRA**, and **HQQ** to enable training **70b-parameter** models on affordable consumer GPUs like **RTX 4090s** with only **24GB RAM**, overcoming traditional mem。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_14c9a23e79b03dd6c76bac65",
+      "cluster_id": "cluster_5b731f6006db4efb73b6ca83",
+      "title": "7 项智能体互联国标发布，百余家企业参与试点",
+      "url": "https://www.jiemian.com/article/14666567.html",
+      "summary": "国家市场监管总局发布《人工智能智能体互联》系列 7 项国家标准，覆盖身份码、能力描述、供需发现等核心环节，小米、联想、火山引擎等百余家企业已参与试点。同期 OpenAI 发布 GPT-5.6 系列（Sol/Terra/Luna），Sol API 定价 5 美元每百万输入 Token，应美国政府要求仅限可信伙伴使用。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "jiemian.com",
+        "home_url": "https://www.jiemian.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1575,7 +1447,7 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-08",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -1584,21 +1456,52 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_fbd48516565b02a4992b1a17",
-      "cluster_id": "cluster_299c61d62ac49e626cf6a16c",
-      "title": "Not much happened today",
-      "url": "https://news.smol.ai/issues/24-03-06-ainews-not-much-happened-today/",
-      "summary": "**Anthropic** released **Claude 3**, replacing Claude 2.1 as the default on Perplexity AI, with **Claude 3 Opus** surpassing **GPT-4** in capability. Debate continues on whether Claude 3's performance stems from emergent properties or patte。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_16c8e55c53f229bb64866c7a",
+      "cluster_id": "cluster_8cf51c616169c50fdcec347e",
+      "title": "Chamath Palihapitiya raises $135M Series A for his AI coding startup, takes CEO role",
+      "url": "https://techcrunch.com/2026/06/29/chamath-palihapitiya-raises-135m-series-a-for-his-ai-coding-startup-takes-ceo-role/",
+      "summary": "VCs remain thirsty to fund AI coding startups. This one, founded by investor Chamath Palihapitiya, is no exception. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.smol.ai",
-        "home_url": "https://news.smol.ai/"
+        "name": "techcrunch.com",
+        "home_url": "https://techcrunch.com/"
       },
       "collected_via": {
-        "name": "Smol AI News",
-        "url": "https://news.smol.ai/rss.xml"
+        "name": "TechCrunch Enterprise",
+        "url": "https://techcrunch.com/category/enterprise/feed/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_170f5ac199b9c289c87e0e9b",
+      "cluster_id": "cluster_79ae2dcb13785675ef10662d",
+      "title": "Salesforce Ben 拆解 Flow Decision 元素：4 种 Outcome 路径与最佳实践",
+      "url": "https://www.salesforceben.com/how-to-use-decision-elements-and-branching-in-salesforce-flow/",
+      "summary": "Salesforce Ben 发布 Flow Decision 元素教程，详解 4 种 Outcome 配置路径、AND/OR/Custom Logic 三类条件逻辑、Record-Triggered Flow 的执行时机选择，以及命名规范和用公式资源简化复杂逻辑等实践建议。Flow 分支能力是企业搭建 Agentforce 自动化的基础组件。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Salesforce Ben",
+        "home_url": "https://www.salesforceben.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -1607,7 +1510,103 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2024-03-07",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_171475166a908d487dc11c92",
+      "cluster_id": "cluster_5d09c84a49ef7a69e9e2bfb9",
+      "title": "国常会部署 AI：加快智算集群建设，推进\"人工智能+\"行动",
+      "url": "https://finance.sina.com.cn/wm/2026-06-29/doc-inifauhq2087621.shtml",
+      "summary": "国务院总理 6 月 29 日主持国务院常务会议，听取人工智能发展情况汇报。会议要求加快关键技术攻关和超大规模智算集群建设，强化高质量数据供给，深入实施\"人工智能+\"行动，促进智能产品和服务加快规模化商业应用，并构建分级分类的安全监管体系。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "新浪财经",
+        "home_url": "https://finance.sina.com.cn/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_180cf0638150d9b64dda33c7",
+      "cluster_id": "cluster_1695f54fa4e1bf9093cb0707",
+      "title": "从 IP 诉讼律师到法律 AI 工程负责人:Thomson Reuters CoCounsel 团队怎么搭起律所和 LLM 之间的桥",
+      "url": "https://legal.thomsonreuters.com/blog/how-valerie-mcconnells-career-shaped-the-next-generation-of-cocounsel-legal/",
+      "summary": "Valerie McConnell 从 Jones Day 的 IP 诉讼律师转型为 Thomson Reuters CoCounsel 解决方案工程负责人,带团队在律所客户需求与 LLM 能力之间搭桥,通过定制化工作流应对复杂法律场景,并用 Agentic AI 把多步骤任务自动化串起来。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "legal.thomsonreuters.com",
+        "home_url": "https://legal.thomsonreuters.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1877b01758c457e6952c22bf",
+      "cluster_id": "cluster_ec225e375ed5ba858725b779",
+      "title": "Cerebras 与 OpenAI 200 亿美元合约吃掉产能，其他 API 等候者被挤出",
+      "url": "https://www.reddit.com/r/MachineLearning/comments/1uiqhiv/cerebras_openai_deal_capacity_has_effectively/",
+      "summary": "一家做实时编程 Agent 的初创公司在 r/MachineLearning 反映，Cerebras IPO 之后产能基本被锁给 OpenAI 的 200 亿美元采购，API 等待名单事实上停摆。 1~2k tokens/s 的高吞吐 ASIC 推理是不少 Agent 产品的硬刚需，Cerebras 与 OpenAI 这层供给绑定正在让其他新玩家提前面临断供。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Reddit",
+        "home_url": "https://www.reddit.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-06-29",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,

@@ -2,23 +2,55 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-15T03:34:30.755Z",
+  "generated_at": "2026-07-23T09:08:21.838Z",
   "group": {
     "id": "github_trending",
     "label": "GitHub 趋势"
   },
   "page": 1,
-  "page_count": 93,
+  "page_count": 111,
   "page_size": 50,
-  "total_count": 4640,
+  "total_count": 5529,
   "next_url": "signals/github_trending/page-002.json",
   "items": [
     {
-      "id": "occ_40fcdb3211a4681b9175d3d2",
-      "cluster_id": "cluster_d1bfed94dbc3e3b290d5343e",
-      "title": "b10015",
-      "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b10015",
-      "summary": "opencl: do not use clCreateBufferWithProperties when targeting CL 2.x ( #25673 ) macOS/iOS: macOS Apple Silicon (arm64) macOS Apple Silicon (arm64, KleidiAI enabled) DISABLED macOS Intel (x64) iOS XCFramework Linux: Ubuntu x64 (CPU) Ubuntu",
+      "id": "occ_4343b6ed81703cafc4cf3047",
+      "cluster_id": "cluster_f846f8c0477174ed5d75ccfc",
+      "title": "chore: update ai news snapshot",
+      "url": "https://github.com/LearnPrompt/ai-news-radar/commit/94ea61eaeba3bdb43401342b3a5f60ccc182d740",
+      "summary": "chore: update ai news snapshot。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "ai-news-radar GitHub commits",
+        "url": "https://github.com/LearnPrompt/ai-news-radar/commits/master.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-23",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_61c08aa9159f83d9f45555ef",
+      "cluster_id": "cluster_f67e70b1d1a438686621e6e6",
+      "title": "b10092",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b10092",
+      "summary": "ggml: enable PowerPC backend variants on AIX ( #25983 ) ggml: enable PowerPC backend variants on AIX Allow the PowerPC CPU backend variants to be built on AIX by extending the platform check in the CMake configuration. This reuses the exist",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -38,20 +70,20 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-23",
       "published_at": null,
-      "collected_at": "2026-07-15T03:34:30.755Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_003ce7fbb04913b0ec9ec5c7",
-      "cluster_id": "cluster_d74e98bda3193d33c74b0281",
-      "title": "FeedMe",
-      "url": "https://github.com/Seanium/FeedMe",
-      "summary": "2. **[FeedMe](https://github.com/Seanium/FeedMe)** - 部署到 GitHub Pages。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_69163d8c907dd623b3435b64",
+      "cluster_id": "cluster_7cd56b63e0a8db7885399376",
+      "title": "0.146.0-alpha.4",
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.146.0-alpha.4",
+      "summary": "Release 0.146.0-alpha.4",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -60,29 +92,94 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "Awesome AI News",
-        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
+        "name": "openai/codex Releases",
+        "url": "https://github.com/openai/codex/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
         "open_source",
+        "engineering",
         "industry_news"
       ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-23",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_875d7cc40a71f794d942d9a3",
+      "cluster_id": "cluster_579278dbee13e35af61d435a",
+      "title": "Release v0.52.0-nightly.20260723.g9681621c6",
+      "url": "https://github.com/google-gemini/gemini-cli/releases/tag/v0.52.0-nightly.20260723.g9681621c6",
+      "summary": "What's Changed fix(core): sequentially verify cached credentials and restore GOOGLE_APPLICATION_CREDENTIALS fallback by @luisfelipe-alt in #28472 feat(evals): add eval coverage report command by @ved015 in #28169 Full Changelog : v0.52.0-ni",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "google-gemini/gemini-cli Releases",
+        "url": "https://github.com/google-gemini/gemini-cli/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-23",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_978a3294e5086580d1b10ea3",
+      "cluster_id": "cluster_9afebc4ed0663d22edb9cb82",
+      "title": "chore: update feeds [skip ci]",
+      "url": "https://github.com/zarazhangrui/follow-builders/commit/7d1dee8a76db5a85cc58503ccc09b32f3f410106",
+      "summary": "chore: update feeds [skip ci]。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "follow-builders GitHub commits",
+        "url": "https://github.com/zarazhangrui/follow-builders/commits/main.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news",
+        "analysis_opinion"
+      ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-23",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
-      "access_state": "direct"
+      "access_state": "indirect"
     },
     {
-      "id": "occ_0096719ddaf32ccde57587eb",
-      "cluster_id": "cluster_fdc09468aa7c3169df988493",
-      "title": "tailscale/tailscale",
-      "url": "https://github.com/tailscale/tailscale",
-      "summary": "tailscale/tailscale appeared on GitHub Trending Go weekly with 781 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "id": "occ_b951519858f844d105ee91cb",
+      "cluster_id": "cluster_23c49030082a8b2ee5de668b",
+      "title": "v0.32.3",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.32.3-rc0",
+      "summary": "What's Changed mlx update by @dhiltgen in #17332 model/parsers: finalize incomplete GLM tool calls by @dhiltgen in #17250 docs: update retirements by @mxyng in #17289 model: align Laguna with upstream llama.cpp by @dhiltgen in #17335 Full C",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -91,28 +188,31 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "GitHub Trending Go weekly",
-        "url": "https://github.com/trending/go?since=weekly"
+        "name": "ollama/ollama Releases",
+        "url": "https://github.com/ollama/ollama/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
-        "open_source"
+        "model_release",
+        "open_source",
+        "engineering",
+        "industry_news"
       ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-23",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_010bf272480c66137ffb8377",
-      "cluster_id": "cluster_022c4327710cbfe72da3ed1f",
-      "title": "TencentCloud/CubeSandbox",
-      "url": "https://github.com/TencentCloud/CubeSandbox",
-      "summary": "TencentCloud/CubeSandbox appeared on GitHub Trending weekly with 1,944 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "id": "occ_c73e4231b33d7cdd24a52698",
+      "cluster_id": "cluster_0c7f99156e0a72622c324ceb",
+      "title": "chore: update ai news snapshot",
+      "url": "https://github.com/LearnPrompt/ai-news-radar/commit/5be86f573dca0ff1f3e74aa36587aefc44d6e12c",
+      "summary": "chore: update ai news snapshot。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -121,28 +221,123 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "GitHub Trending weekly",
-        "url": "https://github.com/trending?since=weekly"
+        "name": "ai-news-radar GitHub commits",
+        "url": "https://github.com/LearnPrompt/ai-news-radar/commits/master.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
-        "open_source"
+        "open_source",
+        "industry_news",
+        "community_discussion"
       ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-23",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_fe1d043f70e049c2ec33c69d",
+      "cluster_id": "cluster_5bcf3e158a024054b43a03ad",
+      "title": "b10103",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b10103",
+      "summary": "metal : add f16 type support to leaky relu ( #25981 )",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "ggml-org/llama.cpp Releases",
+        "url": "https://github.com/ggml-org/llama.cpp/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "model_release",
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-23",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0131eac4ad2ba0206137ca6d",
-      "cluster_id": "cluster_82f526161dc0fb4ff310830c",
-      "title": "microg/GmsCore",
-      "url": "https://github.com/microg/GmsCore",
-      "summary": "microg/GmsCore appeared on GitHub Trending Java daily with 15 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "id": "occ_006a6e77682fbfe511ac513c",
+      "cluster_id": "cluster_78df88887d30244ee252b0a6",
+      "title": "OpenCut-app/OpenCut",
+      "url": "https://github.com/OpenCut-app/OpenCut",
+      "summary": "OpenCut-app/OpenCut appeared on GitHub Trending TypeScript weekly with 7,394 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending TypeScript weekly",
+        "url": "https://github.com/trending/typescript?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_008a0d9d4eb90871cecec009",
+      "cluster_id": "cluster_950a2991f4bb4c990cb07755",
+      "title": "andrewrabert/jellium-desktop",
+      "url": "https://github.com/andrewrabert/jellium-desktop",
+      "summary": "andrewrabert/jellium-desktop appeared on GitHub Trending Rust weekly with 416 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Rust weekly",
+        "url": "https://github.com/trending/rust?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_00cdc9a8a25646f8b9a74b66",
+      "cluster_id": "cluster_360f08b99e30fa7c1347fac1",
+      "title": "kunal-kushwaha/DSA-Bootcamp-Java",
+      "url": "https://github.com/kunal-kushwaha/DSA-Bootcamp-Java",
+      "summary": "kunal-kushwaha/DSA-Bootcamp-Java appeared on GitHub Trending Java daily with 13 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -159,47 +354,49 @@
         "open_source"
       ],
       "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0196d70d0978e6fabd3b0f12",
-      "cluster_id": "cluster_ea1bba92a784740e3d2f9193",
-      "title": "RSS-Master",
-      "url": "https://github.com/TD21forever/RSS-Master",
-      "summary": "- **RSS 处理**: [FeedCraft](https://github.com/Colin-XKL/FeedCraft), [RSS-Master](https://github.com/TD21forever/RSS-Master)。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source befor。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_0144463b2b944df8370eafbd",
+      "cluster_id": "cluster_842bf36f38c5ca3cc5f183a1",
+      "title": "Kimi K2 Tech Report.",
+      "url": "https://raw.githubusercontent.com/MoonshotAI/Kimi-K2/main/tech_report.pdf",
+      "summary": "|[Kimi K2 Tech Report.](https://github.com/MoonshotAI/Kimi-K2/blob/main/tech_report.pdf) | Efficiently training trillion-parameter models demands optimizers that extract more learning from each token, but such methods often lead to crashes。This is an intermediary/self-media lead; trace it to a primary source before tr...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
+        "name": "raw.githubusercontent.com",
+        "home_url": "https://raw.githubusercontent.com/"
       },
       "collected_via": {
-        "name": "Awesome AI News",
-        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
       },
       "source_group": "github_trending",
       "content_tags": [
         "open_source",
-        "industry_news"
+        "research",
+        "industry_news",
+        "community_discussion"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_028b238c7588ba890fdcd40f",
+      "id": "occ_0188301c48cc6977991b8d87",
       "cluster_id": "cluster_39f4bfd16f2b39010cd544d9",
       "title": "Thoughts on America’s AI Action Plan.",
       "url": "https://www.anthropic.com/news/thoughts-on-america-s-ai-action-plan",
@@ -223,53 +420,20 @@
         "community_discussion"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_045b7c984b44d8b533eef669",
-      "cluster_id": "cluster_62b20f4df5ef3945eb3b4b7a",
-      "title": "Reinforcement Learning with Action Chunking.",
-      "url": "https://arxiv.org/abs/2507.07969",
-      "summary": "|[Reinforcement Learning with Action Chunking.](https://arxiv.org/abs/2507.07969) | Q-chunking is a reinforcement learning method that improves offline-to-online learning in long-horizon, sparse-reward tasks by introducing action chunking—g。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_070f55fa87cb2b78438d24a9",
-      "cluster_id": "cluster_50d9c5663d2944bddb915e3d",
-      "title": "yuliskov/SmartTube",
-      "url": "https://github.com/yuliskov/SmartTube",
-      "summary": "yuliskov/SmartTube appeared on GitHub Trending Java weekly with 265 stars this week. 近 7 天本地记录曾在 2026-07-08、2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "id": "occ_01e6feb80bfda42e8b92a7f7",
+      "cluster_id": "cluster_7b553354eb5444076503f1cd",
+      "title": "rohitg00/ai-engineering-from-scratch",
+      "url": "https://github.com/rohitg00/ai-engineering-from-scratch",
+      "summary": "rohitg00/ai-engineering-from-scratch appeared on GitHub Trending daily with 652 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -278,61 +442,28 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "GitHub Trending Java weekly",
-        "url": "https://github.com/trending/java?since=weekly"
+        "name": "GitHub Trending daily",
+        "url": "https://github.com/trending?since=daily"
       },
       "source_group": "github_trending",
       "content_tags": [
         "open_source"
       ],
       "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_08770046c58163ebb92b53c5",
-      "cluster_id": "cluster_c03478b8993cf3f242d2ec08",
-      "title": "Compressing Context.",
-      "url": "https://www.factory.ai/news/compressing-context",
-      "summary": "|[Compressing Context.](https://www.factory.ai/news/compressing-context) | Extended agentic workflows increasingly bump up against the hard limits of context windows. A new solution—**anchored summaries**—offers a smarter alternative to con。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "factory.ai",
-        "home_url": "https://www.factory.ai/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_089adae363293d21a8451490",
-      "cluster_id": "cluster_9c6f94aa14994f895b2e2be9",
-      "title": "tonhowtf/omniget",
-      "url": "https://github.com/tonhowtf/omniget",
-      "summary": "tonhowtf/omniget appeared on GitHub Trending Rust weekly with 303 stars this week. 近 7 天本地记录曾在 2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "id": "occ_02a023dfd13472d52ac4ea5c",
+      "cluster_id": "cluster_bef41a8d82a61cb78a3f026f",
+      "title": "v2.1.218",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.218",
+      "summary": "What's changed Changed /code-review to run as a background subagent, so review work no longer fills your conversation and keeps stacked slash commands as its review target Added screen-reader announcements of deleted text for word and line",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -341,28 +472,30 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "GitHub Trending Rust weekly",
-        "url": "https://github.com/trending/rust?since=weekly"
+        "name": "anthropics/claude-code Releases",
+        "url": "https://github.com/anthropics/claude-code/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
-        "open_source"
+        "open_source",
+        "engineering",
+        "industry_news"
       ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_08b579efc464e4202a5f5888",
-      "cluster_id": "cluster_0c13739dbedc7f3247e38313",
-      "title": "openai/codex-plugin-cc",
-      "url": "https://github.com/openai/codex-plugin-cc",
-      "summary": "openai/codex-plugin-cc appeared on GitHub Trending weekly with 2,063 stars this week. 近 7 天本地记录曾在 2026-07-08、2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "id": "occ_04254de4e2a51cdf1dcc5cfd",
+      "cluster_id": "cluster_fae31da6c227cfdebdce06bd",
+      "title": "Shubhamsaboo/awesome-llm-apps",
+      "url": "https://github.com/Shubhamsaboo/awesome-llm-apps",
+      "summary": "Shubhamsaboo/awesome-llm-apps appeared on GitHub Trending weekly with 4,690 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -379,20 +512,20 @@
         "open_source"
       ],
       "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0954f4ad4b9e33d53dce642d",
-      "cluster_id": "cluster_fcbb057ee95e825d28797401",
-      "title": "microsoft/typescript-go",
-      "url": "https://github.com/microsoft/typescript-go",
-      "summary": "microsoft/typescript-go appeared on GitHub Trending Go weekly with 167 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "id": "occ_04f3b1c8c84daffac5a225aa",
+      "cluster_id": "cluster_f139f6b4a3e34f45215b8a01",
+      "title": "b10083",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b10083",
+      "summary": "cuda: add sqrt_softplus in topk-moe for dsv4 ( #25896 ) Website: https://llama.app macOS/iOS: macOS Apple Silicon (arm64) macOS Apple Silicon (arm64, KleidiAI enabled) DISABLED macOS Intel (x64) iOS XCFramework Linux: Ubuntu x64 (CPU) Ubunt",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -401,28 +534,31 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "GitHub Trending Go weekly",
-        "url": "https://github.com/trending/go?since=weekly"
+        "name": "ggml-org/llama.cpp Releases",
+        "url": "https://github.com/ggml-org/llama.cpp/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
-        "open_source"
+        "model_release",
+        "open_source",
+        "engineering",
+        "industry_news"
       ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0a6d03159a349be44615e77e",
-      "cluster_id": "cluster_1b56cc9447a6475c09dfd2aa",
-      "title": "HKUDS/Vibe-Trading",
-      "url": "https://github.com/HKUDS/Vibe-Trading",
-      "summary": "HKUDS/Vibe-Trading appeared on GitHub Trending Python weekly with 4,252 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "id": "occ_05afd2986af89f1bee33d7ee",
+      "cluster_id": "cluster_9f029f51f92cf18b9607fd37",
+      "title": "clawfeed",
+      "url": "https://github.com/kevinho/clawfeed",
+      "summary": "- **[clawfeed](https://github.com/kevinho/clawfeed)** ⭐⭐⭐⭐⭐ - 多频率摘要系统（4小时/日/周/月），支持 AI 深度分析、书签功能、Google OAuth 多用户。*功能最完整*。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -431,28 +567,29 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "GitHub Trending Python weekly",
-        "url": "https://github.com/trending/python?since=weekly"
+        "name": "Awesome AI News",
+        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
       },
       "source_group": "github_trending",
       "content_tags": [
-        "open_source"
+        "open_source",
+        "industry_news"
       ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0a74518a765ab45a6f8ad18f",
-      "cluster_id": "cluster_daf8f820b4663969fc64933e",
-      "title": "jenkinsci/jenkins",
-      "url": "https://github.com/jenkinsci/jenkins",
-      "summary": "jenkinsci/jenkins appeared on GitHub Trending Java weekly with 117 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "id": "occ_06b7387f16f19fa63aee493d",
+      "cluster_id": "cluster_0a36c0669d936d527dbbf08a",
+      "title": "Release v0.53.0-preview.0",
+      "url": "https://github.com/google-gemini/gemini-cli/releases/tag/v0.53.0-preview.0",
+      "summary": "What's Changed fix(core,a2a): group cancelled tool responses and coalesce consecutive roles to prevent 400 Bad Request by @luisfelipe-alt in #28407 feat(caretaker-triage): implement LLM triage orchestrator and container build by @chadd28 in",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -461,64 +598,36 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "GitHub Trending Java weekly",
-        "url": "https://github.com/trending/java?since=weekly"
+        "name": "google-gemini/gemini-cli Releases",
+        "url": "https://github.com/google-gemini/gemini-cli/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
-        "open_source"
+        "open_source",
+        "engineering",
+        "industry_news"
       ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0a7fe1c6767bf8b64f4a9920",
-      "cluster_id": "cluster_35c61dc1b9178396e6b4c66c",
-      "title": "sundowndev/phoneinfoga",
-      "url": "https://github.com/sundowndev/phoneinfoga",
-      "summary": "sundowndev/phoneinfoga appeared on GitHub Trending Go weekly with 202 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "id": "occ_06e4c32ac5e16c5d9121cfa0",
+      "cluster_id": "cluster_47b99712c11b213913e16976",
+      "title": "Google DeepMind launches Aeneas AI model for ancient Roman inscription analysis.",
+      "url": "https://deepmind.google/discover/blog/aeneas-transforms-how-historians-connect-the-past/",
+      "summary": "|[Google DeepMind launches Aeneas AI model for ancient Roman inscription analysis.](https://deepmind.google/discover/blog/aeneas-transforms-how-historians-connect-the-past/) |Aeneas is the first AI model built to assist historians in unders。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Go weekly",
-        "url": "https://github.com/trending/go?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0aeb10df8c4f6fcaf0272668",
-      "cluster_id": "cluster_82b02f9d043375d933eb4884",
-      "title": "In Leaked Memo, Anthropic CEO Says Company Will Pursue Gulf State Investments After All.",
-      "url": "https://futurism.com/leaked-messages-ceo-anthropic-dictators",
-      "summary": "|[In Leaked Memo, Anthropic CEO Says Company Will Pursue Gulf State Investments After All.](https://futurism.com/leaked-messages-ceo-anthropic-dictators) |Dario Amodei’s remarks reflect the tension between **AI safety values and geopolitica。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "futurism.com",
-        "home_url": "https://futurism.com/"
+        "name": "deepmind.google",
+        "home_url": "https://deepmind.google/"
       },
       "collected_via": {
         "name": "ML & AI News of the Week",
@@ -532,26 +641,57 @@
         "community_discussion"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0cf0e662fdcb93505836469f",
-      "cluster_id": "cluster_684a18e96f3c7cb5fad5b42c",
-      "title": "OpenAI's new economic analysis.",
-      "url": "https://openai.com/global-affairs/new-economic-analysis/",
-      "summary": "|[OpenAI's new economic analysis.](https://openai.com/global-affairs/new-economic-analysis/) |OpenAI's latest economic research shows that 28% of working U.S. adults now use ChatGPT on the job, a sharp rise from 8% in 2023. The data indicat。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_0785ea2c291bb629bc5cb00c",
+      "cluster_id": "cluster_32f5cd7b5175ed7e7fdb87cb",
+      "title": "FeedCraft",
+      "url": "https://github.com/Colin-XKL/FeedCraft",
+      "summary": "| 4 | [FeedCraft](https://github.com/Colin-XKL/FeedCraft) | 2 周前 | 682 |。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "openai.com",
-        "home_url": "https://openai.com/"
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "Awesome AI News",
+        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_07a1638895eca62a288f4f5f",
+      "cluster_id": "cluster_3cc642759ab5ebd6a8bd3784",
+      "title": "Updated Qwen3-235B.",
+      "url": "https://x.com/Alibaba_Qwen/status/1947344511988076547",
+      "summary": "|[Updated Qwen3-235B.](https://x.com/Alibaba_Qwen/status/1947344511988076547) | Alibaba's Qwen team has released an updated Qwen3-235B-A22B, a non-reasoning model, with major improvements.|。ML & AI News of the Week latest report listed this。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "x.com",
+        "home_url": "https://x.com/"
       },
       "collected_via": {
         "name": "ML & AI News of the Week",
@@ -565,143 +705,20 @@
         "community_discussion"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0ddad7e7361e50b99c8d7f31",
-      "cluster_id": "cluster_e47ce894a3c4b30d31d26cec",
-      "title": "chenhg5/cc-connect",
-      "url": "https://github.com/chenhg5/cc-connect",
-      "summary": "chenhg5/cc-connect appeared on GitHub Trending Go daily with 56 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Go daily",
-        "url": "https://github.com/trending/go?since=daily"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0e480ca033203d5630c2de6d",
-      "cluster_id": "cluster_8b33431619c9e6f5fdcfec04",
-      "title": "Microsoft Poaches 20 Top AI Engineers From Google's DeepMind, Including Head of Gemini Chatbot .",
-      "url": "https://winbuzzer.com/2025/07/22/microsoft-poaches-20-top-ai-engineers-from-googles-deepmind-including-head-of-gemini-chatbot-xcxwbn/",
-      "summary": "|[Microsoft Poaches 20 Top AI Engineers From Google's DeepMind, Including Head of Gemini Chatbot .](https://winbuzzer.com/2025/07/22/microsoft-poaches-20-top-ai-engineers-from-googles-deepmind-including-head-of-gemini-chatbot-xcxwbn/) | Mic。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "winbuzzer.com",
-        "home_url": "https://winbuzzer.com/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0eb23b40a334a60653a5f706",
-      "cluster_id": "cluster_f7c18bc830d2068592652a00",
-      "title": "Augani/openreel-video",
-      "url": "https://github.com/Augani/openreel-video",
-      "summary": "Augani/openreel-video appeared on GitHub Trending TypeScript daily with 121 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending TypeScript daily",
-        "url": "https://github.com/trending/typescript?since=daily"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0ef073f4103682bd23a03b4e",
-      "cluster_id": "cluster_3d7c7b2843ae85360da76371",
-      "title": "Crosstalk-Solutions/project-nomad",
-      "url": "https://github.com/Crosstalk-Solutions/project-nomad",
-      "summary": "Crosstalk-Solutions/project-nomad appeared on GitHub Trending TypeScript daily with 92 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending TypeScript daily",
-        "url": "https://github.com/trending/typescript?since=daily"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0f172df2fc9a6fc17accf83f",
-      "cluster_id": "cluster_15d482e5be2488b873b190cb",
-      "title": "Vexa-ai/vexa",
-      "url": "https://github.com/Vexa-ai/vexa",
-      "summary": "Vexa-ai/vexa appeared on GitHub Trending Python daily with 23 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "id": "occ_07a3c206a1c52caa214da6f1",
+      "cluster_id": "cluster_98a99d0df7599b357282334f",
+      "title": "luongnv89/claude-howto",
+      "url": "https://github.com/luongnv89/claude-howto",
+      "summary": "luongnv89/claude-howto appeared on GitHub Trending Python daily with 116 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -718,20 +735,557 @@
         "open_source"
       ],
       "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0f9e42e97eb2b0c059c3646f",
-      "cluster_id": "cluster_6b26dc924771c4c1d534844f",
-      "title": "apache/kafka",
-      "url": "https://github.com/apache/kafka",
-      "summary": "apache/kafka appeared on GitHub Trending Java weekly with 147 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "id": "occ_09464096b29ad7f919c40c50",
+      "cluster_id": "cluster_6be03602766e5bca1354b6c3",
+      "title": "Budgeting for AI in Your Startup.",
+      "url": "https://tomtunguz.com/ai-rd-percent/",
+      "summary": "|[Budgeting for AI in Your Startup.](https://tomtunguz.com/ai-rd-percent/) | Startups are advised to dedicate 10–15% of their R\\&D budget to AI, given that engineers typically earn \\$200k and AI tools cost around \\$30k annually. Spending ma。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "tomtunguz.com",
+        "home_url": "https://tomtunguz.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_09cb74fc3e87fecb30d3b173",
+      "cluster_id": "cluster_8f232e4ac1b8ad161e48c306",
+      "title": "apache/ossie",
+      "url": "https://github.com/apache/ossie",
+      "summary": "apache/ossie appeared on GitHub Trending weekly with 810 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending weekly",
+        "url": "https://github.com/trending?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0afcd419c15dc03b68b3f629",
+      "cluster_id": "cluster_a53d3fd2b571b4b19ee0298a",
+      "title": "Pika Labs Launches AI-Only Social Video App.",
+      "url": "https://x.com/pika_labs/status/1947427650555023410?s=46",
+      "summary": "|[Pika Labs Launches AI-Only Social Video App.](https://x.com/pika_labs/status/1947427650555023410?s=46&utm_source=tldrai) | The AI video startup has opened early access to what it calls the \"first-ever AI-only social video app,\" built on a。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "x.com",
+        "home_url": "https://x.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0b8a483bc696ede1e4063f71",
+      "cluster_id": "cluster_ae19178305e34908edee6dee",
+      "title": "TrendRadar",
+      "url": "https://github.com/sansan0/TrendRadar",
+      "summary": "- **[TrendRadar](https://github.com/sansan0/TrendRadar)** ⭐⭐⭐⭐⭐ - 企业级信息推送，支持 MCP AI 分析、10+ 推送渠道（企业微信、Telegram、钉钉、飞书、邮件等）、统一时间线调度。*企业就绪*。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "Awesome AI News",
+        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0be17ec7035f85c0c50211e7",
+      "cluster_id": "cluster_ef03efa8fa36c2aee1983967",
+      "title": "KnockOutEZ/wigolo",
+      "url": "https://github.com/KnockOutEZ/wigolo",
+      "summary": "KnockOutEZ/wigolo appeared on GitHub Trending TypeScript daily with 478 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending TypeScript daily",
+        "url": "https://github.com/trending/typescript?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0c45326885be580e5b8e97bb",
+      "cluster_id": "cluster_d4553d5b79e4889c9c5303b8",
+      "title": "AI 情报雷达",
+      "url": "https://ryanliangwh.github.io/ai-news-radar/",
+      "summary": "AI News Radar is explicitly watched; feeds=0; github_links=0.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "ryanliangwh.github.io",
+        "home_url": "https://ryanliangwh.github.io/"
+      },
+      "collected_via": {
+        "name": "AI News Radar",
+        "url": "https://ryanliangwh.github.io/ai-news-radar/"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_0cd42857b29625f0fbe627e7",
+      "cluster_id": "cluster_15de882adb5a92e56d537769",
+      "title": "Pumpkin-MC/Pumpkin",
+      "url": "https://github.com/Pumpkin-MC/Pumpkin",
+      "summary": "Pumpkin-MC/Pumpkin appeared on GitHub Trending Rust weekly with 189 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Rust weekly",
+        "url": "https://github.com/trending/rust?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0cf017cf24ee2a60ebef60ad",
+      "cluster_id": "cluster_b303b1e4141446e667c0ef75",
+      "title": "ruvnet/RuView",
+      "url": "https://github.com/ruvnet/RuView",
+      "summary": "ruvnet/RuView appeared on GitHub Trending Rust daily with 741 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Rust daily",
+        "url": "https://github.com/trending/rust?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0d687bdb206183d34af37488",
+      "cluster_id": "cluster_4ba76a8238d7cc5e2a063296",
+      "title": "18 months. 12,000 questions. A whole lot of anxiety. What I learned from reading students’ ChatGPT logs.",
+      "url": "https://www.theguardian.com/technology/2025/jul/27/it-wants-users-hooked-and-jonesing-for-their-next-fix-are-young-people-becoming-too-reliant-on-ai",
+      "summary": "|[18 months. 12,000 questions. A whole lot of anxiety. What I learned from reading students’ ChatGPT logs.](https://www.theguardian.com/technology/2025/jul/27/it-wants-users-hooked-and-jonesing-for-their-next-fix-are-young-people-becoming-t。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "theguardian.com",
+        "home_url": "https://www.theguardian.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0eac532343fd0dfa26f349cb",
+      "cluster_id": "cluster_0d47958b6799cde426d10d46",
+      "title": "Anthropic tests Memory and MCP support for Claude mobile app.",
+      "url": "https://www.testingcatalog.com/anthropic-tests-memory-and-mcp-support-for-claude-mobile-app/",
+      "summary": "|[Anthropic tests Memory and MCP support for Claude mobile app.](https://www.testingcatalog.com/anthropic-tests-memory-and-mcp-support-for-claude-mobile-app/#google_vignette) | Anthropic is working on adding memory and recall features to Cl。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "testingcatalog.com",
+        "home_url": "https://www.testingcatalog.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0eb7f4cc1b636aff0adfc03c",
+      "cluster_id": "cluster_67dda6d379aeb0aa425ec3f8",
+      "title": "AI As Profoundly Abnormal Technology.",
+      "url": "https://blog.ai-futures.org/p/ai-as-profoundly-abnormal-technology",
+      "summary": "|[AI As Profoundly Abnormal Technology.](https://blog.ai-futures.org/p/ai-as-profoundly-abnormal-technology) |AI capabilities are expected to advance dramatically over the next decade. Although some anticipate slow adoption due to safety an。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "blog.ai-futures.org",
+        "home_url": "https://blog.ai-futures.org/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0f094daed1810ad21cc7c814",
+      "cluster_id": "cluster_344d46b0f790a3ec4e82f840",
+      "title": "tirth8205/code-review-graph",
+      "url": "https://github.com/tirth8205/code-review-graph",
+      "summary": "tirth8205/code-review-graph appeared on GitHub Trending Python daily with 882 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Python daily",
+        "url": "https://github.com/trending/python?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0f8a219c12fa5e5d1b674183",
+      "cluster_id": "cluster_0cbf226ba8f17b53fc9efddd",
+      "title": "New open models arrive in the Vertex AI Model Garden.",
+      "url": "https://cloud.google.com/blog/products/ai-machine-learning/deepseek-r1-is-available-for-everyone-in-vertex-ai-model-garden/",
+      "summary": "|[New open models arrive in the Vertex AI Model Garden.](https://cloud.google.com/blog/products/ai-machine-learning/deepseek-r1-is-available-for-everyone-in-vertex-ai-model-garden/) |Google Cloud has added the DeepSeek R1 model to its Verte。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "cloud.google.com",
+        "home_url": "https://cloud.google.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_101fec286df338b9164f3dc6",
+      "cluster_id": "cluster_344d46b0f790a3ec4e82f840",
+      "title": "tirth8205/code-review-graph",
+      "url": "https://github.com/tirth8205/code-review-graph",
+      "summary": "tirth8205/code-review-graph appeared on GitHub Trending daily with 882 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending daily",
+        "url": "https://github.com/trending?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_1124d95db706e18b49d2e288",
+      "cluster_id": "cluster_c409e4d7205545785d999164",
+      "title": "0.146.0-alpha.1",
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.146.0-alpha.1",
+      "summary": "Release 0.146.0-alpha.1",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "openai/codex Releases",
+        "url": "https://github.com/openai/codex/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_11ad8929c1162c69d25dbaa9",
+      "cluster_id": "cluster_45b66faad922efd28827000e",
+      "title": "Qwen3-Coder.",
+      "url": "https://qwenlm.github.io/blog/qwen3-coder/",
+      "summary": "|[Qwen3-Coder.](https://qwenlm.github.io/blog/qwen3-coder/) |Alibaba's new 480B-parameter model sets a new state-of-the-art among open models for coding tasks and reportedly matches the performance of Sonnet 4. Alongside this, Alibaba has o。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "qwenlm.github.io",
+        "home_url": "https://qwenlm.github.io/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_130a7ef8fec0e37eb4fb11f5",
+      "cluster_id": "cluster_50326ca79a739503a971b2e6",
+      "title": "Competition shows humans are still better than AI at coding – just.",
+      "url": "https://www.theguardian.com/technology/2025/jul/26/competition-shows-humans-are-still-better-than-ai-at-coding-just",
+      "summary": "|[Competition shows humans are still better than AI at coding – just.](https://www.theguardian.com/technology/2025/jul/26/competition-shows-humans-are-still-better-than-ai-at-coding-just) | Przemysław Dębiak, who beat OpenAI at world finals。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "theguardian.com",
+        "home_url": "https://www.theguardian.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_13ca75b4039ed7394c30c3b3",
+      "cluster_id": "cluster_50e2211cc224db7957945a47",
+      "title": "HMCL-dev/HMCL",
+      "url": "https://github.com/HMCL-dev/HMCL",
+      "summary": "HMCL-dev/HMCL appeared on GitHub Trending Java weekly with 63 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -748,20 +1302,20 @@
         "open_source"
       ],
       "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_102c8cd804f85c7778782dfb",
-      "cluster_id": "cluster_b229581aae0e9893d3dbd1cd",
-      "title": "wonderwhy-er/DesktopCommanderMCP",
-      "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
-      "summary": "wonderwhy-er/DesktopCommanderMCP appeared on GitHub Trending TypeScript weekly with 2,009 stars this week. 近 7 天本地记录曾在 2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "id": "occ_13e673dd89a2052231ee769d",
+      "cluster_id": "cluster_6fd8d26853d3a3bae3b20655",
+      "title": "kestra-io/kestra",
+      "url": "https://github.com/kestra-io/kestra",
+      "summary": "kestra-io/kestra appeared on GitHub Trending Java daily with 12 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -770,87 +1324,145 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "GitHub Trending TypeScript weekly",
-        "url": "https://github.com/trending/typescript?since=weekly"
+        "name": "GitHub Trending Java daily",
+        "url": "https://github.com/trending/java?since=daily"
       },
       "source_group": "github_trending",
       "content_tags": [
         "open_source"
       ],
       "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_10958a4548795ca399949b2d",
-      "cluster_id": "cluster_7314fbcc7222c9397ec878d2",
-      "title": "SoftBank and OpenAI's $500 Billion AI Project Struggles to Get Off Ground.",
-      "url": "https://www.wsj.com/tech/ai/softbank-openai-a3dc57b4?reflink=desktopwebshare_permalink&st=isodSQ",
-      "summary": "|[SoftBank and OpenAI's $500 Billion AI Project Struggles to Get Off Ground.](https://www.wsj.com/tech/ai/softbank-openai-a3dc57b4?st=isodSQ&reflink=desktopwebshare_permalink&utm_source=tldrai) | Six months after the White House announcemen。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_155d14802eb521d56544b709",
+      "cluster_id": "cluster_92d82495cbcde40d5e7a343d",
+      "title": "likec4/likec4",
+      "url": "https://github.com/likec4/likec4",
+      "summary": "likec4/likec4 appeared on GitHub Trending daily with 80 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "wsj.com",
-        "home_url": "https://www.wsj.com/"
+        "name": "github.com",
+        "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+        "name": "GitHub Trending daily",
+        "url": "https://github.com/trending?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_159137580eb224b13d7d9d43",
+      "cluster_id": "cluster_6d302abbb73d4859ee7e837e",
+      "title": "oblien/openship",
+      "url": "https://github.com/oblien/openship",
+      "summary": "oblien/openship appeared on GitHub Trending TypeScript daily with 1,302 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending TypeScript daily",
+        "url": "https://github.com/trending/typescript?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_15cc6275b28cf2a1a799de59",
+      "cluster_id": "cluster_b303b1e4141446e667c0ef75",
+      "title": "ruvnet/RuView",
+      "url": "https://github.com/ruvnet/RuView",
+      "summary": "ruvnet/RuView appeared on GitHub Trending Rust weekly with 2,456 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Rust weekly",
+        "url": "https://github.com/trending/rust?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_15fd0a028498e8cd24683629",
+      "cluster_id": "cluster_f727dc3c031b45c708934c33",
+      "title": "ai-daily-skill",
+      "url": "https://github.com/geekjourneyx/ai-daily-skill",
+      "summary": "- **[ai-daily-skill](https://github.com/geekjourneyx/ai-daily-skill)** ⭐⭐⭐ - 每日 AI 技能报告和学习资源。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "Awesome AI News",
+        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
       },
       "source_group": "github_trending",
       "content_tags": [
         "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
+        "industry_news"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_118111e6d84239d256603530",
-      "cluster_id": "cluster_9f71052d8d0182397ea2d524",
-      "title": "ethereum/go-ethereum",
-      "url": "https://github.com/ethereum/go-ethereum",
-      "summary": "ethereum/go-ethereum appeared on GitHub Trending Go weekly with 161 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Go weekly",
-        "url": "https://github.com/trending/go?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_11bbb4be5ef35b8c64a988dd",
+      "id": "occ_18b0c60b22850e55bed812a9",
       "cluster_id": "cluster_32f5cd7b5175ed7e7fdb87cb",
       "title": "FeedCraft",
       "url": "https://github.com/Colin-XKL/FeedCraft",
@@ -872,26 +1484,26 @@
         "industry_news"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_1276ef1dfd2c9efdc9acf7c7",
-      "cluster_id": "cluster_627a595094845214fbde8063",
-      "title": "AI summaries cause ‘devastating’ drop in audiences, online news media told.",
-      "url": "https://www.theguardian.com/technology/2025/jul/24/ai-summaries-causing-devastating-drop-in-online-news-audiences-study-finds",
-      "summary": "|[AI summaries cause ‘devastating’ drop in audiences, online news media told.](https://www.theguardian.com/technology/2025/jul/24/ai-summaries-causing-devastating-drop-in-online-news-audiences-study-finds) | Study claims sites previously ra。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_19aa7550901672bba9dc555a",
+      "cluster_id": "cluster_b5006273e0ec9ca2cfb0d5b2",
+      "title": "Human Coder Narrowly Defeats OpenAI in Programming Marathon.",
+      "url": "https://www.perplexity.ai/page/human-coder-beats-openai-in-ma-rVrjgYrERM6_DqDj8NM0kA",
+      "summary": "|[Human Coder Narrowly Defeats OpenAI in Programming Marathon.](https://www.perplexity.ai/page/human-coder-beats-openai-in-ma-rVrjgYrERM6_DqDj8NM0kA) |Polish programmer \"Psyho\" narrowly outperformed an advanced OpenAI model in the 10-hour A。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "theguardian.com",
-        "home_url": "https://www.theguardian.com/"
+        "name": "perplexity.ai",
+        "home_url": "https://www.perplexity.ai/"
       },
       "collected_via": {
         "name": "ML & AI News of the Week",
@@ -905,50 +1517,20 @@
         "community_discussion"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_12922b184b2617f8c23b2849",
-      "cluster_id": "cluster_c87cd13d69aef69146c01790",
-      "title": "google-labs-code/stitch-skills",
-      "url": "https://github.com/google-labs-code/stitch-skills",
-      "summary": "google-labs-code/stitch-skills appeared on GitHub Trending TypeScript weekly with 975 stars this week. 近 7 天本地记录曾在 2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending TypeScript weekly",
-        "url": "https://github.com/trending/typescript?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_13243ded0f4400b8e33c6cab",
-      "cluster_id": "cluster_47cf4754c57775a327732ba4",
-      "title": "auto-news",
-      "url": "https://github.com/finaldie/auto-news",
-      "summary": "- **[auto-news](https://github.com/finaldie/auto-news)** ⭐⭐⭐⭐ - 基于 LLM 的自动新闻聚合器，快速了解趋势。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a ...",
+      "id": "occ_19af4b4cd4bb774ac3a3f124",
+      "cluster_id": "cluster_e4767cf4fbea0c64d52b06fc",
+      "title": "RSSBox",
+      "url": "https://github.com/versun/RSSBox",
+      "summary": "- **[RSSBox](https://github.com/versun/RSSBox)** ⭐⭐⭐⭐ - 智能 RSS 管理，高效信息获取（原 RSS Translator）。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it a...",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -966,83 +1548,20 @@
         "industry_news"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_1459a475fcb90772809ba10d",
-      "cluster_id": "cluster_74ccb72bf236159f268c28d3",
-      "title": "TimeScope Video Understanding Benchmark.",
-      "url": "https://huggingface.co/blog/timescope-video-lmm-benchmark",
-      "summary": "|[TimeScope Video Understanding Benchmark.](https://huggingface.co/blog/timescope-video-lmm-benchmark) |TimeScope is an open-source benchmark designed to test vision-language models on long videos by inserting short \"needle\" clips. It measu。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1504899dcc7d37a1d38d71cc",
-      "cluster_id": "cluster_de860f714a7fd4d23ef8556f",
-      "title": "Arindam200/awesome-ai-apps",
-      "url": "https://github.com/Arindam200/awesome-ai-apps",
-      "summary": "Arindam200/awesome-ai-apps appeared on GitHub Trending Python daily with 21 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Python daily",
-        "url": "https://github.com/trending/python?since=daily"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_16147ecd2715e2a0cbd3f209",
-      "cluster_id": "cluster_f1b052407d44c13bdc9bb43f",
-      "title": "supertokens/supertokens-core",
-      "url": "https://github.com/supertokens/supertokens-core",
-      "summary": "supertokens/supertokens-core appeared on GitHub Trending Java weekly with 113 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "id": "occ_19f2d0c261f260cb7d084e89",
+      "cluster_id": "cluster_ab9b458912444836e2710983",
+      "title": "TGX-Android/Telegram-X",
+      "url": "https://github.com/TGX-Android/Telegram-X",
+      "summary": "TGX-Android/Telegram-X appeared on GitHub Trending Java weekly with 27 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1059,514 +1578,9 @@
         "open_source"
       ],
       "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
+      "event_date": "2026-07-22",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_18af66631a7e0d1aeb313266",
-      "cluster_id": "cluster_7642562fa78b1d9eec7c7345",
-      "title": "kousen/claude-code-training",
-      "url": "https://github.com/kousen/claude-code-training",
-      "summary": "kousen/claude-code-training appeared on GitHub Trending Java weekly with 117 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Java weekly",
-        "url": "https://github.com/trending/java?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1b86f910219edcb0187b7b22",
-      "cluster_id": "cluster_5eb5a1d21c93ad24d3a13ce8",
-      "title": "Trump Administration Pledges to Stimulate AI Use and Exports.",
-      "url": "https://www.wsj.com/tech/ai/trump-pledges-moves-to-stimulate-ai-use-and-exports-b85b0b15?reflink=desktopwebshare_permalink&st=gj1irP",
-      "summary": "|[Trump Administration Pledges to Stimulate AI Use and Exports.](https://www.wsj.com/tech/ai/trump-pledges-moves-to-stimulate-ai-use-and-exports-b85b0b15?st=gj1irP&reflink=desktopwebshare_permalink&utm_source=tldrai) |The Trump administrati。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "wsj.com",
-        "home_url": "https://www.wsj.com/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1dafadeccf7ed37d8fc55ca3",
-      "cluster_id": "cluster_22bd28e973456314d67d0f1b",
-      "title": "Ten AI safety projects I'd like people to work on.",
-      "url": "https://www.lesswrong.com/posts/vxA2BnCPTaPfnJjti/ten-ai-safety-projects-i-d-like-people-to-work-on",
-      "summary": "|[Ten AI safety projects I'd like people to work on.](https://www.lesswrong.com/posts/vxA2BnCPTaPfnJjti/ten-ai-safety-projects-i-d-like-people-to-work-on) | There is a real chance that AI systems capable of causing a catastrophe will be dev。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "lesswrong.com",
-        "home_url": "https://www.lesswrong.com/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1f3a921246fb7f331fa34334",
-      "cluster_id": "cluster_3ef027ce0a2753b737c68e63",
-      "title": "The Big LLM Architecture Comparison: From DeepSeek-V3 to Kimi K2.",
-      "url": "https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison",
-      "summary": "|[The Big LLM Architecture Comparison: From DeepSeek-V3 to Kimi K2.](https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison) | Seven years after the debut of GPT, modern LLMs still rely on surprisingly similar core arch。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "magazine.sebastianraschka.com",
-        "home_url": "https://magazine.sebastianraschka.com/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1f662564bbe8f3d020406812",
-      "cluster_id": "cluster_e622970364717202be2f5925",
-      "title": "HKUDS/DeepTutor",
-      "url": "https://github.com/HKUDS/DeepTutor",
-      "summary": "HKUDS/DeepTutor appeared on GitHub Trending Python weekly with 626 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Python weekly",
-        "url": "https://github.com/trending/python?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1fc1fb04b1235bd7b4623afc",
-      "cluster_id": "cluster_27336071fb1e1e43ec7ade1a",
-      "title": "github-trend",
-      "url": "https://github.com/aichipera/github-trend",
-      "summary": "- **[github-trend](https://github.com/aichipera/github-trend)** ⭐⭐⭐⭐ - AI 驱动的 GitHub Trending 追踪器（日/周/月榜），支持项目总结和趋势分析。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before fac。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "Awesome AI News",
-        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "industry_news"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_201f0835a30cae8445eaf507",
-      "cluster_id": "cluster_bba3d33a846364418d1cc346",
-      "title": "It is tempting to view the capability of current AI technology as a singular quantity.",
-      "url": "https://mathstodon.xyz/@tao/114881418225852441",
-      "summary": "|[It is tempting to view the capability of current AI technology as a singular quantity.](https://mathstodon.xyz/@tao/114881418225852441) | Without a controlled test methodology, one should be wary of making apples-to-apples comparisons bet。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "mathstodon.xyz",
-        "home_url": "https://mathstodon.xyz/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_208cd9a293c167b5ebd2fe12",
-      "cluster_id": "cluster_1d3712745ac27a0524655bd3",
-      "title": "RSS-to-Telegram-Bot",
-      "url": "https://github.com/Rongronggg9/RSS-to-Telegram-Bot",
-      "summary": "- **[RSS-to-Telegram-Bot](https://github.com/Rongronggg9/RSS-to-Telegram-Bot)** ⭐⭐⭐⭐⭐ - 成熟的 Telegram RSS 机器人，专注阅读体验。*最稳定*。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "Awesome AI News",
-        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "industry_news"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_214abf298e9b132f4e08e1f8",
-      "cluster_id": "cluster_12398321c3342b46b17b29e2",
-      "title": "rolldown/rolldown",
-      "url": "https://github.com/rolldown/rolldown",
-      "summary": "rolldown/rolldown appeared on GitHub Trending Rust weekly with 129 stars this week. 近 7 天本地记录曾在 2026-07-08、2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Rust weekly",
-        "url": "https://github.com/trending/rust?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_222f149994bb1ef1fd271336",
-      "cluster_id": "cluster_6ad47ced4fb703a4f8996cf7",
-      "title": "Replit launches Queue to streamline Agent task management.",
-      "url": "https://blog.replit.com/introducing-queue-a-smarter-way-to-work-with-agent",
-      "summary": "|[Replit launches Queue to streamline Agent task management.](https://blog.replit.com/introducing-queue-a-smarter-way-to-work-with-agent) |Replit's Queue streamlines multiple task submissions to the Replit Agent without interrupting app cre。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "blog.replit.com",
-        "home_url": "https://blog.replit.com/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_22e5ba85d6b1b7ba0e3cbb2d",
-      "cluster_id": "cluster_8077e2c226b60f36569b3653",
-      "title": "ai-news-radar",
-      "url": "https://github.com/LearnPrompt/ai-news-radar",
-      "summary": "| 🥇 | [ai-news-radar](https://github.com/LearnPrompt/ai-news-radar) | 2 小时前 | 44 |。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a rep...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "Awesome AI News",
-        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "industry_news"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_24e17ffca9ad3df0cd97f006",
-      "cluster_id": "cluster_3ac15a787d97b1270b4f1e70",
-      "title": "iOfficeAI/OfficeCLI",
-      "url": "https://github.com/iOfficeAI/OfficeCLI",
-      "summary": "iOfficeAI/OfficeCLI appeared on GitHub Trending weekly with 7,129 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending weekly",
-        "url": "https://github.com/trending?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_25550b7067a2a0c2c05a187c",
-      "cluster_id": "cluster_f825d648cf8a76b54e9a524d",
-      "title": "newpodcastforAI",
-      "url": "https://github.com/zacfire/newpodcastforAI",
-      "summary": "- **[newpodcastforAI](https://github.com/zacfire/newpodcastforAI)** ⭐⭐⭐ - 精选 AI 相关播客 RSS 聚合。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it ...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "Awesome AI News",
-        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "industry_news"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_26490ece9273d8d37b5fb864",
-      "cluster_id": "cluster_6db3976e15926a01548dd4f0",
-      "title": "AI and misinformation are supercharging the risk of nuclear war.",
-      "url": "https://www.nature.com/articles/d41586-025-02271-w",
-      "summary": "|[AI and misinformation are supercharging the risk of nuclear war.](https://www.nature.com/articles/d41586-025-02271-w) | Emerging dangers are reshaping the landscape of nuclear deterrence and increasing the threat of mutual annihilation. S。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "nature.com",
-        "home_url": "https://www.nature.com/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_266babfba6e1b6c738ef89d5",
-      "cluster_id": "cluster_c734f6fc572cbb077e3a2492",
-      "title": "actions/checkout",
-      "url": "https://github.com/actions/checkout",
-      "summary": "actions/checkout appeared on GitHub Trending TypeScript weekly with 184 stars this week. 近 7 天本地记录曾在 2026-07-08、2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending TypeScript weekly",
-        "url": "https://github.com/trending/typescript?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_267d1e73122c82b45c6260c5",
-      "cluster_id": "cluster_80da10d24e84d7b9b6cb5b02",
-      "title": "China calls for global AI cooperation days after Trump administration unveils low-regulation strategy.",
-      "url": "https://www.theguardian.com/technology/2025/jul/26/china-calls-for-global-ai-cooperation-days-after-trump-administration-unveils-low-regulation-strategy",
-      "summary": "|[China calls for global AI cooperation days after Trump administration unveils low-regulation strategy.](https://www.theguardian.com/technology/2025/jul/26/china-calls-for-global-ai-cooperation-days-after-trump-administration-unveils-low-r。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "theguardian.com",
-        "home_url": "https://www.theguardian.com/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-15",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
