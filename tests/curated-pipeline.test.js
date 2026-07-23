@@ -1487,6 +1487,40 @@ test("curated source shadow persists repo-safe raw and 186/24/24 funnel receipts
   )));
 
   const baseDiscovery = JSON.parse(await fs.readFile(discoveryPath, "utf8"));
+  const partialAuditDiscovery = structuredClone(baseDiscovery);
+  Object.assign(
+    partialAuditDiscovery.source_audit.content_sources.sources.find((source) => source.id === "content-anthropic-engineering"),
+    {
+      status: "blocked",
+      transport_status: "degraded",
+      completeness_status: "partial",
+      parsed_count: 1
+    }
+  );
+  const partialAuditPath = path.join(rootDir, ".tmp", "partial-audit-with-observations.json");
+  await fs.writeFile(partialAuditPath, `${JSON.stringify(partialAuditDiscovery, null, 2)}\n`, "utf8");
+  const partialAuditResult = await runCuratedSourceShadow({
+    rootDir,
+    reportDate: "2026-07-16",
+    generatedAt: "2026-07-16T02:33:00.000Z",
+    inputPaths: [partialAuditPath],
+    aifyResult,
+    outputDir: "reports-data-partial-audit"
+  });
+  const partialAuditFunnel = JSON.parse(await fs.readFile(partialAuditResult.source_funnel_path, "utf8"));
+  const partialAuditLane = partialAuditFunnel.lanes.find(
+    (lane) => lane.lane_id === "collection:content-anthropic-engineering"
+  );
+  assert.equal(partialAuditLane.stages.fetched.status, "success_with_items");
+  assert.equal(partialAuditLane.stages.parsed.status, "success_with_items");
+  assert.equal(
+    partialAuditFunnel.asset_reconciliation.current_entries.find(
+      (source) => source.source_id === "content-anthropic-engineering"
+    ).transport_state,
+    "blocked",
+    "partial transport degradation must remain visible outside the successful observation lineage"
+  );
+
   const mixedGithub = structuredClone(baseDiscovery);
   mixedGithub.sources = mixedGithub.sources.filter((source) => source.id !== "github-trending");
   mixedGithub.candidates = mixedGithub.candidates.filter((candidate) => candidate.source_id !== "github-trending");

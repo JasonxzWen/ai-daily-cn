@@ -241,6 +241,7 @@ const PROJECT_TARGET = 10;
 const HOT_BLOG_TARGET = 8;
 const BUILDER_OBSERVATION_TARGET = 12;
 const COMMUNITY_LEAD_TARGET = 6;
+const COMMUNITY_OLD_BACKGROUND_TARGET = 1;
 const COMMUNITY_PAPER_TARGET = 3;
 const COMMUNITY_GITHUB_TARGET = 3;
 const COMMUNITY_LOW_SIGNAL_PARTNERSHIP_TARGET = 2;
@@ -801,10 +802,13 @@ function selectReportItems(merged, options = {}) {
   let communityLowSignalPartnerships = 0;
   let communityPaperCount = 0;
   let communityGithubCount = 0;
+  let communityOldBackgroundCount = 0;
   const communityTopicKeys = new Set();
   for (const candidate of communityPool) {
     if (communitySeeds.length >= COMMUNITY_LEAD_TARGET) break;
     const sourceLevel = sourceLevelForCandidate(candidate);
+    const oldBackground = isOutsideMainWindowCandidate(candidate, reportDate);
+    if (oldBackground && communityOldBackgroundCount >= COMMUNITY_OLD_BACKGROUND_TARGET) continue;
     if (isLowSignalVendorPartnership(candidate)) {
       if (communityLowSignalPartnerships >= COMMUNITY_LOW_SIGNAL_PARTNERSHIP_TARGET) continue;
       communityLowSignalPartnerships += 1;
@@ -822,6 +826,9 @@ function selectReportItems(merged, options = {}) {
     }
     if (sourceLevel === "github") {
       communityGithubCount += 1;
+    }
+    if (oldBackground) {
+      communityOldBackgroundCount += 1;
     }
   }
   const communityLeads = communitySeeds.map((candidate) => {

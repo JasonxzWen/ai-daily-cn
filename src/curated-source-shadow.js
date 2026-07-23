@@ -1077,12 +1077,13 @@ function buildRegistryLane({ laneId, logicalSourceId, entries, auditRows, observ
   const observations = sourceIds.flatMap((id) => observationsBySourceId.get(id) || []);
   const registered = stage("source_entry", sourceIds.length > 0 ? "success_with_items" : "not_run", sourceIds);
   const fetchEvidence = audits.filter((audit) => normalizeAuditState(audit.status) !== "not_run");
-  const fetchStatus = aggregateRuntimeStates(fetchEvidence.length > 0
-    ? fetchEvidence.map((audit) => normalizeAuditState(audit.status))
-    : observations.length > 0
-      ? ["success_with_items"]
-      : []);
-  const inferredFetchIds = observations.length > 0 && fetchEvidence.length === 0
+  const auditFetchStates = fetchEvidence.map((audit) => normalizeAuditState(audit.status));
+  const auditFetchStatus = aggregateRuntimeStates(auditFetchStates);
+  const fetchStatus = aggregateRuntimeStates([
+    ...auditFetchStates,
+    ...(observations.length > 0 ? ["success_with_items"] : [])
+  ]);
+  const inferredFetchIds = observations.length > 0 && auditFetchStatus !== "success_with_items"
     ? observations.map((item) => `fetch:${item.id}`)
     : [];
   const fetched = stage(

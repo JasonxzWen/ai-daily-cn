@@ -2630,6 +2630,59 @@
             "minimum": 0
           }
         },
+        "provider_transport_status": {
+          "type": "object",
+          "additionalProperties": {
+            "enum": [
+              "complete",
+              "degraded"
+            ]
+          }
+        },
+        "provider_transport_limitations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "provider_pages_fetched": {
+          "$ref": "#/$defs/non_negative_count_map"
+        },
+        "transport_budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requests_used",
+            "request_budget",
+            "runtime_ms",
+            "runtime_budget_ms",
+            "exhausted"
+          ],
+          "properties": {
+            "requests_used": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "request_budget": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "runtime_ms": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "runtime_budget_ms": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "exhausted": {
+              "type": "boolean"
+            }
+          }
+        },
         "notes": {
           "type": "string"
         },

@@ -71,6 +71,19 @@ test("Aify collection is a logical source with explicit public taxonomy tags", a
   });
   assertAifyCandidate(cached.candidates[0]);
   assert.match(cached.source_audit.content_sources.sources[0].notes, /cache_fallback_used/);
+
+  const expired = await collectContentSources({
+    rootDir: tmp,
+    reportDate: "2026-07-13",
+    generatedAt: "2026-07-21T08:00:00.000Z",
+    sources: [AIFY_SOURCE],
+    fetchRetries: 0,
+    fetchImpl: async () => {
+      throw new Error("network unavailable");
+    }
+  });
+  assert.equal(expired.candidates.length, 0);
+  assert.equal(expired.source_audit.content_sources.sources[0].status, "blocked");
 });
 
 test("daily production stage requests Aify Phase5 evidence and persists the structured result in run-summary", async (t) => {
