@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { gunzipSync } from "node:zlib";
 
 import { isPublicNetworkHost } from "./public-url.js";
 
@@ -75,6 +76,29 @@ export function containsSecretLikeText(value) {
   return SECRET_VALUE_PATTERNS.some(({ pattern }) => pattern.test(text));
 }
 
+export function redactLocalEnvironmentPaths(value, options = {}) {
+  let text = String(value ?? "");
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const { localRoots, localIdentities } = localEnvironmentPathContext(rootDir);
+
+  for (const localRoot of [...localRoots].sort((left, right) => right.length - left.length)) {
+    text = replaceLocalPathRoot(text, localRoot);
+  }
+  for (const identity of localIdentities) {
+    const escapedIdentity = escapeRegExp(identity);
+    text = text
+      .replace(
+        new RegExp(`(^|[^A-Za-z0-9_])\\/(?:Users|home)\\/${escapedIdentity}(?=[/"' <>\\n\\r]|$)`, "gi"),
+        "$1[local-path]"
+      )
+      .replace(
+        new RegExp(`(^|[^A-Za-z0-9_])[A-Za-z]:[\\\\/](?:Users|Documents and Settings)[\\\\/]${escapedIdentity}(?=[\\\\/"' <>\\n\\r]|$)`, "gi"),
+        "$1[local-path]"
+      );
+  }
+  return text;
+}
+
 export function findRepoSafeReceiptPrivacyFindings(value, options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const relativeFile = String(options.relativeFile || "reports-data/observations/in-memory.json").replace(/\\/g, "/");
@@ -133,9 +157,9 @@ export async function scanPublicArtifactsForLocalInfo(options = {}) {
 
   const findings = [];
   for (const filePath of files) {
-    const text = await fs.readFile(filePath, "utf8");
+    const text = await readPrivacyText(filePath);
     const relativeFile = path.relative(rootDir, filePath).replace(/\\/g, "/");
-    const parsedJson = path.extname(relativeFile).toLowerCase() === ".json" ? parseJsonValue(text) : undefined;
+    const parsedJson = /\.json(?:\.gz)?$/i.test(relativeFile) ? parseJsonValue(text) : undefined;
     const decodedStrings = parsedJson === undefined ? [text] : collectJsonStringValues(parsedJson);
     const searchableValues = [text, ...decodedStrings];
     const isInternalReceipt = REPO_SAFE_INTERNAL_RECEIPT_PREFIXES.some((prefix) => relativeFile.startsWith(prefix));
@@ -247,24 +271,10 @@ function unsafeCredentialUrlInStrings(values) {
 
 function localEnvironmentPathPatterns(rootDir) {
   const patterns = [];
-  const localRoots = new Set([
-    rootDir,
-    os.homedir(),
-    process.env.HOME,
-    process.env.USERPROFILE,
-    process.env.CODEX_HOME
-  ].filter(Boolean).map((value) => path.resolve(String(value))));
-  const localIdentities = new Set([
-    process.env.USERNAME,
-    process.env.USER,
-    process.env.LOGNAME
-  ].filter(Boolean).map((value) => String(value).trim()).filter(Boolean));
+  const { localRoots, localIdentities } = localEnvironmentPathContext(rootDir);
 
   for (const localRoot of localRoots) {
-    const normalized = localRoot.replace(/\\/g, "/");
-    const identityMatch = normalized.match(/\/(?:Users|home)\/([^/]+)/i);
-    if (identityMatch?.[1]) localIdentities.add(identityMatch[1]);
-    const exactPattern = exactLocalPathPattern(normalized);
+    const exactPattern = exactLocalPathPattern(localRoot);
     if (exactPattern) {
       patterns.push({ name: "local_environment_path", pattern: exactPattern });
     }
@@ -284,6 +294,39 @@ function localEnvironmentPathPatterns(rootDir) {
   return patterns;
 }
 
+function localEnvironmentPathContext(rootDir) {
+  const localRoots = new Set([
+    rootDir,
+    os.homedir(),
+    process.env.HOME,
+    process.env.USERPROFILE,
+    process.env.CODEX_HOME
+  ].filter(Boolean).map((value) => path.resolve(String(value)).replace(/\\/g, "/")));
+  const localIdentities = new Set([
+    process.env.USERNAME,
+    process.env.USER,
+    process.env.LOGNAME
+  ].filter(Boolean).map((value) => String(value).trim()).filter(Boolean));
+
+  for (const localRoot of localRoots) {
+    const identityMatch = localRoot.match(/\/(?:Users|home)\/([^/]+)/i);
+    if (identityMatch?.[1]) localIdentities.add(identityMatch[1]);
+  }
+  return { localRoots, localIdentities };
+}
+
+function replaceLocalPathRoot(text, normalizedPath) {
+  const trimmed = String(normalizedPath || "").replace(/\/+$/, "");
+  if (!trimmed || trimmed === "/" || /^[A-Za-z]:$/.test(trimmed)) return text;
+  const isWindows = /^[A-Za-z]:\//.test(trimmed);
+  const body = trimmed.split("/").filter(Boolean).map(escapeRegExp).join("[\\\\/]");
+  const absoluteBody = isWindows ? body : `\\/${body}`;
+  return text.replace(
+    new RegExp(`(^|[^A-Za-z0-9_])${absoluteBody}(?=[\\\\/"' <>\\n\\r]|$)`, "gi"),
+    "$1[local-path]"
+  );
+}
+
 function exactLocalPathPattern(normalizedPath) {
   const trimmed = String(normalizedPath || "").replace(/\/+$/, "");
   if (!trimmed || trimmed === "/" || /^[A-Za-z]:$/.test(trimmed)) return null;
@@ -297,7 +340,7 @@ function exactLocalPathPattern(normalizedPath) {
 
 function findPrivatePublicUrlIndex(text, relativeFile) {
   const extension = path.extname(relativeFile).toLowerCase();
-  if (extension === ".json") {
+  if (/\.json(?:\.gz)?$/i.test(relativeFile)) {
     try {
       const parsed = JSON.parse(text);
       const privateUrl = privateUrlInJsonValue(parsed) || sensitivePrivateUrlInJsonValue(parsed);
@@ -388,7 +431,7 @@ async function listTextFiles(target) {
     throw error;
   }
   if (stat.isFile()) {
-    return TEXT_EXTENSIONS.has(path.extname(target).toLowerCase()) ? [target] : [];
+    return isPrivacyTextFile(target) ? [target] : [];
   }
   if (!stat.isDirectory()) {
     return [];
@@ -399,11 +442,22 @@ async function listTextFiles(target) {
     const child = path.join(target, entry.name);
     if (entry.isDirectory()) {
       files.push(...await listTextFiles(child));
-    } else if (entry.isFile() && TEXT_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
+    } else if (entry.isFile() && isPrivacyTextFile(entry.name)) {
       files.push(child);
     }
   }
   return files;
+}
+
+function isPrivacyTextFile(filePath) {
+  return TEXT_EXTENSIONS.has(path.extname(filePath).toLowerCase()) || /\.json\.gz$/i.test(filePath);
+}
+
+async function readPrivacyText(filePath) {
+  const raw = await fs.readFile(filePath);
+  return filePath.toLowerCase().endsWith(".json.gz")
+    ? gunzipSync(raw).toString("utf8")
+    : raw.toString("utf8");
 }
 
 function isInside(rootDir, target) {

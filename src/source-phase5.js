@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { readJsonArtifact } from "./compressed-json.js";
 import { candidatePoolRelativePaths } from "./reports-data-layout.js";
 import { isValidDateString } from "./time.js";
 import { evaluateLegacyReportEligibility } from "./candidates.js";
@@ -588,7 +589,7 @@ async function readCandidatePoolForDate(historyDir, reportDate) {
   for (const relativePath of candidatePoolRelativePaths(reportDate)) {
     const filePath = path.join(historyDir, ...relativePath.split(path.sep));
     try {
-      return JSON.parse(await fs.readFile(filePath, "utf8"));
+      return await readJsonArtifact(filePath);
     } catch {
       // Try the next layered or legacy location.
     }

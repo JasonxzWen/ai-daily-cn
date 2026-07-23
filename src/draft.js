@@ -42,6 +42,7 @@ import {
   normalizeCandidateAuditRoles
 } from "./main-audit-contract.js";
 import { normalizeCandidatePool } from "./candidates.js";
+import { readJsonArtifact } from "./compressed-json.js";
 import { buildOccurrenceStore, writeOccurrenceStore } from "./occurrence-store.js";
 import { occurrenceStoreRelativePath } from "./reports-data-layout.js";
 import { validateOccurrenceStore } from "./schema.js";
@@ -1125,7 +1126,7 @@ async function loadSourceWatchSnapshotHistory(rootDir, reportsDataDir, reportDat
   const files = (await listPersistedCandidatePoolFiles(historyRoot))
     .map((filePath) => ({
       filePath,
-      fileDate: path.basename(filePath).match(/^(\d{4}-\d{2}-\d{2})\.candidates\.json$/)?.[1] || ""
+      fileDate: path.basename(filePath).match(/^(\d{4}-\d{2}-\d{2})\.candidates\.json(?:\.gz)?$/)?.[1] || ""
     }))
     .filter(({ fileDate }) => fileDate && fileDate < reportDate)
     .sort((left, right) => right.fileDate.localeCompare(left.fileDate) || right.filePath.localeCompare(left.filePath));
@@ -1134,7 +1135,7 @@ async function loadSourceWatchSnapshotHistory(rootDir, reportsDataDir, reportDat
   for (const { filePath } of files) {
     let pool;
     try {
-      pool = JSON.parse(await fs.readFile(filePath, "utf8"));
+      pool = await readJsonArtifact(filePath);
     } catch {
       continue;
     }
@@ -1174,7 +1175,7 @@ async function listPersistedCandidatePoolFiles(directory) {
     const entryPath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
       files.push(...await listPersistedCandidatePoolFiles(entryPath));
-    } else if (entry.isFile() && entry.name.endsWith(".candidates.json")) {
+    } else if (entry.isFile() && /\.candidates\.json(?:\.gz)?$/.test(entry.name)) {
       files.push(entryPath);
     }
   }

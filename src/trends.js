@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { PublisherError } from "./errors.js";
+import { compareStableText } from "./stable-order.js";
 import { defaultGeneratedAt, isValidDateString } from "./time.js";
 
 const STATUS_WEIGHT = {
@@ -85,7 +86,7 @@ export function buildTrendIndex(reports, options = {}) {
   const config = normalizeTrendConfig(options.config || {});
   const orderedReports = [...(Array.isArray(reports) ? reports : [])]
     .filter((report) => isValidDateString(report?.report_date))
-    .sort((a, b) => a.report_date.localeCompare(b.report_date));
+    .sort((a, b) => compareStableText(a.report_date, b.report_date));
   const latestDate = options.reportDate || orderedReports.at(-1)?.report_date || "1970-01-01";
   const generatedAt = options.generatedAt || defaultGeneratedAt();
   const occurrences = collectControlledOccurrences(orderedReports, config);
@@ -202,7 +203,7 @@ function summarizeWindow(occurrences, dateTo, config) {
 
   return [...byTopic.values()].map((summary) => {
     const sections = [...summary.sectionSet].sort();
-    const entities = [...summary.entitySet].sort((a, b) => a.localeCompare(b));
+    const entities = [...summary.entitySet].sort(compareStableText);
     const dates = [...summary.dateSet].sort();
     const publicSummary = {
       id: summary.id,
@@ -321,7 +322,7 @@ function buildCandidateTopics(reports, config, dateTo) {
 
   return [...candidates.values()]
     .filter((candidate) => candidate.occurrences >= 2)
-    .sort((a, b) => b.occurrences - a.occurrences || b.dates.size - a.dates.size || a.term.localeCompare(b.term))
+    .sort((a, b) => b.occurrences - a.occurrences || b.dates.size - a.dates.size || compareStableText(a.term, b.term))
     .slice(0, 20)
     .map((candidate) => ({
       term: candidate.term,
@@ -421,7 +422,7 @@ function normalizeControlledList(items) {
       label: String(item.label),
       aliases: unique([item.label, item.id, ...(Array.isArray(item.aliases) ? item.aliases : [])].map(normalizeText))
     }))
-    .sort((a, b) => a.id.localeCompare(b.id));
+    .sort((a, b) => compareStableText(a.id, b.id));
 }
 
 function normalizeText(value) {
@@ -453,7 +454,7 @@ function candidateTerms(text, stopwords) {
 function stableAnnotations(annotationsByDate) {
   return Object.fromEntries(
     Object.entries(annotationsByDate)
-      .sort(([left], [right]) => left.localeCompare(right))
+      .sort(([left], [right]) => compareStableText(left, right))
       .map(([date, annotations]) => [
         date,
         {
@@ -473,7 +474,7 @@ function compareTopicSummaries(left, right) {
     (STATUS_WEIGHT[right.status] || 0) - (STATUS_WEIGHT[left.status] || 0) ||
     right.active_days - left.active_days ||
     right.occurrences - left.occurrences ||
-    left.id.localeCompare(right.id)
+    compareStableText(left.id, right.id)
   );
 }
 

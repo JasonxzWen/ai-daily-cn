@@ -16,10 +16,12 @@ const DOCS_ASSETS_PREFIX = "docs/assets/";
 export async function auditRepoSize(options = {}) {
   const rootDir = path.resolve(options.rootDir || options.root || process.cwd());
   const trackedFiles = listTrackedFiles(rootDir);
+  const trackedFileSet = new Set(trackedFiles);
+  const pendingUntrackedFiles = listPendingUntrackedFiles(rootDir);
   const entries = [];
   let missingFromWorktree = 0;
 
-  for (const relativePath of trackedFiles) {
+  for (const relativePath of [...new Set([...trackedFiles, ...pendingUntrackedFiles])]) {
     const absolutePath = path.join(rootDir, relativePath);
     let stat;
     try {
@@ -37,10 +39,13 @@ export async function auditRepoSize(options = {}) {
       path: normalizedPath,
       bytes: stat.size,
       extension: extensionFor(normalizedPath),
-      top_level: topLevelFor(normalizedPath)
+      top_level: topLevelFor(normalizedPath),
+      pending_untracked: !trackedFileSet.has(relativePath)
     });
   }
 
+  const trackedEntries = entries.filter((entry) => !entry.pending_untracked);
+  const pendingEntries = entries.filter((entry) => entry.pending_untracked);
   const docsAssetsEntries = entries.filter((entry) => entry.path.startsWith(DOCS_ASSETS_PREFIX));
   const duplicateAssets = await findDuplicateAssetGroups(rootDir, docsAssetsEntries);
   const largestFiles = [...entries]
@@ -52,8 +57,18 @@ export async function auditRepoSize(options = {}) {
     root_dir: rootDir,
     generated_at: new Date().toISOString(),
     tracked: {
-      file_count: entries.length,
+      file_count: trackedEntries.length,
       missing_from_worktree: missingFromWorktree,
+      total_bytes: sumBytes(trackedEntries),
+      total_mib: bytesToMiB(sumBytes(trackedEntries))
+    },
+    pending_untracked: {
+      file_count: pendingEntries.length,
+      total_bytes: sumBytes(pendingEntries),
+      total_mib: bytesToMiB(sumBytes(pendingEntries))
+    },
+    planned: {
+      file_count: entries.length,
       total_bytes: sumBytes(entries),
       total_mib: bytesToMiB(sumBytes(entries))
     },
@@ -72,7 +87,7 @@ export function evaluateRepoSizeBudget(audit, budget = {}) {
 
   addThresholdViolation(violations, {
     metric: "tracked_total_bytes",
-    actualBytes: audit.tracked.total_bytes,
+    actualBytes: audit.planned?.total_bytes ?? audit.tracked.total_bytes,
     threshold: thresholds.tracked_total_bytes,
     message: "tracked repository payload exceeds budget"
   });
@@ -132,6 +147,8 @@ export function formatRepoSizeAudit(audit, budgetResult = null) {
   const lines = [
     `tracked files: ${audit.tracked.file_count}`,
     `tracked size: ${formatBytes(audit.tracked.total_bytes)}`,
+    `pending untracked size: ${formatBytes(audit.pending_untracked?.total_bytes || 0)}`,
+    `planned tracked size: ${formatBytes(audit.planned?.total_bytes ?? audit.tracked.total_bytes)}`,
     `docs/assets: ${formatBytes(audit.notable_paths.docs_assets?.bytes || 0)}`,
     `reports-data: ${formatBytes(audit.notable_paths.reports_data?.bytes || 0)}`,
     `candidate JSON: ${formatBytes(audit.notable_paths.reports_data_candidates_json?.bytes || 0)}`,
@@ -202,6 +219,25 @@ function requireValue(argv, index, flag) {
 
 function listTrackedFiles(rootDir) {
   const output = execFileSync("git", ["ls-files", "-z"], {
+    cwd: rootDir,
+    encoding: "buffer",
+    stdio: ["ignore", "pipe", "ignore"],
+    maxBuffer: 64 * 1024 * 1024
+  });
+  return output.toString("utf8").split("\0").filter(Boolean);
+}
+
+function listPendingUntrackedFiles(rootDir) {
+  const output = execFileSync("git", [
+    "ls-files",
+    "-z",
+    "--others",
+    "--exclude-standard",
+    "--",
+    "docs",
+    "reports-data",
+    "retrospectives"
+  ], {
     cwd: rootDir,
     encoding: "buffer",
     stdio: ["ignore", "pipe", "ignore"],
@@ -300,8 +336,8 @@ function buildNotablePaths(entries) {
   const reportsData = filterPrefix(entries, "reports-data/");
   const reportsData2026 = filterPrefix(entries, "reports-data/2026/");
   const reportsDataInternal = filterPrefix(entries, "reports-data/internal/");
-  const candidateJson = reportsData.filter((entry) => entry.path.endsWith(".candidates.json"));
-  const internalCandidateJson = reportsDataInternal.filter((entry) => entry.path.endsWith(".candidates.json"));
+  const candidateJson = reportsData.filter((entry) => /\.candidates\.json(?:\.gz)?$/.test(entry.path));
+  const internalCandidateJson = reportsDataInternal.filter((entry) => /\.candidates\.json(?:\.gz)?$/.test(entry.path));
   const sourceStatusHistoryPaths = new Set(sourceStatusHistoryRelativePaths().map((relativePath) =>
     toRepoPath("reports-data", relativePath)
   ));

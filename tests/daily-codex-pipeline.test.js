@@ -6,6 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
+import { gzipSync } from "node:zlib";
 import {
   buildDailyCodexPipelinePlan,
   prepareDailyCodexPipeline,
@@ -14,6 +15,7 @@ import {
   validateDailyCodexMvpArtifact
 } from "../scripts/run-daily-codex-pipeline.mjs";
 import { publicSignalTaxonomy } from "../src/schema.js";
+import { internalCandidatePoolRelativePath } from "../src/reports-data-layout.js";
 
 const execFileAsync = promisify(execFile);
 const repoRoot = path.resolve(".");
@@ -363,7 +365,7 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
   await writeMinimalRepoFiles(rootDir);
   const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
   const reportJsonPath = path.join(cleanRoot, "reports-data", "2026", "07", `${reportDate}.json`);
-  const candidatesJsonPath = path.join(cleanRoot, "reports-data", "internal", "candidates", "2026", "07", `${reportDate}.candidates.json`);
+  const candidatesJsonPath = path.join(cleanRoot, "reports-data", ...internalCandidatePoolRelativePath(reportDate).split(path.sep));
   const docsDataJsonPath = path.join(cleanRoot, "docs", "data", "2026", "07", `${reportDate}.json`);
   await fs.mkdir(path.dirname(reportJsonPath), { recursive: true });
   await fs.mkdir(path.dirname(candidatesJsonPath), { recursive: true });
@@ -376,7 +378,7 @@ test("daily Codex production orchestrator normalizes legacy daily publish summar
       blocking_issues: []
     }
   }, null, 2)}\n`, "utf8");
-  await fs.writeFile(candidatesJsonPath, "{\"candidates\":[]}\n", "utf8");
+  await fs.writeFile(candidatesJsonPath, gzipSync(Buffer.from("{\"candidates\":[]}\n"), { level: 9, mtime: 0 }));
   await fs.writeFile(docsDataJsonPath, "{}\n", "utf8");
 
   const plan = await prepareDailyCodexPipeline({
@@ -481,7 +483,7 @@ test("daily Codex production orchestrator runs no-publish execute as production 
   await writeMinimalRepoFiles(rootDir);
   const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
   const reportJsonPath = path.join(cleanRoot, "reports-data", "2026", "07", `${reportDate}.json`);
-  const candidatesJsonPath = path.join(cleanRoot, "reports-data", "internal", "candidates", "2026", "07", `${reportDate}.candidates.json`);
+  const candidatesJsonPath = path.join(cleanRoot, "reports-data", ...internalCandidatePoolRelativePath(reportDate).split(path.sep));
   const docsDataJsonPath = path.join(cleanRoot, "docs", "data", "2026", "07", `${reportDate}.json`);
   await fs.mkdir(path.dirname(reportJsonPath), { recursive: true });
   await fs.mkdir(path.dirname(candidatesJsonPath), { recursive: true });
@@ -494,7 +496,7 @@ test("daily Codex production orchestrator runs no-publish execute as production 
       blocking_issues: []
     }
   }, null, 2)}\n`, "utf8");
-  await fs.writeFile(candidatesJsonPath, "{\"candidates\":[]}\n", "utf8");
+  await fs.writeFile(candidatesJsonPath, gzipSync(Buffer.from("{\"candidates\":[]}\n"), { level: 9, mtime: 0 }));
   await fs.writeFile(docsDataJsonPath, "{}\n", "utf8");
 
   const plan = await prepareDailyCodexPipeline({

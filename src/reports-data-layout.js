@@ -36,7 +36,17 @@ export function publicSignalPoolRelativePath(reportDate) {
 
 export function internalCandidatePoolRelativePath(reportDate) {
   const { year, month } = dateParts(reportDate);
+  return path.join(REPORTS_DATA_INTERNAL_DIR, "candidates", year, month, `${reportDate}.candidates.json.gz`);
+}
+
+export function legacyInternalCandidatePoolRelativePath(reportDate) {
+  const { year, month } = dateParts(reportDate);
   return path.join(REPORTS_DATA_INTERNAL_DIR, "candidates", year, month, `${reportDate}.candidates.json`);
+}
+
+export function compressedLegacyCandidatePoolRelativePath(reportDate) {
+  const { year, month } = dateParts(reportDate);
+  return path.join(year, month, `${reportDate}.candidates.json.gz`);
 }
 
 export function legacyCandidatePoolRelativePath(reportDate) {
@@ -47,6 +57,8 @@ export function legacyCandidatePoolRelativePath(reportDate) {
 export function candidatePoolRelativePaths(reportDate) {
   return [
     internalCandidatePoolRelativePath(reportDate),
+    legacyInternalCandidatePoolRelativePath(reportDate),
+    compressedLegacyCandidatePoolRelativePath(reportDate),
     legacyCandidatePoolRelativePath(reportDate)
   ];
 }

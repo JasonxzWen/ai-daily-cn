@@ -33,7 +33,7 @@ corepack pnpm run report:draft -- --date $reportDate --generated-at $generatedAt
 - 条目的 `url` 和 `event_date` 必须与候选池一致。
 - 允许板块为空；不允许为了补满页面绕过候选池。
 - 任何来源采集到的候选，进入正文前都必须完成跨日去重；不能只对 GitHub Trending 做历史比较。
-- 候选池会作为 `reports-data/YYYY/MM/YYYY-MM-DD.candidates.json` 与 `docs/data/YYYY/MM/YYYY-MM-DD.candidates.json` 随日报保留。
+- 候选池会无损压缩保存在内部路径 `reports-data/internal/candidates/YYYY/MM/YYYY-MM-DD.candidates.json.gz`；默认站点构建不会把候选池复制到 `docs/`。
 
 执行顺序：
 

@@ -8,6 +8,7 @@ import { reportRelativePaths, toPosixRelative } from "./paths.js";
 import {
   candidatePoolRelativePaths,
   internalCandidatePoolRelativePath,
+  legacyInternalCandidatePoolRelativePath,
   REPORTS_DATA_INTERNAL_DIR,
   REPORTS_DATA_OCCURRENCES_DIR,
   REPORTS_DATA_OBSERVATIONS_DIR,
@@ -17,10 +18,11 @@ import {
 } from "./reports-data-layout.js";
 import { defaultGeneratedAt } from "./time.js";
 import { validateArticles, validateFeed, validateHome, validateReport, validateTrends } from "./schema.js";
-import { normalizeCandidatePool } from "./candidates.js";
+import { normalizeCandidatePool, readPersistedCandidatePool } from "./candidates.js";
 import { compareOccurrenceChronology } from "./occurrence-store.js";
 import { deriveQualityStatus, normalizeQualityStatus } from "./quality-status.js";
 import { buildTrendIndex, loadTrendConfig } from "./trends.js";
+import { compareStableChineseText, compareStableText } from "./stable-order.js";
 import { withDefaultImportance } from "./importance.js";
 import { isMeaningfulPublicEvidenceAsset } from "./media-policy.js";
 import { isPublishableOfficialComponentFragment } from "./official-component-snapshot.js";
@@ -578,7 +580,7 @@ export function mergeFeed(existingFeed, reports, options = {}) {
     byDate.set(report.report_date, entry);
   }
 
-  const mergedReports = [...byDate.values()].sort((a, b) => b.report_date.localeCompare(a.report_date));
+  const mergedReports = [...byDate.values()].sort((a, b) => compareStableText(b.report_date, a.report_date));
   const updatedAt =
     existingFeed?.updated_at && reportsAreEqual(existingFeed.reports || [], mergedReports)
       ? existingFeed.updated_at
@@ -597,7 +599,7 @@ export function buildArticleIndex(reports = [], options = {}) {
   const byUrl = new Map();
   const orderedReports = [...(Array.isArray(reports) ? reports : [])]
     .filter((report) => report?.report_date)
-    .sort((a, b) => String(b.report_date || "").localeCompare(String(a.report_date || "")));
+    .sort((a, b) => compareStableText(b.report_date, a.report_date));
 
   for (const report of orderedReports) {
     for (const section of ARTICLE_SECTIONS) {
@@ -629,9 +631,9 @@ export function buildArticleIndex(reports = [], options = {}) {
   }
 
   return [...byUrl.values()].sort((a, b) =>
-    String(b.date).localeCompare(String(a.date)) ||
+    compareStableText(b.date, a.date) ||
     Number(b.quality_score || 0) - Number(a.quality_score || 0) ||
-    String(a.title).localeCompare(String(b.title), "zh-Hans-CN")
+    compareStableChineseText(a.title, b.title)
   );
 }
 
@@ -640,7 +642,7 @@ export function buildHomeData(reports = [], options = {}) {
   const articles = Array.isArray(options.articles) ? options.articles : [];
   const orderedReports = [...(Array.isArray(reports) ? reports : [])]
     .filter((report) => report?.report_date)
-    .sort((a, b) => String(b.report_date).localeCompare(String(a.report_date)));
+    .sort((a, b) => compareStableText(b.report_date, a.report_date));
   const feedByDate = new Map((Array.isArray(feed.reports) ? feed.reports : [])
     .map((report) => [String(report?.report_date || ""), report]));
   const home = {
@@ -751,21 +753,29 @@ async function loadSourceWatchCandidatePools(dataInputDir, reports = []) {
     .filter(Boolean))].sort();
   const records = [];
   for (const reportDate of reportDates) {
-    const candidatePoolPath = path.join(
-      dataInputDir,
-      ...internalCandidatePoolRelativePath(reportDate).split(path.sep)
-    );
-    if (!await exists(candidatePoolPath)) {
+    const candidatePoolPath = await firstExistingCandidatePoolPath(dataInputDir, reportDate);
+    if (!candidatePoolPath) {
       continue;
     }
-    const raw = await fs.readFile(candidatePoolPath, "utf8");
+    const { raw, candidatePool } = await readPersistedCandidatePool(candidatePoolPath, reportDate);
     records.push({
       path: candidatePoolPath,
       sha256: createHash("sha256").update(raw).digest("hex"),
-      candidatePool: normalizeCandidatePool(JSON.parse(raw), reportDate)
+      candidatePool
     });
   }
   return records;
+}
+
+async function firstExistingCandidatePoolPath(dataInputDir, reportDate) {
+  for (const relativePath of [
+    internalCandidatePoolRelativePath(reportDate),
+    legacyInternalCandidatePoolRelativePath(reportDate)
+  ]) {
+    const candidatePath = path.join(dataInputDir, ...relativePath.split(path.sep));
+    if (await exists(candidatePath)) return candidatePath;
+  }
+  return "";
 }
 
 function buildSourceWatchConsumption(records, articles, requestedReportDate) {
@@ -1417,7 +1427,7 @@ export function buildDateIndex(feed = {}, reports = [], trends = null) {
   );
   const topicByDate = topicLookupByDate(trends);
   const items = [...feedReports]
-    .sort((a, b) => String(a.report_date || "").localeCompare(String(b.report_date || "")))
+    .sort((a, b) => compareStableText(a.report_date, b.report_date))
     .map((feedReport) => {
       const report = reportByDate.get(feedReport.report_date) || {};
       const metrics = dateSignalMetrics(feedReport, report);
@@ -1781,7 +1791,7 @@ function monthKey(dateString) {
 }
 
 function reportsAreEqual(left, right) {
-  const normalize = (items) => [...items].sort((a, b) => b.report_date.localeCompare(a.report_date));
+  const normalize = (items) => [...items].sort((a, b) => compareStableText(b.report_date, a.report_date));
   const normalizedLeft = normalize(left);
   const normalizedRight = normalize(right);
   if (normalizedLeft.length !== normalizedRight.length) {
@@ -2410,7 +2420,7 @@ async function writeJsonTracked(outDir, relativePath, value, writtenFiles) {
 }
 
 function uniqueSorted(items) {
-  return [...new Set(items)].sort((a, b) => String(a).localeCompare(String(b)));
+  return [...new Set(items)].sort(compareStableText);
 }
 
 export function reportManagedAssetPaths(report) {
@@ -2435,7 +2445,7 @@ async function copyCandidatePoolIfPresent(outDir, report, reportJsonPath, writte
     });
   }
 
-  const candidatePool = normalizeCandidatePool(JSON.parse(await fs.readFile(candidatePath, "utf8")), report.report_date);
+  const { candidatePool } = await readPersistedCandidatePool(candidatePath, report.report_date);
   await writeJsonTracked(outDir, reportRelativePaths(report.report_date).candidateDataPath, candidatePool, writtenFiles);
 }
 

@@ -457,6 +457,21 @@ test("collectSourceWatch uses endpoint limit only as the GitHub transport page s
 test("discover:github-watch CLI writes the source watch artifact", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-watch-"));
   const outputPath = path.join(tmp, "source-candidates-2026-07-06.github-watch.json");
+  const transportStatePath = path.join(tmp, ".tmp", "search-pagination-state.json");
+  const ambientTransportState = `${JSON.stringify({
+    schema_version: 1,
+    lanes: {
+      "source-watch:github:repo-ml-news-of-the-week:commits": {
+        provider: "github_source_watch",
+        state: {
+          nextUrl: "https://api.github.com/repositories/711834199/commits?page=20&per_page=5"
+        },
+        updated_at: generatedAt
+      }
+    }
+  }, null, 2)}\n`;
+  await fs.mkdir(path.dirname(transportStatePath), { recursive: true });
+  await fs.writeFile(transportStatePath, ambientTransportState);
 
   const { stdout } = await execFileAsync(process.execPath, [
     path.join(rootDir, "src", "cli.js"),
@@ -469,6 +484,8 @@ test("discover:github-watch CLI writes the source watch artifact", async () => {
     fixtureWatchlistPath,
     "--fixture-dir",
     fixtureDir,
+    "--repo-root",
+    tmp,
     "--output",
     outputPath
   ], { cwd: rootDir });
@@ -485,6 +502,7 @@ test("discover:github-watch CLI writes the source watch artifact", async () => {
   assert.equal(filePayload.candidates.length, 9);
   assert.equal(filePayload.source_audit.github_watch.fetched_repos, 2);
   assert.equal(filePayload.source_audit.site_watch.fetched_sites, 2);
+  assert.equal(await fs.readFile(transportStatePath, "utf8"), ambientTransportState);
   const aifyCandidate = filePayload.candidates.find((candidate) => candidate.source_id === "site-aify-news");
   assert.equal(aifyCandidate.source_lane, "aify");
   assert.equal(aifyCandidate.source_tier, "first_class");
@@ -494,6 +512,30 @@ test("discover:github-watch CLI writes the source watch artifact", async () => {
   assert.equal(aifyCandidate.source_watch.source_tier, "first_class");
   assert.equal(aifyCandidate.source_watch.verification_policy, "no_secondary_review_required");
   assert.match(aifyCandidate.source_watch.snapshot_fingerprint, /^sha256:[a-f0-9]{64}$/);
+
+  const explicitTransportStatePath = path.join(tmp, "explicit-pagination-state.json");
+  const explicitOutputPath = path.join(tmp, "source-candidates-2026-07-06.explicit-state.json");
+  await execFileAsync(process.execPath, [
+    path.join(rootDir, "src", "cli.js"),
+    "discover:github-watch",
+    "--date",
+    reportDate,
+    "--generated-at",
+    generatedAt,
+    "--config",
+    fixtureWatchlistPath,
+    "--fixture-dir",
+    fixtureDir,
+    "--repo-root",
+    tmp,
+    "--transport-state",
+    explicitTransportStatePath,
+    "--output",
+    explicitOutputPath
+  ], { cwd: rootDir });
+  const explicitTransportState = JSON.parse(await fs.readFile(explicitTransportStatePath, "utf8"));
+  assert.equal(explicitTransportState.schema_version, 1);
+  assert.equal(explicitTransportState.updated_at, generatedAt);
 });
 
 test("source watch quality fixture dedupes stale unchanged repos and keeps internal summaries", async () => {

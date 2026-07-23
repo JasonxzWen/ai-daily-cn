@@ -83,17 +83,26 @@ import {
 import { qualityRepairFeedback, runDailyWorkflow } from "../src/daily-runner.js";
 import { runStatusSelfCheck } from "../src/status-self-check.js";
 import { pnpmInvocationForArgs } from "../src/process-runner.js";
+import { compareStableText } from "../src/stable-order.js";
 import { normalizeUrlIdentity } from "../src/url.js";
 import { validateDailyWorkflowContract } from "../src/workflow-contract.js";
 import { checkWorktreePreflight } from "../src/worktree-preflight.js";
-import { containsInternalSourceField, scanPublicArtifactsForLocalInfo } from "../src/privacy.js";
+import {
+  containsInternalSourceField,
+  redactLocalEnvironmentPaths,
+  scanPublicArtifactsForLocalInfo
+} from "../src/privacy.js";
 import { buildTrendIndex, loadTrendConfig } from "../src/trends.js";
 import { writeDailyPublishRetrospective } from "../src/retrospectives.js";
 import { evaluateDailyContentContract } from "../scripts/check-daily-content-contract.mjs";
+import { readPersistedCandidatePool, writeCandidatePool } from "../src/candidates.js";
+import { encodeJsonArtifact, readJsonArtifact } from "../src/compressed-json.js";
 import {
+  compressedLegacyCandidatePoolRelativePath,
   internalCandidatePoolRelativePath,
   internalSourceStatusHistoryRelativePath,
-  legacyCandidatePoolRelativePath
+  legacyCandidatePoolRelativePath,
+  legacyInternalCandidatePoolRelativePath
 } from "../src/reports-data-layout.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -3776,31 +3785,39 @@ test("GitHub trending discovery compares candidates against recent local history
     }),
     "utf8"
   );
+  const candidatePool = {
+    report_date: "2026-05-24",
+    sources: [
+      {
+        id: "github-trending-daily",
+        name: "GitHub Trending daily",
+        url: "https://github.com/trending?since=daily",
+        category: "github_trending",
+        status: "checked"
+      }
+    ],
+    candidates: [
+      {
+        id: "project-trending-agent",
+        source_id: "github-trending-daily",
+        category: "project",
+        title: "example/trending-agent",
+        url: "https://github.com/example/trending-agent",
+        source: "GitHub Trending daily",
+        event_date: "2026-05-24",
+        source_rank: 7,
+        status: "included"
+      }
+    ]
+  };
+  const internalPath = path.join(tmp, ...internalCandidatePoolRelativePath("2026-05-24").split(path.sep));
+  await fs.mkdir(path.dirname(internalPath), { recursive: true });
+  await fs.writeFile(internalPath, encodeJsonArtifact(candidatePool, internalPath));
   await fs.writeFile(
     path.join(historyDir, "2026-05-24.candidates.json"),
     JSON.stringify({
-      report_date: "2026-05-24",
-      sources: [
-        {
-          id: "github-trending-daily",
-          name: "GitHub Trending daily",
-          url: "https://github.com/trending?since=daily",
-          category: "github_trending",
-          status: "checked"
-        }
-      ],
-      candidates: [
-        {
-          id: "project-trending-agent",
-          source_id: "github-trending-daily",
-          category: "project",
-          title: "example/trending-agent",
-          url: "https://github.com/example/trending-agent",
-          source: "GitHub Trending daily",
-          event_date: "2026-05-24",
-          status: "included"
-        }
-      ]
+      ...candidatePool,
+      candidates: candidatePool.candidates.map((candidate) => ({ ...candidate, source_rank: 99 }))
     }),
     "utf8"
   );
@@ -3829,6 +3846,7 @@ test("GitHub trending discovery compares candidates against recent local history
   assert.match(collected.source_audit.github_trending.notes, /近 7 天/);
   assert.match(repeated.evidence, /2026-05-24/);
   assert.match(repeated.evidence, /2026-05-25/);
+  assert.equal(repeated.previous_rank, 7);
   assert.match(repeated.notes, /seen_2_days_in_7d/);
   assert.match(fresh.evidence, /近 7 天本地记录未见/);
   assert.match(fresh.notes, /new_in_7d/);
@@ -5412,12 +5430,17 @@ test("source registry schema taxonomy enums stay synchronized with the public ta
   );
 });
 
-test("content source discovery listens to every public registry source without admission selectors", async () => {
+test("content source discovery listens to every public registry source without admission selectors", async (t) => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-source-registry-listen-"));
+  t.after(() => fs.rm(tmp, { recursive: true, force: true }));
+  const registry = await loadSourceRegistry({ rootDir });
   const checkedUrls = [];
   const collectedDefault = await collectContentSources({
-    rootDir,
+    rootDir: tmp,
+    sources: registry.sources,
     reportDate: "2026-05-26",
     generatedAt: fixedGeneratedAt,
+    providerThrottleMs: 0,
     fetchImpl: async (url) => {
       checkedUrls.push(String(url));
       return textResponse(emptyRssFixture());
@@ -5429,6 +5452,7 @@ test("content source discovery listens to every public registry source without a
   assert(checkedUrls.some((url) => new URL(url).hostname === "machinelearning.apple.com"));
   assert(checkedUrls.some((url) => url.includes("producthunt.com/feed")));
   assert(checkedUrls.some((url) => url.includes("ifanr.com/feed")));
+  await fs.access(path.join(tmp, ".tmp", "source-cache", "content", "content-arxiv-cs-lg.json"));
 });
 
 test("manual source kind is a collection channel and is not skipped", () => {
@@ -6402,16 +6426,37 @@ test("shared URL identity normalizes tracking parameters for dedupe gates", () =
   );
 });
 
-test("shared pnpm invocation wraps corepack pnpm through cmd on Windows", () => {
+test("public site indexes use locale-independent text ordering", async () => {
+  assert.deepEqual(
+    ["阿", "a", "中", "A"].sort(compareStableText),
+    ["a", "A", "中", "阿"]
+  );
+  for (const relativePath of ["src/site.js", "src/trends.js"]) {
+    const source = await fs.readFile(path.join(rootDir, relativePath), "utf8");
+    assert.doesNotMatch(source, /\.localeCompare\(/, `${relativePath} must not depend on host locale collation`);
+  }
+});
+
+test("shared pnpm invocation prefers Corepack and falls back to pnpm on Unix", () => {
   const windows = pnpmInvocationForArgs(["install", "--frozen-lockfile", "--store-dir", "C:\\tmp\\pnpm store"], { platform: "win32" });
   assert.equal(windows.file, "cmd.exe");
   assert.deepEqual(windows.args.slice(0, 3), ["/d", "/s", "/c"]);
   assert.match(windows.args[3], /^corepack pnpm install --frozen-lockfile --store-dir /);
   assert.match(windows.args[3], /pnpm store/);
 
-  const linux = pnpmInvocationForArgs(["install", "--frozen-lockfile"], { platform: "linux" });
-  assert.equal(linux.file, "corepack");
-  assert.deepEqual(linux.args, ["pnpm", "install", "--frozen-lockfile"]);
+  const corepackLinux = pnpmInvocationForArgs(["install", "--frozen-lockfile"], {
+    platform: "linux",
+    corepackAvailable: true
+  });
+  assert.equal(corepackLinux.file, "corepack");
+  assert.deepEqual(corepackLinux.args, ["pnpm", "install", "--frozen-lockfile"]);
+
+  const pnpmLinux = pnpmInvocationForArgs(["install", "--frozen-lockfile"], {
+    platform: "linux",
+    corepackAvailable: false
+  });
+  assert.equal(pnpmLinux.file, "pnpm");
+  assert.deepEqual(pnpmLinux.args, ["install", "--frozen-lockfile"]);
 });
 
 test("public artifact privacy scan blocks local machine path leakage", async () => {
@@ -6441,6 +6486,19 @@ test("public artifact privacy scan blocks local machine path leakage", async () 
   assert.equal(clean.ok, true, JSON.stringify(clean.findings));
 });
 
+test("local environment path redaction masks this machine without hiding quoted third-party paths", () => {
+  const localPath = path.join(os.homedir(), "Library", "Caches", "ms-playwright", "chromium");
+  const thirdPartyPath = "/Users/mattsdevbox/project/README.md";
+  const redacted = redactLocalEnvironmentPaths(
+    `browser missing at ${localPath}; public quote mentions ${thirdPartyPath}`
+  );
+
+  assert.doesNotMatch(redacted, new RegExp(escapeRegExp(os.homedir()), "i"));
+  assert.match(redacted, /\[local-path\]/);
+  assert.match(redacted, /Library[\\/]Caches[\\/]ms-playwright[\\/]chromium/);
+  assert.match(redacted, /\/Users\/mattsdevbox\/project\/README\.md/);
+});
+
 test("public artifact privacy scan allows third-party paths quoted by public source content", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-privacy-third-party-path-"));
   await fs.mkdir(path.join(tmp, "docs/signals"), { recursive: true });
@@ -6457,6 +6515,76 @@ test("public artifact privacy scan allows third-party paths quoted by public sou
 
   const result = await scanPublicArtifactsForLocalInfo({ rootDir: tmp });
   assert.equal(result.ok, true, JSON.stringify(result.findings));
+});
+
+test("content source collector redacts local browser paths from persisted failure notes", async () => {
+  const localBrowserPath = path.join(os.homedir(), "Library", "Caches", "ms-playwright", "chromium", "chrome");
+  const collected = await collectContentSources({
+    reportDate: "2026-06-05",
+    generatedAt: fixedGeneratedAt,
+    sources: [
+      {
+        id: "content-openrouter-rankings",
+        name: "OpenRouter Rankings",
+        url: "https://openrouter.ai/rankings",
+        source_kind: "openrouter_rankings_public_playwright",
+        candidate_category: "community_lead",
+        source_group: "papers_models",
+        credibility_tag: "primary_material",
+        content_tags: ["model_release"]
+      }
+    ],
+    openrouterRankingsTextFetcher: async () => {
+      throw new Error(`browser executable missing at ${localBrowserPath}`);
+    }
+  });
+
+  const serialized = JSON.stringify(collected);
+  assert.doesNotMatch(serialized, new RegExp(escapeRegExp(os.homedir()), "i"));
+  assert.match(serialized, /browser executable missing/);
+  assert.match(serialized, /\[local-path\]/);
+});
+
+test("privacy scan inspects compressed candidate receipts", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-compressed-privacy-"));
+  const reportDate = "2026-07-22";
+  const localEvidence = `browser executable missing at ${path.join(os.homedir(), "Library", "Caches", "ms-playwright")}`;
+  await writeCandidatePool(path.join(tmp, "reports-data"), reportDate, {
+    schema_version: 1,
+    report_date: reportDate,
+    generated_at: fixedGeneratedAt,
+    sources: [
+      {
+        id: "source-one",
+        name: "Source One",
+        url: "https://example.com/feed",
+        category: "blog",
+        status: "blocked"
+      }
+    ],
+    candidates: [
+      {
+        id: "candidate-one",
+        source_id: "source-one",
+        category: "hot_blog",
+        title: "Candidate One",
+        url: "https://example.com/item",
+        source: "Source One",
+        event_date: reportDate,
+        status: "excluded",
+        evidence: localEvidence
+      }
+    ]
+  });
+
+  const result = await scanPublicArtifactsForLocalInfo({
+    rootDir: tmp,
+    targets: ["reports-data"]
+  });
+  assert.equal(result.ok, false);
+  assert(result.findings.some((finding) =>
+    ["local_environment_path", "windows_user_path", "unix_user_path"].includes(finding.pattern)
+  ));
 });
 
 test("CLI JSON commands can write clean UTF-8 output files", async () => {
@@ -11006,6 +11134,165 @@ test("daily runner allows one AI repair loop in default dry-run mode", async () 
   assert.equal(result.summary.next_action.ai_review_tasks[0].intent, "source_grounded_public_authoring");
 });
 
+test("daily runner maps a collection highlight issue to its bullet edit task", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-highlight-repair-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-22",
+    publish: true,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "3434343434343434343434343434343434343434"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          output: {
+            review: {
+              ok: false,
+              ai_review_tasks: [
+                {
+                  kind: "main_item_editorial_rewrite",
+                  path: "main_items[4].bullets[0]"
+                }
+              ],
+              issues: [
+                {
+                  code: "highlight_missing",
+                  severity: "error",
+                  path: "main_items[4].bullets"
+                }
+              ]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "needs_ai_repair");
+  assert.equal(result.summary.next_action.kind, "codex_ai_repair_contract");
+  assert.deepEqual(
+    result.summary.next_action.ai_review_tasks.map((task) => task.path),
+    ["main_items[4].bullets[0]"]
+  );
+  assert.equal(result.summary.next_action.blocking_issue_count, 1);
+  assert.equal(result.summary.next_action.review_issues[0].code, "highlight_missing");
+  assert.equal(result.summary.next_action.review_issues[0].path, "main_items[4].bullets");
+  assert(!result.summary.stages.some((stage) => stage.id === "publish_real"));
+});
+
+test("daily runner hard-blocks an exhausted collection highlight issue after offering its direct bullet repair", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-highlight-degrade-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const reportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  await fs.mkdir(path.dirname(reportPath), { recursive: true });
+  await fs.writeFile(reportPath, JSON.stringify({
+    report_date: "2026-07-22",
+    main_items: [{ bullets: ["缺少重点标记的正文。"] }]
+  }), "utf8");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-22",
+    publish: false,
+    maxReviewRepairLoops: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "3535353535353535353535353535353535353535"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          output: {
+            review: {
+              ok: false,
+              ai_review_tasks: [
+                {
+                  kind: "main_item_editorial_rewrite",
+                  path: "main_items[0].bullets[0]"
+                }
+              ],
+              issues: [
+                {
+                  code: "highlight_missing",
+                  severity: "error",
+                  path: "main_items[0].bullets"
+                }
+              ]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_signals_only");
+  assert.equal(result.summary.legacy_report.status, "blocked");
+  assert(!result.summary.stages.some((stage) => stage.id === "report_write"));
+});
+
+test("daily runner hard-blocks an unknown collection error paired with a child bullet task", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-bullet-structure-block-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const reportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  await fs.mkdir(path.dirname(reportPath), { recursive: true });
+  await fs.writeFile(reportPath, JSON.stringify({
+    report_date: "2026-07-22",
+    main_items: [{ bullets: ["结构未知的正文。"] }]
+  }), "utf8");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-22",
+    publish: false,
+    maxReviewRepairLoops: 0,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "3636363636363636363636363636363636363636"
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "quality_review") {
+        return {
+          ok: false,
+          output: {
+            review: {
+              ok: false,
+              ai_review_tasks: [
+                {
+                  kind: "main_item_editorial_rewrite",
+                  path: "main_items[0].bullets[0]"
+                }
+              ],
+              issues: [
+                {
+                  code: "bullet_structure_invalid",
+                  severity: "error",
+                  path: "main_items[0].bullets"
+                }
+              ]
+            }
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.final_status, "generated_signals_only");
+  assert.equal(result.summary.legacy_report.status, "blocked");
+  assert(!result.summary.stages.some((stage) => stage.id === "report_write"));
+});
+
 test("daily runner applies first-pass authoring before the first quality review without consuming repair budget", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-first-pass-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
@@ -15022,6 +15309,76 @@ test("report:write 标准化结构化草稿并写入 reports-data", async () => 
   assert.equal(await exists(result.path), true);
   assert.equal(await exists(result.candidatePoolPath), true);
   assert.equal(await exists(path.join(tmp, "reports-data", ...legacyCandidatePoolRelativePath("2026-05-16").split(path.sep))), false);
+});
+
+test("persisted candidate pools gzip the full audit payload without dropping evidence", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-candidate-persistence-"));
+  const reportDate = "2026-05-16";
+  const candidatePool = {
+    schema_version: 1,
+    main_audit_contract_version: 1,
+    report_date: reportDate,
+    generated_at: fixedGeneratedAt,
+    sources: [
+      {
+        id: "source-one",
+        name: "Source One",
+        url: "https://example.com/feed",
+        category: "blog",
+        status: "checked"
+      }
+    ],
+    candidates: [
+      {
+        id: "included-one",
+        source_id: "source-one",
+        category: "hot_blog",
+        title: "Included candidate",
+        url: "https://example.com/included",
+        source: "Source One",
+        event_date: reportDate,
+        status: "included",
+        included_in: "hot_blogs",
+        evidence: "Reader-facing evidence remains available for an included item."
+      },
+      {
+        id: "excluded-one",
+        source_id: "source-one",
+        category: "hot_blog",
+        title: "Excluded candidate",
+        url: "https://example.com/excluded",
+        source: "Source One",
+        event_date: reportDate,
+        status: "excluded",
+        roles: ["main_stream_candidate"],
+        main_rank_score: 12,
+        main_reject_reason: "low_value",
+        evidence: "Evidence for an excluded candidate must remain lossless after compression."
+      }
+    ]
+  };
+
+  const legacyPath = path.join(tmp, ...legacyInternalCandidatePoolRelativePath(reportDate).split(path.sep));
+  const rootLegacyPath = path.join(tmp, ...legacyCandidatePoolRelativePath(reportDate).split(path.sep));
+  const compressedRootLegacyPath = path.join(tmp, ...compressedLegacyCandidatePoolRelativePath(reportDate).split(path.sep));
+  for (const siblingPath of [legacyPath, rootLegacyPath, compressedRootLegacyPath]) {
+    await fs.mkdir(path.dirname(siblingPath), { recursive: true });
+    await fs.writeFile(siblingPath, "legacy duplicate", "utf8");
+  }
+  const outputPath = await writeCandidatePool(tmp, reportDate, candidatePool);
+  const raw = await fs.readFile(outputPath);
+  const { candidatePool: persisted } = await readPersistedCandidatePool(outputPath, reportDate);
+
+  assert.match(outputPath, /\.candidates\.json\.gz$/);
+  assert.deepEqual([...raw.subarray(0, 2)], [0x1f, 0x8b]);
+  assert.equal(persisted.candidates[0].evidence, candidatePool.candidates[0].evidence);
+  assert.equal(persisted.candidates[1].evidence, candidatePool.candidates[1].evidence);
+  assert.equal(persisted.candidates[1].main_rank_score, 12);
+  assert.equal(persisted.candidates[1].main_reject_reason, "low_value");
+  assert.equal(candidatePool.candidates[1].evidence, "Evidence for an excluded candidate must remain lossless after compression.");
+  assert.equal(await exists(legacyPath), false);
+  assert.equal(await exists(rootLegacyPath), false);
+  assert.equal(await exists(compressedRootLegacyPath), false);
 });
 
 test("buildSite copies layered internal candidate pools only when internal data is requested", async () => {
@@ -22985,9 +23342,8 @@ test("report:draft records one terminal main audit disposition and complete reje
   const phase5ReportPath = path.join(phase5Dir, "2026", "06", `${reportDate}.json`);
   const phase5PoolPath = path.join(phase5Dir, internalCandidatePoolRelativePath(reportDate));
   await fs.mkdir(path.dirname(phase5ReportPath), { recursive: true });
-  await fs.mkdir(path.dirname(phase5PoolPath), { recursive: true });
   await fs.writeFile(phase5ReportPath, `${JSON.stringify(drafted.report, null, 2)}\n`, "utf8");
-  await fs.writeFile(phase5PoolPath, `${JSON.stringify(drafted.candidatePool, null, 2)}\n`, "utf8");
+  assert.equal(await writeCandidatePool(phase5Dir, reportDate, drafted.candidatePool), phase5PoolPath);
   const cleanPhase5 = await auditSourceRunHistory({
     rootDir: tmp,
     historyDir: "phase5-data",
@@ -23000,7 +23356,7 @@ test("report:draft records one terminal main audit disposition and complete reje
     JSON.stringify(cleanPhase5.selection_metadata_mismatches)
   );
 
-  await fs.writeFile(phase5PoolPath, `${JSON.stringify(tamperedPool, null, 2)}\n`, "utf8");
+  assert.equal(await writeCandidatePool(phase5Dir, reportDate, tamperedPool), phase5PoolPath);
   const tamperedPhase5 = await auditSourceRunHistory({
     rootDir: tmp,
     historyDir: "phase5-data",
@@ -23526,7 +23882,11 @@ test("report:draft does not apply launch facts to a same-domain Fable policy art
 
 test("published 2026-07-08 Alberta story stays aligned with its official source", async () => {
   const report = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data", "2026", "07", "2026-07-08.json"), "utf8"));
-  const candidatePool = JSON.parse(await fs.readFile(path.join(rootDir, "reports-data", "2026", "07", "2026-07-08.candidates.json"), "utf8"));
+  const candidatePool = await readJsonArtifact(path.join(
+    rootDir,
+    "reports-data",
+    ...compressedLegacyCandidatePoolRelativePath("2026-07-08").split(path.sep)
+  ));
   const albertaUrl = "https://www.anthropic.com/news/alberta-government-claude-cybersecurity";
   const albertaMain = report.main_items.find((item) => item.url === albertaUrl);
   const albertaStory = report.stories.find((story) => story.sources?.some((source) => source.url === albertaUrl));

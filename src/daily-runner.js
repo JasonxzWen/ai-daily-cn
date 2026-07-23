@@ -108,6 +108,7 @@ const PUBLIC_EDITORIAL_REPAIR_TASK_KINDS = new Set([
 // Error-severity issues that must keep the hard block even if they share a path
 // with an editorial task — they are not safely degradable editorial residue.
 const NON_DEGRADABLE_ISSUE_CODES = new Set([
+  "highlight_missing",
   "plain_language_stock_phrase",
   "builder_translation_missing",
   "builder_content_translation_mismatch",
@@ -2738,6 +2739,21 @@ function isPublicEditorialRepairTask(task) {
   return task && PUBLIC_EDITORIAL_REPAIR_TASK_KINDS.has(String(task.kind || ""));
 }
 
+function repairTaskCoversIssue(task, issue) {
+  const taskPath = String(task?.path || "");
+  const issuePath = String(issue?.path || "");
+  if (!taskPath || !issuePath) return false;
+  if (taskPath === issuePath) return true;
+  if (
+    String(issue?.code || "") !== "highlight_missing" ||
+    String(task?.kind || "") !== "main_item_editorial_rewrite" ||
+    !/^main_items\[\d+\]\.bullets$/.test(issuePath)
+  ) {
+    return false;
+  }
+  return /^\[\d+\]$/.test(taskPath.slice(issuePath.length));
+}
+
 function retryablePublicEditorialTasks(review, tasks) {
   const editorialTasks = tasks.filter(isPublicEditorialRepairTask);
   if (editorialTasks.length === 0) return [];
@@ -2746,13 +2762,14 @@ function retryablePublicEditorialTasks(review, tasks) {
     .filter((issue) => String(issue?.severity || "") === "error");
   if (blockingIssues.length === 0) return editorialTasks;
 
-  const taskPaths = new Set(editorialTasks.map((task) => String(task?.path || "")).filter(Boolean));
-  const issuePaths = blockingIssues.map((issue) => String(issue?.path || ""));
-  if (issuePaths.some((issuePath) => !issuePath || !taskPaths.has(issuePath))) {
+  if (blockingIssues.some((issue) =>
+    !editorialTasks.some((task) => repairTaskCoversIssue(task, issue))
+  )) {
     return [];
   }
-  const blockingPaths = new Set(issuePaths);
-  return editorialTasks.filter((task) => blockingPaths.has(String(task?.path || "")));
+  return editorialTasks.filter((task) =>
+    blockingIssues.some((issue) => repairTaskCoversIssue(task, issue))
+  );
 }
 
 // Phase 3 degrade-not-block: when the review/repair loop is exhausted and EVERY
@@ -2767,20 +2784,20 @@ function residualEditorialDegradation(review) {
     return null;
   }
   // Every blocking (error-severity) issue must be COVERED by one of those
-  // editorial tasks (same path) and not a known hard-fail code. Coverage — not
-  // the issue's own `repairable` flag — is the low-risk signal: hot-blog/main-
-  // item editorial residue legitimately carries repairable:false issues paired
-  // with editorial rewrite tasks, while non-editorial blockers
+  // editorial tasks (normally the same path; highlight_missing is represented
+  // by a direct child bullet task) and not a known hard-fail code. Coverage —
+  // not the issue's own `repairable` flag — is the low-risk signal:
+  // hot-blog/main-item editorial residue legitimately carries repairable:false
+  // issues paired with editorial rewrite tasks, while non-editorial blockers
   // (plain_language_stock_phrase, candidate_pool_*, missing/mismatched builder
   // translation) keep the hard block.
-  const editorialPaths = new Set(coveredEditorialTasks.map((task) => String(task?.path || "")));
   const blockingIssues = (Array.isArray(review?.issues) ? review.issues : []).filter(
     (issue) => String(issue?.severity) === "error"
   );
   const allBlockingEditorial = blockingIssues.every(
     (issue) =>
       !NON_DEGRADABLE_ISSUE_CODES.has(String(issue?.code || "")) &&
-      editorialPaths.has(String(issue?.path || ""))
+      coveredEditorialTasks.some((task) => repairTaskCoversIssue(task, issue))
   );
   if (!allBlockingEditorial) {
     return null;
@@ -2914,12 +2931,13 @@ function authoringHandoffMetadata(aiTasks) {
 }
 
 export function qualityRepairFeedback(review, aiTasks) {
-  const taskPaths = new Set((Array.isArray(aiTasks) ? aiTasks : [])
-    .map((task) => String(task?.path || ""))
-    .filter(Boolean));
+  const tasks = Array.isArray(aiTasks) ? aiTasks : [];
   const matchingIssues = (Array.isArray(review?.issues) ? review.issues : [])
-    .filter((issue) => String(issue?.severity || "") === "error" && taskPaths.has(String(issue?.path || "")));
-  const reviewIssues = summarizeAiRepairReviewIssues(review, aiTasks);
+    .filter((issue) =>
+      String(issue?.severity || "") === "error" &&
+      tasks.some((task) => repairTaskCoversIssue(task, issue))
+    );
+  const reviewIssues = summarizeAiRepairReviewIssues(review, tasks);
   const issueKeys = [...new Set(reviewIssues.flatMap((issue) => {
     const pathName = String(issue?.path || "");
     const problems = Array.isArray(issue?.details?.problems)
@@ -3100,16 +3118,15 @@ function qualityRepairStalledBlock({ summary, reportDate, maxReviewRepairLoops }
 }
 
 function summarizeAiRepairReviewIssues(review, aiTasks) {
-  const taskByPath = new Map(
-    aiTasks
-      .filter((task) => task?.path)
-      .map((task) => [task.path, task])
-  );
+  const tasks = aiTasks.filter((task) => task?.path);
   const issues = (Array.isArray(review?.issues) ? review.issues : [])
-    .filter((issue) => String(issue?.severity || "") === "error" && taskByPath.has(String(issue?.path || "")));
+    .filter((issue) =>
+      String(issue?.severity || "") === "error" &&
+      tasks.some((task) => repairTaskCoversIssue(task, issue))
+    );
   if (issues.length > 0) {
     return issues.map((issue) => {
-      const task = taskByPath.get(issue?.path);
+      const task = tasks.find((candidate) => repairTaskCoversIssue(candidate, issue));
       return {
         code: String(issue?.code || ""),
         severity: String(issue?.severity || ""),
@@ -3124,7 +3141,7 @@ function summarizeAiRepairReviewIssues(review, aiTasks) {
       };
     });
   }
-  return aiTasks.map((task) => ({
+  return tasks.map((task) => ({
     code: "",
     severity: "",
     path: String(task?.path || ""),
