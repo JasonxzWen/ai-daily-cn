@@ -6419,16 +6419,26 @@ test("shared URL identity normalizes tracking parameters for dedupe gates", () =
   );
 });
 
-test("shared pnpm invocation uses the platform pnpm executable safely", () => {
+test("shared pnpm invocation prefers Corepack and falls back to pnpm on Unix", () => {
   const windows = pnpmInvocationForArgs(["install", "--frozen-lockfile", "--store-dir", "C:\\tmp\\pnpm store"], { platform: "win32" });
   assert.equal(windows.file, "cmd.exe");
   assert.deepEqual(windows.args.slice(0, 3), ["/d", "/s", "/c"]);
   assert.match(windows.args[3], /^corepack pnpm install --frozen-lockfile --store-dir /);
   assert.match(windows.args[3], /pnpm store/);
 
-  const linux = pnpmInvocationForArgs(["install", "--frozen-lockfile"], { platform: "linux" });
-  assert.equal(linux.file, "pnpm");
-  assert.deepEqual(linux.args, ["install", "--frozen-lockfile"]);
+  const corepackLinux = pnpmInvocationForArgs(["install", "--frozen-lockfile"], {
+    platform: "linux",
+    corepackAvailable: true
+  });
+  assert.equal(corepackLinux.file, "corepack");
+  assert.deepEqual(corepackLinux.args, ["pnpm", "install", "--frozen-lockfile"]);
+
+  const pnpmLinux = pnpmInvocationForArgs(["install", "--frozen-lockfile"], {
+    platform: "linux",
+    corepackAvailable: false
+  });
+  assert.equal(pnpmLinux.file, "pnpm");
+  assert.deepEqual(pnpmLinux.args, ["install", "--frozen-lockfile"]);
 });
 
 test("public artifact privacy scan blocks local machine path leakage", async () => {
@@ -11159,7 +11169,7 @@ test("daily runner maps a collection highlight issue to its bullet edit task", a
   assert(!result.summary.stages.some((stage) => stage.id === "publish_real"));
 });
 
-test("daily runner degrades an exhausted collection highlight issue through its direct bullet task", async () => {
+test("daily runner hard-blocks an exhausted collection highlight issue after offering its direct bullet repair", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-highlight-degrade-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
   const reportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
@@ -11207,10 +11217,9 @@ test("daily runner degrades an exhausted collection highlight issue through its 
     }
   });
 
-  assert.equal(result.summary.final_status, "generated_degraded");
-  const reviewStage = result.summary.stages.find((stage) => stage.id === "quality_review");
-  assert.equal(reviewStage.status, "degraded");
-  assert.deepEqual(reviewStage.output.quality_status.degraded_sections, ["main_items"]);
+  assert.equal(result.summary.final_status, "generated_signals_only");
+  assert.equal(result.summary.legacy_report.status, "blocked");
+  assert(!result.summary.stages.some((stage) => stage.id === "report_write"));
 });
 
 test("daily runner hard-blocks an unknown collection error paired with a child bullet task", async () => {

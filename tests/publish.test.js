@@ -1579,13 +1579,20 @@ test("publish prepare-clean-worktree refreshes existing dependencies with the co
     commandRunner: fakeCommandRunner({ calls })
   });
 
-  const pnpmCall = calls.find((call) => call.file === "pnpm" || call.file === "corepack.cmd" || call.file === "cmd.exe");
+  const pnpmCall = calls.find((call) =>
+    call.file === "pnpm" ||
+    call.file === "corepack" ||
+    call.file === "corepack.cmd" ||
+    call.file === "cmd.exe"
+  );
   assert.ok(pnpmCall, "expected pnpm install to run");
-  if (os.platform() === "win32") {
+  if (pnpmCall.file === "cmd.exe") {
     assert.equal(pnpmCall.file, "cmd.exe");
     assert.deepEqual(pnpmCall.args.slice(0, 3), ["/d", "/s", "/c"]);
     assert.match(pnpmCall.args[3], /^corepack pnpm install --frozen-lockfile --store-dir /);
     assert.match(pnpmCall.args[3], /pnpm-store/);
+  } else if (pnpmCall.file === "corepack") {
+    assert.deepEqual(pnpmCall.args, ["pnpm", "install", "--frozen-lockfile", "--store-dir", pnpmStoreDir]);
   } else {
     assert.equal(pnpmCall.file, "pnpm");
     assert.deepEqual(pnpmCall.args, ["install", "--frozen-lockfile", "--store-dir", pnpmStoreDir]);

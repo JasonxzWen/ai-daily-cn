@@ -108,6 +108,7 @@ const PUBLIC_EDITORIAL_REPAIR_TASK_KINDS = new Set([
 // Error-severity issues that must keep the hard block even if they share a path
 // with an editorial task — they are not safely degradable editorial residue.
 const NON_DEGRADABLE_ISSUE_CODES = new Set([
+  "highlight_missing",
   "plain_language_stock_phrase",
   "builder_translation_missing",
   "builder_content_translation_mismatch",
