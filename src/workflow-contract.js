@@ -265,7 +265,8 @@ async function validateExternalAutomationInventory({ contract, options, failures
 
   const inventory = await inspectAutomationInventory({
     automationsDir: options.automationsDir,
-    projectCwds: inventoryConfig.project_cwds || options.projectCwds
+    projectCwds: inventoryConfig.project_cwds || options.projectCwds,
+    projectCwdBasenames: inventoryConfig.project_cwd_basenames || options.projectCwdBasenames
   });
   if (!inventory.available) {
     warnings.push(`external automation inventory not found: ${inventory.automations_dir || inventory.error}`);
@@ -289,6 +290,13 @@ async function validateExternalAutomationInventory({ contract, options, failures
   }
 
   const activePublish = inventory.active_publish_automations || [];
+  const activeDailyRun = inventory.active_daily_run_automations || [];
+  if (inventoryConfig.require_single_active_daily_run && activeDailyRun.length !== 1) {
+    failures.push(`external automations: expected exactly one active daily run automation, found ${activeDailyRun.length}.`);
+  }
+  if (inventoryConfig.require_zero_active_publish && activePublish.length !== 0) {
+    failures.push(`external automations: expected zero active daily publish automations, found ${activePublish.length}.`);
+  }
   if (inventoryConfig.require_single_active_publish !== false && activePublish.length !== 1) {
     failures.push(`external automations: expected exactly one active daily publish automation, found ${activePublish.length}.`);
   }
@@ -410,10 +418,14 @@ async function validateExternalAutomationPrompt({ contract, options, failures, w
 }
 
 async function resolveExternalAutomationPromptPath({ contract, external, options, warnings, checkedFiles }) {
-  if (external.target === "active_daily_publish") {
+  if (external.target === "active_daily_publish" || external.target === "active_daily_run") {
     const inventory = await inspectAutomationInventory({
       automationsDir: options.automationsDir,
-      projectCwds: external.project_cwds || contract.external_automation_inventory?.project_cwds || options.projectCwds
+      projectCwds: external.project_cwds || contract.external_automation_inventory?.project_cwds || options.projectCwds,
+      projectCwdBasenames:
+        external.project_cwd_basenames ||
+        contract.external_automation_inventory?.project_cwd_basenames ||
+        options.projectCwdBasenames
     });
     if (!inventory.available) {
       warnings.push(`external automation inventory not found for prompt target: ${inventory.automations_dir || inventory.error}`);
@@ -422,12 +434,14 @@ async function resolveExternalAutomationPromptPath({ contract, external, options
     for (const automation of inventory.automations || []) {
       checkedFiles.push(toPortablePath(automation.path));
     }
-    const activePublish = inventory.active_publish_automations || [];
-    if (activePublish.length !== 1 || !activePublish[0]?.path) {
-      warnings.push(`external automation prompt target active_daily_publish expected one active publish automation, found ${activePublish.length}.`);
+    const activeTargets = external.target === "active_daily_run"
+      ? inventory.active_daily_run_automations || []
+      : inventory.active_publish_automations || [];
+    if (activeTargets.length !== 1 || !activeTargets[0]?.path) {
+      warnings.push(`external automation prompt target ${external.target} expected one active automation, found ${activeTargets.length}.`);
       return "";
     }
-    return activePublish[0].path;
+    return activeTargets[0].path;
   }
 
   return defaultAutomationPromptPath();

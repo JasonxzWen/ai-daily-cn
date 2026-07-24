@@ -8797,6 +8797,33 @@ test("automation inventory recognizes daily codex pipeline publish automation", 
   assert.equal(result.active_publish_automations[0].legacy_flow, false);
 });
 
+test("automation inventory recognizes macOS daily codex dry-run by project basename", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-macos-dry-run-automation-"));
+  const automationsDir = path.join(tmp, "automations");
+  await fs.mkdir(path.join(automationsDir, "mac-dry-run"), { recursive: true });
+  await fs.writeFile(
+    path.join(automationsDir, "mac-dry-run", "automation.toml"),
+    [
+      'id = "mac-dry-run"',
+      'kind = "cron"',
+      'name = "AI Daily CN Mac dry run"',
+      'prompt = "node scripts/run-daily-codex-pipeline.mjs --date YYYY-MM-DD --execute; read UTF-8 JSON summary"',
+      'status = "ACTIVE"',
+      'cwds = ["/Users/example/repo/ai-daily-cn"]'
+    ].join("\n"),
+    "utf8"
+  );
+
+  const result = await inspectAutomationInventory({
+    automationsDir,
+    projectCwdBasenames: ["ai-daily-cn"]
+  });
+
+  assert.deepEqual(result.active_daily_run_automations.map((automation) => automation.id), ["mac-dry-run"]);
+  assert.deepEqual(result.active_publish_automations, []);
+  assert.equal(result.active_daily_run_automations[0].role, "daily_dry_run");
+});
+
 test("status:self-check reports degraded published state without blocking", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-status-self-check-ok-"));
   await writeSelfCheckReportFixture(tmp, "2026-06-04", {
@@ -8954,7 +8981,7 @@ test("status:self-check runs publish checks from the prepared clean worktree", a
   assert.equal(saved.checked_repo_root, cleanRoot.replace(/\\/g, "/"));
 });
 
-test("daily workflow contract validates repository workflow markers", async () => {
+test("daily workflow contract validates one portable macOS dry-run automation", async () => {
   const expectedDagContractRunCommand = "node scripts/run-daily-codex-dag.mjs --contract-run --json";
   const contract = JSON.parse(await fs.readFile(path.join(rootDir, "config", "daily-workflow-contract.json"), "utf8"));
   const manifest = JSON.parse(await fs.readFile(path.join(rootDir, "package.json"), "utf8"));
@@ -9006,7 +9033,10 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert(contract.daily_runner.modes.dry_run.allowed_terminal_statuses.includes("generated_signals_only"));
   assert(contract.daily_runner.modes.publish.allowed_terminal_statuses.includes("published_signals_only"));
   assert.equal(contract.external_automation_inventory.require_single_project_automation, true);
-  assert.deepEqual(contract.external_automation_inventory.allowed_project_automation_ids, ["ai-2"]);
+  assert.equal(contract.external_automation_inventory.require_single_active_daily_run, true);
+  assert.equal(contract.external_automation_inventory.require_zero_active_publish, true);
+  assert.equal(contract.external_automation_inventory.require_single_active_publish, false);
+  assert.deepEqual(contract.external_automation_inventory.project_cwd_basenames, ["ai-daily-cn"]);
   assert.equal(contract.external_automation_inventory.require_active_status_self_check, false);
   assert.equal(contract.status_self_check.scheduled, false);
   assert.equal(contract.status_self_check.mode, "manual_diagnostic_only");
@@ -9019,22 +9049,29 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert(contract.external_automation_prompt.contains.includes("signal_index_path"));
   assert(contract.external_automation_prompt.contains.includes("signals.status"));
   assert(contract.external_automation_prompt.contains.includes("legacy_report.status"));
-  assert(contract.external_automation_prompt.contains.includes("Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8"));
+  assert.equal(contract.external_automation_prompt.target, "active_daily_run");
+  assert(contract.external_automation_prompt.contains.includes("pnpm@11.10.0"));
+  assert(contract.external_automation_prompt.contains.includes("node scripts/run-daily-codex-pipeline.mjs"));
+  assert(contract.external_automation_prompt.contains.includes("Asia/Shanghai"));
+  assert(contract.external_automation_prompt.contains.includes("UTF-8"));
+  assert(contract.external_automation_prompt.contains.includes("JSON.parse"));
+  assert(contract.external_automation_prompt.not_contains.includes("--publish"));
   assert.equal(manifest.scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
   assert(!contract.daily_runner || contract.daily_runner.script !== "daily:codex-dag:contract-run");
 
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-"));
   const automationsDir = path.join(tmp, "automations");
-  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
-  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
+  const promptPath = path.join(automationsDir, "mac-dry-run", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "mac-dry-run"), { recursive: true });
   await fs.writeFile(
     promptPath,
     [
-      'id = "ai-2"',
+      'id = "mac-dry-run"',
       'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8"',
+      'name = "AI Daily CN Mac dry run"',
+      'prompt = "在 Codex-owned worktree 中按 Asia/Shanghai 计算 YYYY-MM-DD；用进程内 HTTPS fetch origin/main，验证 clean worktree 与 bootstrap mainSha；用 npm exec --yes --package=pnpm@11.10.0 安装并提供项目局部 pnpm；只运行一次 node scripts/run-daily-codex-pipeline.mjs --date YYYY-MM-DD --execute；publish:dry-run:daily 是内部阶段，不要另行运行 status:self-check；以 UTF-8 读取 .tmp/run-summary-YYYY-MM-DD.json 并 JSON.parse，报告 next_action completed_stages automation_pipeline_mode source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_only generated_degraded generated_signals_only。"',
       'status = "ACTIVE"',
-      'cwds = ["D:\\\\ai-daily-cn"]'
+      'cwds = ["/Users/example/repo/ai-daily-cn"]'
     ].join("\n"),
     "utf8"
   );
@@ -9050,31 +9087,48 @@ test("daily workflow contract validates repository workflow markers", async () =
   assert(result.checked_files.some((file) => file.endsWith("prompts/ai-daily/modules/publish-workflow.md")));
 });
 
+function macDryRunAutomationToml(options = {}) {
+  const id = options.id || "mac-dry-run";
+  const encoding = options.includeUtf8 === false ? "按文本读取" : "以 UTF-8 读取";
+  const prompt = [
+    "在 Codex-owned worktree 中按 Asia/Shanghai 计算 YYYY-MM-DD",
+    "用进程内 HTTPS fetch origin/main，验证 clean worktree 与 bootstrap mainSha",
+    "用 npm exec --yes --package=pnpm@11.10.0 安装并提供项目局部 pnpm",
+    "只运行一次 node scripts/run-daily-codex-pipeline.mjs --date YYYY-MM-DD --execute",
+    "publish:dry-run:daily 是内部阶段，不要另行运行 status:self-check",
+    `${encoding} .tmp/run-summary-YYYY-MM-DD.json 并 JSON.parse`,
+    "报告 next_action completed_stages automation_pipeline_mode source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_only generated_degraded generated_signals_only",
+    options.extraPrompt || ""
+  ].filter(Boolean).join("；");
+  return [
+    `id = "${id}"`,
+    'kind = "cron"',
+    'name = "AI Daily CN Mac dry run"',
+    `prompt = "${prompt}"`,
+    `status = "${options.status || "ACTIVE"}"`,
+    'cwds = ["/Users/example/repo/ai-daily-cn"]'
+  ].join("\n");
+}
+
 test("daily workflow contract rejects any extra project automation definition", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-extra-automation-"));
   const automationsDir = path.join(tmp, "automations");
-  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
-  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
-  await fs.mkdir(path.join(automationsDir, "ai-daily"), { recursive: true });
+  const promptPath = path.join(automationsDir, "mac-dry-run", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "mac-dry-run"), { recursive: true });
+  await fs.mkdir(path.join(automationsDir, "extra"), { recursive: true });
   await fs.writeFile(
     promptPath,
-    [
-      'id = "ai-2"',
-      'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check"',
-      'status = "ACTIVE"',
-      'cwds = ["D:\\\\ai-daily-cn"]'
-    ].join("\n"),
+    macDryRunAutomationToml(),
     "utf8"
   );
   await fs.writeFile(
-    path.join(automationsDir, "ai-daily", "automation.toml"),
+    path.join(automationsDir, "extra", "automation.toml"),
     [
-      'id = "ai-daily"',
+      'id = "extra"',
       'kind = "cron"',
       'prompt = "readonly insight"',
       'status = "PAUSED"',
-      'cwds = ["D:\\\\ai-daily-cn"]'
+      'cwds = ["/Users/example/repo/ai-daily-cn"]'
     ].join("\n"),
     "utf8"
   );
@@ -9087,7 +9141,7 @@ test("daily workflow contract rejects any extra project automation definition", 
 
   assert.equal(result.ok, false);
   assert(
-    result.failures.some((failure) => failure.includes("project automation ai-daily is not allowed")),
+    result.failures.some((failure) => failure.includes("expected exactly one project automation, found 2")),
     result.failures.join("\n")
   );
 });
@@ -9104,19 +9158,9 @@ test("daily workflow contract rejects admission gates or legacy lineage in the p
   await fs.writeFile(contractPath, `${JSON.stringify(contract, null, 2)}\n`, "utf8");
 
   const automationsDir = path.join(tmp, "automations");
-  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  const promptPath = path.join(automationsDir, "mac-dry-run", "automation.toml");
   await fs.mkdir(path.dirname(promptPath), { recursive: true });
-  await fs.writeFile(
-    promptPath,
-    [
-      'id = "ai-2"',
-      'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8"',
-      'status = "ACTIVE"',
-      'cwds = ["D:\\\\ai-daily-cn"]'
-    ].join("\n"),
-    "utf8"
-  );
+  await fs.writeFile(promptPath, macDryRunAutomationToml(), "utf8");
 
   const result = await validateDailyWorkflowContract({
     rootDir,
@@ -9133,22 +9177,12 @@ test("daily workflow contract rejects admission gates or legacy lineage in the p
   assert(result.failures.some((failure) => failure.includes("optional_derivative must be true")), result.failures.join("\n"));
 });
 
-test("daily workflow contract rejects a publish prompt that reads the run summary without explicit UTF-8", async () => {
+test("daily workflow contract rejects a dry-run prompt that reads the run summary without explicit UTF-8", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-prompt-encoding-"));
   const automationsDir = path.join(tmp, "automations");
-  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
+  const promptPath = path.join(automationsDir, "mac-dry-run", "automation.toml");
   await fs.mkdir(path.dirname(promptPath), { recursive: true });
-  await fs.writeFile(
-    promptPath,
-    [
-      'id = "ai-2"',
-      'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check; Get-Content $summaryPath -Raw"',
-      'status = "ACTIVE"',
-      'cwds = ["D:\\\\ai-daily-cn"]'
-    ].join("\n"),
-    "utf8"
-  );
+  await fs.writeFile(promptPath, macDryRunAutomationToml({ includeUtf8: false }), "utf8");
 
   const result = await validateDailyWorkflowContract({
     rootDir,
@@ -9158,27 +9192,19 @@ test("daily workflow contract rejects a publish prompt that reads the run summar
 
   assert.equal(result.ok, false);
   assert(
-    result.failures.some((failure) => failure.includes("Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8")),
+    result.failures.some((failure) => failure.includes('missing marker "UTF-8"')),
     result.failures.join("\n")
   );
 });
 
-test("daily workflow contract rejects an active publish automation with stale Source Watch assertions", async () => {
+test("daily workflow contract rejects an active dry-run automation with stale Source Watch assertions", async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-contract-missing-source-watch-"));
   const automationsDir = path.join(tmp, "automations");
-  const promptPath = path.join(automationsDir, "ai-2", "automation.toml");
-  await fs.mkdir(path.join(automationsDir, "ai-2"), { recursive: true });
-  await fs.writeFile(
-    promptPath,
-    [
-      'id = "ai-2"',
-      'kind = "cron"',
-      'prompt = "corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish; read .tmp/run-summary-YYYY-MM-DD.json next_action completed_stages automation_pipeline_mode publish:dry-run:daily source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_signals_only published_signals_only; bootstrap mainSha; 不要另行运行 status:self-check; source_watch.production_status must stay not_connected"',
-      'status = "ACTIVE"',
-      'cwds = ["D:\\\\ai-daily-cn"]'
-    ].join("\n"),
-    "utf8"
-  );
+  const promptPath = path.join(automationsDir, "mac-dry-run", "automation.toml");
+  await fs.mkdir(path.join(automationsDir, "mac-dry-run"), { recursive: true });
+  await fs.writeFile(promptPath, macDryRunAutomationToml({
+    extraPrompt: "source_watch.production_status must stay not_connected"
+  }), "utf8");
 
   const result = await validateDailyWorkflowContract({
     rootDir,

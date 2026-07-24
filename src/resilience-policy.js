@@ -98,7 +98,7 @@ const DOC_MARKERS = [
     path: "docs/codex-automation-setup.md",
     contains: [
       "config/daily-resilience-policy.json",
-      "corepack pnpm run resilience:validate",
+      "node scripts/validate-daily-resilience-policy.mjs",
       "published_degraded",
       "infrastructure_blocked_after_fallback_exhausted",
       ...SIGNAL_DOC_MARKERS

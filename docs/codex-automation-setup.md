@@ -1,34 +1,46 @@
 # Codex 自动化配置
 
-生产自动化只负责取得最新 `origin/main`、进入本次新建的干净发布工作树、调用唯一入口并读取 summary；业务阶段、恢复和发布范围都由仓库代码负责。
+当前 macOS 自动化每天 `13:05`（`Asia/Shanghai`）运行一次非发布真实链路。它运行在 Codex-owned `worktree`，只负责取得最新 `origin/main`、验证 bootstrap、调用唯一 pipeline 并读取 summary；业务阶段、恢复和发布范围仍由仓库代码负责。
 
-## 唯一入口
+这台 Mac 没有配置自动唤醒。机器在计划时间休眠时，任务可能在恢复后补跑，不能据此声称 13:05 准时完成。
 
-```powershell
-corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
+## 当前唯一入口
+
+Automation 不依赖全局 Corepack 或 Codex 临时 pnpm 路径。先用 npm 的临时执行环境提供项目锁定的 `pnpm@11.10.0`，安装当前 main 的依赖：
+
+```bash
+npm exec --yes --package=pnpm@11.10.0 -- pnpm install --frozen-lockfile
 ```
 
-- 不发布时去掉 `--publish`。
-- `publish:dry-run:daily` 是 pipeline 内部阶段，自动化不单独调用。
+再在同一个精确 pnpm 环境中直接调用 Node 入口：
+
+```bash
+npm exec --yes --package=pnpm@11.10.0 -- node scripts/run-daily-codex-pipeline.mjs --date YYYY-MM-DD --execute
+```
+
+真实发布仍是同一个入口加 `--publish`，但当前 Automation 不得传入该参数；启用它需要新的持续发布授权。
+
+- `publish:dry-run:daily` 是 pipeline 内部阶段，Automation 不单独调用。
 - 不直接调用发现、写入、build、publish 或旧 runner。
 - 不另行调度 `status:self-check`。
-- 项目只允许一个 active publish automation；`multiple_active_daily_publish_automations` 是阻断项。
+- 当前只允许一个 active daily-run Automation，且 active publish Automation 数量必须为零。
+- 将来启用发布时仍只允许一个 publisher；`multiple_active_daily_publish_automations` 是阻断项。
 
-## Bootstrap
+## macOS Bootstrap
 
-自动化先运行 `$env:CODEX_HOME\automations\ai-daily\bootstrap-latest-main.ps1`，并验证：
+每次运行都使用 Automation 自己拥有的 worktree：
 
-1. bootstrap 成功返回 `mainSha`、`publishRoot` 和 `reportDate`；
-2. `publishRoot` 是本次新建的工作树；
-3. 工作树 HEAD 与 bootstrap mainSha 完全一致；
-4. 只在该工作树运行生产入口；
-5. 不复用其他 checkout、其他 worktree 或 `.tmp/daily-codex-pipeline/YYYY-MM-DD` 的旧运行目录。
-
-自动化不得 reset 或 stash launcher 工作树中的用户改动。
+1. 按 `Asia/Shanghai` 计算 `YYYY-MM-DD`。
+2. 仅在当前进程内 fetch 最新 `origin/main`；SSH agent 对 Codex 不可见时，可对公开仓库临时使用 HTTPS，不写持久 Git 配置。
+3. 验证 worktree 干净，并让本次执行代码与 fetch 后的 `origin/main` 相同。
+4. 使用 `pnpm@11.10.0` 在 Automation-owned worktree 安装项目依赖，不执行全局安装。
+5. 记录 `bootstrap mainSha`，并确认 pipeline summary 中的 clean publish root 来自该版本。
+6. 只在 Automation-owned worktree 运行唯一入口，不 reset、stash、clean 或切换用户的 launcher checkout。
+7. 不复用其他 checkout 或 `.tmp/daily-codex-pipeline/YYYY-MM-DD` 的旧运行目录猜测结果。
 
 ## 公共信号优先
 
-共享发现后，runner 先执行：
+共享发现完成后，runner 依次执行：
 
 ```text
 signals_write
@@ -38,80 +50,64 @@ signals_write
   -> signals_publish_real
 ```
 
-- `signals_write` 持久化所有安全、可公开的规范化观察到 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json`。
+当前非发布模式只允许走到真实远端写入之前：
+
+- `signals_write` 把所有安全、可公开的规范化观察持久化到 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json`。
 - `signals_build` 生成 `docs/signals/index.json` 与分组分页。
 - `signals_validate` 验证 schema、lineage、隐私和公开路径。
 - 信源类别、内容类别、可信度、健康和访问状态仅是标签/筛选维度，不是准入条件。
-- 低可信、旧内容、重复事件、社区讨论或缺少原始 X URL 不得阻断公共信号。
+- 可选 legacy 编辑报告在 signal 之后运行；其 admit、quality gate 与 `sources:phase5-audit` 不能改变 signal membership。
 
-可选 legacy 编辑报告在 signal 之后运行。其 admit、候选选择、事实复核、quality gate 和 `sources:phase5-audit` 只影响 legacy 派生产物，不能改变 signal membership 或发布结果。
-
-`signals_build` 还会读取已提交的 immutable occurrence 基线 `reports-data/occurrences/baseline-v1/*.json.gz`，其清单位于 `reports-data/occurrence-baseline-manifest.json`。这是一次性历史迁移结果；自动化不得运行 `signals:migrate-baseline`，生产也不得扫描 legacy 候选池、编辑报告或旧 public JSON 补数。
+历史信号来自 immutable `reports-data/occurrences/baseline-v1/*.json.gz` 和 `reports-data/occurrence-baseline-manifest.json`。Automation 不得运行 `signals:migrate-baseline`，也不得扫描 legacy 候选池、报告或旧 public JSON 补数。
 
 ## Summary 合同
 
-路径模板固定为 `.tmp/run-summary-YYYY-MM-DD.json`。运行时按 report date 展开，并显式用 UTF-8 读取：
+唯一事实源是 `.tmp/run-summary-YYYY-MM-DD.json`。按 UTF-8 读取并执行 `JSON.parse`；不要扫描运行目录猜测 sidecar：
 
-```powershell
-$summaryPath = ".tmp/run-summary-$($bootstrapInfo.reportDate).json"
-$summary = Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8 | ConvertFrom-Json
+```bash
+node -e 'const fs=require("node:fs");const p=".tmp/run-summary-YYYY-MM-DD.json";const s=JSON.parse(fs.readFileSync(p,"utf8"));console.log(JSON.stringify(s,null,2))'
 ```
 
-必须检查：
+至少检查：
 
-- `automation_pipeline_mode`；
-- orchestration node count 与 pipeline plan path；
+- `automation_pipeline_mode`、orchestration node count 和 pipeline plan path；
 - `completed_stages`；
-- `signals.status`；
-- `legacy_report.status`；
-- `source_watch.production_status`；
-- `source_watch.connected`；
-- `source_watch.consumed`；
-- Source Watch producer、occurrence store 和 signal index 的路径、SHA-256 与 lineage；
-- `next_action`。
+- `signals.status` 与 `legacy_report.status`；
+- `source_watch.production_status`、`source_watch.connected`、`source_watch.consumed`；
+- producer、occurrence store、signal index 的路径、SHA-256 与 lineage；
+- `next_action`；
+- `publish_requested` 必须为 false。
 
-Source Watch 的生产 lineage 是 `discover_source_watch` → `signals_write` → `signals_build` → `signals_validate`。connected/consumed 为 true 时，summary 必须提供匹配的 occurrence store 与 signal index 证据；为 false 时必须提供 reason。零条观察只要同日 store/index 与 lineage 有效，也可以为 true。
+Source Watch 的生产 lineage 是 `discover_source_watch` → `signals_write` → `signals_build` → `signals_validate`。零条观察只要同日 store/index 与 lineage 有效，也可以 consumed。
 
 ## 合法终态
 
-dry run：
+当前 dry run：
 
 - `generated_only`
 - `generated_degraded`
 - `generated_signals_only`
 
-publish：
+未来获授权的 publish：
 
 - `published`
 - `published_signals_only`
 - `published_pending_pages_verification`
 
-`published_degraded` 可以出现在 `legacy_report.status`，外层 summary 仍按公共发布结果归一化。`generated_signals_only` / `published_signals_only` 表示公共信号成功、legacy 未完成，自动化必须如实报告，不能声称整次运行没有产物。`infrastructure_blocked_after_fallback_exhausted` 表示允许的 transport/API fallback 已耗尽。
+`published_degraded` 可以出现在 `legacy_report.status`；`infrastructure_blocked_after_fallback_exhausted` 只表示允许的基础设施 fallback 已耗尽。signal-only 成功不能被 legacy 失败覆盖。
 
-## 恢复规则
+## 恢复与验证
 
-- 始终执行 summary 的 `next_action`。
-- `restart_latest_main`：回到 launcher 再走一次 bootstrap，不复用旧产物。
-- signal Git transport 失败：由 runner 执行 signal-scope GitHub API fallback。
-- signal 已发布后 legacy 失败：保留 signal 成功，不回滚、不重复发布。
-- Pages pending：报告 `published_pending_pages_verification`，等待复查。
+- 始终服从 summary 的 `next_action`。
+- `restart_latest_main`：放弃当前运行 worktree，从最新 main 重新 bootstrap；不复用旧产物。
+- 当前非发布模式不得执行 Git push、GitHub API 发布或 Pages 验证。
+- 恢复机器合同位于 `config/daily-resilience-policy.json`。
 
-恢复机器合同位于 `config/daily-resilience-policy.json`。更新自动化、runner 阶段或终态时运行：
+仓库验证：
 
-```powershell
-corepack pnpm run workflow:validate
-corepack pnpm run resilience:validate
+```bash
+node scripts/validate-daily-workflow-contract.mjs
+node scripts/validate-daily-resilience-policy.mjs
 ```
 
-## 自动化提示词最小责任
-
-提示词只应：
-
-1. 指定始终中文；
-2. 执行 bootstrap 并验证 main SHA；
-3. 调用 `corepack pnpm run daily:codex-pipeline` 一次；
-4. 读取 summary；
-5. 验证 signal/legacy 双结果与 Source Watch 证据；
-6. 按 final status、`next_action` 和 `completed_stages` 报告。
-
-不得把业务 stage 重新写成第二套流程，也不得让遗留内容门槛成为 signal 发布条件。
+Automation 提示词只负责 bootstrap、调用一次 pipeline、读取 summary、验证 signal/legacy 双结果与 Source Watch 证据，并按 final status、`next_action` 和 `completed_stages` 用中文报告。不要在提示词里复制第二套业务 DAG。
