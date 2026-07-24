@@ -1,7 +1,9 @@
 export const DEFAULT_SITE = {
   title: "AI 日报",
   siteUrl: "https://jasonxzwen.github.io/ai-daily-cn/",
-  publishBranch: "main"
+  publishBranch: "main",
+  publishAuthorName: "JasonxzWen",
+  publishAuthorEmail: "109508077+JasonxzWen@users.noreply.github.com"
 };
 
 export const SELF_CHECK_HEADINGS = new Set(["自检", "自检与优化建议"]);

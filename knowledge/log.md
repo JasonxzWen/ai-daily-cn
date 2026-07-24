@@ -4,6 +4,10 @@ title: AI Daily CN 知识更新日志
 ---
 # AI Daily CN 知识更新日志
 
+## 2026-07-24
+
+- 记录发布器通过单次 Git commit 参数提供项目发布身份、允许显式环境变量覆盖且不写持久 Git 配置的边界。
+
 ## 2026-07-23
 
 - 记录遗留编辑候选池的内部无损 gzip 持久化路径、旧 JSON 迁移兼容及默认不公开边界。
@@ -30,3 +34,5 @@ title: AI Daily CN 知识更新日志
 - [影子信源编排](../src/curated-source-shadow.js)
 - [信号准入合同](../config/signal-admission-contract.json)
 - [信号池原子编排与验证](../src/signal-pool.js)
+- [站点与发布身份配置](../src/config.js)
+- [Git 发布实现](../src/publish.js)
