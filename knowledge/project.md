@@ -15,6 +15,7 @@ title: AI Daily CN 项目概览
 - Phase 1B 在 Phase 1A 后运行不阻断旧发布器的确定性准入影子阶段：逐项记录 `admitted / rejected / needs_review` 回执，将跨日去重后的信号保存到内部 signal pool，并生成同代、可校验但不进入当前站点发现与公开信号 schema 的 public-ready 伴随投影。
 - Aify“今日精选”在 URL、安全、时效、去重等机械门通过后，原样复用其标题、描述、链接与标签；普通来源必须提供由原文证据约束的一句话事实摘要，不能把入选理由写成读者摘要。
 - Aify 首页“今日精选”由独立严格适配器解析，内容回执 `aify_today_picks` 与站点健康回执 `site-aify-news` 分离；既有 `content-aify-news` archive 配置仍保持原样。
+- 发布器在执行生成产物的 Git commit 时通过单次命令参数提供项目发布身份，显式 `GIT_AUTHOR_*` / `GIT_COMMITTER_*` 环境变量仍可覆盖；该机制不写用户、全局或仓库 Git 配置。
 - 根包使用 Node.js ESM，并通过 Corepack 管理的 pnpm workspace 执行构建、测试与发布前验证。
 
 ## 推断边界
@@ -35,3 +36,5 @@ title: AI Daily CN 项目概览
 - [信号池原子编排与验证](../src/signal-pool.js)
 - [一句话摘要约束](../src/signal-summary.js)
 - [Aify 今日精选适配器](../src/aify-today-picks.js)
+- [站点与发布身份配置](../src/config.js)
+- [Git 发布实现](../src/publish.js)

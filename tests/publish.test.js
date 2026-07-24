@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { PublisherError } from "../src/errors.js";
 import { writeCandidatePool } from "../src/candidates.js";
@@ -15,6 +17,7 @@ import { loadSignalAdmissionContract } from "../src/signal-admission.js";
 import { buildSignalPoolArtifacts } from "../src/signal-pool.js";
 import {
   checkPublishPreflight,
+  createGitAdapter,
   createDailyPublishPlan,
   createPublishPlan,
   createSignalPublishPlan,
@@ -38,6 +41,7 @@ import { buildPublicSignals, buildSite } from "../src/site.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const fixedGeneratedAt = "2026-05-13T02:35:00+08:00";
+const execFileAsync = promisify(execFile);
 let curatedShadowCanonicalFixturePromise;
 
 function withoutGitHubTokenEnv() {
@@ -1925,6 +1929,65 @@ test("publish reports committed local state when the final push fails", async ()
   assert.deepEqual(calls.map((call) => call.name), ["fetch", "pushDryRun", "add", "commit", "push"]);
 });
 
+test("publish git adapter commits with a non-persistent fallback identity and preserves explicit overrides", async () => {
+  const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-publish-git-identity-"));
+  await execGit(repoRoot, ["init", "-b", "main"]);
+  await execGit(repoRoot, ["config", "--local", "user.name", ""]);
+  await execGit(repoRoot, ["config", "--local", "user.email", ""]);
+  await fs.writeFile(path.join(repoRoot, "artifact.txt"), "generated\n");
+
+  const priorIdentity = {
+    GIT_AUTHOR_NAME: process.env.GIT_AUTHOR_NAME,
+    GIT_AUTHOR_EMAIL: process.env.GIT_AUTHOR_EMAIL,
+    GIT_COMMITTER_NAME: process.env.GIT_COMMITTER_NAME,
+    GIT_COMMITTER_EMAIL: process.env.GIT_COMMITTER_EMAIL
+  };
+  for (const key of Object.keys(priorIdentity)) {
+    delete process.env[key];
+  }
+
+  let fallbackIdentity;
+  let overrideIdentity;
+  try {
+    const git = createGitAdapter(repoRoot);
+    await git.add(["artifact.txt"]);
+    await git.commit("chore: publish generated artifact");
+    fallbackIdentity = await execGit(repoRoot, ["show", "-s", "--format=%an%n%ae%n%cn%n%ce", "HEAD"]);
+
+    process.env.GIT_AUTHOR_NAME = "Explicit Author";
+    process.env.GIT_AUTHOR_EMAIL = "author@example.com";
+    process.env.GIT_COMMITTER_NAME = "Explicit Committer";
+    process.env.GIT_COMMITTER_EMAIL = "committer@example.com";
+    await fs.writeFile(path.join(repoRoot, "override.txt"), "override\n");
+    await git.add(["override.txt"]);
+    await git.commit("chore: publish with explicit identity");
+    overrideIdentity = await execGit(repoRoot, ["show", "-s", "--format=%an%n%ae%n%cn%n%ce", "HEAD"]);
+  } finally {
+    for (const [key, value] of Object.entries(priorIdentity)) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
+  }
+
+  assert.deepEqual(fallbackIdentity.split("\n"), [
+    "JasonxzWen",
+    "109508077+JasonxzWen@users.noreply.github.com",
+    "JasonxzWen",
+    "109508077+JasonxzWen@users.noreply.github.com"
+  ]);
+  assert.deepEqual(overrideIdentity.split("\n"), [
+    "Explicit Author",
+    "author@example.com",
+    "Explicit Committer",
+    "committer@example.com"
+  ]);
+  assert.equal(await execGit(repoRoot, ["config", "--local", "--get", "user.name"]), "");
+  assert.equal(await execGit(repoRoot, ["config", "--local", "--get", "user.email"]), "");
+});
+
 test("publish 可在 push 后验证 Pages URL", async () => {
   const calls = [];
   const result = await publishGeneratedArtifacts({
@@ -2208,6 +2271,14 @@ async function tempRepoWithFixture() {
     path.join(inputDir, "official-release.md")
   );
   return tmp;
+}
+
+async function execGit(cwd, args) {
+  const { stdout } = await execFileAsync("git", args, {
+    cwd,
+    encoding: "utf8"
+  });
+  return stdout.trim();
 }
 
 async function writeSignalFixture(repoRoot, reportDate) {

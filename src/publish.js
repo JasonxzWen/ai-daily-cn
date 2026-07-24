@@ -1677,7 +1677,15 @@ export function createGitAdapter(repoRoot) {
       return runGit(repoRoot, ["add", "--all"]);
     },
     async commit(message) {
-      return runGit(repoRoot, ["commit", "-m", message]);
+      return runGit(repoRoot, [
+        "-c",
+        `user.name=${DEFAULT_SITE.publishAuthorName}`,
+        "-c",
+        `user.email=${DEFAULT_SITE.publishAuthorEmail}`,
+        "commit",
+        "-m",
+        message
+      ]);
     },
     async checkout(branch) {
       return runGit(repoRoot, ["checkout", branch]);
