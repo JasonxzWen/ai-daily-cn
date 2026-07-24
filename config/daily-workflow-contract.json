@@ -276,9 +276,15 @@
     {
       "path": "docs/codex-automation-setup.md",
       "contains": [
-        "corepack pnpm run daily:codex-pipeline",
+        "node scripts/run-daily-codex-pipeline.mjs",
         "--execute",
         "--publish",
+        "13:05",
+        "Asia/Shanghai",
+        "worktree",
+        "pnpm@11.10.0",
+        "UTF-8",
+        "JSON.parse",
         "completed_stages",
         ".tmp/daily-codex-pipeline/YYYY-MM-DD",
         "publish:dry-run:daily",
@@ -302,7 +308,7 @@
         "sources:phase5-audit",
         "status:self-check",
         "config/daily-resilience-policy.json",
-        "corepack pnpm run resilience:validate",
+        "node scripts/validate-daily-resilience-policy.mjs",
         "published_degraded",
         "infrastructure_blocked_after_fallback_exhausted",
         "multiple_active_daily_publish_automations",
@@ -395,28 +401,36 @@
     }
   ],
   "external_automation_prompt": {
-    "target": "active_daily_publish",
+    "target": "active_daily_run",
     "contains": [
-      "corepack pnpm run daily:codex-pipeline",
+      "node scripts/run-daily-codex-pipeline.mjs",
+      "pnpm@11.10.0",
       "--execute",
-      "--publish",
+      "origin/main",
+      "worktree",
+      "Asia/Shanghai",
       ".tmp/run-summary-YYYY-MM-DD.json",
       "completed_stages",
       "automation_pipeline_mode",
       "publish:dry-run:daily",
       "bootstrap mainSha",
       "不要另行运行 status:self-check",
-      "Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8",
+      "UTF-8",
+      "JSON.parse",
+      "source_watch.production_status",
       "source_watch.connected",
       "source_watch.consumed",
       "occurrence_store_path",
       "signal_index_path",
       "signals.status",
       "legacy_report.status",
+      "generated_only",
+      "generated_degraded",
       "generated_signals_only",
-      "published_signals_only"
+      "next_action"
     ],
     "not_contains": [
+      "--publish",
       "publish:prepare-worktree",
       "corepack pnpm run publish:dry-run --",
       "pnpm run publish:dry-run --",
@@ -429,15 +443,11 @@
   },
   "external_automation_inventory": {
     "require_single_project_automation": true,
-    "require_single_active_publish": true,
-    "project_cwds": [
-      "D:\\ai-daily-cn"
-    ],
-    "allowed_project_automation_ids": [
-      "ai-2"
-    ],
-    "allowed_daily_publish_ids": [
-      "ai-2"
+    "require_single_active_daily_run": true,
+    "require_zero_active_publish": true,
+    "require_single_active_publish": false,
+    "project_cwd_basenames": [
+      "ai-daily-cn"
     ],
     "require_active_status_self_check": false
   }
