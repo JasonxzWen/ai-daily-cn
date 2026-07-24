@@ -204,8 +204,19 @@ export async function prepareCleanPublishWorktree(options = {}) {
   });
   const targetExists = await pathExists(worktreeDir);
   const targetIsGitCheckout = targetExists && (await pathExists(path.join(worktreeDir, ".git")));
-  const cloneReferenceRoot =
-    options.cloneReferenceRoot === false ? "" : path.resolve(options.cloneReferenceRoot || launcherRepoRoot);
+  let cloneReferenceRoot = "";
+  if (!targetExists && options.cloneReferenceRoot !== false) {
+    if (options.cloneReferenceRoot) {
+      cloneReferenceRoot = path.resolve(options.cloneReferenceRoot);
+    } else {
+      const commonGitDir = await runGitCommand(launcherRepoRoot, ["rev-parse", "--git-common-dir"], {
+        run,
+        errorCode: "git_clone_unavailable",
+        errorMessage: "Unable to resolve the clone reference repository."
+      });
+      cloneReferenceRoot = path.resolve(launcherRepoRoot, commonGitDir);
+    }
+  }
 
   if (targetExists && !targetIsGitCheckout) {
     throw new PublisherError(
