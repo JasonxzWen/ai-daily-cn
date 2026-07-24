@@ -1467,7 +1467,7 @@ test("publish prepare-worktree 先提交本地改动再切回发布分支", asyn
   assert.deepEqual(calls.map((call) => call.name), ["addAll", "commit", "checkout"]);
 });
 
-test("publish prepare-clean-worktree clones with the common Git directory without touching launcher changes", async () => {
+test("publish prepare-clean-worktree clones a dedicated main checkout without touching launcher changes", async () => {
   const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-launcher-"));
   const worktreeDir = path.join(repoRoot, ".tmp", "publish-worktrees", "main");
   const commonGitDir = path.join(repoRoot, "..", "main-checkout", ".git");
