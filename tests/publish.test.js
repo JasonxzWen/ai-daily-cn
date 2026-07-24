@@ -1467,9 +1467,10 @@ test("publish prepare-worktree 先提交本地改动再切回发布分支", asyn
   assert.deepEqual(calls.map((call) => call.name), ["addAll", "commit", "checkout"]);
 });
 
-test("publish prepare-clean-worktree clones a dedicated main checkout without touching launcher changes", async () => {
+test("publish prepare-clean-worktree clones with the common Git directory without touching launcher changes", async () => {
   const repoRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-clean-launcher-"));
   const worktreeDir = path.join(repoRoot, ".tmp", "publish-worktrees", "main");
+  const commonGitDir = path.join(repoRoot, "..", "main-checkout", ".git");
   const calls = [];
 
   const result = await prepareCleanPublishWorktree({
@@ -1477,24 +1478,30 @@ test("publish prepare-clean-worktree clones a dedicated main checkout without to
     worktreeDir,
     remoteUrl: "git@github.com:owner/repo.git",
     installDependencies: false,
-    commandRunner: fakeCommandRunner({ calls })
+    commandRunner: fakeCommandRunner({ calls, commonGitDir })
   });
 
   assert.equal(result.mode, "prepare-clean-worktree");
   assert.equal(result.repo_root, worktreeDir);
   assert.equal(result.remote_main_sha, "1111111111111111111111111111111111111111");
   assert.equal(result.cloned, true);
-  assert.equal(result.clone_reference_root, repoRoot);
+  assert.equal(result.clone_reference_root, commonGitDir);
   assert.equal(result.clean, true);
   assert.equal(result.dependency_status.required, false);
   const cloneCall = calls.find((call) => call.args[0] === "clone");
   assert.ok(cloneCall, "expected clean worktree clone command");
-  assert.deepEqual(cloneCall.args.slice(0, 4), ["clone", "--reference-if-able", repoRoot, "--dissociate"]);
+  assert.deepEqual(cloneCall.args.slice(0, 4), [
+    "clone",
+    "--reference-if-able",
+    commonGitDir,
+    "--dissociate"
+  ]);
   assert.deepEqual(cloneCall.args.slice(-2), ["git@github.com:owner/repo.git", worktreeDir]);
   assert.deepEqual(
     calls.map((call) => call.args.slice(0, 2).join(" ")),
     [
       "ls-remote git@github.com:owner/repo.git",
+      "rev-parse --git-common-dir",
       "clone --reference-if-able",
       "rev-parse --abbrev-ref",
       "rev-parse HEAD",
@@ -2121,6 +2128,9 @@ function fakeCommandRunner(options = {}) {
     }
     if (args[0] === "ls-remote") {
       return `${options.remoteSha || "1111111111111111111111111111111111111111"}\trefs/heads/main\n`;
+    }
+    if (args[0] === "rev-parse" && args[1] === "--git-common-dir") {
+      return options.commonGitDir || ".git";
     }
     if (args[0] === "rev-parse" && args[1] === "--abbrev-ref") {
       return options.branch || "main";
