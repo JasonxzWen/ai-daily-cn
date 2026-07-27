@@ -2546,6 +2546,7 @@ async function classifyAiRepairReviewFailure(stageResult, {
       ...authoringHandoff,
       ai_review_tasks: retryTasks,
       ...qualityRepairNextActionFeedback(feedback),
+      contract_rejected: contractRejected,
       contract_status: "template",
       required_contract_status: "ready",
       required_contract_fields: ["schema_version", "report_date", "status", "edits"],
@@ -3009,11 +3010,9 @@ function createQualityRepairBaseline(feedback, { attempt }) {
 function assessQualityRepairProgress(previousProgress, feedback, { attempt }) {
   const previous = qualityRepairEffectiveSnapshot(previousProgress) || qualityRepairFeedbackSnapshot({});
   const attempted = qualityRepairFeedbackSnapshot(feedback);
-  const previousKeys = new Set(Array.isArray(previous.issue_keys) ? previous.issue_keys : []);
-  const attemptedKeys = Array.isArray(attempted.issue_keys) ? attempted.issue_keys : [];
-  const strictProgress = attemptedKeys.length < previousKeys.size && attemptedKeys.every((key) => previousKeys.has(key));
   const previousActivePaths = Array.isArray(previous.active_paths) ? previous.active_paths : [];
   const attemptedActivePaths = Array.isArray(attempted.active_paths) ? attempted.active_paths : [];
+  const strictProgress = hasStrictQualityRepairProgress(previous, attempted);
   const frozenPaths = [...new Set([
     ...(Array.isArray(previousProgress?.frozen_paths) ? previousProgress.frozen_paths : []),
     ...previousActivePaths.filter((pathName) => !attemptedActivePaths.includes(pathName))
@@ -3034,6 +3033,23 @@ function assessQualityRepairProgress(previousProgress, feedback, { attempt }) {
     active_paths: Array.isArray(effective.active_paths) ? [...effective.active_paths] : [],
     frozen_paths: frozenPaths
   };
+}
+
+export function hasStrictQualityRepairProgress(previous, attempted) {
+  if (previous?.comparable !== true || attempted?.comparable !== true) {
+    return false;
+  }
+  const previousKeys = new Set(Array.isArray(previous.issue_keys) ? previous.issue_keys : []);
+  const attemptedKeys = Array.isArray(attempted.issue_keys) ? attempted.issue_keys : [];
+  const strictSignalProgress =
+    attemptedKeys.length < previousKeys.size &&
+    attemptedKeys.every((key) => previousKeys.has(key));
+  const previousPaths = new Set(Array.isArray(previous.active_paths) ? previous.active_paths : []);
+  const attemptedPaths = Array.isArray(attempted.active_paths) ? attempted.active_paths : [];
+  const strictPathProgress =
+    attemptedPaths.length < previousPaths.size &&
+    attemptedPaths.every((pathName) => previousPaths.has(pathName));
+  return strictSignalProgress || strictPathProgress;
 }
 
 function resolveQualityRepairProgress(previousProgress, { attempt }) {
