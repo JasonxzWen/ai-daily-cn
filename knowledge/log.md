@@ -7,6 +7,7 @@ title: AI Daily CN 知识更新日志
 ## 2026-07-27
 
 - 记录 AI repair contract 部分应用后的安全续接边界：保留已应用编辑，在剩余公开文案问题严格减少时生成下一轮 contract，并允许外层 summary 从明确的嵌套 legacy handoff 恢复。
+- signals 真实发布使 tracked payload 超过旧 256 MiB 总量硬上限；在保留各细分体积门槛的前提下，将总量硬上限调整为 384 MiB，以容纳契约要求的持续信号历史。
 
 ## 2026-07-24
 

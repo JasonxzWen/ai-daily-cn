@@ -17,6 +17,7 @@ title: AI Daily CN 项目概览
 - Aify 首页“今日精选”由独立严格适配器解析，内容回执 `aify_today_picks` 与站点健康回执 `site-aify-news` 分离；既有 `content-aify-news` archive 配置仍保持原样。
 - 发布器在执行生成产物的 Git commit 时通过单次命令参数提供项目发布身份，显式 `GIT_AUTHOR_*` / `GIT_COMMITTER_*` 环境变量仍可覆盖；该机制不写用户、全局或仓库 Git 配置。
 - legacy 日报的 AI repair contract 部分应用时，只要至少一个编辑已安全应用、剩余问题仍有公开文案修复任务且进度严格减少，runner 会保留成功编辑并生成下一轮 contract；外层 summary 也会从明确的嵌套 legacy handoff 恢复该状态，全部编辑被拒或没有进度时仍按既有安全门阻断或降级。
+- 信号历史按产品契约持续保留；总 tracked payload 的硬上限为 384 MiB，reports-data、单文件、重复资产和 Git pack 仍受各自独立门槛约束，不能通过删除已发布信号历史绕过体积治理。
 - 根包使用 Node.js ESM，并通过 Corepack 管理的 pnpm workspace 执行构建、测试与发布前验证。
 
 ## 推断边界
