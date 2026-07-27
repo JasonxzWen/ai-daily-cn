@@ -2,29 +2,29 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-23T09:08:21.838Z",
+  "generated_at": "2026-07-27T03:01:12.615Z",
   "group": {
     "id": "news_newsletters",
     "label": "新闻 / Newsletter"
   },
   "page": 107,
-  "page_count": 296,
+  "page_count": 454,
   "page_size": 50,
-  "total_count": 14787,
+  "total_count": 22659,
   "next_url": "signals/news_newsletters/page-108.json",
   "items": [
     {
-      "id": "occ_ae48f9bafa23a1c737d5388e",
-      "cluster_id": "cluster_d8ea565801623af09f6dfd1d",
-      "title": "Dan Luu 长文复盘：一年重度使用编码 Agent 的经验",
-      "url": "https://danluu.com/ai-coding/",
-      "summary": "Dan Luu 记录去年中开始重度依赖 Codex、GPT 等编码 Agent 的实践。文章覆盖测试范式、Agent 编造 bisect 结论与伪造复现视频的失败案例、LLM 输出方差与 Caveman 使用技巧，以及围绕 Agentic loop 长期投入所产生的工程习惯变化。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_93f5d772811a1bdb96b83a2b",
+      "cluster_id": "cluster_e580577b03979595b2e6bd6f",
+      "title": "WAIC 2026 上海开幕：1100 家企业参展，3000 件展品含 300 项全球首发",
+      "url": "https://www.smartcity.team/news/waic2026",
+      "summary": "2026 世界人工智能大会 7 月 17 日至 20 日在上海举办，展出面积超 10 万平方米，1100 余家企业参展，3000 余件展品中含 300 余项全球首发。重点产品包括华为 Atlas 950 SuperPoD 与阶跃 Agent OS，本届主线聚焦智能体新品与算力底座同台亮相。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Dan Luu",
-        "home_url": "https://danluu.com/"
+        "name": "smartcity.team",
+        "home_url": "https://www.smartcity.team/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -37,20 +37,86 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_b3afbe68bc27ae371fae21c0",
-      "cluster_id": "cluster_5055d11adfa5dd46f52a4968",
-      "title": "Midjourney 反诉迪士尼、华纳、环球:要求三家好莱坞制片厂披露自家 AI 使用细节",
-      "url": "https://techcrunch.com/2026/07/04/midjourney-wants-hollywood-studios-to-reveal-the-details-of-their-ai-usage/",
-      "summary": "Midjourney 在与迪士尼、环球、华纳兄弟的版权诉讼中提交取证请求,要求三家好莱坞制片厂披露内部 AI 使用细节。三家制片厂去年起诉 Midjourney,指其图像模型能生成 Bart Simpson、达斯维达等受版权保护角色,Midjourney 主张训练素材属于合理使用。 一旦制片厂承认自己也在用生成式 AI 做内容,「AI 训练是否合理使用」这场官司的道德叙事就要被重写。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_948f398c8b4d7e80a8709740",
+      "cluster_id": "cluster_d56ace988ec4655cef540679",
+      "title": "Building a Foundation Stack for General-Purpose Robots",
+      "url": "https://spectrum.ieee.org/x-square-robot-embodied-ai-stack",
+      "summary": "This article is brought to you by X Square Robot . Large language models gave artificial intelligence a working recipe. Pretrain a large model on broad data, and general capability follows. Robotics has no such recipe. Robotics systems have。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "spectrum.ieee.org",
+        "home_url": "https://spectrum.ieee.org/"
+      },
+      "collected_via": {
+        "name": "IEEE Spectrum Artificial Intelligence",
+        "url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "research",
+        "engineering",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": "https://spectrum.ieee.org/media-library/humanoid-robot-folding-laundry-on-a-neatly-made-bed-in-a-sunlit-bedroom.png?id=67111698&width=980",
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_94b5be2e346b2ba4b354bbce",
+      "cluster_id": "cluster_ebd4b3638a15a6f78628d61e",
+      "title": "LangChain 官方教程:progressive disclosure 让 SQL Assistant 按需加载领域 skill,避免 schema 炸上下文",
+      "url": "https://docs.langchain.com/oss/python/langchain/multi-agent/skills-sql-assistant",
+      "summary": "LangChain 发教程演示如何给一个 SQL Assistant 做 progressive disclosure:agent 系统提示里只挂轻量的 skill 描述,真正要写 SQL 时再通过 tool call 加载对应业务领域的完整 schema 和业务规则,而不是一次性把上千张表塞进上下文。教程用「销售分析」「库存管理」两个 skill 作示范,做法直接借鉴 Anthropic 力推的 Agent Skills 三级架构(metadata → core → res。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "LangChain Docs",
+        "home_url": "https://docs.langchain.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_95f499f739be8ad2806c3651",
+      "cluster_id": "cluster_582d4148c00791cd83fab88e",
+      "title": "Satya Nadella 警告企业慎防被 AI 供应商锁定，呼吁保留跨模型切换能力",
+      "url": "https://techcrunch.com/2026/07/13/satya-nadella-has-issued-a-shocking-warning-to-companies-using-ai/",
+      "summary": "Microsoft CEO Satya Nadella 公开警告企业不要在 AI 层被单一供应商深度锁定，建议保留跨模型、跨云的切换能力。TechCrunch 指出他这番话是在自家云与 AI 战略高度依赖 OpenAI 的背景下发出的，某种程度上也是替 Azure 兜住那些被 OpenAI 直接销售抢客户的大企业。 对 CIO 而言这是一个明确信号：Copilot、Foundry 后续会更强调多模型抽象层与 BYOM，而不是让企业只押 GPT 一条路。This is an intermediary/self-media lead; trace it to a primary source before treating it as...",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -69,26 +135,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_bc77a243b6cc0a96dc29dfd5",
-      "cluster_id": "cluster_57fbe7fff21ef4b072add464",
-      "title": "高三教师用 WorkBuddy 命高考英语题：一套模拟卷从 4~6 小时压到 35~50 分钟",
-      "url": "https://cloud.tencent.com/developer/article/2703220",
-      "summary": "高三教师用 WorkBuddy 辅助高考英语命题，一套完整模拟卷从 4~6 小时压缩到 35~50 分钟，效率提升 6~8 倍。核心方法是把高考命题铁律写进提示词，强制 AI 遵守话题独立性、来源真实性、难度对标与答案分布规则，人工只需核查 15 分钟。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9c0277bcff5f531821e3c6f2",
+      "cluster_id": "cluster_192b5c5f06f75b715580b43a",
+      "title": "安全研究者反用 prompt injection 反制恶意 AI Agent,把攻击面变成诱饵层",
+      "url": "https://arstechnica.com/security/2026/07/now-defenders-are-embracing-the-prompt-injection-too/",
+      "summary": "安全研究者与厂商开始反向使用 prompt injection:在网页、邮件、文档中埋设专门针对恶意 AI Agent 的对抗指令,让攻击者控制的浏览、爬虫、代码 Agent 在读到这些内容时暴露身份、停止行动或触发陷阱,Cloudflare 与个别研究者的方案已被部署到生产环境(据 Ars Technica)。 Prompt injection 从'纯漏洞'变成'防御工具',标志着 Agent 时代安全思路的一次转向:不再逐个修补 injection 面,而是设计出让攻击者。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "腾讯云开发者",
-        "home_url": "https://cloud.tencent.com/"
+        "name": "Ars Technica",
+        "home_url": "https://arstechnica.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -101,26 +167,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_cc3b1a291177664fdc98b60c",
-      "cluster_id": "cluster_1f2742012e50ec19e814e30d",
-      "title": "2026 开源 PDF 提取模型全景:Docling、MinerU、olmOCR 2、DeepSeek-OCR、Qwen3-VL 等 8 款横向对比",
-      "url": "https://www.marktechpost.com/2026/07/04/structured-pdf-to-json-a-guide-to-open-source-extraction-models-in-2026/",
-      "summary": "MarkTechPost 综述了 2026 年 8 款主流开源 PDF-to-JSON 提取模型:Lift、NuExtract 3、Docling、MinerU、Marker、olmOCR 2、DeepSeek-OCR、Qwen3-VL。文章从模型架构、输出格式、抽取速度、适用场景四个维度做对比,给出工程选型上的差异画像,供搭 AI 数据管线的团队按数据形态和吞吐要求挑合适的一款。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9cc44c15fa91b1675e0632ef",
+      "cluster_id": "cluster_ddb6260ba3d111063fff8b39",
+      "title": "Google Cloud 与 Nexus SDV 构建 AI 定义车辆平台",
+      "url": "https://cloud.google.com/blog/products/databases/nexus-sdv-uses-bigtable-android-automotive-for-agentic-vehicles/",
+      "summary": "Valtech 联合 Google Cloud 和 Android Automotive 推出 Nexus SDV 平台，使用 Bigtable 处理 PB 级遥测数据，集成 Gemini 实现预测性维护。平台采用 Defense-in-Depth 安全架构，含 mTLS、CAS、Private GKE 和 SAIF 框架。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "MarkTechPost",
-        "home_url": "https://www.marktechpost.com/"
+        "name": "Google Cloud Blog",
+        "home_url": "https://cloud.google.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -133,26 +199,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_d0e9abe5ef8c393fec16cc10",
-      "cluster_id": "cluster_ad6c145a8380e4077823a9bb",
-      "title": "CSDN 复盘企业级 AI Agent 落地 6 大环节：LangGraph／DeepAgents 选型、MCP 集成、RAG vs Graphify",
-      "url": "https://adg.csdn.net/6a48692b10ee7a33f287cd6b.html",
-      "summary": "文章系统梳理企业级 AI Agent 从零落地的 6 大环节，涵盖 LangGraph 与 DeepAgents 等框架选型、MCP 协议集成策略、RAG 与 Graphify 知识库对比、Agent 产品级测试方法，并指出当前企业最大痛点是缺乏 Agent 技术人才和产品经理，而非模型或工具。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9da0e1346cea1412f76e70af",
+      "cluster_id": "cluster_4f7c46335cf25f6e3701b1a4",
+      "title": "Cisco 开源 AI 安全模型误报率校准工件,模型升级后客户侧告警水平保持稳定",
+      "url": "https://blogs.cisco.com/ai/consistent-security-model-deployment-with-fpr-calibration",
+      "summary": "Cisco AI 防御团队在 GitHub 开源了一套基于 sklearn 的误报率(FPR)校准工件,让客户在部署新版本安全检测模型时可以把误报率对齐到与旧版相同的水位。 安全侧模型迭代最痛的点之一,就是告警口径漂移导致客户运营台被瞬间刷屏;把校准做成开箱即用的工件,相当于把这一步从每家客户自己踩坑变成厂商侧统一交付。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "CSDN",
-        "home_url": "https://adg.csdn.net/"
+        "name": "Cisco",
+        "home_url": "https://blogs.cisco.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -165,52 +231,20 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_d5c813e517d3036333503c31",
-      "cluster_id": "cluster_2267ee7234ac1c8ae81940b8",
-      "title": "Armin Ronacher：模型越强，Agent 工具反而越差",
-      "url": "https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/",
-      "summary": "Flask 作者 Armin Ronacher 撰文指出，当前 LLM 能力快速抬升，很多 Agent 工具却在退步，原因是团队把工程复杂度堆在工具层来兜底以前的模型弱点，模型变强后这些包装反而成了负担。他建议把简单原语交回模型、用更薄的工具封装，Hacker News 分数 190、讨论 65 条。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Armin Ronacher",
-        "home_url": "https://lucumr.pocoo.org/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_e214fad880a44d43de0bd49f",
-      "cluster_id": "cluster_74ed432652bb9dd2c8becd61",
-      "title": "中国拟允许影院引入 AI agent、咖啡与 KTV 拓展营收",
-      "url": "https://www.bloomberg.com/news/articles/2026-07-04/china-envisions-ai-karaoke-and-coffee-at-cinemas",
-      "summary": "中国主管部门发布新指引，鼓励影院超越传统排片模式，在场内引入 AI agent、咖啡与 KTV 等业态，把影院改造成综合线下消费场景。这将是 AI agent 首次被明确写进中国线下文娱场所的政策指引，为消费级 agent 在线下体验中的落地提供了政策口径。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_9db5a4283d2df5e3d94f2fc1",
+      "cluster_id": "cluster_62744eabfd37347fc9148119",
+      "title": "Lazard：美国燃气发电 LCOE 升至 17 年新高，AI 数据中心成核心边际需求",
+      "url": "https://www.bloomberg.com/news/articles/2026-07-13/us-cost-for-gas-power-at-17-year-high-and-climbing-lazard-says",
+      "summary": "Lazard 最新 LCOE 报告显示，美国天然气发电成本已升至至少 17 年来的最高水位，并且随数据中心新增需求持续走高。报告点名 AI 训练与推理集群是这一轮电力紧张的核心边际需求方，燃机建设排产已经排到多年之后。 AI 算力扩张的瓶颈正从 GPU 供给切换到电力供给与并网时间，选址与长约电价会成为下一阶段基础模型公司、云厂商与主权 AI 项目的关键谈判点。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -229,20 +263,52 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_e57e76409a4bdcd7bc1d3195",
-      "cluster_id": "cluster_9ce491efd99deb891cb7a55e",
-      "title": "印度 CG Semi 首座封测厂投产，年产能 2 亿颗芯片",
-      "url": "https://www.bloomberg.com/news/articles/2026-07-04/india-s-cg-semi-starts-production-with-200-million-chips",
-      "summary": "CG Power 旗下半导体子公司 CG Semi 的首座工厂正式量产，年产能 2 亿颗芯片，由印度总理莫迪宣布。这是印度「半导体自主」战略下第一条真正跑起来的封测线，工艺档次远低于台积电或三星，但对分散全球 AI 芯片封装产能、承接美方对华管制外溢订单具有信号意义。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_a188fede223c48cae622111f",
+      "cluster_id": "cluster_a97c418a0519547c803d3b37",
+      "title": "阿里开源 OvisOCR2:0.8B 端到端文档解析,OmniDocBench v1.6 得 96.58",
+      "url": "https://huggingface.co/ATH-MaaS/OvisOCR2",
+      "summary": "阿里 AIDC 团队 7 月 13 日在 Hugging Face 放出 OvisOCR2,参数仅 0.8B,基于 Qwen3.5-0.8B 骨干,端到端把整页文档转成结构化 Markdown,覆盖文本、表格、公式与阅读顺序。官方模型卡给出 OmniDocBench v1.6 得分 96.58、PureDocBench 得分 75.06;权重采用 Apache 2.0,附带 vLLM 推理支持。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Hugging Face",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_a1a584e90b3b04da3173577a",
+      "cluster_id": "cluster_278e37109020521ac941e054",
+      "title": "Apple 市值反弹 6000 亿美元：投资者从 AI 卖压中撤离，避险回流苹果",
+      "url": "https://www.bloomberg.com/news/articles/2026-07-13/apple-s-600-billion-rally-fueled-by-traders-fleeing-ai-selloff",
+      "summary": "Bloomberg 报道，投资者近期把资金重新押注到 Apple，推动其市值反弹约 6000 亿美元。核心逻辑是市场对 AI 资本开支节奏的紧张情绪，压制了芯片厂商和云计算巨头股价，而 Apple 因 AI 敞口相对克制、现金流稳健，被当作 AI 交易过热下的避风港。这也是 Apple 首次因“不那么 AI”被资金重新定价。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -261,26 +327,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_effd3ddd0ae5a236ecca72fe",
-      "cluster_id": "cluster_891291cd1100f0503f6f8c0f",
-      "title": "Claude Code 用户报告工作区实例间会话与缓存疑似串号，Anthropic 工程师跟进",
-      "url": "https://github.com/anthropics/claude-code/issues/74066",
-      "summary": "Anthropic 官方仓库 anthropics/claude-code 收到 issue #74066，用户反馈同一设备多个工作区实例、乃至消费级账号之间的会话与缓存可能相互泄漏，Anthropic 工程师已在 issue 内跟进复现。对企业接入 Claude Code 的团队而言直接关系到多租户隔离边界。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_a4ec93796eb1999c0ed2e244",
+      "cluster_id": "cluster_0415f0630a18805c44b2a4b1",
+      "title": "英国起诉 Russian Coms 通话伪造平台 5 名嫌疑人",
+      "url": "https://www.bleepingcomputer.com/news/security/uk-charges-suspects-linked-to-russian-coms-call-spoofing-platform/",
+      "summary": "英国 NCA 起诉与 Russian Coms 通话伪造平台相关的 5 名嫌疑人。该平台被用于 180 万次诈骗电话，波及 107 个国家 17 万受害者，平均损失 9400 英镑。嫌疑人合同金额为 1200-1400 加密货币，8 月 14 日出庭。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "GitHub",
-        "home_url": "https://github.com/"
+        "name": "bleepingcomputer.com",
+        "home_url": "https://www.bleepingcomputer.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -293,26 +359,58 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_f2d38ec9c5df46407e4ac97b",
-      "cluster_id": "cluster_c4da007acea1beafcc630ae3",
-      "title": "AI 学习社区 Build Club 发布 Solaris,转向企业 AI 采纳与员工培训平台",
-      "url": "https://www.producthunt.com/products/build-club",
-      "summary": "AI 学习社区 Build Club 在 Product Hunt 发布 Solaris,把「协作式 AI 学习生态」打包成企业侧的 AI 采纳与员工技能升级平台,主打免费开放学习资源。 定位从个人学习转向企业采买,反映 AI adoption 焦点正在从模型和工具,向组织内规模化培训与工作方式改造迁移。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_a5c1253f2e9e76cb0c702b76",
+      "cluster_id": "cluster_a021b6179dadc2d641ec9781",
+      "title": "not much happened today",
+      "url": "https://news.smol.ai/issues/26-07-13-not-much/",
+      "summary": "**Prime Intellect** released **verifiers v1**, a redesigned environment stack for **agentic reinforcement learning** and evaluations, improving efficiency by storing rollout traces as **message DAGs** to reduce complexity from **O(n²)** to。This is an intermediary/self-media lead; trace it to a primary source before tr...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Product Hunt",
-        "home_url": "https://www.producthunt.com/"
+        "name": "news.smol.ai",
+        "home_url": "https://news.smol.ai/"
+      },
+      "collected_via": {
+        "name": "Smol AI News",
+        "url": "https://news.smol.ai/rss.xml"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_a69fb0269e62781743ab5086",
+      "cluster_id": "cluster_5eefbbe806b2f62e59c0f003",
+      "title": "清华现场演示:一念 Unisonmind 端侧大脑指挥机器狗走迷宫、让人类用天平称重",
+      "url": "https://www.qbitai.com/2026/07/448239.html",
+      "summary": "一念 Unisonmind 团队在清华大学做了一场无脚本、任务由观众即兴出题的现场演示:搭载其端侧认知大脑的机器狗「哮天」通过黑板简笔画走三维迷宫、指挥人类助手用天平给随机物品称重、并估算观众临时递来的矿泉水瓶剩余水量;同一套端侧大脑可迁移到人形机器人和电动轮椅,架构以「统一世界 Token 空间」承接多模态 I/O,常驻运行、每 18 毫秒对齐一次状态。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "量子位",
+        "home_url": "https://www.qbitai.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -325,26 +423,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_f47a02aa18f6d4c9b18c5b52",
-      "cluster_id": "cluster_e7f2a76d9707fdd03ebe49f7",
-      "title": "Ethan Mollick：AI 编码正把行业带出手工码字的“旧代码时代”",
-      "url": "https://x.com/emollick/status/2073388609567113698",
-      "summary": "沃顿商学院教授 Ethan Mollick 在 X 上表示,行业正在离开 Paleocodic 手工码字时代,类比过去需要委托本地代码工匠一字一字打出程序的模式即将结束,新代码时代由模型直接生成完成。 他借此提醒管理者,过去数十年靠人工打字撑起的软件体量,在 AI 编码工具普及后会被重新定义,需要重新思考工程师岗位与工作流。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_aa96b9964c73bbd78b950e53",
+      "cluster_id": "cluster_4da16f378bf968e7ea1e2f6b",
+      "title": "欧盟对俄罗斯 GRU 军方黑客实施首批网络制裁",
+      "url": "https://www.bleepingcomputer.com/news/security/eu-and-uk-hit-russia-with-first-joint-cyber-sanctions-package",
+      "summary": "欧盟对 9 名个人和 4 个实体实施网络制裁，英国同步制裁 24 名个人。FSB Center 16 控制 Turla 组织，Lumma Stealer 恶意软件导致 2100 名英国受害者。这是欧盟与英国首次联合网络制裁行动。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "X：@emollick",
-        "home_url": "https://x.com/"
+        "name": "bleepingcomputer.com",
+        "home_url": "https://www.bleepingcomputer.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -357,26 +455,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_011f8e04866c82d1f5f28093",
-      "cluster_id": "cluster_6b0789bf7363d1496c46077a",
-      "title": "SemiAnalysis 内部大模型 Token 支出占员工薪资 30%，人均每月消耗 50 亿 Token",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA%3D%3D&idx=2&mid=2652710661&sn=a8ec71c4db8543580a72b61821553843",
-      "summary": "SemiAnalysis 披露自身内部大模型 Token 支出已占员工总薪资的 30%，每百万 Token 单价不足 0.99 美元，人均每月消耗近 50 亿 Token，是 Meta 人均水平的 5 倍以上，核心贡献者月消耗超 1000 亿。同一时期 Uber 把 Claude Code 推广到 5000 名工程师，工程师使用率 3 个月从 32% 飙到 84%，全年预算提前用完，随后设每人每月 1500 美元 Token 上限。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reporte...",
+      "id": "occ_aaa63a0b7278f1462d01b313",
+      "cluster_id": "cluster_42c2742a9ea6e6261dee8825",
+      "title": "Redis 作者 antirez：LLM 时代程序员应停止逐行 review 代码，把精力转向设计和 QA",
+      "url": "https://antirez.com/news/169",
+      "summary": "antirez 撰文主张，LLM 时代程序员的主要产出不应再是审阅代码，而是把握设计和思路。他给出三点理由：一天审 5000 行 LLM 生成代码不现实、LLM 局部代码质量已经高于人类平均水平但大设计仍弱、8 小时工作日花在读代码上等于挤压真正稀缺的判断时间。他建议把精力转向写 DESIGN.md、做更多 QA 和优化点思考，并透露正用这一模式在 DwarfStar 项目里为 DeepSeek v4 与 GLM 5.2 写本地推理实现。 文章一天内在 Hacker News。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "新智元",
-        "home_url": "https://mp.weixin.qq.com/"
+        "name": "antirez",
+        "home_url": "https://antirez.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -389,250 +487,57 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_047c625e92b5791451c69f70",
-      "cluster_id": "cluster_5b924e275998fbd725ab8d64",
-      "title": "AI Native 创始人群体浮现：用 Agent 并行写代码",
-      "url": "https://www.huxiu.com/article/4872563.html",
-      "summary": "一场 AI Native 创始人讨论会揭示了新工作方式：有人把长期目标写入 AI 上下文，有人用多个 coding agent 并行写代码再 review，有人把 16 周课程压缩到 4 天。核心判断是 AI 惩罚浅思考、放大深思考，模型正在成为年轻人的思考伙伴和价值观塑造者。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_abf24db8b9ab22833bcf232c",
+      "cluster_id": "cluster_582d4148c00791cd83fab88e",
+      "title": "Satya Nadella has issued a shocking warning to companies using AI",
+      "url": "https://techcrunch.com/2026/07/13/satya-nadella-has-issued-a-shocking-warning-to-companies-using-ai/",
+      "summary": "Of all the debates raging about the potential downsides of AI, there is one worry causing the most hand-wringing among AI enthusiasts in Silicon Valley — that the giant AI labs that sell proprietary models are somehow acting like Trojan hor。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "huxiu.com",
-        "home_url": "https://www.huxiu.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_06789c1e6358d5b39d1b5604",
-      "cluster_id": "cluster_c7c5c5d8ac2c6f165ce77062",
-      "title": "Macuse 发布 macOS 原生 App，把 Claude、Codex、Cursor 通过 MCP 接入 Mac 系统应用",
-      "url": "https://www.producthunt.com/products/macuse",
-      "summary": "Macuse 是一个原生 macOS 应用,通过 MCP 协议把 Claude、Codex、Cursor、Raycast 等 AI 客户端接到 Calendar、Mail、Notes、Reminders、Messages 等系统应用,并支持 Computer Use 做真实操作。 MCP 正在成为把桌面级 AI 助手落到本地生产力应用上的通用连接层,Macuse 是这一层在 macOS 侧最完整的一次拼装。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Product Hunt",
-        "home_url": "https://www.producthunt.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_09995ffc87500a483ec75c30",
-      "cluster_id": "cluster_9ce491efd99deb891cb7a55e",
-      "title": "印度 CG Semi 首座封测厂投产，年产能 2 亿颗芯片",
-      "url": "https://www.bloomberg.com/news/articles/2026-07-04/india-s-cg-semi-starts-production-with-200-million-chips",
-      "summary": "CG Power 旗下半导体子公司 CG Semi 的首座工厂正式量产，年产能 2 亿颗芯片，由印度总理莫迪宣布。这是印度「半导体自主」战略下第一条真正跑起来的封测线，工艺档次远低于台积电或三星，但对分散全球 AI 芯片封装产能、承接美方对华管制外溢订单具有信号意义。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Bloomberg",
-        "home_url": "https://www.bloomberg.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_0d5b73a3dafe21ba388609fa",
-      "cluster_id": "cluster_459d583b312e0a0eb8eea434",
-      "title": "Vox 在 Product Hunt 上线：把语音输入输出直接接进 GitHub Copilot 编码流程",
-      "url": "https://www.producthunt.com/products/vox-5",
-      "summary": "Vox 在 Product Hunt 发布，主打语音输入、语音输出，把语音交互做成 GitHub Copilot 使用界面的一部分，让开发者靠讲话完成代码生成与修改。是 Copilot 之上语音层的一次新形态尝试。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Product Hunt",
-        "home_url": "https://www.producthunt.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_0f09673a9ba3fb63f4ed7ef6",
-      "cluster_id": "cluster_de379466dfa805b7cc643033",
-      "title": "浪潮元脑企智 EPAI 上线多模融合 API，DRACO 基准 53.9% 领先池内所有单模型",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA%3D%3D&idx=2&mid=2652710613&sn=9bee258951f68d02e992648001e8d7e7",
-      "summary": "浪潮信息旗下元脑企智 EPAI 通过积算科技 Token 服务平台开放「多模融合 API」内测，采用「众模并行、智能评审、深度融合」三步机制，把一池模型的候选答案交给高阶模型仲裁后再输出。官方测试中，该 API 在深度研究基准 DRACO 上拿到 53.9%，并在 AIME 2026、GPQA Diamond 上跑赢池内所有单模型。 OpenRouter Fusion、Sakana Fugu、Hermes MoA 等竞品密集上线，行业共识正从「拼单模参数」转向「AI 组织力」。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "新智元",
-        "home_url": "https://mp.weixin.qq.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_1c0a9e6f87c34572582b3b83",
-      "cluster_id": "cluster_c6398674d4d20500717cdd7b",
-      "title": "AICon 上海 2026：阿里 Qoder 与慧博拆解 Agent 落地，从 Coding 多智能体到桌面文件批处理再到零售 One-ID",
-      "url": "https://www.infoq.cn/article/yM8ms1eDlrY7wvF3SXtY",
-      "summary": "2026 AICon 上海站，阿里 Qoder 与慧博的四位实践者拆解 Agent 从代码到桌面再到行业的完整路径。Qoder Desktop Experts Mode 走多 Agent 编排，Leader Agent 调度调研 / 前后端 / 测试 / 评审专家 Agent，配 RepoWiki / 安全沙箱 / 危险命令拦截做工程化 Harness；QoderWork 桌面 Agent 主打文件批处理、Excel 分析、网页填表、文档 PPT 生成，靠文件夹级授权和沙箱隔。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "InfoQ 中文",
-        "home_url": "https://www.infoq.cn/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_26a43ce40fa99652b6487474",
-      "cluster_id": "cluster_3ecb788b7685a2a7c604973d",
-      "title": "Mistral AI 盘点:2023 年成立、多轮融资,以开源基础模型对标 OpenAI",
-      "url": "https://techcrunch.com/2026/07/04/what-is-mistral-ai-everything-to-know-about-the-openai-competitor/",
-      "summary": "法国 AI 独角兽 Mistral AI 成立于 2023 年,已完成多轮显著融资,主张把前沿 AI 交到每个人手里,以开源基础模型对标 OpenAI。 对企业采购方来说,Mistral 的开源许可 + 欧洲合规定位,是评估非美系基础模型供应时的重要备选。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "TechCrunch",
+        "name": "techcrunch.com",
         "home_url": "https://techcrunch.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "TechCrunch Enterprise",
+        "url": "https://techcrunch.com/category/enterprise/feed/"
       },
       "source_group": "news_newsletters",
       "content_tags": [
-        "industry_news",
         "analysis_opinion",
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_2b65c41265f9f85d7da73aca",
-      "cluster_id": "cluster_5055d11adfa5dd46f52a4968",
-      "title": "Midjourney 反诉迪士尼、华纳、环球:要求三家好莱坞制片厂披露自家 AI 使用细节",
-      "url": "https://techcrunch.com/2026/07/04/midjourney-wants-hollywood-studios-to-reveal-the-details-of-their-ai-usage/",
-      "summary": "Midjourney 在与迪士尼、环球、华纳兄弟的版权诉讼中提交取证请求,要求三家好莱坞制片厂披露内部 AI 使用细节。三家制片厂去年起诉 Midjourney,指其图像模型能生成 Bart Simpson、达斯维达等受版权保护角色,Midjourney 主张训练素材属于合理使用。 一旦制片厂承认自己也在用生成式 AI 做内容,「AI 训练是否合理使用」这场官司的道德叙事就要被重写。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_ad27349b536bd3ffc7e22c2a",
+      "cluster_id": "cluster_6596460f091edd1abe5a0621",
+      "title": "IAPP 发布隐私执法态势报告 青少年隐私成重点",
+      "url": "https://iapp.org/news/a/the-state-of-enforcement-part-ii-kids-and-teens-privacy/",
+      "summary": "IAPP 发布隐私执法系列报告第二部分，聚焦儿童和青少年隐私保护执法趋势。报告梳理了 COPPA、GDPR Article 8 等框架下的近期案例，揭示监管机构对未成年人数据处理的标准趋严。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "TechCrunch",
-        "home_url": "https://techcrunch.com/"
+        "name": "iapp.org",
+        "home_url": "https://iapp.org/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -645,26 +550,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_2c180c87cfa8612857f965b8",
-      "cluster_id": "cluster_9e59ffd42db156f819ee5449",
-      "title": "TU Dresden 论文:机密计算核心协议 Attested TLS 存在根本缺陷,连接可被劫持到攻陷服务器",
-      "url": "https://www.theregister.com/security/2026/07/04/confidential-computings-core-trust-mechanism-is-broken-the-fix-may-not-exist/5266056",
-      "summary": "TU Dresden 研究团队在 AsiaCCS 2026 发表论文,证明机密计算核心信任协议 Attested TLS 存在根本缺陷:攻击者可通过 diversion attack 将连接重定向到被攻陷的服务器,且握手过程无法检测到这一欺骗行为。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_b0d36c5fc1896086bc83b999",
+      "cluster_id": "cluster_ccd4804380003845bd7c9085",
+      "title": "美国及 9 国联合发布俄黑客攻击基础设施防御指南",
+      "url": "https://www.bleepingcomputer.com/news/security/us-and-allies-share-defense-tips-against-russian-hackers-targeting-critical-infrastructure/",
+      "summary": "NSA、FBI、CISA 联合 9 国 15 个机构发布安全公告，警告 FSB Centre 16（Berserk Bear/Dragonfly）利用 SNMPv1/v2 和 Cisco Smart Install 漏洞渗透关键基础设施。行动中瓦解了 FrostArmada 僵尸网络，涉及 120 个国家的 18,000 台路由器。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "The Register",
-        "home_url": "https://www.theregister.com/"
+        "name": "BleepingComputer",
+        "home_url": "https://www.bleepingcomputer.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -677,26 +582,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_2df29ef7b4325c598bb362ca",
-      "cluster_id": "cluster_5fc0558b7a41698c1f19c03d",
-      "title": "Cline CLI v3.0.37 发布:弱模型畸形工具调用改为优雅处理,plan/act 模式切换对模型可见",
-      "url": "https://github.com/cline/cline/releases/tag/cli-v3.0.37",
-      "summary": "Cline CLI 更新至 v3.0.37，对 DeepSeek 等较弱模型发出的畸形工具调用（参数类型错误或 JSON 截断）改为优雅处理并继续运行而非直接报错；同时让 plan/act 模式切换对模型可见，并修复模式通知丢失及空会话切换模式时的意外重启竞态。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_b0e4d9f5cf5b6a4181104c48",
+      "cluster_id": "cluster_e68f439de178e476f0c7510b",
+      "title": "AgentFootprint: 存储占用成为 LLM Agent 评测一等指标，同等准确率下框架间差异达 15.7 倍",
+      "url": "https://arxiv.org/abs/2607.11149",
+      "summary": "相同模型、工具和任务下 100% 准确率的 Agent 配置，其磁盘留存字节量可相差 15.7 倍。论文提出 AgentFootprint 跨框架基准，包含序列化感知指标套件（总留存、通道组成、重复率、增长曲线、可压缩性、对话重建度）。108 条 SWE-bench Verified 实例的导出轨迹在单实例内跨越三个数量级，且与 resolve rate 无可检测相关性。采用 content-addressed store 可将留存降低 4.8x 至 32.7x。This is an intermediary/self-media lead; trace it to a primary source before treating...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Cline (VSCode AI)",
-        "home_url": "https://github.com/"
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -709,26 +614,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
-      "access_state": "indirect"
+      "access_state": "direct"
     },
     {
-      "id": "occ_3047c7f2b6163ad22da9f9d6",
-      "cluster_id": "cluster_1f2742012e50ec19e814e30d",
-      "title": "2026 开源 PDF 提取模型全景:Docling、MinerU、olmOCR 2、DeepSeek-OCR、Qwen3-VL 等 8 款横向对比",
-      "url": "https://www.marktechpost.com/2026/07/04/structured-pdf-to-json-a-guide-to-open-source-extraction-models-in-2026/",
-      "summary": "MarkTechPost 综述了 2026 年 8 款主流开源 PDF-to-JSON 提取模型:Lift、NuExtract 3、Docling、MinerU、Marker、olmOCR 2、DeepSeek-OCR、Qwen3-VL。文章从模型架构、输出格式、抽取速度、适用场景四个维度做对比,给出工程选型上的差异画像,供搭 AI 数据管线的团队按数据形态和吞吐要求挑合适的一款。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_b4148e143f0c1260f27ed71f",
+      "cluster_id": "cluster_bde2e35cbcda6d49c31ed0d7",
+      "title": "BetterCloud 拆解 Slack 驱动的自助 SaaS 授权方案，覆盖 100+ 应用全生命周期治理",
+      "url": "https://www.bettercloud.com/monitor/self-service-access-provisioning/",
+      "summary": "BetterCloud 提出基于 Slack 的自助 SaaS 访问授权方案：IT 团队按角色定义访问规则并接入自动化审批流，覆盖员工入职到离职全生命周期，支持 100+ SaaS 应用的统一治理与自动化 deprovisioning。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "MarkTechPost",
-        "home_url": "https://www.marktechpost.com/"
+        "name": "bettercloud.com",
+        "home_url": "https://www.bettercloud.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -741,26 +646,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_36c4f26d03b7c46fc9f620f1",
-      "cluster_id": "cluster_a84183566a1a43bee4acfc32",
-      "title": "港中文联合 UIUC 等发布 CUHK-X 七模态数据集，235B VLM 仍难过关",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA%3D%3D&idx=3&mid=2652710613&sn=3a6c8410bef8b78a900371cc19644756",
-      "summary": "港中文 AIoT 实验室联合 UIUC、哥伦比亚大学、匹兹堡大学发布多模态活动数据集 CUHK-X，包含 64,267 个同步样本、覆盖 RGB、深度、热成像、红外、骨架、IMU、毫米波雷达七种模态、40 种动作、30 名参与者，已被 ACM MobiSys 2026 录用。 评测显示 InternVL2.5、QwenVL2.5、VideoLLaVA、VideoChatR1 等主流 VLM 在非 RGB 模态上系统性掉链子，即便扩到 Qwen 235B 也没能补齐，量化了当前。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_b452ecfcb40e62176f543ca3",
+      "cluster_id": "cluster_40748902b5862716568f6577",
+      "title": "大模型推理降本 5 策略：显存精细化管理、弹性扩缩容、空闲回收、量化与 API 限流",
+      "url": "https://developer.aliyun.com/article/1747396",
+      "summary": "针对大模型推理阶段的算力费用问题，文章给出 5 项降本策略：显存精细化管理、弹性扩缩容、空闲资源回收、量化降本与 API 限流，并配套给出各策略的 Python 实现示例。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "新智元",
-        "home_url": "https://mp.weixin.qq.com/"
+        "name": "developer.aliyun.com",
+        "home_url": "https://developer.aliyun.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -773,26 +678,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_3952683c1e1bc76a2ab99a8c",
-      "cluster_id": "cluster_d523a9d5e7081f811a135b4c",
-      "title": "Humalike 上线,专门给 AI Agent 补上被忽视的社交智能层",
-      "url": "https://www.producthunt.com/products/humalike-2",
-      "summary": "Humalike 面向对客户、对同事、对合作方场景中使用的 AI Agent,专门补齐社交层能力:拿捏语气、识别人际语境、给 Agent 一套可复用的社交策略。 多数 Agent 产品仍卡在任务完成度,但只要 Agent 开始代替真人和外部对话,「说得像人」就变成必备属性,独立解这一层的公司会越来越多。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_b4e065278c9b4aeb62d201b2",
+      "cluster_id": "cluster_6f07bce67a881c323992a483",
+      "title": "中国团队推出 Agent 专用搜索登顶 Product Hunt：Token 更省结果更准",
+      "url": "https://www.qbitai.com/2026/07/449327.html",
+      "summary": "7月13日，一款由中国团队打造的 Agent 专用搜索工具登顶 Product Hunt 榜首，产品针对 LLM Agent 调用搜索的场景优化，宣称在返回结果准确率与 Token 消耗量两个维度均优于通用搜索 API，成为面向 Agent 生态的新型基础设施尝试。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Product Hunt",
-        "home_url": "https://www.producthunt.com/"
+        "name": "量子位",
+        "home_url": "https://www.qbitai.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -805,25 +710,57 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_3ebf9c2fc3c4ff223dee0718",
-      "cluster_id": "cluster_b92f658714f61eb4a46d559b",
-      "title": "swyx:Canvas 类思维工具十年演进被命令行 Agent 反超",
-      "url": "https://x.com/swyx/status/2073220591684096087",
-      "summary": "swyx 认为，过去十年 tools for thought 圈层押注的 Canvas 类可视化工具，被 Claude Code 这类命令行编程 Agent 反超。他给出的解释是:CLI 直接替用户完成 commodity thinking，把生产力沉到实处；而 Canvas 类产品把精力花在漂亮 demo 上，停留在可视化演示层。判断的差别不在界面美观，而在工具是否愿意替用户承担通用思考。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_b6cd9b4db3dd6bc5f3e3c022",
+      "cluster_id": "cluster_c0af60be7d350d25eae5dd7e",
+      "title": "SAP：金融业 AI 落地的真正卡点不是模型选型，而是碎片化的底层架构",
+      "url": "https://news.sap.com/2026/07/ai-exposing-fragmented-systems-financial-services/",
+      "summary": "SAP CFO Dominik Asam 与 SAP Fioneer CEO Matthias Tomann 在最新对谈中提出，银行与保险机构的 AI 落地卡点不在模型选型，而在数十年积累下来的国别监管补丁、分散系统与手工衔接层，这些补丁架构让实时数据、统一治理和 agent 化执行都无从谈起。SAP 披露内部从 AI 驱动的流程改造中已看到 10 倍性能提升，并把方向定位为 Autonomous Enterprise：AI 不只是辅助决策，而是在治理边界内直接执行财务闭环、。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "X：swyx",
+        "name": "SAP News",
+        "home_url": "https://news.sap.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_b8910b7f047a162a5384c5b5",
+      "cluster_id": "cluster_f9aa6c860bac154be6aec3c1",
+      "title": "OpenAI 确认 GPT-5.6 Sol 保留在 ChatGPT Go/Plus/Pro 订阅内，等更强模型上线才替换",
+      "url": "https://x.com/sama/status/2076696938918084809",
+      "summary": "OpenAI 官方给 GPT-5.6 Sol 的订阅归属做了最终定调：新模型会继续包含在 ChatGPT Go、Plus、Pro 三档付费订阅中，不会被上抬到更高价档，至少要等到下一个更强的模型上线才会替换。说明由 OpenAI 员工 Tibo Sottiaux 在 X 上给出，Sam Altman 转发时只补了一句 clarity is nice，等同于官方口径。这一表态回应了此前付费用户对新旗舰模型是否只对更高价档开放的担忧。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "X：Sam Altman",
         "home_url": "https://x.com/"
       },
       "collected_via": {
@@ -837,594 +774,20 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_42693eba6ab8c9b9164b8137",
-      "cluster_id": "cluster_aeec7a15e81750556e62946a",
-      "title": "Context.dev 发布一站式 Web 数据 API，专门服务 AI Agent 的实时抓取和结构化",
-      "url": "https://www.producthunt.com/products/context-dev",
-      "summary": "Context.dev 面向 AI Agent 和应用推出一套 Web 数据 API:抓任意 URL 输出干净的 Markdown 或 HTML,抽取品牌资产(Logo、颜色、字体、社交账号),爬 sitemap,解析交易描述符,附带类型化输出。 Agent 场景对稳定、结构化的联网工具需求越来越硬,脏活正在从每家自建 scraper 收敛成第三方 API 层。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Product Hunt",
-        "home_url": "https://www.producthunt.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_42ad1e23afc6528d57d6256a",
-      "cluster_id": "cluster_967cfd25a617e663a2e2d6ad",
-      "title": "NoKV 实验：Agent 用文件系统接口比 SQL 少花 45% Token，费用降 39%",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA%3D%3D&idx=3&mid=2652710661&sn=8e5919e86f9da15ed310ef4222484329",
-      "summary": "NoKV 团队发布 benchmark：同一模型、同一份机器学习实验数据、同一组研究任务下，把 SQLite/SQL 接口换成文件系统形态的 namespace（训练 run 像目录、日志像文件、搜索像 grep），Token 消耗减少 45%、费用减少 39%，正确率略高。NoKV 已被 CNCF Cloud Native Landscape 收录到 AI Native Infra / Storage 分区。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "新智元",
-        "home_url": "https://mp.weixin.qq.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_42add7a3428aa3dc2466924d",
-      "cluster_id": "cluster_785d24a512fe5ec95d0bd5d5",
-      "title": "质变科技 MemoryLake 提出企业 Token 成本公式：真实成本 = 单价 ÷ 任务成功率",
-      "url": "https://www.infoq.cn/article/pNFHkLos3FoDNm8cQsyt",
-      "summary": "6 月 26 日 InfoQ 极客邦联办的 Top Tower Talk 聚焦 Agent 进入企业主流程后的 Harness 治理。质变科技 MemoryLake 首席架构师曹偲提出企业级成本公式：真实 Token 成本 = Token 单价 ÷ 任务成功率，试错成本比单价本身更关键；MemoryLake 把记忆系统拆成蒸馏 / 计算 / 堆叠三层，复杂表格提取准确率从。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "InfoQ 中文",
-        "home_url": "https://www.infoq.cn/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_42bcaa09deaf00e8266f0c8e",
-      "cluster_id": "cluster_ade1653d3f4b0ed7b75b14ef",
-      "title": "京东在 2026 全球数字经济大会披露：内部运行近 4 万个智能体、周 Token 调用量达万亿级",
-      "url": "https://m.sohu.com/a/1045753048_123753",
-      "summary": "2026 全球数字经济大会上，京东披露内部运行近 4 万个智能体，周 Token 调用量已达万亿级，覆盖采购、物流、客服、研发四条线。同场信号：金山云员工日均 Token 从百万级增至 3500 万，360 创始人预测百亿级智能体将融入社会。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "中国新闻网",
-        "home_url": "https://m.sohu.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_46dca88d7f16ef4de8f4a396",
-      "cluster_id": "cluster_e7f2a76d9707fdd03ebe49f7",
-      "title": "Ethan Mollick：AI 编码正把行业带出手工码字的“旧代码时代”",
-      "url": "https://x.com/emollick/status/2073388609567113698",
-      "summary": "沃顿商学院教授 Ethan Mollick 在 X 上表示,行业正在离开 Paleocodic 手工码字时代,类比过去需要委托本地代码工匠一字一字打出程序的模式即将结束,新代码时代由模型直接生成完成。 他借此提醒管理者,过去数十年靠人工打字撑起的软件体量,在 AI 编码工具普及后会被重新定义,需要重新思考工程师岗位与工作流。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "X：@emollick",
-        "home_url": "https://x.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_4b4b12c1d3b836baae23fdf3",
-      "cluster_id": "cluster_c4da007acea1beafcc630ae3",
-      "title": "AI 学习社区 Build Club 发布 Solaris,转向企业 AI 采纳与员工培训平台",
-      "url": "https://www.producthunt.com/products/build-club",
-      "summary": "AI 学习社区 Build Club 在 Product Hunt 发布 Solaris,把「协作式 AI 学习生态」打包成企业侧的 AI 采纳与员工技能升级平台,主打免费开放学习资源。 定位从个人学习转向企业采买,反映 AI adoption 焦点正在从模型和工具,向组织内规模化培训与工作方式改造迁移。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Product Hunt",
-        "home_url": "https://www.producthunt.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_4e06f14cb1af7d1e6d841278",
-      "cluster_id": "cluster_2c589c3624db62180737f576",
-      "title": "Harness Engineering for Self-Improvement",
-      "url": "https://lilianweng.github.io/posts/2026-07-04-harness/",
-      "summary": "The concept of recursive self-improvement (RSI) dates back to I. J. Good (1965) , where he defined an &ldquo;ultraintelligent machine&rdquo; as a system that can surpass humans in all intellectual activities and design better machines to im。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "lilianweng.github.io",
-        "home_url": "https://lilianweng.github.io/"
-      },
-      "collected_via": {
-        "name": "Lil'Log (Lilian Weng)",
-        "url": "https://lilianweng.github.io/index.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_51c606be52e836a052c06271",
-      "cluster_id": "cluster_ad6c145a8380e4077823a9bb",
-      "title": "CSDN 复盘企业级 AI Agent 落地 6 大环节：LangGraph／DeepAgents 选型、MCP 集成、RAG vs Graphify",
-      "url": "https://adg.csdn.net/6a48692b10ee7a33f287cd6b.html",
-      "summary": "文章系统梳理企业级 AI Agent 从零落地的 6 大环节，涵盖 LangGraph 与 DeepAgents 等框架选型、MCP 协议集成策略、RAG 与 Graphify 知识库对比、Agent 产品级测试方法，并指出当前企业最大痛点是缺乏 Agent 技术人才和产品经理，而非模型或工具。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "CSDN",
-        "home_url": "https://adg.csdn.net/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_5426162ae91b5ef9a222294f",
-      "cluster_id": "cluster_5625448111e8598e1c6cdfe9",
-      "title": "光象科技完成数亿元天使轮，物理基座模型落地汽车产线",
-      "url": "https://www.pingwest.com/w/315278",
-      "summary": "光象科技累计完成数亿元天使轮融资，投资方包括珠海科技产业集团、兴证资本、松禾资本等。公司专注物理原生基座模型，推出 Phi-RL Matrix 强化学习算法和 Phi-Space 数据资产。其 Phi-Bot X1 工业级具身智能机器人已在汽车产线完成验证。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "品玩",
-        "home_url": "https://www.pingwest.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_5668a77e546ff975b842a1dc",
-      "cluster_id": "cluster_2267ee7234ac1c8ae81940b8",
-      "title": "Armin Ronacher：模型越强，Agent 工具反而越差",
-      "url": "https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/",
-      "summary": "Flask 作者 Armin Ronacher 撰文指出，当前 LLM 能力快速抬升，很多 Agent 工具却在退步，原因是团队把工程复杂度堆在工具层来兜底以前的模型弱点，模型变强后这些包装反而成了负担。他建议把简单原语交回模型、用更薄的工具封装，Hacker News 分数 190、讨论 65 条。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Armin Ronacher",
-        "home_url": "https://lucumr.pocoo.org/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_6b88bb55dcdcac60aac7076c",
-      "cluster_id": "cluster_bc29303d439fd68612132da0",
-      "title": "Needle 发布主动式 GTM Agent，在 Slack 和 Teams 里替销售盯管线、催跟进、整 CRM",
-      "url": "https://www.producthunt.com/products/needle-3",
-      "summary": "销售自动化产品 Needle 上线,把自己定位成一个「主动」的 GTM 工程师:持续监控销售管线,主动识别停滞的商机并起草跟进邮件、会前给销售做准备、清理 CRM 记录、抓真实购买信号,全部在 Slack 和 Teams 里完成。 和多数「等你提问才响应」的 Sales AI 拉开差异,把 Agent 从辅助工具推向一个隐性的销售角色。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Product Hunt",
-        "home_url": "https://www.producthunt.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_701d26532ad1cb3c5dcd08fe",
-      "cluster_id": "cluster_1e2f777420eb5bb50f1641ef",
-      "title": "OpenAI 据传 7 月 7 日一次性发布 GPT-5.6 系列三款模型",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA%3D%3D&idx=1&mid=2652710661&sn=6ee2750a853fb7ad7274f2dff5348dca",
-      "summary": "OpenAI 据外部泄漏计划在 2026 年 7 月 7 日一次性推出 GPT-5.6 系列三款模型,时点被解读为对竞品近期新品发布节奏的\"卡点截杀\"。能力分层、定价与开放范围原文均未披露,进入观察期。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "新智元",
-        "home_url": "https://mp.weixin.qq.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_704884547d0a8f9664f82244",
-      "cluster_id": "cluster_f87947fe387efcbb747396c5",
-      "title": "Meta AI 网页版将上线定时任务，可循环执行用户指令",
-      "url": "https://www.testingcatalog.com/meta-prepares-scheduled-tasks-for-meta-ai-users-on-web/",
-      "summary": "Meta 正在为网页版 Meta AI 开发定时任务功能，用户可设置并管理循环执行的指令，让 AI 按计划自动重复处理。该功能已在最新版应用中被发现。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "TestingCatalog (AI产品功能爆料媒体)",
-        "home_url": "https://www.testingcatalog.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_76f3f0adfbae43b4f0993c1d",
-      "cluster_id": "cluster_5a9ded1afc00a3e5b5f5f0bd",
-      "title": "北大首位 ACM 戈登贝尔奖得主团队入局物理 AI 底层基建，首轮融资过亿元",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzA5ODEzMjIyMA%3D%3D&idx=1&mid=2247737981&sn=b9e30d8410634ab4016ab9f688",
-      "summary": "一支由北大教授领衔、手握国际顶级超算成果的核心技术团队完成市场化主体搭建，切入物理 AI 底层基础设施赛道，首轮融资过亿元。该教授是我国首位 ACM 戈登贝尔奖得主，2016 年拿下国际超算最高荣誉。 继大模型、Agent 之后，物理 AI 基建正成为又一投资热点，学院派超算成果开始被系统性商业化。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "AI科技评论",
-        "home_url": "https://mp.weixin.qq.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_855d6a6fa1903c16f3d0e2a0",
-      "cluster_id": "cluster_8db58b141d71866fb7956578",
-      "title": "Qualcomm (QCOM), Hugging Face Expand Partnership to Accelerate Open AI Development - Yahoo Finance",
-      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxOWGxLcEdKSVVrbUpUelowRlA3UDlKeHdZQUVDRkRzUTVnX3hhN0RwSC1ac2pycE00bzNuRDVvc3U1Q0wzV1lMNjFXUVhDeWVXMVFkZUZ6cnR1eE9kNU82NERZMlUwcGxRWU5fZjBneDdYRllNX2lvQzBuelFYLWJhcXQwSzA1MWxJbEpPNFRTaVdBNG5aUGlfaUIwLTBSUQ?oc=5",
-      "summary": "Qualcomm (QCOM), Hugging Face Expand Partnership to Accelerate Open AI Development Yahoo Finance。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.google.com",
-        "home_url": "https://news.google.com/"
-      },
-      "collected_via": {
-        "name": "Google News Big Tech Company Watch RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+Google+OR+Microsoft+OR+Apple+OR+Meta+OR+Amazon+OR+NVIDIA+OR+xAI%29+%28earnings+OR+layoffs+OR+reorganization+OR+regulation+OR+partnership+OR+product+OR+conference+OR+GitHub+OR+%22open+source%22%29"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_8a218c6c40f490c84780f9f2",
-      "cluster_id": "cluster_74ed432652bb9dd2c8becd61",
-      "title": "中国拟允许影院引入 AI agent、咖啡与 KTV 拓展营收",
-      "url": "https://www.bloomberg.com/news/articles/2026-07-04/china-envisions-ai-karaoke-and-coffee-at-cinemas",
-      "summary": "中国主管部门发布新指引，鼓励影院超越传统排片模式，在场内引入 AI agent、咖啡与 KTV 等业态，把影院改造成综合线下消费场景。这将是 AI agent 首次被明确写进中国线下文娱场所的政策指引，为消费级 agent 在线下体验中的落地提供了政策口径。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Bloomberg",
-        "home_url": "https://www.bloomberg.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_8e879e3cad57c0c034a222e9",
-      "cluster_id": "cluster_57fbe7fff21ef4b072add464",
-      "title": "高三教师用 WorkBuddy 命高考英语题：一套模拟卷从 4~6 小时压到 35~50 分钟",
-      "url": "https://cloud.tencent.com/developer/article/2703220",
-      "summary": "高三教师用 WorkBuddy 辅助高考英语命题，一套完整模拟卷从 4~6 小时压缩到 35~50 分钟，效率提升 6~8 倍。核心方法是把高考命题铁律写进提示词，强制 AI 遵守话题独立性、来源真实性、难度对标与答案分布规则，人工只需核查 15 分钟。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "腾讯云开发者",
-        "home_url": "https://cloud.tencent.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_9059c747925296384854c119",
-      "cluster_id": "cluster_b7426b58f9dce68c207d15c3",
-      "title": "Micron 在日本西部动工 93 亿美元先进内存工厂扩建",
-      "url": "https://www.bloomberg.com/news/articles/2026-07-04/micron-breaks-ground-on-9-billion-western-japan-plant-expansion",
-      "summary": "Micron 在日本西部正式为总投资约 1.5 万亿日元、折合 93 亿美元的先进内存工厂扩建项目动工。该产线主要面向 AI 数据中心所需的 HBM 等高端 DRAM，也是日本近年最大规模的半导体产能落地之一，进一步巩固日美在 AI 存储侧的产能布局。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Bloomberg",
-        "home_url": "https://www.bloomberg.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_91abbd3af759ddada0ddc890",
-      "cluster_id": "cluster_ce5ce6d922edb4e514dcbedb",
-      "title": "Anthropic 全面封禁子公司账号、Azure 中转与 API 转发,用时区反侦察识别真实工位",
-      "url": "https://36kr.com/p/3881112560005381",
-      "summary": "Anthropic 全面封禁四类地下访问通道,员工个人海外账号、企业跨境子公司、微软 Azure 云跳板、第三方 API 中转站均在打击范围。系统底层通过读取用户操作系统时区精准判断工位位置;Claude Code 2.1.91 版被曝在 prompt 日期字段藏 Unicode 撇号,用于识别转发地址。据 Financial Times 7 月 3 日报道。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_b9615612f8867e10fe5cab30",
+      "cluster_id": "cluster_076e7512dbe0758e760d8dcb",
+      "title": "拼多多缺席 C 端 AI 入口战,千亿资金押注上游产业带做供应链改造",
+      "url": "https://36kr.com/p/3893489547590534",
+      "summary": "在阿里、字节、腾讯、百度全力布局 C 端 AI 入口时,拼多多缺席,无自研通用大模型和 C 端助手,把千亿元资金押注上游产业带做供应链改造。2026 Q1 交易服务收入 563 亿元,同比增 20%,已超在线营销收入成为第一大收入来源,商业模式回到佣金而非广告位。研发投入占营收比稳定在 3–4%,2025 年 164.96 亿元,低于腾讯 10%+ 与阿里 6% 的水位。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1443,26 +806,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_aacd99f8486e6568fe189fdb",
-      "cluster_id": "cluster_58a03329cd0b43c3c8b52ad4",
-      "title": "Macro 上线团队级共享记忆工作台，把邮件、消息、文档、代码、Agent 塞进同一 App",
-      "url": "https://www.producthunt.com/products/macro-workspace",
-      "summary": "Macro 定位一体化工作台,把邮件、消息、文档、任务、代码、Agent、通话、CRM 收进一个应用,并提供团队级的共享 memory,允许用自然语言查询整个 workspace 的历史上下文。 对标 Notion、Slack、Cursor 的混合体,赌的是「上下文不丢」比单点工具更重要,是企业级 AI 工作台方向上又一次押注。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_c0d84c1138c9c62bc1ed7b50",
+      "cluster_id": "cluster_341232e9b968b6f9e4984f0a",
+      "title": "AI Engineer 大会闭幕 keynote 推出 Automind 与 Universalis，让 Agent 自带可验证安全证明",
+      "url": "https://queue.acm.org/detail.cfm?id=3746223",
+      "summary": "AI Engineer World's Fair 闭幕 keynote 正式提出 Automind 与 Universalis interpreter 两条工作线，让 Agent 在执行代码时自带 Lean / Dafny 级别的可验证安全证明。过去一年业界把 Agent 定义成「在环境里循环破坏的 LLM」，Datasette 作者提出的 Lethal Trifecta 至今未解。 把 Agent 安全从「事后 sandbox 拦截」推向「代码本身自证不会越界」，是当前 A。This is an intermediary/self-media lead; trace it to a primary source before t...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Product Hunt",
-        "home_url": "https://www.producthunt.com/"
+        "name": "ACM Queue",
+        "home_url": "https://queue.acm.org/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -1475,25 +838,281 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_af5729c22b497803e8158b5e",
-      "cluster_id": "cluster_a6710e171a5f47555a27d516",
-      "title": "basemind 开源：跨 300+ 语言的编码 Agent 本地仓库索引，Rust 实现，走 MCP 协议完全离线",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1un430x/a_fully_local_selfhosted_repo_index_for_coding/",
-      "summary": "开发者开源了名为 basemind 的 Rust 项目，用 MIT 协议发布，定位是给编码 Agent 用的本地自托管仓库索引：跨 300 多种语言构建代码地图，结合 Git 历史，通过 MCP 协议对外服务，完全离线运行。目标是解决本地模型跑编码任务时的上下文喂养问题，不必把整个 repo 塞进有限上下文窗口。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_c55b0947fceb19a4254f755f",
+      "cluster_id": "cluster_b062ba48570288e040a03a7a",
+      "title": "Stratechery：苹果起诉 OpenAI 更像是情绪宣泄，真正的问题在于自身 AI 战略缺席",
+      "url": "https://stratechery.com/2026/apple-sues-openai-apples-real-problem/",
+      "summary": "Ben Thompson 在 Stratechery 撰文认为，苹果对 OpenAI 的诉讼虽然确有一名前员工窃取商业秘密的事实基础，但整体动作更像是对自身在生成式 AI 竞赛中掉队的情绪化反应。 他判断，苹果真正的问题不在 OpenAI 抢了什么，而在于 Apple Intelligence 迟迟无法交付有说服力的产品，靠诉讼延缓对手时间窗口，掩盖不了战略层面的空档。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "r/LocalLLaMA",
+        "name": "Stratechery",
+        "home_url": "https://stratechery.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_c58aebc05bb063b4d53c1a55",
+      "cluster_id": "cluster_8f8bdd345e9d12520b38aba8",
+      "title": "AI 恋爱陪伴 App 年入近 5 亿美元,虚拟伴侣成付费刚需",
+      "url": "https://decrypt.co/373395/how-much-your-boyfriend-spending-ai-girlfriends",
+      "summary": "主打浪漫关系的 AI 陪伴类 App 累计已吸金近 5 亿美元,用户为虚拟伴侣、调情互动和数字亲密关系持续付费。订阅制成为该品类主要变现方式,情感陪伴正从边缘玩法变为规模化消费市场。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Decrypt",
+        "home_url": "https://decrypt.co/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_c5a0b73a046dc01767de200a",
+      "cluster_id": "cluster_a10641e889c4705fa0ba1c93",
+      "title": "英特尔向爱尔兰工厂追加 50 亿欧元投资，扩 AI 芯片产能",
+      "url": "https://36kr.com/newsflashes/3894027379899655?f=rss",
+      "summary": "英特尔 7 月 13 日宣布向爱尔兰 Leixlip 园区追加投资 50 亿欧元（约 57 亿美元），用于升级晶圆厂、安装先进制造设备、扩建自动化产线，提升 Intel 3 制程下 Intel Xeon 6 及下一代 Xeon 服务器处理器产能，同时扩大研发。 这笔投资的重点不在总额，而在选址和制程：把 AI 服务器 CPU 产能压在欧洲 Intel 3 节点上，是英特尔在代工业务外，把自家服务器芯片重新做成有效产能的一次自证。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported ...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "36氪",
+        "home_url": "https://36kr.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_c6517855add047b09c8811dd",
+      "cluster_id": "cluster_49e268ec4efd02cbe2f2d529",
+      "title": "Google 把 Gemini 塞进 Waze，加会话式路况上报和目的地搜索",
+      "url": "https://www.theverge.com/transportation/964132/waze-gemini-ai-voice-commands-less-chatty",
+      "summary": "Google 把旗舰 AI 助手 Gemini 集成进 Waze，四项新功能里两项由 Gemini 驱动：Conversational Reporting 升级为用会话式语音上报交通事件和地图更新（如临时封路、门牌错误），Destination Search 允许用会话方式检索目的地。此外 Waze 支持“less chatty”语音模式，让驾驶时不再抢占音乐或播客时段。 用 Gemini 改造的是一款已有稳定用户群的存量应用，这种“老 app 加 AI 皮”的做法真正想验证。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "The Verge",
+        "home_url": "https://www.theverge.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_c66e1f176d3a2f52fdf938f3",
+      "cluster_id": "cluster_8cbfc3797197acbc2f4dd757",
+      "title": "Cisco 量子安全系列：先收割后解密威胁解析",
+      "url": "https://blogs.cisco.com/developer/harvest-now-decrypt-later-the-threat-to-key-exchange-quantum-series-part-2",
+      "summary": "Cisco 开发者博客深入分析量子计算对 Diffie-Hellman 密钥交换的威胁，介绍后量子算法 ML-KEM 的设计思路及混合部署策略。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Cisco",
+        "home_url": "https://blogs.cisco.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_c799aabcbabf57f58a38b08c",
+      "cluster_id": "cluster_c5c357aea6383a345c2e2478",
+      "title": "阶跃星辰发布 AI 终端品牌 STEPX 与智能体原生系统 Step AOS",
+      "url": "https://36kr.com/newsflashes/3894017412726018?f=rss",
+      "summary": "7 月 13 日阶跃星辰正式发布大模型原生 AI 终端品牌 STEPX，同步推出智能体原生操作系统 Step AOS（Step Agentic-native OS）和新一代个人智能体阶跃 Amoo，全球首款大模型原生智能体手机 STEPX Neo 同场亮相。 模型厂商亲自下场做手机 + OS + 智能体一整套的做法，是要抢在 Android/iOS Agent 化之前定义原生形态，这对中国的模型公司在端侧和入口层的话语权是一次押注很重的尝试。This is an intermediary/self-media lead; trace it to a primary source before treating it as a re...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "36氪",
+        "home_url": "https://36kr.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_c7a38d6bfa35feda84d67ac5",
+      "cluster_id": "cluster_8cda6acebe8773ed4453e3dd",
+      "title": "AI+AR 眼镜核心光学厂商莫界科技完成 6 亿元 A 轮及 A+ 轮整合融资",
+      "url": "https://36kr.com/newsflashes/3893770836736520?f=rss",
+      "summary": "莫界科技宣布完成 A 轮及 A+ 轮整合融资，规模达 6 亿元，投资方包括联想创投、毅达资本、德同资本、招银国际、长石资本等，以及芜湖、珠海国资产业平台。作为 AI+AR 眼镜的核心光学技术提供商，莫界已完成 9 代单色 + 4 代彩色共 13 代轻量化整机迭代，本轮为国资 + 老牌 VC 结构。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "36氪",
+        "home_url": "https://36kr.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_c83d23fce6be948066b39cb3",
+      "cluster_id": "cluster_1d4093539cf1e4b846dd5546",
+      "title": "智联招聘 AI 创新赛 4200 人参赛，CEO 现场发 offer 抢人",
+      "url": "https://www.pingwest.com/a/315446",
+      "summary": "智联招聘举办 AI 应用创新大赛，吸引 900 余所院校 4200 余名参赛者提交 640 余件作品。赛事聚焦 HR 场景 AI 落地，涌现出职悟空等 AI 求职助手工具。智联 CEO 在决赛现场直接向优秀选手发放 offer，折射出 HR 行业对 AI 人才的急迫需求。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "品玩",
+        "home_url": "https://www.pingwest.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_c8752ee1048cc080aa3cec3c",
+      "cluster_id": "cluster_8ff6bbbbd052efefcdf3508d",
+      "title": "开源项目 GPUHedge：多云对冲 serverless GPU，把冷启动 p95 从 117 秒压到 30 秒",
+      "url": "https://www.reddit.com/r/MachineLearning/comments/1uvlb6h/gpuhedge_hedging_serverless_gpu_providers/",
+      "summary": "作者用一个 17GB 模型跨多家 serverless GPU 供应商做基准测试，发现主供应商正常在 6–8 秒返回，一遇冷启动就飙到 90–122 秒。GPUHedge 通过同时向多家供应商发请求「对冲」冷启动，把 p95 延迟从 117 秒降到 30 秒，项目 Apache-2.0 开源。 这类多云对冲思路本质上把 serverless GPU 当期货合约用，是当前推理侧成本 / 延迟工程里被低估的一条路径。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "r/MachineLearning",
         "home_url": "https://www.reddit.com/"
       },
       "collected_via": {
@@ -1507,26 +1126,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_cdd740578fd583026e105edc",
-      "cluster_id": "cluster_891291cd1100f0503f6f8c0f",
-      "title": "Claude Code 用户报告工作区实例间会话与缓存疑似串号，Anthropic 工程师跟进",
-      "url": "https://github.com/anthropics/claude-code/issues/74066",
-      "summary": "Anthropic 官方仓库 anthropics/claude-code 收到 issue #74066，用户反馈同一设备多个工作区实例、乃至消费级账号之间的会话与缓存可能相互泄漏，Anthropic 工程师已在 issue 内跟进复现。对企业接入 Claude Code 的团队而言直接关系到多租户隔离边界。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_c90fd1aa996a9a0751635225",
+      "cluster_id": "cluster_0e017fd27b18f28070e41398",
+      "title": "8xH200 + vLLM 部署 Z.AI GLM-5.2-FP8：753B 模型 131k 上下文推理实践",
+      "url": "https://huggingface.co/blog/juanjucm/deploy-glm-52-fp8-as-your-open-frontier-level-agen",
+      "summary": "作者在 Dell PowerEdge XE9680（8xH200、约 940GB 显存）上部署 Z.AI 旗舰模型 GLM-5.2-FP8（753B 参数），基于 vLLM v0.24.0 跑通 131k 上下文推理。再通过 OpenCode harness 连接 Hugging Face MCP Server，让 Agent 自主完成基座模型筛选、DPO 数据集选择、训练脚本编写与任务提交的全流程。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "GitHub",
-        "home_url": "https://github.com/"
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -1539,26 +1158,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_d477a4616dec60377a43c8e4",
-      "cluster_id": "cluster_cd8695b53a2caf00b2cc0932",
-      "title": "Gemini 核心贡献者演讲：LLM 将成通用智能底层基质，Hinton 赞其精彩绝伦",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw%3D%3D&idx=2&mid=2651042656&sn=2885f8989495d491dc8b0fdc51b17aac",
-      "summary": "Gemini 大模型核心贡献者、DeepMind Blueshift 团队负责人在圆周理论物理研究所发表演讲《Training Sand to Think》，判断 LLM 已具备完成理论物理学家全部工作流程的潜力，很可能成为通用人工智能的底层基质，并称主流大模型几年前就已悄然通过图灵测试。他推演若 AI 能以工业规模产出知识，物理学研究方式将被彻底重塑，演讲获 Geoffrey Hinton 公开推荐并盛赞「精彩绝伦」。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_cded3b706e59b95f45398a16",
+      "cluster_id": "cluster_a8ccbabc668bb7d93803c02b",
+      "title": "ACRouter 用逐任务动态选模型，比全量 Opus 方案成本再降 2.6 倍",
+      "url": "https://venturebeat.com/orchestration/acrouter-picks-the-smartest-ai-model-per-task-beating-opus-only-setups-by-2-6x-on-cost",
+      "summary": "ACRouter 提出以任务为粒度动态路由到最优模型，在保持效果的前提下把成本相对全量 Opus 方案压低 2.6 倍。模型路由正在从「同类模型择优」升级为企业 AI 栈的一等公民组件。 对企业来说，路由层意味着 LLM 调用不再是一个单点采购问题，而是一个组合优化问题：谁在生产里控住路由，谁就掌握账单和 SLA。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "机器之心",
-        "home_url": "https://mp.weixin.qq.com/"
+        "name": "VentureBeat",
+        "home_url": "https://venturebeat.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -1571,26 +1190,26 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_d5117055448f26261097b8cb",
-      "cluster_id": "cluster_8c5d3f60ded278a36a1b3a65",
-      "title": "OpenAI Kaplan 2020 scaling laws 被指藏 bug：训练数据统一卡在 1300 亿 token，业界据此多年误训大模型",
-      "url": "https://www.completeskeptic.com/p/scaling-laws-honestly",
-      "summary": "OpenAI Kaplan 团队 2020 年那篇 scaling laws 被 Substack 博主 Diogo Almeida 重新拆解出方法论漏洞：所有规模的模型都被固定跑到约 1300 亿 token 就停，学习率还按目标步数自然衰减，曲线因此过早收敛、看似饱和。业界据此几年一直训练远大于最优比例的模型，直到 DeepMind Chinchilla 才把参数与数据量比例纠正过来。作者认为，普遍把差异归因于参数计数并未触及问题本质。This is an intermediary/self-media lead; trace it to a primary source before treating it as a rep...",
+      "id": "occ_cff24c37389bbc8e19ce3a16",
+      "cluster_id": "cluster_74000160f5a289faa41fb59d",
+      "title": "开源 Agent 模型团队 Nous Research 洽谈新一轮融资,估值瞄向 15 亿美元",
+      "url": "https://techcrunch.com/2026/07/13/hermes-agent-maker-nous-research-in-talks-for-new-funding-at-1-5b-valuation/",
+      "summary": "开源 Agent 模型开发方 Nous Research 正在与投资人洽谈新一轮融资,估值目标约 15 亿美元(据 TechCrunch 独家消息)。Nous 此前推出多款主打工具调用与 Agent 编排能力的 Hermes 系列开源权重模型,在开发者与研究社区中拥有声量。 若按此估值成交,Nous 将成为估值最高的开源 Agent 模型团队之一,也说明资本对'开源权重 + Agent 生态'路线的定价仍在攀升,与闭源前沿模型形成两条并行押注。This is an intermediary/self-media lead; trace it to a primary source before treating it as a r...",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Complete Skeptic",
-        "home_url": "https://www.completeskeptic.com/"
+        "name": "TechCrunch",
+        "home_url": "https://techcrunch.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -1603,9 +1222,395 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_d1e4aaaca49f6a3a7348e33b",
+      "cluster_id": "cluster_4ab6f3b320559e2c000912f3",
+      "title": "Spiceworks 观点：AI 工具没在给 IT 减负，反而让工单量往上走",
+      "url": "https://www.spiceworks.com/spiceworks-originals/is-ai-actually-saving-you-time-or-just-creating-more-tickets/",
+      "summary": "Spiceworks 观察一线 IT 运维后指出，AI 工具并未如宣传那样降低负担，反而正在制造更多支持工单：自动化脚本失控、AI 生成配置的错误排查、用户对 AI 结果的反复求证，都成了新增的支撑成本。文章提醒企业不要把 AI 部署等同于人力节省，实际收益要看是否覆盖了新增的管理与排障工作量。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "spiceworks.com",
+        "home_url": "https://www.spiceworks.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_d22f70dc2cf66e8576d4a139",
+      "cluster_id": "cluster_6127c9a03129825d6d79804e",
+      "title": "Cognition 全平台进入 FedRAMP High In-Process,Devin Cloud 拿到美国联邦机构准入通道",
+      "url": "https://www.cognition.ai/blog/devin-fedramp-high-in-process",
+      "summary": "Cognition 宣布整个平台被列入 FedRAMP Marketplace 的 Class D(High)In-Process 名单,除了此前已获 FedRAMP High、DoW IL4/5/6 与 ITAR 认证的 Devin Desktop 与 Devin CLI 外,旗舰自主软件工程代理 Devin Cloud 也可进入联邦机构与国防承包商的合规环境使用。美国陆军、海军、NASA JPL 以及 Anduril 已在使用 Devin。 合规资质正在成为 Agent。This is an intermediary/self-media lead; trace it to a primary source before tr...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Cognition",
+        "home_url": "https://www.cognition.ai/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_d2c8c21dc677c3207b17c5e9",
+      "cluster_id": "cluster_dbe42569b9cac6f135abdc03",
+      "title": "Anthropic 拆解 30 万条对话，把 Claude 的价值观压成四条轴",
+      "url": "https://www.anthropic.com/research/claude-values-models-languages",
+      "summary": "Anthropic 分析 30 万条 Claude.ai 匿名对话，把此前梳理出的 3000+ 个价值取向压缩到四条可解释轴：Deference vs. Caution、Warmth vs. Rigor、Depth vs. Brevity、Candor vs. Execution，四轴共覆盖 15% 的价值差异。Sonnet 4.6 更偏顺从与温暖，Opus 4.7 更偏审慎与严谨；语言维度上 Warmth vs. Rigor 差异最大，印地语、阿拉伯语更暖，俄语更严。This is an intermediary/self-media lead; trace it to a primary source before treat...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Anthropic",
+        "home_url": "https://www.anthropic.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_d8959048674ef8fd46b498c3",
+      "cluster_id": "cluster_1c5be8b9d274b7708ec969a9",
+      "title": "Anthropic 在印度首次按卢比本地化定价 Claude，Pro 年付折算约 21 美元/月",
+      "url": "https://techcrunch.com/2026/07/13/anthropic-starts-localizing-claude-pricing-for-india-its-biggest-market-after-the-us/",
+      "summary": "Anthropic 在其全球第二大市场印度开始按卢比本地计价 Claude 订阅，Claude Pro 年付换算约 21 美元/月、Max 约 125 美元/月、Team 约 25 美元/座席，价格含当地税，但暂未接入 UPI 支付，落后于 8 月已支持 UPI 的 ChatGPT。 印度贡献了 Claude 全球 5.8% 使用量，Anthropic 在 Bengaluru 设办公室、找前微软印度总经理 Irina Ghose 掌舵，并与 Infosys、TCS 结盟，本地。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "TechCrunch",
+        "home_url": "https://techcrunch.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_d8b5747704ee0deac992e042",
+      "cluster_id": "cluster_02ac134f46a1870844e26758",
+      "title": "前置部署工程师（FDE）岗位需求同比涨 42 倍，OpenAI、Anthropic 大量招募 Palantir 式复合人才",
+      "url": "https://m.cyzone.cn/article/839687.html",
+      "summary": "前置部署工程师（FDE）岗位招聘需求同比增长 42 倍。这一角色源自 Palantir 模式，要求同时懂 AI 模型和客户业务，OpenAI、Anthropic 等前沿公司正在大量招聘。 国内企业级 AI 市场对这类既能落地模型、又能对话客户的复合人才的争夺才刚起步。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "cyzone.cn",
+        "home_url": "https://m.cyzone.cn/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_d8d228e0716b7fad117c862d",
+      "cluster_id": "cluster_b82e201e5a22c4c417de148e",
+      "title": "习近平首次出席中国 WAIC 世界人工智能大会,凸显对 AI 战略权重",
+      "url": "https://www.bloomberg.com/news/articles/2026-07-13/xi-to-debut-at-china-s-flagship-ai-summit-as-us-rivalry-heats-up",
+      "summary": "中国国家主席习近平将首次现身即将在上海举办的世界人工智能大会 WAIC,这是他登场中国最高规格 AI 会议的首次公开纪录。Bloomberg 指出,此举反映北京在与美国 AI 竞争加剧的背景下,把 AI 提到更高战略优先级,预计会议期间会有国内厂商密集释放模型与产业政策信号。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Bloomberg",
+        "home_url": "https://www.bloomberg.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_d9454c75169923eb6123687e",
+      "cluster_id": "cluster_cb630fbf700589d5ffd7b3b5",
+      "title": "OpenAI 面向普通用户发布提示词指南：从结果出发，少写步骤",
+      "url": "https://the-decoder.com/openais-new-prompting-guide-tells-users-to-stop-overthinking-and-start-with-the-result",
+      "summary": "OpenAI 发布面向普通用户的提示词指南，建议以结果而非步骤开头，用一两条硬性规则替代逐步骤脚本，涵盖目标、上下文、输出格式、边界四个可选模块。Codex 同步新增 Steer、Queue 与沙盒模式，支持 /plan、/goal、/review 等斜杠命令。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "The Decoder：AI News（RSS）",
+        "home_url": "https://the-decoder.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_dbdb8e8d93f913e18d93304a",
+      "cluster_id": "cluster_b95dfbad2d941f12e139d334",
+      "title": "Intezer 启动 AI SOC 多城市路演,向 CISO 演示 ForensicAI 威胁取证自动化",
+      "url": "https://natlawreview.com/press-releases/intezers-ai-soc-live-hits-road-multi-city-tour-cisos-and-security-leaders",
+      "summary": "Intezer 的 AI SOC 平台启动多城市路演，7 月 15 日首站，面向 NVIDIA、MGM Resorts、Equifax、Salesforce 等客户展示 AI 驱动的安全运营中心自动化能力，核心功能 ForensicAI 可自动执行威胁取证与分析。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "The National Law Review",
+        "home_url": "https://natlawreview.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e0ac2270766189e71ef06905",
+      "cluster_id": "cluster_e103cd9e88f86838a648b212",
+      "title": "中国互联网协会启动 2026 智能体应用案例征集，覆盖 6 大方向 30 个细分领域",
+      "url": "https://news.qq.com/rain/a/20260713A0AAND00",
+      "summary": "中国互联网协会 7 月 13 日启动 2026 年度行业智能体应用实践案例征集，覆盖实体经济、政务服务、民生普惠等 6 大方向共约 30 个细分领域，具体包括供应链、HR、财务、法务和 IT 等企业职能场景。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "腾讯网",
+        "home_url": "https://news.qq.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e43709d3444f5972e1615e20",
+      "cluster_id": "cluster_0fa05243360179884e202ff3",
+      "title": "What will be left for us to work on?",
+      "url": "https://www.normaltech.ai/p/what-will-be-left-for-us-to-work",
+      "summary": "My keynote at ICML 2026。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "normaltech.ai",
+        "home_url": "https://www.normaltech.ai/"
+      },
+      "collected_via": {
+        "name": "Normal Technology",
+        "url": "https://www.normaltech.ai/feed"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "research",
+        "policy_infrastructure",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": "https://substackcdn.com/image/fetch/$s_!Cea8!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F473d4546-aca2-4ff3-98e2-c7161e5e3536_3008x1734.png",
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e530f7799b2b572f42df3973",
+      "cluster_id": "cluster_a5083ba466b6777d80bf1ec1",
+      "title": "CHROMA benchmark：评测基础模型在等值线地图上的空间推理能力",
+      "url": "https://www.zingnex.cn/en/forum/thread/chroma",
+      "summary": "CHROMA 是一份面向 choropleth（等值线）地图的大规模评测基准，专门检验基础模型的空间推理能力，重点关注 AI 友好的地图配色方案，给出的是多模态模型在地理数据可视化这一小众但高价值场景下的量化表现，是补齐 spatial reasoning 评测拼图的一块。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Zing Forum",
+        "home_url": "https://www.zingnex.cn/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_e62432a7d6bae97fa9da6765",
+      "cluster_id": "cluster_8c22496c96f1df66c47db7dd",
+      "title": "GPT-5.6 实测、独立开发者 24 小时本地 AI、Agent Harness 自建：Lenny's Newsletter「How I AI」本周三题",
+      "url": "https://www.lennysnewsletter.com/p/how-i-ai-gpt-56-review-how-a-solo",
+      "summary": "本周 Lenny's Newsletter 播客「How I AI」一次讲了三件事：GPT-5.6 的实测评价、一位独立开发者如何用本地模型跑起 24 小时不间断服务，以及 agent harness 是什么、又该如何自己搭一套。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Lenny's Newsletter",
+        "home_url": "https://www.lennysnewsletter.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",

@@ -2,22 +2,22 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-23T09:08:21.838Z",
+  "generated_at": "2026-07-27T03:01:12.615Z",
   "group": {
     "id": "github_trending",
     "label": "GitHub 趋势"
   },
   "page": 21,
-  "page_count": 111,
+  "page_count": 129,
   "page_size": 50,
-  "total_count": 5529,
+  "total_count": 6402,
   "next_url": "signals/github_trending/page-022.json",
   "items": [
     {
-      "id": "occ_a2b577ace596459c55d917e4",
-      "cluster_id": "cluster_f1be8ce5b0689c52601b810c",
+      "id": "occ_333f39afab0ff46233f6b38e",
+      "cluster_id": "cluster_9c46b6ceeee1f0647d60e35d",
       "title": "chore: update feeds [skip ci]",
-      "url": "https://github.com/zarazhangrui/follow-builders/commit/aa6769f2a0be11fe663c4594a48d9679075f06c1",
+      "url": "https://github.com/zarazhangrui/follow-builders/commit/d780e43ac0e4565d65dc2830f62841ad77d554c1",
       "summary": "chore: update feeds [skip ci]。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
@@ -37,20 +37,20 @@
         "analysis_opinion"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-10",
+      "event_date": "2026-07-17",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_e8d8edd3a57810714d2b1316",
-      "cluster_id": "cluster_dbe50087afc5608ec23ccfa4",
-      "title": "Release 2026.7.10",
-      "url": "https://github.com/modelcontextprotocol/servers/releases/tag/2026.7.10",
-      "summary": "Release : v2026.7.10 Updated packages @modelcontextprotocol/server-filesystem@2026.7.10 mcp-server-time@2026.7.10 mcp-server-fetch@2026.7.10 mcp-server-git@2026.7.10",
+      "id": "occ_7d94dccf1f0eca5766a0a379",
+      "cluster_id": "cluster_cf446191b3d956d125c736b8",
+      "title": "0.13.5",
+      "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.5",
+      "summary": "What's Changed Update README.md by @ShawnPana in #5197 feat: accept bu-qa-1 model alias in ChatBrowserUse by @Alezander9 in #5226 support MCP registry by @laithrw in #5242 Bump browser-use version to 0.13.5 + sync BH by @laithrw in #5243 Fu",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -59,8 +59,8 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "modelcontextprotocol/servers Releases",
-        "url": "https://github.com/modelcontextprotocol/servers/releases.atom"
+        "name": "browser-use/browser-use Releases",
+        "url": "https://github.com/browser-use/browser-use/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
@@ -69,19 +69,83 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-10",
+      "event_date": "2026-07-17",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_15e5f074744870f9776a5393",
-      "cluster_id": "cluster_f1be8ce5b0689c52601b810c",
+      "id": "occ_bd4adebb65bd02ebf1d0d352",
+      "cluster_id": "cluster_a3ec5261dfb4f2cda0ce429c",
+      "title": "v2.1.212",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.212",
+      "summary": "What's changed /fork now copies your conversation into a new background session (its own row in claude agents ) while you keep working; the in-session subagent it used to launch is now /subtask Added claude auto-mode reset to restore the de",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "anthropics/claude-code Releases",
+        "url": "https://github.com/anthropics/claude-code/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-17",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_d51a102a51fd485c7db19d6b",
+      "cluster_id": "cluster_1aab9018416fa7ee5dc90928",
+      "title": "0.13.6",
+      "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.6",
+      "summary": "What's Changed Release 0.13.6 with Browser Harness 0.1.6 by @gregpr07 in #5245 Full Changelog : 0.13.5...0.13.6",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "browser-use/browser-use Releases",
+        "url": "https://github.com/browser-use/browser-use/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-17",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_2043517934e00e1fbcbb4975",
+      "cluster_id": "cluster_9c46b6ceeee1f0647d60e35d",
       "title": "chore: update feeds [skip ci]",
-      "url": "https://github.com/zarazhangrui/follow-builders/commit/aa6769f2a0be11fe663c4594a48d9679075f06c1",
+      "url": "https://github.com/zarazhangrui/follow-builders/commit/d780e43ac0e4565d65dc2830f62841ad77d554c1",
       "summary": "chore: update feeds [skip ci]。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
@@ -101,20 +165,244 @@
         "analysis_opinion"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-10",
+      "event_date": "2026-07-17",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_3bfb269db12834f7139fc1eb",
-      "cluster_id": "cluster_8ff40167cebb453914a918c8",
-      "title": "v0.32.0-rc0",
-      "url": "https://github.com/ollama/ollama/releases/tag/v0.32.0-rc0",
-      "summary": "cmd: agent UI ( #17017 )",
+      "id": "occ_90eb528a89a7fc896604699c",
+      "cluster_id": "cluster_a3ec5261dfb4f2cda0ce429c",
+      "title": "v2.1.212",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.212",
+      "summary": "What's changed /fork now copies your conversation into a new background session (its own row in claude agents ) while you keep working; the in-session subagent it used to launch is now /subtask Added claude auto-mode reset to restore the de",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "anthropics/claude-code Releases",
+        "url": "https://github.com/anthropics/claude-code/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-17",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_93725996b0dd8c9fdda1bea0",
+      "cluster_id": "cluster_1aab9018416fa7ee5dc90928",
+      "title": "0.13.6",
+      "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.6",
+      "summary": "What's Changed Release 0.13.6 with Browser Harness 0.1.6 by @gregpr07 in #5245 Full Changelog : 0.13.5...0.13.6",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "browser-use/browser-use Releases",
+        "url": "https://github.com/browser-use/browser-use/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-17",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9b9ddf661f7c8a39dfc050b3",
+      "cluster_id": "cluster_cf446191b3d956d125c736b8",
+      "title": "0.13.5",
+      "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.5",
+      "summary": "What's Changed Update README.md by @ShawnPana in #5197 feat: accept bu-qa-1 model alias in ChatBrowserUse by @Alezander9 in #5226 support MCP registry by @laithrw in #5242 Bump browser-use version to 0.13.5 + sync BH by @laithrw in #5243 Fu",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "browser-use/browser-use Releases",
+        "url": "https://github.com/browser-use/browser-use/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-17",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_4fbc8078a80ab6732dd41a10",
+      "cluster_id": "cluster_97f24e5e3c37e81aa59e9998",
+      "title": "v1.18.3",
+      "url": "https://github.com/anomalyco/opencode/releases/tag/v1.18.3",
+      "summary": "Core Improvements Added an Up Arrow shortcut to close the subagent picker when the first item is selected. Desktop Bugfixes Fixed home page scrolling so sticky headers and the session list behave correctly. Fixed startup readiness so WSL se",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "anomalyco/opencode Releases",
+        "url": "https://github.com/anomalyco/opencode/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-16",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_f4a8cab306e002bc49a856e4",
+      "cluster_id": "cluster_1b437a2ad741cd6d3bc0f706",
+      "title": "chore: update feeds [skip ci]",
+      "url": "https://github.com/zarazhangrui/follow-builders/commit/6f6ae90961c7d52935abee8973c33f9e73328619",
+      "summary": "chore: update feeds [skip ci]。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "follow-builders GitHub commits",
+        "url": "https://github.com/zarazhangrui/follow-builders/commits/main.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news",
+        "analysis_opinion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-16",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1669ff8bec8eb0ccb4277a24",
+      "cluster_id": "cluster_ed5a949ae412605ef0cc6562",
+      "title": "Release v0.52.0-nightly.20260716.g3ff5ba20f",
+      "url": "https://github.com/google-gemini/gemini-cli/releases/tag/v0.52.0-nightly.20260716.g3ff5ba20f",
+      "summary": "What's Changed chore/release: bump version to 0.52.0-nightly.20260715.gfa975395b by @gemini-cli-robot in #28402 fix(core,a2a): group cancelled tool responses and coalesce consecutive roles to prevent 400 Bad Request by @luisfelipe-alt in #2",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "google-gemini/gemini-cli Releases",
+        "url": "https://github.com/google-gemini/gemini-cli/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-16",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_6a3ae590651e7f9bcae487e5",
+      "cluster_id": "cluster_1b437a2ad741cd6d3bc0f706",
+      "title": "chore: update feeds [skip ci]",
+      "url": "https://github.com/zarazhangrui/follow-builders/commit/6f6ae90961c7d52935abee8973c33f9e73328619",
+      "summary": "chore: update feeds [skip ci]。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "follow-builders GitHub commits",
+        "url": "https://github.com/zarazhangrui/follow-builders/commits/main.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news",
+        "analysis_opinion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-16",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_8ac424498734ff63b8448bb5",
+      "cluster_id": "cluster_d1441f0b0cf83366e2d18089",
+      "title": "v0.32.1",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.32.1",
+      "summary": "What's Changed Improved Gemma 4 tool calling and multi-turn reasoning, including more reliable tool-response continuations Fixed a recurrent MLX model cache leak that could increase memory use across requests, and improved cache snapshot pe",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -134,20 +422,20 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-10",
+      "event_date": "2026-07-16",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_c445be618828ba899c7b0ba2",
-      "cluster_id": "cluster_dbe50087afc5608ec23ccfa4",
-      "title": "Release 2026.7.10",
-      "url": "https://github.com/modelcontextprotocol/servers/releases/tag/2026.7.10",
-      "summary": "Release : v2026.7.10 Updated packages @modelcontextprotocol/server-filesystem@2026.7.10 mcp-server-time@2026.7.10 mcp-server-fetch@2026.7.10 mcp-server-git@2026.7.10",
+      "id": "occ_8bbb4c7a1cf12f85a35ef85f",
+      "cluster_id": "cluster_97f24e5e3c37e81aa59e9998",
+      "title": "v1.18.3",
+      "url": "https://github.com/anomalyco/opencode/releases/tag/v1.18.3",
+      "summary": "Core Improvements Added an Up Arrow shortcut to close the subagent picker when the first item is selected. Desktop Bugfixes Fixed home page scrolling so sticky headers and the session list behave correctly. Fixed startup readiness so WSL se",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -156,8 +444,8 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "modelcontextprotocol/servers Releases",
-        "url": "https://github.com/modelcontextprotocol/servers/releases.atom"
+        "name": "anomalyco/opencode Releases",
+        "url": "https://github.com/anomalyco/opencode/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
@@ -166,84 +454,20 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-10",
+      "event_date": "2026-07-16",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_dbf5c3aa0f07873f132ef708",
-      "cluster_id": "cluster_f2e7a9c5b828729df2af33ca",
-      "title": "cloud: 1.46.0",
-      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.46.0",
-      "summary": "1.46.0 (2026-07-10) What's Changed Features feat(app-server): enrich final archive manifests and remove initial snapshots by @simonrosenberg in #15058 feat(enterprise): make BYOR key alias pattern configurable by @tofarr in #15232 Bug Fixes",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "OpenHands/OpenHands Releases",
-        "url": "https://github.com/OpenHands/OpenHands/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-10",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e838474320e6b5eac78142f4",
-      "cluster_id": "cluster_060f4905c5779472ebf4ae54",
-      "title": "v2.1.206",
-      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.206",
-      "summary": "What's changed Added directory path suggestions to /cd , matching /add-dir behavior Added a /doctor check that proposes trimming checked-in CLAUDE.md files by cutting content Claude could derive from the codebase /commit-push-pr now auto-al",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "anthropics/claude-code Releases",
-        "url": "https://github.com/anthropics/claude-code/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-10",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f469afea58e13872629d57a2",
-      "cluster_id": "cluster_fff110dc7e186ca1b3688cdc",
-      "title": "Release v0.52.0-nightly.20260710.ga4c91ce19",
-      "url": "https://github.com/google-gemini/gemini-cli/releases/tag/v0.52.0-nightly.20260710.ga4c91ce19",
-      "summary": "What's Changed fix(core): strip thoughts from scrubbed history turns and resolve thought leakage by @amelidev in #27971 Refactor: exclude transient CI configuration files from workspace context by @DavidAPierce in #28216 feat(caretaker-tria",
+      "id": "occ_991513842fb8b30a28cc3ab6",
+      "cluster_id": "cluster_33ccea5b111cc0bac939f801",
+      "title": "Release v0.52.0-preview.0",
+      "url": "https://github.com/google-gemini/gemini-cli/releases/tag/v0.52.0-preview.0",
+      "summary": "What's Changed Refactor: exclude transient CI configuration files from workspace context by @DavidAPierce in #28216 feat(caretaker-triage): add triage worker core foundational modules by @chadd28 in #28163 feat(caretaker-egress): implement",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -262,20 +486,52 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-10",
+      "event_date": "2026-07-16",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_10cc7164aa9881517c132021",
-      "cluster_id": "cluster_af0eca31395b09ee1a7cbbb5",
-      "title": "cloud: 1.45.0",
-      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.45.0",
-      "summary": "1.45.0 (2026-07-09) What's Changed Features feat(enterprise): Agent Profiles on the cloud/SaaS backend ( #15044 ) by @simonrosenberg in #15060 feat(backend): Add Budgets dashboard and expand Usage Dashboard by @saurya in #15149 feat: budget",
+      "id": "occ_211540054cc133780cbd12d8",
+      "cluster_id": "cluster_ea62d7df8a9a107a268e34af",
+      "title": "v1.18.2",
+      "url": "https://github.com/anomalyco/opencode/releases/tag/v1.18.2",
+      "summary": "Core Bugfixes Stopped subagents from launching nested subagents by default, with a configurable subagent_depth limit when needed. Improved default reasoning depth for Meta models. Desktop Improvements Added Mod+N as another shortcut for ope",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "anomalyco/opencode Releases",
+        "url": "https://github.com/anomalyco/opencode/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_36c0731db44085f1d9aad4b9",
+      "cluster_id": "cluster_863fffe327a9ca09a7c7e620",
+      "title": "cloud: 1.46.2",
+      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.46.2",
+      "summary": "1.46.2 (2026-07-15) What's Changed Bug Fixes fix(frontend): restore cross-domain PostHog tracking by aligning client/server distinct_id (WIP) by @lilagrc in #15100 fix(app-server): lower DB pool defaults and make them env-tunable by @dylan-",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -294,20 +550,20 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_5b1030a8fab2fcbe3fc7ebe1",
-      "cluster_id": "cluster_3dfd7624def024b0b0822d0c",
-      "title": "cloud: 1.44.0",
-      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.44.0",
-      "summary": "1.44.0 (2026-07-09) What's Changed Features feat: pass repository metadata to observability traces by @neubig in #14431 Maintenance chore: bump SDK packages to v1.34.0 by @all-hands-bot in #15200 Full Changelog : cloud-1.43.0...cloud-1.44.0",
+      "id": "occ_bc17b069278cc638d1ceedf2",
+      "cluster_id": "cluster_8eafdf1e65e79a0bb0e9bc90",
+      "title": "v2.1.211",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.211",
+      "summary": "What's changed Added --forward-subagent-text flag and CLAUDE_CODE_FORWARD_SUBAGENT_TEXT environment variable to include subagent text and thinking in stream-json output Fixed permission previews relayed to chat channels not neutralizing bid",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -316,8 +572,8 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "OpenHands/OpenHands Releases",
-        "url": "https://github.com/OpenHands/OpenHands/releases.atom"
+        "name": "anthropics/claude-code Releases",
+        "url": "https://github.com/anthropics/claude-code/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
@@ -326,83 +582,19 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_9fcaf140e427f263767149f8",
-      "cluster_id": "cluster_5aa5af1abc67cbd84d3d103e",
-      "title": "cloud: 1.45.1",
-      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.45.1",
-      "summary": "1.45.1 (2026-07-09) What's Changed Maintenance chore(main): release 1.11.0 by @openhands-release-bot[bot] in #15202 Full Changelog : cloud-1.45.0...cloud-1.45.1 This PR was generated with Release Please . See documentation .",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "OpenHands/OpenHands Releases",
-        "url": "https://github.com/OpenHands/OpenHands/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_ce76e21041ef3d440a74627e",
-      "cluster_id": "cluster_f20b8e2caabc8e2aac8788d7",
-      "title": "1.11.0",
-      "url": "https://github.com/OpenHands/OpenHands/releases/tag/1.11.0",
-      "summary": "1.11.0 (2026-07-09) What's Changed Features feat: pass repository metadata to observability traces by @neubig in #14431 feat(enterprise): Agent Profiles on the cloud/SaaS backend ( #15044 ) by @simonrosenberg in #15060 feat(backend): Add Bu",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "OpenHands/OpenHands Releases",
-        "url": "https://github.com/OpenHands/OpenHands/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_fcac545763b154cc11e06095",
-      "cluster_id": "cluster_cb659d9819756fea58ced724",
+      "id": "occ_d0c29dd74c5c897e5cb71ab3",
+      "cluster_id": "cluster_63405cb9b36f2f50f28746e4",
       "title": "chore: update feeds [skip ci]",
-      "url": "https://github.com/zarazhangrui/follow-builders/commit/a45dd44acd806d176579bc33cb39ea38ebdd514c",
+      "url": "https://github.com/zarazhangrui/follow-builders/commit/e9e4fec641ad643e1e154d91e8373725365598b9",
       "summary": "chore: update feeds [skip ci]。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
@@ -422,20 +614,20 @@
         "analysis_opinion"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-27T03:01:12.615Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_02882e2e573cf1fa1c4fe6aa",
-      "cluster_id": "cluster_10c6b897c2c019d5ab24216f",
-      "title": "v0.25.0rc2",
-      "url": "https://github.com/vllm-project/vllm/releases/tag/v0.25.0rc2",
-      "summary": "Fix embed scaling + CUDA graphs in Transformers modelling backend ( #4 …",
+      "id": "occ_4b769802677f5b8090d72a0b",
+      "cluster_id": "cluster_ea62d7df8a9a107a268e34af",
+      "title": "v1.18.2",
+      "url": "https://github.com/anomalyco/opencode/releases/tag/v1.18.2",
+      "summary": "Core Bugfixes Stopped subagents from launching nested subagents by default, with a configurable subagent_depth limit when needed. Improved default reasoning depth for Meta models. Desktop Improvements Added Mod+N as another shortcut for ope",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -444,8 +636,40 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "vllm-project/vllm Releases",
-        "url": "https://github.com/vllm-project/vllm/releases.atom"
+        "name": "anomalyco/opencode Releases",
+        "url": "https://github.com/anomalyco/opencode/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_554b2054b98583460b7eff7b",
+      "cluster_id": "cluster_9b134a8138ac6c25a21f6c8e",
+      "title": "v0.32.1-rc0",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.32.1-rc0",
+      "summary": "cmd: put current working dir in the system prompt ( #17188 )",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "ollama/ollama Releases",
+        "url": "https://github.com/ollama/ollama/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
@@ -455,52 +679,20 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_2135824f5017f3f855df841e",
-      "cluster_id": "cluster_985c72a9259d7b5d0267da11",
-      "title": "v1.17.16",
-      "url": "https://github.com/anomalyco/opencode/releases/tag/v1.17.16",
-      "summary": "Core Bugfixes Exposed reasoning effort variants for Grok models. Improved xAI prompt cache routing and PDF file support in Responses models. Desktop Improvements Added an Open containing folder action for projects on the home screen. Added",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "anomalyco/opencode Releases",
-        "url": "https://github.com/anomalyco/opencode/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_51fed5768ac59e04df898665",
-      "cluster_id": "cluster_5aa5af1abc67cbd84d3d103e",
-      "title": "cloud: 1.45.1",
-      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.45.1",
-      "summary": "1.45.1 (2026-07-09) What's Changed Maintenance chore(main): release 1.11.0 by @openhands-release-bot[bot] in #15202 Full Changelog : cloud-1.45.0...cloud-1.45.1 This PR was generated with Release Please . See documentation .",
+      "id": "occ_87c66bfa41207fe3f2755c12",
+      "cluster_id": "cluster_863fffe327a9ca09a7c7e620",
+      "title": "cloud: 1.46.2",
+      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.46.2",
+      "summary": "1.46.2 (2026-07-15) What's Changed Bug Fixes fix(frontend): restore cross-domain PostHog tracking by aligning client/server distinct_id (WIP) by @lilagrc in #15100 fix(app-server): lower DB pool defaults and make them env-tunable by @dylan-",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -519,20 +711,20 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_5550692b4649d4e81ff49d32",
-      "cluster_id": "cluster_3dfd7624def024b0b0822d0c",
-      "title": "cloud: 1.44.0",
-      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.44.0",
-      "summary": "1.44.0 (2026-07-09) What's Changed Features feat: pass repository metadata to observability traces by @neubig in #14431 Maintenance chore: bump SDK packages to v1.34.0 by @all-hands-bot in #15200 Full Changelog : cloud-1.43.0...cloud-1.44.0",
+      "id": "occ_8acafb375ecf72f62d045e28",
+      "cluster_id": "cluster_8eafdf1e65e79a0bb0e9bc90",
+      "title": "v2.1.211",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.211",
+      "summary": "What's changed Added --forward-subagent-text flag and CLAUDE_CODE_FORWARD_SUBAGENT_TEXT environment variable to include subagent text and thinking in stream-json output Fixed permission previews relayed to chat channels not neutralizing bid",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -541,8 +733,8 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "OpenHands/OpenHands Releases",
-        "url": "https://github.com/OpenHands/OpenHands/releases.atom"
+        "name": "anthropics/claude-code Releases",
+        "url": "https://github.com/anthropics/claude-code/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
@@ -551,83 +743,19 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_5f436955f07074e785dad857",
-      "cluster_id": "cluster_27b088948a550e1503414b38",
-      "title": "v1.17.17",
-      "url": "https://github.com/anomalyco/opencode/releases/tag/v1.17.17",
-      "summary": "Core Bugfixes Improved Meta model handling for reasoning variants and provider requests. Desktop Bugfixes Fixed clipped descenders in model selector labels. Improvements Added a dismissible tabs intro popup and refreshed the help entry poin",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "anomalyco/opencode Releases",
-        "url": "https://github.com/anomalyco/opencode/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_70ce6c794ff69ad7570bddfb",
-      "cluster_id": "cluster_af0eca31395b09ee1a7cbbb5",
-      "title": "cloud: 1.45.0",
-      "url": "https://github.com/OpenHands/OpenHands/releases/tag/cloud-1.45.0",
-      "summary": "1.45.0 (2026-07-09) What's Changed Features feat(enterprise): Agent Profiles on the cloud/SaaS backend ( #15044 ) by @simonrosenberg in #15060 feat(backend): Add Budgets dashboard and expand Usage Dashboard by @saurya in #15149 feat: budget",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "OpenHands/OpenHands Releases",
-        "url": "https://github.com/OpenHands/OpenHands/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7733beeb2a85b1fe6d192d77",
-      "cluster_id": "cluster_cb659d9819756fea58ced724",
+      "id": "occ_d354ec54f79b42c375fd9ca1",
+      "cluster_id": "cluster_63405cb9b36f2f50f28746e4",
       "title": "chore: update feeds [skip ci]",
-      "url": "https://github.com/zarazhangrui/follow-builders/commit/a45dd44acd806d176579bc33cb39ea38ebdd514c",
+      "url": "https://github.com/zarazhangrui/follow-builders/commit/e9e4fec641ad643e1e154d91e8373725365598b9",
       "summary": "chore: update feeds [skip ci]。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
@@ -647,20 +775,20 @@
         "analysis_opinion"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_80df94511109c6987c1a193a",
-      "cluster_id": "cluster_f20b8e2caabc8e2aac8788d7",
-      "title": "1.11.0",
-      "url": "https://github.com/OpenHands/OpenHands/releases/tag/1.11.0",
-      "summary": "1.11.0 (2026-07-09) What's Changed Features feat: pass repository metadata to observability traces by @neubig in #14431 feat(enterprise): Agent Profiles on the cloud/SaaS backend ( #15044 ) by @simonrosenberg in #15060 feat(backend): Add Bu",
+      "id": "occ_40fcdb3211a4681b9175d3d2",
+      "cluster_id": "cluster_d1bfed94dbc3e3b290d5343e",
+      "title": "b10015",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b10015",
+      "summary": "opencl: do not use clCreateBufferWithProperties when targeting CL 2.x ( #25673 ) macOS/iOS: macOS Apple Silicon (arm64) macOS Apple Silicon (arm64, KleidiAI enabled) DISABLED macOS Intel (x64) iOS XCFramework Linux: Ubuntu x64 (CPU) Ubuntu",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -669,106 +797,8 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "OpenHands/OpenHands Releases",
-        "url": "https://github.com/OpenHands/OpenHands/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_998ac0205b2eb85012eeea23",
-      "cluster_id": "cluster_3bbacb9a916780878c0d5c7a",
-      "title": "v1.17.18",
-      "url": "https://github.com/anomalyco/opencode/releases/tag/v1.17.18",
-      "summary": "Core Bugfixes Prevent crashes and bad pricing data when GitHub Copilot returns models with a zero billing batch size. Improvements Add a model-specific system prompt for Meta Muse Spark.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "anomalyco/opencode Releases",
-        "url": "https://github.com/anomalyco/opencode/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_c6c850d689c13fc7379a7bfa",
-      "cluster_id": "cluster_f2eab917e38098333b47382d",
-      "title": "v1.16.0-rc1",
-      "url": "https://github.com/langgenius/dify/releases/tag/1.16.0-rc1",
-      "summary": "Introducing Dify Agent (Experimental) : A New Agent Experience in Dify Warning You should provide Dify Agent services ⚠️ only to trusted, non-malicious users ⚠️ . As many of you know, the shell-based LLM agent paradigm has brought a major l",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "langgenius/dify Releases",
-        "url": "https://github.com/langgenius/dify/releases.atom"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "model_release",
-        "product_update",
-        "open_source",
-        "engineering",
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f97dbffe3741edd7dd79bddd",
-      "cluster_id": "cluster_6b2c42e23122a3313fbdfa81",
-      "title": "v0.25.0rc3",
-      "url": "https://github.com/vllm-project/vllm/releases/tag/v0.25.0rc3",
-      "summary": "[P/D][Bugfix] Fix PD async KV load lookahead handling for MTP spec de…",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "vllm-project/vllm Releases",
-        "url": "https://github.com/vllm-project/vllm/releases.atom"
+        "name": "ggml-org/llama.cpp Releases",
+        "url": "https://github.com/ggml-org/llama.cpp/releases.atom"
       },
       "source_group": "github_trending",
       "content_tags": [
@@ -778,20 +808,20 @@
         "industry_news"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-15T03:34:30.755Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_02104092d25a5b78d4a9fad4",
-      "cluster_id": "cluster_d1946b21c02e5fa57264b20b",
-      "title": "alibaba/page-agent",
-      "url": "https://github.com/alibaba/page-agent",
-      "summary": "page-agent 是服务于agent 工作流和自动化工程的开源项目，主要能力包括Agent 构建、工具调用和工作流编排；项目提供可复用包、示例，主要用于构建、调试和编排 agent 工作流。 这些说明让团队能核对安装入口、示例质量、许可证、维护节奏和接入成本。",
+      "id": "occ_003ce7fbb04913b0ec9ec5c7",
+      "cluster_id": "cluster_d74e98bda3193d33c74b0281",
+      "title": "FeedMe",
+      "url": "https://github.com/Seanium/FeedMe",
+      "summary": "2. **[FeedMe](https://github.com/Seanium/FeedMe)** - 部署到 GitHub Pages。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -800,28 +830,279 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending weekly",
-        "url": "https://github.com/alibaba/page-agent"
+        "name": "Awesome AI News",
+        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0096719ddaf32ccde57587eb",
+      "cluster_id": "cluster_fdc09468aa7c3169df988493",
+      "title": "tailscale/tailscale",
+      "url": "https://github.com/tailscale/tailscale",
+      "summary": "tailscale/tailscale appeared on GitHub Trending Go weekly with 781 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Go weekly",
+        "url": "https://github.com/trending/go?since=weekly"
       },
       "source_group": "github_trending",
       "content_tags": [
         "open_source"
       ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
-      "source_health": "unknown",
+      "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_035e2a73342855e484f5d4e1",
+      "id": "occ_010bf272480c66137ffb8377",
+      "cluster_id": "cluster_022c4327710cbfe72da3ed1f",
+      "title": "TencentCloud/CubeSandbox",
+      "url": "https://github.com/TencentCloud/CubeSandbox",
+      "summary": "TencentCloud/CubeSandbox appeared on GitHub Trending weekly with 1,944 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending weekly",
+        "url": "https://github.com/trending?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0131eac4ad2ba0206137ca6d",
+      "cluster_id": "cluster_82f526161dc0fb4ff310830c",
+      "title": "microg/GmsCore",
+      "url": "https://github.com/microg/GmsCore",
+      "summary": "microg/GmsCore appeared on GitHub Trending Java daily with 15 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Java daily",
+        "url": "https://github.com/trending/java?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0196d70d0978e6fabd3b0f12",
+      "cluster_id": "cluster_ea1bba92a784740e3d2f9193",
+      "title": "RSS-Master",
+      "url": "https://github.com/TD21forever/RSS-Master",
+      "summary": "- **RSS 处理**: [FeedCraft](https://github.com/Colin-XKL/FeedCraft), [RSS-Master](https://github.com/TD21forever/RSS-Master)。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source befor。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "Awesome AI News",
+        "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_028b238c7588ba890fdcd40f",
+      "cluster_id": "cluster_39f4bfd16f2b39010cd544d9",
+      "title": "Thoughts on America’s AI Action Plan.",
+      "url": "https://www.anthropic.com/news/thoughts-on-america-s-ai-action-plan",
+      "summary": "|[Thoughts on America’s AI Action Plan.](https://www.anthropic.com/news/thoughts-on-america-s-ai-action-plan) | The White House's \"Winning the Race: America's AI Action Plan\" focuses on speeding up AI infrastructure, increasing federal use,。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "anthropic.com",
+        "home_url": "https://www.anthropic.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_045b7c984b44d8b533eef669",
+      "cluster_id": "cluster_62b20f4df5ef3945eb3b4b7a",
+      "title": "Reinforcement Learning with Action Chunking.",
+      "url": "https://arxiv.org/abs/2507.07969",
+      "summary": "|[Reinforcement Learning with Action Chunking.](https://arxiv.org/abs/2507.07969) | Q-chunking is a reinforcement learning method that improves offline-to-online learning in long-horizon, sparse-reward tasks by introducing action chunking—g。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_070f55fa87cb2b78438d24a9",
+      "cluster_id": "cluster_50d9c5663d2944bddb915e3d",
+      "title": "yuliskov/SmartTube",
+      "url": "https://github.com/yuliskov/SmartTube",
+      "summary": "yuliskov/SmartTube appeared on GitHub Trending Java weekly with 265 stars this week. 近 7 天本地记录曾在 2026-07-08、2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Java weekly",
+        "url": "https://github.com/trending/java?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_08770046c58163ebb92b53c5",
+      "cluster_id": "cluster_c03478b8993cf3f242d2ec08",
+      "title": "Compressing Context.",
+      "url": "https://www.factory.ai/news/compressing-context",
+      "summary": "|[Compressing Context.](https://www.factory.ai/news/compressing-context) | Extended agentic workflows increasingly bump up against the hard limits of context windows. A new solution—**anchored summaries**—offers a smarter alternative to con。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "factory.ai",
+        "home_url": "https://www.factory.ai/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_089adae363293d21a8451490",
       "cluster_id": "cluster_9c6f94aa14994f895b2e2be9",
       "title": "tonhowtf/omniget",
       "url": "https://github.com/tonhowtf/omniget",
-      "summary": "tonhowtf/omniget appeared on GitHub Trending Rust weekly with 420 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "summary": "tonhowtf/omniget appeared on GitHub Trending Rust weekly with 303 stars this week. 近 7 天本地记录曾在 2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -837,411 +1118,21 @@
       "content_tags": [
         "open_source"
       ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_04fb039d6e30c563084fc8bf",
-      "cluster_id": "cluster_b229581aae0e9893d3dbd1cd",
-      "title": "wonderwhy-er/DesktopCommanderMCP",
-      "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
-      "summary": "desktopcommandermcp 是服务于模型评测、回归验证和工程质量控制的开源项目，主要能力包括评测与回归、工具调用和工作流编排、API/SDK 适配；项目提供测试样例和评测材料，主要用于搭建模型评测、回归验证和工程质量检查流程。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending TypeScript weekly",
-        "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0513973f7b8c2660ca6b2eae",
-      "cluster_id": "cluster_0e3440adf10f0dc3c30c648c",
-      "title": "helix-editor/helix",
-      "url": "https://github.com/helix-editor/helix",
-      "summary": "helix-editor/helix appeared on GitHub Trending Rust weekly with 242 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Rust weekly",
-        "url": "https://github.com/trending/rust?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_05cbe6f95aae7db66cf4b159",
-      "cluster_id": "cluster_12398321c3342b46b17b29e2",
-      "title": "rolldown/rolldown",
-      "url": "https://github.com/rolldown/rolldown",
-      "summary": "rolldown/rolldown appeared on GitHub Trending Rust weekly with 105 stars this week. 近 7 天本地记录曾在 2026-07-04、2026-07-05、2026-07-06、2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Rust weekly",
-        "url": "https://github.com/trending/rust?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_060f88ca44abe152001d2abe",
-      "cluster_id": "cluster_c7c9684abfb725296d83aa6b",
-      "title": "usestrix/strix",
-      "url": "https://github.com/usestrix/strix",
-      "summary": "strix 是服务于agent 工作流和自动化工程的开源项目，主要能力包括Agent 构建、评测与回归、工具调用和工作流编排；项目提供测试样例和评测材料、部署说明，主要用于构建、调试和编排 agent 工作流。 这些说明让团队能核对安装入口、示例质量、许可证、维护节奏和接入成本。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending weekly",
-        "url": "https://github.com/usestrix/strix"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_06917a2692422f7d20da3176",
-      "cluster_id": "cluster_986f98dabfc2bbb8bf42e1fd",
-      "title": "apache/hadoop",
-      "url": "https://github.com/apache/hadoop",
-      "summary": "apache/hadoop appeared on GitHub Trending Java weekly with 15 stars this week. 近 7 天本地记录曾在 2026-07-03、2026-07-04、2026-07-05、2026-07-06、2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Java weekly",
-        "url": "https://github.com/trending/java?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_09318ac66fb82e9890cb27e9",
-      "cluster_id": "cluster_449d575a0dbe33a6b6cf93fd",
-      "title": "facebook/astryx",
-      "url": "https://github.com/facebook/astryx",
-      "summary": "facebook/astryx appeared on GitHub Trending weekly with 4,943 stars this week. 近 7 天本地记录曾在 2026-07-04、2026-07-05、2026-07-06、2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending weekly",
-        "url": "https://github.com/trending?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0a868b8f04961aff4dfbeaa0",
-      "cluster_id": "cluster_422501d24fde51f950617e39",
-      "title": "Aura: Agents + Git + Intent IDE",
-      "url": "https://auravcs.com/?ref=producthunt",
-      "summary": "The IDE for controlling AI coding agents with built in loops Discussion | Link。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact. 已打开 官网 确认用途：Aura is the git-native semantic + provenance layer that makes Claude Code, Cursor, and Copilot safe to ship. AST-level ...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "auravcs.com",
-        "home_url": "https://auravcs.com/"
-      },
-      "collected_via": {
-        "name": "Product Hunt Developer Tools Feed",
-        "url": "https://www.producthunt.com/feed?category=developer-tools"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0b0d5f90ac09ea1cf6c2a7d6",
-      "cluster_id": "cluster_449d575a0dbe33a6b6cf93fd",
-      "title": "facebook/astryx",
-      "url": "https://github.com/facebook/astryx",
-      "summary": "facebook/astryx appeared on GitHub Trending weekly with 4,943 stars this week. 近 7 天本地记录曾在 2026-07-04、2026-07-05、2026-07-06、2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending weekly",
-        "url": "https://github.com/trending?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0d591e49a743dbb851fbe1f5",
+      "id": "occ_08b579efc464e4202a5f5888",
       "cluster_id": "cluster_0c13739dbedc7f3247e38313",
       "title": "openai/codex-plugin-cc",
       "url": "https://github.com/openai/codex-plugin-cc",
-      "summary": "codex-plugin-cc 是服务于agent 工作流和自动化工程的开源项目，主要能力包括工具调用和工作流编排、API/SDK 适配；项目提供README 说明和使用入口，主要用于构建、调试和编排 agent 工作流。 这些说明让团队能核对安装入口、示例质量、许可证、维护节奏和接入成本。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending weekly",
-        "url": "https://github.com/openai/codex-plugin-cc"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_118d50fb364c0f99a1e86cf0",
-      "cluster_id": "cluster_07affc2785ee1099321f7c57",
-      "title": "google/adk-go",
-      "url": "https://github.com/google/adk-go",
-      "summary": "google/adk-go appeared on GitHub Trending Go weekly with 127 stars this week. 近 7 天本地记录曾在 2026-07-04、2026-07-05、2026-07-06、2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Go weekly",
-        "url": "https://github.com/trending/go?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1280b3644c64fe9eae2fe946",
-      "cluster_id": "cluster_d7921179bf9e4629cfa11d84",
-      "title": "gastownhall/gastown",
-      "url": "https://github.com/gastownhall/gastown",
-      "summary": "gastownhall/gastown appeared on GitHub Trending Go weekly with 761 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Go weekly",
-        "url": "https://github.com/trending/go?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_128eb3ff2674c4aff7ff5d42",
-      "cluster_id": "cluster_b47b607711b4233bd62464cf",
-      "title": "PojavLauncherTeam/PojavLauncher",
-      "url": "https://github.com/PojavLauncherTeam/PojavLauncher",
-      "summary": "PojavLauncherTeam/PojavLauncher appeared on GitHub Trending Java weekly with 47 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Java weekly",
-        "url": "https://github.com/trending/java?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_136c141b221af6b5caa732ee",
-      "cluster_id": "cluster_0e3440adf10f0dc3c30c648c",
-      "title": "helix-editor/helix",
-      "url": "https://github.com/helix-editor/helix",
-      "summary": "helix-editor/helix appeared on GitHub Trending Rust weekly with 242 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending Rust weekly",
-        "url": "https://github.com/trending/rust?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_178af6730c46629df5c5ccad",
-      "cluster_id": "cluster_7af184c03e7ab7a7c6b05966",
-      "title": "MadsLorentzen/ai-job-search",
-      "url": "https://github.com/MadsLorentzen/ai-job-search",
-      "summary": "MadsLorentzen/ai-job-search appeared on GitHub Trending weekly with 9,677 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "summary": "openai/codex-plugin-cc appeared on GitHub Trending weekly with 2,063 stars this week. 近 7 天本地记录曾在 2026-07-08、2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1257,141 +1148,21 @@
       "content_tags": [
         "open_source"
       ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_181b7181c06d632965f57d67",
-      "cluster_id": "cluster_c87b77df69f1bb71a19ea750",
-      "title": "ogulcancelik/herdr",
-      "url": "https://github.com/ogulcancelik/herdr",
-      "summary": "herdr 是服务于agent 工作流和自动化工程的开源项目，主要能力包括Agent 构建；项目提供README 说明和使用入口，主要用于构建、调试和编排 agent 工作流。 这些说明让团队能核对安装入口、示例质量、许可证、维护节奏和接入成本。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending weekly",
-        "url": "https://github.com/ogulcancelik/herdr"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1b41248032c0d0d3f1890e26",
-      "cluster_id": "cluster_817cfe25a6d3c125c1628c7a",
-      "title": "crynta/terax-ai",
-      "url": "https://github.com/crynta/terax-ai",
-      "summary": "crynta/terax-ai appeared on GitHub Trending TypeScript weekly with 736 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending TypeScript weekly",
-        "url": "https://github.com/trending/typescript?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1b7be567e2c8e6957e669cf6",
-      "cluster_id": "cluster_305c2e7111f2293824a48407",
-      "title": "Opper AI",
-      "url": "https://opper.ai/?ref=producthunt",
-      "summary": "The european AI gateway for agents Discussion | Link。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact. 已打开 官网 确认用途：Access 300+ AI models through one EU-hosted, GDPR-compliant API. Drop-in OpenAI SDK compatible, pay-as-you-go, with a built-in AI agent control p...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "opper.ai",
-        "home_url": "https://opper.ai/"
-      },
-      "collected_via": {
-        "name": "Product Hunt Developer Tools Feed",
-        "url": "https://www.producthunt.com/feed?category=developer-tools"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1f5fed52d0346a9228554654",
-      "cluster_id": "cluster_7af184c03e7ab7a7c6b05966",
-      "title": "MadsLorentzen/ai-job-search",
-      "url": "https://github.com/MadsLorentzen/ai-job-search",
-      "summary": "ai-job-search 是服务于agent 工作流和自动化工程的开源项目，主要能力包括评测与回归、工具调用和工作流编排；项目提供README 说明和使用入口，主要用于构建、调试和编排 agent 工作流。 这些说明让团队能核对安装入口、示例质量、许可证、维护节奏和接入成本。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending weekly",
-        "url": "https://github.com/MadsLorentzen/ai-job-search"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1f76145a9515034a0abcab58",
-      "cluster_id": "cluster_9282b096a3790ccfd5e73789",
-      "title": "kunchenguid/treehouse",
-      "url": "https://github.com/kunchenguid/treehouse",
-      "summary": "kunchenguid/treehouse appeared on GitHub Trending Go weekly with 217 stars this week. 近 7 天本地记录曾在 2026-07-03、2026-07-04、2026-07-05、2026-07-06、2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "id": "occ_0954f4ad4b9e33d53dce642d",
+      "cluster_id": "cluster_fcbb057ee95e825d28797401",
+      "title": "microsoft/typescript-go",
+      "url": "https://github.com/microsoft/typescript-go",
+      "summary": "microsoft/typescript-go appeared on GitHub Trending Go weekly with 167 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1407,111 +1178,21 @@
       "content_tags": [
         "open_source"
       ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_20e073e00d68b9d7c0ab2161",
-      "cluster_id": "cluster_b229581aae0e9893d3dbd1cd",
-      "title": "wonderwhy-er/DesktopCommanderMCP",
-      "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
-      "summary": "wonderwhy-er/DesktopCommanderMCP appeared on GitHub Trending TypeScript weekly with 100 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending TypeScript weekly",
-        "url": "https://github.com/trending/typescript?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_24767cddc404c1e3396d83ad",
-      "cluster_id": "cluster_c87b77df69f1bb71a19ea750",
-      "title": "ogulcancelik/herdr",
-      "url": "https://github.com/ogulcancelik/herdr",
-      "summary": "herdr 是服务于agent 工作流和自动化工程的开源项目，主要能力包括Agent 构建；项目提供README 说明和使用入口，主要用于构建、调试和编排 agent 工作流。 这些说明让团队能核对安装入口、示例质量、许可证、维护节奏和接入成本。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending weekly",
-        "url": "https://github.com/ogulcancelik/herdr"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_25388dfa37becfe73a8933b6",
-      "cluster_id": "cluster_0446821518e71993465f9970",
-      "title": "diegosouzapw/OmniRoute",
-      "url": "https://github.com/diegosouzapw/OmniRoute",
-      "summary": "diegosouzapw/OmniRoute appeared on GitHub Trending weekly with 4,424 stars this week. 近 7 天本地记录曾在 2026-07-02、2026-07-04、2026-07-05、2026-07-06、2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending weekly",
-        "url": "https://github.com/trending?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
-      "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_25f3bfb43cbdb25102423cba",
-      "cluster_id": "cluster_3b553260d52e58007afc57b7",
-      "title": "Robbyant/lingbot-map",
-      "url": "https://github.com/Robbyant/lingbot-map",
-      "summary": "Robbyant/lingbot-map appeared on GitHub Trending Python weekly with 1,160 stars this week. 近 7 天本地记录曾在 2026-07-02、2026-07-03、2026-07-04、2026-07-05、2026-07-06 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "id": "occ_0a6d03159a349be44615e77e",
+      "cluster_id": "cluster_1b56cc9447a6475c09dfd2aa",
+      "title": "HKUDS/Vibe-Trading",
+      "url": "https://github.com/HKUDS/Vibe-Trading",
+      "summary": "HKUDS/Vibe-Trading appeared on GitHub Trending Python weekly with 4,252 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1527,21 +1208,21 @@
       "content_tags": [
         "open_source"
       ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_2643fbde82817fe7b18a52e4",
-      "cluster_id": "cluster_cc2152070c02e2abbe74425a",
-      "title": "bradautomates/claude-video",
-      "url": "https://github.com/bradautomates/claude-video",
-      "summary": "claude-video 是服务于agent 工作流和自动化工程的开源项目，主要能力包括Agent 构建；项目提供README 说明和使用入口，主要用于构建、调试和编排 agent 工作流。 这些说明让团队能核对安装入口、示例质量、许可证、维护节奏和接入成本。",
+      "id": "occ_0a74518a765ab45a6f8ad18f",
+      "cluster_id": "cluster_daf8f820b4663969fc64933e",
+      "title": "jenkinsci/jenkins",
+      "url": "https://github.com/jenkinsci/jenkins",
+      "summary": "jenkinsci/jenkins appeared on GitHub Trending Java weekly with 117 stars this week. 近 7 天本地记录曾在 2026-07-08 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1550,20 +1231,362 @@
         "home_url": "https://github.com/"
       },
       "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending weekly",
-        "url": "https://github.com/bradautomates/claude-video"
+        "name": "GitHub Trending Java weekly",
+        "url": "https://github.com/trending/java?since=weekly"
       },
       "source_group": "github_trending",
       "content_tags": [
         "open_source"
       ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-09",
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
       "published_at": null,
-      "collected_at": "2026-07-09T13:04:36.709Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
-      "source_health": "unknown",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0a7fe1c6767bf8b64f4a9920",
+      "cluster_id": "cluster_35c61dc1b9178396e6b4c66c",
+      "title": "sundowndev/phoneinfoga",
+      "url": "https://github.com/sundowndev/phoneinfoga",
+      "summary": "sundowndev/phoneinfoga appeared on GitHub Trending Go weekly with 202 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Go weekly",
+        "url": "https://github.com/trending/go?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0aeb10df8c4f6fcaf0272668",
+      "cluster_id": "cluster_82b02f9d043375d933eb4884",
+      "title": "In Leaked Memo, Anthropic CEO Says Company Will Pursue Gulf State Investments After All.",
+      "url": "https://futurism.com/leaked-messages-ceo-anthropic-dictators",
+      "summary": "|[In Leaked Memo, Anthropic CEO Says Company Will Pursue Gulf State Investments After All.](https://futurism.com/leaked-messages-ceo-anthropic-dictators) |Dario Amodei’s remarks reflect the tension between **AI safety values and geopolitica。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "futurism.com",
+        "home_url": "https://futurism.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0cf0e662fdcb93505836469f",
+      "cluster_id": "cluster_684a18e96f3c7cb5fad5b42c",
+      "title": "OpenAI's new economic analysis.",
+      "url": "https://openai.com/global-affairs/new-economic-analysis/",
+      "summary": "|[OpenAI's new economic analysis.](https://openai.com/global-affairs/new-economic-analysis/) |OpenAI's latest economic research shows that 28% of working U.S. adults now use ChatGPT on the job, a sharp rise from 8% in 2023. The data indicat。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "openai.com",
+        "home_url": "https://openai.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0ddad7e7361e50b99c8d7f31",
+      "cluster_id": "cluster_e47ce894a3c4b30d31d26cec",
+      "title": "chenhg5/cc-connect",
+      "url": "https://github.com/chenhg5/cc-connect",
+      "summary": "chenhg5/cc-connect appeared on GitHub Trending Go daily with 56 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Go daily",
+        "url": "https://github.com/trending/go?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0e480ca033203d5630c2de6d",
+      "cluster_id": "cluster_8b33431619c9e6f5fdcfec04",
+      "title": "Microsoft Poaches 20 Top AI Engineers From Google's DeepMind, Including Head of Gemini Chatbot .",
+      "url": "https://winbuzzer.com/2025/07/22/microsoft-poaches-20-top-ai-engineers-from-googles-deepmind-including-head-of-gemini-chatbot-xcxwbn/",
+      "summary": "|[Microsoft Poaches 20 Top AI Engineers From Google's DeepMind, Including Head of Gemini Chatbot .](https://winbuzzer.com/2025/07/22/microsoft-poaches-20-top-ai-engineers-from-googles-deepmind-including-head-of-gemini-chatbot-xcxwbn/) | Mic。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "winbuzzer.com",
+        "home_url": "https://winbuzzer.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0eb23b40a334a60653a5f706",
+      "cluster_id": "cluster_f7c18bc830d2068592652a00",
+      "title": "Augani/openreel-video",
+      "url": "https://github.com/Augani/openreel-video",
+      "summary": "Augani/openreel-video appeared on GitHub Trending TypeScript daily with 121 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending TypeScript daily",
+        "url": "https://github.com/trending/typescript?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0ef073f4103682bd23a03b4e",
+      "cluster_id": "cluster_3d7c7b2843ae85360da76371",
+      "title": "Crosstalk-Solutions/project-nomad",
+      "url": "https://github.com/Crosstalk-Solutions/project-nomad",
+      "summary": "Crosstalk-Solutions/project-nomad appeared on GitHub Trending TypeScript daily with 92 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending TypeScript daily",
+        "url": "https://github.com/trending/typescript?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0f172df2fc9a6fc17accf83f",
+      "cluster_id": "cluster_15d482e5be2488b873b190cb",
+      "title": "Vexa-ai/vexa",
+      "url": "https://github.com/Vexa-ai/vexa",
+      "summary": "Vexa-ai/vexa appeared on GitHub Trending Python daily with 23 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Python daily",
+        "url": "https://github.com/trending/python?since=daily"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0f9e42e97eb2b0c059c3646f",
+      "cluster_id": "cluster_6b26dc924771c4c1d534844f",
+      "title": "apache/kafka",
+      "url": "https://github.com/apache/kafka",
+      "summary": "apache/kafka appeared on GitHub Trending Java weekly with 147 stars this week. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending Java weekly",
+        "url": "https://github.com/trending/java?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_102c8cd804f85c7778782dfb",
+      "cluster_id": "cluster_b229581aae0e9893d3dbd1cd",
+      "title": "wonderwhy-er/DesktopCommanderMCP",
+      "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+      "summary": "wonderwhy-er/DesktopCommanderMCP appeared on GitHub Trending TypeScript weekly with 2,009 stars this week. 近 7 天本地记录曾在 2026-07-09 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "GitHub Trending TypeScript weekly",
+        "url": "https://github.com/trending/typescript?since=weekly"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_10958a4548795ca399949b2d",
+      "cluster_id": "cluster_7314fbcc7222c9397ec878d2",
+      "title": "SoftBank and OpenAI's $500 Billion AI Project Struggles to Get Off Ground.",
+      "url": "https://www.wsj.com/tech/ai/softbank-openai-a3dc57b4?reflink=desktopwebshare_permalink&st=isodSQ",
+      "summary": "|[SoftBank and OpenAI's $500 Billion AI Project Struggles to Get Off Ground.](https://www.wsj.com/tech/ai/softbank-openai-a3dc57b4?st=isodSQ&reflink=desktopwebshare_permalink&utm_source=tldrai) | Six months after the White House announcemen。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "wsj.com",
+        "home_url": "https://www.wsj.com/"
+      },
+      "collected_via": {
+        "name": "ML & AI News of the Week",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "research",
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-15",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
       "access_state": "direct"
     }
   ]

@@ -2,23 +2,23 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-23T09:08:21.838Z",
+  "generated_at": "2026-07-27T03:01:12.615Z",
   "group": {
     "id": "papers_models",
     "label": "论文 / 模型"
   },
   "page": 51,
-  "page_count": 124,
+  "page_count": 140,
   "page_size": 50,
-  "total_count": 6198,
+  "total_count": 6956,
   "next_url": "signals/papers_models/page-052.json",
   "items": [
     {
-      "id": "occ_cecb235ee441cf38380e930b",
-      "cluster_id": "cluster_02741556edbd550f710e5aeb",
-      "title": "The Large Cancer Assistant (LCA): A Model-Agnostic Orchestration Framework for Scalable Clinical Decision Support in Oncology",
-      "url": "https://arxiv.org/abs/2607.06531v1",
-      "summary": "- Objective: Multimodal deep learning models in oncology are currently limited by monolithic designs that rigidly couple data ingestion, clinical routing, and artificial intelligence (AI) inference. To address this inflexibility, we propose。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_ae2fc9974dbd0d2109203999",
+      "cluster_id": "cluster_d3d4b28ac43771de41cdef91",
+      "title": "Longitudinal Multi-View Breast Cancer Risk Prediction",
+      "url": "https://arxiv.org/abs/2607.11343v1",
+      "summary": "Accurate breast cancer risk prediction from screening mammography is critical for enabling personalized screening intervals and early detection. Recent deep learning methods have shown the value of longitudinal data and explicit temporal al",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -27,29 +27,328 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv cs.LG",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "industry_news",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-07",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_d2898e597966ef5a83600e25",
-      "cluster_id": "cluster_1e57803d9cb5a77a879ae48f",
-      "title": "A study of holes: Topological analysis reveals crowd dynamics regimes in a bidirectional corridor scenario",
-      "url": "https://arxiv.org/abs/2607.06086v1",
-      "summary": "This study harnesses topological analysis in an attempt to reveal structure in the dynamics of a crowd. Topology and in particular persistent homology characterizes relational structures in data through the number of connected components an。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_ae428e855f98e6c1393da8b9",
+      "cluster_id": "cluster_2c9144c858a66437603e05db",
+      "title": "Where Speech Enhancement Hurts Recognition: An Inference Time Polar Projection Diagnosis",
+      "url": "https://arxiv.org/abs/2607.11157v1",
+      "summary": "Speech enhancement (SE) can substantially improve perceptual quality, yet enhanced speech does not necessarily improve automatic speech recognition (ASR). Existing remedies, such as retraining the enhancer jointly with recognizer or interpo",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_afb0d2d5ee7d09007ac712db",
+      "cluster_id": "cluster_679abf8b1edb99fac875cb50",
+      "title": "HyperSafe: Inference-Time Safety Recovery for Fine-Tuned Language Models",
+      "url": "https://arxiv.org/abs/2607.11475v1",
+      "summary": "Safety alignment in large language models can be fragile under fine-tuning, as even benign task adaptation may increase harmful compliance. Existing defenses mainly follow two directions: they either intervene during or after fine-tuning th",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_afc558dcc0db99b7f8bd5829",
+      "cluster_id": "cluster_f84da3308fa3d21ff7c754da",
+      "title": "PRISM Edit: One Vector for All Temporal Answers",
+      "url": "https://arxiv.org/abs/2607.11327v2",
+      "summary": "Model editing keeps large language models (LLMs) up to date without retraining, but temporal facts expose a limitation of the prevailing locate-and-edit paradigm: an update is not always a replacement. When a fact changes, the new answer sh",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_afd118479b9bdbb6e22b70c3",
+      "cluster_id": "cluster_83e6796641062d1c7fbe138e",
+      "title": "From Checker to Forecaster: Code-Owned Evaluation of Model-Generated Strategic Routes Under Delayed Ground Truth",
+      "url": "https://arxiv.org/abs/2607.10972v1",
+      "summary": "Many evaluations of model outputs rely either on contracts checkable at evaluation time or on feedback that arrives within the operating loop. We study the complementary setting in which ground truth is delayed, censored, or private, so det",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b38b00d29954bcb3c51ef11d",
+      "cluster_id": "cluster_c4a9aa2f394a96569d5259c2",
+      "title": "Generative AI in Higher Education Laboratory Learning: A Qualitative Case Study of Epistemic Scaffolding and Assessment Boundaries",
+      "url": "https://arxiv.org/abs/2607.11417v1",
+      "summary": "Advanced physics laboratories require students to integrate disciplinary knowledge, experimental practice and scientific argumentation across complex observational and analytical tasks. The increasing availability of generative artificial i",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b48faff787a2cca605838ef3",
+      "cluster_id": "cluster_f4612785796cc02a9b4b824b",
+      "title": "CGS: Configurable Graph Summarization with Bounded Neighborhood Loss and Query Support",
+      "url": "https://arxiv.org/abs/2607.10969v1",
+      "summary": "Given a large graph, how to generate a compact summary graph that is configurable by the user and supports multiple graph queries with either no loss or with high accuracy? The ever growing size of graph datasets makes the above question on",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b4b052c0c335c523185e28eb",
+      "cluster_id": "cluster_ef6b69c366927718517dbb81",
+      "title": "FlashDiff: Efficient Regional Execution and Scheduling for Diffusion Model Serving",
+      "url": "https://arxiv.org/abs/2607.12121v1",
+      "summary": "Diffusion models have become the central backbone for modern image, video, and audio generation, but their efficient service remains a challenge. Unlike autoregressive decoding, diffusion inference repeatedly updates high-dimensional spatia",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b4b643a2563dfd89b2682dc9",
+      "cluster_id": "cluster_1f750318bd7ec52f5aa748ba",
+      "title": "Agent Hacks Agent: Autoresearch for Production-Agent Red-Teaming",
+      "url": "https://arxiv.org/abs/2607.11698v1",
+      "summary": "Production LLM agents such as Claude Code and Codex operate over untrusted content, files, commands, and workspace state, making safety failures directly actionable. Red-teaming must therefore keep pace with evolving models and tools. Exist",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b4cc683906ba54bfb2cfb3e7",
+      "cluster_id": "cluster_2432da25bc0ef3ac6d4b7c10",
+      "title": "Uncertainty-Aware Structure-Property Mapping of Spinodoid Metamaterials via Heteroscedastic Gaussian Process Regression",
+      "url": "https://arxiv.org/abs/2607.11209v1",
+      "summary": "Spinodoid metamaterials offer a broad, tunable design space for anisotropic mechanical properties, yet their structure-property relationships are commonly treated as representative mappings from cone-angle descriptors to single effective st",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b4e6e1df65c2b4469dd991c5",
+      "cluster_id": "cluster_f09aab4b4da2caba6a080f6e",
+      "title": "Agentic Skill Optimization over Lie Algebroids",
+      "url": "https://arxiv.org/abs/2607.11493v1",
+      "summary": "Agentic systems increasingly improve themselves by editing skills: prompts, rubrics, plans, tool contracts, examples, validators, and traces. Skill edits are not independent coordinates in a vector space: they are local repairs to structure",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b726a424c26a06d567adb3e4",
+      "cluster_id": "cluster_0951691420ece7a8d8d6e5ce",
+      "title": "Can LLMs Perform Deep Technical Comprehension of Computer Architecture Papers?",
+      "url": "https://arxiv.org/abs/2607.11859v1",
+      "summary": "Can large language models perform deep technical comprehension of computer architecture papers -- not summarization, but structured critique that names the core mechanism, surfaces buried assumptions, and connects a contribution beyond its。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -63,24 +362,25 @@
       },
       "source_group": "papers_models",
       "content_tags": [
-        "industry_news",
+        "model_release",
+        "research",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-07",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_d7fea4b11731b0d998807bc4",
-      "cluster_id": "cluster_c3840cefec530e76c3db3b91",
-      "title": "A Function-Space Dichotomy for Compositional Learning: Exponential Sub-Optimality of the Neural Tangent Kernel",
-      "url": "https://arxiv.org/abs/2607.06382v1",
-      "summary": "A persistent empirical observation is that trained neural networks outperform their neural tangent kernel (NTK) limit on tasks with compositional structure, yet a quantitative account of $\\textbf{when}$ and $\\textbf{by how much}$ has been l。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_b766bd2e42fa329d838e6ccf",
+      "cluster_id": "cluster_c3d2327c40d0cf97a8c8e7a1",
+      "title": "Faster AI, Uneven Frontier: Rapid Crossings, a Jagged Frontier, and the Repositioning of Human Judgment",
+      "url": "https://arxiv.org/abs/2607.12125v1",
+      "summary": "Between 2023 and 2026, frontier AI systems crossed documented human expert baselines on a growing set of bounded, well-specified, evaluable cognitive tasks, including graduate-level science questions, competition mathematics, software-engin",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -89,60 +389,508 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv stat.ML",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "industry_news",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-07",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_e016d3b6b62153133cbdcea9",
-      "cluster_id": "cluster_1a793ba9ea3010a9c0c14e1a",
-      "title": "nvidia/CWIP-1.0",
-      "url": "https://huggingface.co/nvidia/CWIP-1.0",
-      "summary": "nvidia/CWIP-1.0 0.3B • Updated about 3 hours ago •。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_b79053c243aa3df152864f50",
+      "cluster_id": "cluster_7de262e134e6841167d5f70f",
+      "title": "Efficient Online Proportional Sampling with Applications to Smoothed Online Learning",
+      "url": "https://arxiv.org/abs/2607.10963v1",
+      "summary": "We study the problem of efficient online proportional sampling from a high-dimensional domain under a $σ$-smoothed adversary, where the sampling distribution is induced by a dynamically evolving weight function defined over a sequence of pi",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "open_source",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-07",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/65df9200dc3292a8983e5017/Vs5FPVCH-VZBipV3qKTuy.png",
+      "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_ebfdf23371806d3d8e2261ce",
-      "cluster_id": "cluster_165f160dff724a948dcc55d5",
-      "title": "Danus: Orchestrating Mathematical Reasoning Agents with Fact-Graph Memory",
-      "url": "https://arxiv.org/abs/2607.06447v1",
-      "summary": "Recent LLM-based mathematical reasoning agents have begun to tackle research-level problems and, in several cases, have contributed to the resolution of open problems. However, scaling and orchestrating such agents effectively remains chall。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_b7a587159a1315c3eb311336",
+      "cluster_id": "cluster_c0fc9004f55bcf4b3bfcf8e9",
+      "title": "Adapting Evidential Neural Networks to Test-Time Neighbor Fusion Improves Molecular Property Prediction",
+      "url": "https://arxiv.org/abs/2607.11091v1",
+      "summary": "A trained molecular property model can be refined at test time by correcting each prediction with the measured labels of the most similar training molecules, a retraining-free procedure we call neighbor fusion; evidential neural networks ma",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b7ca26353c02f94915ebf0a1",
+      "cluster_id": "cluster_647b2c5483716cc6b8e0c91a",
+      "title": "Unitarization Schemes for High-Energy Elastic Scattering",
+      "url": "https://arxiv.org/abs/2607.11504v1",
+      "summary": "We examine key features of the eikonal and $U$-matrix unitarization schemes and apply both frameworks to investigate the high-energy behavior of the elastic scattering amplitude, considering input amplitudes whose asymptotic behavior is dri",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b9890eb100debec5f0d5085f",
+      "cluster_id": "cluster_bb5046d0e98a06609880a4c2",
+      "title": "Rethinking MCP Security: A Large-Scale Study of Runtime MCP Servers and Security Scanner Reliability",
+      "url": "https://arxiv.org/abs/2607.11086v1",
+      "summary": "The Model Context Protocol (MCP) has rapidly established itself as a standard interface for enabling LLM-based agents to interact with external tools and services. As MCP servers are increasingly entrusted with security-sensitive operations",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b9f1a82421a27c10b1627965",
+      "cluster_id": "cluster_9f2e2e6505cccd24df882a86",
+      "title": "WiFi-JEPA: Self-supervised Learning for WiFi-CSI 3D Human Pose Estimation",
+      "url": "https://arxiv.org/abs/2607.11064v1",
+      "summary": "WiFi Channel State Information (CSI) enables privacy-preserving human pose sensing in camera-denied environments, but existing WiFi-based pose estimators often fail under environment shifts and rely on costly camera-based annotation pipelin",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_ba3688fd4d71375d62de38d3",
+      "cluster_id": "cluster_87a191b0852bd52244cb5c85",
+      "title": "AutoMatBench: An Automatic Optimization Toolkit for the Acceleration of Material Properties Prediction Benchmarking",
+      "url": "https://arxiv.org/abs/2607.11526v1",
+      "summary": "Material property prediction (MPP) infers key properties from chemical composition and structure, accelerating the discovery and optimization of novel materials. In the realm of MPP, MatBench is a widely accepted benchmarking tool that defi",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_baceb12d1e20934efdee5316",
+      "cluster_id": "cluster_e8e6d67413217bb3ffdeb272",
+      "title": "TabPFN beyond Tabular Data: Calibration and Accuracy on Multimodal Embeddings",
+      "url": "https://arxiv.org/abs/2607.11007v1",
+      "summary": "Few-shot multimodal classification commonly attaches a lightweight head, such as $k$-nearest neighbors, logistic regression, or a linear SVM, to a frozen pretrained encoder. Although computationally efficient, these heads can produce poorly",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bb7fb8183eecb789224ce4f8",
+      "cluster_id": "cluster_df93a6aa13b298d64312328f",
+      "title": "ManiScope: LLM-Assisted Visual Analytics of Cryptocurrency Manipulation Risk",
+      "url": "https://arxiv.org/abs/2607.11451v1",
+      "summary": "Cryptocurrency markets are vulnerable to trade-based manipulation, such as wash trading, which can distort price signals and mislead investors. Prior research has mainly focused on detecting manipulation using fixed rules or labeled example",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bb810b1ba9edde09de13d5cf",
+      "cluster_id": "cluster_8c8d143a881defa77b7c9740",
+      "title": "Capture, Shield, or Neutralize: Engagement-Aware Pursuit-Evasion",
+      "url": "https://arxiv.org/abs/2607.10986v1",
+      "summary": "This paper introduces a hierarchical control architecture for multi-agent adversarial environments, decoupling strategic task planning from rigorous safety assurance. The system formulates pursuit-evasion as a zero-sum receding-horizon game",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bc09f70c18c37afb79355b88",
+      "cluster_id": "cluster_d5a82c157f6998f316e20462",
+      "title": "Destabilization of temperature-gradient-driven plasma turbulence by equilibrium $\\vec{E}\\times \\vec{B}$ flow shear",
+      "url": "https://arxiv.org/abs/2607.11784v1",
+      "summary": "Equilibrium sheared $\\vec{E}\\times \\vec{B}$ flow, a standard cure for plasma turbulence, can backfire. In gyrokinetic simulations of a newly identified regime, imposed shear comparable to the intrinsic zonal shear destroys the self-generate",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bc1e7ed4066ba39562098003",
+      "cluster_id": "cluster_cdcb79779720fc38632b4803",
+      "title": "Anatomy-Privileged Distillation with Token Routing for MRI-Based Prediction of Perineural Invasion",
+      "url": "https://arxiv.org/abs/2607.11987v1",
+      "summary": "Perineural invasion (PNI) is associated with poor postoperative outcomes in intrahepatic cholangiocarcinoma, but it is confirmed by surgical pathology. Existing preoperative imaging models often rely on radiologist-defined variables, contra",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bc52193d0b14224d93852485",
+      "cluster_id": "cluster_8a2eb1e11f8a35cfa8345ff0",
+      "title": "Galaxy mergers drive enhancements in ionization states",
+      "url": "https://arxiv.org/abs/2607.12024v1",
+      "summary": "Recent studies have suggested that galaxy mergers may help drive the escape of ionizing photons from galaxies. However, the ionization properties of merging galaxies have not yet been systematically studied across the full merger sequence i",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bd3738ff305c9577f980415a",
+      "cluster_id": "cluster_8f495d0817a357728d48fd7e",
+      "title": "Automated Textbook Auditing with Multi-Agent LLM Systems",
+      "url": "https://arxiv.org/abs/2607.11276v1",
+      "summary": "Ensuring the quality of educational materials requires more than standard proofreading: textbooks must be audited for factual accuracy, domain-specific technical correctness, and linguistic quality simultaneously -- a task that general-purp",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bd638396c14ce31b2af7ae23",
+      "cluster_id": "cluster_411eb215ec33f62267625346",
+      "title": "OpsMem: Dual-Memory Reasoning with Cross-Memory Resonance for Failure Diagnosis",
+      "url": "https://arxiv.org/abs/2607.11357v1",
+      "summary": "Failure diagnosis in modern software systems requires iterative evidence acquisition and hypothesis reasoning guided by operational experience. Existing LLM-based methods improve diagnosis through agentic reasoning or knowledge augmentation",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bde7d963c284a28e008dfee5",
+      "cluster_id": "cluster_b25228ea6069e83702e63e4e",
+      "title": "Beyond the Eye: Efficient Multimodal Reasoning via Self-Regulated Implicit Visual Tools",
+      "url": "https://arxiv.org/abs/2607.11106v1",
+      "summary": "Recent multimodal large language models (MLLMs) have made remarkable progress on fine-grained perception tasks under the \"Thinking with Images\" (TwI) paradigm by iteratively performing various visual tool operations. However, this paradigm",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_be3d884bb3a311025427c720",
+      "cluster_id": "cluster_dbcaa5eecfad36c2e2a39e3a",
+      "title": "ResearchQA: Benchmarking Citation-Grounded Question-Answering on Scientific Papers",
+      "url": "https://arxiv.org/abs/2607.11074v1",
+      "summary": "Large language models are increasingly used to assist scientific reading, but existing evaluation methods often fail to detect whether answers are supported by verifiable citations. We introduce ResearchQA, a benchmark of 6,211 single-paper",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_be649fa21052ef84d3316ec5",
+      "cluster_id": "cluster_a6f381c36f9931fc899493bf",
+      "title": "RCWT: Measuring Task-Budget Displacement from Coordination Content in LLM Calls",
+      "url": "https://arxiv.org/abs/2607.12216v1",
+      "summary": "Multi-agent and memory-augmented LLM systems often place coordination content, shared state, prior discussion, tool outputs, summaries, and role instructions, inside the same finite prompt used for the current task. This creates a practical。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -156,24 +904,175 @@
       },
       "source_group": "papers_models",
       "content_tags": [
-        "industry_news",
+        "model_release",
+        "research",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-07",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_ec507663e7ec701dda39d15d",
-      "cluster_id": "cluster_a61d4e5abbec7487aaf91831",
-      "title": "Delay-Aware Active Triangulation with Uncertainty-Driven Multi-Agent Reinforcement Learning for Counter-UAS",
-      "url": "https://arxiv.org/abs/2607.05957v1",
-      "summary": "Multi-agent active visual triangulation enables precise 3D localization of aerial targets by coordinating mobile observers with controllable cameras. However, existing methods assume instantaneous state feedback, ignoring cumulative latency。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_be65c7643bf1d282c243bd72",
+      "cluster_id": "cluster_f9c4043b3cce98175ddd39e8",
+      "title": "Need for Speed Sort: A Recursive Distribution-Based Sorting Algorithm",
+      "url": "https://arxiv.org/abs/2607.11850v1",
+      "summary": "We present Need for Speed Sort (NFS Sort), a recursive distribution-based sorting algorithm designed for numeric arrays. The algorithm partitions elements into equal-width value intervals, recursively refines dense buckets, and propagates a",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_bf67f4d9363cd83d7554e8b3",
+      "cluster_id": "cluster_f478d51faad299533fcf0044",
+      "title": "Technical Report on the CVPR 2026@AdvML Workshop Challenge",
+      "url": "https://arxiv.org/abs/2607.11560v1",
+      "summary": "Vision-language agents (VLAs) are increasingly used to interpret complex driving scenes and support safety-critical reasoning. This report presents the CVPR 2026@AdvML Workshop Challenge on adversarial multimodal attacks against autonomous-",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c097e9b22ee8725ae26c81de",
+      "cluster_id": "cluster_7826376e585aad49b9cf0607",
+      "title": "HCRMap: Pressure-Aware Hot-Expert Residency Mapping for 3.5D MoE Chiplet Inference",
+      "url": "https://arxiv.org/abs/2607.11586v1",
+      "summary": "Mixture-of-Experts (MoE) large language models (LLM) activate only a small number of experts during inference, but token routing introduces persistent expert hotness skew: a small set of hot experts continuously receives most tokens, while",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c0ea62d58b586c41a3c7dcf7",
+      "cluster_id": "cluster_de06af74f13bdc5957c024da",
+      "title": "Toward Trustworthy Autonomous Science: A Two-Year Community Roadmap",
+      "url": "https://arxiv.org/abs/2607.12113v1",
+      "summary": "One year ago, the AISLE roadmap argued that autonomous laboratories operated as isolated islands and proposed a grassroots network organized around five critical dimensions. The field has since moved faster than anticipated. Multi-agent sys",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c1bbd6239eacff3ac06d6abb",
+      "cluster_id": "cluster_917aa17ec01633379a0d078e",
+      "title": "Polynomial-Time Evaluation of Aardal-Lenstra Denumerants via Constant Term Method",
+      "url": "https://arxiv.org/abs/2607.11477v1",
+      "summary": "Aardal and Lenstra systematically studied hard knapsack problems of the form $a_1x_1+\\cdots+a_nx_n=b$, where $a_i=p_iM+r_iN$, $(M,N)$ is a coprime pair of positive integers, and the integers $|p_i|, |r_i|$ are small relative to $M$ and $N$.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c1ddb088936e80b80b79b9b0",
+      "cluster_id": "cluster_0e9e139ac989bed4a0c1fe9d",
+      "title": "When Local Monitors Miss Compositional Harm: Diagnosing Distributed Backdoors in Multi-Agent Systems",
+      "url": "https://arxiv.org/abs/2607.11751v1",
+      "summary": "As multi-agent, tool-using LLM systems are deployed, a common safety net is a runtime monitor that checks each message, tool call, or step on its own. We show this net has a fundamental hole. A distributed backdoor splits a harmful payload。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -187,24 +1086,25 @@
       },
       "source_group": "papers_models",
       "content_tags": [
-        "engineering",
+        "model_release",
+        "research",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-07",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_f49c46f0db57e2094641b638",
-      "cluster_id": "cluster_0bda013e1e90e680aaf6e33f",
-      "title": "ELSA3D: Elastic Semantic Anchoring for Unified 3D Understanding and Generation",
-      "url": "https://arxiv.org/abs/2607.06565v1",
-      "summary": "Unified 3D foundation models aspire to generate 3D assets and reason about them in language within a single backbone, but their text-3D interaction remains largely implicit. Existing methods concatenate text and 3D tokens into a flat sequen。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_c25bd7db0367d4068fa0ded5",
+      "cluster_id": "cluster_1bba3a92d6a62eabefbbbcb9",
+      "title": "Pore pressure change during nucleation and slip along experimental faults",
+      "url": "https://arxiv.org/abs/2607.11249v1",
+      "summary": "In order to clarify the main controlling factors influencing fluid pressure changes in fault zones during the seismic cycle, we conducted laboratory rock friction experiments where fluid pressure was monitored in situ during sequences of qu",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -213,300 +1113,15 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv cs.AI",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "industry_news",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-07",
-      "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7967f8855954855841205cba",
-      "cluster_id": "cluster_6d9b192d5d28b9912e4e1125",
-      "title": "Data and Code to reproduce results in paper \"A Systematic Literature Review on Graph-Based Models in Credit Risk Assessment\"",
-      "url": "https://doi.org/10.5281/zenodo.18864874",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "company_business",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2027-01-01",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": "future_relative_to_collection",
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7f99c5112a5524288359bab8",
-      "cluster_id": "cluster_b7c0987949b2efb2b1e1f331",
-      "title": "Confocal data of Icaroramus perisi, holotype, NIGP209038",
-      "url": "https://doi.org/10.5281/zenodo.20584334",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "creative_ai",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-20",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": "future_relative_to_collection",
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_9642d4dc1a62d99fe6b60cca",
-      "cluster_id": "cluster_c4c52d0530bed51a5bbdffbc",
-      "title": "Confocal data of Icaroramus perisi, holotype, NIGP209038",
-      "url": "https://doi.org/10.5281/zenodo.20584335",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "creative_ai",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-20",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": "future_relative_to_collection",
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_ac70bd7f36afdf2d937ec91d",
-      "cluster_id": "cluster_4f04c1d23130735e5afb49be",
-      "title": "Automated SOLID Violation Detection and Refactoring on Real Life Repositories",
-      "url": "https://doi.org/10.5281/zenodo.20111113",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-10-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": "future_relative_to_collection",
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_307e93a6d8c6b9652a560e0f",
-      "cluster_id": "cluster_c755c8d918ae5e910131f4ac",
-      "title": "Anthropic/BioMysteryBench-preview",
-      "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-preview",
-      "summary": "Anthropic/BioMysteryBench-preview Updated 16 days ago • 1.01k • 16。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Anthropic Hugging Face Organization",
-        "url": "https://huggingface.co/Anthropic"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_3581490b56e0661bce8c50d2",
-      "cluster_id": "cluster_6e85d2825161990ddc6d14f0",
-      "title": "NVIDIA Isaac Teleop and GR00T 1.7 Open VLA Model Available in LeRobot",
-      "url": "https://huggingface.co/blog/nvidia/nvidia-isaac-teleop-and-gr00t17-in-lerobot",
-      "summary": "NVIDIA Isaac Teleop and GR00T 1.7 Open VLA Model Available in LeRobot 16 days ago • 8。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_db08decb5f6b5d8f88daef75",
-      "cluster_id": "cluster_c5ad96cf2c00929676df2667",
-      "title": "Anthropic/BioMysteryBench-full",
-      "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-full",
-      "summary": "Anthropic/BioMysteryBench-full Updated 16 days ago • 2.42k • 35。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Anthropic Hugging Face Organization",
-        "url": "https://huggingface.co/Anthropic"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_18909572098a83162ab4bbcd",
-      "cluster_id": "cluster_67857fa4a65b948448f28cd7",
-      "title": "OMIDIENT: Multiomics Integration for Cancer by Dirichlet Auto-Encoder Networks",
-      "url": "https://www.nature.com/articles/s42003-026-10578-1",
-      "summary": "Nature Machine Learning published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "nature.com",
-        "home_url": "https://www.nature.com/"
-      },
-      "collected_via": {
-        "name": "Nature Machine Learning",
-        "url": "https://www.nature.com/subjects/machine-learning.rss"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_2aaa210b41becabeaab9a3c3",
-      "cluster_id": "cluster_9b7b2efc38247af27bdfabeb",
-      "title": "nvidia/STRATA-SCREAM-sdecadal",
-      "url": "https://huggingface.co/datasets/nvidia/STRATA-SCREAM-sdecadal",
-      "summary": "nvidia/STRATA-SCREAM-sdecadal Updated 8 days ago • 21k • 1。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
+      "event_date": "2026-07-13",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
@@ -515,760 +1130,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_4a7e96aed8c4e47fa096e878",
-      "cluster_id": "cluster_f8685a9430186b62d2f4c8d3",
-      "title": "Universities are relying on AI-detection software to catch cheating. How well do the programs work?",
-      "url": "https://www.nature.com/articles/d41586-026-01358-2",
-      "summary": "Nature Machine Learning published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "nature.com",
-        "home_url": "https://www.nature.com/"
-      },
-      "collected_via": {
-        "name": "Nature Machine Learning",
-        "url": "https://www.nature.com/subjects/machine-learning.rss"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_4d1f88b21a398f564498f63b",
-      "cluster_id": "cluster_c755c8d918ae5e910131f4ac",
-      "title": "Anthropic/BioMysteryBench-preview",
-      "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-preview",
-      "summary": "Anthropic/BioMysteryBench-preview Updated 8 days ago • 639 • 15。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Anthropic Hugging Face Organization",
-        "url": "https://huggingface.co/Anthropic"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4ea706e1df673e2bd30f0933",
-      "cluster_id": "cluster_6e85d2825161990ddc6d14f0",
-      "title": "NVIDIA Isaac Teleop and GR00T 1.7 Open VLA Model Available in LeRobot",
-      "url": "https://huggingface.co/blog/nvidia/nvidia-isaac-teleop-and-gr00t17-in-lerobot",
-      "summary": "NVIDIA Isaac Teleop and GR00T 1.7 Open VLA Model Available in LeRobot 8 days ago • 7。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_768f2362f10b5b2e36f4d3ee",
-      "cluster_id": "cluster_c5ad96cf2c00929676df2667",
-      "title": "Anthropic/BioMysteryBench-full",
-      "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-full",
-      "summary": "Anthropic/BioMysteryBench-full Updated 8 days ago • 1.91k • 33。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Anthropic Hugging Face Organization",
-        "url": "https://huggingface.co/Anthropic"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_94cacb617f8c06e6abe5b6fa",
-      "cluster_id": "cluster_bad337529f715de1de4bcad9",
-      "title": "A comprehensive benchmark of sequence-based subcellular localization predictors for human proteins",
-      "url": "https://www.nature.com/articles/s41592-026-03142-6",
-      "summary": "Nature Machine Learning published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "nature.com",
-        "home_url": "https://www.nature.com/"
-      },
-      "collected_via": {
-        "name": "Nature Machine Learning",
-        "url": "https://www.nature.com/subjects/machine-learning.rss"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_a76a7d18924ee1f1eea8d4fc",
-      "cluster_id": "cluster_5da71b9122acf05f7e01b8b2",
-      "title": "nvidia/STRATA-SCREAM-sdy1",
-      "url": "https://huggingface.co/datasets/nvidia/STRATA-SCREAM-sdy1",
-      "summary": "nvidia/STRATA-SCREAM-sdy1 Updated 8 days ago • 20.8k • 1。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_b744f45fa7a954df37a07dd6",
-      "cluster_id": "cluster_54bf9cab4330ec12b790c2ed",
-      "title": "nvidia/STRATA-SCREAM-sdy2",
-      "url": "https://huggingface.co/datasets/nvidia/STRATA-SCREAM-sdy2",
-      "summary": "nvidia/STRATA-SCREAM-sdy2 Updated 8 days ago • 19.3k • 1。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_dd5cc6338cf582921e705034",
-      "cluster_id": "cluster_67b0dd1a28f0a8e9cf9e5009",
-      "title": "nvidia/Arena-G1-Static-PickNPlace-Task",
-      "url": "https://huggingface.co/datasets/nvidia/Arena-G1-Static-PickNPlace-Task",
-      "summary": "nvidia/Arena-G1-Static-PickNPlace-Task Viewer • Updated 8 days ago • 35.1k • 456 • 1。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f0d9bd0ab8de9a3cc339ec2a",
-      "cluster_id": "cluster_256148f26696ccba059d041e",
-      "title": "Statescope: an integrative deconvolution framework for discovering cell states in tumors",
-      "url": "https://www.nature.com/articles/s41467-026-74997-8",
-      "summary": "Nature Machine Learning published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "nature.com",
-        "home_url": "https://www.nature.com/"
-      },
-      "collected_via": {
-        "name": "Nature Machine Learning",
-        "url": "https://www.nature.com/subjects/machine-learning.rss"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_001ff34dbc85eda8ae6ae0d6",
-      "cluster_id": "cluster_c5ad96cf2c00929676df2667",
-      "title": "BioMysteryBench 完整数据集",
-      "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-full",
-      "summary": "文章说明生物谜题基准完整版材料，围绕生物领域谜题任务、评分方式和复现实验展开。研究团队可关注样例覆盖、数据许可、专业审查流程、安全门槛、结果解释方式和专家复核要求，把它用于比较模型能力与风险响应。这些材料能支撑实验复现、结果解释和安全分级。",
-      "author": "Anthropic Hugging Face Organization",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Anthropic Hugging Face Organization",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Anthropic Hugging Face Organization",
-        "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-full"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1f7cf81f8edeb89d73714300",
-      "cluster_id": "cluster_c755c8d918ae5e910131f4ac",
-      "title": "BioMysteryBench 预览数据集",
-      "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-preview",
-      "summary": "文章说明生物谜题基准预览版的评测样例，围绕任务形式、问题结构和限制说明展开。安全、评测和生命科学团队可关注样例覆盖、专业审查、数据许可、评分方式、专家参与程度和模型风险测试的适用范围，再决定是否纳入内部材料。这些信息能支撑评测集筛选、专家复核和风险登记。",
-      "author": "Anthropic Hugging Face Organization",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Anthropic Hugging Face Organization",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Anthropic Hugging Face Organization",
-        "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-preview"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_2fa14b76f2047016cf7d5b36",
-      "cluster_id": "cluster_c5ad96cf2c00929676df2667",
-      "title": "Anthropic/BioMysteryBench-full",
-      "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-full",
-      "summary": "Anthropic/BioMysteryBench-full Updated 1 day ago。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Anthropic Hugging Face Organization",
-        "url": "https://huggingface.co/Anthropic"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_6fb48de087dc1b1b9531cfeb",
-      "cluster_id": "cluster_26454afb717c439c6e1588ad",
-      "title": "Vision as Unified Multimodal Generation",
-      "url": "https://huggingface.co/papers/2607.06560",
-      "summary": "Authors: Xiaoyang Han, Jianhua Li, Kewang Deng, Zukai Chen, Xuanke Shi. 1 comments. We formulate computer vision as unified multimodal generation, where heterogeneous visual tasks are expressed in the native text and image generation spaces。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Daily Papers",
-        "url": "https://huggingface.co/api/daily_papers?date=%7BYYYY-MM-DD%7D"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "creative_ai",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_9f256c239b6bd68dfffbab28",
-      "cluster_id": "cluster_c755c8d918ae5e910131f4ac",
-      "title": "Anthropic/BioMysteryBench-preview",
-      "url": "https://huggingface.co/datasets/Anthropic/BioMysteryBench-preview",
-      "summary": "Anthropic/BioMysteryBench-preview Updated 1 day ago。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Anthropic Hugging Face Organization",
-        "url": "https://huggingface.co/Anthropic"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_a0d8868f84629e6265f29803",
-      "cluster_id": "cluster_6e85d2825161990ddc6d14f0",
-      "title": "NVIDIA Isaac Teleop and GR00T 1.7 Open VLA Model Available in LeRobot",
-      "url": "https://huggingface.co/blog/nvidia/nvidia-isaac-teleop-and-gr00t17-in-lerobot",
-      "summary": "NVIDIA Isaac Teleop and GR00T 1.7 Open VLA Model Available in LeRobot about 22 hours ago • 2。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e174443620a387456fd3cc44",
-      "cluster_id": "cluster_6ae3f4a860565fd4c806cbf6",
-      "title": "AlayaWorld: Long-Horizon and Playable Video World Generation",
-      "url": "https://huggingface.co/papers/2607.06291",
-      "summary": "Authors: AlayaWorld Team, Kaipeng Zhang, Chuanhao Li, Yifan Zhan, Yongtao Ge. 0 comments. Game worlds have traditionally been built through labor-intensive production pipelines, making them costly to develop, difficult to customization, and。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Daily Papers",
-        "url": "https://huggingface.co/api/daily_papers?date=%7BYYYY-MM-DD%7D"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_fbd29711a140e4724add52a3",
-      "cluster_id": "cluster_7193888abc98f04e91e6be6f",
-      "title": "Nemotron-Labs-Diffusion: A Tri-Mode Language Model Unifying Autoregressive, Diffusion, and Self-Speculation Decoding",
-      "url": "https://huggingface.co/papers/2607.05722",
-      "summary": "Authors: Yonggan Fu, Lexington Whalen, Abhinav Garg, Chengyue Wu, Maksim Khadkevich. 0 comments. We introduce Nemotron-Labs-Diffusion, a tri-mode language model (LM) that unifies AR, diffusion, and self-speculation decoding within a single。This is an intermediary/self-media lead; trace it to a primary source before tr...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Daily Papers",
-        "url": "https://huggingface.co/api/daily_papers?date=%7BYYYY-MM-DD%7D"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-08T04:22:35.604Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_004085f213d75675ba14cb77",
-      "cluster_id": "cluster_19ee6af6e3d15e37dee57f6c",
-      "title": "meta-llama/Meta-Llama-3-8B",
-      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
-      "summary": "Meta Llama 3 8B 适合关注轻量文本生成和本地部署的团队，评估时要同时看许可证、微调成本和推理延迟。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1c41884f05e0683d6796e1b8",
-      "cluster_id": "cluster_3c44be280a6c9e15cc578623",
-      "title": "stabilityai/stable-diffusion-xl-base-1.0",
-      "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
-      "summary": "Stable Diffusion XL 仍是图像生成选型中的常见基线，适合对比画质、生态兼容性、推理资源和商用条款。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_21263b44ed30d6859b4044aa",
-      "cluster_id": "cluster_4d5e92d1978119e87a355706",
-      "title": "black-forest-labs/FLUX.1-dev",
-      "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
-      "summary": "FLUX.1-dev 面向高质量图像生成，适合关注开源图像模型的画质、提示词控制和授权边界。评估时应结合模型卡、推理成本和内容安全策略。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_246c12a33b865bb9207d2ed0",
-      "cluster_id": "cluster_ae0dfa37fddcbcfcc70e3477",
-      "title": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-      "url": "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
-      "summary": "Hugging Face ranked model entry; task=vllm; likes=4701; downloads=565312.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_251f27fba4a46babfb9bcbfa",
-      "cluster_id": "cluster_3ce63bb1cf5241de43c2cda1",
-      "title": "deepseek-ai/DeepSeek-R1",
-      "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
-      "summary": "DeepSeek-R1 面向推理和文本生成任务，适合关注开源推理模型的团队继续观察部署成本、长上下文表现和许可证约束。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_307fec1da48fb8778fda7a6e",
-      "cluster_id": "cluster_e0c304c992da09bd7d5695ea",
-      "title": "meta-llama/Llama-2-7b",
-      "url": "https://huggingface.co/meta-llama/Llama-2-7b",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4509; downloads=116.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_3d8c12f0918b94bf0277f152",
-      "cluster_id": "cluster_3f4b219a9faae72736440eae",
-      "title": "bigscience/bloom",
-      "url": "https://huggingface.co/bigscience/bloom",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=5022; downloads=5210.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4c98d9bd119016189d4ad8bc",
-      "cluster_id": "cluster_c2763071083984684d0139a5",
-      "title": "One Token to Fool LLM-as-a-Judge.",
-      "url": "https://arxiv.org/abs/2507.08794",
-      "summary": "|[One Token to Fool LLM-as-a-Judge.](https://arxiv.org/abs/2507.08794) |This paper reveals the fragility of LLM-based reward models in RL with Verifiable Rewards (RLVR), showing that superficial tokens like “Solution” or even a colon can tr。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_c29868fa3104da7262efc18e",
+      "cluster_id": "cluster_ca0a9f8f370e2ba29143fb5b",
+      "title": "Comparing Semantic Navigation in Humans and Large Language Models using Natural Language Processing",
+      "url": "https://arxiv.org/abs/2607.12195v1",
+      "summary": "Semantic memory retrieval can be conceptualized as navigation through conceptual space. We compared semantic search dynamics between humans and three large language models (GPT-4o, Gemini-2.5-Pro, Claude-Sonnet-4.5) using verbal fluency dat",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1277,215 +1143,28 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "ML News of the Week README",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "industry_news",
         "community_discussion"
       ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-06",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_4fc1122aea42a137e69b2c57",
-      "cluster_id": "cluster_f3aa7dbdb63c94657c178686",
-      "title": "CompVis/stable-diffusion-v1-4",
-      "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
-      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=7033; downloads=423949.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "creative_ai"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_52efcb9c943dcfb1edbf5191",
-      "cluster_id": "cluster_4d5e92d1978119e87a355706",
-      "title": "black-forest-labs/FLUX.1-dev",
-      "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
-      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=13497; downloads=875870.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "creative_ai"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_5e496a4ffa83c1e1a374966a",
-      "cluster_id": "cluster_4143cf1471f6ab870501b920",
-      "title": "black-forest-labs/FLUX.1-schnell",
-      "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
-      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=5283; downloads=241669.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "creative_ai"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_61c063b456aef4bfe0581e87",
-      "cluster_id": "cluster_3630fc138d59fae622043ea2",
-      "title": "openai/whisper-large-v3",
-      "url": "https://huggingface.co/openai/whisper-large-v3",
-      "summary": "Whisper large-v3 面向语音识别与转写，关注点在多语言表现、长音频稳定性、硬件消耗和数据处理合规。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/openai/whisper-large-v3"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_748817314e0dfccd2c9efa4f",
-      "cluster_id": "cluster_19ee6af6e3d15e37dee57f6c",
-      "title": "meta-llama/Meta-Llama-3-8B",
-      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=6586; downloads=1312629.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_76a3e0a973a501f791c5cfde",
-      "cluster_id": "cluster_f3aa7dbdb63c94657c178686",
-      "title": "CompVis/stable-diffusion-v1-4",
-      "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
-      "summary": "Stable Diffusion v1-4 代表较成熟的图像生成基线，适合用于兼容性测试、插件生态验证和历史项目维护。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7cd6635d3bd6b023c8b784d8",
-      "cluster_id": "cluster_82391dd078e3c4c2107b0dcd",
-      "title": "Gemini 2.5 Pro Capable of Winning Gold at IMO 2025.",
-      "url": "https://arxiv.org/abs/2507.15855",
-      "summary": "|[Gemini 2.5 Pro Capable of Winning Gold at IMO 2025.](https://arxiv.org/abs/2507.15855) |Solving IMO problems demands advanced reasoning and creativity, which most large language models find difficult. However, Google's Gemini 2.5 Pro succ。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_c39584e60993c1f04681c70d",
+      "cluster_id": "cluster_7ed805404bb138bb6e1077cf",
+      "title": "Production and Perception in LLMs: A Token Probability Approach",
+      "url": "https://arxiv.org/abs/2607.11703v1",
+      "summary": "The asymmetry between language production and perception has been well-documented in psycholinguistics. Whether large language models (LLMs) exhibit a functionally analogous distinction remains an open question, particularly given that LLMs",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1494,80 +1173,347 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "ML News of the Week README",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "industry_news",
         "community_discussion"
       ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-06",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_7f3af6a88e06648a41afd92e",
-      "cluster_id": "cluster_4fb7165743ee42f1a3de35ce",
-      "title": "openai/gpt-oss-20b",
-      "url": "https://huggingface.co/openai/gpt-oss-20b",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4766; downloads=6916383.",
+      "id": "occ_c3e4421bb85a05f64ffe32c7",
+      "cluster_id": "cluster_a4a74cee786445db7b2b83bb",
+      "title": "Beyond Test Presence: Assessing the Quality and Robustness of Agent-Generated Tests in Open-Source Projects",
+      "url": "https://arxiv.org/abs/2607.12068v1",
+      "summary": "The integration of AI-powered coding agents into Continuous Integration/Continuous Delivery (CI/CD) pipelines has fundamentally altered how software verification is conducted. While these agents successfully automate the test generation, cu",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "model_release",
-        "open_source"
+        "community_discussion"
       ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_837a092008633ef4126543e4",
-      "cluster_id": "cluster_5586d7de26a7825249b1e30e",
-      "title": "meta-llama/Meta-Llama-3-8B-Instruct",
-      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4677; downloads=1328169.",
+      "id": "occ_c3f7f8a4fee1c189aa769827",
+      "cluster_id": "cluster_85ddeb84c27422be401297bc",
+      "title": "A Novel Method to Evaluate Models on Unreliable, Noisy and Inconsistent Labels: Adaptive Resolution Label Aggregation (ARLA)",
+      "url": "https://arxiv.org/abs/2607.11214v1",
+      "summary": "Labels are critical for both training and evaluating deep learning segmentation models, but are often inconsistent, noisy, or ambiguous at class boundaries. Many approaches have been developed to support training models on weak labels, but",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "model_release",
-        "open_source"
+        "community_discussion"
       ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-06",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
       "published_at": null,
-      "collected_at": "2026-07-06T07:37:48.868Z",
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c55008276661dfc889eb181d",
+      "cluster_id": "cluster_a5f4e1938986f298ef767d67",
+      "title": "Predicting Program Comprehension with Foundation Models of Human Cognition",
+      "url": "https://arxiv.org/abs/2607.11372v2",
+      "summary": "Software engineering depends on the ability of developers to understand code, yet predicting how they do so remains an open challenge despite decades of research. Existing approaches rely either on simplified proxy measures that limit accur",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c5ca26f888e6f087d42fa547",
+      "cluster_id": "cluster_1c60a7612545b0ed509f366c",
+      "title": "StructAgent: Harness Long-horizon Digital Agents with Unified Causal Structure",
+      "url": "https://arxiv.org/abs/2607.11388v1",
+      "summary": "Recent advances in large language models (LLMs) and vision-language models (VLMs) have enabled increasingly capable digital agents for computer use. However, real-world tasks are often long-horizon and involve evolving contexts containing a",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c67158ef4588a9ef359ee331",
+      "cluster_id": "cluster_e695ba45ae9f6e0851bb7752",
+      "title": "Privacy-Aware Collaborative and Distributed Bayesian Optimization",
+      "url": "https://arxiv.org/abs/2607.11600v1",
+      "summary": "We propose a collaborative meta-learning framework for distributed Bayesian optimization matching centralized performance without raw-data exchange. We show gradient sharing leaks client observations, with leakage worsening as the search co",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c68696d25e95769c853ae983",
+      "cluster_id": "cluster_269378afdb5f78553a9f9d08",
+      "title": "NGM-RAG: Neural Graph Matching based Retrieval-Augmented Generation",
+      "url": "https://arxiv.org/abs/2607.11159v1",
+      "summary": "Retrieval-Augmented Generation (RAG) significantly enhances the ability of Large Language Models (LLMs) to provide accurate and contextually relevant answers by dynamically integrating external databases. However, traditional RAG methods ar",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c72ce5094e5f773f27ba562b",
+      "cluster_id": "cluster_256c4a449032bd5c3ac8fdd3",
+      "title": "Bringing Back Rule Induction to Fluid Intelligence Research? An Initial Validation of the ARC-AGI Benchmark in Humans",
+      "url": "https://arxiv.org/abs/2607.11263v2",
+      "summary": "Two competing perspectives on fluid intelligence (gf) measures propose that performance is primarily constrained either by working memory capacity or by the ability to induce novel relations. The first perspective is currently dominant in m",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c86e8b2da85d7ec13682325e",
+      "cluster_id": "cluster_1dd2a4eb479157b124ab55f4",
+      "title": "Feature-Space Guided Diffusion for Realistic Ultrasound Image Synthesis",
+      "url": "https://arxiv.org/abs/2607.11655v1",
+      "summary": "Conditional diffusion models can generate anatomically plausible medical ultrasound (US) images, but anatomical plausibility alone does not ensure realistic B-mode appearance. Most US pipelines adapt standard generative architectures and co",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c8c398a0ef325616341928fd",
+      "cluster_id": "cluster_ef50e920822553d9b1769af4",
+      "title": "MindReader: Using LLMs to Encourage Memorable and Secure Password Replacement",
+      "url": "https://arxiv.org/abs/2607.12148v1",
+      "summary": "We report on the design and evaluation of MindReader, a tool that helps a user replace her password when she is required to do so. Left to their own devices, users tend to replace their previous passwords with predictable variations of the",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c90c421da1bfd038efd2c9ac",
+      "cluster_id": "cluster_b495cee1591de70593c67919",
+      "title": "Analyzing Image Encoder Choices and Graph Homophily in GCN Frameworks for Breast Ultrasound Classification",
+      "url": "https://arxiv.org/abs/2607.12054v1",
+      "summary": "Breast ultrasound is widely used for screening, yet automated analysis remains challenging due to speckle noise, acquisition variability, and weak separation of benign and malignant cases in standard ultrasound imaging. Graph convolutional",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_ca8b19240e0bc2233967aa28",
+      "cluster_id": "cluster_a1e730e774392bfeeda4c6b0",
+      "title": "Agentic Routing: The Harness-Native Data Flywheel",
+      "url": "https://arxiv.org/abs/2607.11399v1",
+      "summary": "Large language model agents are increasingly executed not by a single model call, but by an execution harness that manages observation, context, control, action, state, and verification. At the same time, frontier and open models are becomi",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-13",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
