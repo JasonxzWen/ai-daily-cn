@@ -18,7 +18,7 @@ import {
   resumePublishPush,
   verifyPublishedUrl
 } from "./publish.js";
-import { canonicalReportUrl } from "./paths.js";
+import { canonicalReportDataUrl } from "./paths.js";
 import { assemblePrompt } from "./prompt.js";
 import {
   collectBuilderFallbacks,
@@ -1119,7 +1119,7 @@ try {
   } else if (command === "publish:verify-pages") {
     const args = parseArgs(argv);
     const reportDate = args.date || firstPositionalDate(argv);
-    const pagesUrl = args.url || (reportDate ? canonicalReportUrl(args["site-url"] || DEFAULT_SITE.siteUrl, reportDate) : "");
+    const pagesUrl = args.url || (reportDate ? canonicalReportDataUrl(args["site-url"] || DEFAULT_SITE.siteUrl, reportDate) : "");
     if (!pagesUrl) {
       throw new PublisherError("pages_url_required", "publish:verify-pages requires --url or --date.");
     }
