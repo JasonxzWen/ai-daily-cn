@@ -9055,11 +9055,14 @@ test("daily workflow contract validates one portable macOS dry-run automation", 
   assert(contract.external_automation_prompt.contains.includes("legacy_report.status"));
   assert.equal(contract.external_automation_prompt.target, "active_daily_run");
   assert(contract.external_automation_prompt.contains.includes("pnpm@11.10.0"));
+  assert(contract.external_automation_prompt.contains.includes("pnpm run browser:install"));
   assert(contract.external_automation_prompt.contains.includes("node scripts/run-daily-codex-pipeline.mjs"));
   assert(contract.external_automation_prompt.contains.includes("Asia/Shanghai"));
   assert(contract.external_automation_prompt.contains.includes("UTF-8"));
   assert(contract.external_automation_prompt.contains.includes("JSON.parse"));
   assert(contract.external_automation_prompt.not_contains.includes("--publish"));
+  assert.equal(contract.required_package_scripts["browser:install"], "playwright install chromium");
+  assert.equal(manifest.scripts["browser:install"], "playwright install chromium");
   assert.equal(manifest.scripts["daily:codex-dag:contract-run"], expectedDagContractRunCommand);
   assert(!contract.daily_runner || contract.daily_runner.script !== "daily:codex-dag:contract-run");
 
@@ -9073,7 +9076,7 @@ test("daily workflow contract validates one portable macOS dry-run automation", 
       'id = "mac-dry-run"',
       'kind = "cron"',
       'name = "AI Daily CN Mac dry run"',
-      'prompt = "在 Codex-owned worktree 中按 Asia/Shanghai 计算 YYYY-MM-DD；用进程内 HTTPS fetch origin/main，验证 clean worktree 与 bootstrap mainSha；用 npm exec --yes --package=pnpm@11.10.0 安装并提供项目局部 pnpm；只运行一次 node scripts/run-daily-codex-pipeline.mjs --date YYYY-MM-DD --execute；publish:dry-run:daily 是内部阶段，不要另行运行 status:self-check；以 UTF-8 读取 .tmp/run-summary-YYYY-MM-DD.json 并 JSON.parse，报告 next_action completed_stages automation_pipeline_mode source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_only generated_degraded generated_signals_only。"',
+      'prompt = "在 Codex-owned worktree 中按 Asia/Shanghai 计算 YYYY-MM-DD；用进程内 HTTPS fetch origin/main，验证 clean worktree 与 bootstrap mainSha；用 npm exec --yes --package=pnpm@11.10.0 安装并提供项目局部 pnpm；运行 pnpm run browser:install 安装锁定 Chromium；只运行一次 node scripts/run-daily-codex-pipeline.mjs --date YYYY-MM-DD --execute；publish:dry-run:daily 是内部阶段，不要另行运行 status:self-check；以 UTF-8 读取 .tmp/run-summary-YYYY-MM-DD.json 并 JSON.parse，报告 next_action completed_stages automation_pipeline_mode source_watch.production_status source_watch.connected source_watch.consumed occurrence_store_path signal_index_path signals.status legacy_report.status generated_only generated_degraded generated_signals_only。"',
       'status = "ACTIVE"',
       'cwds = ["/Users/example/repo/ai-daily-cn"]'
     ].join("\n"),
@@ -9094,10 +9097,14 @@ test("daily workflow contract validates one portable macOS dry-run automation", 
 function macDryRunAutomationToml(options = {}) {
   const id = options.id || "mac-dry-run";
   const encoding = options.includeUtf8 === false ? "按文本读取" : "以 UTF-8 读取";
+  const browserInstall = options.includeBrowserInstall === false
+    ? []
+    : ["运行 pnpm run browser:install 安装锁定 Chromium"];
   const prompt = [
     "在 Codex-owned worktree 中按 Asia/Shanghai 计算 YYYY-MM-DD",
     "用进程内 HTTPS fetch origin/main，验证 clean worktree 与 bootstrap mainSha",
     "用 npm exec --yes --package=pnpm@11.10.0 安装并提供项目局部 pnpm",
+    ...browserInstall,
     "只运行一次 node scripts/run-daily-codex-pipeline.mjs --date YYYY-MM-DD --execute",
     "publish:dry-run:daily 是内部阶段，不要另行运行 status:self-check",
     `${encoding} .tmp/run-summary-YYYY-MM-DD.json 并 JSON.parse`,
@@ -9197,6 +9204,26 @@ test("daily workflow contract rejects a dry-run prompt that reads the run summar
   assert.equal(result.ok, false);
   assert(
     result.failures.some((failure) => failure.includes('missing marker "UTF-8"')),
+    result.failures.join("\n")
+  );
+});
+
+test("daily workflow contract rejects an active dry-run automation without locked Chromium bootstrap", async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-workflow-prompt-browser-"));
+  const automationsDir = path.join(tmp, "automations");
+  const promptPath = path.join(automationsDir, "mac-dry-run", "automation.toml");
+  await fs.mkdir(path.dirname(promptPath), { recursive: true });
+  await fs.writeFile(promptPath, macDryRunAutomationToml({ includeBrowserInstall: false }), "utf8");
+
+  const result = await validateDailyWorkflowContract({
+    rootDir,
+    automationsDir,
+    automationPromptPath: promptPath
+  });
+
+  assert.equal(result.ok, false);
+  assert(
+    result.failures.some((failure) => failure.includes('missing marker "pnpm run browser:install"')),
     result.failures.join("\n")
   );
 });
