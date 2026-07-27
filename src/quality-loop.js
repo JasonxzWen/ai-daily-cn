@@ -120,7 +120,7 @@ const HOT_BLOG_COVERAGE_PATTERNS = [
   /(?:\u8bfb\u8005|\u56e2\u961f|\u5173\u6ce8|\u7559\u610f|\u6838\u5bf9|\u5224\u65ad|\u8bd5\u70b9|\u91c7\u8d2d|\u843d\u5730|\u98ce\u9669|\u5c40\u9650|\u8def\u7ebf\u56fe|\u53c2\u8003|\u5b89\u5168\u95e8)/u
 ];
 const PUBLIC_TEMPLATE_BODY_RE = /(?:^|\n)\s*(?:(?:==(?:keyword-[^|=]+|tag-[^|=]+)\|(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:==(?:影响|留意|变化|落点|判断点|为什么重要)==)|(?:影响|留意|变化|落点|判断点|为什么重要))[:：]|(?:它影响开发者和产品团队能否直接复用官方代码|看仓库活跃度、README、许可证、模型卡|它提示某个产品、平台或服务是否接近可试用|看是否有明确入口、价格、地区、权限|可用它判断是否值得跟进|可用它判断是否需要试用|不直接做 AI 的读者也可用它判断行业风向|这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补|这条内容涉及[^。；;\n]*读者可重点核对|目前最需要补看的信息是|可先关注适用对象、落地边界和后续变化|进入 GitHub Trending Top 10，可作为|优先核对 README|重点看 README、许可证、近期维护和可复现门槛|AI 工程工具方向的开源项目观察|读者可用它快速判断|先核对[^。；;\n]*再判断是否值得进入主体跟进|要核对|适合[^。；;\n]{0,24}(?:判断|试水)|记录了一条[^。；;\n]*(?:公开条目|公开动态)|详情需回到原文链接核对|说明 AI 产品、平台或工程变化|内容包括功能变化、使用场景、接入方式、限制条件和后续部署边界|仍需要回到原文核对入口|信号集中在|价值集中在|可用于比较[^。；;\n]*接口形态|可用于了解项目代码入口|同类方案差异)/u;
-const BUILDER_TEMPLATE_TRANSLATION_RE = /(?:这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补)/u;
+const BUILDER_TEMPLATE_TRANSLATION_RE = /(?:这是一条关于[^。；;\n]*Builder 讨论|读者可关注官方说明|直译待补|这条 Builder 动态关注[^。；;\n]*，更接近一条[^。；;\n]*观点；后续需要用官方文档、代码入口或可复现实验确认)/u;
 // Common English verbs/nouns/function words that, left untranslated (in any
 // case, incl. Title-Case like "Launch"), signal a short Builder card was not
 // actually translated. Product names (Claude, Vercel, GPT-6, OpenAI) are not here.
@@ -1311,14 +1311,42 @@ function collectCandidatePoolIssues(report, candidatePool, issues, context = {})
 
 function collectBuilderTranslationIssues(report, issues, aiReviewTasks) {
   const items = Array.isArray(report?.builder_observations) ? report.builder_observations : [];
+  const firstTranslationPathByText = new Map();
   items.forEach((item, index) => {
     const originalText = String(item?.original_text || "").trim();
     const translation = String(item?.translation || "").trim();
     const content = String(item?.content || "").trim();
+    const normalizedTranslation = translation.replace(/\s+/g, " ");
+    const translationPath = `builder_observations[${index}].translation`;
+    const duplicateOf = normalizedTranslation
+      ? firstTranslationPathByText.get(normalizedTranslation)
+      : "";
+    if (normalizedTranslation && !duplicateOf) {
+      firstTranslationPathByText.set(normalizedTranslation, translationPath);
+    } else if (duplicateOf) {
+      issues.push({
+        code: "builder_translation_duplicate",
+        severity: "error",
+        path: translationPath,
+        message: "Builder observations with different source posts must not reuse the same translation.",
+        repairable: true,
+        details: { duplicate_of: duplicateOf }
+      });
+      if (!aiReviewTasks.some((task) =>
+        task.kind === "builder_translation_rewrite" && task.path === translationPath
+      )) {
+        aiReviewTasks.push({
+          kind: "builder_translation_rewrite",
+          path: translationPath,
+          source_path: `builder_observations[${index}].original_text`,
+          instruction: "Translate this specific original_text into distinct, concrete Chinese. Preserve its own claim, names, numbers, uncertainty and tone; do not reuse another Builder card."
+        });
+      }
+    }
     if (originalText && translation) {
       aiReviewTasks.push({
         kind: "translation_fidelity",
-        path: `builder_observations[${index}].translation`,
+        path: translationPath,
         source_path: `builder_observations[${index}].original_text`,
         instruction: "Check whether translation preserves the full meaning of original_text without summarizing or adding facts."
       });
@@ -1453,8 +1481,8 @@ function buildChecklist(issues, aiReviewTasks, context = {}) {
     },
     {
       id: "builder_translation",
-      ok: !failedCodes.has("builder_translation_missing") && !failedCodes.has("builder_content_translation_mismatch") && !failedCodes.has("builder_translation_template") && !failedCodes.has("builder_translation_too_weak"),
-      status: failedCodes.has("builder_translation_missing") || failedCodes.has("builder_content_translation_mismatch") || failedCodes.has("builder_translation_template") || failedCodes.has("builder_translation_too_weak") ? "failed" : aiReviewTasks.some((task) => task.kind === "translation_fidelity") ? "ai_review_required" : "passed"
+      ok: !failedCodes.has("builder_translation_missing") && !failedCodes.has("builder_content_translation_mismatch") && !failedCodes.has("builder_translation_template") && !failedCodes.has("builder_translation_too_weak") && !failedCodes.has("builder_translation_duplicate"),
+      status: failedCodes.has("builder_translation_missing") || failedCodes.has("builder_content_translation_mismatch") || failedCodes.has("builder_translation_template") || failedCodes.has("builder_translation_too_weak") || failedCodes.has("builder_translation_duplicate") ? "failed" : aiReviewTasks.some((task) => task.kind === "translation_fidelity") ? "ai_review_required" : "passed"
     },
     {
       id: "content_density",

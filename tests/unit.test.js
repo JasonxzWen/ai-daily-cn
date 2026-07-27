@@ -11450,6 +11450,106 @@ test("daily runner applies first-pass authoring before the first quality review 
   assert.equal(result.summary.automation_first_pass_authoring.first_review_ok, true);
 });
 
+test("daily runner retains safe first-pass authoring edits when one edit is rejected", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-first-pass-partial-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const reportDate = "2026-07-27";
+  const reportPath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const authoredPath = path.join(cleanRoot, ".tmp", "daily-report.authored.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const acceptedTranslation = "作者认为智能体在无人值守运行前必须建立覆盖工具调用与失败恢复的评测闭环。";
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate,
+    publish: false,
+    prepareCleanWorktree: async () => ({
+      ok: true,
+      next_cwd: cleanRoot,
+      remote_main_sha: "6868686868686868686868686868686868686868"
+    }),
+    firstPassAuthoringContractAuthor: async ({ tasks }) => ({
+      schema_version: 1,
+      report_date: reportDate,
+      status: "ready",
+      edits: tasks.map((task) => ({
+        path: task.path,
+        value: task.path === "hot_blogs[0].summary"
+          ? "这条编辑因包含禁词而被确定性拒绝。"
+          : task.path === "builder_observations[0].translation"
+            ? acceptedTranslation
+            : "来源约束的首轮公开文案。",
+        reason: "source-grounded authoring",
+        evidence_path: null
+      }))
+    }),
+    runStage: async (stage) => {
+      if (stage.id === "report_draft") {
+        await fs.mkdir(path.dirname(reportPath), { recursive: true });
+        await fs.writeFile(reportPath, `${JSON.stringify({
+          report_date: reportDate,
+          stories: [],
+          main_items: [],
+          hot_blogs: [{
+            title: "智能体评测",
+            summary: "模板摘要。",
+            url: "https://example.com/blog"
+          }],
+          github_trending: [],
+          builder_observations: [{
+            original_text: "Agents need eval loops before unattended work.",
+            translation: "重复模板。",
+            content: "重复模板。",
+            url: "https://x.com/example/status/1"
+          }]
+        }, null, 2)}\n`, "utf8");
+        await fs.writeFile(candidatePoolPath, `${JSON.stringify({ report_date: reportDate, candidates: [] })}\n`, "utf8");
+      }
+      if (stage.id === "first_pass_authoring") {
+        const authored = JSON.parse(await fs.readFile(reportPath, "utf8"));
+        authored.builder_observations[0].translation = acceptedTranslation;
+        authored.builder_observations[0].content = acceptedTranslation;
+        await fs.writeFile(authoredPath, `${JSON.stringify(authored, null, 2)}\n`, "utf8");
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            path: authoredPath,
+            contract_applied: [{
+              index: 1,
+              path: "builder_observations[0].translation",
+              reason: "source-grounded authoring",
+              evidence_path: ""
+            }],
+            contract_rejected: [{
+              index: 0,
+              path: "hot_blogs[0].summary",
+              code: "public_copy_banned_term",
+              message: "AI repair value still contains a banned public copy term."
+            }],
+            review: { ok: false, ai_review_tasks: [{ kind: "hot_blog_editorial_rewrite", path: "hot_blogs[0].summary" }] }
+          }
+        };
+      }
+      if (stage.id === "quality_review") {
+        assert.equal(stage.command.args[2], ".tmp/daily-report.authored.json");
+        const reviewed = JSON.parse(await fs.readFile(authoredPath, "utf8"));
+        assert.equal(reviewed.builder_observations[0].translation, acceptedTranslation);
+        return { ok: true, output: { review: { ok: true, ai_review_tasks: [] } } };
+      }
+      if (stage.id === "report_write") {
+        assert(stage.command.args.includes(".tmp/daily-report.authored.json"));
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  assert.equal(result.summary.current_report_path, ".tmp/daily-report.authored.json");
+  assert.equal(result.summary.automation_first_pass_authoring.status, "partial");
+  assert.equal(result.summary.automation_first_pass_authoring.applied_count, 1);
+  assert.equal(result.summary.automation_first_pass_authoring.rejected_count, 1);
+});
+
 test("daily runner falls back to formal review without applying an incomplete first-pass contract", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-first-pass-fallback-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
@@ -13218,6 +13318,35 @@ test("quality review rejects templated builder translations", async () => {
   assert(templateIssues.some((issue) => issue.path === "builder_observations[0].translation"));
   assert(templateIssues.some((issue) => issue.path === "builder_observations[0].content"));
   assert(review.ai_review_tasks.some((task) => task.kind === "builder_translation_rewrite"));
+  assert.equal(review.checklist.find((item) => item.id === "builder_translation").status, "failed");
+});
+
+test("quality review rejects duplicate builder translations and routes later copies to repair", async () => {
+  const report = JSON.parse(await readFixture("reports/good/structured-report.json"));
+  const translation = "作者认为智能体在无人值守运行前必须建立覆盖工具调用与失败恢复的评测闭环。";
+  report.builder_observations = Array.from({ length: 3 }, (_, index) => ({
+    author: `Builder ${index + 1}`,
+    original_text: `Distinct original Builder post ${index + 1}.`,
+    translation,
+    content: translation,
+    url: `https://x.com/example/status/${index + 1}`
+  }));
+  report.self_check.builder_observations = report.builder_observations.length;
+
+  const review = reviewReportQuality(report);
+  const duplicateIssues = review.issues.filter((issue) => issue.code === "builder_translation_duplicate");
+
+  assert.equal(review.ok, false);
+  assert.deepEqual(duplicateIssues.map((issue) => issue.path), [
+    "builder_observations[1].translation",
+    "builder_observations[2].translation"
+  ]);
+  assert(duplicateIssues.every((issue) => issue.repairable === true));
+  assert(duplicateIssues.every((issue) => issue.details.duplicate_of === "builder_observations[0].translation"));
+  assert(review.ai_review_tasks.some((task) =>
+    task.kind === "builder_translation_rewrite" &&
+    task.path === "builder_observations[1].translation"
+  ));
   assert.equal(review.checklist.find((item) => item.id === "builder_translation").status, "failed");
 });
 
