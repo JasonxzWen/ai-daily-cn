@@ -4,6 +4,10 @@ title: AI Daily CN 知识更新日志
 ---
 # AI Daily CN 知识更新日志
 
+## 2026-07-27
+
+- 记录 AI repair contract 部分应用后的安全续接边界：保留已应用编辑，在剩余公开文案问题严格减少时生成下一轮 contract，并允许外层 summary 从明确的嵌套 legacy handoff 恢复。
+
 ## 2026-07-24
 
 - 记录发布器通过单次 Git commit 参数提供项目发布身份、允许显式环境变量覆盖且不写持久 Git 配置的边界。
@@ -36,3 +40,4 @@ title: AI Daily CN 知识更新日志
 - [信号池原子编排与验证](../src/signal-pool.js)
 - [站点与发布身份配置](../src/config.js)
 - [Git 发布实现](../src/publish.js)
+- [日更 runner](../src/daily-runner.js)

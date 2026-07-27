@@ -2426,7 +2426,7 @@ async function classifyAiRepairReviewFailure(stageResult, {
   const output = stageResult.output || {};
   const contractRejected = Array.isArray(output.contract_rejected) ? output.contract_rejected : null;
   const contractApplied = Array.isArray(output.contract_applied) ? output.contract_applied : null;
-  if (!contractRejected || contractRejected.length > 0 || !contractApplied || contractApplied.length === 0) {
+  if (!contractRejected || !contractApplied || contractApplied.length === 0) {
     return null;
   }
 
