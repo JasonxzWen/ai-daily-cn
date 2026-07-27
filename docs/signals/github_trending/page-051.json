@@ -2,7 +2,7 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-27T05:50:05.082Z",
+  "generated_at": "2026-07-27T07:26:46.947Z",
   "group": {
     "id": "github_trending",
     "label": "GitHub 趋势"
@@ -10,9 +10,69 @@
   "page": 51,
   "page_count": 133,
   "page_size": 50,
-  "total_count": 6634,
+  "total_count": 6636,
   "next_url": "signals/github_trending/page-052.json",
   "items": [
+    {
+      "id": "occ_7bb0b6bfa7252286f352ed9d",
+      "cluster_id": "cluster_810460beb79df931806861c1",
+      "title": "SWE-bench Pro",
+      "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
+      "summary": "Scale Labs 公开榜单显示，SWE-bench Pro Public Dataset 当前第一是 SWE-Agent + claude-4-5-Sonnet（anthropic，Resolve Rate 43.72%）。 前三名为 SWE-Agent + claude-4-5-Sonnet 43.72%、SWE-Agent + claude-4-Sonnet 42.70%、SWE-Agent + claude-4-5-haiku 39.45%，Top 10 供应商分布为 anthropic 3、openai 2、moonshot 1、unknown 1。 这个榜单适合观察 coding agent 在长周期真实工程任务上的相对表现，但生产选型仍要结合 scaffold、成本上限、置信区间和团队自有仓库…",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "scaleapi.github.io",
+        "home_url": "https://scaleapi.github.io/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Scale Labs SWE-Bench Pro",
+        "url": "https://scaleapi.github.io/SWE-bench_Pro-os/"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_7dc91a60b89847ecd8e3dc9b",
+      "cluster_id": "cluster_a368faa9ac2a6f5c8ae04374",
+      "title": "Stirling-Tools/Stirling-PDF",
+      "url": "https://github.com/Stirling-Tools/Stirling-PDF",
+      "summary": "Stirling-PDF 是自托管 PDF 工具箱，覆盖编辑、转换、合并、OCR 等文档处理任务；对 AI 工作流的价值在于把文档拆分、压缩、转换、预处理和权限隔离留在本地环境，适合评估批处理接口和部署维护成本。如果接入 agent pipeline，应先明确文件存储、任务队列和敏感文档删除策略。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · GitHub Trending Java weekly",
+        "url": "https://github.com/Stirling-Tools/Stirling-PDF"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
     {
       "id": "occ_7e7f13bfc89df06ff9764ef2",
       "cluster_id": "cluster_0a8884baa5f55aa6602b2f44",
@@ -1443,66 +1503,6 @@
       "collected_via": {
         "name": "GitHub Trending weekly",
         "url": "https://github.com/trending?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-02",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f6e0be132ec1f957b4d130e8",
-      "cluster_id": "cluster_c5d3fe2948643ba051e628fb",
-      "title": "google-labs-code/design.md",
-      "url": "https://github.com/google-labs-code/design.md",
-      "summary": "design.md 是 Google Labs Code 给 coding agents 使用的设计契约规范，把视觉识别、交互约束、品牌语气和验收标准写成仓库内文档；它对本项目的启发是把前端风格、内容边界和截图验收沉到版本化设计文件，而不是留在对话记忆里。后续应把它转化为本仓库 DESIGN.md 的必检项和页面验收用例。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · GitHub Trending weekly",
-        "url": "https://github.com/google-labs-code/design.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-02",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f8c72bbb83ffb3cad431ea1d",
-      "cluster_id": "cluster_cb2c51bc30a37065c6d71c04",
-      "title": "every-app/open-seo",
-      "url": "https://github.com/every-app/open-seo",
-      "summary": "every-app/open-seo appeared on GitHub Trending TypeScript weekly with 1,630 stars this week. 近 7 天本地记录曾在 2026-06-28、2026-06-29、2026-06-30、2026-07-01 出现；今日需要复核它是否仍在 GitHub Trending 前列、是否有 release/commit 或 star velocity。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending TypeScript weekly",
-        "url": "https://github.com/trending/typescript?since=weekly"
       },
       "source_group": "github_trending",
       "content_tags": [

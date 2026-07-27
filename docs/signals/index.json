@@ -2,15 +2,15 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_index",
-  "generated_at": "2026-07-27T05:50:05.082Z",
-  "total_count": 58266,
-  "recent_count": 1906,
+  "generated_at": "2026-07-27T07:26:46.947Z",
+  "total_count": 59845,
+  "recent_count": 2032,
   "recent_window_hours": 48,
   "page_size": 50,
   "coverage": {
-    "input_record_count": 59579,
-    "occurrence_count": 58266,
-    "coalesced_record_count": 1313,
+    "input_record_count": 61161,
+    "occurrence_count": 59845,
+    "coalesced_record_count": 1316,
     "normalization_error_count": 0
   },
   "groups": [
@@ -267,11 +267,76 @@
     {
       "id": "github_trending",
       "label": "GitHub 趋势",
-      "count": 6634,
-      "recent_count": 429,
+      "count": 6636,
+      "recent_count": 431,
       "page_count": 133,
       "first_page_url": "signals/github_trending/page-001.json",
       "preview": [
+        {
+          "id": "occ_58475ab2942a4f220044867c",
+          "cluster_id": "cluster_dc120243d15a4582e7610884",
+          "title": "chore: update feeds [skip ci]",
+          "url": "https://github.com/zarazhangrui/follow-builders/commit/29efce360dea6cc54f3826ba89a2608eba2212fa",
+          "summary": "chore: update feeds [skip ci]。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "github.com",
+            "home_url": "https://github.com/"
+          },
+          "collected_via": {
+            "name": "follow-builders GitHub commits",
+            "url": "https://github.com/zarazhangrui/follow-builders/commits/main.atom"
+          },
+          "source_group": "github_trending",
+          "content_tags": [
+            "open_source",
+            "industry_news",
+            "analysis_opinion"
+          ],
+          "credibility_tag": "monitoring_lead",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_70eb0db2a7adb7d34e486b93",
+          "cluster_id": "cluster_96d85ce65b8ca109c91664c4",
+          "title": "b10144",
+          "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b10144",
+          "summary": "server + ui: fix stream routes for model names containing a slash ( #26137 ) server + ui: refactor resumable stream routes to query string conv_id The conversation id can embed a model name containing slashes (ggml-org/...) in router mode,",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "github.com",
+            "home_url": "https://github.com/"
+          },
+          "collected_via": {
+            "name": "ggml-org/llama.cpp Releases",
+            "url": "https://github.com/ggml-org/llama.cpp/releases.atom"
+          },
+          "source_group": "github_trending",
+          "content_tags": [
+            "model_release",
+            "open_source",
+            "engineering",
+            "industry_news"
+          ],
+          "credibility_tag": "primary_material",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
         {
           "id": "occ_7e56767f22fba1d0a71e0be9",
           "cluster_id": "cluster_b811cc97eff4aae9d6caa89b",
@@ -460,187 +525,161 @@
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
-        },
-        {
-          "id": "occ_015a25feaba5efc7ce70b834",
-          "cluster_id": "cluster_f3a7b176543a423f7bd9b67a",
-          "title": "permissionlesstech/bitchat",
-          "url": "https://github.com/permissionlesstech/bitchat",
-          "summary": "permissionlesstech/bitchat appeared on GitHub Trending daily with 1,166 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "github.com",
-            "home_url": "https://github.com/"
-          },
-          "collected_via": {
-            "name": "GitHub Trending daily",
-            "url": "https://github.com/trending?since=daily"
-          },
-          "source_group": "github_trending",
-          "content_tags": [
-            "open_source"
-          ],
-          "credibility_tag": "pending_review",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_02c65fd457e82e1c7b521b01",
-          "cluster_id": "cluster_89a3d11efaad1f13014c03a5",
-          "title": "AI-RSS",
-          "url": "https://github.com/wolfitem/AI-RSS",
-          "summary": "- **[AI-RSS](https://github.com/wolfitem/AI-RSS)** ⭐⭐⭐ - AI 增强的 RSS 阅读体验。Awesome AI News latest report listed this entry; use it as a discovery lead and verify with the original source before factual inclusion. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "github.com",
-            "home_url": "https://github.com/"
-          },
-          "collected_via": {
-            "name": "Awesome AI News",
-            "url": "https://raw.githubusercontent.com/taielab/awesome-ai-news/main/README.md"
-          },
-          "source_group": "github_trending",
-          "content_tags": [
-            "open_source",
-            "industry_news"
-          ],
-          "credibility_tag": "monitoring_lead",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
         }
       ]
     },
     {
       "id": "community_discussions",
       "label": "社区讨论",
-      "count": 6270,
-      "recent_count": 439,
-      "page_count": 126,
+      "count": 6317,
+      "recent_count": 482,
+      "page_count": 127,
       "first_page_url": "signals/community_discussions/page-001.json",
       "preview": [
         {
-          "id": "occ_071b97e5e292d8b022ea508d",
-          "cluster_id": "cluster_50d75c63d9cba3e823ff7b73",
-          "title": "Antares: Highly Efficient Open Weight AI Models for Vulnerability Localization",
-          "url": "https://blogs.cisco.com/ai/introducing-antares-the-most-efficient-open-weight-ai-models-for-vulnerability-localization",
-          "summary": "Article URL: https://blogs.cisco.com/ai/introducing-antares-the-most-efficient-open-weight-ai-models-for-vulnerability-localization Comments URL: https://news.ycombinator.com/item?id=49065410 Points: 1 # Comments: 0。Treat this as a community lead unless it is backed by a primary source.",
+          "id": "occ_00f507c3a23ad2e0b203a2f5",
+          "cluster_id": "cluster_4f1db3237bccd96ceb57a6be",
+          "title": "Comms",
+          "url": "https://www.producthunt.com/products/comms-ai-agents-inside-imessage",
+          "summary": "Launch iMessage agents in seconds Discussion | Link",
           "author": null,
           "handle": null,
           "original_text": null,
           "publisher": {
-            "name": "blogs.cisco.com",
-            "home_url": "https://blogs.cisco.com/"
+            "name": "producthunt.com",
+            "home_url": "https://www.producthunt.com/"
           },
           "collected_via": {
-            "name": "Hacker News AI newest",
-            "url": "https://hnrss.org/newest?q=AI"
-          },
-          "source_group": "community_discussions",
-          "content_tags": [
-            "industry_news",
-            "community_discussion"
-          ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_17c3708017bc44e8f59cbd67",
-          "cluster_id": "cluster_08fb7576d14ed4a9270ecb2d",
-          "title": "Show HN: ASL V6 – Open-source AST red-teaming engine for Python AI agents",
-          "url": "https://github.com/sivaadityacoder/asl-v6",
-          "summary": "Hacker News Show Stories API published this intermediary lead entry. Treat this as a community lead unless it is backed by a primary source.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "github.com",
-            "home_url": "https://github.com/"
-          },
-          "collected_via": {
-            "name": "Hacker News Show Stories API",
-            "url": "https://hacker-news.firebaseio.com/v0/showstories.json"
+            "name": "Product Hunt Developer Tools Feed",
+            "url": "https://www.producthunt.com/feed?category=developer-tools"
           },
           "source_group": "community_discussions",
           "content_tags": [
             "product_update",
+            "open_source",
             "engineering",
-            "industry_news",
             "community_discussion"
           ],
           "credibility_tag": "community_lead",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_1c4478fba272ca9324eb5074",
-          "cluster_id": "cluster_8c458371616162d81fe34eb4",
-          "title": "Show HN: Watch random code typed out on an MS-DOS IDE",
-          "url": "https://hackerman.specr.net/",
-          "summary": "As a software dev, I really enjoy having live coding videos playing in the background while I work. But it's surprisingly difficult to find hour+ long videos of coding without commentary on Youtube. What I really wanted was an infinite codi。Treat this as a community lead unless it is backed by a primary source.",
+          "id": "occ_031739102abee57f3ddb3300",
+          "cluster_id": "cluster_051f34b9aae910454be245f3",
+          "title": "Grok 4.5",
+          "url": "https://www.producthunt.com/products/grok",
+          "summary": "SpaceXAI's model for coding, agentic tasks & knowledge work Discussion | Link",
           "author": null,
           "handle": null,
           "original_text": null,
           "publisher": {
-            "name": "hackerman.specr.net",
-            "home_url": "https://hackerman.specr.net/"
+            "name": "producthunt.com",
+            "home_url": "https://www.producthunt.com/"
           },
           "collected_via": {
-            "name": "Hacker News Show Stories API",
-            "url": "https://hacker-news.firebaseio.com/v0/showstories.json"
+            "name": "Product Hunt Trending Feed",
+            "url": "https://www.producthunt.com/feed"
           },
           "source_group": "community_discussions",
           "content_tags": [
             "product_update",
-            "engineering",
+            "open_source",
             "industry_news",
             "community_discussion"
           ],
           "credibility_tag": "community_lead",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_3463ebcd2c12dafdfdf9d175",
-          "cluster_id": "cluster_9f7819d7fc828fb56d338cbf",
-          "title": "'Skynet Day' is now shorthand for OpenAI's agent going rogue",
-          "url": "https://fortune.com/2026/07/26/james-cameron-terminator-skynet-day-openai-ai-agent-hack-hugging-face/",
+          "id": "occ_06415e86a4548e09fd51a28c",
+          "cluster_id": "cluster_69ed2a112b9c0a66c0510ac3",
+          "title": "iMessage Hermes on a Raspberry Pi",
+          "url": "https://www.producthunt.com/products/imessage-hermes-on-a-raspberry-pi",
+          "summary": "An always-on AI agent that lives in your home Discussion | Link",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "producthunt.com",
+            "home_url": "https://www.producthunt.com/"
+          },
+          "collected_via": {
+            "name": "Product Hunt Trending Feed",
+            "url": "https://www.producthunt.com/feed"
+          },
+          "source_group": "community_discussions",
+          "content_tags": [
+            "product_update",
+            "open_source",
+            "industry_news",
+            "community_discussion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_078a8b3da05945bb224bd219",
+          "cluster_id": "cluster_eb3e65dcae271fb5cbacc218",
+          "title": "superfile",
+          "url": "https://www.producthunt.com/products/superfile",
+          "summary": "A modern, visual file manager for the terminal Discussion | Link",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "producthunt.com",
+            "home_url": "https://www.producthunt.com/"
+          },
+          "collected_via": {
+            "name": "Product Hunt Trending Feed",
+            "url": "https://www.producthunt.com/feed"
+          },
+          "source_group": "community_discussions",
+          "content_tags": [
+            "product_update",
+            "open_source",
+            "industry_news",
+            "community_discussion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_089c2b1d11368cfb7e1d9953",
+          "cluster_id": "cluster_2a3ec95b8415b02d573ad52e",
+          "title": "The old-school way of keeping the summer heat out of your home",
+          "url": "https://monocle.com/design/architecture/keeping-your-home-cool-without-air-conditioning/",
           "summary": "Hacker News Topstories API published this intermediary lead entry. Treat this as a community lead unless it is backed by a primary source.",
           "author": null,
           "handle": null,
           "original_text": null,
           "publisher": {
-            "name": "fortune.com",
-            "home_url": "https://fortune.com/"
+            "name": "monocle.com",
+            "home_url": "https://monocle.com/"
           },
           "collected_via": {
             "name": "Hacker News Topstories API",
@@ -655,133 +694,106 @@
           "credibility_tag": "community_lead",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_6017cd304b1f2f58d9dd3772",
-          "cluster_id": "cluster_b66dd0d4d57e4be786cd0210",
-          "title": "Sand battery: Finland's answer to a renewable energy headache",
-          "url": "https://www.cnbc.com/2026/07/25/finland-sand-battery-renewable-energy-storage.html",
-          "summary": "Hacker News Topstories API published this intermediary lead entry. Treat this as a community lead unless it is backed by a primary source.",
+          "id": "occ_140eb80fa1c3c9414b2bcef4",
+          "cluster_id": "cluster_4f1db3237bccd96ceb57a6be",
+          "title": "Comms",
+          "url": "https://www.producthunt.com/products/comms-ai-agents-inside-imessage",
+          "summary": "Launch iMessage agents in seconds Discussion | Link",
           "author": null,
           "handle": null,
           "original_text": null,
           "publisher": {
-            "name": "cnbc.com",
-            "home_url": "https://www.cnbc.com/"
+            "name": "producthunt.com",
+            "home_url": "https://www.producthunt.com/"
           },
           "collected_via": {
-            "name": "Hacker News Topstories API",
-            "url": "https://hacker-news.firebaseio.com/v0/topstories.json"
+            "name": "Product Hunt Trending Feed",
+            "url": "https://www.producthunt.com/feed"
           },
           "source_group": "community_discussions",
           "content_tags": [
-            "engineering",
+            "product_update",
+            "open_source",
             "industry_news",
             "community_discussion"
           ],
           "credibility_tag": "community_lead",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_7609726227ccce5200b33d75",
-          "cluster_id": "cluster_25ddc66c0a283be13c9e4336",
-          "title": "What breaks in production AI workflows?",
-          "url": "https://www.indiehackers.com/post/weve-reproduced-30-real-ai-runtime-failures-over-the-past-week-here-s-the-pattern-we-keep-seeing-4570fe4242",
-          "summary": "Article URL: https://www.indiehackers.com/post/weve-reproduced-30-real-ai-runtime-failures-over-the-past-week-here-s-the-pattern-we-keep-seeing-4570fe4242 Comments URL: https://news.ycombinator.com/item?id=49064805 Points: 2 # Comments: 0。Treat this as a community lead unless it is backed by a primary source.",
+          "id": "occ_168beb125da010c3c0143e45",
+          "cluster_id": "cluster_2efdac82ba571ea59be4e257",
+          "title": "FindDiskKiller",
+          "url": "https://www.producthunt.com/products/finddiskkiller",
+          "summary": "See which apps are hammering your Mac's disk Discussion | Link",
           "author": null,
           "handle": null,
           "original_text": null,
           "publisher": {
-            "name": "indiehackers.com",
-            "home_url": "https://www.indiehackers.com/"
+            "name": "producthunt.com",
+            "home_url": "https://www.producthunt.com/"
           },
           "collected_via": {
-            "name": "Hacker News AI newest",
-            "url": "https://hnrss.org/newest?q=AI"
+            "name": "Product Hunt Trending Feed",
+            "url": "https://www.producthunt.com/feed"
           },
           "source_group": "community_discussions",
           "content_tags": [
+            "product_update",
+            "open_source",
             "industry_news",
             "community_discussion"
           ],
           "credibility_tag": "community_lead",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_972f8a0b05cfcb126f7a6bd2",
-          "cluster_id": "cluster_5b8bec0ea06beac11697c1a3",
-          "title": "Foxconn drops VMware, adopts hyperconverged upstart Arcrfra",
-          "url": "https://www.theregister.com/virtualization/2026/07/27/foxconn-drops-vmware-adopts-hyperconverged-upstart-arcrfra-for-workloads-including-ai/5278684",
-          "summary": "Hacker News Topstories API published this intermediary lead entry. Treat this as a community lead unless it is backed by a primary source.",
+          "id": "occ_2819f4686db21fab0bc22846",
+          "cluster_id": "cluster_bc806beb4ed2b71fff445a1f",
+          "title": "Repaint Socials",
+          "url": "https://www.producthunt.com/products/repaint-ai-website-builder",
+          "summary": "Build a website from Google Business, Instagram, or Facebook Discussion | Link",
           "author": null,
           "handle": null,
           "original_text": null,
           "publisher": {
-            "name": "theregister.com",
-            "home_url": "https://www.theregister.com/"
+            "name": "producthunt.com",
+            "home_url": "https://www.producthunt.com/"
           },
           "collected_via": {
-            "name": "Hacker News Topstories API",
-            "url": "https://hacker-news.firebaseio.com/v0/topstories.json"
+            "name": "Product Hunt Trending Feed",
+            "url": "https://www.producthunt.com/feed"
           },
           "source_group": "community_discussions",
           "content_tags": [
-            "engineering",
+            "product_update",
+            "open_source",
             "industry_news",
             "community_discussion"
           ],
           "credibility_tag": "community_lead",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_bd489d8cc8da74563bade950",
-          "cluster_id": "cluster_13092d1af7b308725ed5c61f",
-          "title": "Show HN: Rainslice – AI Employees for Home Services Businesses",
-          "url": "https://rainslice.ai/",
-          "summary": "Hey friends, Introducing Rainslice - a suite of AI employees that run and grow your home services business. I'd like to introduce you to your first AI employee, Pamela. Pamela has a realistic voice and picks up the phone during after-hours。Treat this as a community lead unless it is backed by a primary source.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "rainslice.ai",
-            "home_url": "https://rainslice.ai/"
-          },
-          "collected_via": {
-            "name": "Hacker News AI newest",
-            "url": "https://hnrss.org/newest?q=AI"
-          },
-          "source_group": "community_discussions",
-          "content_tags": [
-            "industry_news",
-            "community_discussion"
-          ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
@@ -792,20 +804,80 @@
     {
       "id": "x_updates",
       "label": "X 动态",
-      "count": 1402,
-      "recent_count": 17,
+      "count": 1424,
+      "recent_count": 38,
       "page_count": 29,
       "first_page_url": "signals/x_updates/page-001.json",
       "preview": [
         {
-          "id": "occ_00e60acf8a7973fea27fda99",
-          "cluster_id": "cluster_1178197bb0c4fe2b05ec10e1",
-          "title": "Zara Zhang: What do you do when you’re waiting for AI output? https://t.co/74RH0Od3nR",
-          "url": "https://x.com/zarazhangrui/status/2081200367480738098",
-          "summary": "What do you do when you’re waiting for AI output? https://t.co/74RH0Od3nR",
+          "id": "occ_0c29a68260c15312c0733fc0",
+          "cluster_id": "cluster_0287786003f00aad024c1cff",
+          "title": "Peter Yang: Living life on the edge everyday https://t.co/t5rgfthg5f",
+          "url": "https://x.com/petergyang/status/2081559330537734574",
+          "summary": "Living life on the edge everyday https://t.co/t5rgfthg5f",
+          "author": "Peter Yang",
+          "handle": "petergyang",
+          "original_text": "Living life on the edge everyday https://t.co/t5rgfthg5f",
+          "publisher": {
+            "name": "x.com",
+            "home_url": "https://x.com/"
+          },
+          "collected_via": {
+            "name": "follow-builders X feed",
+            "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json"
+          },
+          "source_group": "x_updates",
+          "content_tags": [
+            "analysis_opinion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_298facf205885710aca5a0f6",
+          "cluster_id": "cluster_7853d2edd181ebaf21414c73",
+          "title": "Guillermo Rauch: 👨‍💻 https://t.co/e8wWoxxSi4 https://t.co/S2kthc0VMF",
+          "url": "https://x.com/rauchg/status/2081571905157714199",
+          "summary": "👨‍💻 https://t.co/e8wWoxxSi4 https://t.co/S2kthc0VMF",
+          "author": "Guillermo Rauch",
+          "handle": "rauchg",
+          "original_text": "👨‍💻 https://t.co/e8wWoxxSi4 https://t.co/S2kthc0VMF",
+          "publisher": {
+            "name": "x.com",
+            "home_url": "https://x.com/"
+          },
+          "collected_via": {
+            "name": "follow-builders X feed",
+            "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json"
+          },
+          "source_group": "x_updates",
+          "content_tags": [
+            "analysis_opinion"
+          ],
+          "credibility_tag": "community_lead",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_2c817730056b162f9c9913af",
+          "cluster_id": "cluster_652461d658efbe59834e0146",
+          "title": "Zara Zhang: The reason there are so many AI tutorials: the more general a chat product is, …",
+          "url": "https://x.com/zarazhangrui/status/2081627109299310684",
+          "summary": "The reason there are so many AI tutorials: the more general a chat product is, the harder it is to use. People face a blank box and freeze, because they genuinely don't know what to ask for",
           "author": "Zara Zhang",
           "handle": "zarazhangrui",
-          "original_text": "What do you do when you’re waiting for AI output? https://t.co/74RH0Od3nR",
+          "original_text": "The reason there are so many AI tutorials: the more general a chat product is, the harder it is to use. People face a blank box and freeze, because they genuinely don't know what to ask for",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -819,23 +891,23 @@
             "analysis_opinion"
           ],
           "credibility_tag": "community_lead",
-          "event_date": "2026-07-26",
+          "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_2286d65eb5d2c2fb3809cb8a",
-          "cluster_id": "cluster_6e323799b7ca8e00923d8b1c",
-          "title": "Peter Steinberger: Been running codex all day to do massive parallel QA in prep of the next releas…",
-          "url": "https://x.com/steipete/status/2081169373784633552",
-          "summary": "Been running codex all day to do massive parallel QA in prep of the next release. Sol got insanely good at really understanding intent and is finding complex behavior issues. In the past such workflow did fell apart at compaction boundaries and/or the model started cheating. https://t.co/5xnKD6nAKh",
-          "author": "Peter Steinberger",
-          "handle": "steipete",
-          "original_text": "Been running codex all day to do massive parallel QA in prep of the next release. Sol got insanely good at really understanding intent and is finding complex behavior issues. In the past such workflow did fell apart at compaction boundaries and/or the model started cheating. https://t.co/5xnKD6nAKh",
+          "id": "occ_329b560c2dcae74f23dda382",
+          "cluster_id": "cluster_e0e23f6a22847942a52d7dec",
+          "title": "Amjad Masad: Interesting drop from former Anthropic employee: Hackers prefer to use massivel…",
+          "url": "https://x.com/amasad/status/2081576172656456076",
+          "summary": "Interesting drop from former Anthropic employee: Hackers prefer to use massively subsidized labs AI subscriptions for attacks as opposed to open models. https://t.co/gSVw9tv346 https://t.co/e6nOCeo0Mj",
+          "author": "Amjad Masad",
+          "handle": "amasad",
+          "original_text": "Interesting drop from former Anthropic employee: Hackers prefer to use massively subsidized labs AI subscriptions for attacks as opposed to open models. https://t.co/gSVw9tv346 https://t.co/e6nOCeo0Mj",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -849,23 +921,23 @@
             "analysis_opinion"
           ],
           "credibility_tag": "community_lead",
-          "event_date": "2026-07-26",
+          "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_23f84ec3bb20f7337e13b9b0",
-          "cluster_id": "cluster_d5c4ae092188848f07b442dd",
-          "title": "Nan Yu: I’m talking about software in this case, but it generalizes into things like pu…",
-          "url": "https://x.com/thenanyu/status/2081183178568405171",
-          "summary": "I’m talking about software in this case, but it generalizes into things like public health, or law… Instead of a feature, it’s some other sort of designed and implemented intention",
-          "author": "Nan Yu",
-          "handle": "thenanyu",
-          "original_text": "I’m talking about software in this case, but it generalizes into things like public health, or law… Instead of a feature, it’s some other sort of designed and implemented intention",
+          "id": "occ_40941b12bd7af9a814727297",
+          "cluster_id": "cluster_6fab24c249b5887075167412",
+          "title": "Thibault Sottiaux: Vibes are strong. Never seen OpenAI more focused and humming.",
+          "url": "https://x.com/thsottiaux/status/2081534792903147881",
+          "summary": "Vibes are strong. Never seen OpenAI more focused and humming.",
+          "author": "Thibault Sottiaux",
+          "handle": "thsottiaux",
+          "original_text": "Vibes are strong. Never seen OpenAI more focused and humming.",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -879,23 +951,23 @@
             "analysis_opinion"
           ],
           "credibility_tag": "community_lead",
-          "event_date": "2026-07-26",
+          "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_3dd7a099c27285604854920b",
-          "cluster_id": "cluster_463c8b1b54317948943fb68e",
-          "title": "Garry Tan: PS This is a shitpost",
-          "url": "https://x.com/garrytan/status/2081234705287086195",
-          "summary": "PS This is a shitpost",
+          "id": "occ_537fc8d48598301152df6a0f",
+          "cluster_id": "cluster_29dc2f7e6367104bada783d1",
+          "title": "Garry Tan: Don’t LARP Be earnest",
+          "url": "https://x.com/garrytan/status/2081586567211348432",
+          "summary": "Don’t LARP Be earnest",
           "author": "Garry Tan",
           "handle": "garrytan",
-          "original_text": "PS This is a shitpost",
+          "original_text": "Don’t LARP Be earnest",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -909,83 +981,23 @@
             "analysis_opinion"
           ],
           "credibility_tag": "community_lead",
-          "event_date": "2026-07-26",
+          "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_5de3b63fe782b520cdafdebf",
-          "cluster_id": "cluster_b68ab22c72256d97944e27c8",
-          "title": "Simon Willison: An Inside Look at the Relay Market Powering Token Resellers and Fraud",
-          "url": "https://simonwillison.net/2026/Jul/26/relay-market/",
-          "summary": "An Inside Look at the Relay Market Powering Token Resellers and Fraud Fascinating investigation by Matt Lenhard into the market that has grown up around reselling LLM tokens at a discount by pooling API keys from various sources. This looks",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "simonwillison.net",
-            "home_url": "https://simonwillison.net/"
-          },
-          "collected_via": {
-            "name": "Simon Willison Weblog",
-            "url": "https://simonwillison.net/atom/everything/"
-          },
-          "source_group": "x_updates",
-          "content_tags": [
-            "analysis_opinion"
-          ],
-          "credibility_tag": "pending_review",
-          "event_date": "2026-07-26",
-          "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_74a757cada6c55f013f23bde",
-          "cluster_id": "cluster_3efbf33e81bef116c5ef1ece",
-          "title": "Nan Yu: If you can make a SoftwareFactory, then you can make a SoftwareFactoryFactory",
-          "url": "https://x.com/thenanyu/status/2081187979024797858",
-          "summary": "If you can make a SoftwareFactory, then you can make a SoftwareFactoryFactory",
-          "author": "Nan Yu",
-          "handle": "thenanyu",
-          "original_text": "If you can make a SoftwareFactory, then you can make a SoftwareFactoryFactory",
-          "publisher": {
-            "name": "x.com",
-            "home_url": "https://x.com/"
-          },
-          "collected_via": {
-            "name": "follow-builders X feed",
-            "url": "https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json"
-          },
-          "source_group": "x_updates",
-          "content_tags": [
-            "analysis_opinion"
-          ],
-          "credibility_tag": "community_lead",
-          "event_date": "2026-07-26",
-          "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_83148796fdb372506103b1c8",
-          "cluster_id": "cluster_0179a4a80248dae1368d87e3",
-          "title": "Zara Zhang: AI-native companies have a culture akin to an open-source community",
-          "url": "https://x.com/zarazhangrui/status/2081223709755650054",
-          "summary": "AI-native companies have a culture akin to an open-source community",
+          "id": "occ_8858e457d6a359595a6c8f20",
+          "cluster_id": "cluster_75fd0e5607b93ec2679ec110",
+          "title": "Zara Zhang: Stop measuring your AI adoption in tokens burned Measure the time from a user n…",
+          "url": "https://x.com/zarazhangrui/status/2081627581997269192",
+          "summary": "Stop measuring your AI adoption in tokens burned Measure the time from a user need arriving to that thing shipping",
           "author": "Zara Zhang",
           "handle": "zarazhangrui",
-          "original_text": "AI-native companies have a culture akin to an open-source community",
+          "original_text": "Stop measuring your AI adoption in tokens burned Measure the time from a user need arriving to that thing shipping",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -999,23 +1011,23 @@
             "analysis_opinion"
           ],
           "credibility_tag": "community_lead",
-          "event_date": "2026-07-26",
+          "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_9445a5c037fa64f7d9c229bd",
-          "cluster_id": "cluster_295ba231e00680d9bc15e3c6",
-          "title": "Peter Steinberger: 1) Competition is good for the ecosystem. 2) Serving models at scale is hard. P…",
-          "url": "https://x.com/steipete/status/2081175795587072421",
-          "summary": "1) Competition is good for the ecosystem. 2) Serving models at scale is hard. Proud that @OpenAI signed the letter. Ant is silent on it. https://t.co/r9QVQ2R9JH",
-          "author": "Peter Steinberger",
-          "handle": "steipete",
-          "original_text": "1) Competition is good for the ecosystem. 2) Serving models at scale is hard. Proud that @OpenAI signed the letter. Ant is silent on it. https://t.co/r9QVQ2R9JH",
+          "id": "occ_9ba9a1bd6d4f3fe073d3b7e6",
+          "cluster_id": "cluster_3bd022dc4e66e0a9ca92623d",
+          "title": "Guillermo Rauch: Vercel proudly co-signs the Open Weights and American AI Leadership letter. Ope…",
+          "url": "https://x.com/rauchg/status/2081546513885622760",
+          "summary": "Vercel proudly co-signs the Open Weights and American AI Leadership letter. Open source, data, protocols &amp; research enable the technological wonders we enjoy every day, enriching our lives and our world. Open weights are the logical next frontier: https://t.co/SMeMS2lINu https://t.co/JeQwc1YvtL",
+          "author": "Guillermo Rauch",
+          "handle": "rauchg",
+          "original_text": "Vercel proudly co-signs the Open Weights and American AI Leadership letter. Open source, data, protocols &amp; research enable the technological wonders we enjoy every day, enriching our lives and our world. Open weights are the logical next frontier: https://t.co/SMeMS2lINu https://t.co/JeQwc1YvtL",
           "publisher": {
             "name": "x.com",
             "home_url": "https://x.com/"
@@ -1029,9 +1041,9 @@
             "analysis_opinion"
           ],
           "credibility_tag": "community_lead",
-          "event_date": "2026-07-26",
+          "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:01:12.615Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
@@ -1042,17 +1054,17 @@
     {
       "id": "news_newsletters",
       "label": "新闻 / Newsletter",
-      "count": 22742,
-      "recent_count": 552,
-      "page_count": 455,
+      "count": 22839,
+      "recent_count": 598,
+      "page_count": 457,
       "first_page_url": "signals/news_newsletters/page-001.json",
       "preview": [
         {
-          "id": "occ_001129fd768e85060b88599e",
-          "cluster_id": "cluster_c74137c76879c9b2c3b9e2d0",
-          "title": "现场直击：高昂真机成本锁死具身进化，Google 科学家用视频世界模型破局｜RSS 2026",
-          "url": "https://www.leiphone.com/category/private/PRwTba7CYAuCGWlY.html",
-          "summary": "Sherry Yang 独家解密 World Gym：两张 A100 跑通云端演练，让机器人从失败中自我恢复 作者丨 张 璐 编辑丨 齐铖湧 在机器人技术狂飙突进的今天，具身智能领域正面临着一个行业性的 核心困境 ： 我们已经拥有了高容量的深度神经网络，但 现实世界中高昂的交互与试错成本，成为了阻碍机器人通往AGI的最大瓶颈 。 在虚拟世界里，游戏和代码的执行成本几乎为零，因此我们见证了 AlphaGo 的奇迹和大语言模型在编程大赛中夺冠。但在物理世界中，机器人每一次真机试错。This is an intermediary/self-media lead; trace it to a primary source before t...",
+          "id": "occ_01624e8833418da4ca648390",
+          "cluster_id": "cluster_c367cbdc510295bb1bbbe141",
+          "title": "12位AI芯片高管复盘WAIC：云端抢做超节点，端侧还在等爆款",
+          "url": "https://www.leiphone.com/category/chips/XB7cWxmP9oLjiP2D.html",
+          "summary": "“都是超节点。”这是2026世界人工智能大会（WAIC）上算力公司给参会者最深的印象。 算力公司集体展示超节点，代表的是推理时代AI算力的竞争焦点已从单颗芯片性能延伸至芯片、互联、软件和系统的整体协同。 这也是雷峰网与12家AI芯片及基础设施企业高管对话后，收获的第一个共识。 一致的判断还包括AI主流工作负载正从训练转向推理，Agent是这种转变的核心因素。此外，多家企业认为产品已经从技术演示进入商业验证阶段。 01 一直低调的芯片公司也亮相WAIC 这些共识，也解释了国产芯。This is an intermediary/self-media lead; trace it to a primary source before t...",
           "author": null,
           "handle": null,
           "original_text": null,
@@ -1073,18 +1085,82 @@
           "credibility_tag": "single_source_relay",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "indirect"
         },
         {
-          "id": "occ_0aa58089e321e5144251a45d",
-          "cluster_id": "cluster_5ef14a84ea9eae96e014f272",
-          "title": "崔东树：2026年1-6月汽车行业利润率3.8%",
-          "url": "https://36kr.com/newsflashes/3913363065312640?f=rss",
-          "summary": "36氪获悉，中国汽车流通协会乘联分会负责人崔东树发文表示，2026年1-6月的汽车行业收入51893亿元，同比增1.8%；成本46100亿元，增2.8%；利润1954亿元，同比降20%；汽车行业利润率3.8%，相对于下游工业企业利润率6.5%的平均水平，汽车行业仍偏低。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+          "id": "occ_01c2db41784f92f2f843e87a",
+          "cluster_id": "cluster_abc593cc456edf83efb9788f",
+          "title": "数字生命卡兹克开源 Leader.skill：把模糊需求拆成 Agent 能独立跑数小时的目标任务书",
+          "url": "https://mp.weixin.qq.com/s/AwOk3di8m6eVeIUjzNftgg",
+          "summary": "Leader.skill 用「目标七问」方法论把人类的模糊需求转化为 Agent 可独立执行数小时的目标任务书，覆盖目的、完成态、反作弊、边界等维度。作者建议先用 Claude Fable 5 或 Kimi K3 规划目标，再交由 GPT-5.6 Sol、GLM-5.2 等模型长程执行，项目已开源。 作者称这套流程是「浪费 20 亿 Token 后」跑出来的经验：目标定义清晰度直接决定 Agent 长跑能不能收敛，Skill 本身也在把这套判断固化成可复用能力。This is an intermediary/self-media lead; trace it to a primary source before treating ...",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "数字生命卡兹克",
+            "home_url": "https://mp.weixin.qq.com/"
+          },
+          "collected_via": {
+            "name": "Aify News",
+            "url": "https://aify-news.pages.dev/articles.json"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_025106d2d5f1a8492a535b11",
+          "cluster_id": "cluster_759f189a8f83d8206bc85fb7",
+          "title": "亚马逊云科技推出 CloudFormation 快速模式，加快基础设施部署速度",
+          "url": "https://www.infoq.cn/article/Fk5KPrsXATeIHJj8MVBW",
+          "summary": "点击查看原文>。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "infoq.cn",
+            "home_url": "https://www.infoq.cn/"
+          },
+          "collected_via": {
+            "name": "InfoQ CN",
+            "url": "https://www.infoq.cn/feed"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_055c1be94dd5cabec7d97572",
+          "cluster_id": "cluster_e4af75e77c4b60b6ec5d73df",
+          "title": "A股三大指数集体收涨，长鑫科技全天成交超1400亿",
+          "url": "https://36kr.com/newsflashes/3913543572657286?f=rss",
+          "summary": "36氪获悉，A股三大指数集体收涨，沪指涨1.15%，深成指涨2.72%，创指涨3.16%；新股N长鑫上市首日涨超465%，成交超1400亿刷新记录，超越工商银行成为A股总市值“一哥”；玻璃纤维、覆铜板、脑机接口概念走强，国际复材、中材科技、创新医疗涨停；保险、油气、电信跌幅居前，中国人寿、中国石油跌超1%，中国联通跌0.9%。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
           "author": null,
           "handle": null,
           "original_text": null,
@@ -1105,18 +1181,114 @@
           "credibility_tag": "single_source_relay",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "indirect"
         },
         {
-          "id": "occ_11c6de9a78701c893a462622",
-          "cluster_id": "cluster_5929d00362bf952479de4e6f",
-          "title": "Veteran Developer Song Jae-kyung Unveils Solo AI MMO, Pioneering One-Person Era - 조선일보",
-          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPT3NMenB4RG1PSzBQVFUwamZTNF93dFhiaEZ0dDRoS1YtanZiZUZpcmh2LWpZaVJadXQwTzBkQ1JWZ2hEQnViS29iOTR1WnRtejdVNXJpVmQ3MFVMdURSLWZqYkRkZndRcFVDTlo5RkJOZ1Y1SnBIMGl0OHdmX1RNTmZLTXIwaGRV?oc=5",
-          "summary": "Veteran Developer Song Jae-kyung Unveils Solo AI MMO, Pioneering One-Person Era 조선일보。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+          "id": "occ_06638c5fa55ced8b7ea14d4b",
+          "cluster_id": "cluster_d666be17f22c816e29b468b9",
+          "title": "朗廷酒店任命施洛德为新COO，曾在希尔顿集团任职逾20年",
+          "url": "https://36kr.com/newsflashes/3913570160563336?f=rss",
+          "summary": "7月27日，朗廷酒店集团宣布，任命施洛德为首席运营官（COO），已于2026年6月22日起正式生效。加入朗廷酒店集团前，施洛德常驻迪拜，担任莱佛士与费尔蒙酒店及度假酒店欧洲与非洲区域的高级运营副总裁。在此之前，他曾任费尔蒙酒店及度假酒店亚洲、中东与非洲区域的高级运营副总裁。在其职业生涯早期，施洛德曾于希尔顿集团任职逾20年，先后在欧洲、中东与亚太地区担任单体酒店、区域管理与品牌营销的管理要职。（新浪财经）。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "36kr.com",
+            "home_url": "https://36kr.com/"
+          },
+          "collected_via": {
+            "name": "36Kr",
+            "url": "https://36kr.com/feed"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_07d41fdb375bb3cbb133fcea",
+          "cluster_id": "cluster_ed2a68c62c2c60a502e51cc2",
+          "title": "Matt Shumer 用 20x Max 订阅跑 Opus 5 循环，让 Claude 24/7 自主开发一款新游戏",
+          "url": "https://nitter.net/mattshumer_/status/2081475194502226298",
+          "summary": "Matt Shumer 公开演示：把 Claude Opus 5 挂在 20 倍 Max 订阅上开一个持续 loop，让模型 24/7 完全自主写一款他构思的新游戏，同时开放邮件列表征集内测。做法本身工程上并不复杂，但把「个人订阅额度 + 一个人类构思 + 长时自治 loop」这一组合当成正规产品开发流程展示出来，本身就是 agent 从工具走向长时自治工作方式的一个信号。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "X：Matt Shumer",
+            "home_url": "https://nitter.net/"
+          },
+          "collected_via": {
+            "name": "Aify News",
+            "url": "https://aify-news.pages.dev/articles.json"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_244c9a596e5dc08654c31b72",
+          "cluster_id": "cluster_da20c6650502345205ec1f08",
+          "title": "韩国交易巨头与LG CNS合作，在代币化测试中将应收账款上链",
+          "url": "https://36kr.com/newsflashes/3913527712109955?f=rss",
+          "summary": "韩国最大的贸易公司 POSCO International 已开始在区块链上对贸易应收账款进行代币化试点，该试验有望加快其全球子公司之间的商业支付速度。该公司去年通过涵盖钢铁、能源及电池材料的业务实现了222亿美元的收入。该公司表示，正与LG集团的技术部门LG CNS合作，在Layer-1区块链Injective（INJ）上发行、转让及结算应收款项，两家公司在一次新闻简报会上向CoinDesk透露。此次试点使用的是由浦项制铁海外业务及其交易对手之间的真实贸易产生的应收账款，而。This is an intermediary/self-media lead; trace it to a primary source before t...",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "36kr.com",
+            "home_url": "https://36kr.com/"
+          },
+          "collected_via": {
+            "name": "36Kr",
+            "url": "https://36kr.com/feed"
+          },
+          "source_group": "news_newsletters",
+          "content_tags": [
+            "industry_news",
+            "analysis_opinion",
+            "community_discussion"
+          ],
+          "credibility_tag": "single_source_relay",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "indirect"
+        },
+        {
+          "id": "occ_3456e2f70d191dbc2ebb2417",
+          "cluster_id": "cluster_dbd8bbb28fa32bcc0a845b18",
+          "title": "The Hugging Face Breach Exposed A Gap In AI Safety Controls - Forbes",
+          "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQOVhUMl9PNXZvazUtTlU0ZUQyV2tPNFRpYUhlNWlrVjc1MGU2VDljSEo5UWh6TlJxWjB6TmNhQzZ6OVRWYTJyQ2hmWWYtY3hJZHRVQy1CcnByUUxGYVZCclVYc3F4cjNQSmxrVHU0dVFCb2JjS0VSaDRhU1l0Qm9ndGRPSk5lWWNRYUFTN1JCcXVOR3BaNGxiZUNwbkRIMC1rVjlpRW1RV3R3b1dZM2JUYVhsWQ?oc=5",
+          "summary": "The Hugging Face Breach Exposed A Gap In AI Safety Controls Forbes。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
           "author": null,
           "handle": null,
           "original_text": null,
@@ -1125,44 +1297,12 @@
             "home_url": "https://news.google.com/"
           },
           "collected_via": {
-            "name": "Google News AIGC Video Image Game RSS",
-            "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28AI+video+OR+AI+image+OR+generative+game+OR+AI+game+tools+OR+Runway+OR+Pika+OR+Luma+OR+Kling+OR+Firefly%29"
+            "name": "Google News Official Open Source Watch RSS",
+            "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
           },
           "source_group": "news_newsletters",
           "content_tags": [
-            "industry_news",
-            "creative_ai",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_135a22f04149aeba4293194a",
-          "cluster_id": "cluster_9db5e21c2c4d735306063b63",
-          "title": "韩国6月外币存款规模连续第三个月走高",
-          "url": "https://36kr.com/newsflashes/3913361690334600?f=rss",
-          "summary": "韩国央行周一公布数据，受美元储蓄增加带动，6月韩国外币存款规模连续第三个月走高。韩国银行数据显示，6月末本国居民外币存款余额达1133.33亿美元，较上月增加10.8亿美元。（新浪财经）。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "36kr.com",
-            "home_url": "https://36kr.com/"
-          },
-          "collected_via": {
-            "name": "36Kr",
-            "url": "https://36kr.com/feed"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
+            "open_source",
             "industry_news",
             "analysis_opinion",
             "community_discussion"
@@ -1170,135 +1310,7 @@
           "credibility_tag": "single_source_relay",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_16d0da93a2e5e7ec7dd9f515",
-          "cluster_id": "cluster_5ab995f3eeb96022afa783a4",
-          "title": "中际旭创据悉将把香港发售价定在每股980港元，低于最高推介价格",
-          "url": "https://36kr.com/newsflashes/3913428985304197?f=rss",
-          "summary": "据媒体援引知情人士透露，中际旭创目前告诉潜在投资者，其香港上市交易的价格势将定在低于最高推介价格的水平上。知情人士称，该公司将把价格定在每股980港元；由于事未公开，知情人士要求匿名。之前的最高推介价格为1010港元。（新浪财经）。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "36kr.com",
-            "home_url": "https://36kr.com/"
-          },
-          "collected_via": {
-            "name": "36Kr",
-            "url": "https://36kr.com/feed"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_1c49c9bdaa27285490fa9919",
-          "cluster_id": "cluster_324a21576a39021220491142",
-          "title": "东方甄选在合肥设立新公司",
-          "url": "https://36kr.com/newsflashes/3913437900772488?f=rss",
-          "summary": "36氪获悉，企查查App显示，近日，东方甄选（合肥）网络科技有限公司成立，法定代表人为张健，注册资本为800万元，经营范围包含组织文化艺术交流活动、网络文化经营、演出经纪、日用品销售、日用百货销售、食品互联网销售等，由东方甄选关联的东方优选（北京）科技有限公司全资持股，股权穿透显示，公司实际控制人为俞敏洪。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "36kr.com",
-            "home_url": "https://36kr.com/"
-          },
-          "collected_via": {
-            "name": "36Kr",
-            "url": "https://36kr.com/feed"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_2a283268ef8b9b8a302379ed",
-          "cluster_id": "cluster_c2cfc37df583620d3151c45c",
-          "title": "“词元无限”完成天使++轮融资，累计融资金额达数亿元",
-          "url": "https://36kr.com/newsflashes/3913346330645891?f=rss",
-          "summary": "36氪获悉，近日，企业级AI Agent基础设施专属服务商“词元无限”宣布完成天使++轮融资。本轮融资由临芯投资领投，华控基金跟投，这也是词元无限在一个月内完成的第二笔融资，累计融资额已达数亿元人民币。资金将主要用于加速打造其企业级AI Agent基础设施平台，深化与清华大学、北京航空航天大学等高校的联合研究，并持续构建面向Agent应用范式的下一代基础设施。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "36kr.com",
-            "home_url": "https://36kr.com/"
-          },
-          "collected_via": {
-            "name": "36Kr",
-            "url": "https://36kr.com/feed"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_2cd1ee289ecba8213a5daf7e",
-          "cluster_id": "cluster_bc9cfabdeae6d4afe25c045f",
-          "title": "佐治亚理工学院徐丹飞：别被「视觉生成」骗了，视频预测≠机器人规划｜RSS 2026",
-          "url": "https://www.leiphone.com/category/private/KaA5T40NOj9bLBM3.html",
-          "summary": "解构组合式世界模型，用因子图与时间注意力跨越“视行断层” 作者丨 张 璐 编辑丨 齐铖湧 当前的具身智能与世界模型领域，正面临着一个尴尬的现状。 随着以 Sora 为代表的高保真视频生成技术走向成熟，模型已经能够为机器人构建出极其逼真的未来画面，让人感觉AGI似乎触手可及。 但回到真实的物理世界，令人困惑的现象出现了： 即便模型能够预测出完美的未来画面，机械臂在实际落地执行时依然频频失效。 这暴露出了行业内长期被忽视的一个核心矛盾—— 能够“生成”成功的结果，绝不等同于拥有真。This is an intermediary/self-media lead; trace it to a primary source before t...",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "leiphone.com",
-            "home_url": "https://www.leiphone.com/"
-          },
-          "collected_via": {
-            "name": "Leiphone",
-            "url": "https://www.leiphone.com/feed"
-          },
-          "source_group": "news_newsletters",
-          "content_tags": [
-            "industry_news",
-            "analysis_opinion",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
@@ -1309,27 +1321,27 @@
     {
       "id": "papers_models",
       "label": "论文 / 模型",
-      "count": 7080,
-      "recent_count": 236,
-      "page_count": 142,
+      "count": 8491,
+      "recent_count": 250,
+      "page_count": 170,
       "first_page_url": "signals/papers_models/page-001.json",
       "preview": [
         {
-          "id": "occ_39dff7f9ee867f3668036a8d",
-          "cluster_id": "cluster_526d8a814c4339b5e1397c4d",
-          "title": "microsoft/benchpress-score-matrix",
-          "url": "https://huggingface.co/datasets/microsoft/benchpress-score-matrix",
-          "summary": "microsoft/benchpress-score-matrix。Treat this as a community lead unless it is backed by a primary source.",
+          "id": "occ_38a52fbc116ed033ed3a2866",
+          "cluster_id": "cluster_810460beb79df931806861c1",
+          "title": "Scale Labs SWE-Bench Pro #1: SWE-Agent + claude-4-5-Sonnet",
+          "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
+          "summary": "anthropic · 43.72%",
           "author": null,
           "handle": null,
           "original_text": null,
           "publisher": {
-            "name": "huggingface.co",
-            "home_url": "https://huggingface.co/"
+            "name": "anthropic",
+            "home_url": "https://scaleapi.github.io/"
           },
           "collected_via": {
-            "name": "Microsoft Hugging Face Organization",
-            "url": "https://huggingface.co/microsoft"
+            "name": "Scale Labs SWE-Bench Pro",
+            "url": "https://scaleapi.github.io/SWE-bench_Pro-os/"
           },
           "source_group": "papers_models",
           "content_tags": [
@@ -1340,50 +1352,18 @@
           "credibility_tag": "primary_material",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
+          "collected_at": "2026-07-27T07:31:46.084Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_832b717b7cebf588d73eca11",
-          "cluster_id": "cluster_9e2a039793143dd112dc36de",
-          "title": "Large language model driven multicenter prediction and explainable risk attribution of acute kidney injury",
-          "url": "https://www.nature.com/articles/s41467-026-76029-x",
-          "summary": "Nature Machine Learning published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "nature.com",
-            "home_url": "https://www.nature.com/"
-          },
-          "collected_via": {
-            "name": "Nature Machine Learning",
-            "url": "https://www.nature.com/subjects/machine-learning.rss"
-          },
-          "source_group": "papers_models",
-          "content_tags": [
-            "model_release",
-            "research",
-            "community_discussion"
-          ],
-          "credibility_tag": "single_source_relay",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T05:50:05.082Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "indirect"
-        },
-        {
-          "id": "occ_10fb2b5d2d556e15d066572c",
+          "id": "occ_8851c19e9a8d6215aa81d2f3",
           "cluster_id": "cluster_810460beb79df931806861c1",
-          "title": "Scale Labs SWE-Bench Pro #9: gpt-5-2025-08-07 (High)",
+          "title": "Scale Labs SWE-Bench Pro #7: SWE-Agent + gpt-oss-120b",
           "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
-          "summary": "openai · 41.78±3.49%",
+          "summary": "openai · 16.20%",
           "author": null,
           "handle": null,
           "original_text": null,
@@ -1404,18 +1384,50 @@
           "credibility_tag": "primary_material",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:11:57.220Z",
+          "collected_at": "2026-07-27T07:31:46.084Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_46183ddba946edda9f722578",
+          "id": "occ_9b55a2ca7145e6f9948955ed",
           "cluster_id": "cluster_810460beb79df931806861c1",
-          "title": "Scale Labs SWE-Bench Pro #5: claude-opus-4-5-20251101",
+          "title": "Scale Labs SWE-Bench Pro #4: SWE-Agent + gpt-5-2025-08-07 (High)",
           "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
-          "summary": "anthropic · 45.89±3.60%",
+          "summary": "openai · 36.30%",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "openai",
+            "home_url": "https://scaleapi.github.io/"
+          },
+          "collected_via": {
+            "name": "Scale Labs SWE-Bench Pro",
+            "url": "https://scaleapi.github.io/SWE-bench_Pro-os/"
+          },
+          "source_group": "papers_models",
+          "content_tags": [
+            "model_release",
+            "research",
+            "community_discussion"
+          ],
+          "credibility_tag": "primary_material",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:31:46.084Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_adb671e949a97a85b964f8a7",
+          "cluster_id": "cluster_810460beb79df931806861c1",
+          "title": "Scale Labs SWE-Bench Pro #2: SWE-Agent + claude-4-Sonnet",
+          "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
+          "summary": "anthropic · 42.70%",
           "author": null,
           "handle": null,
           "original_text": null,
@@ -1436,23 +1448,23 @@
           "credibility_tag": "primary_material",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:11:57.220Z",
+          "collected_at": "2026-07-27T07:31:46.084Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_64704fb5d6381e559344fabe",
+          "id": "occ_bb8698917981cb0740cb0829",
           "cluster_id": "cluster_810460beb79df931806861c1",
-          "title": "Scale Labs SWE-Bench Pro #7: gemini-3-pro-preview",
+          "title": "Scale Labs SWE-Bench Pro #6: SWE-Agent + kimi-k2-instruct",
           "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
-          "summary": "google · 43.30±3.60%",
+          "summary": "moonshot · 27.67%",
           "author": null,
           "handle": null,
           "original_text": null,
           "publisher": {
-            "name": "google",
+            "name": "moonshot",
             "home_url": "https://scaleapi.github.io/"
           },
           "collected_via": {
@@ -1468,23 +1480,23 @@
           "credibility_tag": "primary_material",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:11:57.220Z",
+          "collected_at": "2026-07-27T07:31:46.084Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_7458625752ce1feeeaaa1d7f",
+          "id": "occ_c2d4567c7e1f72cd873ef9d0",
           "cluster_id": "cluster_810460beb79df931806861c1",
-          "title": "Scale Labs SWE-Bench Pro #6: claude-4-5-Sonnet",
+          "title": "Scale Labs SWE-Bench Pro #5: SWE-Agent + glm-4.5",
           "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
-          "summary": "anthropic · 43.60±3.60%",
+          "summary": "unknown · 35.52%",
           "author": null,
           "handle": null,
           "original_text": null,
           "publisher": {
-            "name": "anthropic",
+            "name": "unknown",
             "home_url": "https://scaleapi.github.io/"
           },
           "collected_via": {
@@ -1500,50 +1512,18 @@
           "credibility_tag": "primary_material",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:11:57.220Z",
+          "collected_at": "2026-07-27T07:31:46.084Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",
           "access_state": "direct"
         },
         {
-          "id": "occ_9752118ca6a3c471f05abc76",
+          "id": "occ_c2fdbd04ea1f42adcf90d283",
           "cluster_id": "cluster_810460beb79df931806861c1",
-          "title": "Scale Labs SWE-Bench Pro #8: claude-4-Sonnet",
+          "title": "Scale Labs SWE-Bench Pro #3: SWE-Agent + claude-4-5-haiku",
           "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
-          "summary": "anthropic · 42.70±3.59%",
-          "author": null,
-          "handle": null,
-          "original_text": null,
-          "publisher": {
-            "name": "anthropic",
-            "home_url": "https://scaleapi.github.io/"
-          },
-          "collected_via": {
-            "name": "Scale Labs SWE-Bench Pro",
-            "url": "https://scaleapi.github.io/SWE-bench_Pro-os/"
-          },
-          "source_group": "papers_models",
-          "content_tags": [
-            "model_release",
-            "research",
-            "community_discussion"
-          ],
-          "credibility_tag": "primary_material",
-          "event_date": "2026-07-27",
-          "published_at": null,
-          "collected_at": "2026-07-27T03:11:57.220Z",
-          "date_anomaly": null,
-          "image_url": null,
-          "source_health": "available",
-          "access_state": "direct"
-        },
-        {
-          "id": "occ_99cf2c84151a910559d717dd",
-          "cluster_id": "cluster_810460beb79df931806861c1",
-          "title": "Scale Labs SWE-Bench Pro #3: claude-opus-4-6 (thinking)*",
-          "url": "https://scaleapi.github.io/SWE-bench_Pro-os/",
-          "summary": "anthropic · 51.90±3.61%",
+          "summary": "anthropic · 39.45%",
           "author": null,
           "handle": null,
           "original_text": null,
@@ -1564,7 +1544,39 @@
           "credibility_tag": "primary_material",
           "event_date": "2026-07-27",
           "published_at": null,
-          "collected_at": "2026-07-27T03:11:57.220Z",
+          "collected_at": "2026-07-27T07:31:46.084Z",
+          "date_anomaly": null,
+          "image_url": null,
+          "source_health": "available",
+          "access_state": "direct"
+        },
+        {
+          "id": "occ_05885d099a6b455be46bd6ca",
+          "cluster_id": "cluster_f97cc00c674bd907e71cc901",
+          "title": "nvidia/PhysicalAI-SmartSpaces : Add complete Croissant metadata with Responsible AI fields",
+          "url": "https://huggingface.co/datasets/nvidia/PhysicalAI-SmartSpaces/discussions/22",
+          "summary": "nvidia/PhysicalAI-SmartSpaces : Add complete Croissant metadata with Responsible AI fields。Treat this as a community lead unless it is backed by a primary source.",
+          "author": null,
+          "handle": null,
+          "original_text": null,
+          "publisher": {
+            "name": "huggingface.co",
+            "home_url": "https://huggingface.co/"
+          },
+          "collected_via": {
+            "name": "NVIDIA Hugging Face Organization",
+            "url": "https://huggingface.co/nvidia"
+          },
+          "source_group": "papers_models",
+          "content_tags": [
+            "model_release",
+            "research",
+            "community_discussion"
+          ],
+          "credibility_tag": "primary_material",
+          "event_date": "2026-07-27",
+          "published_at": null,
+          "collected_at": "2026-07-27T07:26:46.947Z",
           "date_anomaly": null,
           "image_url": null,
           "source_health": "available",

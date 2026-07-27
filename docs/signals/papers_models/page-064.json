@@ -2,178 +2,23 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-27T05:50:05.082Z",
+  "generated_at": "2026-07-27T07:26:46.947Z",
   "group": {
     "id": "papers_models",
     "label": "论文 / 模型"
   },
   "page": 64,
-  "page_count": 142,
+  "page_count": 170,
   "page_size": 50,
-  "total_count": 7080,
+  "total_count": 8491,
   "next_url": "signals/papers_models/page-065.json",
   "items": [
     {
-      "id": "occ_c17dd992f85c99c371571522",
-      "cluster_id": "cluster_32e2db27eca9a8cc646f8aae",
-      "title": "sentence-transformers/all-MiniLM-L6-v2",
-      "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
-      "summary": "Hugging Face ranked model entry; task=sentence-similarity; likes=5032; downloads=246342719.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d5f86b470c583edfa13aecc2",
-      "cluster_id": "cluster_da27a622511f166d35c77e35",
-      "title": "meta-llama/Llama-2-7b-chat-hf",
-      "url": "https://huggingface.co/meta-llama/Llama-2-7b-chat-hf",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4786; downloads=266303.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d61504d1662c3c1af85301c9",
-      "cluster_id": "cluster_3630fc138d59fae622043ea2",
-      "title": "openai/whisper-large-v3",
-      "url": "https://huggingface.co/openai/whisper-large-v3",
-      "summary": "Whisper large-v3 面向语音识别与转写，关注点在多语言表现、长音频稳定性、硬件消耗和数据处理合规。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/openai/whisper-large-v3"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_da839df53495a11c93c6857b",
-      "cluster_id": "cluster_3f4b219a9faae72736440eae",
-      "title": "bigscience/bloom",
-      "url": "https://huggingface.co/bigscience/bloom",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=5021; downloads=5210.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e1da38eeed01d7074e9f2148",
-      "cluster_id": "cluster_4143cf1471f6ab870501b920",
-      "title": "black-forest-labs/FLUX.1-schnell",
-      "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
-      "summary": "FLUX.1-schnell 面向快速图像生成，适合观察速度、质量、推理资源和输出内容审核之间的取舍。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e69320b5aa69f999a0e57452",
-      "cluster_id": "cluster_20dd420f3331c26ac890b2e4",
-      "title": "nvidia/gr00t17-lerobot-libero_10-640",
-      "url": "https://huggingface.co/nvidia/gr00t17-lerobot-libero_10-640",
-      "summary": "nvidia/gr00t17-lerobot-libero_10-640。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_5e9d237a806c206706dce3b5",
+      "cluster_id": "cluster_c191c2da58c86f2dd45d963c",
+      "title": "Data for Agents",
+      "url": "https://huggingface.co/blog/nvidia/open-data-for-agents",
+      "summary": "Data for Agents about 20 hours ago • 10。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -191,144 +36,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-05",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/65df9200dc3292a8983e5017/Vs5FPVCH-VZBipV3qKTuy.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e8d74d9e4887453dd75500ce",
-      "cluster_id": "cluster_f04cdc083440fc60c35320ee",
-      "title": "nvidia/HiLiftAeroML",
-      "url": "https://huggingface.co/datasets/nvidia/HiLiftAeroML",
-      "summary": "nvidia/HiLiftAeroML Updated about 14 hours ago •。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
+      "collected_at": "2026-07-09T13:04:36.709Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_ecb14522236268951c7a6c6c",
-      "cluster_id": "cluster_ae0dfa37fddcbcfcc70e3477",
-      "title": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-      "url": "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
-      "summary": "Hugging Face ranked model entry; task=vllm; likes=4701; downloads=523960.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f26aa2d2efb65bee45b81695",
-      "cluster_id": "cluster_19ee6af6e3d15e37dee57f6c",
-      "title": "meta-llama/Meta-Llama-3-8B",
-      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
-      "summary": "Meta Llama 3 8B 适合关注轻量文本生成和本地部署的团队，评估时要同时看许可证、微调成本和推理延迟。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_fb2138b987613ba292d85d67",
-      "cluster_id": "cluster_3c44be280a6c9e15cc578623",
-      "title": "stabilityai/stable-diffusion-xl-base-1.0",
-      "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
-      "summary": "Stable Diffusion XL 仍是图像生成选型中的常见基线，适合对比画质、生态兼容性、推理资源和商用条款。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-05",
-      "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_fdd68198f743e271ed659046",
-      "cluster_id": "cluster_c2763071083984684d0139a5",
-      "title": "One Token to Fool LLM-as-a-Judge.",
-      "url": "https://arxiv.org/abs/2507.08794",
-      "summary": "|[One Token to Fool LLM-as-a-Judge.](https://arxiv.org/abs/2507.08794) |This paper reveals the fragility of LLM-based reward models in RL with Verifiable Rewards (RLVR), showing that superficial tokens like “Solution” or even a colon can tr。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_6429662993e60e110f7fa49e",
+      "cluster_id": "cluster_c0a1eb999345088291170a12",
+      "title": "Institutional Red-Teaming: Deployment Rules, Not Just Models, Causally Shape Multi-Agent AI Safety",
+      "url": "https://arxiv.org/abs/2607.07695v1",
+      "summary": "We introduce institutional red-teaming, an evaluation methodology for testing deployment rules in multi-agent AI: hold the agents, objectives, and task state fixed, vary only one rule, and attribute the resulting change in collective behavi。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -337,157 +58,401 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
         "industry_news",
         "community_discussion"
       ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-05",
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T07:16:26.939Z",
+      "collected_at": "2026-07-09T13:04:36.709Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_2424bc4b7de4d658c0be1639",
-      "cluster_id": "cluster_3146bb5891bf3647a8d07fa4",
-      "title": "Qwen/AgentWorldBench",
-      "url": "https://huggingface.co/datasets/Qwen/AgentWorldBench",
-      "summary": "Qwen/AgentWorldBench Viewer • Updated 23 days ago • 2.17k • 2.59k • 85。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_6949306c0ea57c211aa4491f",
+      "cluster_id": "cluster_27a2def167b365d2c45d7ab7",
+      "title": "From Noisy Traces to Root Causes: Structural Trajectory Analysis and Causal Extraction for Agent Optimization",
+      "url": "https://arxiv.org/abs/2607.07702v1",
+      "summary": "The optimization of long-horizon agents increasingly relies on reflection-based mechanisms, where a large language model (LLM) acts as an optimizer to diagnose agent failures and improve agent policies. However, real execution traces are di。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "Qwen Hugging Face Organization",
-        "url": "https://huggingface.co/Qwen"
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "model_release",
-        "research",
+        "industry_news",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-27T03:01:12.615Z",
+      "collected_at": "2026-07-09T13:04:36.709Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0ca8c16fded20bbf3f8a38e6",
-      "cluster_id": "cluster_3146bb5891bf3647a8d07fa4",
-      "title": "Qwen/AgentWorldBench",
-      "url": "https://huggingface.co/datasets/Qwen/AgentWorldBench",
-      "summary": "Qwen/AgentWorldBench Viewer • Updated 19 days ago • 2.17k • 3.12k • 83。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_8cf069e607a897e96fdf753c",
+      "cluster_id": "cluster_612147ea2bf89cbe2ab6a4cd",
+      "title": "Selective Timestep Weighting and Advantage-Based Replay for Sample-Efficient Diffusion RLHF",
+      "url": "https://arxiv.org/abs/2607.07693v1",
+      "summary": "Reinforcement learning from human feedback (RLHF) has emerged as a powerful paradigm for aligning generative models with human preferences. However, applying RLHF to diffusion models remains highly feedback inefficient, as existing approach。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "Qwen Hugging Face Organization",
-        "url": "https://huggingface.co/Qwen"
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "model_release",
-        "research",
+        "industry_news",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
+      "collected_at": "2026-07-09T13:04:36.709Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_45c132c89c7f777f1077c6d8",
-      "cluster_id": "cluster_265c8f80bf6051c757ad211a",
-      "title": "Interpretable deep learning to predict one year glycemic control in type 1 diabetes using real world data",
-      "url": "https://www.nature.com/articles/s41598-026-59937-2",
-      "summary": "Nature Machine Learning published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_8e0227a72b94844717bba6d2",
+      "cluster_id": "cluster_20e040d91e477828d9a65d66",
+      "title": "Stability and Convergence of Optimistic Exponential Weights with Asymmetric Step Sizes in Bimatrix Games",
+      "url": "https://arxiv.org/abs/2607.07517v1",
+      "summary": "We study bimatrix two-player games and investigate the last-iterate convergence and stability of equilibria for the iterates generated by the optimistic exponential weights method. In contrast to prior work, we allow the step sizes $η_x$ an。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "nature.com",
-        "home_url": "https://www.nature.com/"
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "Nature Machine Learning",
-        "url": "https://www.nature.com/subjects/machine-learning.rss"
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_d673bf173e7c149022df12cd",
-      "cluster_id": "cluster_3146bb5891bf3647a8d07fa4",
-      "title": "Qwen/AgentWorldBench",
-      "url": "https://huggingface.co/datasets/Qwen/AgentWorldBench",
-      "summary": "Qwen/AgentWorldBench Viewer • Updated 11 days ago • 2.17k • 2.44k • 78。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Qwen Hugging Face Organization",
-        "url": "https://huggingface.co/Qwen"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
+        "industry_news",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
+      "collected_at": "2026-07-09T13:04:36.709Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_004971e389bc54c7551bfdde",
-      "cluster_id": "cluster_deede0538205756c838ef6e3",
-      "title": "meta-llama/Llama-3.1-8B-Instruct",
-      "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
-      "summary": "meta-llama/Llama-3.1-8B-Instruct 是 Hugging Face 上的文本生成模型，当前采样显示下载量为 9024304、收藏数为 6229，适合关注开源指令模型的人复核模型卡和许可。",
+      "id": "occ_9536f2a8d5d64d8467fb495b",
+      "cluster_id": "cluster_db568db523389edfb65f6101",
+      "title": "Breaking Database Lock-in: Agentic Regeneration of High Performance Storage Readers for Database Bypass",
+      "url": "https://arxiv.org/abs/2607.07696v1",
+      "summary": "Analytical workloads operating on data stored in external database systems face a fundamental bottleneck: data access is guarded entirely by the database driver, like JDBC or ODBC, forcing all reads through query execution and other driver。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "engineering",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a5098c58a54a4d5482db46f7",
+      "cluster_id": "cluster_6d93072409d8f3fd3e5ca024",
+      "title": "Statistical inverse learning and $\\ell^1$-regularization",
+      "url": "https://arxiv.org/abs/2607.07468v1",
+      "summary": "We study the recovery of sparse functions from finite, noisy, and indirect observations in the framework of statistical inverse learning. The unknown is modeled as an element of $\\ell^1$, and observations are generated through a possibly no。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv stat.ML",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_aae186536d8b7cd7462eec11",
+      "cluster_id": "cluster_c0a1eb999345088291170a12",
+      "title": "Institutional Red-Teaming: Deployment Rules, Not Just Models, Causally Shape Multi-Agent AI Safety",
+      "url": "https://arxiv.org/abs/2607.07695v1",
+      "summary": "We introduce institutional red-teaming, an evaluation methodology for testing deployment rules in multi-agent AI: hold the agents, objectives, and task state fixed, vary only one rule, and attribute the resulting change in collective behavi。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_ae68b29d0a5a66be6fe268aa",
+      "cluster_id": "cluster_6c74f84064756d939a358f4b",
+      "title": "Multi-Agent Robotic Control with Onboard Vision-Language Models",
+      "url": "https://arxiv.org/abs/2607.07403v1",
+      "summary": "Vision Language Models (VLMs) and Vision Language Action (VLA) models have shown promise in robotic control. Yet, they face significant challenges regarding explainability, generalization, and compute requirements. This paper presents a Mul。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b043ac0f5a1db01c6688a813",
+      "cluster_id": "cluster_6bf0e713d084145956b9eaaa",
+      "title": "Co-LMLM: Continuous-Query Limited Memory Language Models",
+      "url": "https://arxiv.org/abs/2607.07707v1",
+      "summary": "Limited memory language models (LMLMs) externalize factual knowledge during pretraining to a knowledge base (KB), rather than memorizing it in their weights. During generation, the model then fetches knowledge from the KB as needed. This re。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b8dd5f22a979d8bdbd696fcd",
+      "cluster_id": "cluster_965618c0123d8a71e5eef48d",
+      "title": "The Key to Going Linear: Analysis-Driven Transformer Linearization",
+      "url": "https://arxiv.org/abs/2607.07706v1",
+      "summary": "The quadratic cost of causal self-attention severely bottlenecks long-context transformer inference. While numerous post hoc linearization pipelines exist, it is difficult to identify which components preserve model quality. This work isola。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.LG",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b993c5e676085b10e9cce9e0",
+      "cluster_id": "cluster_612147ea2bf89cbe2ab6a4cd",
+      "title": "Selective Timestep Weighting and Advantage-Based Replay for Sample-Efficient Diffusion RLHF",
+      "url": "https://arxiv.org/abs/2607.07693v1",
+      "summary": "Reinforcement learning from human feedback (RLHF) has emerged as a powerful paradigm for aligning generative models with human preferences. However, applying RLHF to diffusion models remains highly feedback inefficient, as existing approach。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.LG",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c9de77cff3f4db98a9190dfa",
+      "cluster_id": "cluster_c47fbed91e8c7061f26aea47",
+      "title": "Agon: Competitive Cross-Model RL with Implicit Rival Grading of Reasoning",
+      "url": "https://arxiv.org/abs/2607.07690v1",
+      "summary": "Reinforcement learning from verifiable rewards (e.g. GRPO) is the engine behind today's reasoning models, yet it grades only the final answer. On hard problems this trains models to write more rather than to think better, since the trace it。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_d9697e94823ec926cfa3d49b",
+      "cluster_id": "cluster_59667c6a9b026ee308400506",
+      "title": "A hierarchical memory architecture overcomes context limits in long-horizon multi-agent computational modeling",
+      "url": "https://arxiv.org/abs/2607.07666v1",
+      "summary": "Large language models (LLMs) demonstrate remarkable reasoning capabilities, yet their stateless architecture fundamentally limits deployment in long-horizon research workflows requiring multi-session continuity and quantitative rigor. Here。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_e52d8cb0726f12194cd30e76",
+      "cluster_id": "cluster_de05c289a5a65d2ec24c9b71",
+      "title": "PaddlePaddle/PP-DocLayoutV3",
+      "url": "https://huggingface.co/PaddlePaddle/PP-DocLayoutV3",
+      "summary": "PaddlePaddle/PP-DocLayoutV3 Image Segmentation • Updated 1 day ago。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -496,8 +461,70 @@
         "home_url": "https://huggingface.co/"
       },
       "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct"
+        "name": "PaddlePaddle Hugging Face Organization",
+        "url": "https://huggingface.co/PaddlePaddle"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "open_source",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/1654942635336-5f3ff69679c1ba4c353d0c5a.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_f79d475d9214bee0f712c4e4",
+      "cluster_id": "cluster_6bf0e713d084145956b9eaaa",
+      "title": "Co-LMLM: Continuous-Query Limited Memory Language Models",
+      "url": "https://arxiv.org/abs/2607.07707v1",
+      "summary": "Limited memory language models (LMLMs) externalize factual knowledge during pretraining to a knowledge base (KB), rather than memorizing it in their weights. During generation, the model then fetches knowledge from the KB as needed. This re。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.LG",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-09T13:04:36.709Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0a60353167cf2081815b0dc7",
+      "cluster_id": "cluster_ae0dfa37fddcbcfcc70e3477",
+      "title": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "url": "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "summary": "Hugging Face ranked model entry; task=vllm; likes=4705; downloads=630559.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -505,16 +532,16 @@
         "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
-      "source_health": "unknown",
+      "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_04ad1f7e5e68fd8da550f39e",
+      "id": "occ_159ae18399c8b50f7bdf3a45",
       "cluster_id": "cluster_82391dd078e3c4c2107b0dcd",
       "title": "Gemini 2.5 Pro Capable of Winning Gold at IMO 2025.",
       "url": "https://arxiv.org/abs/2507.15855",
@@ -536,78 +563,47 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_11cf7bbb56639c50925c4054",
-      "cluster_id": "cluster_fbca0493e7e99a96deba8a1e",
-      "title": "Fast Dash",
-      "url": "https://doi.org/10.5281/zenodo.21185872",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
+      "id": "occ_17146ccf50f68d8080919606",
+      "cluster_id": "cluster_4542559f9f131d4ddc66ed8e",
+      "title": "Tongyi-MAI/Z-Image-Turbo",
+      "url": "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo",
+      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=4940; downloads=933580.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
       },
       "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "engineering",
-        "community_discussion"
+        "model_release",
+        "creative_ai"
       ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_13671bc451954c26395444f9",
-      "cluster_id": "cluster_bca4523d6a9b6015d2a83bf0",
-      "title": "Data and code for \"One phenomenon, three roots: a bibliometric map of parasocial and companionship bonds with AI agents\"",
-      "url": "https://doi.org/10.5281/zenodo.21185050",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "engineering",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_18d5868ad103d9cec4574df9",
+      "id": "occ_1757338bc942e66be5dbf9ac",
       "cluster_id": "cluster_c2763071083984684d0139a5",
       "title": "One Token to Fool LLM-as-a-Judge.",
       "url": "https://arxiv.org/abs/2507.08794",
@@ -629,299 +625,20 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_195f37b602b1089e7fc1ceb8",
-      "cluster_id": "cluster_f3aa7dbdb63c94657c178686",
-      "title": "CompVis/stable-diffusion-v1-4",
-      "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
-      "summary": "black-forest-labs/FLUX.1-dev-controlnet 是 Hugging Face 上的图像控制模型，当前采样显示下载量为 420764、收藏数为 7033。关注点应放在控制条件、生成质量和与现有图像工作流的适配。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_245fb15f69c76202fde2be6e",
-      "cluster_id": "cluster_63887660927478a4345d398f",
-      "title": "AI Cost Watch - Week of 1 July 2026 (Issue 4)",
-      "url": "https://doi.org/10.5281/zenodo.20541643",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_2463b270deff594815489d62",
-      "cluster_id": "cluster_d15c73c7dbf1cae26e1d1d98",
-      "title": "The AI Private-Valuation Marks-vs-Reality Ledger: a pre-registered, reproducible scoreboard for how private AI valuations survive a real public price",
-      "url": "https://doi.org/10.5281/zenodo.20672581",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "funding",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_3372cd57d68ebedfd6ee1a1b",
-      "cluster_id": "cluster_3f4b219a9faae72736440eae",
-      "title": "bigscience/bloom",
-      "url": "https://huggingface.co/bigscience/bloom",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=5021; downloads=4900.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_39a893115d10b83ca480459a",
-      "cluster_id": "cluster_62d1fd57c7e4e36b0dce9927",
-      "title": "Demonstration of use of computer vision capabilities of large language models (LLMs) using R",
-      "url": "https://doi.org/10.5281/zenodo.21184988",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_3bbfb97f46a87e6901bd0dcb",
-      "cluster_id": "cluster_19ee6af6e3d15e37dee57f6c",
-      "title": "meta-llama/Meta-Llama-3-8B",
-      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=6586; downloads=1289733.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_3d1c7305cf53900ba9591885",
-      "cluster_id": "cluster_2d7788550c15c5ce27c5614e",
-      "title": "Kube ClusterGuard",
-      "url": "https://doi.org/10.5281/zenodo.21196012",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4ec8c5ac449aff7510039ff9",
-      "cluster_id": "cluster_5586d7de26a7825249b1e30e",
-      "title": "meta-llama/Meta-Llama-3-8B-Instruct",
-      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4677; downloads=1312920.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_55c2325bc90a4934c957a6d8",
-      "cluster_id": "cluster_b17715c1f0b54c341e6b1a7b",
-      "title": "Demonstration of use of computer vision capabilities of large language models (LLMs) using R",
-      "url": "https://doi.org/10.5281/zenodo.20782175",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_5a7dc040e2c88afea237de76",
+      "id": "occ_17f06c96b221ef8d866c1875",
       "cluster_id": "cluster_4d5e92d1978119e87a355706",
       "title": "black-forest-labs/FLUX.1-dev",
       "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
-      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=13496; downloads=875870.",
+      "summary": "FLUX.1-dev 是图像生成模型，榜单热度显示它仍被大量用于文生图和视觉创作实验。选型时需要结合模型卡、许可证、推理成本和生成质量，尤其关注商用限制、硬件需求和团队已有工作流。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -930,29 +647,60 @@
         "home_url": "https://huggingface.co/"
       },
       "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev"
       },
       "source_group": "papers_models",
       "content_tags": [
         "model_release",
-        "creative_ai"
+        "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
-      "source_health": "available",
+      "source_health": "unknown",
       "access_state": "direct"
     },
     {
-      "id": "occ_6e339b91fc1d0dd2c9912a0a",
-      "cluster_id": "cluster_32e2db27eca9a8cc646f8aae",
-      "title": "sentence-transformers/all-MiniLM-L6-v2",
-      "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
-      "summary": "Hugging Face ranked model entry; task=sentence-similarity; likes=5032; downloads=244099047.",
+      "id": "occ_1cfffeef585a185742723875",
+      "cluster_id": "cluster_3630fc138d59fae622043ea2",
+      "title": "openai/whisper-large-v3",
+      "url": "https://huggingface.co/openai/whisper-large-v3",
+      "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为语音识别方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/openai/whisper-large-v3"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_225f9c2e0cacb86d7f497a5e",
+      "cluster_id": "cluster_3ce63bb1cf5241de43c2cda1",
+      "title": "deepseek-ai/DeepSeek-R1",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=13448; downloads=8592821.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -970,175 +718,82 @@
         "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_7bdbf592e23b2ea78c86d7fc",
+      "id": "occ_2d0d5c34931242a97518f81d",
+      "cluster_id": "cluster_19ee6af6e3d15e37dee57f6c",
+      "title": "meta-llama/Meta-Llama-3-8B",
+      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=6591; downloads=1315525.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_2de7b965d67d7051d3da4e67",
+      "cluster_id": "cluster_7ecad021dde729bf1f3b6774",
+      "title": "stabilityai/stable-diffusion-3-medium",
+      "url": "https://huggingface.co/stabilityai/stable-diffusion-3-medium",
+      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=4994; downloads=3725.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "creative_ai"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_30488d4d73c5a9c20e0721ac",
       "cluster_id": "cluster_4143cf1471f6ab870501b920",
       "title": "black-forest-labs/FLUX.1-schnell",
       "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
-      "summary": "black-forest-labs/FLUX.1-schnell 是 Hugging Face 上的图像生成模型，当前采样显示下载量为 241669、收藏数为 5282，任务类型为文本生成图像。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_80d5602d3c45636f6fdde1b0",
-      "cluster_id": "cluster_f85326ed9ab1c9be95a7804f",
-      "title": "openai/gpt-oss-120b",
-      "url": "https://huggingface.co/openai/gpt-oss-120b",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4946; downloads=4183948.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_83f29e2fafec9ecf0c3804a7",
-      "cluster_id": "cluster_4fb7165743ee42f1a3de35ce",
-      "title": "openai/gpt-oss-20b",
-      "url": "https://huggingface.co/openai/gpt-oss-20b",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4766; downloads=6916383.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_89e142f4e4d8aca4f7c57a30",
-      "cluster_id": "cluster_ae0dfa37fddcbcfcc70e3477",
-      "title": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-      "url": "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
-      "summary": "Hugging Face ranked model entry; task=vllm; likes=4701; downloads=523960.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_8ec9d82e6be945eff809e445",
-      "cluster_id": "cluster_464e108a8a04d874daa0bf8c",
-      "title": "hexgrad/Kokoro-82M",
-      "url": "https://huggingface.co/hexgrad/Kokoro-82M",
-      "summary": "openai/whisper-large-v3-turbo 是 Hugging Face 上的语音识别模型，当前采样显示下载量为 13685663、收藏数为 6445。语音产品团队可重点复核延迟、语言覆盖和部署成本。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/hexgrad/Kokoro-82M"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "open_source"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_98817f9d77991ee4590a3eb8",
-      "cluster_id": "cluster_3c44be280a6c9e15cc578623",
-      "title": "stabilityai/stable-diffusion-xl-base-1.0",
-      "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
-      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=7890; downloads=1324801.",
+      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=5299; downloads=245019.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1156,20 +811,20 @@
         "creative_ai"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_99112559ed5fad6b6940f324",
-      "cluster_id": "cluster_e0c304c992da09bd7d5695ea",
-      "title": "meta-llama/Llama-2-7b",
-      "url": "https://huggingface.co/meta-llama/Llama-2-7b",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4509; downloads=124.",
+      "id": "occ_3a09ca6f9229bf328488b164",
+      "cluster_id": "cluster_a0d5aaf3b3e59dfbb307c9cd",
+      "title": "deepseek-ai/DeepSeek-V4-Pro",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=5171; downloads=1200179.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1187,51 +842,51 @@
         "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_9b481dd22dc3916eb6527d91",
-      "cluster_id": "cluster_63887660927478a4345d398f",
-      "title": "AI Cost Watch - Week of 1 July 2026 (Issue 4)",
-      "url": "https://doi.org/10.5281/zenodo.20541643",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
+      "id": "occ_3bdb70ea1709077b849d2624",
+      "cluster_id": "cluster_4d5e92d1978119e87a355706",
+      "title": "black-forest-labs/FLUX.1-dev",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
+      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=13534; downloads=755766.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
       },
       "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "company_business",
-        "community_discussion"
+        "model_release",
+        "creative_ai"
       ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_9b4e20d02b0ee5dfb10f99b9",
+      "id": "occ_4397f50cf768821046567867",
       "cluster_id": "cluster_a0d5aaf3b3e59dfbb307c9cd",
       "title": "deepseek-ai/DeepSeek-V4-Pro",
       "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
-      "summary": "deepseek-ai/DeepSeek-V4-Pro 是 Hugging Face 上的文本生成模型，当前采样显示下载量为 1232675、收藏数为 5154，适合继续复核模型卡、许可和推理成本。",
+      "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为文本生成方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1249,20 +904,328 @@
         "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "unknown",
       "access_state": "direct"
     },
     {
-      "id": "occ_a1da6a64279f68d5cadcac6c",
-      "cluster_id": "cluster_7ecad021dde729bf1f3b6774",
-      "title": "stabilityai/stable-diffusion-3-medium",
-      "url": "https://huggingface.co/stabilityai/stable-diffusion-3-medium",
-      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=4990; downloads=3705.",
+      "id": "occ_4b0cd442b55dce92aac839a4",
+      "cluster_id": "cluster_32e2db27eca9a8cc646f8aae",
+      "title": "sentence-transformers/all-MiniLM-L6-v2",
+      "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+      "summary": "Hugging Face ranked model entry; task=sentence-similarity; likes=5045; downloads=247907292.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_4babb7e8f8fcc6b9d798d8b8",
+      "cluster_id": "cluster_f85326ed9ab1c9be95a7804f",
+      "title": "openai/gpt-oss-120b",
+      "url": "https://huggingface.co/openai/gpt-oss-120b",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4953; downloads=4298781.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_5f65392accf581f1f4ede809",
+      "cluster_id": "cluster_464e108a8a04d874daa0bf8c",
+      "title": "hexgrad/Kokoro-82M",
+      "url": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "summary": "Kokoro-82M 是轻量文本转语音模型，榜单热度说明语音合成应用仍关注小模型、速度和部署成本。采用前应测试目标语言、音色质量、许可证、延迟和批量生成稳定性。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_7119863fb9f898785bc82d2b",
+      "cluster_id": "cluster_4143cf1471f6ab870501b920",
+      "title": "black-forest-labs/FLUX.1-schnell",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
+      "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为图像生成方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_73c26a212f5e546cc5df28ba",
+      "cluster_id": "cluster_32e2db27eca9a8cc646f8aae",
+      "title": "相关团队说明模型能力和评估方法更新",
+      "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+      "summary": "文章说明轻量句向量模型在语义任务中的持续使用，围绕语义搜索、聚类、去重和轻量检索增强展开。应用团队可关注模型尺寸、延迟、语言覆盖、向量质量、索引成本、评估数据和部署风险，决定是否替换或保留现有检索链路。这些指标能支撑召回评测、成本核算和线上监控。",
+      "author": "Hugging Face Trending Models",
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Hugging Face Trending Models",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_83ee8decb4a5c475cced8050",
+      "cluster_id": "cluster_f3aa7dbdb63c94657c178686",
+      "title": "CompVis/stable-diffusion-v1-4",
+      "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
+      "summary": "stable-diffusion-v1-4 是经典图像生成模型，仍在榜单中保持可见度，说明它在示例、复现和轻量实验中还有需求。团队采用时应比较新模型的质量、速度、许可证和部署成本。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8446923f9d30e85d1395fbea",
+      "cluster_id": "cluster_3630fc138d59fae622043ea2",
+      "title": "openai/whisper-large-v3",
+      "url": "https://huggingface.co/openai/whisper-large-v3",
+      "summary": "Hugging Face ranked model entry; task=automatic-speech-recognition; likes=5918; downloads=5893742.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_864ab10fb017219838733eab",
+      "cluster_id": "cluster_c2763071083984684d0139a5",
+      "title": "One Token to Fool LLM-as-a-Judge.",
+      "url": "https://arxiv.org/abs/2507.08794",
+      "summary": "|[One Token to Fool LLM-as-a-Judge.](https://arxiv.org/abs/2507.08794) |This paper reveals the fragility of LLM-based reward models in RL with Verifiable Rewards (RLVR), showing that superficial tokens like “Solution” or even a colon can tr。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "ML News of the Week README",
+        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_89a1ea70dfc2ac85cdc049f3",
+      "cluster_id": "cluster_3f4b219a9faae72736440eae",
+      "title": "bigscience/bloom",
+      "url": "https://huggingface.co/bigscience/bloom",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=5023; downloads=5324.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8df2cbd12d6b166e16ed8047",
+      "cluster_id": "cluster_e0c304c992da09bd7d5695ea",
+      "title": "meta-llama/Llama-2-7b",
+      "url": "https://huggingface.co/meta-llama/Llama-2-7b",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4511; downloads=113.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9e3b92eac69ee1c21cc6de8a",
+      "cluster_id": "cluster_464e108a8a04d874daa0bf8c",
+      "title": "hexgrad/Kokoro-82M",
+      "url": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "summary": "Hugging Face ranked model entry; task=text-to-speech; likes=6462; downloads=13509796.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1280,51 +1243,20 @@
         "creative_ai"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_ac6f0e41e1687abcec691eab",
-      "cluster_id": "cluster_4542559f9f131d4ddc66ed8e",
-      "title": "Tongyi-MAI/Z-Image-Turbo",
-      "url": "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo",
-      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=4928; downloads=921675.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Trending Models",
-        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "creative_ai"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_b427de62bc7ce8ce5f71cf1e",
+      "id": "occ_b8dabe990614ac554d5ed129",
       "cluster_id": "cluster_3ce63bb1cf5241de43c2cda1",
       "title": "deepseek-ai/DeepSeek-R1",
       "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
-      "summary": "Qwen/Qwen3-Embedding-8B 是 Hugging Face 上的文本向量模型，当前采样显示下载量为 8338210、收藏数为 13436。它适合进入检索增强、语义搜索和企业知识库场景的初步评估。",
+      "summary": "DeepSeek-R1 是文本生成与推理模型，下载量和收藏量显示社区仍在持续试用。开发者评估时应结合模型卡、许可证、上下文长度、推理成本和真实任务表现，避免只用热度衡量可用性。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1342,51 +1274,82 @@
         "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "unknown",
       "access_state": "direct"
     },
     {
-      "id": "occ_b4a3ffe17557259daca769b6",
-      "cluster_id": "cluster_d15c73c7dbf1cae26e1d1d98",
-      "title": "The AI Private-Valuation Marks-vs-Reality Ledger: a pre-registered, reproducible scoreboard for how private AI valuations survive a real public price",
-      "url": "https://doi.org/10.5281/zenodo.20672581",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
+      "id": "occ_bd028b8ad069dd8411b10d07",
+      "cluster_id": "cluster_3c44be280a6c9e15cc578623",
+      "title": "stabilityai/stable-diffusion-xl-base-1.0",
+      "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
+      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=7899; downloads=1371718.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
       },
       "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "open_source",
-        "community_discussion"
+        "model_release",
+        "creative_ai"
       ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_b8d51167f77b1aba308cd95c",
-      "cluster_id": "cluster_a0d5aaf3b3e59dfbb307c9cd",
-      "title": "deepseek-ai/DeepSeek-V4-Pro",
-      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=5155; downloads=1232675.",
+      "id": "occ_ca9d7e370b440ff342009696",
+      "cluster_id": "cluster_deede0538205756c838ef6e3",
+      "title": "meta-llama/Llama-3.1-8B-Instruct",
+      "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
+      "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为文本生成方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_cdf4f42df52a8afde8fd56b8",
+      "cluster_id": "cluster_4fb7165743ee42f1a3de35ce",
+      "title": "openai/gpt-oss-20b",
+      "url": "https://huggingface.co/openai/gpt-oss-20b",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4771; downloads=7014199.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1404,16 +1367,16 @@
         "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_b95489391c72d2c07283db56",
+      "id": "occ_ced4d611a422586b60802702",
       "cluster_id": "cluster_82391dd078e3c4c2107b0dcd",
       "title": "Gemini 2.5 Pro Capable of Winning Gold at IMO 2025.",
       "url": "https://arxiv.org/abs/2507.15855",
@@ -1435,20 +1398,20 @@
         "community_discussion"
       ],
       "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_bc683251de08c6721bb64ca7",
-      "cluster_id": "cluster_4d5e92d1978119e87a355706",
-      "title": "black-forest-labs/FLUX.1-dev",
-      "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
-      "summary": "black-forest-labs/FLUX.1-dev 是 Hugging Face 上的图像生成模型，当前采样显示下载量为 875870、收藏数为 13496。读者在评估时应继续查看模型卡、许可证、运行成本和商用限制。",
+      "id": "occ_cfa698e5e9fbe2e4d531a09c",
+      "cluster_id": "cluster_3c44be280a6c9e15cc578623",
+      "title": "stabilityai/stable-diffusion-xl-base-1.0",
+      "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
+      "summary": "该模型在 Hugging Face 本周榜单中保持较高热度，可作为图像生成方向的候选基线。选型时应核对模型卡、许可证、资源需求和部署成本，并用自有样例验证效果。",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1458,7 +1421,7 @@
       },
       "collected_via": {
         "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev"
+        "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -1466,51 +1429,20 @@
         "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "unknown",
       "access_state": "direct"
     },
     {
-      "id": "occ_bf178697508b9915b33db759",
-      "cluster_id": "cluster_d15c73c7dbf1cae26e1d1d98",
-      "title": "The AI Private-Valuation Marks-vs-Reality Ledger: a pre-registered, reproducible scoreboard for how private AI valuations survive a real public price",
-      "url": "https://doi.org/10.5281/zenodo.20672581",
-      "summary": "Zenodo (CERN European Organization for Nuclear Research)",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "doi.org",
-        "home_url": "https://doi.org/"
-      },
-      "collected_via": {
-        "name": "OpenAlex",
-        "url": "https://api.openalex.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "company_business",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-04",
-      "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_c0b87d72b773b47bd18cb802",
+      "id": "occ_e86cc1de6fafc315948ca6c9",
       "cluster_id": "cluster_deede0538205756c838ef6e3",
       "title": "meta-llama/Llama-3.1-8B-Instruct",
       "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
-      "summary": "Hugging Face ranked model entry; task=text-generation; likes=6229; downloads=9024304.",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=6252; downloads=9004427.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1528,20 +1460,20 @@
         "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_c29a770eccf44de641327b8e",
-      "cluster_id": "cluster_3630fc138d59fae622043ea2",
-      "title": "openai/whisper-large-v3",
-      "url": "https://huggingface.co/openai/whisper-large-v3",
-      "summary": "openai/whisper-large-v3 是 Hugging Face 上的自动语音识别模型，当前采样显示下载量为 5799742、收藏数为 5910，可用于观察语音转写模型的需求变化。",
+      "id": "occ_f318436fdb8958445a2cc025",
+      "cluster_id": "cluster_da27a622511f166d35c77e35",
+      "title": "meta-llama/Llama-2-7b-chat-hf",
+      "url": "https://huggingface.co/meta-llama/Llama-2-7b-chat-hf",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4788; downloads=267253.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1550,8 +1482,8 @@
         "home_url": "https://huggingface.co/"
       },
       "collected_via": {
-        "name": "AI Daily legacy report · Hugging Face Trending Models",
-        "url": "https://huggingface.co/openai/whisper-large-v3"
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -1559,12 +1491,74 @@
         "open_source"
       ],
       "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-04",
+      "event_date": "2026-07-08",
       "published_at": null,
-      "collected_at": "2026-07-06T06:57:46.425Z",
+      "collected_at": "2026-07-08T04:22:35.604Z",
       "date_anomaly": null,
       "image_url": null,
-      "source_health": "unknown",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_f7c47918158066f0d7556c89",
+      "cluster_id": "cluster_5586d7de26a7825249b1e30e",
+      "title": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=4686; downloads=1337752.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_fc9bdefd4b1115eb72092396",
+      "cluster_id": "cluster_f3aa7dbdb63c94657c178686",
+      "title": "CompVis/stable-diffusion-v1-4",
+      "url": "https://huggingface.co/CompVis/stable-diffusion-v1-4",
+      "summary": "Hugging Face ranked model entry; task=text-to-image; likes=7034; downloads=426356.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "creative_ai"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-08",
+      "published_at": null,
+      "collected_at": "2026-07-08T04:22:35.604Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
       "access_state": "direct"
     }
   ]

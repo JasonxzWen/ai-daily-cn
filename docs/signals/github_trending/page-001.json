@@ -2,7 +2,7 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-27T05:50:05.082Z",
+  "generated_at": "2026-07-27T07:26:46.947Z",
   "group": {
     "id": "github_trending",
     "label": "GitHub 趋势"
@@ -10,9 +10,74 @@
   "page": 1,
   "page_count": 133,
   "page_size": 50,
-  "total_count": 6634,
+  "total_count": 6636,
   "next_url": "signals/github_trending/page-002.json",
   "items": [
+    {
+      "id": "occ_58475ab2942a4f220044867c",
+      "cluster_id": "cluster_dc120243d15a4582e7610884",
+      "title": "chore: update feeds [skip ci]",
+      "url": "https://github.com/zarazhangrui/follow-builders/commit/29efce360dea6cc54f3826ba89a2608eba2212fa",
+      "summary": "chore: update feeds [skip ci]。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "follow-builders GitHub commits",
+        "url": "https://github.com/zarazhangrui/follow-builders/commits/main.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "open_source",
+        "industry_news",
+        "analysis_opinion"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-27",
+      "published_at": null,
+      "collected_at": "2026-07-27T07:26:46.947Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_70eb0db2a7adb7d34e486b93",
+      "cluster_id": "cluster_96d85ce65b8ca109c91664c4",
+      "title": "b10144",
+      "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b10144",
+      "summary": "server + ui: fix stream routes for model names containing a slash ( #26137 ) server + ui: refactor resumable stream routes to query string conv_id The conversation id can embed a model name containing slashes (ggml-org/...) in router mode,",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "github.com",
+        "home_url": "https://github.com/"
+      },
+      "collected_via": {
+        "name": "ggml-org/llama.cpp Releases",
+        "url": "https://github.com/ggml-org/llama.cpp/releases.atom"
+      },
+      "source_group": "github_trending",
+      "content_tags": [
+        "model_release",
+        "open_source",
+        "engineering",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-27",
+      "published_at": null,
+      "collected_at": "2026-07-27T07:26:46.947Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
     {
       "id": "occ_7e56767f22fba1d0a71e0be9",
       "cluster_id": "cluster_b811cc97eff4aae9d6caa89b",
@@ -1483,69 +1548,6 @@
       "collected_via": {
         "name": "GitHub Trending Java weekly",
         "url": "https://github.com/trending/java?since=weekly"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-07-27",
-      "published_at": null,
-      "collected_at": "2026-07-27T03:01:12.615Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1fd43202a40b00412d6857fb",
-      "cluster_id": "cluster_aa30b3acec399c1c1a767cb9",
-      "title": "OpenAI prepares to launch GPT-5 in August, The Verge reports.",
-      "url": "https://www.reuters.com/business/openai-prepares-launch-gpt-5-august-verge-reports-2025-07-24/",
-      "summary": "|[OpenAI prepares to launch GPT-5 in August, The Verge reports.](https://www.reuters.com/business/openai-prepares-launch-gpt-5-august-verge-reports-2025-07-24/) | OpenAI is preparing to launch GPT-5 as soon as August, introducing an AI syst。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "reuters.com",
-        "home_url": "https://www.reuters.com/"
-      },
-      "collected_via": {
-        "name": "ML & AI News of the Week",
-        "url": "https://raw.githubusercontent.com/SalvatoreRa/ML-news-of-the-week/main/README.md"
-      },
-      "source_group": "github_trending",
-      "content_tags": [
-        "open_source",
-        "research",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "monitoring_lead",
-      "event_date": "2026-07-27",
-      "published_at": null,
-      "collected_at": "2026-07-27T03:01:12.615Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_203d28093b8aa871f8fdb0e0",
-      "cluster_id": "cluster_4da75bf042e85c54857bb73e",
-      "title": "kepano/defuddle",
-      "url": "https://github.com/kepano/defuddle",
-      "summary": "kepano/defuddle appeared on GitHub Trending TypeScript daily with 28 stars today. 近 7 天本地记录未见该仓库，按新进入 GitHub Trending 前列的项目优先核查。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "github.com",
-        "home_url": "https://github.com/"
-      },
-      "collected_via": {
-        "name": "GitHub Trending TypeScript daily",
-        "url": "https://github.com/trending/typescript?since=daily"
       },
       "source_group": "github_trending",
       "content_tags": [
