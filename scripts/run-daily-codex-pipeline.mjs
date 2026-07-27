@@ -6,7 +6,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { finished } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
-import { qualityRepairFeedback, runDailyWorkflow } from "../src/daily-runner.js";
+import {
+  hasStrictQualityRepairProgress,
+  qualityRepairFeedback,
+  runDailyWorkflow
+} from "../src/daily-runner.js";
 import {
   internalCandidatePoolRelativePath,
   legacyCandidatePoolRelativePath,
@@ -122,6 +126,106 @@ async function productionDailyWorkflowAvailable(rootDir) {
   );
 }
 
+async function restoreRolledBackPathProgressAction(existingSummary, plan) {
+  const progress = existingSummary?.quality_repair_progress;
+  const stages = Array.isArray(existingSummary?.stages) ? existingSummary.stages : [];
+  const rolledBackRepair = stages.some((stage) =>
+    stage?.id === "quality_ai_repair" &&
+    stage?.output?.rolled_back === true &&
+    stage?.output?.repair_stalled === true
+  );
+  const suppressedContentRepair = stages.some((stage) =>
+    stage?.id === "content_contract" &&
+    stage?.output?.repair_reentry_suppressed === true
+  );
+  if (
+    existingSummary?.legacy_report?.status !== "blocked" ||
+    existingSummary.legacy_report?.failed_stage_id !== "validate" ||
+    progress?.stalled !== true ||
+    !rolledBackRepair ||
+    !suppressedContentRepair ||
+    !hasStrictQualityRepairProgress(progress.previous || progress.effective, progress.attempted)
+  ) {
+    return null;
+  }
+
+  const cleanRoot = path.resolve(String(existingSummary.clean_repo_root || ""));
+  const allowedCleanRoot = path.resolve(plan.root_dir, ".tmp", "publish-worktrees");
+  if (!isPathInside(allowedCleanRoot, cleanRoot)) {
+    return null;
+  }
+  const resolveEvidencePath = (value) => {
+    const resolved = path.isAbsolute(String(value || ""))
+      ? path.resolve(String(value))
+      : path.resolve(cleanRoot, String(value || ""));
+    return isPathInsideOrEqual(cleanRoot, resolved) ? resolved : "";
+  };
+  const sourceReportPath = resolveEvidencePath(existingSummary.current_report_path);
+  const candidatePoolPath = resolveEvidencePath(existingSummary.candidate_pool_path);
+  const qualityReviewPath = resolveEvidencePath(existingSummary.quality_review_path);
+  if (
+    !sourceReportPath ||
+    !candidatePoolPath ||
+    !qualityReviewPath ||
+    !(await fileExists(sourceReportPath)) ||
+    !(await fileExists(candidatePoolPath)) ||
+    !(await fileExists(qualityReviewPath))
+  ) {
+    return null;
+  }
+
+  const artifact = await readJsonOrNull(qualityReviewPath);
+  const review = artifact?.review && typeof artifact.review === "object" ? artifact.review : artifact;
+  const activePaths = new Set(
+    Array.isArray(progress.previous?.active_paths)
+      ? progress.previous.active_paths
+      : Array.isArray(progress.effective?.active_paths)
+        ? progress.effective.active_paths
+        : []
+  );
+  const repairTasksByPath = new Map();
+  for (const task of Array.isArray(review?.ai_review_tasks) ? review.ai_review_tasks : []) {
+    const taskPath = String(task?.path || "");
+    if (
+      activePaths.has(taskPath) &&
+      task?.requires_source_grounding === true
+    ) {
+      repairTasksByPath.set(taskPath, task);
+    }
+  }
+  const aiReviewTasks = [...repairTasksByPath.values()];
+  const feedback = qualityRepairFeedback(review, aiReviewTasks);
+  if (!feedback.comparable || aiReviewTasks.length === 0) {
+    return null;
+  }
+
+  const attempt = Math.max(1, Number(existingSummary.review_repair_attempts || 1));
+  const suffix = attempt <= 1 ? "" : `-attempt-${attempt}`;
+  const contractPath = path.join(plan.root_dir, ".tmp", `quality-ai-repair-${plan.report_date}${suffix}.json`);
+  if (!(await fileExists(contractPath))) {
+    return null;
+  }
+  const maxReviewRepairLoops = Math.max(attempt, Number(existingSummary.max_review_repair_loops || 5));
+  return {
+    kind: "codex_ai_repair_contract",
+    contract_path: contractPath,
+    summary_path: plan.outputs.run_summary,
+    source_report_path: sourceReportPath,
+    candidate_pool_path: candidatePoolPath,
+    quality_review_path: qualityReviewPath,
+    max_review_repair_loops: maxReviewRepairLoops,
+    remaining_review_repair_loops: Math.max(0, maxReviewRepairLoops - attempt),
+    ai_review_tasks: aiReviewTasks,
+    review_issues: feedback.review_issues,
+    blocking_issue_count: feedback.blocking_issue_count,
+    issue_keys: feedback.issue_keys,
+    issue_fingerprint: feedback.issue_fingerprint,
+    required_contract_status: "ready",
+    required_contract_fields: ["schema_version", "report_date", "status", "edits"],
+    message: "Reapply the preserved repair contract because the prior attempt strictly reduced active paths and was rolled back by legacy issue-key matching."
+  };
+}
+
 async function runSingleScriptDagOrchestrator(plan, options = {}) {
   const dagManifest = await readJsonOrNull(path.join(plan.root_dir, "config", "daily-codex-dag.json"));
   const pipelinePlanPath = singleScriptPipelinePlanPath(plan);
@@ -152,8 +256,12 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
     && existingSummary.legacy_report?.next_action?.kind === "codex_ai_repair_contract"
     ? existingSummary.legacy_report.next_action
     : null;
-  const resumableSummary = nestedAiRepairAction
-    ? { ...existingSummary, final_status: "needs_ai_repair", next_action: nestedAiRepairAction }
+  const rolledBackPathProgressAction = nestedAiRepairAction
+    ? null
+    : await restoreRolledBackPathProgressAction(existingSummary, plan);
+  const resumableAction = nestedAiRepairAction || rolledBackPathProgressAction;
+  const resumableSummary = resumableAction
+    ? { ...existingSummary, final_status: "needs_ai_repair", next_action: resumableAction }
     : existingSummary;
   const shouldResumeAiRepair = resumableSummary?.final_status === "needs_ai_repair";
   await writeJson(plan.outputs.run_summary, shouldResumeAiRepair
@@ -596,6 +704,9 @@ ${JSON.stringify(nextAction.ai_review_tasks || [], null, 2)}
 The current matching error-severity issue and its issue.details are:
 ${JSON.stringify(nextAction.review_issues || [], null, 2)}
 
+The prior contract edits rejected by deterministic validation are:
+${JSON.stringify(nextAction.contract_rejected || [], null, 2)}
+
 Return one JSON object as the final response with exactly this contract shape:
 {
   "schema_version": 1,
@@ -614,6 +725,7 @@ Return one JSON object as the final response with exactly this contract shape:
 Requirements:
 - Include at least one edit and only exact task paths declared above.
 - For every task, read the matching error-severity issue and its issue.details before writing the replacement.
+- Do not repeat a rejected value or its rejected pattern; satisfy every deterministic rejection message for that path.
 - chinese_chars means actual Han characters, not total string length; satisfy the current review's observed requirements instead of assuming a fixed threshold.
 - Never edit a path absent from the current ai_review_tasks.
 - Keep facts, names, dates, numbers, links, and uncertainty consistent with the source report and candidate evidence.

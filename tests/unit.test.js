@@ -80,7 +80,11 @@ import {
   repairReportQuality,
   reviewReportQuality
 } from "../src/quality-loop.js";
-import { qualityRepairFeedback, runDailyWorkflow } from "../src/daily-runner.js";
+import {
+  hasStrictQualityRepairProgress,
+  qualityRepairFeedback,
+  runDailyWorkflow
+} from "../src/daily-runner.js";
 import { runStatusSelfCheck } from "../src/status-self-check.js";
 import { pnpmInvocationForArgs } from "../src/process-runner.js";
 import { compareStableText } from "../src/stable-order.js";
@@ -11679,6 +11683,30 @@ test("daily runner resumes from AI repair contract and continues with optimized 
   assert.equal(reportWriteStage.command.args.includes("--editorial-rank-artifact"), false);
 });
 
+test("quality repair path progress requires fewer paths without adding a new path", () => {
+  const previous = {
+    comparable: true,
+    issue_keys: ["hot_blogs[0].summary|too_short", "hot_blogs[1].summary|too_short"],
+    active_paths: ["hot_blogs[0].summary", "hot_blogs[1].summary"]
+  };
+
+  assert.equal(hasStrictQualityRepairProgress(previous, {
+    comparable: true,
+    issue_keys: ["hot_blogs[1].summary|low_information"],
+    active_paths: ["hot_blogs[1].summary"]
+  }), true);
+  assert.equal(hasStrictQualityRepairProgress(previous, {
+    comparable: true,
+    issue_keys: ["hot_blogs[0].summary|low_information", "hot_blogs[1].summary|too_short"],
+    active_paths: ["hot_blogs[0].summary", "hot_blogs[1].summary"]
+  }), false);
+  assert.equal(hasStrictQualityRepairProgress(previous, {
+    comparable: true,
+    issue_keys: ["hot_blogs[2].summary|too_short"],
+    active_paths: ["hot_blogs[2].summary"]
+  }), false);
+});
+
 test("daily runner creates a new empty AI repair template for public editorial repair failures", async () => {
   const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-repair-template-"));
   const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
@@ -11792,14 +11820,14 @@ test("daily runner creates a new empty AI repair template for public editorial r
               ],
               issues: [
                 {
-                  code: "hot_blog_summary_template",
+                  code: "hot_blog_summary_untranslated",
                   severity: "error",
                   path: "hot_blogs[1].summary",
-                  message: "Current attempt still has one template/coverage problem.",
+                  message: "Current attempt reduced the affected paths but changed the remaining issue kind.",
                   details: {
-                    problems: ["template_or_low_information"],
-                    chinese_chars: 90,
-                    chinese_ratio: 0.588,
+                    problems: ["summary_too_short", "not_chinese_editorial_summary"],
+                    chinese_chars: 42,
+                    chinese_ratio: 0.32,
                     requirements: { min_chinese_chars: 100, max_chinese_chars: 200, min_chinese_ratio: 0.45, min_coverage_hits: 2 }
                   }
                 }
@@ -11833,8 +11861,9 @@ test("daily runner creates a new empty AI repair template for public editorial r
   assert.deepEqual(resumed.summary.quality_repair_progress.active_paths, ["hot_blogs[1].summary"]);
   assert.deepEqual(resumed.summary.quality_repair_progress.frozen_paths, ["hot_blogs[0].summary"]);
   assert.equal(resumed.summary.next_action.review_issues.length, 1);
-  assert.equal(resumed.summary.next_action.review_issues[0].message, "Current attempt still has one template/coverage problem.");
-  assert.equal(resumed.summary.next_action.review_issues[0].details.chinese_chars, 90);
+  assert.equal(resumed.summary.next_action.review_issues[0].message, "Current attempt reduced the affected paths but changed the remaining issue kind.");
+  assert.equal(resumed.summary.next_action.review_issues[0].details.chinese_chars, 42);
+  assert.equal(resumed.summary.next_action.contract_rejected[0].code, "public_copy_banned_term");
   assert.equal(resumed.summary.next_action.blocking_issue_count, 1);
   assert.match(resumed.summary.next_action.issue_fingerprint, /^[a-f0-9]{64}$/);
   const currentReview = JSON.parse(await fs.readFile(resumed.summary.next_action.quality_review_path, "utf8"));
@@ -11855,7 +11884,7 @@ test("daily runner creates a new empty AI repair template for public editorial r
   assert.equal(template.review_issues[0].phase, "first_pass_authoring");
   assert.equal(template.review_issues[0].intent, "source_grounded_public_authoring");
   assert.equal(template.review_issues[0].authoring_contract, "public_prose_authoring_v1");
-  assert.equal(template.review_issues[0].details.chinese_chars, 90);
+  assert.equal(template.review_issues[0].details.chinese_chars, 42);
   assert(template.bad_examples.some((example) => example.value.includes("价值在于")));
 });
 

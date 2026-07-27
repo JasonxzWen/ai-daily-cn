@@ -1133,6 +1133,130 @@ test("daily Codex production orchestrator restores a nested legacy AI repair han
   assert.deepEqual(summary.next_action, repairAction);
 });
 
+test("daily Codex production orchestrator restores a rolled-back repair with strict path progress", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-path-progress-resume-"));
+  const reportDate = "2026-07-27";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const sourceReportPath = path.join(cleanRoot, ".tmp", "daily-report.optimized.json");
+  const candidatePoolPath = path.join(cleanRoot, ".tmp", `source-candidates-${reportDate}.json`);
+  const qualityReviewPath = path.join(cleanRoot, ".tmp", `quality-review-${reportDate}.json`);
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+  const tasks = [
+    {
+      kind: "hot_blog_editorial_rewrite",
+      path: "hot_blogs[0].summary",
+      requires_source_grounding: true
+    },
+    {
+      kind: "hot_blog_editorial_rewrite",
+      path: "hot_blogs[1].summary",
+      requires_source_grounding: true
+    }
+  ];
+  const issues = tasks.map((task, index) => ({
+    code: "hot_blog_summary_untranslated",
+    severity: "error",
+    path: task.path,
+    message: `Initial blocker ${index + 1}.`,
+    details: { problems: ["summary_too_short"] }
+  }));
+  await fs.mkdir(path.dirname(sourceReportPath), { recursive: true });
+  await fs.mkdir(path.dirname(contractPath), { recursive: true });
+  await fs.writeFile(sourceReportPath, `${JSON.stringify({ report_date: reportDate, hot_blogs: [] })}\n`, "utf8");
+  await fs.writeFile(candidatePoolPath, `${JSON.stringify({ report_date: reportDate, candidates: [] })}\n`, "utf8");
+  await fs.writeFile(qualityReviewPath, `${JSON.stringify({
+    report_date: reportDate,
+    review: {
+      ok: false,
+      report_date: reportDate,
+      issues,
+      ai_review_tasks: tasks
+    }
+  }, null, 2)}\n`, "utf8");
+  await fs.writeFile(contractPath, `${JSON.stringify({
+    schema_version: 1,
+    report_date: reportDate,
+    status: "ready",
+    edits: tasks.map((task) => ({
+      path: task.path,
+      value: "一段满足当前任务要求的中文摘要。",
+      reason: "Resume the accepted repair."
+    }))
+  }, null, 2)}\n`, "utf8");
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  const previousPaths = tasks.map((task) => task.path);
+  await fs.writeFile(plan.outputs.run_summary, `${JSON.stringify({
+    schema_version: 1,
+    report_date: reportDate,
+    mode: "publish",
+    final_status: "published_signals_only",
+    clean_repo_root: cleanRoot,
+    current_report_path: ".tmp/daily-report.optimized.json",
+    candidate_pool_path: `.tmp/source-candidates-${reportDate}.json`,
+    quality_review_path: `.tmp/quality-review-${reportDate}.json`,
+    review_repair_attempts: 1,
+    max_review_repair_loops: 5,
+    quality_repair_progress: {
+      state: "stalled",
+      stalled: true,
+      strict_progress: false,
+      previous: {
+        comparable: true,
+        issue_keys: previousPaths.map((pathName) => `${pathName}|summary_too_short`),
+        active_paths: previousPaths
+      },
+      effective: {
+        comparable: true,
+        issue_keys: previousPaths.map((pathName) => `${pathName}|summary_too_short`),
+        active_paths: previousPaths
+      },
+      attempted: {
+        comparable: true,
+        issue_keys: ["hot_blogs[1].summary|template_or_low_information"],
+        active_paths: ["hot_blogs[1].summary"]
+      },
+      active_paths: previousPaths
+    },
+    legacy_report: {
+      status: "blocked",
+      failed_stage_id: "validate",
+      error_code: "1"
+    },
+    stages: [
+      { id: "quality_ai_repair", status: "degraded", output: { rolled_back: true, repair_stalled: true } },
+      { id: "content_contract", status: "degraded", output: { repair_reentry_suppressed: true } },
+      { id: "validate", status: "failed" }
+    ]
+  }, null, 2)}\n`, "utf8");
+
+  const workflowRunner = async ({ summaryPath }) => {
+    const seen = JSON.parse(await fs.readFile(summaryPath, "utf8"));
+    assert.equal(seen.final_status, "needs_ai_repair");
+    assert.equal(seen.next_action.kind, "codex_ai_repair_contract");
+    assert.equal(seen.next_action.contract_path, contractPath);
+    assert.equal(seen.next_action.source_report_path, sourceReportPath);
+    assert.equal(seen.next_action.candidate_pool_path, candidatePoolPath);
+    assert.equal(seen.next_action.quality_review_path, qualityReviewPath);
+    assert.deepEqual(seen.next_action.ai_review_tasks.map((task) => task.path), previousPaths);
+    return { summary: seen, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    maxAutomatedAiRepairAttempts: 0
+  });
+
+  assert.equal(summary.final_status, "needs_ai_repair");
+  assert.equal(summary.next_action.contract_path, contractPath);
+});
+
 test("daily Codex production orchestrator authors a repair contract and resumes within one entrypoint run", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-auto-repair-"));
   const reportDate = "2026-07-10";
@@ -1349,7 +1473,12 @@ test("daily Codex production repair author returns schema-constrained UTF-8 JSON
             source_report_path: sourceReportPath,
             candidate_pool_path: candidatePoolPath,
             quality_review_path: qualityReviewPath,
-            ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }]
+            ai_review_tasks: [{ path: "stories[0].what_happened", kind: "public_editorial_rewrite" }],
+            contract_rejected: [{
+              path: "stories[0].what_happened",
+              code: "public_copy_banned_term",
+              message: "The prior value contained banned term: 披露"
+            }]
           },
           stages: [{ id: "quality_review", status: "failed" }]
         }
@@ -1388,6 +1517,9 @@ test("daily Codex production repair author returns schema-constrained UTF-8 JSON
   const prompt = await fs.readFile(path.join(plan.work_dir, "structured-repair-prompt.txt"), "utf8");
   assert.match(prompt, /Return one JSON object as the final response/);
   assert.match(prompt, /matching error-severity issue and its issue\.details/);
+  assert.match(prompt, /prior contract edits rejected by deterministic validation/);
+  assert.match(prompt, /banned term: 披露/);
+  assert.match(prompt, /Do not repeat a rejected value or its rejected pattern/);
   assert.match(prompt, /chinese_chars means actual Han characters/);
   assert.match(prompt, /Never edit a path absent from the current ai_review_tasks/);
   assert.doesNotMatch(prompt, /Chinese-character ratio of at least 0\.45/);
