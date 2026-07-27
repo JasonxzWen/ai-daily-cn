@@ -2,7 +2,7 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-27T07:26:46.947Z",
+  "generated_at": "2026-07-27T09:07:24.374Z",
   "group": {
     "id": "official_blogs",
     "label": "官网博客"
@@ -10,9 +10,102 @@
   "page": 83,
   "page_count": 277,
   "page_size": 50,
-  "total_count": 13831,
+  "total_count": 13834,
   "next_url": "signals/official_blogs/page-084.json",
   "items": [
+    {
+      "id": "occ_5ad2f93be2f5bce24c6d5188",
+      "cluster_id": "cluster_1c9b44953320e0b2e76c5e0d",
+      "title": "Gary Abel on GPT-Rosalind in biodefense workflows",
+      "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/",
+      "summary": "OpenAI post includes partner detail from Fourth Eon Biosecurity around deploying GPT-Rosalind in analytical and screening workflows.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "openai.com",
+        "home_url": "https://openai.com/"
+      },
+      "collected_via": {
+        "name": "OpenAI News",
+        "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "analysis_opinion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-05-29",
+      "published_at": null,
+      "collected_at": "2026-05-29T18:39:17.274Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_ef665d316ecc1fb80b39af53",
+      "cluster_id": "cluster_1c9b44953320e0b2e76c5e0d",
+      "title": "OpenAI 发布 Rosalind Biodefense 并开放 GPT-Rosalind 可信访问",
+      "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/",
+      "summary": "OpenAI 宣布 Rosalind Biodefense，并称将向选定的美国政府、盟友公共卫生与生物防御伙伴提供 GPT-Rosalind 的可信访问。帖子把使用场景限定在流行病建模、早期检测、筛查、风险评估和响应准备等公共安全任务，而不是面向大众直接开放。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "openai.com",
+        "home_url": "https://openai.com/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · OpenAI",
+        "url": "https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "other"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-05-29",
+      "published_at": null,
+      "collected_at": "2026-05-29T18:39:17.274Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_1955180a28489107bab5336c",
+      "cluster_id": "cluster_ac3d09a478fb443d1a2c0e9d",
+      "title": "OpenAI’s Frontier Governance Framework",
+      "url": "https://openai.com/index/openai-frontier-governance-framework",
+      "summary": "Explore OpenAI’s Frontier Governance Framework and how our AI safety, security, and risk practices align with emerging EU and California regulations.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "openai.com",
+        "home_url": "https://openai.com/"
+      },
+      "collected_via": {
+        "name": "OpenAI News RSS",
+        "url": "https://openai.com/news/rss.xml"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "product_update",
+        "company_business",
+        "policy_infrastructure",
+        "industry_news"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-05-28",
+      "published_at": null,
+      "collected_at": "2026-07-27T03:01:12.615Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
     {
       "id": "occ_3bc710d9be970640ed0161df",
       "cluster_id": "cluster_48ec9bc1ed6417bed499b7c0",
@@ -1449,96 +1542,6 @@
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1a3d8684f399de1524390165",
-      "cluster_id": "cluster_bba0291239de90f8abc7db44",
-      "title": "Introducing Search Toolkit",
-      "url": "https://mistral.ai/news/search-toolkit/",
-      "summary": "Mistral 的 Search Toolkit 把 ingestion、retrieval、evaluation 合并到一个可替换组件框架里，目标是减少 RAG 团队在文档解析、chunking、索引、混合检索和评测之间反复接线的工作。文章最有用的点是把“回答差”拆成检索质量问题：企业内部 wiki、工单、文件、代码库往往各有结构，如果没有统一处理和评测接口，团队只能调 prompt 或换模型。Search Toolkit 提供标准 adapter、BM25 / dense / hybrid retrieval 和 recall、precision、MRR、NDCG 等指标，适合把 RAG 改成可回归的工程系统。",
-      "author": "Mistral",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Mistral AI",
-        "home_url": "https://mistral.ai/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Mistral AI",
-        "url": "https://mistral.ai/news/search-toolkit/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "other"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T18:48:09.023Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_282c3beed2ccbc77ea986743",
-      "cluster_id": "cluster_ecd5e076dc7c6d7d8d6346e3",
-      "title": "Mistral Search Toolkit",
-      "url": "https://docs.mistral.ai/studio-api/knowledge-rag/search-toolkit",
-      "summary": "Mistral Docs 显示 Search Toolkit 可通过 uv 安装，提供 ingestion、retrieval、evaluation 的可插拔组件，并支持多格式提取、chunking、metadata enrichment、vector stores 和检索评测。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "docs.mistral.ai",
-        "home_url": "https://docs.mistral.ai/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Mistral Docs",
-        "url": "https://docs.mistral.ai/studio-api/knowledge-rag/search-toolkit"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T18:48:09.023Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_67ac8d7d647fe21ecce81398",
-      "cluster_id": "cluster_1fad6f064584a97547f1f766",
-      "title": "Mistral 在 AI Now Summit 同日推出工业工程 AI、Vibe 和 Search Toolkit",
-      "url": "https://mistral.ai/news/ai-now-summit-2026/",
-      "summary": "Mistral 的 AI Now Summit 把企业 AI 叙事拆成三个可落地面：工业工程物理模型、长周期 productivity agent Vibe，以及面向 AI 应用的检索工具链。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "mistral.ai",
-        "home_url": "https://mistral.ai/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Mistral AI",
-        "url": "https://mistral.ai/news/ai-now-summit-2026/"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "other"
-      ],
-      "credibility_tag": "pending_review",
-      "event_date": "2026-05-28",
-      "published_at": null,
-      "collected_at": "2026-05-28T18:48:09.023Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
       "access_state": "direct"
     }
   ]

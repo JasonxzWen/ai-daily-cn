@@ -2,7 +2,7 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-27T07:26:46.947Z",
+  "generated_at": "2026-07-27T09:07:24.374Z",
   "group": {
     "id": "official_blogs",
     "label": "官网博客"
@@ -10,9 +10,99 @@
   "page": 84,
   "page_count": 277,
   "page_size": 50,
-  "total_count": 13831,
+  "total_count": 13834,
   "next_url": "signals/official_blogs/page-085.json",
   "items": [
+    {
+      "id": "occ_1a3d8684f399de1524390165",
+      "cluster_id": "cluster_bba0291239de90f8abc7db44",
+      "title": "Introducing Search Toolkit",
+      "url": "https://mistral.ai/news/search-toolkit/",
+      "summary": "Mistral 的 Search Toolkit 把 ingestion、retrieval、evaluation 合并到一个可替换组件框架里，目标是减少 RAG 团队在文档解析、chunking、索引、混合检索和评测之间反复接线的工作。文章最有用的点是把“回答差”拆成检索质量问题：企业内部 wiki、工单、文件、代码库往往各有结构，如果没有统一处理和评测接口，团队只能调 prompt 或换模型。Search Toolkit 提供标准 adapter、BM25 / dense / hybrid retrieval 和 recall、precision、MRR、NDCG 等指标，适合把 RAG 改成可回归的工程系统。",
+      "author": "Mistral",
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Mistral AI",
+        "home_url": "https://mistral.ai/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Mistral AI",
+        "url": "https://mistral.ai/news/search-toolkit/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "other"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-05-28",
+      "published_at": null,
+      "collected_at": "2026-05-28T18:48:09.023Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_282c3beed2ccbc77ea986743",
+      "cluster_id": "cluster_ecd5e076dc7c6d7d8d6346e3",
+      "title": "Mistral Search Toolkit",
+      "url": "https://docs.mistral.ai/studio-api/knowledge-rag/search-toolkit",
+      "summary": "Mistral Docs 显示 Search Toolkit 可通过 uv 安装，提供 ingestion、retrieval、evaluation 的可插拔组件，并支持多格式提取、chunking、metadata enrichment、vector stores 和检索评测。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "docs.mistral.ai",
+        "home_url": "https://docs.mistral.ai/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Mistral Docs",
+        "url": "https://docs.mistral.ai/studio-api/knowledge-rag/search-toolkit"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-05-28",
+      "published_at": null,
+      "collected_at": "2026-05-28T18:48:09.023Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_67ac8d7d647fe21ecce81398",
+      "cluster_id": "cluster_1fad6f064584a97547f1f766",
+      "title": "Mistral 在 AI Now Summit 同日推出工业工程 AI、Vibe 和 Search Toolkit",
+      "url": "https://mistral.ai/news/ai-now-summit-2026/",
+      "summary": "Mistral 的 AI Now Summit 把企业 AI 叙事拆成三个可落地面：工业工程物理模型、长周期 productivity agent Vibe，以及面向 AI 应用的检索工具链。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "mistral.ai",
+        "home_url": "https://mistral.ai/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Mistral AI",
+        "url": "https://mistral.ai/news/ai-now-summit-2026/"
+      },
+      "source_group": "official_blogs",
+      "content_tags": [
+        "other"
+      ],
+      "credibility_tag": "pending_review",
+      "event_date": "2026-05-28",
+      "published_at": null,
+      "collected_at": "2026-05-28T18:48:09.023Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
     {
       "id": "occ_e10cbe8e4036319dd4783332",
       "cluster_id": "cluster_5348a7d239028e9b1bf7be7a",
@@ -1453,101 +1543,6 @@
         "community_discussion"
       ],
       "credibility_tag": "pending_review",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_2073c51a1db8706258d8214a",
-      "cluster_id": "cluster_5219cb779454b714718d5826",
-      "title": "MiniMax Agent Team: Built for Long-Running Tasks and Continuous Evolution",
-      "url": "https://www.minimax.io/blog/minimax-agent-team-long-running-1779893953",
-      "summary": "AI Agent 2026-05-27 MiniMax Agent Team: Built for Long-Running Tasks and Continuous Evolution Today we are introducing the overall upgrade of MiniMax Agent. We have given the upgraded Agent a new name: Mavis — MiniMax as a Jarvis, your AI b",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "minimax.io",
-        "home_url": "https://www.minimax.io/"
-      },
-      "collected_via": {
-        "name": "MiniMax Blog",
-        "url": "https://www.minimax.io/blog"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "model_release",
-        "product_update",
-        "engineering",
-        "creative_ai"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_5573f873dc5527a95691b80e",
-      "cluster_id": "cluster_cbdb6ccd9d67777486b9f703",
-      "title": "Kuaishou Technology Announces First Quarter 2026 Unaudited Financial Results",
-      "url": "https://kuaishou.gcs-web.com/news-releases/news-release-details/kuaishou-technology-announces-first-quarter-2026-unaudited",
-      "summary": "Kuaishou Technology Announces First Quarter 2026 Unaudited Financial Results。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "kuaishou.gcs-web.com",
-        "home_url": "https://kuaishou.gcs-web.com/"
-      },
-      "collected_via": {
-        "name": "Kuaishou Company News",
-        "url": "https://kuaishou.gcs-web.com/news-events/company-news"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "company_business",
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-05-27",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_6582973c53ffac02b563a458",
-      "cluster_id": "cluster_9e899a157ff8ca685d215ee4",
-      "title": "Shipping a Trillion Parameters With a Hub Bucket: Delta Weight Sync in TRL",
-      "url": "https://huggingface.co/blog/delta-weight-sync",
-      "summary": "Hugging Face Blog published this blog/interview entry.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Blog",
-        "url": "https://huggingface.co/blog/feed.xml"
-      },
-      "source_group": "official_blogs",
-      "content_tags": [
-        "industry_news"
-      ],
-      "credibility_tag": "primary_material",
       "event_date": "2026-05-27",
       "published_at": null,
       "collected_at": "2026-07-15T03:02:17.127Z",
