@@ -178,6 +178,7 @@
     "blocking_issue": "multiple_active_daily_publish_automations"
   },
   "required_package_scripts": {
+    "browser:install": "playwright install chromium",
     "daily:codex-pipeline": "node scripts/run-daily-codex-pipeline.mjs",
     "daily:codex-dag:contract-run": "node scripts/run-daily-codex-dag.mjs --contract-run --json",
     "daily:run": "node src/cli.js daily:run",
@@ -283,6 +284,7 @@
         "Asia/Shanghai",
         "worktree",
         "pnpm@11.10.0",
+        "pnpm run browser:install",
         "UTF-8",
         "JSON.parse",
         "completed_stages",
@@ -405,6 +407,7 @@
     "contains": [
       "node scripts/run-daily-codex-pipeline.mjs",
       "pnpm@11.10.0",
+      "pnpm run browser:install",
       "--execute",
       "origin/main",
       "worktree",

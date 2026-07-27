@@ -12,7 +12,13 @@ Automation 不依赖全局 Corepack 或 Codex 临时 pnpm 路径。先用 npm �
 npm exec --yes --package=pnpm@11.10.0 -- pnpm install --frozen-lockfile
 ```
 
-再在同一个精确 pnpm 环境中直接调用 Node 入口：
+再用项目锁定的 Playwright 安装测试所需 Chromium；该命令可重复执行，已存在的匹配版本会直接复用：
+
+```bash
+npm exec --yes --package=pnpm@11.10.0 -- pnpm run browser:install
+```
+
+最后在同一个精确 pnpm 环境中直接调用 Node 入口：
 
 ```bash
 npm exec --yes --package=pnpm@11.10.0 -- node scripts/run-daily-codex-pipeline.mjs --date YYYY-MM-DD --execute
@@ -34,9 +40,10 @@ npm exec --yes --package=pnpm@11.10.0 -- node scripts/run-daily-codex-pipeline.m
 2. 仅在当前进程内 fetch 最新 `origin/main`；SSH agent 对 Codex 不可见时，可对公开仓库临时使用 HTTPS，不写持久 Git 配置。
 3. 验证 worktree 干净，并让本次执行代码与 fetch 后的 `origin/main` 相同。
 4. 使用 `pnpm@11.10.0` 在 Automation-owned worktree 安装项目依赖，不执行全局安装。
-5. 记录 `bootstrap mainSha`，并确认 pipeline summary 中的 clean publish root 来自该版本。
-6. 只在 Automation-owned worktree 运行唯一入口，不 reset、stash、clean 或切换用户的 launcher checkout。
-7. 不复用其他 checkout 或 `.tmp/daily-codex-pipeline/YYYY-MM-DD` 的旧运行目录猜测结果。
+5. 运行 `pnpm run browser:install`，确保完整验证使用与项目 Playwright 版本匹配的 Chromium。
+6. 记录 `bootstrap mainSha`，并确认 pipeline summary 中的 clean publish root 来自该版本。
+7. 只在 Automation-owned worktree 运行唯一入口，不 reset、stash、clean 或切换用户的 launcher checkout。
+8. 不复用其他 checkout 或 `.tmp/daily-codex-pipeline/YYYY-MM-DD` 的旧运行目录猜测结果。
 
 ## 公共信号优先
 

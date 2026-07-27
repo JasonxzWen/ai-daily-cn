@@ -20,6 +20,7 @@ title: AI Daily CN 项目概览
 - AI repair 的严格进度既可以表现为错误信号集合严格缩小，也可以表现为阻断路径严格减少且没有新增路径；后者允许同一路径在修复后暴露更具体的剩余问题，并可从旧版误回滚后继发的 validate 阻断恢复原 contract。路径数量不变或出现新路径仍不算进展。
 - 信号历史按产品契约持续保留；总 tracked payload 的硬上限为 384 MiB，reports-data、单文件、重复资产和 Git pack 仍受各自独立门槛约束，不能通过删除已发布信号历史绕过体积治理。
 - 根包使用 Node.js ESM，并通过 Corepack 管理的 pnpm workspace 执行构建、测试与发布前验证。
+- macOS 日更 Automation 在安装锁定依赖后执行仓库 `browser:install`，为完整验证准备与项目 Playwright 版本匹配的 Chromium；该步骤不依赖全局浏览器或全局包。
 
 ## 推断边界
 
@@ -29,6 +30,7 @@ title: AI Daily CN 项目概览
 
 - [项目 README](../README.md)
 - [项目包定义](../package.json)
+- [Codex Automation 配置](../docs/codex-automation-setup.md)
 - [命令行入口](../src/cli.js)
 - [候选池持久化](../src/candidates.js)
 - [候选池路径布局](../src/reports-data-layout.js)
