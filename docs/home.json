@@ -1,8 +1,141 @@
 {
   "schema_version": 1,
   "site_title": "AI 日报",
-  "generated_at": "2026-07-23T09:51:59.458Z",
+  "generated_at": "2026-07-27T09:30:52.691Z",
   "latest_edition": {
+    "report_date": "2026-07-27",
+    "title": "AI 日报 2026-07-27",
+    "summary": "今日主线：Alibaba Cloud发布安全治理和平台控制变化；Microsoft介绍模型能力和推理入口变化；Microsoft介绍模型能力和推理入口变化；技术博客补充 agent 和开发工具的落地边界。",
+    "report_url": "data/2026/07/2026-07-27.json",
+    "data_url": "data/2026/07/2026-07-27.json",
+    "generated_at": "2026-07-27T09:07:24.374Z",
+    "story_count": 8,
+    "lead_story": {
+      "id": "article-c4ddefe341c4a4bb",
+      "title": "Alibaba Cloud发布安全治理和平台控制变化",
+      "url": "https://www.alibabacloud.com/blog/qoder-security-officially-launches-assigning-a-dedicated-security-engineer-to-every-developer_603392",
+      "summary": "阿里云宣布 Qoder Security 正式上线，并将其定位为面向每位开发者的“专属安全工程师”。现有证据确认了产品发布及其安全辅助定位，但未提供检测范围、部署方式或效果数据。 它把安全检查前移到开发环节，但团队是否采用仍取决于实际支持的漏洞类型、代码访问权限、误报率及修复建议质量，这些边界尚不能从现有材料确认。",
+      "event_date": "2026-07-27",
+      "source": "Alibaba Cloud Blog",
+      "label": "本期主线",
+      "tags": [
+        "AI 工程栈",
+        "Alibaba",
+        "商业洞察"
+      ],
+      "report_url": "data/2026/07/2026-07-27.json"
+    },
+    "secondary_stories": [
+      {
+        "id": "article-1bfc86f321c47914",
+        "title": "Microsoft介绍模型能力和推理入口变化",
+        "url": "https://huggingface.co/spaces/microsoft/paza-bench/discussions/4",
+        "summary": "Microsoft 的 PAZA Bench 讨论区出现一项新增自动语音识别（ASR）模型的请求。当前材料只确认社区提出了请求，未证明模型已被纳入评测，也没有给出评测结果。 若模型最终进入 PAZA Bench，开发者将获得新的横向比较对象；在维护者确认、评测配置和结果公布前，这仍只是候选扩充线索，不能据此判断模型能力。",
+        "event_date": "2026-07-27",
+        "source": "Microsoft Hugging Face Organization",
+        "label": "本期主线",
+        "tags": [
+          "Hugging Face",
+          "基础模型",
+          "快讯"
+        ],
+        "report_url": "data/2026/07/2026-07-27.json"
+      },
+      {
+        "id": "article-7d4dad75e7818051",
+        "title": "Microsoft介绍模型能力和推理入口变化",
+        "url": "https://huggingface.co/microsoft/models",
+        "summary": "Microsoft 的 Hugging Face 组织模型页显示共有 539 个模型，提供集中浏览入口。现有证据没有指明其中哪些模型为当日新增，也未说明模型能力、许可证或维护状态发生变化。 这一目录便于开发者发现 Microsoft 发布的模型，但数量本身不能回答能否商用或部署；选型仍需逐一查看模型卡、许可证、任务类型和更新时间。",
+        "event_date": "2026-07-27",
+        "source": "Microsoft Hugging Face Organization",
+        "label": "本期主线",
+        "tags": [
+          "AI 算力与推理服务",
+          "Hugging Face",
+          "快讯"
+        ],
+        "report_url": "data/2026/07/2026-07-27.json"
+      },
+      {
+        "id": "article-7b33b9ecfc4bac3c",
+        "title": "MiniMax Hugging Face Organization介绍模型能力和推理入口变化",
+        "url": "https://huggingface.co/MiniMaxAI/models",
+        "summary": "MiniMaxAI 的 Hugging Face 组织页当前列出 19 个模型，为其公开模型提供统一入口。现有材料未标明新增项、更新时间或具体能力变化，因此不能据此确认发生了新模型发布。 集中目录降低了查找 MiniMaxAI 模型资源的成本，但工程采用仍要落到单个模型的权重、许可证、运行需求和模型卡说明，目录总数不能替代这些判断。",
+        "event_date": "2026-07-27",
+        "source": "MiniMax Hugging Face Organization",
+        "label": "本期主线",
+        "tags": [
+          "AI 算力与推理服务",
+          "Hugging Face",
+          "商业洞察"
+        ],
+        "report_url": "data/2026/07/2026-07-27.json"
+      }
+    ],
+    "compact_stories": [
+      {
+        "id": "article-0a6815eca549f8fe",
+        "title": "Moonshot AI Hugging Face Organization介绍模型能力和推理入口变化",
+        "url": "https://huggingface.co/moonshotai/models",
+        "summary": "Moonshot AI 的 Hugging Face 组织模型页显示 18 个模型，形成其公开模型的集中浏览入口。材料没有指出哪些条目最近更新，也没有提供新能力或新版本说明。 开发者可从该目录继续核对 Moonshot AI 的公开权重和推理入口；是否适合部署仍取决于各模型的许可证、参数规模、硬件要求与版本说明。",
+        "event_date": "2026-07-27",
+        "source": "Moonshot AI Hugging Face Organization",
+        "label": "本期主线",
+        "tags": [
+          "AI 算力与推理服务",
+          "Hugging Face",
+          "快讯"
+        ],
+        "report_url": "data/2026/07/2026-07-27.json"
+      },
+      {
+        "id": "article-5a9ec5bdd2f45d6f",
+        "title": "OpenAI介绍模型权重和使用说明",
+        "url": "https://huggingface.co/openai/gpt-oss-120b/discussions",
+        "summary": "OpenAI 的 gpt-oss-120b 在 Hugging Face 设有公开社区讨论区，用户可围绕该模型提交和查看讨论。当前证据只确认讨论入口存在，没有指出新的官方公告、版本变化或已解决事项。 讨论区可帮助部署者发现使用问题和社区经验，但帖子不等同于官方规格或修复承诺；关键结论仍需回到模型卡、代码仓库和正式版本记录核验。",
+        "event_date": "2026-07-27",
+        "source": "OpenAI Hugging Face Organization",
+        "label": "本期主线",
+        "tags": [
+          "AI 工程栈",
+          "Hugging Face",
+          "快讯"
+        ],
+        "report_url": "data/2026/07/2026-07-27.json"
+      },
+      {
+        "id": "article-6d5cbba323f2f5dd",
+        "title": "OpenAI介绍模型能力和推理入口变化",
+        "url": "https://huggingface.co/openai/models",
+        "summary": "OpenAI 的 Hugging Face 组织模型页当前列出 39 个模型，提供统一检索入口。现有材料没有说明这些条目中哪些为新发布或近期更新，也未证明模型能力发生变化。 集中入口方便开发者查找 OpenAI 的开放模型资源，但采用决策仍需逐项核对模型卡、许可证、参数规模、硬件需求和更新时间，不能仅凭目录数量判断。",
+        "event_date": "2026-07-27",
+        "source": "OpenAI Hugging Face Organization",
+        "label": "本期主线",
+        "tags": [
+          "AI 算力与推理服务",
+          "Hugging Face",
+          "快讯"
+        ],
+        "report_url": "data/2026/07/2026-07-27.json"
+      },
+      {
+        "id": "article-2749f28c2c9195f3",
+        "title": "Qwen介绍模型能力和推理入口变化",
+        "url": "https://huggingface.co/Qwen/models",
+        "summary": "Qwen 的 Hugging Face 组织页显示共有 458 个模型，为不同任务和版本提供集中入口。当前证据没有标出当日新增模型，也没有给出单一、明确的能力更新。 庞大的模型目录为尺寸、任务和部署方案选择提供了更多入口，也提高了筛选成本；开发者仍需根据模型卡、许可证、量化版本和硬件要求逐项判断。",
+        "event_date": "2026-07-27",
+        "source": "Qwen Hugging Face Organization",
+        "label": "本期主线",
+        "tags": [
+          "AI 算力与推理服务",
+          "Hugging Face",
+          "商业洞察"
+        ],
+        "report_url": "data/2026/07/2026-07-27.json"
+      }
+    ]
+  },
+  "previous_edition": {
     "report_date": "2026-07-22",
     "title": "AI 日报 2026-07-22",
     "summary": "今日主线：OpenAI介绍 Claude Code agent 工具工作流；Z.ai Hugging Face Organization介绍模型能力和推理入口变化；Google Keyword整理公开产品或工程信息；技术博客补充 agent 和开发工具的落地边界。",
@@ -135,140 +268,21 @@
       }
     ]
   },
-  "previous_edition": {
-    "report_date": "2026-07-09",
-    "title": "AI 日报 2026-07-09",
-    "summary": "今日主线：OpenAI介绍模型能力和推理入口变化；Microsoft介绍 agent 与开发者工具能力；OpenAI介绍模型评估和研究结果；技术博客补充 agent 和开发工具的落地边界。",
-    "report_url": "data/2026/07/2026-07-09.json",
-    "data_url": "data/2026/07/2026-07-09.json",
-    "generated_at": "2026-07-09T13:04:36.709Z",
-    "story_count": 8,
-    "lead_story": {
-      "id": "article-3fb14968493dc682",
-      "title": "OpenAI介绍模型能力和推理入口变化",
-      "url": "https://openai.com/index/introducing-gpt-live",
-      "summary": "OpenAI梳理模型评测与能力边界，重点包括能力边界、评估设置、数据来源、使用场景和限制说明，使用前提是结论仍要依赖可复现评测、真实任务和公开限制。 可观察的是 AI 产品、模型或平台策略的实际变化",
-      "event_date": "2026-07-08",
-      "source": "OpenAI Company News RSS",
-      "label": "本期主线",
+  "source_watch": [
+    {
+      "id": "article-fa546fe507d67327",
+      "title": "AIFY · AI feed for you",
+      "url": "https://aify-news.pages.dev/",
+      "summary": "Source Watch 检测到 AIFY · AI feed for you 的公开站点或信源快照发生变化。",
+      "event_date": "2026-07-27",
+      "source": "AIFY · AI feed for you",
+      "label": "Source Watch",
       "tags": [
-        "AI 算力与推理服务",
+        "AI 助手与 Agent",
         "OpenAI",
         "快讯"
-      ],
-      "report_url": "data/2026/07/2026-07-09.json"
+      ]
     },
-    "secondary_stories": [
-      {
-        "id": "article-156baccb80e387dd",
-        "title": "Microsoft介绍 agent 与开发者工具能力",
-        "url": "https://www.microsoft.com/en-us/research/blog/flint-a-visualization-language-for-the-ai-era/",
-        "summary": "微软研究院调整开发者 agent 工作流，重点包括任务编排、上下文、权限控制、工程集成和失败恢复，使用前提是实际效果要看权限模型、评估回放、团队流程和可观测性。 可观察的是代码、权重、示例、许可证和生态复用条件",
-        "event_date": "2026-07-08",
-        "source": "Microsoft Research Blog",
-        "label": "本期主线",
-        "tags": [
-          "AI 助手与 Agent",
-          "Microsoft",
-          "论文"
-        ],
-        "report_url": "data/2026/07/2026-07-09.json"
-      },
-      {
-        "id": "article-e9167e656930e3f1",
-        "title": "OpenAI介绍模型评估和研究结果",
-        "url": "https://openai.com/index/separating-signal-from-noise-coding-evaluations",
-        "summary": "OpenAI给出Blackwell MLPerf 训练性能结果，重点包括训练基准、硬件吞吐、模型规模、对比设置和数据中心部署前提，使用前提是benchmark 结果仍要结合任务类型、集群配置、能耗和真实训练负载判断。 可观察的是 agent、开发工具和自动化工作流的接入成本",
-        "event_date": "2026-07-08",
-        "source": "OpenAI News RSS",
-        "label": "本期主线",
-        "tags": [
-          "AI 助手与 Agent",
-          "OpenAI",
-          "论文"
-        ],
-        "report_url": "data/2026/07/2026-07-09.json"
-      },
-      {
-        "id": "article-ae0ec71fdcb44d65",
-        "title": "Anthropic介绍模型评估和研究结果",
-        "url": "https://www.anthropic.com/research/off-switch-dual-use",
-        "summary": "Anthropic梳理模型评测与能力边界，重点包括能力边界、评估设置、数据来源、使用场景和限制说明，使用前提是结论仍要依赖可复现评测、真实任务和公开限制。 可观察的是评测设置、能力边界和内部实验参照价值",
-        "event_date": "2026-07-08",
-        "source": "Anthropic Research",
-        "label": "本期主线",
-        "tags": [
-          "AI 工程栈",
-          "Anthropic",
-          "论文"
-        ],
-        "report_url": "data/2026/07/2026-07-09.json"
-      }
-    ],
-    "compact_stories": [
-      {
-        "id": "article-ebb1bbaa99d3f35a",
-        "title": "Alibaba Cloud介绍安全治理和平台控制变化",
-        "url": "https://www.alibabacloud.com/blog/alibaba-cloud-waap-pioneers-a-new-paradigm-for-agentic-application-security-in-china_603344",
-        "summary": "Alibaba Cloud调整开发者 agent 工作流，重点包括任务编排、上下文、权限控制、工程集成和失败恢复，使用前提是实际效果要看权限模型、评估回放、团队流程和可观测性。 可观察的是 agent、开发工具和自动化工作流的接入成本",
-        "event_date": "2026-07-09",
-        "source": "Alibaba Cloud Blog",
-        "label": "本期主线",
-        "tags": [
-          "AI 助手与 Agent",
-          "Alibaba",
-          "商业洞察"
-        ],
-        "report_url": "data/2026/07/2026-07-09.json"
-      },
-      {
-        "id": "article-e00d55023af7c16f",
-        "title": "OpenAI介绍安全治理和平台控制变化",
-        "url": "https://openai.com/index/government-national-security-partnerships",
-        "summary": "OpenAI说明安全治理和平台控制更新，重点包括策略检查、风险控制、上线约束、审计记录和组织执行，使用前提是治理效果取决于误判率、日志留存、人工复核和系统接入范围。 可观察的是合规、安全和平台治理口径变化",
-        "event_date": "2026-07-08",
-        "source": "OpenAI News RSS",
-        "label": "本期主线",
-        "tags": [
-          "OpenAI",
-          "企业 AI 采纳",
-          "商业洞察"
-        ],
-        "report_url": "data/2026/07/2026-07-09.json"
-      },
-      {
-        "id": "article-1afe3e0c6a3aeba5",
-        "title": "Alibaba Cloud介绍模型评估和研究结果",
-        "url": "https://www.alibabacloud.com/blog/alibaba-cloud-emr-serverless-starrocks-lakehouse-multimodal-retrieval-one-sql-for-full-text-scalar-and-vector-hybrid-search_603345",
-        "summary": "Alibaba Cloud介绍机器人学习与多模态推理实验，重点包括具身任务规划、训练数据、多模态推理和评估工作流，使用前提是研究信号仍需要看真实机器人任务、数据规模和评测设置。 可观察的是评测设置、能力边界和内部实验参照价值",
-        "event_date": "2026-07-09",
-        "source": "Alibaba Cloud Blog",
-        "label": "本期主线",
-        "tags": [
-          "Alibaba",
-          "基础模型",
-          "论文"
-        ],
-        "report_url": "data/2026/07/2026-07-09.json"
-      },
-      {
-        "id": "article-3447f8d32f7ed63d",
-        "title": "OpenAI介绍 Claude Code agent 工具工作流",
-        "url": "https://openai.com/index/k-12-educators-practical-skills",
-        "summary": "OpenAI整理公开产品或工程信息，重点包括标题、适用场景、访问条件、限制说明和后续链接，使用前提是访问条件、地区范围、价格和使用限制决定可采用性。 可观察的是 AI 产品、模型或平台策略的实际变化",
-        "event_date": "2026-07-08",
-        "source": "OpenAI News RSS",
-        "label": "本期主线",
-        "tags": [
-          "AI 助手与 Agent",
-          "OpenAI",
-          "实战方法"
-        ],
-        "report_url": "data/2026/07/2026-07-09.json"
-      }
-    ]
-  },
-  "source_watch": [
     {
       "id": "article-d4553d5b79e4889c",
       "title": "AI 情报雷达",
@@ -279,19 +293,6 @@
       "label": "Source Watch",
       "tags": [
         "AI 助手与 Agent",
-        "快讯"
-      ]
-    },
-    {
-      "id": "article-fa546fe507d67327",
-      "title": "AIFY · AI feed for you",
-      "url": "https://aify-news.pages.dev/",
-      "summary": "Source Watch 检测到 AIFY · AI feed for you 的公开站点或信源快照发生变化。",
-      "event_date": "2026-07-22",
-      "source": "AIFY · AI feed for you",
-      "label": "Source Watch",
-      "tags": [
-        "AI 市场动态",
         "快讯"
       ]
     },
@@ -311,6 +312,12 @@
     }
   ],
   "archive": [
+    {
+      "report_date": "2026-07-09",
+      "title": "AI 日报 2026-07-09",
+      "summary": "今日主线：OpenAI介绍模型能力和推理入口变化；Microsoft介绍 agent 与开发者工具能力；OpenAI介绍模型评估和研究结果；技术博客补充 agent 和开发工具的落地边界。",
+      "url": "data/2026/07/2026-07-09.json"
+    },
     {
       "report_date": "2026-07-08",
       "title": "AI 日报 2026-07-08",
@@ -376,13 +383,7 @@
       "title": "AI 日报 2026-06-26",
       "summary": "今天最值得看的主线有 Alibaba Cloud披露 agent 与开发者工具能力；Microsoft披露模型评估和研究结果；Google Keyword更新agent 工作流和开发工具能力；热门博客这轮主要看 agent 和开发工具的落地边界。",
       "url": "data/2026/06/2026-06-26.json"
-    },
-    {
-      "report_date": "2026-06-25",
-      "title": "AI 日报 2026-06-25",
-      "summary": "今天最值得看的主线有 Meta Newsroom披露 Claude Code agent 工具工作流；Alibaba Cloud披露 agent 与开发者工具能力；微软研究院更新AI 产品、平台或工程实践；热门博客这轮主要看 agent 和开发工具的落地边界。",
-      "url": "data/2026/06/2026-06-25.json"
     }
   ],
-  "byte_size": 20379
+  "byte_size": 21291
 }
