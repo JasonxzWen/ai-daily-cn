@@ -1411,6 +1411,10 @@ async function runFirstPassAuthoring({ summary, context, runStage, authorContrac
     const fullyApplied = rejected.length === 0 && appliedPaths.size === expectedPaths.size
       && [...expectedPaths].every((taskPath) => appliedPaths.has(taskPath));
     if (!fullyApplied) {
+      const partialReport = appliedPaths.size > 0
+        ? await readJsonIfExists(absoluteCleanPath(context.cleanRoot, AUTHORED_REPORT_PATH))
+        : null;
+      const partialResultUsed = Boolean(partialReport && typeof partialReport === "object");
       recordStage(summary, {
         id: applyStage.id,
         status: "degraded",
@@ -1418,14 +1422,25 @@ async function runFirstPassAuthoring({ summary, context, runStage, authorContrac
         output: {
           ...normalized.output,
           attempts: 1,
-          fallback_used: true,
-          fallback_report_path: DEFAULT_REPORT_PATH,
-          reason: "first_pass_contract_not_fully_applied"
+          fallback_used: !partialResultUsed,
+          ...(partialResultUsed
+            ? { partial_result_used: true, partial_report_path: AUTHORED_REPORT_PATH }
+            : { fallback_report_path: DEFAULT_REPORT_PATH }),
+          reason: partialResultUsed
+            ? "accepted_first_pass_edits_retained"
+            : "first_pass_contract_not_fully_applied"
         },
         now
       });
-      firstPass.status = "fallback";
-      firstPass.reason = "first_pass_contract_not_fully_applied";
+      if (partialResultUsed) {
+        summary.current_report_path = AUTHORED_REPORT_PATH;
+        firstPass.status = "partial";
+        firstPass.reason = "accepted_first_pass_edits_retained";
+        firstPass.authored_report_path = AUTHORED_REPORT_PATH;
+      } else {
+        firstPass.status = "fallback";
+        firstPass.reason = "first_pass_contract_not_fully_applied";
+      }
       return;
     }
 
