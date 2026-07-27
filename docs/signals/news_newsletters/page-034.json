@@ -2,63 +2,29 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-27T03:01:12.615Z",
+  "generated_at": "2026-07-27T05:50:05.082Z",
   "group": {
     "id": "news_newsletters",
     "label": "新闻 / Newsletter"
   },
   "page": 34,
-  "page_count": 454,
+  "page_count": 455,
   "page_size": 50,
-  "total_count": 22659,
+  "total_count": 22742,
   "next_url": "signals/news_newsletters/page-035.json",
   "items": [
     {
-      "id": "occ_2b626b244ed55e2a62802b1e",
-      "cluster_id": "cluster_93a12409a9b6de224869dc8c",
-      "title": "Funding to the AI sector in 2025 surpassed every year in the past decade",
-      "url": "https://news.crunchbase.com/venture/funding-data-third-largest-year-2025/",
-      "summary": "Funding to the AI sector in 2025 surpassed every year in the past decade。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_1ab9daef66ba4e71d57cfb30",
+      "cluster_id": "cluster_569fe833de71f114c5ddb994",
+      "title": "TEST_S",
+      "url": "https://audit-test.example.com/s",
+      "summary": "Aify News published this intermediary lead entry. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_2b84da49723bafede36ef687",
-      "cluster_id": "cluster_c344914bbaf1590cfab2768e",
-      "title": "OpenRouter 上线音频转写 API，同一 API key 直通 Whisper 与按 token 计价的 STT 模型",
-      "url": "https://openrouter.ai/blog/tutorials/transcription-on-openrouter",
-      "summary": "OpenRouter 新增 POST /api/v1/audio/transcriptions 端点，开发者用与 Chat Completions 同一把 Bearer key 上传 base64 音频，即可返回文本与 usage 对象，无需另接 Whisper 服务或第二家 SDK。同一模型在多 provider 之间自动负载均衡，价格按 token 计。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "OpenRouter Blog",
-        "home_url": "https://openrouter.ai/"
+        "name": "audit-test.example.com",
+        "home_url": "https://audit-test.example.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -80,17 +46,83 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2bbc9471dc6930191eb869af",
-      "cluster_id": "cluster_fc4bf01f5dbd92775d83dfb1",
-      "title": "SkewAdam 优化器：将 MoE 优化器状态显存开销压缩 97%，6.7B MoE 可塞进单张 40GB 显卡",
-      "url": "https://www.reddit.com/r/MachineLearning/comments/1v38k1m/skewadam_a_tiered_optimizer_that_cuts_moe_state/",
-      "summary": "SkewAdam 是一个针对 MoE 训练的分层优化器：对稀疏激活的专家参数改走低精度动量、对稠密骨干保留 Adam 状态，从而将优化器状态显存开销降低约 97%。作者展示 6.7B MoE 模型可以在单张 40GB GPU 上完成训练，对预算受限但想跑稀疏专家路由的团队意义明显，尤其适合小规模研究组做 MoE 微调实验。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_1b0cc216eab96d1eef3307ef",
+      "cluster_id": "cluster_a849d4f1c224851c67183790",
+      "title": "2024",
+      "url": "https://news.crunchbase.com/sections/ai/",
+      "summary": "2024。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Reddit r/MachineLearning",
-        "home_url": "https://www.reddit.com/"
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1b1182ccd4dbdafbeedfc947",
+      "cluster_id": "cluster_333fb8eb094aab1313b1edb1",
+      "title": "后驱纯电+五连杆+两个座位，smart #2 背负 fortwo 续作名号重返市场",
+      "url": "https://www.ifanr.com/1672776",
+      "summary": "最经典的 smart 回归。 #欢迎关注爱范儿官方微信公众号：爱范儿（微信号：ifanr），更多精彩内容第一时间为您奉上。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "ifanr.com",
+        "home_url": "https://www.ifanr.com/"
+      },
+      "collected_via": {
+        "name": "iFanr",
+        "url": "https://www.ifanr.com/feed"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": "https://s3.ifanr.com/wp-content/uploads/2026/07/smfm.jpg",
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1b59a18eae5e69ee9d519d14",
+      "cluster_id": "cluster_a2c3a8019257f393fbba0ced",
+      "title": "Liquid AI 公开 LFM2.5-8B-A1B 词表原地升级配方：约 10% 增量预训，把词表从 65K 扩到 128K",
+      "url": "https://old.reddit.com/r/LocalLLaMA/comments/1v3c6hx/tokenizer_expansion_upgrading_a_models_tokenizer/",
+      "summary": "Liquid AI 公开了 LFM2.5-8B-A1B 的 tokenizer 原地升级方法：不需要从头重训，只用约 10% 规模的 continued pretraining，就把词表从 65K 扩到 128K，专门解决原分词器对多语种切分过细的问题。团队同步放出博客、技术报告 arXiv 2607.15232 以及 Hugging Face 权重，把“换词表 + 少量增量预训”做成一条可复用的持续预训练路径。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "r/LocalLLaMA",
+        "home_url": "https://old.reddit.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -112,51 +144,17 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2cac56dc96f51abb248301d6",
-      "cluster_id": "cluster_f04cc6c58c997a2064fd2dd0",
-      "title": "Q1 2023 Latin America",
-      "url": "https://news.crunchbase.com/venture/latin-america-vc-funding-q1-2023/",
-      "summary": "Q1 2023 Latin America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_1bcf6b84749cd190bb34ea33",
+      "cluster_id": "cluster_862376329b78c8c1a80db436",
+      "title": "腾讯 WorkBuddy 月访问量破 2097 万居 AI 办公智能体首位,腾讯、字节、阿里同步整合旗下产品线",
+      "url": "https://www.chinaventure.com.cn/news/113-20260722-392404.html",
+      "summary": "易观发布《2026 年 Q2 中国办公智能体平台市场洞察报告》,腾讯 WorkBuddy 以 2097 万月访问量在 17 款 AI 办公智能体中排名第一,超过第二三名之和。与此同时,腾讯、字节、阿里三家大厂都在把旗下多条 AI 办公产品线合并整合。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_2d492d7ebb020fb7531a0193",
-      "cluster_id": "cluster_8fbbc5452ee19b933ca5d8a0",
-      "title": "Google 推出 Tunix：基于 JAX 的高吞吐智能体后训练库",
-      "url": "https://developers.googleblog.com/scaling-agentic-rl-high-throughput-agentic-training-with-tunix",
-      "summary": "Google 发布 Tunix，一个基于 JAX 的原生后训练库，旨在消除多轮、使用工具的 LLM 推理智能体训练中的 TPU 闲置瓶颈。Tunix 通过高并发异步 rollout 与解耦的生产者-消费者流水线最大化硬件吞吐量，确保训练器持续获得数据。该库提供即插即用抽象和持续宏观级性能分析，便于集成自定义环境。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Google Developers Blog",
-        "home_url": "https://developers.googleblog.com/"
+        "name": "投中网",
+        "home_url": "https://www.chinaventure.com.cn/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -178,11 +176,45 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2ddb03c2bcb8ff222205801b",
-      "cluster_id": "cluster_ca8bf43a48c0b29bb1dc553f",
-      "title": "3",
-      "url": "https://news.crunchbase.com/sections/ai/?pages=3",
-      "summary": "3。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_1bfa323f40dffd9e479acf22",
+      "cluster_id": "cluster_c23ac75d806ff97366671a69",
+      "title": "Grammarly",
+      "url": "https://www.crunchbase.com/organization/grammarly",
+      "summary": "Grammarly。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1c9eef7a708d9b2165e66d3a",
+      "cluster_id": "cluster_6e199aa5dd1414fa20744502",
+      "title": "2022 Latin America",
+      "url": "https://news.crunchbase.com/venture/latin-america-venture-funding-slows-q4-2022/",
+      "summary": "2022 Latin America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -212,44 +244,11 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2f235f2b8c94a321a41f6406",
-      "cluster_id": "cluster_d458f03a2dced1d580a9bef6",
-      "title": "OpenAI model goes rogue during testing and hacks startup - ABC News & Headlines – Australian Broadcasting Corporation",
-      "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOU2w3OGgxMEhiTjF6WnE4emJieHlXeC1heGt0T3VLTERHM3NxTDZkRERrSkpsNDJTNEEza3RyVk5OUUhsZ3lia1lXSGsxUHVIWncwaUJhcUhLR1FROFVYeXVlVVA3bFlyMmNDRDRoa1pFeENWX0YxT3JyYmR5S1BrSkxoYm9mdUpXQkxJVmQzTQ?oc=5",
-      "summary": "OpenAI model goes rogue during testing and hacks startup ABC News & Headlines – Australian Broadcasting Corporation。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.google.com",
-        "home_url": "https://news.google.com/"
-      },
-      "collected_via": {
-        "name": "Google News Official Open Source Watch RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "open_source",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_2f3f0c930f9f83c5bf3d10dd",
-      "cluster_id": "cluster_5a8aed736792ec20d3b57aae",
-      "title": "Q2 2026 Asia",
-      "url": "https://news.crunchbase.com/venture/data-china-ai-lead-asia-startup-funding-peak-q2-2026/",
-      "summary": "Q2 2026 Asia。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_1cb58920295da15b5d4e1c7c",
+      "cluster_id": "cluster_75f2b9cfce81ab1b1c1ce604",
+      "title": "Q1 2026 Global",
+      "url": "https://news.crunchbase.com/venture/record-breaking-funding-ai-global-q1-2026/",
+      "summary": "Q1 2026 Global。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -279,11 +278,147 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2f4784fcbc2b87592ea9fba4",
-      "cluster_id": "cluster_4064a3dbd1724114c5d63f71",
-      "title": "IP Law Needs Update for Modern Internet - Legis1",
-      "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTE1ZNERWbzQ3THFWdG5yQ3NfT3VPZHVYbGF1ckV5SDFLT2VPa0ozcFZpQnNFeTdxNTBHSlU5SnlacHQ5dzhNaGItVXBHT0VWN3RuTllFMm9ob0hjdjdSUWpmVmJuenNDT0Zobzc4c0NTandraUNBWklselE0SQ?oc=5",
-      "summary": "IP Law Needs Update for Modern Internet Legis1。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_1ccf4721815f90dc8db3e174",
+      "cluster_id": "cluster_f80fbd32c4f08a39a5587306",
+      "title": "Careers",
+      "url": "https://about.crunchbase.com/about-us/careers/",
+      "summary": "Careers。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "about.crunchbase.com",
+        "home_url": "https://about.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1d3069bf4e2cc5dda4a7d3e5",
+      "cluster_id": "cluster_df07406f54745d270a29e18e",
+      "title": "Cohere",
+      "url": "https://www.crunchbase.com/organization/cohere-82b8",
+      "summary": "Cohere。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1d6b5904695a496a9b2820b5",
+      "cluster_id": "cluster_5f0c47c0d59a06fd3deedb4a",
+      "title": "an open letter",
+      "url": "https://futureoflife.org/open-letter/pause-giant-ai-experiments/",
+      "summary": "an open letter。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "futureoflife.org",
+        "home_url": "https://futureoflife.org/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1db5142e063c005e4f12e44e",
+      "cluster_id": "cluster_ac4aa4513347b74c2e136a98",
+      "title": "Cybersecurity",
+      "url": "https://news.crunchbase.com/sections/cybersecurity/",
+      "summary": "Cybersecurity。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1df14bb7318e986ccfaeccb6",
+      "cluster_id": "cluster_c6adcd0c6e68cc4d49825fc8",
+      "title": "Alexander Wissner-Gross on AI's Transformative Decade - StartupHub.ai",
+      "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQMDN4TGtROG1ab3hMenBzellzS0xfNDlBa0hXd0IyQVk0ZGRhMXp5eGN4WGR6a19DN29nSzdpakt6NzNGSTNHdUFZb2VMYlEzY2FRZFNkRnR4amRPa21DejZJVDREbUxhU3Vxa0NveEprdldxa1RYeE1rcWRJdGJoSVZJM1FJMDRKaU10VE84QVlWcjFsOTl1QXczMHI2VFc5SVJneFlIX1pMNy04RlE1RWNHRnJjTWM?oc=5",
+      "summary": "Alexander Wissner-Gross on AI's Transformative Decade StartupHub.ai。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -311,11 +446,45 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_2fce33be0d80a38dc36f9d5c",
-      "cluster_id": "cluster_4ba5b5f7de50d5fe709b357d",
-      "title": "Hugging Face",
-      "url": "https://www.crunchbase.com/organization/hugging-face",
-      "summary": "Hugging Face。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_1e07369e7e355207bd9b1d04",
+      "cluster_id": "cluster_078569c93589ba6fec231d64",
+      "title": "Emerging Unicorn Board",
+      "url": "https://news.crunchbase.com/emerging-unicorn-list/",
+      "summary": "Emerging Unicorn Board。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1e0c605fd88c06dafe994d4c",
+      "cluster_id": "cluster_d7979ad551bf338aea16ee6e",
+      "title": "Anthropic",
+      "url": "https://www.crunchbase.com/organization/anthropic",
+      "summary": "Anthropic。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -345,11 +514,11 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3009ab47ace7bcc2d70f885f",
-      "cluster_id": "cluster_fba443ccd62dcc42348efae8",
-      "title": "Casetext",
-      "url": "https://www.crunchbase.com/organization/casetext",
-      "summary": "Casetext。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_1e2c7963acd9e509fd9962bb",
+      "cluster_id": "cluster_ed002adeb8b2c4085d992917",
+      "title": "Zilliz",
+      "url": "https://www.crunchbase.com/organization/zilliz",
+      "summary": "Zilliz。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -379,11 +548,145 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3076a32960acdd2839c755b8",
-      "cluster_id": "cluster_7b3bf3c1475f9be49529d8e7",
-      "title": "Morning Minute: OpenAI Model Escapes Containment, Hacks Hugging Face - Decrypt",
-      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQY1YwU09CMlRzT2JmYS15NVp3Ym9NNVlaemlQbXdRTTlyRmJKc3dkNjZ2SWktZVlfdTJacmk2ZndBa19FZEtGdW1taEptVmpiUWlRZEFFVkcxOGdQOElRQTMzX3BVLTJOOW5MZGhZc2E0Y0xfU21XaFBvMEdidXBrMkN4bE1MODQ4bkF3bjF1NWZISmZKYWJj0gGfAUFVX3lxTFA3eTBheWNMdWJ4S283akZYak5oQU93cmZpc1k0dEtodGZqM2pGbzNZMU5fXzZaYnVFbVhRTG1HUjVYY0JwSlJPYWZTWDBpTk56MlVDNE1JVXV3TEhjajBFamlOc0E2ekFuMERZckQzbjZaa3U3MXRTX0NHS0VPMjd4S0h2T2RzcVZQZ1c5M2VWN3R3dXd2OUZWSTA0NzdrMA?oc=5",
-      "summary": "Morning Minute: OpenAI Model Escapes Containment, Hacks Hugging Face Decrypt。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_1e73775789ded82545c9b258",
+      "cluster_id": "cluster_9fadec6de054151a2e7d2bde",
+      "title": "Elon Musk 称 Micron 给予 Tesla 内存芯片\"重要配额\"缓解 HBM 紧张",
+      "url": "https://www.bloomberg.com/news/articles/2026-07-22/musk-says-micron-gave-tesla-significant-supply-of-memory-chips",
+      "summary": "Elon Musk 公开表示美光近期给了 Tesla 一笔\"重要配额\"的存储芯片供应，缓解了车厂在这一稀缺物料上的压力。当前 HBM 和高端 DRAM 因 AI 训练与推理需求全线吃紧，配额分配已成为大厂之间的博弈杠杆。 AI 与 EV 争抢内存供应链的格局正在形成：训练侧要 HBM，推理与车端要 LPDDR/GDDR，同一晶圆产能池被同时挤压。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Bloomberg",
+        "home_url": "https://www.bloomberg.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1ebee76f0503a0c0c4e76643",
+      "cluster_id": "cluster_c1a1fb8f749a55afd083ced9",
+      "title": "Q1 2023 North America",
+      "url": "https://news.crunchbase.com/venture/n-america-startup-funding-weakens-q1-2023/",
+      "summary": "Q1 2023 North America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_1f1942b92cb2169b278e3a7a",
+      "cluster_id": "cluster_3c2151e1f55babbf73b87d7d",
+      "title": "Where Argentina And Spain Are Scoring Startup Goals",
+      "url": "https://news.crunchbase.com/venture/world-cup-finalists-argentina-spain-startup-funding-data/",
+      "summary": "Where Argentina And Spain Are Scoring Startup Goals。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_200efa9faa981a29a9ba5058",
+      "cluster_id": "cluster_9884a722f4aa145cafeb909f",
+      "title": "AI21 Labs",
+      "url": "https://www.crunchbase.com/organization/ai21",
+      "summary": "AI21 Labs。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_209f206b2d8d11e2013cbf9a",
+      "cluster_id": "cluster_9186d338d686108c5c76d914",
+      "title": "Stocks and the Economy Are Increasingly Relying on the A.I. Boom - The New York Times",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE1pd3lUdFg5TkpBanp6YTNIZENreTk3bDBLVnVBZWw4VzlFdXlGUWxjcDRFQ3NBYktza2NmcWRjLWdfZlRrVWtvYmMwUFNfNENqb2Y0SkprYklCVnhyN1NhNnBYcTFodlk3MjZyUndUSW41SDQ1RUNxQUc3eDAycXM?oc=5",
+      "summary": "Stocks and the Economy Are Increasingly Relying on the A.I. Boom The New York Times。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -392,12 +695,11 @@
         "home_url": "https://news.google.com/"
       },
       "collected_via": {
-        "name": "Google News Official Open Source Watch RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
+        "name": "Google News AI RSS",
+        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=artificial+intelligence+OR+generative+AI"
       },
       "source_group": "news_newsletters",
       "content_tags": [
-        "open_source",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
@@ -412,21 +714,21 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_308866352da8cbb8e95a3f5c",
-      "cluster_id": "cluster_8a9112af667e729f84f15111",
-      "title": "美国财政部威胁对 Moonshot 制裁，指其蒸馏 Anthropic Fable 模型",
-      "url": "https://techcrunch.com/2026/07/22/treasury-threatens-sanctions-after-white-house-claims-moonshot-distilled-anthropics-fable/",
-      "summary": "美国财政部长 Scott Bessent 在 X 上加码警告，称若中国公司对美国模型进行「隐蔽的、工业级规模的蒸馏」构成 IP 盗窃，制裁和实体清单都将纳入选项。白宫科技政策主管 Michael Kratsios 更进一步指控 Moonshot 用 Nvidia GB300 服务器（含通过泰国渠道获取的 GB300）训练 K3，涉嫌违反出口管制。 分歧在于 Fable 7 月 1 日才公开发布，部分专家质疑 K3 的能力很难在此窗口内通过蒸馏 Fable 得到；但从「开源不是。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_2154d1565d2ffe7337b3fb15",
+      "cluster_id": "cluster_265a854eff3877f0d382a173",
+      "title": "2026 State AI Laws: Legislative Wrap-Up - Epstein Becker Green",
+      "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxOTVRSM21RN1VtSnBabnJTMGRsZmNLbnEzX0lNMVctQTRuRW1YMG80dmZLSDBMcnBxWWxDMXRmMm5xdUVCX1p2UWJ3Xy1qVnR6cXhJRmtuZzJ3N01fNW9LYll1NHNPRDRwRVJ5RUJsSzhPSFN4ZUVhd2JwVUlBNVJwbE1Ea2VJNU5XOEJ1eA?oc=5",
+      "summary": "2026 State AI Laws: Legislative Wrap-Up Epstein Becker Green。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "TechCrunch",
-        "home_url": "https://techcrunch.com/"
+        "name": "news.google.com",
+        "home_url": "https://news.google.com/"
       },
       "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
+        "name": "Google News AI RSS",
+        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=artificial+intelligence+OR+generative+AI"
       },
       "source_group": "news_newsletters",
       "content_tags": [
@@ -444,43 +746,11 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_311117fa3da3968d30a09566",
-      "cluster_id": "cluster_cd019c1f60c9837ffb608588",
-      "title": "富士通出售 5 座澳洲数据中心，转向数字转型和主权 AI",
-      "url": "https://www.itnews.com.au/news/fujitsu-sells-five-australian-data-centres-627511",
-      "summary": "富士通以约 2 亿澳元将澳洲 5 座数据中心（容量 2MW 至 92MW)出售给私募基金 Next Capital，转而聚焦「数字转型」与「主权 AI」服务。此前富士通已退出美国数据中心业务。在 AI 驱动的数据中心建设热潮里，富士通选择逆向操作。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "iTnews",
-        "home_url": "https://www.itnews.com.au/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_315c3b26cbced576ac754322",
-      "cluster_id": "cluster_80c81ee49dd9ab942eecdc63",
-      "title": "Meta",
-      "url": "https://www.crunchbase.com/organization/facebook",
-      "summary": "Meta。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_216bc51122c02faa1d513106",
+      "cluster_id": "cluster_e4f4bf0c0562b8bfa01d036d",
+      "title": "ChatGPT",
+      "url": "https://www.crunchbase.com/organization/chatgpt",
+      "summary": "ChatGPT。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -510,175 +780,11 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_325d8be3f27ba82686d018b8",
-      "cluster_id": "cluster_84b387fd2cb5ac29e63c0d20",
-      "title": "OpenAI models went online and hacked tech startup Hugging Face to cheat a cyber test, company says - Houston Chronicle",
-      "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPa2ZVUndiaE14UmJEQ2FUSkNfUVRwOFgtWHhyZm5vVDJjalBtc2xPaXVxY0htSW40LTZJenJ5Znd1T3BSUktsM1AyT2R6c0NUZGJObWJ6TjJBNG9SS0NMZnNGalVmUlJQVXVHMGhJMFFEbWZLd0VBU2k3d3c5eXoxOFF4ejh5Z2poYzh6akFBZWc4NWRGdk43b1g2Slk0UTBaMWx1Rg?oc=5",
-      "summary": "OpenAI models went online and hacked tech startup Hugging Face to cheat a cyber test, company says Houston Chronicle。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.google.com",
-        "home_url": "https://news.google.com/"
-      },
-      "collected_via": {
-        "name": "Google News Official Open Source Watch RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "open_source",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_325fa8225550a1cfe425797e",
-      "cluster_id": "cluster_8a66df8174938feacac78d14",
-      "title": "前 Uber 联合创始人 Travis Kalanick 的工业机器人公司 Atoms 完成 17 亿美元融资,a16z 领投、Uber 跟投",
-      "url": "https://techcrunch.com/2026/07/22/travis-kalanicks-robotics-company-raises-1-7b-led-by-a16z/",
-      "summary": "前 Uber 联合创始人 Travis Kalanick 创立的工业机器人公司 Atoms 完成 17 亿美元融资,a16z 领投,Uber 也加入了这一轮。公司宣称要用 industrial AI 改造制造业和物流,但对外披露的产品与部署路径仍相对模糊。 工业和物理世界的 AI 部署正在成为下一个大额资金入口,估值和融资跑在实际交付之前是这波 industrial AI 项目的共同特征。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "TechCrunch",
-        "home_url": "https://techcrunch.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_330c726370498dd5a79d0e82",
-      "cluster_id": "cluster_2fe4dcff84b77bd5e063aa7e",
-      "title": "CISA 要求紧急修补 Langflow AI Agent 框架主动利用漏洞",
-      "url": "https://www.bleepingcomputer.com/news/security/cisa-orders-feds-to-patch-actively-exploited-langflow-rce-flaw/",
-      "summary": "美国 CISA 下令联邦机构紧急修补 Langflow 可视化 AI Agent 构建框架中的一个正被主动利用的远程代码执行漏洞。Langflow 是用于构建 AI Agent 和 RAG 应用的低代码平台，该漏洞已被攻击者实际利用。CISA 将漏洞列入已知被利用漏洞目录，要求联邦机构在规定期限内完成修补。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "BleepingComputer",
-        "home_url": "https://www.bleepingcomputer.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3370df4fe64252a3ee1509bf",
-      "cluster_id": "cluster_28275a284aae1cdd0792137e",
-      "title": "What the OpenAI–Hugging Face Incident Really Tells Us - Arctic Wolf",
-      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOdnRUTmZRU1lZbVhZTUJjNWZTMTlibGY3RV9GbkloNWZ3WE1nWkxHV2ZscGk4amRpUmZtQWhyRmJjTEs2LTJhX2FvTzJHRjlvZTBsZFk5SUc0RWtkdmdkdTBTWkxxSk5ZMkhxeVNvYTM1bERweFNBaHZVSzNmc3pKUEVXWXdNWlBtOTk1aUN6TTdZMTNYNW1B?oc=5",
-      "summary": "What the OpenAI–Hugging Face Incident Really Tells Us Arctic Wolf。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.google.com",
-        "home_url": "https://news.google.com/"
-      },
-      "collected_via": {
-        "name": "Google News Official Open Source Watch RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "open_source",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3372187d6ba7e2ff61f33a83",
-      "cluster_id": "cluster_5ebd7507ab9d13a12f70cc5b",
-      "title": "Imbue",
-      "url": "https://www.crunchbase.com/organization/generally-intelligent",
-      "summary": "Imbue。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "crunchbase.com",
-        "home_url": "https://www.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_34c06b7fd537acd4e9be7607",
+      "id": "occ_2236eeb426f086b2ef310ff3",
       "cluster_id": "cluster_a849d4f1c224851c67183790",
-      "title": "Q3 2023",
+      "title": "Q2 2023",
       "url": "https://news.crunchbase.com/sections/ai/",
-      "summary": "Q3 2023。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "summary": "Q2 2023。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -708,26 +814,24 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_351f0bccf046249ea9b13d97",
-      "cluster_id": "cluster_81e9df5247b6b37d126db999",
-      "title": "Q2 2023 Asia",
-      "url": "https://news.crunchbase.com/venture/startup-funding-falls-h1-2023-asia/",
-      "summary": "Q2 2023 Asia。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_2256cefa4a66579c0e0dc459",
+      "cluster_id": "cluster_a23368b553982426e6dbb095",
+      "title": "Ramp, FIS make AI moves - Payments Dive",
+      "url": "https://news.google.com/rss/articles/CBMickFVX3lxTE5iYy15ckNCZHJQazN2NVZzUmRYYUFMTHdsM1hUUTFwSVhYWUZlQ29TTTB3MWxMSUJQU3VWNGxDWmtZX1lKREJnQU5MdkdWeFcxaHBFc2k4bjVrYVR6SE1yTXJrYjFkUzJLMFZGdUo4b0V4Zw?oc=5",
+      "summary": "Ramp, FIS make AI moves Payments Dive。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
+        "name": "news.google.com",
+        "home_url": "https://news.google.com/"
       },
       "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
+        "name": "Google News AI RSS",
+        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=artificial+intelligence+OR+generative+AI"
       },
       "source_group": "news_newsletters",
       "content_tags": [
-        "product_update",
-        "funding",
         "industry_news",
         "analysis_opinion",
         "community_discussion"
@@ -742,11 +846,11 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3647f43fa6d008a5b5d4b373",
-      "cluster_id": "cluster_2dfe3b0a3e7a7380b2948a06",
-      "title": "What To Know About Open AI’s ‘Unprecedented’—And Autonomous—Hack Of Hugging Face - Forbes",
-      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPd09ZNDdxa04zTWVmZDBkMDR2RTVPaUJhNE5OOU5Ua3NIQ1Itb1lSMnFQNWdLYk9FeHE3aDVOOUF3R21fd1ktUXo4R1liSmNldFoxc25SdU9TeFFCM09lSUN0SWpTbHp2TGdUdy1fVXVMNWtIcU1aYk9QcnAxMXFRU1hMdGZkTnlaMGQ1b1JEN2xQZFd5dUxSSi04U2xQV0RyTU5wcXdQbFA4N0pMdkVQaWhsaWk4QVloSWc?oc=5",
-      "summary": "What To Know About Open AI’s ‘Unprecedented’—And Autonomous—Hack Of Hugging Face Forbes。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_2277b91cec1cf4ac70d3bc13",
+      "cluster_id": "cluster_4c4a708adf8c5984eda87c6b",
+      "title": "OpenAI says its AI agent broke out of testing sandbox to hack Hugging Face - Ars Technica",
+      "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOT28zdWJkS0hQT254NEdPWG5rQWVDdExGMG13SnNUdDAyWWFhdlRGYlBiTGlBYmhJb29LbDJDUUlqWEpIZVRDekxPQVZDWmRVd1cwNWJKWmFYclplSVk3cm5FYlJwNTRrR1A5WHpLOE5ubjdqZFA2ZmExWm9YS284Zzl1ZGllYnBON2pvWlJqVmdHLWY5RnhtMk9wTUNvTURJdElZ?oc=5",
+      "summary": "OpenAI says its AI agent broke out of testing sandbox to hack Hugging Face Ars Technica。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -775,145 +879,11 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_36cee90651b64943577b19e3",
-      "cluster_id": "cluster_54b25fa77316598e1c2c0ceb",
-      "title": "角落新声｜我的上帝模式，一名设计师创作环境的演变",
-      "url": "https://sspai.com/post/112109",
-      "summary": "声音只是其中一个切片。客观来看，它记录的是我的创作环境如何不断迭代；但从个人经历来看，它真正映照的是我对创作这件事的理解如何变化。 查看全文。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "sspai.com",
-        "home_url": "https://sspai.com/"
-      },
-      "collected_via": {
-        "name": "SSPAI",
-        "url": "https://sspai.com/feed"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_375c2e844e0860d09e4467f6",
-      "cluster_id": "cluster_da23170c37420ae6f3efbc83",
-      "title": "DALL-E",
-      "url": "https://www.crunchbase.com/organization/dall-e-2",
-      "summary": "DALL-E。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "crunchbase.com",
-        "home_url": "https://www.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_37839bf2c12bc8435e6077a4",
-      "cluster_id": "cluster_863e4f6f6269a6713433c8ac",
-      "title": "2022 Asia",
-      "url": "https://news.crunchbase.com/venture/asia-venture-funding-falls-q4-2022/",
-      "summary": "2022 Asia。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_390ef414dc450e7b28cd0205",
-      "cluster_id": "cluster_cd9c33b516e919739149ed82",
-      "title": "Jasper",
-      "url": "https://www.crunchbase.com/organization/jasper-ai",
-      "summary": "Jasper。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "crunchbase.com",
-        "home_url": "https://www.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_398dfa2e356e21872b7d9fe6",
-      "cluster_id": "cluster_31b4bd18e27a02425472f0d1",
-      "title": "Synthesia’s AI training platform is moving beyond videos into live coaching",
-      "url": "https://techcrunch.com/2026/07/22/synthesias-ai-training-platform-is-moving-beyond-videos-into-live-coaching/",
-      "summary": "Synthesia launched AI Roleplay Sessions, an interactive enterprise training platform where employees practice workplace conversations with AI avatars that provide feedback, scoring, and analytics to help companies measure training effective。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "id": "occ_22c2e96392b139efdf10614e",
+      "cluster_id": "cluster_df4ae22f604b6d07c9990867",
+      "title": "The Anthropic-Physical Intelligence rumor roiling AI Twitter",
+      "url": "https://techcrunch.com/2026/07/21/the-anthropic-physical-intelligence-rumor-roiling-ai-twitter/",
+      "summary": "Anthropic and OpenAI's aggressive 2026 acquisition sprees set the stage for a weekend rumor. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -940,17 +910,115 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3a011e30e27984cb738d7317",
-      "cluster_id": "cluster_776618ab7f6c49d148555d72",
-      "title": "Q3 2024 North America",
-      "url": "https://news.crunchbase.com/venture/north-american-startup-funding-recap-q3-2024/",
-      "summary": "Q3 2024 North America。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_23311cbb5a868ace828a388d",
+      "cluster_id": "cluster_00ebc8a45aae0897b21972f3",
+      "title": "Gautam Mukunda: Regulate AI Like the Airline Industry - StartupHub.ai",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNQ2xISTdaa2hvNmdsVFJ2dFpJaGhwWlktZjF0WGlUZmpTVkd2QkRXdmxUdVl2dEhBdmtBdUpDRGZpS3NmVGNVNGtnbktPajZDY2FNWjdaZmFNOF9LTWYzbGdBVFNsX0JwbXdIaGp2YVpZWk9XUXJyWFhzUjRuOVJGWl9HNWU2SlM3TjhDUlY1YmpEN3Y2NjYzUVJYRHM2bFlXcTNKVTUtVm0xWlR3Z0w3SGZJUlJrdw?oc=5",
+      "summary": "Gautam Mukunda: Regulate AI Like the Airline Industry StartupHub.ai。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
+        "name": "news.google.com",
+        "home_url": "https://news.google.com/"
+      },
+      "collected_via": {
+        "name": "Google News AI Policy RSS",
+        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=artificial+intelligence+policy+OR+AI+regulation"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "policy_infrastructure",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_238c12cea8779b97d207204b",
+      "cluster_id": "cluster_caee63d87714061fb77a6b65",
+      "title": "OpenAI's models went rogue and hacked Hugging Face. More concerning behavior may be next - Fortune",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQblN5a3FEbHM4RTBhUkNPZzV3TG5vVDBZbk83RnZ6NVhKbWl5WUtZXzZEekJNNDVkMWFYLXlzeWI0cVM5Q3cwM2NBQzhUR1E0dDB2UUR3VUlucHVhMVhGemNtQlUxN1ltNGVKY0Q1SUU0XzlvZEtkSW9RcW5Jb1BfLW91MEk4M0IxOW5tZERR?oc=5",
+      "summary": "OpenAI's models went rogue and hacked Hugging Face. More concerning behavior may be next Fortune。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.google.com",
+        "home_url": "https://news.google.com/"
+      },
+      "collected_via": {
+        "name": "Google News Official Open Source Watch RSS",
+        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "open_source",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_24014d21524029a76779a187",
+      "cluster_id": "cluster_eacb43157949c3d0d535e510",
+      "title": "这届世界杯花钱最狠的人，不懂球丨2026世界杯消费报告",
+      "url": "https://36kr.com/p/3906526848144515?f=rss",
+      "summary": "随着加时赛那粒制胜进球的落下，西班牙时隔16年再次举起大力神杯 ，这场横跨美加墨三国、48支球队的世界杯终于尘埃落定。 这届世界杯从来不缺爆冷、争议和绝少，但比球场更热闹的，是年轻人的钱包。 深夜外卖订单暴涨？联名盲盒开售秒空？球迷酒吧一座难求？ 在这一个来月的世界杯比赛期间，年轻人们究竟为了「这场球」豪掷出多少钱？ 如今赛场的喧嚣散去，翻看这段时间的消费记录，才发现今年看球的画风有些变了。针对这届世界杯年轻人的观赛与消费选择，「后浪研究所」发起了一项世界杯消费小调查，共回收。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "36kr.com",
+        "home_url": "https://36kr.com/"
+      },
+      "collected_via": {
+        "name": "36Kr",
+        "url": "https://36kr.com/feed"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_24368109f1d5b235f8f8eabd",
+      "cluster_id": "cluster_1ad747d0d3cdb453a2bcb826",
+      "title": "Company",
+      "url": "https://about.crunchbase.com/about-us/",
+      "summary": "Company。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "about.crunchbase.com",
+        "home_url": "https://about.crunchbase.com/"
       },
       "collected_via": {
         "name": "Crunchbase News AI",
@@ -974,17 +1042,51 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3a1a62fe934fac406f7fdf32",
-      "cluster_id": "cluster_b7934efcf7e62289f7cd2ec4",
-      "title": "OpenAI 总裁 Greg Brockman 公开评价月之暗面 Kimi K3「相当不错」,但不确定是否蒸馏自 ChatGPT",
-      "url": "https://www.bloomberg.com/news/articles/2026-07-22/openai-president-says-kimi-k3-pretty-good-unsure-if-distilled",
-      "summary": "OpenAI 总裁 Greg Brockman 罕见正面回应上周月之暗面发布的 Kimi K3,承认其能力「相当不错」、已具备挑战自家模型的水平,同时抛出一个悬而未决的问题:不确定 Kimi K3 是否通过对 ChatGPT 输出做知识蒸馏训练得来。 这与同一天白宫官员指控月之暗面违规使用美国模型和 Nvidia 芯片的表态呼应,蒸馏合规正从学术问题变成中美 AI 竞争的政策语言。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_24aa19c507ce667e626ff754",
+      "cluster_id": "cluster_70209cd40fb60b15411e4e98",
+      "title": "Blog",
+      "url": "https://about.crunchbase.com/blog/",
+      "summary": "Blog。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "Bloomberg",
-        "home_url": "https://www.bloomberg.com/"
+        "name": "about.crunchbase.com",
+        "home_url": "https://about.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_24bd60ecda647ed745a07c4d",
+      "cluster_id": "cluster_3fc8bdb7cc18e6870f3b22ca",
+      "title": "GigaToken 开源：AMD 双路 CPU 上 GPT-2 分词速度较 Hugging Face 快 989 倍",
+      "url": "https://github.com/marcelroed/gigatoken",
+      "summary": "开源分词器 GigaToken 在 AMD EPYC 9565 双路 144 核 CPU 上，对 GPT-2 分词吞吐达 24.53 GB/s，较 Hugging Face Tokenizers 快 989 倍、较 tiktoken 快 681 倍，可无缝替换现有分词管线。对大规模数据预处理和推理前端而言，这是一项直接可落地的工程优化。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "GitHub",
+        "home_url": "https://github.com/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -1003,14 +1105,146 @@
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_24fe7a8a8497ca888d9b03a3",
+      "cluster_id": "cluster_6deae87e629a169503a34a89",
+      "title": "Substack adds an AI detector to help spot blogs written by no one",
+      "url": "https://www.theverge.com/ai-artificial-intelligence/968855/substack-pangram-ai-detecting-tool",
+      "summary": "Substack will now help users determine whether what they're reading may have been written by AI. A new tool coming to the platform can scan posts, notes, replies, and comments to provide an estimate of how much text could be AI-generated or。This is an intermediary/self-media lead; trace it to a primary source before t...",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "theverge.com",
+        "home_url": "https://www.theverge.com/"
+      },
+      "collected_via": {
+        "name": "The Verge AI",
+        "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
       "access_state": "indirect"
     },
     {
-      "id": "occ_3a578159abe1e661a0c7a497",
-      "cluster_id": "cluster_c5011a400ba31afd30664007",
-      "title": "Midjourney",
-      "url": "https://www.crunchbase.com/organization/midjourney",
-      "summary": "Midjourney。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_25a14be63d1a023a12197e5c",
+      "cluster_id": "cluster_c516fdafd9c00fdac874d98d",
+      "title": "When AI Attacks: OpenAI Models Autonomously Hack Hugging Face - Dark Reading",
+      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQT2pvYUxCbjV3SlRULTA5WTJkeWxSNExkVFBHa0hJNFZ5OEU3UXItY0w2c2ZPaWRXZzZkQ2Exci1PV2FfNmZuU0hOU1FkTVd5ZU9sS3c4bkdCSXU4eTloVkZIY0NvaWZOT0Yzem1OcFlCcjNPSk5WcWVvd1RBbU9ZeXhGSWZqVHpGVDNj?oc=5",
+      "summary": "When AI Attacks: OpenAI Models Autonomously Hack Hugging Face Dark Reading。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.google.com",
+        "home_url": "https://news.google.com/"
+      },
+      "collected_via": {
+        "name": "Google News Official Open Source Watch RSS",
+        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "open_source",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_25b26ec779351b5e3db6ef73",
+      "cluster_id": "cluster_ed61e80bf0a9d74538384844",
+      "title": "The White House Is Trying to Figure Out What to Do About Chinese AI",
+      "url": "https://www.wired.com/story/the-white-house-is-trying-to-figure-out-what-to-do-about-chinese-ai/",
+      "summary": "There’s a debate going on in the Trump administration over how to handle increasingly powerful Chinese AI models. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "wired.com",
+        "home_url": "https://www.wired.com/"
+      },
+      "collected_via": {
+        "name": "WIRED AI Feed",
+        "url": "https://www.wired.com/feed/tag/ai/latest/rss"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "policy_infrastructure",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": "https://media.wired.com/photos/6a5fecfac92cec058a76a8e2/master/pass/politics_chinese_ai_white_house.jpg",
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_25f2da62147efb0afc840660",
+      "cluster_id": "cluster_0f2cfadf3040a2b958694b47",
+      "title": "Go To Crunchbase.com",
+      "url": "http://www.crunchbase.com/",
+      "summary": "Go To Crunchbase.com。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "http://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_26a7130b4de5771ae594bcca",
+      "cluster_id": "cluster_55de899fdf0ef629b7f4fcf1",
+      "title": "Character.ai",
+      "url": "https://www.crunchbase.com/organization/character-ai",
+      "summary": "Character.ai。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1040,469 +1274,11 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_3ade1023f2b00d712a114648",
-      "cluster_id": "cluster_751197fa691bbcacd9260805",
-      "title": "xAI",
-      "url": "https://www.crunchbase.com/organization/xai",
-      "summary": "xAI。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "crunchbase.com",
-        "home_url": "https://www.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3b338a8c039c164a60f6e98b",
-      "cluster_id": "cluster_883d73b6468dabb78ceaeeec",
-      "title": "2021 Europe",
-      "url": "https://news.crunchbase.com/venture/europe-vc-funding-unicorns-2021-monthly-recap/",
-      "summary": "2021 Europe。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3b9483f283b04708ffcefc50",
-      "cluster_id": "cluster_1f16267e3c5386ea849b6316",
-      "title": "Georgia appeals court warns against AI-generated fake legal citations after Henry County Schools race discrimination suit ruling - CBS News",
-      "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxQNVp0SjVKb1ItNzYtcXpPbGpxMFp2NGt6LUFlRDFXZHJrSGdoQlUyNkp2OTZROEREZmZNRTJrUElFdUlNWHQwTFAzZnNwTVZ2Smg3YlY2NUFwbWdFckEtbG1nZ0FFeWxFeWZJalZ1d1dNTTFmSS11Ym8xYzd3Y1FsdFR1VWdEUU1RTjJfTEplcEh4NWpKOEt4RGN4WVlJS21tY1FSTXhNUlpJZVhBbVlNZXZKWnEzemhERUNsRXBBemFqaVVKRXItVVpNb3BtR2lKTGFIbk1Ua0M?oc=5",
-      "summary": "Georgia appeals court warns against AI-generated fake legal citations after Henry County Schools race discrimination suit ruling CBS News。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.google.com",
-        "home_url": "https://news.google.com/"
-      },
-      "collected_via": {
-        "name": "Google News AI RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=artificial+intelligence+OR+generative+AI"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3c3861bd2138fbac28c770c3",
-      "cluster_id": "cluster_0849e81078e1323e48d0b9b1",
-      "title": "韩国披露外交官数据泄露事件，黑客潜伏外交部教育系统长达 10 个月",
-      "url": "https://www.bleepingcomputer.com/news/security/south-korea-discloses-data-breach-impacting-diplomats-worldwide/",
-      "summary": "韩国外交部披露，黑客自 2025 年 4 月起利用国立外交院在线教育系统漏洞，持续 10 个月窃取现任及前任外交人员个人信息，影响至少 6000 人，包括 350 名驻外使节。泄露数据包括 ID、姓名、邮箱和加密密码。韩国外交部表示因涉及外交安全敏感性，延迟 5 个月才公开此事。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "BleepingComputer",
-        "home_url": "https://www.bleepingcomputer.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3c6d18f78f79ab1ab093442e",
-      "cluster_id": "cluster_ef745bd8351de6393e0ce922",
-      "title": "世界模型四张主流榜单口径打架，DeepMind、INSAIT 的 Physics-IQ 榜首都是国产模型",
-      "url": "https://mp.weixin.qq.com/s?__biz=MzA3NzUxMzM5MQ%3D%3D&idx=1&mid=2453899818&sn=e8e407f562d45d0e08a83aec1854d9eb",
-      "summary": "WAIC 2026 现场具身智能与视频生成公司集体讲「世界模型」，拆解目前四张主流榜单会发现口径彼此冲突：DeepMind 与 INSAIT 的 Physics-IQ 榜首是中国模型，另外三张给出完全不同的第一名。差异折射出世界模型定义之争，物理一致性、可交互性、长时序一致、生成保真度各成一派；谁的评测口径成主流，谁就抢下技术叙事与融资叙事的定义权。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Z Finance",
-        "home_url": "https://mp.weixin.qq.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3c87037379a121880d60edec",
-      "cluster_id": "cluster_db072b011120063a4d1d178a",
-      "title": "Amazon Cuts Jobs in Artificial General Intelligence Unit - WSJ",
-      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQZ0VZaUtnWWYyYndPMF9QbmZ4c3Q5Q1hGcFJwZk5RQmxXeWNSOWw4aUl0bEtEVUc1RnNLTGk3QXJiVk84c1FGRDJ6aTRLc3JFc24ycUl4S3NlUlFOYV9DU0VNeWFnN2s2RGxOV1JGQ0pNRnN6YzAzM0p0WDNqejNDS3oyMDRLYmpjcjZEdTExLTQyS0pzZ2xEbA?oc=5",
-      "summary": "Amazon Cuts Jobs in Artificial General Intelligence Unit WSJ。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.google.com",
-        "home_url": "https://news.google.com/"
-      },
-      "collected_via": {
-        "name": "Google News AI RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=artificial+intelligence+OR+generative+AI"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3d5c845ff0e41f6e6fb35b6b",
-      "cluster_id": "cluster_716393ec1372d83805d0e58b",
-      "title": "Acronis 警告:企业 GenAI 助手继承员工权限,一旦凭证泄露就成勒索软件放大器",
-      "url": "https://www.bleepingcomputer.com/news/security/how-enterprise-genai-can-amplify-ransomware-risk-and-how-to-contain-it/",
-      "summary": "企业 GenAI 助手和 Agent 继承了员工的身份和权限,一旦凭证被攻破,攻击者可以借 AI 快速定位敏感数据、搜索备份文档、滥用已授权 API。Microsoft 每天检测到约 3800 万次身份风险事件,针对 Microsoft 365 用户的 OAuth 设备码钓鱼也已大规模出现。Acronis 建议把 AI 纳入现有身份治理和数据保护框架,不要另起一套体系单独管。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "BleepingComputer",
-        "home_url": "https://www.bleepingcomputer.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3dea401b34e34e5c80933b81",
-      "cluster_id": "cluster_7d6e7a01ef0ae53e766223a2",
-      "title": "OpenAI says AI models went rogue, hacked Hugging Face - Lee News Central",
-      "url": "https://news.google.com/rss/articles/CBMiiAJBVV95cUxQQ2ZvQjY0NEd6TkpjMXVrQ3Uzc2hHblRfTkJIZHJjUTQwbGNGQTJUUkFCTjVKOTQyR0dzQndIUGtfMmdfVHZackZGTUR3bzFqRVJUOXpoSjlTanFReVFnd2hGY1ZQQXcwUGJvTk1wNC04cVlWNmswczh4NWNVYWw4djIxTXNyRUVZMnZxeVRLa21haUtHdUZRYUZqMVFtX2xrYUdjS2VFU3FWcVlFOXRGZldHSTZBRTI1bHBiYmowbGlycGRvYkRyWW9Ob04wNUU0T1pFWXA5WGc5RGZCbWx4N2hDdzBMVldCbzU4ZHRFNHF2MjRuM3JQRDRMdU9QenB3S19LT0t3a28?oc=5",
-      "summary": "OpenAI says AI models went rogue, hacked Hugging Face Lee News Central。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.google.com",
-        "home_url": "https://news.google.com/"
-      },
-      "collected_via": {
-        "name": "Google News Official Open Source Watch RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "open_source",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3ee045be3ce69a8795023be0",
-      "cluster_id": "cluster_3a1a8dbfa1e7b1394b065013",
-      "title": "Tech Layoffs Tracker",
-      "url": "https://news.crunchbase.com/startups/tech-layoffs/",
-      "summary": "Tech Layoffs Tracker。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3f6bb4eef6661ae421417bbe",
-      "cluster_id": "cluster_d8735414acf95382b392633f",
-      "title": "OpenAI's Hugging Face Breach Shows AI Is Getting Too Hard to Contain - Bloomberg.com",
-      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPM2VZdmVwU1lkTWdlcGJUZkRoRDFzVUwwYlE3c0Q2bUhsRThPLVotSmxINXdnNlFzNWREekR4VDdYZzNHZC1fZ2VvNzNyaFVPM2FnajRCZ1duazVTc21vWHRwZDhCOUxYRG1USV9nSUJXRmJyaGN5U2V4Q2xnZW5wS3dLbWhrRUpUZTlYZmNFN05NRXlGdlBfV1JXMFNhbWo3eGNUeG5GaDZNaUhpQy1NN2lIcXFxa2VRYmxYTkhndw?oc=5",
-      "summary": "OpenAI's Hugging Face Breach Shows AI Is Getting Too Hard to Contain Bloomberg.com。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.google.com",
-        "home_url": "https://news.google.com/"
-      },
-      "collected_via": {
-        "name": "Google News Official Open Source Watch RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "open_source",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3f76caf0dec39014426bde07",
-      "cluster_id": "cluster_24fa872935b84d45a67cc8bc",
-      "title": "黑石为 AirTrunk 澳大利亚数据中心敲定 30 亿美元贷款，AI 基建债务担忧持续升温",
-      "url": "https://www.bloomberg.com/news/articles/2026-07-22/blackstone-tying-up-3-billion-airtrunk-loan-as-data-center-debt-binge-woes-grow",
-      "summary": "黑石正联合银团为 AirTrunk 在澳大利亚新建的数据中心搭建总额 43 亿澳元（约 30 亿美元）的融资。这是黑石收购 AirTrunk 之后又一笔巨额基建借贷，市场对为 AI 训推负载堆积起来的数据中心债务规模再度警觉；银行是否已系统性低估本轮 AI 基建周期的信用尾部风险，成为新的焦点。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "Bloomberg",
-        "home_url": "https://www.bloomberg.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3fa4e401c409a4553cac3275",
-      "cluster_id": "cluster_956422920a05549b18ffc412",
-      "title": "'Unprecedented': OpenAI models autonomously hacked another AI company - Euronews.com",
-      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxONmY5eHNlS3hIS01mZENlYU8xd19Cd1hhQ0NVb0ZmS1gzSmgwRnVoYXBIdTlYOUFsd20tX1lDTlE2VXhOTjFuU19ScXEtVFA4dGlEVWNNNFJLVmlQWVp4SjhGVlNBTzM5Q3FWZEh5RUxqQTliWS1aaHZmZUo1bEpKeHhsTnFIR0NERHZ2NWUyQ3RlYmJVbktyejFIWDBlbUZZbUxveWZaYWpkX3Zlb3V5Vkhlb2dJdw?oc=5",
-      "summary": "'Unprecedented': OpenAI models autonomously hacked another AI company Euronews.com。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.google.com",
-        "home_url": "https://news.google.com/"
-      },
-      "collected_via": {
-        "name": "Google News Official Open Source Watch RSS",
-        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=%28OpenAI+OR+Anthropic+OR+DeepSeek+OR+Qwen+OR+Kimi+OR+Moonshot+OR+MiniMax+OR+Hunyuan+OR+Zhipu+OR+%22Meta+Llama%22%29+%28GitHub+OR+Hugging+Face+OR+open-source+OR+%22model+weights%22%29"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "open_source",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3fb47b9e94690dc29e4f8387",
-      "cluster_id": "cluster_09b1c216cb2d4f1fadb99d72",
-      "title": "Poolside Releases Laguna S 2.1, an Open-Weight Agentic Coding Model Punching Above Its Weight Class on SWE-Bench Multilingual",
-      "url": "https://www.marktechpost.com/2026/07/21/poolside-releases-laguna-s-2-1/",
-      "summary": "Poolside has released Laguna S 2.1, a 118B open-weight Mixture-of-Experts coding model with 8B active parameters per token and a 1M-token context. It matches or beats models several times its size on agentic coding benchmarks, ships under O。This is an intermediary/self-media lead; trace it to a primary source before t...",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "marktechpost.com",
-        "home_url": "https://www.marktechpost.com/"
-      },
-      "collected_via": {
-        "name": "Planet AI",
-        "url": "https://www.planet-ai.net/rss.xml"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3fc08ede193513f5e7db08ee",
-      "cluster_id": "cluster_8eea6814717999b34a702b61",
-      "title": "Billion-Dollar Exits",
-      "url": "https://news.crunchbase.com/company-ipo-exits-list/",
-      "summary": "Billion-Dollar Exits。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "news.crunchbase.com",
-        "home_url": "https://news.crunchbase.com/"
-      },
-      "collected_via": {
-        "name": "Crunchbase News AI",
-        "url": "https://news.crunchbase.com/sections/ai/"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "product_update",
-        "funding",
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_3fd486b70ead2feac58e8538",
-      "cluster_id": "cluster_839f7a51d7b587ae6fb6fad7",
-      "title": "Introducing OpenAI Presence",
-      "url": "https://openai.com/index/introducing-openai-presence",
-      "summary": "Introducing OpenAI Presence, a proven enterprise AI agent platform that helps organizations deploy trusted voice and chat agents for customer and internal workflows. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_26b93e4f3ce007a72dd0d771",
+      "cluster_id": "cluster_932591afba7f1cf55372f3f4",
+      "title": "How news organizations are using AI to advance their vital missions",
+      "url": "https://openai.com/index/how-news-organizations-are-using-ai",
+      "summary": "News organizations are using AI to strengthen reporting, grow audiences, and improve business operations, with OpenAI tools supporting journalists and publishers worldwide. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1529,17 +1305,17 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_4038caa790d45ae122bbe98c",
-      "cluster_id": "cluster_85f9ec43ddd7962560201277",
-      "title": "华为小艺以满分 42 分摘得 IMO 2026 金牌，Agent 系统能力再上一台阶",
-      "url": "https://www.ithome.com/0/980/058.htm",
-      "summary": "华为宣布小艺在 2026 年国际数学奥林匹克竞赛（IMO 2026）上以满分 42 分摘金，覆盖代数、几何、数论与组合数学四大门类，标志华为 AI 在复杂问题建模、长程推理、工具协同和严格验证上取得新突破。今年 6 月小艺 Claw 已接入 openPangu 2.0 Pro，昇腾单卡吞吐达到业界主流水平的 2 倍。 IMO 满分开始成为国内大厂对标 OpenAI、Google 的公开赛道，比拼的不只是模型，还有整套 Agent 与工具链的组合能力。This is an intermediary/self-media lead; trace it to a primary source before treating it as ...",
+      "id": "occ_26dd6295471f83d360454069",
+      "cluster_id": "cluster_d4af12d30d7453c4bf1e567f",
+      "title": "LangWatch 推出 Langy：从 trace 到 PR 的自动化 agent 修复",
+      "url": "https://langwatch.ai/blog/introducing-langy-your-automated-ai-engineer",
+      "summary": "LangWatch 发布 Langy，嵌入 observability 平台的 coding agent，自动读取生产 trace、聚类问题模式、撰写 Scenario 测试、连接 GitHub 开 PR 并在 CI 中验证。首个 demo 通过 MCP 连接机器人测试 voice agent。每次 Langy 运行自身也被追踪和计费。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "IT 之家",
-        "home_url": "https://www.ithome.com/"
+        "name": "LangWatch",
+        "home_url": "https://langwatch.ai/"
       },
       "collected_via": {
         "name": "Aify News",
@@ -1561,43 +1337,11 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_406b02446325646b64aac646",
-      "cluster_id": "cluster_124538d66c01e30bde921484",
-      "title": "Anthropic 27 万美元年薪招 Salesforce 开发工程师，AI 与 SaaS 不是零和博弈",
-      "url": "https://www.salesforceben.com/why-even-anthropic-cant-vibe-code-away-salesforce/",
-      "summary": "Anthropic 以 27 万美元年薪招聘 Salesforce 开发工程师，要求使用 Claude 辅助开发而非替代 Salesforce 平台。加上此前 19 万美元的 Salesforce 管理员岗位，AI 公司与 SaaS 正在形成共生关系而非零和替代。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "salesforceben.com",
-        "home_url": "https://www.salesforceben.com/"
-      },
-      "collected_via": {
-        "name": "Aify News",
-        "url": "https://aify-news.pages.dev/articles.json"
-      },
-      "source_group": "news_newsletters",
-      "content_tags": [
-        "industry_news",
-        "analysis_opinion",
-        "community_discussion"
-      ],
-      "credibility_tag": "single_source_relay",
-      "event_date": "2026-07-22",
-      "published_at": null,
-      "collected_at": "2026-07-23T09:08:21.838Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "indirect"
-    },
-    {
-      "id": "occ_410d715679805a4ddf4ad2df",
-      "cluster_id": "cluster_182ce443244ee084b5fe0599",
-      "title": "OpenAI",
-      "url": "https://www.crunchbase.com/organization/openai",
-      "summary": "OpenAI。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_2754c9f08bba5cb5c93ade33",
+      "cluster_id": "cluster_1588aea4c7d2f2f3690b8eeb",
+      "title": "Sameer Dholakia",
+      "url": "https://www.crunchbase.com/person/sameer-dholakia",
+      "summary": "Sameer Dholakia。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1627,11 +1371,204 @@
       "access_state": "indirect"
     },
     {
-      "id": "occ_417fcaffd2cf04a814b51a8b",
-      "cluster_id": "cluster_9df6f1c2178c216965f57745",
-      "title": "Mobileye",
-      "url": "https://www.crunchbase.com/organization/mobileye-vision-technologies",
-      "summary": "Mobileye。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "id": "occ_278fcbd0ae2a7931cf1a6bd6",
+      "cluster_id": "cluster_7c49a9cf52e16d8bc5c300b8",
+      "title": "Google 借 Galaxy Unpacked 2026 把 Gemini 深度嵌入 Samsung 折叠机、手表与眼镜",
+      "url": "https://blog.google/products-and-platforms/platforms/android/galaxy-unpacked-2026/",
+      "summary": "Google 在 Samsung Galaxy Unpacked 2026 上公布三项 Gemini 集成，覆盖新折叠机、智能手表与智能眼镜三类形态，主打语音、多模态与跨设备协作，正面回应 Apple Intelligence 与 Meta 智能眼镜。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Google",
+        "home_url": "https://blog.google/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_279a328be16f10d54397d9ac",
+      "cluster_id": "cluster_762deb0db3631d8035e8d744",
+      "title": "美参议员 Warner 发布《美国 AI 未来框架》:呼吁 NIST 牵头制定 AI Agent 测试基准",
+      "url": "https://www.warner.senate.gov/wp-content/uploads/2026/07/FINAL-AI-Framework-Booklet.pdf",
+      "summary": "美国参议院情报委员会主席、参议员 Mark Warner 发布《A Framework for America's AI Future》白皮书,把 AI Agent 治理列为核心议题:建议由 NIST 主导建立一整套 AI Agent 测试流程与基准,专门评估那些能访问用户敏感数据、可执行高风险动作的 Agent。框架同时覆盖模型安全、出口管制、算力供应链等美国 AI 政策抓手。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "Sen. Warner",
+        "home_url": "https://www.warner.senate.gov/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_27e74e0efdf2532c492c0995",
+      "cluster_id": "cluster_708774a5bb516cae7d55046a",
+      "title": "Crunchbase Enterprise",
+      "url": "https://about.crunchbase.com/products/crunchbase-enterprise/",
+      "summary": "Crunchbase Enterprise。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "about.crunchbase.com",
+        "home_url": "https://about.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_2852e7049bbabb45c95525f3",
+      "cluster_id": "cluster_6b54e67eb8c899e367b2cdd1",
+      "title": "Arcee, a US open source AI lab, says Chinese models are not inherently dangerous",
+      "url": "https://techcrunch.com/2026/07/22/arcee-a-us-open-source-ai-lab-says-chinese-models-are-not-inherently-dangerous/",
+      "summary": "As Chinese AI models grow in capability and popularity among U.S. companies, the arguing over what should be done about them has reached a fever pitch. This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "techcrunch.com",
+        "home_url": "https://techcrunch.com/"
+      },
+      "collected_via": {
+        "name": "TechCrunch AI",
+        "url": "https://techcrunch.com/category/artificial-intelligence/feed/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_28863745d204c24f29a47d9e",
+      "cluster_id": "cluster_63e15ad75f3f0b3149ae23d1",
+      "title": "阿里云 PolarDB 联手 MemOS 发布 AI 长期记忆方案:关系、向量、图数据库统一检索底座",
+      "url": "https://developer.aliyun.com/article/1750353",
+      "summary": "阿里云 PolarDB-PG 与 MemOS 联合发布一站式 AI 记忆管理方案。MemOS 作为记忆操作系统,负责记忆的提取、调度与治理;PolarDB-PG 提供关系、向量、图数据库的统一检索底座,解决 AI 智能体跨会话记忆丢失、多模态数据分散管理的核心痛点。方案支持分层存储和弹性扩展,目标是为企业 AI 应用提供可规模化的长期记忆能力。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "developer.aliyun.com",
+        "home_url": "https://developer.aliyun.com/"
+      },
+      "collected_via": {
+        "name": "Aify News",
+        "url": "https://aify-news.pages.dev/articles.json"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_28d7c8a12b4a9f8168f4e8f7",
+      "cluster_id": "cluster_410f3cb87142e93f0cd51a6e",
+      "title": "‘Unprecedented’: OpenAI says AI models autonomously hacked another company - Al Jazeera",
+      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQRWl1M2pOZE5xZlRtQUFKR1U5bDJKeTAtS2JLS201aTZ6dS1fcm9aYWlZR3BXalJpY21KNk8yQl9ldTJxdHlWNEh2dVN4S3MtRTlBYUxRYWNrdGV5YjIxcEVMRjhnZS1HbTNnQnFYYWZnMmlHVlNxMmRub0FZaEFaNEc1eG5PMF80YnNMMVZhRzZCTmxmVmhacFZPamZrQUhMX0ZRd1JRbUljT1NRcHIwUDl30gG3AUFVX3lxTE5FczYtUTZKSk1jNHJpYWtyVHdJbTY2QXROWnNxN3dhektwMXZRZzRSM3p3eGJ4TG5DM0FvSDZBbnZDb3BJa1lDMGlTcTJpX3pKc1NFRHFKcUZXZGU0TzNSWkFzWENzcDEzWTd0M3o3YThkY2pUU0Y0VG5HdDVDajVUbWoyY1BLMXNYR0VmcFdKTmRQcnlKeWFtMEZFd3JhVkZWVFlHLUdIQ1A4eEctODkxN1I5aEtCaw?oc=5",
+      "summary": "‘Unprecedented’: OpenAI says AI models autonomously hacked another company Al Jazeera。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.google.com",
+        "home_url": "https://news.google.com/"
+      },
+      "collected_via": {
+        "name": "Google News AI RSS",
+        "url": "https://news.google.com/rss/search?ceid=US%3Aen&gl=US&hl=en-US&q=artificial+intelligence+OR+generative+AI"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_28dd33bb70139e06e6937de1",
+      "cluster_id": "cluster_310fa31877a09dc1ce14e118",
+      "title": "Zuoyebang",
+      "url": "https://www.crunchbase.com/organization/zuoyebang",
+      "summary": "Zuoyebang。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1657,6 +1594,74 @@
       "collected_at": "2026-07-23T09:08:21.838Z",
       "date_anomaly": null,
       "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_28e106abdf67553f84773f41",
+      "cluster_id": "cluster_6e19fc16acac0b59c2c5f5eb",
+      "title": "Searches and Lists",
+      "url": "https://www.crunchbase.com/featured",
+      "summary": "Featured Searches and Lists。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "crunchbase.com",
+        "home_url": "https://www.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "indirect"
+    },
+    {
+      "id": "occ_29609d08a32d5de910e93dc2",
+      "cluster_id": "cluster_81da548ff7d79e2449b4b3ae",
+      "title": "Crunchbase News",
+      "url": "https://news.crunchbase.com/",
+      "summary": "Data-driven reporting on private markets, startups, founders, and investors。This is an intermediary/self-media lead; trace it to a primary source before treating it as a reported fact.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "news.crunchbase.com",
+        "home_url": "https://news.crunchbase.com/"
+      },
+      "collected_via": {
+        "name": "Crunchbase News AI",
+        "url": "https://news.crunchbase.com/sections/ai/"
+      },
+      "source_group": "news_newsletters",
+      "content_tags": [
+        "product_update",
+        "funding",
+        "industry_news",
+        "analysis_opinion",
+        "community_discussion"
+      ],
+      "credibility_tag": "single_source_relay",
+      "event_date": "2026-07-22",
+      "published_at": null,
+      "collected_at": "2026-07-23T09:08:21.838Z",
+      "date_anomaly": null,
+      "image_url": "https://news.crunchbase.com/wp-content/uploads/2018/07/cb_news_logo_gradient-2x.png",
       "source_health": "available",
       "access_state": "indirect"
     }

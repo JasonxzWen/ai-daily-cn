@@ -2,23 +2,23 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-27T03:01:12.615Z",
+  "generated_at": "2026-07-27T05:50:05.082Z",
   "group": {
     "id": "papers_models",
     "label": "论文 / 模型"
   },
   "page": 43,
-  "page_count": 140,
+  "page_count": 142,
   "page_size": 50,
-  "total_count": 6956,
+  "total_count": 7080,
   "next_url": "signals/papers_models/page-044.json",
   "items": [
     {
-      "id": "occ_cc82e31f37a164646a2a9e2d",
-      "cluster_id": "cluster_4416a4f6e306162920f014d6",
-      "title": "EMO: Energy Efficiency Modeling and Optimization for AI Workloads",
-      "url": "https://arxiv.org/abs/2607.12324v1",
-      "summary": "The massive energy consumption of GPU-accelerated AI workloads challenges sustainable computing. We observe that execution asynchrony (e.g., CPU-GPU, concurrent streams, multi-GPU) creates slack, allowing non-critical kernels to run at lowe",
+      "id": "occ_80df0e751a04f07be7c29b57",
+      "cluster_id": "cluster_d791c175b971414ff9a85b74",
+      "title": "Inference Pipelines as Operating-System Objects: Priority Scheduling and Constant-Footprint Streaming for Microcontroller Neural Inference",
+      "url": "https://arxiv.org/abs/2607.12614v1",
+      "summary": "Microcontroller runtimes treat the inference pipeline -- pre-processing, accelerator invocation, post-processing -- as application code: every project re-implements stage sequencing, buffer sizing, and completion signalling around a library",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -44,11 +44,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_cc86a993016c5aeb352bd04c",
-      "cluster_id": "cluster_8f572eacbe0ad0893562959a",
-      "title": "Where Reasoning Matters: Rethinking Latent Reasoning in Semantic ID-based Generative Recommendation",
-      "url": "https://arxiv.org/abs/2607.12425v1",
-      "summary": "Semantic ID-based generative recommendation predicts an item by generating a short sequence of semantic ID tokens, where each token is produced autoregressively. Latent reasoning has recently been introduced to improve this process through",
+      "id": "occ_81025efc653edb0874a7c532",
+      "cluster_id": "cluster_18a857c63af8ebe1eddf2109",
+      "title": "Cross-Core Inference Offload as an Operating-System Service on Dual-Core Microcontrollers",
+      "url": "https://arxiv.org/abs/2607.12620v1",
+      "summary": "Dual-core MCUs are asymmetric: on NXP's MCXN947, the second Cortex-M33 has no FPU, DSP extension, TrustZone, or MPU. We treat the asymmetry as a design input in the Phase 3 dual-core architecture of SynapticOS, an open-source Zephyr-based r",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -74,11 +74,101 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_cd7ea5d8775efbda2d128e88",
-      "cluster_id": "cluster_40a04f695548b570800c69d9",
-      "title": "LatentFlow: A General Framework for Conditioning Stochastic Processes",
-      "url": "https://arxiv.org/abs/2607.12922v1",
-      "summary": "Stochastic-process models are, as a rule, far easier to simulate than to condition. Non-linear observations, non-Gaussian likelihoods, black-box information, and global constraints all induce intractable conditional laws, requiring bespoke,。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_814f5eae9f6e0cdf1a0238d4",
+      "cluster_id": "cluster_2e0eac579010b0aaaa76e4aa",
+      "title": "Knowledge- and Gradient-Guided Reinforcement Learning for Parametrized Action Markov Decision Processes",
+      "url": "https://arxiv.org/abs/2607.12924v1",
+      "summary": "In this paper, we study Reinforcement Learning in Parametrized Action Markov Decision Processes (PAMDP), where each decision consists of a symbolic action and numerical parameters. In such settings Reinforcement Learning algorithms typicall",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_822bbbd6806edeebf504859c",
+      "cluster_id": "cluster_43df3846e70de3fa33e53f5d",
+      "title": "ViHoRec: A Quality-Controlled Vietnamese Hotel Recommendation Dataset and Cold-Start Benchmark",
+      "url": "https://arxiv.org/abs/2607.12946v1",
+      "summary": "Recommender-system research for Vietnamese remains limited by the absence of a public, well-documented hotel interaction resource. Building such a resource is challenging for three reasons: cross-platform hotel names must be reconciled befo",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8260691e7b3199c7e18bd900",
+      "cluster_id": "cluster_9221869994353f1e6a961149",
+      "title": "GeoSEAN: Explainable Country-Level Image Geolocation for ASEAN Regions",
+      "url": "https://arxiv.org/abs/2607.12284v1",
+      "summary": "Image geolocation aims to infer the geographic origin of an image from visual content alone. However, this task remains challenging in regions where countries share similar urban, roadside, architectural, and environmental characteristics.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8335c229aca2b8d22e4a11f9",
+      "cluster_id": "cluster_dbf970f8d0256ebafebdecb3",
+      "title": "ANGLE: Angular Neural Generative Learning via Engression",
+      "url": "https://arxiv.org/abs/2607.12833v1",
+      "summary": "Circular data, representing angles or directions, are frequently encountered in computer vision, biology, geology, and meteorology. Traditional regression targets the conditional mean, which is often geometrically misleading for circular re。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -106,11 +196,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_cdddbf7c940326ec8c24fcb3",
-      "cluster_id": "cluster_cc05150ee422909d4afe2f1a",
-      "title": "UR-VC: Unsupervised Robotic Value Correction for Time-Derived Progress Proxies",
-      "url": "https://arxiv.org/abs/2607.12892v1",
-      "summary": "Modern robot learning systems increasingly rely on dense progress or value signals to evaluate intermediate states, guide policy learning, and detect task completion, making the quality of these signals critical. Since such dense labels are。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_84714d6057417b1c25c2d642",
+      "cluster_id": "cluster_36f20c30f4514f0d72cd1f9b",
+      "title": "Privacy Attacks on Stable Marriage",
+      "url": "https://arxiv.org/abs/2607.13015v1",
+      "summary": "The stable marriage problem appears in many privacy-sensitive domains, for example in the National Resident Matching Program in the US. In such applications, preserving the privacy of users' preference lists is essential to prevent strategi。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -119,8 +209,8 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv cs.AI",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -138,11 +228,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_cf842663c131a2cb02e34942",
-      "cluster_id": "cluster_735b5cae6f64605029738f8a",
-      "title": "Semantic-Edge Response Decoding of SAM3 for Zero-Shot Crack Segmentation",
-      "url": "https://arxiv.org/abs/2607.12292v1",
-      "summary": "Crack segmentation is essential for infrastructure inspection and structural health assessment, but existing high-performance methods typically require task-specific pixel-level annotations and training. Text-promptable vision foundation mo",
+      "id": "occ_84b5e27b81e49bbcb861559e",
+      "cluster_id": "cluster_65475dbe311a1105aa931b89",
+      "title": "ORRAM: An OpenROAD-Integrated RAM Generator Using Standard Cells",
+      "url": "https://arxiv.org/abs/2607.12244v1",
+      "summary": "Memory inference remains a significant challenge in turnkey ASIC design flows. Inferring flip-flops from RTL can create thousands of densely interconnected instances which dramatically slow down design flows and impede performance. Memory c",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -168,75 +258,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_d073c1a97be7fac344f0b1a1",
-      "cluster_id": "cluster_65b5f3593116ed1bf401a1af",
-      "title": "nvidia/Nemotron-3-Embed-8B-BF16",
-      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
-      "summary": "nvidia/Nemotron-3-Embed-8B-BF16 Sentence Similarity • 8B • Updated about 6 hours ago • 318 • 13。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/65df9200dc3292a8983e5017/Vs5FPVCH-VZBipV3qKTuy.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d0bcaf08310dc9eaf3557ea1",
-      "cluster_id": "cluster_e6ed78784ddee9bbe8f33dea",
-      "title": "Segregate, Refine, Integrate: Decomposing Multimodal Fusion for Sentiment Analysis",
-      "url": "https://arxiv.org/abs/2607.12686v1",
-      "summary": "Multimodal fusion must simultaneously refine modality-specific signals and model cross-modal interactions; two competing objectives typically entangled within the same operation. We propose \\textbf{SeRIn} (\\textbf{Se}gregate, \\textbf{R}efin。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.CL",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d0ed92fb078aef236eacb941",
-      "cluster_id": "cluster_b80eb01ad31a69613f550b0d",
-      "title": "A Learning-Rate-Gated Failure of GRPO in a Small Language and Vision-Language Model Web Agent: A Controlled Null and Its Mechanism",
-      "url": "https://arxiv.org/abs/2607.12640v1",
-      "summary": "Reinforcement learning with verifiable rewards, and Group Relative Policy Optimization (GRPO) in particular, is now run routinely on a supervised checkpoint in the hope of producing a stronger agent. We ask whether it adds skill to a small",
+      "id": "occ_8674178d8e9e5c4b6f7ea231",
+      "cluster_id": "cluster_ca42f5fe7bc40cb97ea60746",
+      "title": "An Extension to the Procedure for Developing Uncertainty-Consistent Shear Wave Velocity Profiles from Inversion of Experimental Surface Wave Dispersion Data",
+      "url": "https://arxiv.org/abs/2607.12743v1",
+      "summary": "Measurements of shear wave velocity (Vs) with uncertainty are critical for site-specific probabilistic seismic hazard studies. However, rigorously quantifying the uncertainty in Vs over large enough areas and great enough depths remains cha",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -262,11 +288,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_d12b04dc63b0127b9d179bb3",
-      "cluster_id": "cluster_19be812a9fed41b9bf615d9a",
-      "title": "What Does Goodness Measure? A Likelihood-Ratio Account of Forward-Forward Learning",
-      "url": "https://arxiv.org/abs/2607.12501v1",
-      "summary": "The Forward-Forward (FF) algorithm trains each layer locally, so that a scalar goodness - the sum of squared activations - is high on real inputs and low on contrastive ones, with activations normalized between layers. Both choices are usua。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_86e2990c41b490b73634ffbb",
+      "cluster_id": "cluster_ba81b8d59c6c2a327c370fcc",
+      "title": "XScientist: A Git-Like Research Protocol for Long-Running Autonomous Scientific Discovery",
+      "url": "https://arxiv.org/abs/2607.12301v1",
+      "summary": "Autonomous research systems are often evaluated as one-shot paper generators: given a topic, they produce a manuscript and a small set of experiment logs. This framing hides the operational problem that makes such systems difficult to trust。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -275,8 +301,8 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv stat.ML",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -294,11 +320,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_d218e4699b888f0bcbd18681",
-      "cluster_id": "cluster_508edfefebc85904190ed304",
-      "title": "Singular and nearly singular quadrature in arbitrary dimensions",
-      "url": "https://arxiv.org/abs/2607.12440v1",
-      "summary": "The accurate numerical evaluation of integrals with singular or nearly singular kernels remains a fundamental challenge in scientific computing, particularly as the spatial dimension increases. While existing approaches, including singulari",
+      "id": "occ_86edbc2c17ffdb4156bb2c48",
+      "cluster_id": "cluster_853b9f6b1f3912d87baea058",
+      "title": "On-Device Deep Research at 4B: Exposure Bounds Faithfulness, Retrieval Bounds Coverage",
+      "url": "https://arxiv.org/abs/2607.12257v1",
+      "summary": "On-device research agents search a corpus, read sources, and write a cited brief on a personal laptop. Whether their citations are faithful, and at what cost, is unmeasured for a deployable small model. This study fixes one 4B generator on",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -324,43 +350,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_d32517f03b90c9406b53f33a",
-      "cluster_id": "cluster_58638f96f9a74c270dda1a4e",
-      "title": "Accelerating Masked Diffusion Large Language Models: A Survey of Efficient Inference Techniques",
-      "url": "https://arxiv.org/abs/2607.12829v1",
-      "summary": "Diffusion large language models (dLLMs) offer a theoretical advantage in parallel generation over standard autoregressive models. However, parallel generation alone does not guarantee practical speedups. Realizing this efficiency requires s。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.CL",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d3906e1242207158bf9de118",
-      "cluster_id": "cluster_2f84af35b7b937bf1461fd63",
-      "title": "Bulkhead: Automated Semantic Detection and Remediation of Container Escape Vulnerabilities",
-      "url": "https://arxiv.org/abs/2607.12723v1",
-      "summary": "Filesystem isolation in container ecosystems is often weakened by cross-boundary path misresolution, causing path traversal (PaTra) vulnerabilities. These vulnerabilities stem from insecure host-container interactions and have become increa",
+      "id": "occ_88ef93b18166f55d4be6f588",
+      "cluster_id": "cluster_7d26668af7c8107c922dfd95",
+      "title": "Coupled Shock Cooling and Radioactive Heating in the Type IIb Supernova SN 2024aecx: An Extended Envelope and Rapid Optical Decline",
+      "url": "https://arxiv.org/abs/2607.12700v1",
+      "summary": "SN~2024aecx is a nearby, rapidly evolving stripped-envelope supernova with a prominent double-peaked ultraviolet--optical light curve. We model its multiband evolution with an extended version of \\texttt{TransFit}, in which the early shock-",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -386,11 +380,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_d404e1a3231049996cb34808",
-      "cluster_id": "cluster_235b4dcdb171298316c689f8",
-      "title": "How Many Tasks Are Enough for Agent Benchmark Decisions? A Replay Analysis of Public LLM Agent Benchmarks",
-      "url": "https://arxiv.org/abs/2607.12338v1",
-      "summary": "Agent benchmarks often compare two agents after all tasks have run, but costly evaluations make partial runs tempting. A task fraction alone does not show whether a partial run supports the same pairwise conclusion as the completed benchmar",
+      "id": "occ_8a1013087dccb20e1f1f9cfd",
+      "cluster_id": "cluster_61047db738f10a9a38f3093e",
+      "title": "ArchSim: Computer Architecture Simulation as a Service",
+      "url": "https://arxiv.org/abs/2607.12359v1",
+      "summary": "Conducting a complete computer architecture simulation study is challenging because configuration, execution, and analysis are often encoded implicitly in scripts or directory conventions rather than represented explicitly. As a result, stu",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -416,43 +410,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_d430e07de9aa84285f81173b",
-      "cluster_id": "cluster_b2903c471099ce87040137bc",
-      "title": "Who Grades the Grader? Co-Evolving Evaluation Metrics and Skills for Self-Improving LLM Agents",
-      "url": "https://arxiv.org/abs/2607.12790v1",
-      "summary": "Self-evolving agent systems improve by creating, revising, and retiring their own skills, but every such loop rests on a hidden assumption: a reliable evaluation metric already exists. In many real applications it does not. We make three cl。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.CL",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d474988ff8f4e515cd20e1ec",
-      "cluster_id": "cluster_2c8e8197af683f9f1a81bf7f",
-      "title": "On the Security Implications of PQC in TLS: Handshake Exhaustion and IDS Degradation",
-      "url": "https://arxiv.org/abs/2607.12504v1",
-      "summary": "Post-Quantum Cryptography (PQC) is increasingly being integrated into TLS 1.3 to enhance resilience against quantum-enabled attacks. However, the additional computational and communication overhead introduced by PQC primitives during the ha",
+      "id": "occ_8a3356f586c15329f3106cb2",
+      "cluster_id": "cluster_84b85db8c8d2d557af2bf7e0",
+      "title": "Stability Buys Time: A Re-Keying Game for Encrypted Multi-Agent Control",
+      "url": "https://arxiv.org/abs/2607.12742v1",
+      "summary": "Encrypted control lets a cloud coordinate a fleet of agents on fully homomorphically encrypted state, keeping their positions and commands private. The approximate scheme for real-valued control, CKKS, returns decryptions that carry the enc",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -478,737 +440,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_d475af144c852d8a2c88fc1b",
-      "cluster_id": "cluster_ff74a1100d0d025177823acf",
-      "title": "Evaluating Health Misinformation in Low-Resource Languages: Integrating Small Language Models with a Culturally-Sensitive Responsible NLP Framework (Bangla as a Case Study)",
-      "url": "https://arxiv.org/abs/2607.12336v1",
-      "summary": "Artificial Intelligence (AI) technologies, while serving as a foundational enabler for modern social media and digital health services, exert a bivalent effect by simultaneously acting as a combatant against and a spread vector for misinfor",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d58d285f3a5d4c0fe5ce99b0",
-      "cluster_id": "cluster_c5e194f3bed87a726228b87d",
-      "title": "Can LLMs Write Reliable Rubrics? A Meta-Evaluation for Experiment Reproduction",
-      "url": "https://arxiv.org/abs/2607.12835v1",
-      "summary": "Rubric-based evaluation is a promising approach for assessing open-ended outputs from LLM-based research agents, particularly in paper reproduction, where direct paper-to-repository comparison is prone to hallucination. However, constructin",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d66b714364c5580cc52e785c",
-      "cluster_id": "cluster_e0df77f965d69170eb6ead45",
-      "title": "Pinching-Antenna-Assisted Terahertz Communications: Modeling and Benchmarking",
-      "url": "https://arxiv.org/abs/2607.12695v1",
-      "summary": "Pinching antenna systems (PASS) employing dielectric waveguides have recently emerged as a promising flexible antenna architecture for high-frequency wireless communications. While prior work has focused primarily on millimeter-wave regimes",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d720859ca71e67fe4cd979e7",
-      "cluster_id": "cluster_8be69d4ce6968766275c3b2a",
-      "title": "Globalized Constrained Stein Variational Inference for Diverse Feasible Robot Motion Planning",
-      "url": "https://arxiv.org/abs/2607.12732v1",
-      "summary": "Robot motion planning is inherently multimodal, yet classical planners typically return only a single solution. Probabilistic formulations address this limitation by maintaining a distribution over motions, allowing the planner to reason ov",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d8420b501e9153f242e7feee",
-      "cluster_id": "cluster_a973d2811c832e239b7b62e6",
-      "title": "PalmClaw: A Native On-Device Agent Framework for Mobile Phones",
-      "url": "https://arxiv.org/abs/2607.13027v1",
-      "summary": "Large Language Model (LLM) agents have moved beyond generating responses to executing multi-step tasks by calling tools, observing the results, and iteratively deciding the next action. Most agent systems run on desktops or servers, which s",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d84f476de61ebca8b9371cb6",
-      "cluster_id": "cluster_c7b7c503d76c1a9d3a92075b",
-      "title": "Adversarial Attacks on Online Handwriting using Salience-based Temporal Editing",
-      "url": "https://arxiv.org/abs/2607.12500v1",
-      "summary": "Deep learning models for online handwriting recognition have been shown effective and are increasingly deployed in practical applications. However, their vulnerability to adversarial attacks is still a challenge. Existing adversarial method",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_da73b569ef739f0dd039b261",
-      "cluster_id": "cluster_977ef15f08eeadeb132964d5",
-      "title": "SynapticOS: An Inference-First Runtime Architecture for Neural Processing Units on Resource-Constrained Microcontrollers",
-      "url": "https://arxiv.org/abs/2607.12606v1",
-      "summary": "Microcontrollers with on-die neural processing units (NPUs) have become mainstream, but the system software hosting them has not: production combinations of Zephyr or FreeRTOS with TensorFlow Lite Micro treat AI inference as an application-",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_da849ad0adf100c42f1c0b78",
-      "cluster_id": "cluster_1716da1200d839fd698bf003",
-      "title": "Rough Path Signature-Guided Geometry Augmentation for Few-Shot Industrial Surface Defect Detection",
-      "url": "https://arxiv.org/abs/2607.12245v1",
-      "summary": "Few-shot industrial defect detection remains difficult for standard supervised detectors, which achieve poor performance on boundary-dominated industrial defects. This paper proposes rough path signature-guided geometry augmentation (RPS-GA",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_dbe798bd93774e91a0054109",
-      "cluster_id": "cluster_42e2129cfd7040195a77bcaf",
-      "title": "Code-MUE: Measuring Code LLMs' Uncertainty through Execution-based Semantic Interaction Graphs",
-      "url": "https://arxiv.org/abs/2607.12273v1",
-      "summary": "As Code Large Language Models (LLMs) become central to modern software engineering, their inherent stochasticity poses significant real-world risks, where even minor errors can lead to severe functional, security, or safety consequences. Re",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_dc5b2511052f8e5150137c9b",
-      "cluster_id": "cluster_e5684ed80e3e868524e609d9",
-      "title": "Audio Diarization: A New Paradigm for Exploring Audio Recordings with Unknown Event Classes",
-      "url": "https://arxiv.org/abs/2607.12703v1",
-      "summary": "We propose a new task, audio diarization. The motivation is that there are applications, such as audio monitoring in an unknown environment, where initially the sound event classes to be recognized are unknown. For such a scenario, we propo",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_dc85a384a2c4ebaa8b59a339",
-      "cluster_id": "cluster_fd3defa27b1beed572f88cee",
-      "title": "Open-KNEAD: Knowledge-grounded Nutrition Estimation via Agentic Decomposition",
-      "url": "https://arxiv.org/abs/2607.12911v1",
-      "summary": "Multimodal Large Language Models (MLLMs) are increasingly used for dietary assessment from meal images, where retrieval-augmented grounding was shown to sharpen nutrition estimates. However, we find this premise no longer holds for current",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_dcad543a1c4f4bbce887e5ec",
-      "cluster_id": "cluster_81bb684fda9df248a3b7fffb",
-      "title": "StratMamba: Strategic and Reactive Stream Partitioning for Path-Efficient LiDAR-Based Obstacle Avoidance",
-      "url": "https://arxiv.org/abs/2607.12370v1",
-      "summary": "This paper proposes StratMamba, a dual-stream Mamba-based temporal modeling architecture, to more efficiently capture long-horizon temporal dependencies required for robot navigation in complex and obstacle-rich environments. StratMamba lev",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_dcd94c6569ae5ded95bfda63",
-      "cluster_id": "cluster_25df4b920017069a54a0e08d",
-      "title": "Weakly Supervised Spatio-Temporal Candidate Discovery of Dairy Farm Sites from Seasonal Satellite Imagery",
-      "url": "https://arxiv.org/abs/2607.12748v1",
-      "summary": "Farm site discovery from satellite imagery is a spatiotemporal candidate ranking problem because farm evidence is distributed across pasture, field boundaries, roads, buildings, and seasonal vegetation patterns. Direct farm labels are often",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_dd796966b4865f774ddca19c",
-      "cluster_id": "cluster_a412cd76aa5ddf69bfb002ce",
-      "title": "Detecting Rendering Bugs in Imperative Data Visualization Libraries via Equivalent Mutations",
-      "url": "https://arxiv.org/abs/2607.12363v1",
-      "summary": "Imperative data visualization libraries construct plots through a sequence of stateful API calls that incrementally create and update graphic elements. Rendering bugs in these libraries often manifest as incorrect visual outputs rather than",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_ddf281cb108478b5ac29f4a7",
-      "cluster_id": "cluster_b0c542c58ba261450e89194f",
-      "title": "LLMs Can See the Smoke but not the Fire: Evaluating Abductive Reasoning with Elenchos",
-      "url": "https://arxiv.org/abs/2607.12733v1",
-      "summary": "Large language models (LLMs) excel at pattern recognition and text generation, but their capacity for abductive inference - inferring latent hypotheses that explain observed behavior - remains poorly understood. Here, we introduce Elenchos",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_de4450ccf1e5a565c2058167",
-      "cluster_id": "cluster_be70dcff010da3cb98a8445c",
-      "title": "Swarming and Opinion Dynamics",
-      "url": "https://arxiv.org/abs/2607.12844v1",
-      "summary": "Collective dynamics in multi-agent systems provide a powerful framework for understanding how coherent group-level patterns can emerge from simple interactions between individuals. Such phenomena are observed in many natural and artificial",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_deb369e9c96132c387214a72",
-      "cluster_id": "cluster_d40d6c145a2d458738b050fa",
-      "title": "ExToken: Structured Exploration for Efficient Vision-Language-Action Reinforcement Fine-tuning",
-      "url": "https://arxiv.org/abs/2607.12931v1",
-      "summary": "Reinforcement Learning (RL) has demonstrated significant potential for improving Vision-Language-Action (VLA) models on complex manipulation tasks. However, its practical scalability remains severely limited by the substantial cost of envir",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e1b009774157994574f7b59d",
-      "cluster_id": "cluster_a0766a2857e87f5179ad35c5",
-      "title": "ViCo3D: Empowering LiDAR-based Collaborative 3D Object Detection with Vision Foundation Models",
-      "url": "https://arxiv.org/abs/2607.12959v1",
-      "summary": "LiDAR-based collaborative 3D perception in Vehicle-to-Everything (V2X) systems typically relies on fusing bird's-eye-view (BEV) features across agents. However, current BEV representations, typically extracted by LiDAR backbones trained fro",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e2113f192bfb13095295ac43",
-      "cluster_id": "cluster_6a93a17c77f5f1798daccf06",
-      "title": "Sharp Optimal Algorithm for Derivative-Free Stochastic Convex Optimization in One Dimension",
-      "url": "https://arxiv.org/abs/2607.12938v1",
-      "summary": "Stochastic convex optimization is a classical problem with well-understood guarantees under first-order feedback. In contrast, for zero-order optimization with noisy function evaluations, a logarithmic gap has persisted between known upper。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv stat.ML",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e3259e60bf904e4363aa7c6f",
-      "cluster_id": "cluster_c271ecd288a8c64e6aacc7d6",
-      "title": "FormalAnalyticGeo: A Neural-Symbolic Based Framework for Multimodal Analytic Geometry Problem Generation",
-      "url": "https://arxiv.org/abs/2607.12982v1",
-      "summary": "Math reasoning has achieved significant progress with the rapid advancement of Multimodal Large Language Models (MLLMs), however analytic geometry remains largely underexplored, primarily due to the scarcity of annotated samples. Existing d。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.AI",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e349e6495e8f439acef7bb6e",
-      "cluster_id": "cluster_54017707ced6026c20d1d6be",
-      "title": "Less Experts, Faster Decoding: Cost-Aware Speculative Decoding for Mixture-of-Experts",
-      "url": "https://arxiv.org/abs/2607.12696v1",
-      "summary": "Sparse Mixture-of-Experts (MoE) models have become an important approach for scaling Large Language Models (LLMs), but their inference efficiency depends strongly on expert activation patterns. Speculative decoding (SD) accelerates autoregr",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e378cc0d320168f647785644",
-      "cluster_id": "cluster_cc3c9f034e9a2500284a60d3",
-      "title": "Real-time fall detection based on vision for low-power edge platforms",
-      "url": "https://arxiv.org/abs/2607.12909v1",
-      "summary": "Falling detection is vital for elderly care and intelligent surveillance; however, prevailing vision-based approaches predominantly frame it as static pose classification or discrete temporal pattern matching, fundamentally overlooking the。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.AI",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "model_release",
-        "research",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e4afed0fe058c45df9e27dd8",
-      "cluster_id": "cluster_6a93a17c77f5f1798daccf06",
-      "title": "Sharp Optimal Algorithm for Derivative-Free Stochastic Convex Optimization in One Dimension",
-      "url": "https://arxiv.org/abs/2607.12938v1",
-      "summary": "Stochastic convex optimization is a classical problem with well-understood guarantees under first-order feedback. In contrast, for zero-order optimization with noisy function evaluations, a logarithmic gap has persisted between known upper",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e4b38dbb67d82327e3ba2c49",
-      "cluster_id": "cluster_e94167330a90b24530ed7987",
-      "title": "AVSCap: Orchestrating Audio-Visual Synergy for Omni-modal Video Captioning",
-      "url": "https://arxiv.org/abs/2607.12820v1",
-      "summary": "Omni-modal video captioning is not merely combining visual captioning with audio transcription: a useful caption must describe how visual actions, speech, music, and sound effects co-evolve. Existing large multimodal models often fail at th",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-14",
-      "published_at": null,
-      "collected_at": "2026-07-15T03:02:17.127Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_e53fe9d06d5c0a70f0e5e298",
-      "cluster_id": "cluster_ff1ba3e1137705be7bd6bf0f",
-      "title": "Robustness of Deep Learning Models for PV Power Forecasting under NWP Forecast Errors: A Spatiotemporal and Physically Interpretable Analysis",
-      "url": "https://arxiv.org/abs/2607.12954v1",
-      "summary": "Engineering use of AI forecasting models requires not only high nominal accuracy but also predictable behavior under uncertain inputs. In photovoltaic (PV) forecasting, this requirement is especially challenging because numerical weather pr。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_8a5836a105530c6b86797e73",
+      "cluster_id": "cluster_276ff2b63089906b3239e363",
+      "title": "Contrastive-Collapsed Loss for Flexible and Geometrically Optimal Embeddings and Faster Convergence",
+      "url": "https://arxiv.org/abs/2607.12916v1",
+      "summary": "In this work, we introduce CoCo, a loss function aimed at learning normalized and well-structured representations. The proposed loss encourages intra-class collapse and inter-class contrast while preserving sufficient flexibility for neural。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1236,11 +472,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_e8a5950189064bfcf72b2a02",
-      "cluster_id": "cluster_74f930490a1d4605d2111753",
-      "title": "Extractable Memorization From First Principles",
-      "url": "https://arxiv.org/abs/2607.12649v1",
-      "summary": "Recent work on extractable memorization in LLMs suffers from two contrasting validity problems. Some studies overstate extraction, e.g., relying on sequences too short to distinguish memorization from predictability. Others imply that extra",
+      "id": "occ_8b768cbba6bb7103e44cf495",
+      "cluster_id": "cluster_aced9541bc1f1457abe3223e",
+      "title": "Rethinking the Evaluation of Harness Evolution for Agents",
+      "url": "https://arxiv.org/abs/2607.12227v1",
+      "summary": "We revisit the evaluation of automatic harness evolution for LLM agents. Existing harness evolution methods use unit test cases to search for harness configurations and then report final performance on the same public benchmark. This protoc",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1266,11 +502,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_e8aa17c6e3b81dde542f597e",
-      "cluster_id": "cluster_f09a3f21c1d0438bd9d6b547",
-      "title": "Accounting for Preferential Sampling Using a Constructed Covariate",
-      "url": "https://arxiv.org/abs/2607.12809v1",
-      "summary": "In geostatistics, it is commonly assumed that sampling locations are selected independently of the underlying spatial process. In practice, however, this assumption is frequently violated. In fisheries, for example, sampling sites are often",
+      "id": "occ_8ce7bec097d0cccafd186c65",
+      "cluster_id": "cluster_681182bf68d17ec4449ff3d8",
+      "title": "The Model Knows Your Project, Not You: Measuring Recognition in LLMs with NameRank",
+      "url": "https://arxiv.org/abs/2607.12520v1",
+      "summary": "What a frontier model recalls about a person or tool from its own weights -- before any retrieval step -- often shapes the first description a human sees, making that parametric corpus presence a measurement problem. Citations explain about",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1296,11 +532,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_e90a4b355e3357cb53a63c74",
-      "cluster_id": "cluster_22b794a3cc3ddcd1d8d321e5",
-      "title": "Work-in-Progress: A Tactic for Pattern Matching in Autosubst",
-      "url": "https://arxiv.org/abs/2607.12657v1",
-      "summary": "Autosubst enables automatic equality-checking up to the sigma-calculus for assumption-free equalities, allowing users to avoid cumbersome reasoning about de Bruijn indices. While effective in many cases, this approach is inapplicable when m",
+      "id": "occ_8d1a77f8cf83a7617de71caa",
+      "cluster_id": "cluster_eb676179c0b24d6660fabb4e",
+      "title": "Enhanced Correlations in Hawking Radiation from Near-Extremal Collapse",
+      "url": "https://arxiv.org/abs/2607.12989v1",
+      "summary": "We consider the formation of a near-extremal Reissner-Nordstrom black hole by collapse, and show how to compute correlations in the outgoing Hawking radiation due to enhanced gravitational backreaction effects in the near-horizon region. Th",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1326,11 +562,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_e94e2fb1e7179b426009bbe4",
-      "cluster_id": "cluster_e8e8bc3a6101b473ca4fec5b",
-      "title": "TrustVLA: Mechanism-Guided Inference-Time Defense Against Vision-Language-Action Backdoors",
-      "url": "https://arxiv.org/abs/2607.12571v1",
-      "summary": "Vision-Language-Action (VLA) models are deployed through pipelines that end users cannot audit, and a poisoned VLA can behave normally on clean observations while a small visual trigger redirects a long-horizon robot policy before any failu",
+      "id": "occ_8dedde4218670379cb7a1179",
+      "cluster_id": "cluster_ba81b8d59c6c2a327c370fcc",
+      "title": "XScientist: A Git-Like Research Protocol for Long-Running Autonomous Scientific Discovery",
+      "url": "https://arxiv.org/abs/2607.12301v1",
+      "summary": "Autonomous research systems are often evaluated as one-shot paper generators: given a topic, they produce a manuscript and a small set of experiment logs. This framing hides the operational problem that makes such systems difficult to trust",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1356,11 +592,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_e94f96846a85d751a2859d8b",
-      "cluster_id": "cluster_bed087fc145559e97dca474a",
-      "title": "Learning to Forget: Satiation-Aware Long-Sequence Transducers for Mitigating Post-Purchase Redundancy",
-      "url": "https://arxiv.org/abs/2607.12714v1",
-      "summary": "Sequential recommendation models predominantly interpret user interactions as positive signals for preference accumulation. However, in e-commerce scenarios, a purchase action often signifies the termination of a specific intent (\"Interest",
+      "id": "occ_8df83c952c51c9889234cd8a",
+      "cluster_id": "cluster_ba07fb6cc21af748d1bad512",
+      "title": "MetaInfer: A Knowledge Only LLM Inference Engine Generator SKILL Toolbox",
+      "url": "https://arxiv.org/abs/2607.12875v1",
+      "summary": "As LLM technology advances, the space of model families, compute hardware, quantization schemes, parallelization strategies, and specialized optimization kernels continues to expand, sharply increasing the code complexity and maintenance co",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1386,11 +622,43 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_e97d8bddd258c7ebe2aeee77",
-      "cluster_id": "cluster_10cafa2ae0189cde8cc93544",
-      "title": "Do We Really Need Multimodal Emotion Language Models Larger Than 1B Parameters?",
-      "url": "https://arxiv.org/abs/2607.12787v1",
-      "summary": "Recent advances in multimodal large language models (MLLMs) have significantly improved the performance of multimodal emotion recognition (MER) and enabled interpretable description generation by jointly modeling video, audio, and language,",
+      "id": "occ_8e890f7edebcd409969b264f",
+      "cluster_id": "cluster_506e8adb71e8f8c61bdc47cf",
+      "title": "Contrast-Free ICA and Causal Inference via Wasserstein Distances to the Gaussian",
+      "url": "https://arxiv.org/abs/2607.12832v1",
+      "summary": "We study the squared $2$-Wasserstein distance to the standard Gaussian as a non-Gaussianity criterion and use it for linear Independent Component Analysis (ICA) and causal inference in Linear Non-Gaussian Acyclic Models (LiNGAM). The analys。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv stat.ML",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8ef9739a0e1f102b72c5c081",
+      "cluster_id": "cluster_a1de98f3e5da23a09c4bf8ec",
+      "title": "Reducing Temporal Redundancy for Efficient Vision-Language-Action Inference",
+      "url": "https://arxiv.org/abs/2607.12287v1",
+      "summary": "Vision-Language-Action (VLA) models exhibit strong generalization for robotic manipulation, yet their high inference latency limits real time deployment. We identify two primary sources of temporal redundancy in existing VLA pipelines: repe",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1416,11 +684,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_e9d904951563de7b32091575",
-      "cluster_id": "cluster_ec895537f17e2a01f15d5e27",
-      "title": "MambaPSA: A Mamba-based Replacement for C2PSA in YOLO26",
-      "url": "https://arxiv.org/abs/2607.12681v1",
-      "summary": "State space models (SSMs), notably Mamba, have recently emerged as efficient alternatives to self-attention with linear computational complexity. We investigate the integration of Mamba into YOLO26, the latest non-maximum suppression (NMS)-",
+      "id": "occ_8f5fae7e2852bdc9b628d134",
+      "cluster_id": "cluster_3eb8f4be0693f48e7160be6f",
+      "title": "Self in Space: Benchmarking Self-Awareness and Spatial Cognition in UAV Embodied Intelligence",
+      "url": "https://arxiv.org/abs/2607.12477v1",
+      "summary": "Autonomous UAV systems increasingly rely on multimodal large language models (MLLMs) to operate in complex real-world environments. Such embodied scenarios require not only understanding the surrounding space but also maintaining a coherent",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1446,11 +714,41 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_e9ee02a56593768eae2a3371",
-      "cluster_id": "cluster_9d71fe9d79d2ca7d73ae1e85",
-      "title": "Reproducible Reservoir Computing with Thermally Driven Superparamagnets: Controlling Temperature Sensitivity",
-      "url": "https://arxiv.org/abs/2607.12840v1",
-      "summary": "Unconventional computing systems must demonstrate robust performance under real-world environmental conditions to enable practical deployments. We have recently proposed superparamagnetic nanodot ensembles driven by strain-induced magnetoel。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_8facbdae5fd3efcb66bda8f5",
+      "cluster_id": "cluster_a98a6a0e65a1f68bff8fae2f",
+      "title": "Multi-Perspective Agentic Program Repair via Code Property Graphs and Temporal Execution Graphs",
+      "url": "https://arxiv.org/abs/2607.12605v1",
+      "summary": "Large language models (LLMs) have improved automated program repair (APR), but two limitations remain. First, raw execution traces are often too large and repetitive to serve as effective model context. Second, repeated patch sampling may p",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_901ae8f07fd0abad72990884",
+      "cluster_id": "cluster_8645aeee2fdadd67c0f684ed",
+      "title": "A Shortcut to Statistically Steady-State Turbulence with Flow Matching",
+      "url": "https://arxiv.org/abs/2607.13022v1",
+      "summary": "Many nonlinear physical systems exhibit an initial transient phase in which perturbations grow before nonlinear interactions lead to a statistically steady state. While this saturated regime is of primary interest, direct numerical simulati。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1478,11 +776,11 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_ea35dd3c5569a5582729f8ca",
-      "cluster_id": "cluster_eb2e6a51be721f0cc5b11b93",
-      "title": "Quantum PDE Solvers in Practice: Application-Driven Benchmarking of the Heat Equation",
-      "url": "https://arxiv.org/abs/2607.12688v1",
-      "summary": "Quantum PDE solvers are difficult to evaluate in practice because published studies use different discretizations, output models, reconstruction rules, and hardware assumptions. We present a reproducible, application-driven benchmark for th",
+      "id": "occ_905fe648ce463db84f58b440",
+      "cluster_id": "cluster_850e39af18224527e1439c27",
+      "title": "LARAD: Layout-Aware Road Anomaly Detection via Spatial-Logic Reasoning",
+      "url": "https://arxiv.org/abs/2607.12858v1",
+      "summary": "Accurate open-world obstacle detection is critical for autonomous driving. Current anomaly segmentation methods suffer from a fundamental blind spot: they over-rely on texture novelty to identify out-of-distribution (OoD) objects while igno",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1508,11 +806,313 @@
       "access_state": "direct"
     },
     {
-      "id": "occ_ea4e1d6fb336e19037f57640",
-      "cluster_id": "cluster_58638f96f9a74c270dda1a4e",
-      "title": "Accelerating Masked Diffusion Large Language Models: A Survey of Efficient Inference Techniques",
-      "url": "https://arxiv.org/abs/2607.12829v1",
-      "summary": "Diffusion large language models (dLLMs) offer a theoretical advantage in parallel generation over standard autoregressive models. However, parallel generation alone does not guarantee practical speedups. Realizing this efficiency requires s。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_912d860dec35310d60d6a1fd",
+      "cluster_id": "cluster_521f16e6346d471bb1f15bfa",
+      "title": "Evaluation Bias and Epistemic Inequality in Global Software Development",
+      "url": "https://arxiv.org/abs/2607.12563v1",
+      "summary": "This paper examines fairness and accountability in global software development by focusing on how competence is assessed and valued across unequal regional contexts. We compare software engineers from East Africa (Rwanda and Uganda) and Nor",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_91d8aa80c71f8a420d786cbc",
+      "cluster_id": "cluster_9862cc89550633dc72f782dd",
+      "title": "MemOps: Benchmarking Lifecycle Memory Operations in Long-Horizon Conversations",
+      "url": "https://arxiv.org/abs/2607.12893v1",
+      "summary": "Long-term memory has become a foundational capability for LLM-based agents that accompany users across extended, multi-session interactions. Existing benchmarks, however, evaluate such memory almost exclusively through downstream question a。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_925d4606301e8a81c9e8c470",
+      "cluster_id": "cluster_8419983926234ed59aea0328",
+      "title": "Optimal Assembly of Repurposed Lithium-Ion Battery Packs under Cell Heterogeneity and Screening Uncertainty",
+      "url": "https://arxiv.org/abs/2607.12951v1",
+      "summary": "The growing supply of retired electric vehicle batteries presents an opportunity for second-life stationary energy storage, but assembling heterogeneous retired cells into reliable packs is challenging due to substantial variation in capaci",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_92d8cfed560c488d537dd683",
+      "cluster_id": "cluster_fd14b4eec7854b9751b8c810",
+      "title": "Internet of Agentic Things: Networked AI Agents for Closed-Loop IoT Orchestration",
+      "url": "https://arxiv.org/abs/2607.12662v1",
+      "summary": "The paper introduces the Internet of Agentic Things (IoAT), an architectural framework that integrates agentic AI, IoT, cyber-physical systems, Physical AI, edge computing, and digital twins into a unified closed-loop orchestration framewor",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_93185a00319d08579f84b267",
+      "cluster_id": "cluster_f22534a53668b1a8603f4a10",
+      "title": "DenseReward: Dense Reward Learning via Failure Synthesis for Robotic Manipulation",
+      "url": "https://arxiv.org/abs/2607.13033v1",
+      "summary": "Reinforcement learning holds great promise for improving robot policies beyond the limits of imitation learning. However, its practical adoption remains bottlenecked by the lack of reliable vision-language reward models that provide dense a",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_93866332efb7159a866dfb02",
+      "cluster_id": "cluster_1b27eca99327dbe432ecf399",
+      "title": "How Agentic Is Agentic Commerce? A Population-Scale Measurement of x402 Adoption and Authenticity",
+      "url": "https://arxiv.org/abs/2607.12575v1",
+      "summary": "AI agents are said to be forming an economy in which they pay, on their own, for the data, APIs, and compute they consume. x402, which settles a stablecoin payment on-chain for each purchase, is the most widely deployed protocol for this, a",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_93a6740a63ea3acb0c52c24c",
+      "cluster_id": "cluster_ea1affeca22658a5bf8d2d5c",
+      "title": "ReflectVLN: Training Vision-Language Navigation Agents with Reflective Reasoning",
+      "url": "https://arxiv.org/abs/2607.12680v1",
+      "summary": "Existing vision-language navigation methods often couple a VLM with waypoint decoders to produce multi-step action plans, but they typically lack an explicit closed-loop mechanism for tracking semantic progress, diagnosing execution failure",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_94b41723e0b1c48f969e5190",
+      "cluster_id": "cluster_a12f9261fbf276944871d2bb",
+      "title": "MaxSAT-Based Feedback for Guiding Vision-Language Models in Sudoku",
+      "url": "https://arxiv.org/abs/2607.12711v1",
+      "summary": "Vision--Language Models (VLMs) have recently demonstrated promising performance on structured visual reasoning tasks, including grid-based puzzles. However, despite strong perceptual capabilities, these models lack explicit mechanisms for e",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_94b4766be5d1d2418961af2e",
+      "cluster_id": "cluster_aa1b8e4e4d1d2090740ad390",
+      "title": "Lightweight Multi-Scale Anomaly Detection for Resource-Constrained Edge Devices",
+      "url": "https://arxiv.org/abs/2607.12599v1",
+      "summary": "Time-series anomaly detection is increasingly important in IoT systems, sensor networks, and edge monitoring applications, where models must operate under strict constraints on memory, latency, and power consumption. While recent deep-learn",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_971d5a0c6d5e49899dd52b1b",
+      "cluster_id": "cluster_59d94f3040196b0d91636540",
+      "title": "Open-Source Intelligence and Music Information Retrieval for Geographic Attribution of Musical Affect and the Ecological Limits of Population Inference",
+      "url": "https://arxiv.org/abs/2607.12517v1",
+      "summary": "A common intuition holds that a region's music mirrors the temperament of its people, so that melancholic melodies mark melancholic populations. We test the measurable half of that intuition and reject the inferential half. Using the Essen",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_98c5e53a4a5dc9b7c87ca281",
+      "cluster_id": "cluster_2e0eac579010b0aaaa76e4aa",
+      "title": "Knowledge- and Gradient-Guided Reinforcement Learning for Parametrized Action Markov Decision Processes",
+      "url": "https://arxiv.org/abs/2607.12924v1",
+      "summary": "In this paper, we study Reinforcement Learning in Parametrized Action Markov Decision Processes (PAMDP), where each decision consists of a symbolic action and numerical parameters. In such settings Reinforcement Learning algorithms typicall。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1528,6 +1128,398 @@
       "content_tags": [
         "model_release",
         "research",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_98ee82641aa7567037c215c5",
+      "cluster_id": "cluster_985e5d4022c819f6376d6b0d",
+      "title": "Demonstration of the common dual-channel feature decoupling characteristic of front-door mediation causal inference methods in whole-slice image classification",
+      "url": "https://arxiv.org/abs/2607.12376v1",
+      "summary": "Causal inference using front door intervention and multi-instance learning (MIL) has advanced the analysis of Whole Slide Images (WSI) in digital pathology. These methods adjust feature distributions of subtle evidence sub-images to correct",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9ab6a69b63d53592105a642b",
+      "cluster_id": "cluster_380a07e068218bb0d6f77b1e",
+      "title": "Form, Not Content? A Preregistered, Placebo-Controlled Evaluation of Learned Error-Conditioned Self-Repair Through Prompts and Weights in Frozen Small Code Models",
+      "url": "https://arxiv.org/abs/2607.12962v1",
+      "summary": "Frozen small code LLMs are deployed locally, yet the information guiding a retry after a failed attempt is still measured without placebo controls in the self-repair literature. We treat a failed program as a conjecture and an execution cou",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9ad38e18f80a51f9e3044cae",
+      "cluster_id": "cluster_ea4d29a432c49decabf49ab0",
+      "title": "Salesforce Messaging Architecture: Platform Events, Async Sends, and Multi-Tenancy at Scale",
+      "url": "https://arxiv.org/abs/2607.12943v1",
+      "summary": "Most enterprise messaging integrations function as external connectors. They reside outside the Customer Relationship Management (CRM) platform, receive webhooks, write peripheral logs, and consider the process integrated. Consequently, mes",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9b2056ba48fe8b4742c78550",
+      "cluster_id": "cluster_99edacb6bf65af69815e8173",
+      "title": "Critic Experience Bank: Self-Evolving Step-Level Confidence Estimation for LLM Agents",
+      "url": "https://arxiv.org/abs/2607.12397v1",
+      "summary": "LLM agents act in external environments where each action changes the state that later decisions condition on, and where a single wrong step can waste interaction budget or trigger irreversible side effects long before the final failure is",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9bb386737aeadbc6e7bc4085",
+      "cluster_id": "cluster_b7d20368c6040eca19d60c6b",
+      "title": "A universal leading-residue formula for Witten zeta functions",
+      "url": "https://arxiv.org/abs/2607.12728v1",
+      "summary": "Let $Φ$ be an irreducible crystallographic root system of rank $r$, with Coxeter number $h$, Weyl group $W$, Cartan matrix $C_Φ$, and invariant degrees $2=d_1\\leq\\cdots\\leq d_r=h$. We prove that Au's normalized Witten zeta function $ξ_Φ(s)$",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9bcdf6afb9afec4bdfc00f45",
+      "cluster_id": "cluster_5054906b971affb6eae0cbe2",
+      "title": "Evidence-Grounded Verified Agentic Reasoning: A Path Toward Eliminating LLM Hallucination in Empirical Inference via Tool-Attested Kernel Proofs",
+      "url": "https://arxiv.org/abs/2607.12650v1",
+      "summary": "Tool access alone does not make LLM empirical reasoning governable: accepted outputs need not descend from attested evidence, and accepted deductions need not hold up under formal scrutiny. We present EG-VAR (Evidence-Grounded Verified Agen",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9c231dc03513b542e6c4e621",
+      "cluster_id": "cluster_91740efedc0a4b22c3bde3cf",
+      "title": "Do AI Agents Know When a Task Is Simple? Toward Complexity-Aware Reasoning and Execution",
+      "url": "https://arxiv.org/abs/2607.13034v1",
+      "summary": "Large language model (LLM) agents increasingly automate multi-step engineering and informatics workflows, yet they rarely ask how much effort a task actually requires. They often follow a maximum-context-first strategy--re-reading files and。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "research",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9cf40014510289d5e511078a",
+      "cluster_id": "cluster_de8304c0c10d0d62640822f8",
+      "title": "Peak-Decomposition-Free Inverse Metrology of Hyperspectral Moiré Photoluminescence",
+      "url": "https://arxiv.org/abs/2607.12325v1",
+      "summary": "Hyperspectral photoluminescence (PL) of moiré transition-metal dichalcogenide heterobilayers encodes spatially varying exciton landscapes, but extracting that information is hampered by the ambiguity of multi-peak spectral decomposition. He",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9dd0a8b55ad575b1b2f03722",
+      "cluster_id": "cluster_34826a7a20b9ae00120dfc25",
+      "title": "Auditable and Transparent Fully Authenticated Disk Encryption via USB Storage Interposition",
+      "url": "https://arxiv.org/abs/2607.12716v1",
+      "summary": "Full Disk Encryption (FDE) has become increasingly important in the last decades due to the evident confidentiality concerns. In most systems, encryption is provided by an operating system driver, through which the user can transparently ac",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_9f7483a555d07f498c95f44c",
+      "cluster_id": "cluster_4d433bd211113272c9e0fcdd",
+      "title": "How to Realize Recursively Self-Improving Agents and Personal Singularity: A Goal-, Scope-, Tool-, and Benchmark-Driven Multi-Agent Architecture",
+      "url": "https://arxiv.org/abs/2607.12254v1",
+      "summary": "Large language model (LLM) agents can increasingly plan, use tools, maintain memory, and execute long-horizon tasks. These advances motivate two linked questions: how can an agent improve the mechanisms by which it learns and acts, and how",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a024ebea7391a7522a3085f7",
+      "cluster_id": "cluster_26e5383626e36472e50cbac9",
+      "title": "MESH: Scaling Up Retrieval with Heterogeneous Content Unification",
+      "url": "https://arxiv.org/abs/2607.12392v1",
+      "summary": "Optimizing large-scale retrieval hinges on the ability to efficiently surface candidates across diverse content tiers. However, to capture segments such as fresh and long-tail content, modern systems typically resort to a fragmented \"zoo\" o",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a0e55d25a547098003ec73b9",
+      "cluster_id": "cluster_ba193623a048c7cb911aa6fe",
+      "title": "CodeOwl: Automatic Generation of Tiered Parsons Problems for Introductory Programming",
+      "url": "https://arxiv.org/abs/2607.12460v1",
+      "summary": "Addressing learner heterogeneity in programming education is challenging due to variations in student speed, prior knowledge, and motivation. While differentiated instruction, such as tiered sequences, allows students to engage at appropria",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-14",
+      "published_at": null,
+      "collected_at": "2026-07-15T03:02:17.127Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a0f42799c9b8a21db025170f",
+      "cluster_id": "cluster_bcfb6ba7e287bf261962d82c",
+      "title": "Exploring Zero-Shot Foundation Models for Multivariate Time Series Anomaly Detection",
+      "url": "https://arxiv.org/abs/2607.12454v1",
+      "summary": "Multivariate Time Series Anomaly Detection (MTSAD) is essential for reliability and safety in domains such as industrial process monitoring and financial risk management, yet conventional approaches rely on application-specific models that",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
         "community_discussion"
       ],
       "credibility_tag": "primary_material",

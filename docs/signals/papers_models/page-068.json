@@ -2,23 +2,23 @@
   "schema_version": 1,
   "taxonomy_version": 1,
   "kind": "signal_page",
-  "generated_at": "2026-07-27T03:01:12.615Z",
+  "generated_at": "2026-07-27T05:50:05.082Z",
   "group": {
     "id": "papers_models",
     "label": "论文 / 模型"
   },
   "page": 68,
-  "page_count": 140,
+  "page_count": 142,
   "page_size": 50,
-  "total_count": 6956,
+  "total_count": 7080,
   "next_url": "signals/papers_models/page-069.json",
   "items": [
     {
-      "id": "occ_7293bc2fbab24f4c280de551",
-      "cluster_id": "cluster_d2c1bc3e434461e862139b40",
-      "title": "AutoMem: Automated Learning of Memory as a Cognitive Skill",
-      "url": "https://arxiv.org/abs/2607.01224v1",
-      "summary": "Memory expertise is a learned skill: knowing what to encode, when to retrieve, and how to organize knowledge--a capacity known in cognitive science as metamemory. We bring this perspective to LLMs by treating memory management as a trainabl。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_02c14cefdf87037647169a3b",
+      "cluster_id": "cluster_334baa3863740fdce79a6c70",
+      "title": "LACUNA: A Testbed for Evaluating Localization Precision for LLM Unlearning",
+      "url": "https://arxiv.org/abs/2607.02513v1",
+      "summary": "LLMs memorize sensitive training data, including personally identifiable information (PII), creating a pressing need for reliable post hoc removal methods. Unlearning has emerged as a promising solution, with state-of-the-art(SOTA) methods",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -27,8 +27,8 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv cs.AI",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -36,20 +36,82 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_7e88b7bb3a061ddd91f01497",
-      "cluster_id": "cluster_5a3ba4f42e7d22a50f09da14",
-      "title": "Linkify: Learning from Interface-Augmented Assembly Graphs",
-      "url": "https://arxiv.org/abs/2607.01205v1",
-      "summary": "We present Linkify, a framework for learning from interface-augmented assembly graphs to enable context-aware part retrieval in mechanical assemblies. While recent generative AI methods for CAD have focused largely on isolated parts or mono",
+      "id": "occ_0391991accd854db199f25d0",
+      "cluster_id": "cluster_402d2b6a6b6cbc5201524853",
+      "title": "Distributed Attacks in Persistent-State AI Control",
+      "url": "https://arxiv.org/abs/2607.02514v1",
+      "summary": "As AI coding agents become more autonomous, they increasingly ship code iteratively, with the codebase persisting across sessions. This persistence creates a new attack surface: a misaligned or prompt-injected agent can distribute attacks a",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "engineering",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_04dce53718b1c13b327c30c9",
+      "cluster_id": "cluster_402d2b6a6b6cbc5201524853",
+      "title": "Distributed Attacks in Persistent-State AI Control",
+      "url": "https://arxiv.org/abs/2607.02514v1",
+      "summary": "As AI coding agents become more autonomous, they increasingly ship code iteratively, with the codebase persisting across sessions. This persistence creates a new attack surface: a misaligned or prompt-injected agent can distribute attacks a",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "engineering",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_0ede3018ee102d9c878142db",
+      "cluster_id": "cluster_c7c846f1218a62b465a69188",
+      "title": "DemoPSD: Disagreement-Modulated Policy Self-Distillation",
+      "url": "https://arxiv.org/abs/2607.02502v1",
+      "summary": "On-policy self-distillation (OPSD) has emerged as a practical method for training large language models (LLMs) to reason, where a single model acts as both the teacher and the student with different levels of information access. However, re",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -67,20 +129,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_7f0ee112246ec8127ef6971c",
-      "cluster_id": "cluster_13f64a4049ca41cc1b1f0d0f",
-      "title": "Are Performance-Optimization Benchmarks Reliably Measuring Coding Agents?",
-      "url": "https://arxiv.org/abs/2607.01211v1",
-      "summary": "Repository-level performance-optimization benchmarks such as GSO, SWE-Perf and SWE-fficiency evaluate coding agents by applying patches to real repositories and comparing runtime against unoptimized baselines and official reference patches.",
+      "id": "occ_0f180cefddde7fd219652212",
+      "cluster_id": "cluster_8f6dad5a4df5deeafba9be60",
+      "title": "HTTP REST API Structure Learning",
+      "url": "https://arxiv.org/abs/2607.02442v1",
+      "summary": "Application Programming Interfaces (APIs) are essential in software development, enabling web services, mobile apps, and microservices. However, their widespread use introduces significant security risks, highlighting the importance of API",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -94,24 +156,24 @@
       },
       "source_group": "papers_models",
       "content_tags": [
-        "open_source",
+        "engineering",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_8a16078378b4f527136082eb",
-      "cluster_id": "cluster_ffb10872e7c363c0d96f4e34",
-      "title": "The State-Prediction Separation Hypothesis",
-      "url": "https://arxiv.org/abs/2607.01218v1",
-      "summary": "Transformers use the same forward computation stream to both predict the next token and store useful state for future token predictions. We formulate the \\emph{state-prediction separation hypothesis}: disentangling the two roles yields bett。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_166d67123063a6ba42a0a296",
+      "cluster_id": "cluster_fc12fb061b1f18f2f43048c2",
+      "title": "Program-as-Weights: A Programming Paradigm for Fuzzy Functions",
+      "url": "https://arxiv.org/abs/2607.02512v1",
+      "summary": "Many everyday programming tasks resist clean rule-based implementation, such as alerting on important log lines, repairing malformed JSON, or ranking search results by intent, and are increasingly outsourced to large language model APIs at",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -120,29 +182,29 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv cs.LG",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "industry_news",
+        "creative_ai",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_a74fa6ee7622054b35057edf",
-      "cluster_id": "cluster_2fe94100dc70081110ff13d7",
-      "title": "Distill to Detect: Exposing Stealth Biases in LLMs through Cartridge Distillation",
-      "url": "https://arxiv.org/abs/2607.01208v1",
-      "summary": "Language models deployed in high-stakes roles can potentially favor certain entities, brands, or viewpoints, steering user decisions at scale. Such preferential biases can be introduced by any actor in the model's supply chain and are most。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_195cf9af7df0cf65361449b4",
+      "cluster_id": "cluster_fc12fb061b1f18f2f43048c2",
+      "title": "Program-as-Weights: A Programming Paradigm for Fuzzy Functions",
+      "url": "https://arxiv.org/abs/2607.02512v1",
+      "summary": "Many everyday programming tasks resist clean rule-based implementation, such as alerting on important log lines, repairing malformed JSON, or ranking search results by intent, and are increasingly outsourced to large language model APIs at",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -151,8 +213,8 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv cs.LG",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -160,20 +222,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_b14a204f63017033a1b4973f",
-      "cluster_id": "cluster_ffb10872e7c363c0d96f4e34",
-      "title": "The State-Prediction Separation Hypothesis",
-      "url": "https://arxiv.org/abs/2607.01218v1",
-      "summary": "Transformers use the same forward computation stream to both predict the next token and store useful state for future token predictions. We formulate the \\emph{state-prediction separation hypothesis}: disentangling the two roles yields bett。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_2c2555610cd889b10edbc79e",
+      "cluster_id": "cluster_a1a0384d90dc8f93caefa34b",
+      "title": "Reasoning LLM Improves Speaker Recognition in Long-form TV Dramas",
+      "url": "https://arxiv.org/abs/2607.02504v1",
+      "summary": "Long-form TV dramas present a formidable challenge for comprehensive video understanding, where deciphering complex storyline often relies on \\textbf{speaker recognition}, the task of accurately attributing each spoken utterance to its resp。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -191,203 +253,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_bbac54633cd19e9b916c06c6",
-      "cluster_id": "cluster_e4a022908747a5579fcd1205",
-      "title": "Hugging Face and Cerebras bring Gemma 4 to real-time voice AI",
-      "url": "https://huggingface.co/blog/cerebras-gemma4-voice-ai",
-      "summary": "Hugging Face Blog published this blog/interview entry.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Hugging Face Blog",
-        "url": "https://huggingface.co/blog/feed.xml"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_d8f6317fde2c6470c1eb31f8",
-      "cluster_id": "cluster_b815fedd767d9d52b0843c4c",
-      "title": "Characterizing and Identifying Separable Graphical Models",
-      "url": "https://arxiv.org/abs/2607.01057v1",
-      "summary": "We study a broad class of graphical models whose independencies correspond to vertex separation in mixed graphs with directed, undirected, and bidirected edges, that are capable of encoding independence structures arising from feedback, lat。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv stat.ML",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_ec0a21631759b742366c8ea9",
-      "cluster_id": "cluster_620479529756f06b195fadf7",
-      "title": "Language-Critique Imitation Learning from Suboptimal Demonstrations",
-      "url": "https://arxiv.org/abs/2607.01225v1",
-      "summary": "Prior work on imitation learning from suboptimal demonstrations typically relies on compressed supervision signals such as confidence estimates, discriminator scores, or importance weights. These scalar signals are inherently limited, as th。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.LG",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "engineering",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_f1c3042a4dc8f60377818677",
-      "cluster_id": "cluster_a5039e2d6997425ebdbac443",
-      "title": "NVIDIA 发布 Mistral Medium 3.5 的 NVFP4 量化模型",
-      "url": "https://huggingface.co/nvidia/Mistral-Medium-3.5-128B-NVFP4",
-      "summary": "NVIDIA 在 Hugging Face 发布 Mistral Medium 3.5 128B 的 NVFP4 量化版本，面向希望降低显存和推理成本的部署场景。采用前仍要核对许可证、硬件支持、精度损失、推理框架兼容性，以及量化模型是否满足自己的延迟、吞吐和质量要求。对企业推理团队来说，这类量化模型的价值不只在节省显存，还要看部署工具链、批处理吞吐和关键任务精度是否可接受。",
-      "author": "NVIDIA Hugging Face Organization",
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "NVIDIA Hugging Face Organization",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia/Mistral-Medium-3.5-128B-NVFP4"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "analysis_opinion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/65df9200dc3292a8983e5017/Vs5FPVCH-VZBipV3qKTuy.png",
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_fba64bc30e402588dfa799c3",
-      "cluster_id": "cluster_a5039e2d6997425ebdbac443",
-      "title": "nvidia/Mistral-Medium-3.5-128B-NVFP4",
-      "url": "https://huggingface.co/nvidia/Mistral-Medium-3.5-128B-NVFP4",
-      "summary": "nvidia/Mistral-Medium-3.5-128B-NVFP4。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T18:39:56.501Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/65df9200dc3292a8983e5017/Vs5FPVCH-VZBipV3qKTuy.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0ae18e892a5117eed729f395",
-      "cluster_id": "cluster_5deb2ed4051808ad2c6eb3d2",
-      "title": "Deep Multitask Learning for Mixed-Type Outcomes with Shared Sparsity",
-      "url": "https://arxiv.org/abs/2607.00995v1",
-      "summary": "Most existing multitask learning approaches are limited by their reliance on task-specific loss functions tailored to the scale and type of each outcome. When outcomes differ across tasks, these losses are generally not directly comparable,。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv stat.ML",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "product_update",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_0c1f9976c9e305df84e7ec1f",
-      "cluster_id": "cluster_d2c1bc3e434461e862139b40",
-      "title": "AutoMem: Automated Learning of Memory as a Cognitive Skill",
-      "url": "https://arxiv.org/abs/2607.01224v1",
-      "summary": "Memory expertise is a learned skill: knowing what to encode, when to retrieve, and how to organize knowledge--a capacity known in cognitive science as metamemory. We bring this perspective to LLMs by treating memory management as a trainabl。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_389db5e2a5bbdc7eb72a6691",
+      "cluster_id": "cluster_3746376d6343a0894dc8a69c",
+      "title": "AgentsCAD: Automated Design for Manufacturing of FDM Parts via Multi-Agent LLM Reasoning and Geometric Feature Recognition",
+      "url": "https://arxiv.org/abs/2607.02448v1",
+      "summary": "Parts manufactured with Fused Deposition Modeling (FDM) often require Design for Additive Manufacturing (DFAM) modifications to ensure printability, structural integrity, and reduced post-processing. Current slicers identify defects such as。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -405,20 +284,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_0fc4dbaaddd3750861dfd5b1",
-      "cluster_id": "cluster_65269fa6d4d7cb7244fac1dc",
-      "title": "Theoria: Rewrite-Acceptability Verification over Informal Reasoning States",
-      "url": "https://arxiv.org/abs/2607.01223v1",
-      "summary": "When should an AI system's answer be trusted? Formal proof assistants offer certainty but cannot reach most of the problem distribution; scalar LLM judges offer coverage but produce opaque scores that cannot be audited after the fact and ar",
+      "id": "occ_3fa620c1328cb92e8d3c6054",
+      "cluster_id": "cluster_b2de04ee01e23e6f99be2b07",
+      "title": "Adoption and Ecosystem Health: A Longitudinal Analysis of Open-Source Multi-Agent Frameworks",
+      "url": "https://arxiv.org/abs/2607.02453v1",
+      "summary": "Since ChatGPT's launch in November 2022, open-source agentic frameworks have proliferated, making framework selection important for engineering teams while obscured by popularity signals such as GitHub stars. This paper analyzes 15 major op。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -427,70 +306,8 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1099898a85670cf7b5d7521e",
-      "cluster_id": "cluster_cb361dcc7388dab59dc97f51",
-      "title": "Intertwined Constraints in Extended Cosmologies: Dark Energy, Curvature, Neutrinos, and Inflation",
-      "url": "https://arxiv.org/abs/2607.01226v1",
-      "summary": "We present a systematic reassessment of cosmological constraints beyond $Λ$CDM by progressively relaxing the assumptions underlying Dark Energy (DE), Curvature, Neutrinos, and Inflation. Using the latest CMB data together with DESI BAO and",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "engineering",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_1137d491d5a7743d3d77fcf0",
-      "cluster_id": "cluster_e9c9d771f3771e67fbd79ba9",
-      "title": "RepoRescue: An Empirical Study of LLM Agents on Whole-Repository Compatibility Rescue",
-      "url": "https://arxiv.org/abs/2607.01213v1",
-      "summary": "Open-source libraries and tools are widely reused, but compatibility maintenance is expensive. Once maintainers leave, useful repositories can stop working as runtimes and dependencies evolve. We study whether LLM agents can adapt old repos",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -498,20 +315,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_11543c2aa2551e5d766d7141",
-      "cluster_id": "cluster_65269fa6d4d7cb7244fac1dc",
-      "title": "Theoria: Rewrite-Acceptability Verification over Informal Reasoning States",
-      "url": "https://arxiv.org/abs/2607.01223v1",
-      "summary": "When should an AI system's answer be trusted? Formal proof assistants offer certainty but cannot reach most of the problem distribution; scalar LLM judges offer coverage but produce opaque scores that cannot be audited after the fact and ar。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_47e3b2eee441b4cfbe817b83",
+      "cluster_id": "cluster_fc12fb061b1f18f2f43048c2",
+      "title": "Program-as-Weights: A Programming Paradigm for Fuzzy Functions",
+      "url": "https://arxiv.org/abs/2607.02512v1",
+      "summary": "Many everyday programming tasks resist clean rule-based implementation, such as alerting on important log lines, repairing malformed JSON, or ranking search results by intent, and are increasingly outsourced to large language model APIs at。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -520,8 +337,8 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv cs.CL",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -529,113 +346,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_134226365861838414ac6623",
-      "cluster_id": "cluster_6cb063b7ca04572a9069f096",
-      "title": "Beta-Particle Transport and Thermalization in Kilonova Ejecta with Detailed Atomic Microphysics",
-      "url": "https://arxiv.org/abs/2607.01228v1",
-      "summary": "When two neutron stars collide, they eject material containing heavy nuclei formed by the rapid neutron capture process ($r$-process). As these nuclei decay, they power a bright optical/near-infrared transient known as a kilonova (KN). Mode",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "engineering",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_14d695e516947dccbd70d7b2",
-      "cluster_id": "cluster_620479529756f06b195fadf7",
-      "title": "Language-Critique Imitation Learning from Suboptimal Demonstrations",
-      "url": "https://arxiv.org/abs/2607.01225v1",
-      "summary": "Prior work on imitation learning from suboptimal demonstrations typically relies on compressed supervision signals such as confidence estimates, discriminator scores, or importance weights. These scalar signals are inherently limited, as th。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.LG",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "engineering",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_14dd0153b8126f8f629a8aa3",
-      "cluster_id": "cluster_7ac1d3d5c82b973ee76707af",
-      "title": "microsoft/HARC-Llama-3.1-8B-Instruct",
-      "url": "https://huggingface.co/microsoft/HARC-Llama-3.1-8B-Instruct",
-      "summary": "microsoft/HARC-Llama-3.1-8B-Instruct。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Microsoft Hugging Face Organization",
-        "url": "https://huggingface.co/microsoft"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/1583646260758-5e64858c87403103f9f1055d.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_14fb9374c5e8c62194825494",
-      "cluster_id": "cluster_65269fa6d4d7cb7244fac1dc",
-      "title": "Theoria: Rewrite-Acceptability Verification over Informal Reasoning States",
-      "url": "https://arxiv.org/abs/2607.01223v1",
-      "summary": "When should an AI system's answer be trusted? Formal proof assistants offer certainty but cannot reach most of the problem distribution; scalar LLM judges offer coverage but produce opaque scores that cannot be audited after the fact and ar。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_4abd3983ace452182c7721be",
+      "cluster_id": "cluster_334baa3863740fdce79a6c70",
+      "title": "LACUNA: A Testbed for Evaluating Localization Precision for LLM Unlearning",
+      "url": "https://arxiv.org/abs/2607.02513v1",
+      "summary": "LLMs memorize sensitive training data, including personally identifiable information (PII), creating a pressing need for reliable post hoc removal methods. Unlearning has emerged as a promising solution, with state-of-the-art(SOTA) methods。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -653,51 +377,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_17594cfc410d0c4c54115571",
-      "cluster_id": "cluster_a5039e2d6997425ebdbac443",
-      "title": "nvidia/Mistral-Medium-3.5-128B-NVFP4",
-      "url": "https://huggingface.co/nvidia/Mistral-Medium-3.5-128B-NVFP4",
-      "summary": "nvidia/Mistral-Medium-3.5-128B-NVFP4。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "NVIDIA Hugging Face Organization",
-        "url": "https://huggingface.co/nvidia"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/65df9200dc3292a8983e5017/Vs5FPVCH-VZBipV3qKTuy.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_23ca7a259f06491a8cfa8971",
-      "cluster_id": "cluster_9fa1fc8e8d4537f59d98a52a",
-      "title": "Is One Layer Enough? Training A Single Transformer Layer Can Match Full-Parameter RL Training",
-      "url": "https://arxiv.org/abs/2607.01232v1",
-      "summary": "Reinforcement learning (RL) has become a central component of post-training large language models (LLMs), yet little is understood about how RL adaptation is distributed across transformer layers. Existing approaches typically update all mo",
+      "id": "occ_4b29420cd8c7ba3218406b03",
+      "cluster_id": "cluster_ce5cd88adf62bf35d8fc730c",
+      "title": "WorldDirector: Building Controllable World Simulators with Persistent Dynamic Memory",
+      "url": "https://arxiv.org/abs/2607.02517v1",
+      "summary": "We present WorldDirector, a highly controllable video world model framework designed for persistent dynamic object memory and unrestricted viewpoint exploration. Unlike existing world models that entangle physical dynamics with pixel render",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -715,20 +408,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_29a7bbe09d72d785b627515a",
-      "cluster_id": "cluster_13f64a4049ca41cc1b1f0d0f",
-      "title": "Are Performance-Optimization Benchmarks Reliably Measuring Coding Agents?",
-      "url": "https://arxiv.org/abs/2607.01211v1",
-      "summary": "Repository-level performance-optimization benchmarks such as GSO, SWE-Perf and SWE-fficiency evaluate coding agents by applying patches to real repositories and comparing runtime against unoptimized baselines and official reference patches.",
+      "id": "occ_4bf431ae02086a45c1c4e98b",
+      "cluster_id": "cluster_ddca28235bd25f8a62f10ba8",
+      "title": "ReContext: Recursive Evidence Replay as LLM Harness for Long-Context Reasoning",
+      "url": "https://arxiv.org/abs/2607.02509v1",
+      "summary": "Understanding and reasoning over long contexts has become a key requirement for deploying large language models (LLMs) in realistic applications. Although recent LLMs support increasingly long context windows, they often fail to use relevan。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -737,39 +430,8 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_2ac0fc0f436dc1ccb8edec3b",
-      "cluster_id": "cluster_9fa1fc8e8d4537f59d98a52a",
-      "title": "Is One Layer Enough? Training A Single Transformer Layer Can Match Full-Parameter RL Training",
-      "url": "https://arxiv.org/abs/2607.01232v1",
-      "summary": "Reinforcement learning (RL) has become a central component of post-training large language models (LLMs), yet little is understood about how RL adaptation is distributed across transformer layers. Existing approaches typically update all mo",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
@@ -777,50 +439,20 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_2c681a58695fcbe6711e7382",
-      "cluster_id": "cluster_77ca4bb9df0ebe60f91925a5",
-      "title": "Microsoft 在 Hugging Face 发布 HARC-Qwen2.5-7B-Instruct 模型页",
-      "url": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct",
-      "summary": "Microsoft 在 Hugging Face 上架 HARC-Qwen2.5-7B-Instruct 模型页，公开入口显示其基座为 Qwen2.5-7B-Instruct，并提供查看模型卡、权重、许可证和推理限制的入口。",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "AI Daily legacy report · Microsoft Hugging Face Organization",
-        "url": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "unknown",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_36ad6b0e1dc09932be4ef9ed",
-      "cluster_id": "cluster_6cb063b7ca04572a9069f096",
-      "title": "Beta-Particle Transport and Thermalization in Kilonova Ejecta with Detailed Atomic Microphysics",
-      "url": "https://arxiv.org/abs/2607.01228v1",
-      "summary": "When two neutron stars collide, they eject material containing heavy nuclei formed by the rapid neutron capture process ($r$-process). As these nuclei decay, they power a bright optical/near-infrared transient known as a kilonova (KN). Mode",
+      "id": "occ_4d8e2907af9b3cd66ac2f28e",
+      "cluster_id": "cluster_a49a02aa0a73617879438d4e",
+      "title": "VT-WAM: Visual-Tactile World Action Model for Contact-Rich Manipulation",
+      "url": "https://arxiv.org/abs/2607.02503v1",
+      "summary": "Contact-rich manipulation requires policies to react to local deformation, pressure, slip, and friction, yet these cues are temporally sparse and often invisible in visual observations. Existing visual-tactile policies usually feed tactile",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -838,483 +470,112 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_38968db15bdf0f685ffe4ff9",
-      "cluster_id": "cluster_77ca4bb9df0ebe60f91925a5",
-      "title": "Microsoft 在 Hugging Face 发布 HARC-Qwen2.5-7B-Instruct 模型页",
-      "url": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct",
-      "summary": "Microsoft 在 Hugging Face 上架 HARC-Qwen2.5-7B-Instruct 模型页，公开入口显示其基座为 Qwen2.5-7B-Instruct。",
+      "id": "occ_524bdb873bc5b92eeb6dedfd",
+      "cluster_id": "cluster_fc12fb061b1f18f2f43048c2",
+      "title": "Program-as-Weights: A Programming Paradigm for Fuzzy Functions",
+      "url": "https://arxiv.org/abs/2607.02512v1",
+      "summary": "Many everyday programming tasks resist clean rule-based implementation, such as alerting on important log lines, repairing malformed JSON, or ranking search results by intent, and are increasingly outsourced to large language model APIs at。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
       "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "AI Daily legacy report · huggingface.co",
-        "url": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct"
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_58a143fc812f754e6060a79b",
+      "cluster_id": "cluster_402d2b6a6b6cbc5201524853",
+      "title": "Distributed Attacks in Persistent-State AI Control",
+      "url": "https://arxiv.org/abs/2607.02514v1",
+      "summary": "As AI coding agents become more autonomous, they increasingly ship code iteratively, with the codebase persisting across sessions. This persistence creates a new attack surface: a misaligned or prompt-injected agent can distribute attacks a",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "engineering",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_5be8839a048e1c9b029ff8d6",
+      "cluster_id": "cluster_b2de04ee01e23e6f99be2b07",
+      "title": "arXiv cs.MA公布模型评估和研究结果",
+      "url": "https://arxiv.org/abs/2607.02453v1",
+      "summary": "arXiv cs.MA说明多 agent 安全护栏方案，重点包括策略检查、提示过滤、响应控制、企业应用和可观测性，使用前提是多 agent 系统仍要处理策略一致性、误拦截、日志留存和人工兜底。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · arxiv.org",
+        "url": "https://arxiv.org/abs/2607.02453v1"
       },
       "source_group": "papers_models",
       "content_tags": [
         "research"
       ],
       "credibility_tag": "pending_review",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "unknown",
       "access_state": "direct"
     },
     {
-      "id": "occ_39bfc9a0725c8dace7c8d5f4",
-      "cluster_id": "cluster_356e488d2474d282e9d8ee59",
-      "title": "Ink3D: Sculpting 3D Assets with Extremely Complex Textures via Video Generative Models",
-      "url": "https://arxiv.org/abs/2607.01222v1",
-      "summary": "Recent 3D generative models can synthesize high-quality geometry but often struggle to reproduce intricate textures from reference images, largely due to the scarcity of large-scale 3D training data with rich surface appearance. In contrast",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "creative_ai",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_427903c93e73374922d0ef65",
-      "cluster_id": "cluster_5a3ba4f42e7d22a50f09da14",
-      "title": "Linkify: Learning from Interface-Augmented Assembly Graphs",
-      "url": "https://arxiv.org/abs/2607.01205v1",
-      "summary": "We present Linkify, a framework for learning from interface-augmented assembly graphs to enable context-aware part retrieval in mechanical assemblies. While recent generative AI methods for CAD have focused largely on isolated parts or mono",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "creative_ai",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4347f79abffadc3cb5d1adba",
-      "cluster_id": "cluster_9fa1fc8e8d4537f59d98a52a",
-      "title": "Is One Layer Enough? Training A Single Transformer Layer Can Match Full-Parameter RL Training",
-      "url": "https://arxiv.org/abs/2607.01232v1",
-      "summary": "Reinforcement learning (RL) has become a central component of post-training large language models (LLMs), yet little is understood about how RL adaptation is distributed across transformer layers. Existing approaches typically update all mo。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.CL",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_44c73de571068d077a64d1d7",
-      "cluster_id": "cluster_0418b75ddebefb8a8091ced9",
-      "title": "Optimal Resource Utilization for Autonomous Laboratory Orchestrators",
-      "url": "https://arxiv.org/abs/2607.01188v1",
-      "summary": "In autonomous laboratories, AI agents suggest the next batch of experiments to do. However, planning and executing those tasks taking full advantage of the available resources is a completely different question. This can be challenging when",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "engineering",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4587dcb74c6ea3d6846d491e",
-      "cluster_id": "cluster_d2c1bc3e434461e862139b40",
-      "title": "AutoMem: Automated Learning of Memory as a Cognitive Skill",
-      "url": "https://arxiv.org/abs/2607.01224v1",
-      "summary": "Memory expertise is a learned skill: knowing what to encode, when to retrieve, and how to organize knowledge--a capacity known in cognitive science as metamemory. We bring this perspective to LLMs by treating memory management as a trainabl。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.AI",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4880a49170dde7c6461a4257",
-      "cluster_id": "cluster_ffb10872e7c363c0d96f4e34",
-      "title": "The State-Prediction Separation Hypothesis",
-      "url": "https://arxiv.org/abs/2607.01218v1",
-      "summary": "Transformers use the same forward computation stream to both predict the next token and store useful state for future token predictions. We formulate the \\emph{state-prediction separation hypothesis}: disentangling the two roles yields bett。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.CL",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4bd6eaae35bafd6fad4fc066",
-      "cluster_id": "cluster_77ca4bb9df0ebe60f91925a5",
-      "title": "microsoft/HARC-Qwen2.5-7B-Instruct",
-      "url": "https://huggingface.co/microsoft/HARC-Qwen2.5-7B-Instruct",
-      "summary": "microsoft/HARC-Qwen2.5-7B-Instruct。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Microsoft Hugging Face Organization",
-        "url": "https://huggingface.co/microsoft"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/1583646260758-5e64858c87403103f9f1055d.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_4f885fa04f3b035b81e5c62e",
-      "cluster_id": "cluster_65269fa6d4d7cb7244fac1dc",
-      "title": "Theoria: Rewrite-Acceptability Verification over Informal Reasoning States",
-      "url": "https://arxiv.org/abs/2607.01223v1",
-      "summary": "When should an AI system's answer be trusted? Formal proof assistants offer certainty but cannot reach most of the problem distribution; scalar LLM judges offer coverage but produce opaque scores that cannot be audited after the fact and ar",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_53d989e3d64e0a72bdef3372",
-      "cluster_id": "cluster_6cb063b7ca04572a9069f096",
-      "title": "Beta-Particle Transport and Thermalization in Kilonova Ejecta with Detailed Atomic Microphysics",
-      "url": "https://arxiv.org/abs/2607.01228v1",
-      "summary": "When two neutron stars collide, they eject material containing heavy nuclei formed by the rapid neutron capture process ($r$-process). As these nuclei decay, they power a bright optical/near-infrared transient known as a kilonova (KN). Mode",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_5ca1fbfb83f0a9e1e12f7991",
-      "cluster_id": "cluster_d2c1bc3e434461e862139b40",
-      "title": "AutoMem: Automated Learning of Memory as a Cognitive Skill",
-      "url": "https://arxiv.org/abs/2607.01224v1",
-      "summary": "Memory expertise is a learned skill: knowing what to encode, when to retrieve, and how to organize knowledge--a capacity known in cognitive science as metamemory. We bring this perspective to LLMs by treating memory management as a trainabl",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_618a603973ebafafcf4d3e97",
-      "cluster_id": "cluster_d864d5a8bf0a19e703f6762c",
-      "title": "Touching and Feeling the Data: A Reusable Software Pipeline for Tactile Statistical Graphs in Accessible Education",
-      "url": "https://arxiv.org/abs/2607.01214v1",
-      "summary": "Statistical visualization is usually treated as a visual medium, but data can also be touched. Three dimensional printed tactile graphs let blind and low vision students feel distributions, trace trends, and explore relationships through di",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "creative_ai",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_70bea6f4fc5c2f7a88bcc6db",
-      "cluster_id": "cluster_b3aa419ff01a66e75bf4120f",
-      "title": "microsoft/colipri",
-      "url": "https://huggingface.co/microsoft/colipri",
-      "summary": "microsoft/colipri。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "huggingface.co",
-        "home_url": "https://huggingface.co/"
-      },
-      "collected_via": {
-        "name": "Microsoft Hugging Face Organization",
-        "url": "https://huggingface.co/microsoft"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "open_source",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/1583646260758-5e64858c87403103f9f1055d.png",
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_717f1c1defeb25231ac52103",
-      "cluster_id": "cluster_ffb10872e7c363c0d96f4e34",
-      "title": "The State-Prediction Separation Hypothesis",
-      "url": "https://arxiv.org/abs/2607.01218v1",
-      "summary": "Transformers use the same forward computation stream to both predict the next token and store useful state for future token predictions. We formulate the \\emph{state-prediction separation hypothesis}: disentangling the two roles yields bett。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.LG",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_73070bc49b1574a541584664",
-      "cluster_id": "cluster_78010a24b73ebd5334e67322",
-      "title": "M2Note: Continual Evolution of Vision Language Models via Mistake Notebook Learning",
-      "url": "https://arxiv.org/abs/2607.00685v1",
-      "summary": "Vision Language Models (VLMs) have demonstrated remarkable capabilities in multimodal reasoning tasks, yet they still suffer from recurring failures, such as skipping key visual checks, misapplying domain rules, and hallucinating unsupporte。Treat this as a community lead unless it is backed by a primary source.",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv cs.MA",
-        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "industry_news",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_7692bfa055331a7989c4fea4",
-      "cluster_id": "cluster_c614a15ea54544d6681ae1bc",
-      "title": "Decision-Aware Training for Sample-Based Generative Models",
-      "url": "https://arxiv.org/abs/2607.01171v1",
-      "summary": "Sample-based generative models are increasingly used for probabilistic forecasting in high-stakes decision settings, yet their training objectives are blind to the decision maker's cost structure. These models are commonly trained with stri。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_5dc58e51ffc87be33fecdbfb",
+      "cluster_id": "cluster_d72eb936df40fffee00e2a07",
+      "title": "The Dual Nature of LLM Persona: Aggregated Tendencies and Frame-Dependent Geometry",
+      "url": "https://arxiv.org/abs/2607.02368v1",
+      "summary": "Evaluations of LLM personas via psychometric questionnaires typically rely on aggregate scores, discarding within-instance correlation structure. We test whether this geometric structure is intrinsic or frame-dependent. Constructing within-。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1332,20 +593,51 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_7858eef1e294093b078c4387",
-      "cluster_id": "cluster_e888cdf032d88afca22b758b",
-      "title": "Distributed Containment of a Compromised Agent through Repulsive Cages",
-      "url": "https://arxiv.org/abs/2607.01230v1",
-      "summary": "UAV swarms and cyber-physical multi-agent systems are increasingly deployed in safety-critical missions that require coordinated motion, distributed decision making, and autonomy. A major security risk arises when a legitimate agent is hija",
+      "id": "occ_65558cf06af5cd4f40363247",
+      "cluster_id": "cluster_8afa830570ae6a39db670865",
+      "title": "ByteDance-Seed/PAR",
+      "url": "https://huggingface.co/ByteDance-Seed/PAR",
+      "summary": "ByteDance-Seed/PAR Updated 3 days ago • 5。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "ByteDance Seed Hugging Face Organization",
+        "url": "https://huggingface.co/ByteDance-Seed"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "open_source",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": "https://cdn-avatars.huggingface.co/v1/production/uploads/6535c9e88bde2fae19b6fb25/flkDUqd_YEuFsjeNET3r-.png",
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_6655ca46a1f3686893a20f5a",
+      "cluster_id": "cluster_334baa3863740fdce79a6c70",
+      "title": "LACUNA: A Testbed for Evaluating Localization Precision for LLM Unlearning",
+      "url": "https://arxiv.org/abs/2607.02513v1",
+      "summary": "LLMs memorize sensitive training data, including personally identifiable information (PII), creating a pressing need for reliable post hoc removal methods. Unlearning has emerged as a promising solution, with state-of-the-art(SOTA) methods。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1354,29 +646,29 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "policy_infrastructure",
+        "industry_news",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_7b4e90843627ac384a1b24d3",
-      "cluster_id": "cluster_5a3ba4f42e7d22a50f09da14",
-      "title": "Linkify: Learning from Interface-Augmented Assembly Graphs",
-      "url": "https://arxiv.org/abs/2607.01205v1",
-      "summary": "We present Linkify, a framework for learning from interface-augmented assembly graphs to enable context-aware part retrieval in mechanical assemblies. While recent generative AI methods for CAD have focused largely on isolated parts or mono",
+      "id": "occ_6905259edec71714920d8486",
+      "cluster_id": "cluster_b2de04ee01e23e6f99be2b07",
+      "title": "Adoption and Ecosystem Health: A Longitudinal Analysis of Open-Source Multi-Agent Frameworks",
+      "url": "https://arxiv.org/abs/2607.02453v1",
+      "summary": "Since ChatGPT's launch in November 2022, open-source agentic frameworks have proliferated, making framework selection important for engineering teams while obscured by popularity signals such as GitHub stars. This paper analyzes 15 major op。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1385,60 +677,28 @@
         "home_url": "https://arxiv.org/"
       },
       "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
       },
       "source_group": "papers_models",
       "content_tags": [
-        "creative_ai",
-        "community_discussion"
+        "open_source"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_8852ee371daac538715a38e5",
-      "cluster_id": "cluster_625710adac1433ec55bd614d",
-      "title": "TIME Commissioning Observations: II. On-sky Characterization and the 2D Map Data Processing Pipeline",
-      "url": "https://arxiv.org/abs/2607.01220v1",
-      "summary": "The Tomographic Ionized-carbon Mapping Experiment (TIME) is a line intensity mapping (LIM) instrument that is designed to observe the power spectrum of the [CII] $158$~$μ$m emission line during the Epoch of Reionization. TIME completed a co",
-      "author": null,
-      "handle": null,
-      "original_text": null,
-      "publisher": {
-        "name": "arxiv.org",
-        "home_url": "https://arxiv.org/"
-      },
-      "collected_via": {
-        "name": "arXiv",
-        "url": "https://export.arxiv.org/"
-      },
-      "source_group": "papers_models",
-      "content_tags": [
-        "engineering",
-        "community_discussion"
-      ],
-      "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
-      "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
-      "date_anomaly": null,
-      "image_url": null,
-      "source_health": "available",
-      "access_state": "direct"
-    },
-    {
-      "id": "occ_88c38196498f82057b609a30",
-      "cluster_id": "cluster_e888cdf032d88afca22b758b",
-      "title": "Distributed Containment of a Compromised Agent through Repulsive Cages",
-      "url": "https://arxiv.org/abs/2607.01230v1",
-      "summary": "UAV swarms and cyber-physical multi-agent systems are increasingly deployed in safety-critical missions that require coordinated motion, distributed decision making, and autonomy. A major security risk arises when a legitimate agent is hija",
+      "id": "occ_6a357b5fd7559a7ed2646190",
+      "cluster_id": "cluster_437096b2a9a99d4462bd0755",
+      "title": "PointDiT: Pixel-Space Diffusion for Monocular Geometry Estimation",
+      "url": "https://arxiv.org/abs/2607.02515v1",
+      "summary": "State-of-the-art single-image 3D reconstruction methods often rely on complex hybrid architectures and loss functions, or compress geometry into latent spaces in order to leverage pre-trained latent diffusion models. In this work, we show t",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1456,20 +716,51 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_8a40780ead46e38fb29eab8a",
-      "cluster_id": "cluster_d2c1bc3e434461e862139b40",
-      "title": "AutoMem: Automated Learning of Memory as a Cognitive Skill",
-      "url": "https://arxiv.org/abs/2607.01224v1",
-      "summary": "Memory expertise is a learned skill: knowing what to encode, when to retrieve, and how to organize knowledge--a capacity known in cognitive science as metamemory. We bring this perspective to LLMs by treating memory management as a trainabl。Treat this as a community lead unless it is backed by a primary source.",
+      "id": "occ_6b21f1e1bf287cac3700b6af",
+      "cluster_id": "cluster_fc12fb061b1f18f2f43048c2",
+      "title": "Program-as-Weights: A Programming Paradigm for Fuzzy Functions",
+      "url": "https://arxiv.org/abs/2607.02512v1",
+      "summary": "Many everyday programming tasks resist clean rule-based implementation, such as alerting on important log lines, repairing malformed JSON, or ranking search results by intent, and are increasingly outsourced to large language model APIs at",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_72c895970fa68955fd703bf3",
+      "cluster_id": "cluster_ee443ce1b60b9b987cefc573",
+      "title": "What LLM Agents Say When No One Is Watching: Social Structure and Latent Objective Emergence in Multi-Agent Debates",
+      "url": "https://arxiv.org/abs/2607.02507v1",
+      "summary": "LLM agents will increasingly act in socially structured settings where role, audience, and relational context can shape what is advantageous or costly to say. We study whether such social structure, without any explicit objective in the pro。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1487,20 +778,174 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_8a9a2f2fd0f4feb5c7c18daf",
-      "cluster_id": "cluster_13f64a4049ca41cc1b1f0d0f",
-      "title": "Are Performance-Optimization Benchmarks Reliably Measuring Coding Agents?",
-      "url": "https://arxiv.org/abs/2607.01211v1",
-      "summary": "Repository-level performance-optimization benchmarks such as GSO, SWE-Perf and SWE-fficiency evaluate coding agents by applying patches to real repositories and comparing runtime against unoptimized baselines and official reference patches.",
+      "id": "occ_793d04e663f39b0794ac0ad0",
+      "cluster_id": "cluster_9ff9eae0c6b6d84ab24d68c1",
+      "title": "Online Safety Monitoring for LLMs",
+      "url": "https://arxiv.org/abs/2607.02510v1",
+      "summary": "Despite alignment training, LLMs remain prone to generating unsafe outputs at deployment time. Monitoring outputs online and raising an alarm when safety can no longer be assumed is therefore critical. We study a simple real-time monitor th。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.LG",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_798446ba4c1649029864fb7d",
+      "cluster_id": "cluster_fe84c8b2c672f4948bf225b5",
+      "title": "An Additive MLP-GNN Framework for Characterizing Chemical and Structural Contributions to Aqueous Solubility",
+      "url": "https://arxiv.org/abs/2607.02212v1",
+      "summary": "Aqueous solubility is a key property in early-stage drug discovery, but most predictive models merge physicochemical descriptors and molecular graph information into a single representation, obscuring whether a prediction is driven by globa。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv stat.ML",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_7a8b06c07d8b57a8bf805766",
+      "cluster_id": "cluster_fc12fb061b1f18f2f43048c2",
+      "title": "Program-as-Weights: A Programming Paradigm for Fuzzy Functions",
+      "url": "https://arxiv.org/abs/2607.02512v1",
+      "summary": "Many everyday programming tasks resist clean rule-based implementation, such as alerting on important log lines, repairing malformed JSON, or ranking search results by intent, and are increasingly outsourced to large language model APIs at。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.LG",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_87c5ed5c8a81fbad23bb3320",
+      "cluster_id": "cluster_9ff9eae0c6b6d84ab24d68c1",
+      "title": "Online Safety Monitoring for LLMs",
+      "url": "https://arxiv.org/abs/2607.02510v1",
+      "summary": "Despite alignment training, LLMs remain prone to generating unsafe outputs at deployment time. Monitoring outputs online and raising an alarm when safety can no longer be assumed is therefore critical. We study a simple real-time monitor th。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv stat.ML",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_88ba35f568e746974540be9d",
+      "cluster_id": "cluster_b2de04ee01e23e6f99be2b07",
+      "title": "arXiv cs.MA公布模型评估和研究结果",
+      "url": "https://arxiv.org/abs/2607.02453v1",
+      "summary": "**arXiv cs.MA**：arXiv cs.MA 论文讨论多代理系统中的安全护栏，重点放在策略检查、提示过滤和响应控制。它提供的是研究和实现思路，工程团队仍要在真实任务中验证误拦截、日志留存和人工接管机制。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · arXiv cs.MA",
+        "url": "https://arxiv.org/abs/2607.02453v1"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "open_source"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_8c0a1f5235935a5f6cdf2fbe",
+      "cluster_id": "cluster_334baa3863740fdce79a6c70",
+      "title": "LACUNA: A Testbed for Evaluating Localization Precision for LLM Unlearning",
+      "url": "https://arxiv.org/abs/2607.02513v1",
+      "summary": "LLMs memorize sensitive training data, including personally identifiable information (PII), creating a pressing need for reliable post hoc removal methods. Unlearning has emerged as a promising solution, with state-of-the-art(SOTA) methods",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1514,24 +959,489 @@
       },
       "source_group": "papers_models",
       "content_tags": [
-        "open_source",
+        "industry_news",
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
       "published_at": null,
-      "collected_at": "2026-07-02T09:00:49.015Z",
+      "collected_at": "2026-07-06T06:57:46.425Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
       "access_state": "direct"
     },
     {
-      "id": "occ_8d4ae9bdddac20aaf9b831d6",
+      "id": "occ_8d9a3345c68797477c8c1da7",
+      "cluster_id": "cluster_ee443ce1b60b9b987cefc573",
+      "title": "What LLM Agents Say When No One Is Watching: Social Structure and Latent Objective Emergence in Multi-Agent Debates",
+      "url": "https://arxiv.org/abs/2607.02507v1",
+      "summary": "LLM agents will increasingly act in socially structured settings where role, audience, and relational context can shape what is advantageous or costly to say. We study whether such social structure, without any explicit objective in the pro。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.LG",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a00bd247fa135e8ed299ec57",
+      "cluster_id": "cluster_402d2b6a6b6cbc5201524853",
+      "title": "Distributed Attacks in Persistent-State AI Control",
+      "url": "https://arxiv.org/abs/2607.02514v1",
+      "summary": "As AI coding agents become more autonomous, they increasingly ship code iteratively, with the codebase persisting across sessions. This persistence creates a new attack surface: a misaligned or prompt-injected agent can distribute attacks a。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "engineering",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a489bc48c8bc8ed6af066f5d",
+      "cluster_id": "cluster_402d2b6a6b6cbc5201524853",
+      "title": "Distributed Attacks in Persistent-State AI Control",
+      "url": "https://arxiv.org/abs/2607.02514v1",
+      "summary": "As AI coding agents become more autonomous, they increasingly ship code iteratively, with the codebase persisting across sessions. This persistence creates a new attack surface: a misaligned or prompt-injected agent can distribute attacks a",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "engineering",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a4d53a19be67e0707e732da9",
+      "cluster_id": "cluster_612a70cbb93b34d3f32f7424",
+      "title": "Hardware-Enforced Semantic Coordination for Safety-Critical Real-Time Autonomous Systems",
+      "url": "https://arxiv.org/abs/2607.02376v1",
+      "summary": "Recent advances in agentic AI are producing increasingly complex autonomous systems that integrate large language models, world models, optimization engines, specialized neural architectures, autonomous platforms, and human operators. While。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_a7f056c106ab4abfad5a38ee",
+      "cluster_id": "cluster_c6b9b73529d3679a83247caa",
+      "title": "Alignment Is All You Need For X-to-4D Generation",
+      "url": "https://arxiv.org/abs/2607.02516v1",
+      "summary": "Generative diffusion models excel at synthesizing high-quality images, videos, and 3D content under multimodal control. However, arbitrary user-defined modality-to-4D (X-to-4D) generation remains challenging due to the high cost of construc",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_ab8e49394b7a05efb1188fcb",
+      "cluster_id": "cluster_25066f9cf98e80d76cf185f1",
+      "title": "Aggregation with Exponential Weights is Optimal in Expectation",
+      "url": "https://arxiv.org/abs/2607.02247v1",
+      "summary": "The aggregation with exponential weights (AEW) estimator is not fully understood in the basic setting of model selection aggregation with squared loss. In particular, whether it is minimax-rate optimal in expectation for large enough fixed。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv stat.ML",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_b9cb22470dd18bb874b254df",
+      "cluster_id": "cluster_fc12fb061b1f18f2f43048c2",
+      "title": "Program-as-Weights: A Programming Paradigm for Fuzzy Functions",
+      "url": "https://arxiv.org/abs/2607.02512v1",
+      "summary": "Many everyday programming tasks resist clean rule-based implementation, such as alerting on important log lines, repairing malformed JSON, or ranking search results by intent, and are increasingly outsourced to large language model APIs at",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c53d639b4355006a5eb4e0c6",
+      "cluster_id": "cluster_334baa3863740fdce79a6c70",
+      "title": "LACUNA: A Testbed for Evaluating Localization Precision for LLM Unlearning",
+      "url": "https://arxiv.org/abs/2607.02513v1",
+      "summary": "LLMs memorize sensitive training data, including personally identifiable information (PII), creating a pressing need for reliable post hoc removal methods. Unlearning has emerged as a promising solution, with state-of-the-art(SOTA) methods。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.CL",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.CL&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c595f14194c84190dc41b0af",
+      "cluster_id": "cluster_ee443ce1b60b9b987cefc573",
+      "title": "What LLM Agents Say When No One Is Watching: Social Structure and Latent Objective Emergence in Multi-Agent Debates",
+      "url": "https://arxiv.org/abs/2607.02507v1",
+      "summary": "LLM agents will increasingly act in socially structured settings where role, audience, and relational context can shape what is advantageous or costly to say. We study whether such social structure, without any explicit objective in the pro。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_c9f25e60319cdf7c9e7b3e79",
+      "cluster_id": "cluster_1328029900d49792c86f9bf6",
+      "title": "Securing People and their Machines Against Major Faults",
+      "url": "https://arxiv.org/abs/2607.02304v1",
+      "summary": "We consider grassroots platforms -- distributed systems of agents consisting of people identified by self-chosen public keys and their machines (smartphones) -- and wish to make them secure against \\emph{major faults}: the loss of their pri。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.MA",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.MA&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "engineering",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_cd4afd46ee549c5ff7961494",
+      "cluster_id": "cluster_fc12fb061b1f18f2f43048c2",
+      "title": "Program-as-Weights: A Programming Paradigm for Fuzzy Functions",
+      "url": "https://arxiv.org/abs/2607.02512v1",
+      "summary": "Many everyday programming tasks resist clean rule-based implementation, such as alerting on important log lines, repairing malformed JSON, or ranking search results by intent, and are increasingly outsourced to large language model APIs at",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_d905e4677726ee4427ed28b4",
+      "cluster_id": "cluster_405dcc55c2a3c95b28967266",
+      "title": "Cross-Audit Projection for Model Risk Prediction",
+      "url": "https://arxiv.org/abs/2607.02328v1",
+      "summary": "For training-data-based model risk prediction, $K$-fold cross-validation~(CV) is widely used to mitigate the well-known over-optimism of the empirical risk and is often regarded as reliable. However, for binary classification via empirical。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv stat.ML",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Astat.ML&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_d9833c740e4307acfd0b9d85",
+      "cluster_id": "cluster_9ff9eae0c6b6d84ab24d68c1",
+      "title": "Online Safety Monitoring for LLMs",
+      "url": "https://arxiv.org/abs/2607.02510v1",
+      "summary": "Despite alignment training, LLMs remain prone to generating unsafe outputs at deployment time. Monitoring outputs online and raising an alarm when safety can no longer be assumed is therefore critical. We study a simple real-time monitor th。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.AI",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.AI&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_dc915996b6a34e74eb8820b8",
+      "cluster_id": "cluster_c7c846f1218a62b465a69188",
+      "title": "DemoPSD: Disagreement-Modulated Policy Self-Distillation",
+      "url": "https://arxiv.org/abs/2607.02502v1",
+      "summary": "On-policy self-distillation (OPSD) has emerged as a practical method for training large language models (LLMs) to reason, where a single model acts as both the teacher and the student with different levels of information access. However, re。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv cs.LG",
+        "url": "http://export.arxiv.org/api/query?max_results=20&search_query=cat%3Acs.LG&sortBy=submittedDate&sortOrder=descending"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_f8e88db96d58cc81b1312260",
+      "cluster_id": "cluster_ddca28235bd25f8a62f10ba8",
+      "title": "ReContext: Recursive Evidence Replay as LLM Harness for Long-Context Reasoning",
+      "url": "https://arxiv.org/abs/2607.02509v1",
+      "summary": "Understanding and reasoning over long contexts has become a key requirement for deploying large language models (LLMs) in realistic applications. Although recent LLMs support increasingly long context windows, they often fail to use relevan",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "arxiv.org",
+        "home_url": "https://arxiv.org/"
+      },
+      "collected_via": {
+        "name": "arXiv",
+        "url": "https://export.arxiv.org/"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "industry_news",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-06T06:57:46.425Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_194761c02b963044337a1312",
       "cluster_id": "cluster_edabd1a1c8e013b6fa191250",
       "title": "Cosmos3",
       "url": "https://huggingface.co/collections/nvidia/cosmos3",
-      "summary": "Cosmos3 Collection Omnimodal World Models for Physical AI • 17 items • Updated about 11 hours ago •。Treat this as a community lead unless it is backed by a primary source.",
+      "summary": "Cosmos3 Collection Omnimodal World Models for Physical AI • 18 items • Updated about 2 hours ago •。Treat this as a community lead unless it is backed by a primary source.",
       "author": null,
       "handle": null,
       "original_text": null,
@@ -1549,12 +1459,105 @@
         "community_discussion"
       ],
       "credibility_tag": "primary_material",
-      "event_date": "2026-07-01",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_980b3a33be97c9ebf8254251",
+      "cluster_id": "cluster_c0535ee36d88e1062186690f",
+      "title": "ByteDance-Seed/EdgeBench",
+      "url": "https://huggingface.co/datasets/ByteDance-Seed/EdgeBench",
+      "summary": "ByteDance-Seed/EdgeBench Updated 9 minutes ago •。Treat this as a community lead unless it is backed by a primary source.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "ByteDance Seed Hugging Face Organization",
+        "url": "https://huggingface.co/ByteDance-Seed"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "open_source",
+        "community_discussion"
+      ],
+      "credibility_tag": "primary_material",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T18:39:56.501Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_021d0d8a38e1213ea99ee5d9",
+      "cluster_id": "cluster_3ce63bb1cf5241de43c2cda1",
+      "title": "deepseek-ai/DeepSeek-R1",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
+      "summary": "Hugging Face ranked model entry; task=text-generation; likes=13425; downloads=7849894.",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "Hugging Face Trending Models",
+        "url": "https://huggingface.co/api/models?direction=-1&limit=50&sort=likes"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
       "published_at": null,
       "collected_at": "2026-07-02T09:00:49.015Z",
       "date_anomaly": null,
       "image_url": null,
       "source_health": "available",
+      "access_state": "direct"
+    },
+    {
+      "id": "occ_09e675081f0de82443dc2c85",
+      "cluster_id": "cluster_464e108a8a04d874daa0bf8c",
+      "title": "hexgrad/Kokoro-82M",
+      "url": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "summary": "Kokoro-82M 是小型语音生成模型，适合关注低成本 TTS、旁白生成和本地语音链路的人快速试验。落地前要核对语种、音色授权、延迟、音质和长文本稳定性。",
+      "author": null,
+      "handle": null,
+      "original_text": null,
+      "publisher": {
+        "name": "huggingface.co",
+        "home_url": "https://huggingface.co/"
+      },
+      "collected_via": {
+        "name": "AI Daily legacy report · Hugging Face Trending Models",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M"
+      },
+      "source_group": "papers_models",
+      "content_tags": [
+        "model_release",
+        "open_source"
+      ],
+      "credibility_tag": "monitoring_lead",
+      "event_date": "2026-07-02",
+      "published_at": null,
+      "collected_at": "2026-07-02T09:00:49.015Z",
+      "date_anomaly": null,
+      "image_url": null,
+      "source_health": "unknown",
       "access_state": "direct"
     }
   ]
