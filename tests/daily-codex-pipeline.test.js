@@ -1078,6 +1078,61 @@ test("daily Codex production orchestrator preserves daily runner mode when autom
   assert.equal(saved.automation_pipeline_mode, "single_script_dag_orchestrator");
 });
 
+test("daily Codex production orchestrator restores a nested legacy AI repair handoff", async () => {
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-nested-repair-resume-"));
+  const reportDate = "2026-07-27";
+  await writeMinimalRepoFiles(rootDir);
+  const cleanRoot = path.join(rootDir, ".tmp", "publish-worktrees", "main");
+  const contractPath = path.join(rootDir, ".tmp", `quality-ai-repair-${reportDate}.json`);
+  const plan = await prepareDailyCodexPipeline({
+    rootDir,
+    reportDate,
+    executeRequested: true,
+    publishRequested: true,
+    codexBin: "codex.cmd"
+  });
+  const repairAction = {
+    kind: "codex_ai_repair_contract",
+    contract_path: contractPath,
+    summary_path: plan.outputs.run_summary
+  };
+  await fs.mkdir(path.dirname(plan.outputs.run_summary), { recursive: true });
+  await fs.writeFile(plan.outputs.run_summary, `${JSON.stringify({
+    report_date: reportDate,
+    mode: "publish",
+    final_status: "blocked",
+    clean_repo_root: cleanRoot,
+    next_action: {
+      kind: "inspect_stage_failure",
+      stage_id: "quality_ai_repair"
+    },
+    legacy_report: {
+      status: "needs_ai_repair",
+      failed_stage_id: "quality_review",
+      next_action: repairAction
+    },
+    stages: [
+      { id: "signals_publish_real", status: "passed" },
+      { id: "quality_ai_repair", status: "failed" }
+    ]
+  }, null, 2)}\n`, "utf8");
+
+  const workflowRunner = async ({ summaryPath }) => {
+    const seen = JSON.parse(await fs.readFile(summaryPath, "utf8"));
+    assert.equal(seen.final_status, "needs_ai_repair");
+    assert.deepEqual(seen.next_action, repairAction);
+    return { summary: seen, summaryPath };
+  };
+
+  const { summary } = await runDailyCodexPipeline(plan, {
+    workflowRunner,
+    maxAutomatedAiRepairAttempts: 0
+  });
+
+  assert.equal(summary.final_status, "needs_ai_repair");
+  assert.deepEqual(summary.next_action, repairAction);
+});
+
 test("daily Codex production orchestrator authors a repair contract and resumes within one entrypoint run", async () => {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "daily-codex-production-auto-repair-"));
   const reportDate = "2026-07-10";

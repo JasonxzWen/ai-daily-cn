@@ -148,10 +148,17 @@ async function runSingleScriptDagOrchestrator(plan, options = {}) {
     }
   });
   const existingSummary = await readJsonOrNull(plan.outputs.run_summary);
-  const shouldResumeAiRepair = existingSummary?.final_status === "needs_ai_repair";
+  const nestedAiRepairAction = existingSummary?.legacy_report?.status === "needs_ai_repair"
+    && existingSummary.legacy_report?.next_action?.kind === "codex_ai_repair_contract"
+    ? existingSummary.legacy_report.next_action
+    : null;
+  const resumableSummary = nestedAiRepairAction
+    ? { ...existingSummary, final_status: "needs_ai_repair", next_action: nestedAiRepairAction }
+    : existingSummary;
+  const shouldResumeAiRepair = resumableSummary?.final_status === "needs_ai_repair";
   await writeJson(plan.outputs.run_summary, shouldResumeAiRepair
     ? {
-        ...existingSummary,
+        ...resumableSummary,
         automation_pipeline_mode: SINGLE_SCRIPT_AUTOMATION_PIPELINE_MODE,
         summary_path: plan.outputs.run_summary,
         pipeline_plan_path: pipelinePlanPath,

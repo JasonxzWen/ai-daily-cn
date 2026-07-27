@@ -11754,6 +11754,11 @@ test("daily runner creates a new empty AI repair template for public editorial r
         path: "hot_blogs[0].summary",
         value: "第一次修复后的热文摘要。",
         reason: "Replace generic public copy."
+      },
+      {
+        path: "hot_blogs[1].summary",
+        value: "发布方披露的第二篇热文摘要。",
+        reason: "Exercise partial contract rejection."
       }
     ]
   }, null, 2), "utf8");
@@ -11774,7 +11779,11 @@ test("daily runner creates a new empty AI repair template for public editorial r
           output: {
             ok: false,
             contract_applied: [{ path: "hot_blogs[0].summary" }],
-            contract_rejected: [],
+            contract_rejected: [{
+              path: "hot_blogs[1].summary",
+              code: "public_copy_banned_term",
+              message: "AI repair value still contains a banned public copy term."
+            }],
             review: {
               ok: false,
               ai_review_tasks: [
