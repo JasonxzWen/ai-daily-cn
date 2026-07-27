@@ -6,6 +6,7 @@ title: AI Daily CN 知识更新日志
 
 ## 2026-07-27
 
+- 修正 Pages 可见性验证仍指向已废弃 legacy HTML 的漂移，使 `publish:verify-pages --date` 与真实日报发布统一验证 canonical data JSON。
 - 记录首轮 authoring 的部分成功续接边界，并把跨 Builder 翻译重复前移为发布前可修复的确定性质量错误。
 - 固化 macOS 日更 Automation 的浏览器准备合同：依赖安装后通过仓库 `browser:install` 安装项目 Playwright 匹配的 Chromium，避免完整验证因用户缓存缺失而阻断。
 - 记录 AI repair contract 部分应用后的安全续接边界：保留已应用编辑，在剩余公开文案问题严格减少时生成下一轮 contract，并允许外层 summary 从明确的嵌套 legacy handoff 恢复。
@@ -45,5 +46,6 @@ title: AI Daily CN 知识更新日志
 - [信号池原子编排与验证](../src/signal-pool.js)
 - [站点与发布身份配置](../src/config.js)
 - [Git 发布实现](../src/publish.js)
+- [发布 CLI](../src/cli.js)
 - [日更 runner](../src/daily-runner.js)
 - [质量审查与修复](../src/quality-loop.js)

@@ -8654,6 +8654,10 @@ test("publish:verify-pages emits structured retryable misses without nonzero exi
   const parsed = JSON.parse(result.stdout);
 
   assert.equal(parsed.ok, false);
+  assert.equal(
+    parsed.pages_url,
+    "https://jasonxzwen.github.io/ai-daily-cn/data/2026/06/2026-06-04.json"
+  );
   assert.equal(parsed.publish_status.error_code, "pages_cache_delay");
   assert.match(parsed.publish_status.publish_error, /pages_verification_failed/);
   assert.match(parsed.publish_status.publish_error, /HTTP 404/);
