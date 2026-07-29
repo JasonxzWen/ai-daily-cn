@@ -4,6 +4,13 @@ title: AI Daily CN 知识更新日志
 ---
 # AI Daily CN 知识更新日志
 
+## 2026-07-29
+
+- 将每日 raw observations、occurrence store 与内部 signal pool 迁移为确定性 gzip JSON；读取、发布、Source Watch 验证和工作流合同统一接受压缩路径，公开 JSON 路径保持不变。
+- 删除既有 raw observations、source funnel、内部 signal pool 与 public-ready 影子历史；canonical baseline 与 occurrence 历史继续保留，避免公开信号事实和 lineage 丢失。
+- 修复热文剪枝后不回填导致的虚假覆盖不足：后续合格候选会继续补足目标数量。
+- 修复后续质量 review 停滞时误回滚已接受部分编辑的问题，并让自动修复提示直接携带确定性公开文案禁词表。
+
 ## 2026-07-27
 
 - 修正 Pages 可见性验证仍指向已废弃 legacy HTML 的漂移，使 `publish:verify-pages --date` 与真实日报发布统一验证 canonical data JSON。

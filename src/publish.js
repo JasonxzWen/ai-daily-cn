@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import { isDeepStrictEqual, promisify } from "node:util";
 import path from "node:path";
+import { readJsonArtifact } from "./compressed-json.js";
 import { DEFAULT_SITE } from "./config.js";
 import {
   assertOwnedPath,
@@ -1159,7 +1160,7 @@ async function requireSignalArtifacts(repoRoot, reportDate, options = {}) {
   const absoluteOccurrencePath = path.join(repoRoot, ...occurrencePath.split("/"));
   let occurrence;
   try {
-    occurrence = JSON.parse(await fs.readFile(absoluteOccurrencePath, "utf8"));
+    occurrence = await readJsonArtifact(absoluteOccurrencePath);
   } catch (error) {
     throw new PublisherError("signal_occurrence_store_missing", `Signal publication requires ${occurrencePath}.`, {
       cause: error.message
@@ -1279,8 +1280,8 @@ async function requireOptionalCuratedShadowReceipts(repoRoot, reportDate, option
   let funnel;
   try {
     [raw, funnel] = await Promise.all([
-      fs.readFile(rawPath, "utf8").then(JSON.parse),
-      fs.readFile(funnelPath, "utf8").then(JSON.parse)
+      readJsonArtifact(rawPath),
+      readJsonArtifact(funnelPath)
     ]);
   } catch {
     throw new PublisherError("curated_shadow_receipt_invalid", "Curated shadow receipts must be valid JSON.", {
@@ -1353,8 +1354,8 @@ async function requireOptionalCuratedShadowReceipts(repoRoot, reportDate, option
     let publicSignalPool;
     try {
       [signalPool, publicSignalPool] = await Promise.all([
-        fs.readFile(signalPath, "utf8").then(JSON.parse),
-        fs.readFile(publicSignalPath, "utf8").then(JSON.parse)
+        readJsonArtifact(signalPath),
+        readJsonArtifact(publicSignalPath)
       ]);
       const contract = await loadSignalAdmissionContract({ rootDir: repoRoot });
       const existingSignals = await loadPriorSignalState({ rootDir: repoRoot, reportDate });

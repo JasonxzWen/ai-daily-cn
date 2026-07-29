@@ -7,6 +7,7 @@ import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
 import { gzipSync } from "node:zlib";
+import { encodeJsonArtifact, readJsonArtifact } from "../src/compressed-json.js";
 import {
   buildDailyCodexPipelinePlan,
   prepareDailyCodexPipeline,
@@ -15,7 +16,7 @@ import {
   validateDailyCodexMvpArtifact
 } from "../scripts/run-daily-codex-pipeline.mjs";
 import { publicSignalTaxonomy } from "../src/schema.js";
-import { internalCandidatePoolRelativePath } from "../src/reports-data-layout.js";
+import { internalCandidatePoolRelativePath, occurrenceStoreRelativePath } from "../src/reports-data-layout.js";
 
 const execFileAsync = promisify(execFile);
 const repoRoot = path.resolve(".");
@@ -905,11 +906,11 @@ test("daily Codex production orchestrator refuses incomplete or mismatched signa
     {
       name: "occurrence-lineage-missing",
       async mutateEvidence(evidence) {
-        const store = JSON.parse(await fs.readFile(evidence.occurrenceStorePath, "utf8"));
+        const store = await readJsonArtifact(evidence.occurrenceStorePath);
         store.input_record_count = 0;
         store.occurrence_count = 0;
         store.occurrences = [];
-        await fs.writeFile(evidence.occurrenceStorePath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+        await fs.writeFile(evidence.occurrenceStorePath, encodeJsonArtifact(store, evidence.occurrenceStorePath));
       },
       mutate(stages) {
         return stages;
@@ -1519,6 +1520,7 @@ test("daily Codex production repair author returns schema-constrained UTF-8 JSON
   assert.match(prompt, /matching error-severity issue and its issue\.details/);
   assert.match(prompt, /prior contract edits rejected by deterministic validation/);
   assert.match(prompt, /banned term: 披露/);
+  assert.match(prompt, /Avoid these deterministic public-copy banned terms:[\s\S]*披露/);
   assert.match(prompt, /Do not repeat a rejected value or its rejected pattern/);
   assert.match(prompt, /chinese_chars means actual Han characters/);
   assert.match(prompt, /Never edit a path absent from the current ai_review_tasks/);
@@ -2411,10 +2413,7 @@ async function writeProductionSourceWatchEvidence({
   const occurrenceStorePath = path.join(
     cleanRoot,
     "reports-data",
-    "occurrences",
-    reportDate.slice(0, 4),
-    reportDate.slice(5, 7),
-    `${reportDate}.json`
+    occurrenceStoreRelativePath(reportDate)
   );
   const signalIndexPath = path.join(cleanRoot, "docs", "signals", "index.json");
   const signalPagePath = path.join(cleanRoot, "docs", "signals", "github_trending", "page-001.json");
@@ -2495,8 +2494,8 @@ async function writeProductionSourceWatchEvidence({
     normalization_errors: [],
     occurrences: occurrenceItems
   };
-  const occurrenceStoreRaw = `${JSON.stringify(occurrenceStore, null, 2)}\n`;
-  await fs.writeFile(occurrenceStorePath, occurrenceStoreRaw, "utf8");
+  const occurrenceStoreRaw = encodeJsonArtifact(occurrenceStore, occurrenceStorePath);
+  await fs.writeFile(occurrenceStorePath, occurrenceStoreRaw);
   const occurrenceStoreSha256 = createHash("sha256").update(occurrenceStoreRaw).digest("hex");
 
   const publicItems = occurrenceItems.map((item) => ({

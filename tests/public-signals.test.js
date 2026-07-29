@@ -9,6 +9,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 
+import { readJsonArtifact } from "../src/compressed-json.js";
 import {
   buildOccurrenceStore,
   writeOccurrenceStore
@@ -973,7 +974,7 @@ test("occurrence store writes to a stable dated path independent of report outpu
     target,
     path.join(tmp, "reports-data", ...occurrenceStoreRelativePath("2026-07-14").split(path.sep))
   );
-  assert.deepEqual(JSON.parse(await fs.readFile(target, "utf8")), store);
+  assert.deepEqual(await readJsonArtifact(target), store);
 });
 
 test("occurrence store refuses a same-day rewrite that drops or mutates an existing occurrence", async () => {
@@ -1010,7 +1011,7 @@ test("occurrence store refuses a same-day rewrite that drops or mutates an exist
       error?.details?.changed_occurrence_ids?.includes(initial.occurrences[0].id)
   );
 
-  assert.deepEqual(JSON.parse(await fs.readFile(target, "utf8")), initial);
+  assert.deepEqual(await readJsonArtifact(target), initial);
 });
 
 test("occurrence store permits an exact same-day superset without rewriting prior rows", async () => {
@@ -1031,7 +1032,7 @@ test("occurrence store permits an exact same-day superset without rewriting prio
   });
 
   const target = await writeOccurrenceStore({ rootDir: tmp, outputDir: "reports-data", store: expanded });
-  const persisted = JSON.parse(await fs.readFile(target, "utf8"));
+  const persisted = await readJsonArtifact(target);
   assert.equal(persisted.occurrence_count, 2);
   assert.deepEqual(persisted.occurrences.find((item) => item.id === initial.occurrences[0].id), initial.occurrences[0]);
 });
@@ -1073,7 +1074,8 @@ test("independent signal writer merges same-day reruns while freezing persisted 
     generatedAt: rerunGeneratedAt,
     inputPaths: [discoveryPath]
   });
-  const persisted = JSON.parse(await fs.readFile(rerun.occurrenceStorePath, "utf8"));
+  assert.match(rerun.occurrenceStorePath, /\.json\.gz$/);
+  const persisted = await readJsonArtifact(rerun.occurrenceStorePath);
 
   assert.deepEqual(rerun.store, persisted);
   assert.deepEqual(persisted.occurrences.find((item) => item.id === frozenOccurrence.id), frozenOccurrence);

@@ -96,7 +96,7 @@
       },
       "dependencies": ["normalize-canonicalize"],
       "inputs": [{ "path": ".tmp/daily-codex-pipeline/{report_date}/artifacts/canonical-candidates.json", "required": true }],
-      "outputs": [{ "path": "reports-data/occurrences/{yyyy}/{mm}/{report_date}.json", "required": true }],
+      "outputs": [{ "path": "reports-data/occurrences/{yyyy}/{mm}/{report_date}.json.gz", "required": true }],
       "schemas": {
         "input": "schemas/daily-codex-dag.schema.json#/$defs/plannedNodeInput",
         "output": "schemas/occurrence-store.schema.json"
@@ -122,7 +122,7 @@
         "summary": "Mapped to the production public-signal builder and independent from the legacy report builder."
       },
       "dependencies": ["persist-signal-occurrences"],
-      "inputs": [{ "path": "reports-data/occurrences/{yyyy}/{mm}/{report_date}.json", "required": true }],
+      "inputs": [{ "path": "reports-data/occurrences/{yyyy}/{mm}/{report_date}.json.gz", "required": true }],
       "outputs": [{ "path": "docs/signals/index.json", "required": true }],
       "schemas": {
         "input": "schemas/occurrence-store.schema.json",

@@ -389,7 +389,7 @@ async function requireMatchingOccurrenceStore({ rootDir, outputDir, store }) {
   const target = path.resolve(rootDir, outputDir, ...occurrenceStoreRelativePath(store.report_date).split("/"));
   let existing;
   try {
-    existing = JSON.parse(await fs.readFile(target, "utf8"));
+    existing = await readJsonArtifact(target);
   } catch (error) {
     throw new PublisherError("occurrence_store_missing", "report:draft requires the occurrence store written by signals:write, but it is missing or unreadable.", {
       path: target,
@@ -458,7 +458,7 @@ export async function writeDiscoveryOccurrenceStore(options = {}) {
     store,
     mergeExisting: true
   });
-  const persistedStore = JSON.parse(await fs.readFile(occurrenceStorePath, "utf8"));
+  const persistedStore = await readJsonArtifact(occurrenceStorePath);
   const persistedValidation = validateOccurrenceStore(persistedStore);
   if (!persistedValidation.valid) {
     throw new PublisherError("occurrence_store_existing_invalid", "Persisted occurrence store is invalid after write.", {
@@ -768,6 +768,37 @@ function selectReportItems(merged, options = {}) {
     item: hotBlogItem(candidate, { officialBlogContentTypes })
   }));
   const hotBlogPrune = pruneHotBlogDrafts(hotBlogDrafts);
+  let evaluatedHotBlogDrafts = hotBlogDrafts.length;
+  hotBlogInfraVendorCount = hotBlogPrune.items
+    .filter(({ candidate }) => isOverrepresentedInfraVendorCandidate(candidate))
+    .length;
+  for (const candidate of hotBlogPool) {
+    if (hotBlogPrune.items.length >= HOT_BLOG_TARGET) break;
+    const key = normalizeUrl(candidate.url);
+    if (!key || hotBlogSeenUrls.has(key)) continue;
+    if (
+      isOverrepresentedInfraVendorCandidate(candidate) &&
+      enforceHotBlogInfraVendorCap &&
+      hotBlogInfraVendorCount >= MAX_INFRA_VENDOR_HOT_BLOGS
+    ) {
+      continue;
+    }
+    const entry = { candidate, item: hotBlogItem(candidate, { officialBlogContentTypes }) };
+    const refill = pruneHotBlogDrafts([...hotBlogPrune.items, entry]);
+    hotBlogSeenUrls.add(key);
+    evaluatedHotBlogDrafts += 1;
+    if (refill.items.length === hotBlogPrune.items.length) {
+      hotBlogPrune.pruned += 1;
+      for (const [reason, count] of Object.entries(refill.prune_reasons)) {
+        hotBlogPrune.prune_reasons[reason] = (hotBlogPrune.prune_reasons[reason] || 0) + count;
+      }
+      continue;
+    }
+    hotBlogPrune.items.push(entry);
+    if (isOverrepresentedInfraVendorCandidate(candidate)) {
+      hotBlogInfraVendorCount += 1;
+    }
+  }
   const hotBlogs = hotBlogPrune.items.map(({ candidate }) => {
     const hotCandidate = markIncludedCandidate(candidate, "hot_blog", "hot_blogs");
     selectedIds.add(candidate.id);
@@ -867,7 +898,7 @@ function selectReportItems(merged, options = {}) {
       hot_blogs: {
         eligible_candidates: hotBlogPool.length,
         target: HOT_BLOG_TARGET,
-        selected_before_prune: hotBlogDrafts.length,
+        selected_before_prune: evaluatedHotBlogDrafts,
         selected: hotBlogs.length,
         pruned: hotBlogPrune.pruned,
         prune_reasons: hotBlogPrune.prune_reasons

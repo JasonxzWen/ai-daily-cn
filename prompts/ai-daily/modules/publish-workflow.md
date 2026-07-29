@@ -15,7 +15,7 @@ corepack pnpm run daily:codex-pipeline -- --date YYYY-MM-DD --execute --publish
 
 共享发现与规范化完成后，公共信号通道必须先运行：
 
-1. `signals_write`：把所有安全、可公开的规范化观察写入 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json`。
+1. `signals_write`：把所有安全、可公开的规范化观察写入 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json.gz`。
 2. `signals_build`：生成 `docs/signals/index.json` 和分组分页文件。
 3. `signals_validate`：验证 schema、跨文件 lineage、隐私与公开路径。
 4. `signals_publish_dry_run`：执行信号发布预检。

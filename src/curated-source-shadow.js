@@ -8,6 +8,7 @@ import {
   aifyPayloadSequenceHash,
   createAifyTodayPicksFailure
 } from "./aify-today-picks.js";
+import { encodeJsonArtifact } from "./compressed-json.js";
 import { PublisherError } from "./errors.js";
 import { buildOccurrenceStore } from "./occurrence-store.js";
 import { findRepoSafeReceiptPrivacyFindings } from "./privacy.js";
@@ -1611,7 +1612,7 @@ export async function writeJsonPairAtomic(entries, fileSystem = fs) {
         else throw error;
       }
       prepared.push({ target, temporary, backup, existed, backedUp: false, finalized: false });
-      await fileSystem.writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+      await fileSystem.writeFile(temporary, encodeJsonArtifact(value, target));
     }
     for (const item of prepared) {
       if (!item.existed) continue;

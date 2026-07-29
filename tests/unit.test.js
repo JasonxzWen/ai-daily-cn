@@ -9011,7 +9011,7 @@ test("daily workflow contract validates one portable macOS dry-run automation", 
   assert.equal(sourceWatch.validation_stage, "signals_validate");
   assert.equal(
     sourceWatch.occurrence_store_path_template,
-    "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json"
+    "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json.gz"
   );
   assert.equal(sourceWatch.public_index_path, "docs/signals/index.json");
   assert(sourceWatch.connected_requires.includes("signals_write_passed"));
@@ -9025,7 +9025,7 @@ test("daily workflow contract validates one portable macOS dry-run automation", 
     runs_before: "signals_write",
     public_behavior_changes: false,
     failure_blocks_legacy_publisher: false,
-    signal_pool_path_template: "reports-data/signals/YYYY/MM/YYYY-MM-DD.json",
+    signal_pool_path_template: "reports-data/signals/YYYY/MM/YYYY-MM-DD.json.gz",
     public_ready_path_template: "reports-data/public-signal-pool/YYYY/MM/YYYY-MM-DD.json",
     summary_readiness_fail_closed: true,
     aify_today_picks_passthrough: true
@@ -12172,6 +12172,104 @@ test("daily runner rolls back a stalled repair and suppresses content-contract r
   assert.equal(contentStage.status, "degraded");
   assert.equal(contentStage.output.repair_reentry_suppressed, true);
   assert.deepEqual(calls.filter((id) => id === "quality_ai_repair"), ["quality_ai_repair"]);
+});
+
+test("daily runner keeps accepted partial repair when the following review stalls", async () => {
+  const launcherRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ai-daily-runner-partial-repair-stalled-"));
+  const cleanRoot = path.join(launcherRoot, ".tmp", "publish-worktrees", "main");
+  const summaryPath = path.join(launcherRoot, ".tmp", "run-summary-2026-07-14.json");
+  const contractPath = path.join(launcherRoot, ".tmp", "quality-ai-repair-2026-07-14.json");
+  const sourcePath = path.join(cleanRoot, ".tmp", "daily-report.json");
+  const task = { kind: "hot_blog_editorial_rewrite", path: "hot_blogs[0].summary" };
+  const issue = {
+    code: "hot_blog_summary_template",
+    severity: "error",
+    path: task.path,
+    message: "The same residual signal remains.",
+    details: { problems: ["template_or_low_information"] }
+  };
+  await fs.mkdir(path.dirname(sourcePath), { recursive: true });
+  await fs.writeFile(sourcePath, JSON.stringify({
+    report_date: "2026-07-14",
+    hot_blogs: [{ title: "A", summary: "pre-repair checkpoint" }]
+  }), "utf8");
+  await fs.mkdir(path.dirname(contractPath), { recursive: true });
+  await fs.writeFile(contractPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    status: "ready",
+    edits: [{ path: task.path, value: "accepted partial repair", reason: "repair" }]
+  }), "utf8");
+  await fs.writeFile(summaryPath, JSON.stringify({
+    schema_version: 1,
+    report_date: "2026-07-14",
+    mode: "publish",
+    launcher_root: launcherRoot,
+    clean_repo_root: cleanRoot,
+    summary_path: summaryPath,
+    max_review_repair_loops: 5,
+    review_repair_attempts: 1,
+    current_report_path: ".tmp/daily-report.json",
+    candidate_pool_path: ".tmp/source-candidates-2026-07-14.json",
+    quality_review_path: ".tmp/quality-review-2026-07-14.json",
+    quality_repair_path: ".tmp/quality-repair-2026-07-14.json",
+    quality_repair_progress: {
+      schema_version: 1,
+      state: "baseline",
+      stalled: false,
+      effective: {
+        comparable: true,
+        issue_keys: [`${task.path}|template_or_low_information`],
+        active_paths: [task.path]
+      },
+      active_paths: [task.path],
+      frozen_paths: []
+    },
+    stages: [],
+    final_status: "needs_ai_repair",
+    next_action: {
+      kind: "codex_ai_repair_contract",
+      contract_path: contractPath,
+      source_report_path: sourcePath,
+      quality_review_path: path.join(cleanRoot, ".tmp", "quality-review-2026-07-14.json"),
+      ai_review_tasks: [task],
+      review_issues: [issue]
+    }
+  }), "utf8");
+
+  const result = await runDailyWorkflow({
+    launcherRoot,
+    reportDate: "2026-07-14",
+    publish: true,
+    runStage: async (stage) => {
+      if (stage.id === "quality_ai_repair") {
+        await fs.writeFile(path.join(cleanRoot, ".tmp", "daily-report.optimized.json"), JSON.stringify({
+          report_date: "2026-07-14",
+          hot_blogs: [{ title: "A", summary: "accepted partial repair" }]
+        }), "utf8");
+        return { ok: true, output: { contract_applied: [{ path: task.path }], contract_rejected: [] } };
+      }
+      if (stage.id === "quality_review") {
+        return { ok: false, output: { review: { ok: false, issues: [issue], ai_review_tasks: [task] } } };
+      }
+      if (stage.id === "content_contract") {
+        return {
+          ok: false,
+          output: {
+            ok: false,
+            issues: [{ code: "hot_blog_summary_contract_failed", severity: "error", path: task.path }]
+          }
+        };
+      }
+      return { ok: true, output: { stage: stage.id } };
+    }
+  });
+
+  const optimized = JSON.parse(await fs.readFile(path.join(cleanRoot, ".tmp", "daily-report.optimized.json"), "utf8"));
+  assert.equal(optimized.hot_blogs[0].summary, "accepted partial repair");
+  const reviewStage = result.summary.stages.find((stage) => stage.id === "quality_review");
+  assert.equal(reviewStage.output.rolled_back, undefined);
+  assert.equal(reviewStage.output.repair_stalled, true);
 });
 
 test("daily runner keeps unrelated structural content-contract failures blocked after repair stalls", async () => {
@@ -21987,7 +22085,25 @@ test("report:draft prunes duplicate and templated hot blogs before quality revie
       evidence: "AWS explains P-EAGLE speculative decoding on SageMaker, covering draft model parallelism, decoding latency, throughput tradeoffs, deployment setup, and when the optimization does not help.",
       sourceLevel: "primary",
       editorialCategory: "engineering_deep_dive"
-    })
+    }),
+    ...[
+      ["gemini-robotics-safety", "Google DeepMind Blog", "https://deepmind.google/discover/blog/gemini-robotics-safety", "Gemini Robotics safety evaluation for embodied agents"],
+      ["gemini-robotics-safety-duplicate", "Google DeepMind Blog", "https://deepmind.google/discover/blog/gemini-robotics-safety-duplicate", "Gemini Robotics safety evaluation for embodied agents"],
+      ["magentic-benchmark", "Microsoft Research Blog", "https://www.microsoft.com/en-us/research/blog/magentic-benchmark", "Magentic benchmark for multi-agent task completion"],
+      ["claude-circuits", "Anthropic Research", "https://www.anthropic.com/research/claude-circuits", "Claude circuit tracing for model interpretability"],
+      ["llama-inference", "Meta AI Blog", "https://ai.meta.com/blog/llama-inference-stack", "Llama inference stack for production serving"],
+      ["qwen-tokenizer", "Qwen Blog", "https://qwen.ai/blog/multilingual-tokenizer", "Qwen multilingual tokenizer design and evaluation"],
+      ["deepseek-attention", "DeepSeek Research", "https://deepseek.com/research/sparse-attention", "DeepSeek sparse attention for long-context inference"]
+    ].map(([id, source, url, title]) => mainStreamRepairCandidate(reportDate, {
+      id,
+      category: "hot_blog",
+      source,
+      url,
+      title,
+      evidence: `${source} explains ${title}, including the technical method, evaluation evidence, deployment constraints, failure analysis, and practical engineering boundaries.`,
+      sourceLevel: "primary",
+      editorialCategory: "engineering_deep_dive"
+    }))
   ];
   const discoveryPath = path.join(tmp, "discovery.json");
   await fs.writeFile(discoveryPath, `${JSON.stringify(discoveryEnvelope({
@@ -22006,6 +22122,7 @@ test("report:draft prunes duplicate and templated hot blogs before quality revie
   const titles = drafted.report.hot_blogs.map((item) => item.title.replace(/\s+/g, " ").trim());
   assert.equal(new Set(titles).size, titles.length, `hot blog titles should be unique: ${JSON.stringify(titles)}`);
   assert(!drafted.report.hot_blogs.some((item) => item.candidate_id === "nvidia-xr-agent-duplicate"));
+  assert.equal(drafted.report.hot_blogs.length, 8, "later unique candidates should backfill pruned hot-blog slots");
   assert(drafted.report.hot_blogs.length < hotBlogCandidates.length);
   const snapshot = drafted.report.self_check.selection_snapshot.hot_blogs;
   assert(snapshot.pruned >= 1, JSON.stringify(snapshot));

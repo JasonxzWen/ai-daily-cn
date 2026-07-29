@@ -158,7 +158,7 @@ function validateSignalPoolShadowSemantics({ value, prefix, failures }) {
     runs_before: "signals_write",
     public_behavior_changes: false,
     failure_blocks_legacy_publisher: false,
-    signal_pool_path_template: "reports-data/signals/YYYY/MM/YYYY-MM-DD.json",
+    signal_pool_path_template: "reports-data/signals/YYYY/MM/YYYY-MM-DD.json.gz",
     public_ready_path_template: "reports-data/public-signal-pool/YYYY/MM/YYYY-MM-DD.json",
     summary_readiness_fail_closed: true,
     aify_today_picks_passthrough: true
@@ -214,7 +214,7 @@ function validateSourceWatchSemantics({ sourceWatch, prefix, failures }) {
   const exactFields = {
     producer_stage: "discover_source_watch",
     persistence_stage: "signals_write",
-    occurrence_store_path_template: "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json",
+    occurrence_store_path_template: "reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json.gz",
     consumer_stage: "signals_build",
     validation_stage: "signals_validate",
     public_index_path: "docs/signals/index.json",

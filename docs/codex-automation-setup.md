@@ -59,7 +59,7 @@ signals_write
 
 当前非发布模式只允许走到真实远端写入之前：
 
-- `signals_write` 把所有安全、可公开的规范化观察持久化到 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json`。
+- `signals_write` 把所有安全、可公开的规范化观察持久化到 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json.gz`。
 - `signals_build` 生成 `docs/signals/index.json` 与分组分页。
 - `signals_validate` 验证 schema、lineage、隐私和公开路径。
 - 信源类别、内容类别、可信度、健康和访问状态仅是标签/筛选维度，不是准入条件。

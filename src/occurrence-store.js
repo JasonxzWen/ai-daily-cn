@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { isDeepStrictEqual } from "node:util";
 
+import { encodeJsonArtifact, readJsonArtifact } from "./compressed-json.js";
 import { PublisherError } from "./errors.js";
 import { canonicalPublicUrlIdentity, isPublicNetworkHost, sanitizePublicHttpUrl } from "./public-url.js";
 import { occurrenceStoreRelativePath } from "./reports-data-layout.js";
@@ -98,7 +99,7 @@ export async function writeOccurrenceStore(options = {}) {
   await fs.mkdir(path.dirname(target), { recursive: true });
   const temporary = `${target}.${process.pid}.${randomUUID()}.tmp`;
   try {
-    await fs.writeFile(temporary, `${JSON.stringify(persisted, null, 2)}\n`, "utf8");
+    await fs.writeFile(temporary, encodeJsonArtifact(persisted, target));
     await fs.rename(temporary, target);
   } catch (error) {
     await fs.rm(temporary, { force: true }).catch(() => {});
@@ -110,7 +111,7 @@ export async function writeOccurrenceStore(options = {}) {
 async function readExistingOccurrenceStore(target) {
   let payload;
   try {
-    payload = JSON.parse(await fs.readFile(target, "utf8"));
+    payload = await readJsonArtifact(target);
   } catch (error) {
     if (error.code === "ENOENT") return null;
     throw new PublisherError(
