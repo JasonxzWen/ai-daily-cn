@@ -565,7 +565,8 @@ async function resumeDailyWorkflowFromAiRepair({
         reportPath: OPTIMIZED_REPORT_PATH
       });
       if (repairDecision?.degrade) {
-        if (repairDecision.repair_stalled && sourceReportSnapshot === null) {
+        const shouldRollbackStalledRepair = repairDecision.repair_stalled && repairDecision.rollback !== false;
+        if (shouldRollbackStalledRepair && sourceReportSnapshot === null) {
           summary.final_status = "blocked";
           summary.next_action = {
             kind: "quality_repair_stalled",
@@ -576,7 +577,7 @@ async function resumeDailyWorkflowFromAiRepair({
           await writeSummary(summaryPath, summary);
           return { summary, summaryPath };
         }
-        if (repairDecision.repair_stalled) {
+        if (shouldRollbackStalledRepair) {
           const optimizedPath = absoluteCleanPath(summary.clean_repo_root, OPTIMIZED_REPORT_PATH);
           await fs.mkdir(path.dirname(optimizedPath), { recursive: true });
           await fs.writeFile(optimizedPath, sourceReportSnapshot, "utf8");

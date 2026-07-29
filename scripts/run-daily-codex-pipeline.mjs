@@ -6,11 +6,13 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { finished } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
+import { readJsonArtifact } from "../src/compressed-json.js";
 import {
   hasStrictQualityRepairProgress,
   qualityRepairFeedback,
   runDailyWorkflow
 } from "../src/daily-runner.js";
+import { PUBLIC_COPY_BANNED_TERMS } from "../src/quality-loop.js";
 import {
   internalCandidatePoolRelativePath,
   legacyCandidatePoolRelativePath,
@@ -725,6 +727,7 @@ Return one JSON object as the final response with exactly this contract shape:
 Requirements:
 - Include at least one edit and only exact task paths declared above.
 - For every task, read the matching error-severity issue and its issue.details before writing the replacement.
+- Avoid these deterministic public-copy banned terms: ${PUBLIC_COPY_BANNED_TERMS.join(", ")}.
 - Do not repeat a rejected value or its rejected pattern; satisfy every deterministic rejection message for that path.
 - chinese_chars means actual Han characters, not total string length; satisfy the current review's observed requirements instead of assuming a fixed threshold.
 - Never edit a path absent from the current ai_review_tasks.
@@ -960,7 +963,7 @@ async function deriveProductionSourceWatchSummary({ cleanRoot, reportDate, compl
     "reports-data",
     ...occurrenceStoreRelativePath(reportDate).split(path.sep)
   );
-  const occurrenceStore = await readJsonOrNull(occurrenceStorePath);
+  const occurrenceStore = await readJsonArtifactOrNull(occurrenceStorePath);
   const occurrenceStoreRecord = await artifactRecord(occurrenceStorePath);
   const occurrenceValidation = validateOccurrenceStore(occurrenceStore);
   if (
@@ -2383,6 +2386,14 @@ async function readJson(filePath) {
 async function readJsonOrNull(filePath) {
   try {
     return await readJson(filePath);
+  } catch {
+    return null;
+  }
+}
+
+async function readJsonArtifactOrNull(filePath) {
+  try {
+    return await readJsonArtifact(filePath);
   } catch {
     return null;
   }

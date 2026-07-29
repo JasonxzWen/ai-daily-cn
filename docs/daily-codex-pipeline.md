@@ -54,7 +54,7 @@ discover_source_watch
   -> signals_validate
 ```
 
-`discover_source_watch` 写 `.tmp/source-watch-YYYY-MM-DD.json` 并返回精确 path/SHA receipt。`signals_write` 将观察按持久 `observation_id` 写到 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json`；`signals_build` 生成 `docs/signals/index.json` 与分页；`signals_validate` 验证 schema、跨文件 lineage、隐私和公开路径。
+`discover_source_watch` 写 `.tmp/source-watch-YYYY-MM-DD.json` 并返回精确 path/SHA receipt。`signals_write` 将观察按持久 `observation_id` 写到 `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json.gz`；`signals_build` 生成 `docs/signals/index.json` 与分页；`signals_validate` 验证 schema、跨文件 lineage、隐私和公开路径。
 
 summary 只有在同一次运行证明 producer receipt、occurrence store、observation lineage、build、validate 与 signal index 全部一致时，才报告：
 

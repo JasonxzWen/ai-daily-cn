@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import { isDeepStrictEqual } from "node:util";
 import path from "node:path";
 
+import { readJsonArtifact } from "./compressed-json.js";
 import {
   assertOwnedPath,
   loadCuratedShadowCanonicalOwners,
@@ -239,7 +240,7 @@ async function listHistoricalPoolFiles(rootDir, inputDir, relativeRoot, reportDa
       const monthPath = await assertOwnedPath(rootDir, path.join(yearPath, month.name), "signal_pool_history_path_unsafe");
       const entries = await fs.readdir(monthPath, { withFileTypes: true });
       for (const entry of entries.sort((left, right) => left.name.localeCompare(right.name))) {
-        const match = /^(\d{4}-\d{2}-\d{2})\.json$/.exec(entry.name);
+        const match = /^(\d{4}-\d{2}-\d{2})\.json(?:\.gz)?$/.exec(entry.name);
         if (!entry.isFile() || !match || match[1] >= reportDate) continue;
         if (`${year.name}-${month.name}` !== match[1].slice(0, 7)) {
           throw new PublisherError("signal_pool_history_invalid", "Historical signal pool path must match its filename date.", {
@@ -644,7 +645,7 @@ function publisherHomeUrl(value) {
 
 async function readJson(filePath, code) {
   try {
-    return JSON.parse(await fs.readFile(filePath, "utf8"));
+    return await readJsonArtifact(filePath);
   } catch (error) {
     throw new PublisherError(code, "Signal pool input must be readable JSON.", {
       path: filePath,

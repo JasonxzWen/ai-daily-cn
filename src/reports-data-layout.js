@@ -11,12 +11,12 @@ export const SOURCE_STATUS_HISTORY_FILE = "source-status-history.json";
 
 export function occurrenceStoreRelativePath(reportDate) {
   const { year, month } = dateParts(reportDate);
-  return path.join(REPORTS_DATA_OCCURRENCES_DIR, year, month, `${reportDate}.json`);
+  return path.join(REPORTS_DATA_OCCURRENCES_DIR, year, month, `${reportDate}.json.gz`);
 }
 
 export function rawObservationsRelativePath(reportDate) {
   const { year, month } = dateParts(reportDate);
-  return path.join(REPORTS_DATA_OBSERVATIONS_DIR, year, month, `${reportDate}.json`);
+  return path.join(REPORTS_DATA_OBSERVATIONS_DIR, year, month, `${reportDate}.json.gz`);
 }
 
 export function sourceFunnelRelativePath(reportDate) {
@@ -26,7 +26,7 @@ export function sourceFunnelRelativePath(reportDate) {
 
 export function signalPoolRelativePath(reportDate) {
   const { year, month } = dateParts(reportDate);
-  return path.join(REPORTS_DATA_SIGNALS_DIR, year, month, `${reportDate}.json`);
+  return path.join(REPORTS_DATA_SIGNALS_DIR, year, month, `${reportDate}.json.gz`);
 }
 
 export function publicSignalPoolRelativePath(reportDate) {

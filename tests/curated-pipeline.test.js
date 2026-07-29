@@ -6,6 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
+import { encodeJsonArtifact, readJsonArtifact } from "../src/compressed-json.js";
 import {
   aifyPayloadSequenceHash,
   collectAifyTodayPicks,
@@ -829,7 +830,8 @@ test("curated source shadow persists repo-safe raw and 186/24/24 funnel receipts
     aifyResult,
     outputDir: "reports-data"
   });
-  const raw = JSON.parse(await fs.readFile(result.raw_observations_path, "utf8"));
+  assert.match(result.raw_observations_path, /\.json\.gz$/);
+  const raw = await readJsonArtifact(result.raw_observations_path);
   const funnel = JSON.parse(await fs.readFile(result.source_funnel_path, "utf8"));
   const admissionContract = await loadSignalAdmissionContract({ rootDir });
 
@@ -874,8 +876,8 @@ test("curated source shadow persists repo-safe raw and 186/24/24 funnel receipts
     })
   ]);
   const [forwardRaw, reverseRaw] = await Promise.all([
-    fs.readFile(forwardResult.raw_observations_path, "utf8").then(JSON.parse),
-    fs.readFile(reverseResult.raw_observations_path, "utf8").then(JSON.parse)
+    readJsonArtifact(forwardResult.raw_observations_path),
+    readJsonArtifact(reverseResult.raw_observations_path)
   ]);
   assert.deepEqual(forwardRaw.observations, reverseRaw.observations, "duplicate provenance selection must be input-order independent");
   const deterministicGithubRaw = forwardRaw.observations.find((item) => item.observation_id === githubCandidate.observation_id);
@@ -1154,7 +1156,8 @@ test("curated source shadow persists repo-safe raw and 186/24/24 funnel receipts
     inputDir: "reports-data",
     outputDir: "reports-data"
   });
-  const persistedPool = JSON.parse(await fs.readFile(poolResult.signal_pool_path, "utf8"));
+  assert.match(poolResult.signal_pool_path, /\.json\.gz$/);
+  const persistedPool = await readJsonArtifact(poolResult.signal_pool_path);
   const persistedPublicPool = JSON.parse(await fs.readFile(poolResult.public_signal_pool_path, "utf8"));
   assert.equal(JSON.stringify(persistedPool), JSON.stringify(built.signalPool));
   assert.equal(JSON.stringify(persistedPublicPool), JSON.stringify(built.publicSignalPool));
@@ -1236,7 +1239,7 @@ test("curated source shadow persists repo-safe raw and 186/24/24 funnel receipts
     inputDir: "reports-data",
     outputDir: "reports-data"
   });
-  const nextPool = JSON.parse(await fs.readFile(nextPoolResult.signal_pool_path, "utf8"));
+  const nextPool = await readJsonArtifact(nextPoolResult.signal_pool_path);
   const repeatedAdmissions = nextPool.admission_receipts.filter((item) => (
     expectedAdmission.expected_by_observation_id[item.observation_id]?.disposition === "admitted"
   ));
@@ -1244,7 +1247,7 @@ test("curated source shadow persists repo-safe raw and 186/24/24 funnel receipts
   assert(repeatedAdmissions.every((item) => item.reason_code === "duplicate_no_new_state"));
 
   const [nextRaw, nextFunnel] = await Promise.all([
-    fs.readFile(nextSourceResult.raw_observations_path, "utf8").then(JSON.parse),
+    readJsonArtifact(nextSourceResult.raw_observations_path),
     fs.readFile(nextSourceResult.source_funnel_path, "utf8").then(JSON.parse)
   ]);
   const changedRaw = structuredClone(nextRaw);
@@ -1268,7 +1271,7 @@ test("curated source shadow persists repo-safe raw and 186/24/24 funnel receipts
     "a changed content hash on an existing canonical URL is a new state"
   );
   await Promise.all([
-    fs.writeFile(nextPoolResult.signal_pool_path, `${JSON.stringify(changedPool.signalPool, null, 2)}\n`, "utf8"),
+    fs.writeFile(nextPoolResult.signal_pool_path, encodeJsonArtifact(changedPool.signalPool, nextPoolResult.signal_pool_path)),
     fs.writeFile(nextPoolResult.public_signal_pool_path, `${JSON.stringify(changedPool.publicSignalPool, null, 2)}\n`, "utf8")
   ]);
   const reboundState = await loadPriorSignalState({ rootDir, reportDate: "2026-07-18" });

@@ -3,7 +3,7 @@ import { findPlainLanguageIssues } from "./plain-language.js";
 import { collectCandidateCoverageIssues } from "./candidates.js";
 import { collectMainAuditConsistencyIssues } from "./main-audit-consistency.js";
 
-const PUBLIC_COPY_BANNED_TERMS = [
+export const PUBLIC_COPY_BANNED_TERMS = [
   "披露",
   "准入门槛",
   "候选池",

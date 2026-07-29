@@ -50,7 +50,7 @@ signals_write
   -> signals_publish_real
 ```
 
-- [ ] `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json` 存在且 schema/lineage 有效。
+- [ ] `reports-data/occurrences/YYYY/MM/YYYY-MM-DD.json.gz` 存在且 schema/lineage 有效。
 - [ ] `docs/signals/index.json` 与分页 union、计数一致。
 - [ ] tag/filter 未改变 signal membership 或默认时序。
 - [ ] legacy admit/quality/candidate rules 没有成为 signal ancestor 或发布前提。
