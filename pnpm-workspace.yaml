@@ -1,6 +1,9 @@
 packages:
   - "apps/*"
   - "packages/*"
+minimumReleaseAge: 10080
+blockExoticSubdeps: true
+trustPolicy: no-downgrade
 minimumReleaseAgeExclude:
   - '@astryxdesign/core@0.1.4'
   - '@astryxdesign/theme-neutral@0.1.4'
